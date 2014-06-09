@@ -95,16 +95,31 @@ tcheck (EApp e1 e2) i =
         _                                   -> Nothing
 tcheck (ETLam f) i =   
   do t <- tcheck (f i) (i+1)
-     return (Typ (Forall (\x -> subst i (Typ (Var x)) t))) 
+     return (Typ (Forall (\x -> substSigma i (Typ (Var x)) t))) 
 tcheck (ETApp e o) i = 
   do t <- tcheck e i
      case t of
-        Typ (Forall f) -> Just (subst i o (f i)) 
+        Typ (Forall f) -> Just (substSigma i o (f i)) 
         otherwise -> Nothing
 tcheck (EAnd e1 e2) i = 
   do t1 <- tcheck e1 i
      t2 <- tcheck e2 i
      return (And t1 t2)
+     
+{-     
+data PTyp a = Var a | Forall (a -> PSigma a) | Fun (PSigma a) (PSigma a) | PInt 
 
-subst :: Int -> PSigma Int -> PSigma Int -> PSigma Int
-subst = error "TODO!"
+data PSigma a = And (PSigma a) (PSigma a) | Typ (PTyp a)
+-}
+
+substSigma :: Int -> PSigma Int -> PSigma Int -> PSigma Int
+substSigma i t (And o1 o2) = And (substSigma i t o1) (substSigma i t o2)
+substSigma i t (Typ (Var x)) 
+  | x == i = t
+  | otherwise = Typ (Var x)
+substSigma i t (Typ (Forall g)) = Typ (Forall (substSigma i t . g))
+substSigma i t (Typ (Fun o1 o2)) = Typ (Fun (substSigma i t o1) (substSigma i t o2))
+substSigma i t (Typ PInt) = Typ PInt 
+
+-- substTyp :: Int -> PSigma Int -> PTyp Int -> P Int
+--substTyp i o (Var x) | i == x 
