@@ -1,4 +1,4 @@
-{-# LANGUAGE FlexibleInstances, RecordWildCards #-}
+{-# LANGUAGE FlexibleInstances #-}
 {-# OPTIONS_GHC -fwarn-incomplete-patterns #-}
 module Pretty where
 
@@ -16,53 +16,53 @@ prettyPrintPSigma = prettyPrint
 prettyPrintPExp :: PExp Int Int -> String
 prettyPrintPExp = prettyPrint
 
-precApp :: Int
-precApp = 1
-
-precFun :: Int
-precFun = 2
-
 parenPrec :: Int -> Int -> Doc -> Doc
 parenPrec inheritedPrec currentPrec t
     | inheritedPrec <= 0          = t
     | inheritedPrec < currentPrec = parens t
     | otherwise                   = t
 
-data L = L
-    { lx :: Int  -- fresh label for variables
-    , la :: Int  -- fresh label for type variables
-    } deriving (Eq, Show)
-
 class Pretty a where
     pretty :: a -> Doc
-    pretty = prettyPrec 0 L{ lx = 0, la = 0 }
+    pretty = prettyPrec 0 (0, 0)
   
-    prettyPrec :: Int -> L -> a -> Doc
+    prettyPrec :: Int -> (Int, Int) -> a -> Doc
     prettyPrec _ _ = pretty
 
-alpha :: Int -> String
-alpha n
-    | n < 0     = error "alpha called with n < 0"
+uident :: Int -> String
+uident n
+    | n < 0     = error "`lident` called with n < 0"
+    | n < 26    = [chr (ord 'A' + n)]
+    | otherwise = "A" ++ show (n - 25)
+
+lident :: Int -> String
+lident n
+    | n < 0     = error "`uident` called with n < 0"
     | n < 26    = [chr (ord 'a' + n)]
-    | otherwise = "a" ++ show (n - 26)
+    | otherwise = "a" ++ show (n - 25)
 
 instance Pretty (PTyp Int) where
-    prettyPrec p L{..} (Var a)     = text (alpha a)
-    prettyPrec p L{..} (Forall f)  = text ("forall " ++ alpha la ++ ".") <+> prettyPrec p L{ la = la + 1, .. } (f la)
-    prettyPrec p L{..} (Fun t1 t2) = parenPrec p precFun $ prettyPrec (precFun - 1) L{..} t1 <+> text "->" <+> prettyPrec p L{..} t2
-    prettyPrec p L{..} PInt        = text "Int"
+    prettyPrec p l@(luident, llident) t = 
+        case t of
+            Var a     -> text (uident a)
+            Forall f  -> text ("forall " ++ uident luident ++ ".") <+> prettyPrec p (luident+1, llident) (f luident)
+            Fun t1 t2 -> parenPrec p 3 $ prettyPrec 2 l t1 <+> text "->" <+> prettyPrec 3 l t2
+            PInt      -> text "Int"
 
 instance Pretty (PSigma Int) where
-    prettyPrec p L{..} (And s1 s2) = prettyPrec p L{..} s1 <+> text "&" <+> prettyPrec p L{..} s2
-    prettyPrec p L{..} (Typ t)     = prettyPrec p L{..} t
+    prettyPrec p l o = 
+        case o of 
+            And o1 o2 -> parenPrec p 4 $ prettyPrec p l o1 <+> text "&" <+> prettyPrec 3 l o2
+            Typ t     -> prettyPrec p l t
 
 instance Pretty (PExp Int Int) where
-    prettyPrec p L{..} (EVar x)     = text (alpha x)
-    prettyPrec p L{..} (ELam t f)   = char '\\' <> 
-                                                parens (text (alpha lx) <+> colon <+> prettyPrec p L{ lx = lx + 1, .. } t) <> 
-                                                char '.' <+> 
-                                                prettyPrec p L{ lx = lx + 1, .. } (f lx)
-    prettyPrec p L{..} (ETLam f)    = text "/\\" <> text (alpha la) <> char '.' <+> prettyPrec p L{ la = la + 1, .. } (f la)
-    prettyPrec p L{..} (ETApp e t)  = prettyPrec p L{..} e <+> prettyPrec p L{..} t
-    prettyPrec p L{..} (EApp e1 e2) = prettyPrec precApp L{..} e1 <+> prettyPrec precApp L{..} e2 
-    prettyPrec p L{..} (EAnd e1 e2) = prettyPrec precApp L{..} e1 <+> text "&" <+> prettyPrec precApp L{..} e2 
+    prettyPrec p l@(luident, llident) e =
+        case e of
+            EVar x     -> text (lident x)
+            ETLam f    -> parenPrec p 3 $ text ("/\\" ++ uident luident ++ ".") <+> prettyPrec 0 (luident+1, llident) (f luident)
+            ELam o f   -> parenPrec p 3 $ 
+                            text ("\\(" ++ lident llident ++ " : " ++ show (prettyPrec p (luident, llident+1) o) ++ ").")
+                            <+> prettyPrec 0 (luident, llident+1) (f llident)
+            ETApp e1 t -> parenPrec p 2 $ prettyPrec 2 l e1 <+> prettyPrec 1 l t
+            EApp e1 e2 -> parenPrec p 2 $ prettyPrec 2 l e1 <+> prettyPrec 1 l e2 
+            EAnd e1 e2 -> parenPrec p 3 $ prettyPrec 3 l e1 <+> text ",," <+> prettyPrec 3 l e2 
