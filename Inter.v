@@ -30,6 +30,7 @@ subSigma2 (Typ t1)    t2 i = subTyp t1 t2 i
 
 Require Import Arith.
 Require Import Arith.MinMax.
+Require Import Setoid.
 
 Check eq_nat_dec.
 
@@ -89,3 +90,14 @@ Fixpoint subTyp (n : nat) (t1 : PTyp nat) (t2 : PTyp nat) (i : nat) : Prop  :=
             | (_,_) => False
           end
   end.
+
+Lemma implements : forall t1 t2 n i, subTyp (size t1 n) t1 t2 i -> sub i t1 t2.
+Proof.
+induction t1; intros.
+simpl in H.
+destruct t2; try destruct H. 
+destruct (eq_nat_dec a n0).
+rewrite e.
+apply SVar. reflexivity.
+destruct H.
+destruct t2; try destruct H.
