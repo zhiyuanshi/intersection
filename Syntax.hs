@@ -1,6 +1,6 @@
 {-# OPTIONS_GHC -fwarn-incomplete-patterns #-}
 {-# LANGUAGE FlexibleInstances, RecordWildCards #-}
-module IntersectionSubtyping where
+module Syntax where
 
 import Text.PrettyPrint
 
