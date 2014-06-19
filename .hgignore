@@ -1,0 +1,12 @@
+syntax: glob
+systemf/.cache
+systemf/.classpath
+systemf/.project
+Lexer.hs
+Parser.hs
+Parser.info
+dist/
+*.class
+*.info
+*.swp
+*~
