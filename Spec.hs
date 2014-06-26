@@ -65,11 +65,22 @@ main = hspec $ do
         it "Int <: Int & Int" $ sub int intnint
         it "Int & Int <: Int" $ sub intnint int
         it "Int & Int <: Int & Int" $ sub intnint intnint
+        it "Int -> Int <: Int -> Int" $ sub (Typ int2int) (Typ int2int)
+        it "Int </: Int -> Int" $ not $ sub int (Typ int2int)
+        it "Int -> Int </: Int" $ not $ sub (Typ int2int) int 
         it "forall A. Int & Int <: forall A. Int & Int" $ sub (forall (\_ -> intnint)) (forall (\_ -> intnint))
         it "forall A. A <: forall A. A" $ sub (forall (\a -> var a)) (forall (\a -> var a))
+        it "forall A. Int </: forall A. A" $ not $ sub (forall (\_ -> int)) (forall (\a -> var a))
+        it "forall A. A </: forall A. Int" $ not $ sub (forall (\a -> var a)) (forall (\_ -> int))
 
         it "forall A. Int & A <: forall A. A & Int" $ 
             sub (forall (\a -> int .&&. var a)) (forall (\a -> var a .&&. int))
 
         it "forall A. forall B. A & B <: forall A. forall B. B & A" $ 
             sub (forall (\a -> forall (\b -> var a .&&. var b))) (forall (\a -> forall (\b -> var b .&&. var a)))
+
+        it "forall A. forall B. A & B <: forall A. forall B. A" $ 
+            sub (forall (\a -> forall (\b -> var a .&&. var b))) (forall (\a -> forall (\_ -> var a)))
+
+        it "forall A. forall B. A </: forall A. forall B. A & B" $ 
+            not $ sub (forall (\a -> forall (\_ -> var a))) (forall (\a -> forall (\b -> var a .&&. var b)))
