@@ -5,70 +5,68 @@ import Test.Hspec
 import Syntax
 import Pretty
 
--- Int & Int
-t1 = And (Typ PInt) (Typ PInt)
+int = Typ PInt
 
--- Int
-t2 = Typ PInt
+int2int = Fun int int
 
--- Int & (Int -> Int)
-t3 = And (Typ PInt) t4
-
--- Int -> Int
-t4 = Typ (Fun (Typ PInt) (Typ PInt))
-
--- forall a . a -> a 
-t5 = Typ (Forall (\a -> Typ (Fun (Typ (Var a)) (Typ (Var a)))))
-
--- forall a . Int & a -> a
-t6 = Typ (Forall (\a -> Typ (Fun (And (Typ PInt) (Typ (Var a))) (Typ (Var a)))))
-
--- (Int -> Int) & Int
-t7 = And t4 (Typ PInt)
+intnint = And int int
 
 main :: IO ()
 main = hspec $ do
-    describe "alpha" $ do
-        it "n = 0" $
-            alpha 0 `shouldBe` "a"
-        it "n = 1" $
-            alpha 1 `shouldBe` "b"
-        it "n = 25" $
-            alpha 25 `shouldBe` "z"
-        it "n = 26" $
-            alpha 26 `shouldBe` "a0"
-    
+    describe "tvar" $ do
+        it "n = 0"  $ tvar 0 `shouldBe` "A"
+        it "n = 1"  $ tvar 1 `shouldBe` "B"
+        it "n = 25" $ tvar 25 `shouldBe` "Z"
+        it "n = 26" $ tvar 26 `shouldBe` "A1"
+
+    describe "var" $ do
+        it "n = 0"  $ var 0 `shouldBe` "a"
+        it "n = 1"  $ var 1 `shouldBe` "b"
+        it "n = 25" $ var 25 `shouldBe` "z"
+        it "n = 26" $ var 26 `shouldBe` "a1"
+
     describe "pretty print types" $ do
-        it "forall a. a" $
-            prettyPrintPSigma (Typ (Forall (\a -> Typ (Var a)))) `shouldBe` "forall a. a"
-        it "forall a. forall b. a -> b -> a" $
+        it "Int -> Int" $ prettyPrintPSigma (Typ int2int) `shouldBe` "Int -> Int"
+
+        it "forall A. A" $ prettyPrintPSigma (Typ (Forall (\a -> Typ (Var a)))) `shouldBe` "forall A. A"
+
+        it "forall A. forall B. A -> B -> A" $
             prettyPrintPSigma (Typ (Forall (\a -> Typ (Forall (\b -> 
                                 Typ (Fun (Typ (Var a)) (Typ (Fun (Typ (Var b)) (Typ (Var a))))))))))
-                `shouldBe` "forall a. forall b. a -> b -> a"
-        it "forall a. forall b. (a -> b) -> a" $
+            `shouldBe` "forall A. forall B. A -> B -> A"
+
+        it "forall A. forall B. (A -> B) -> A" $
             prettyPrintPSigma (Typ (Forall (\a -> Typ (Forall (\b -> 
                                 Typ (Fun (Typ (Fun (Typ (Var a)) (Typ (Var b)))) (Typ (Var a))))))))
-                `shouldBe` "forall a. forall b. (a -> b) -> a"
-        it "Int" $
-            prettyPrintPSigma (Typ PInt) `shouldBe` "Int"
+            `shouldBe` "forall A. forall B. (A -> B) -> A"
 
-        it "Int & Int" $
-            prettyPrintPSigma t1 `shouldBe` "Int & Int"
+    describe "Right associativity of ->" $ do
+        it "Int -> Int -> Int"   $ 
+            prettyPrintPSigma (Typ (Fun int (Typ int2int))) 
+            `shouldBe` "Int -> Int -> Int"
 
-        it "Int" $
-            prettyPrintPSigma t2 `shouldBe` "Int"
+        it "(Int -> Int) -> Int" $ 
+            prettyPrintPSigma (Typ (Fun (Typ int2int) int)) 
+            `shouldBe` "(Int -> Int) -> Int"
 
-        it "Int & (Int -> Int)" $
-            prettyPrintPSigma t3 `shouldBe` "Int & (Int -> Int)"
+    describe "Left associativity of &" $ do
+        it "Int & Int & Int"   $ 
+            prettyPrintPSigma (And intnint int) `shouldBe` "Int & Int & Int"
 
-        it "Int -> Int" $
-            prettyPrintPSigma t4 `shouldBe` "Int -> Int"
+        it "Int & (Int & Int)" $ 
+            prettyPrintPSigma (And int intnint) `shouldBe` "Int & (Int & Int)"
 
-        it "(Int -> Int) & Int" $
-            prettyPrintPSigma t7 `shouldBe` "(Int -> Int) & Int"
+    describe "-> has higher precedence than &" $ do
+        it "Int & Int -> Int"   $ prettyPrintPSigma (And int (Typ int2int)) `shouldBe` "Int & Int -> Int"
 
-        it "Int & Int & Int" $
-            prettyPrintPSigma (And (And (Typ PInt) (Typ PInt)) (Typ PInt)) `shouldBe` "Int & Int & Int"
+        it "(Int & Int) -> Int" $ prettyPrintPSigma (Typ (Fun intnint int)) `shouldBe` "(Int & Int) -> Int" 
 
-        it "Int & (Int & Int)" $
-            prettyPrintPSigma (And (Typ PInt) (And (Typ PInt) (Typ PInt))) `shouldBe` "Int & (Int & Int)"
+        it "Int -> (Int & Int)" $ prettyPrintPSigma (Typ (Fun int intnint)) `shouldBe` "Int -> (Int & Int)"
+
+        it "Int -> Int & Int"   $ prettyPrintPSigma (And (Typ int2int) int) `shouldBe` "Int -> Int & Int"
+
+        it "Int -> Int & Int -> Int" $ 
+            prettyPrintPSigma (And (Typ int2int) (Typ int2int)) `shouldBe` "Int -> Int & Int -> Int"
+
+        it "(Int & Int) -> (Int & Int)" $ 
+            prettyPrintPSigma (Typ (Fun intnint intnint)) `shouldBe` "(Int & Int) -> (Int & Int)"
