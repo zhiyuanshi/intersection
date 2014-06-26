@@ -29,23 +29,23 @@ class Pretty a where
     prettyPrec :: Int -> (Int, Int) -> a -> Doc
     prettyPrec _ _ = pretty
 
-tvar :: Int -> String
-tvar n
-    | n < 0     = error "`var` called with n < 0"
+uident :: Int -> String
+uident n
+    | n < 0     = error "`lident` called with n < 0"
     | n < 26    = [chr (ord 'A' + n)]
     | otherwise = "A" ++ show (n - 25)
 
-var :: Int -> String
-var n
-    | n < 0     = error "`tvar` called with n < 0"
+lident :: Int -> String
+lident n
+    | n < 0     = error "`uident` called with n < 0"
     | n < 26    = [chr (ord 'a' + n)]
     | otherwise = "a" ++ show (n - 25)
 
 instance Pretty (PTyp Int) where
-    prettyPrec p l@(ltvar, lvar) t = 
+    prettyPrec p l@(luident, llident) t = 
         case t of
-            Var a     -> text (tvar a)
-            Forall f  -> text ("forall " ++ tvar ltvar ++ ".") <+> prettyPrec p (ltvar+1, lvar) (f ltvar)
+            Var a     -> text (uident a)
+            Forall f  -> text ("forall " ++ uident luident ++ ".") <+> prettyPrec p (luident+1, llident) (f luident)
             Fun t1 t2 -> parenPrec p 3 $ prettyPrec 2 l t1 <+> text "->" <+> prettyPrec 3 l t2
             PInt      -> text "Int"
 
@@ -56,13 +56,13 @@ instance Pretty (PSigma Int) where
             Typ t     -> prettyPrec p l t
 
 instance Pretty (PExp Int Int) where
-    prettyPrec p l@(ltvar, lvar) e =
+    prettyPrec p l@(luident, llident) e =
         case e of
-            EVar x     -> text (var x)
-            ETLam f    -> parenPrec p 3 $ text ("/\\" ++ tvar ltvar ++ ".") <+> prettyPrec 0 (ltvar+1, lvar) (f ltvar)
+            EVar x     -> text (lident x)
+            ETLam f    -> parenPrec p 3 $ text ("/\\" ++ uident luident ++ ".") <+> prettyPrec 0 (luident+1, llident) (f luident)
             ELam o f   -> parenPrec p 3 $ 
-                            text ("\\(" ++ var lvar ++ " : " ++ show (prettyPrec p (ltvar, lvar+1) o) ++ ").")
-                            <+> prettyPrec 0 (ltvar, lvar+1) (f lvar)
+                            text ("\\(" ++ lident llident ++ " : " ++ show (prettyPrec p (luident, llident+1) o) ++ ").")
+                            <+> prettyPrec 0 (luident, llident+1) (f llident)
             ETApp e1 t -> parenPrec p 2 $ prettyPrec 2 l e1 <+> prettyPrec 1 l t
             EApp e1 e2 -> parenPrec p 2 $ prettyPrec 2 l e1 <+> prettyPrec 1 l e2 
             EAnd e1 e2 -> parenPrec p 3 $ prettyPrec 3 l e1 <+> text ",," <+> prettyPrec 3 l e2 
