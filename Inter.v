@@ -12,6 +12,36 @@ Inductive PTyp A :=
   | And : PTyp A -> PTyp A -> PTyp A.
 
 (*
+
+----------
+|t1 <: t2|
+----------
+
+a <: a                             Sub-Var
+
+           t1 <: t2
+------------------------------     Sub-Forall
+forall a . t1 <: forall a . t2
+
+t3 <: t1     t2 <: t4
+---------------------              Sub-Arrow
+t1 -> t2 <: t3 -> t4
+
+t <: t1   t <: t2
+-----------------                  Sub-&1
+t <: t1 & t2
+
+t1 <: t
+------------                       Sub-&2
+t1 & t2 <: t
+
+t2 <: t
+------------                       Sub-&3
+t1 & t2 <: t
+
+*)
+		    
+(*
 subTyp :: PTyp Int -> PTyp Int -> Int -> Bool
 subTyp PInt    PInt             _ = True
 subTyp (Var x) (Var y)          _ = x == y
