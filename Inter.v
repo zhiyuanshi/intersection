@@ -1,10 +1,10 @@
 (*
-data PTyp a = Var a | Forall (a -> PSigma a) | Fun (PSigma a) (PSigma a) | PInt 
+data PTyp a = Var a | Forall (a -> PSigma a) | Fun (PSigma a) (PSigma a) | PInt
 
 data PSigma a = And (PSigma a) (PSigma a) | Typ (PTyp a)
 *)
 
-Inductive PTyp A := 
+Inductive PTyp A :=
   | Var : A -> PTyp A
   | PInt : PTyp A
   | Forall : (A -> PTyp A) -> PTyp A
@@ -40,17 +40,17 @@ t2 <: t
 t1 & t2 <: t
 
 *)
-		    
+
 (*
 subTyp :: PTyp Int -> PTyp Int -> Int -> Bool
 subTyp PInt    PInt             _ = True
 subTyp (Var x) (Var y)          _ = x == y
 subTyp (Forall f) (Forall g)    i = subSigma (f i) (g i) (i+1)
-subTyp (Fun o1 o2) (Fun o3 o4)  i = subSigma o3 o1 i && subSigma o2 o4 i 
+subTyp (Fun o1 o2) (Fun o3 o4)  i = subSigma o3 o1 i && subSigma o2 o4 i
 subTyp _           _            _ = False
 
 subSigma :: PSigma Int -> PSigma Int -> Int -> Bool
-subSigma o (And o1 o2) i = subSigma o o1 i && subSigma o o2 i 
+subSigma o (And o1 o2) i = subSigma o o1 i && subSigma o o2 i
 subSigma o (Typ t)     i = subSigma2 o t i
 
 subSigma2 :: PSigma Int -> PTyp Int -> Int -> Bool
@@ -108,10 +108,10 @@ Defined.
 (* A functional definition : algorithm *)
 
 Fixpoint subTyp (n : nat) (t1 : PTyp nat) (t2 : PTyp nat) (i : nat) : Prop  :=
-  match n with 
+  match n with
       | 0 => False
       | S m =>
-          match (t1,t2) with 
+          match (t1,t2) with
             | (PInt,PInt) => True
             | (Var x, Var y) => if (eq_nat_dec x y) then True else False
             | (Forall f, Forall g) => subTyp m (f i) (g i) (i+1)
@@ -125,7 +125,7 @@ Lemma implements : forall t1 t2 n i, subTyp (size t1 n) t1 t2 i -> sub i t1 t2.
 Proof.
 induction t1; intros.
 simpl in H.
-destruct t2; try destruct H. 
+destruct t2; try destruct H.
 destruct (eq_nat_dec a n0).
 rewrite e.
 apply SVar. reflexivity.

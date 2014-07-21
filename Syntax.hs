@@ -4,21 +4,21 @@ module Syntax where
 -- Syntax:
 
 -- t ::= a | forall a . o | o1 -> o2 | Int
--- o ::= o1 & o2 | t 
+-- o ::= o1 & o2 | t
 
-data PTyp a = Var a | Forall (a -> PSigma a) | Fun (PSigma a) (PSigma a) | PInt 
+data PTyp a = Var a | Forall (a -> PSigma a) | Fun (PSigma a) (PSigma a) | PInt
 
 data PSigma a = And (PSigma a) (PSigma a) | Typ (PTyp a)
 
 -- e ::= x | \(x : o) . e | e1 e2 | /\a . e | e t | e1 & e2
 
-data PExp t e = 
-    EVar e 
-  | ELam (PSigma t) (e -> PExp t e) 
-  | EApp (PExp t e) (PExp t e) 
+data PExp t e =
+    EVar e
+  | ELam (PSigma t) (e -> PExp t e)
+  | EApp (PExp t e) (PExp t e)
   | ETLam (t -> PExp t e)
   | ETApp (PExp t e) (PSigma t)
-  | EAnd (PExp t e) (PExp t e)  
+  | EAnd (PExp t e) (PExp t e)
 
 {- Subtyping Relation:
 
@@ -69,11 +69,11 @@ subTyp :: PTyp Int -> PTyp Int -> Int -> Bool
 subTyp PInt    PInt            _ = True
 subTyp (Var x) (Var y)         _ = x == y
 subTyp (Forall f) (Forall g)   i = subSigma (f i) (g i) (i+1)
-subTyp (Fun o1 o2) (Fun o3 o4) i = subSigma o3 o1 i && subSigma o2 o4 i 
+subTyp (Fun o1 o2) (Fun o3 o4) i = subSigma o3 o1 i && subSigma o2 o4 i
 subTyp _           _           _ = False
 
 subSigma :: PSigma Int -> PSigma Int -> Int -> Bool
-subSigma o (And o1 o2) i = subSigma o o1 i && subSigma o o2 i 
+subSigma o (And o1 o2) i = subSigma o o1 i && subSigma o o2 i
 subSigma o (Typ t)     i = subSigma2 o t i
 
 subSigma2 :: PSigma Int -> PTyp Int -> Int -> Bool
@@ -85,42 +85,42 @@ sub o1 o2 = subSigma o1 o2 0
 
 tcheck :: PExp Int (PSigma Int) -> Int -> Maybe (PSigma Int)
 
-tcheck (EVar t)    _  = Just t 
+tcheck (EVar t)    _  = Just t
 
-tcheck (ELam s f)  i  = 
+tcheck (ELam s f)  i  =
     do tbody <- tcheck (f s) i
        return (Typ (Fun s tbody))
 
-tcheck (EApp e1 e2) i = 
+tcheck (EApp e1 e2) i =
     do t1 <- tcheck e1 i
        t2 <- tcheck e2 i
-       case t1 of 
-         Typ (Fun t3 t4) | subSigma t2 t3 i -> Just t4 
+       case t1 of
+         Typ (Fun t3 t4) | subSigma t2 t3 i -> Just t4
          _                                  -> Nothing
 
-tcheck (ETLam f) i = 
+tcheck (ETLam f) i =
     do t <- tcheck (f i) (i+1)
-       return (Typ (Forall (\a -> substSigma i (Typ (Var a)) t))) 
+       return (Typ (Forall (\a -> substSigma i (Typ (Var a)) t)))
 
-tcheck (ETApp e o) i = 
+tcheck (ETApp e o) i =
     do t <- tcheck e i
        case t of
-         Typ (Forall f) -> Just (substSigma i o (f i)) 
+         Typ (Forall f) -> Just (substSigma i o (f i))
          _              -> Nothing
 
-tcheck (EAnd e1 e2) i = 
+tcheck (EAnd e1 e2) i =
     do t1 <- tcheck e1 i
        t2 <- tcheck e2 i
        return (And t1 t2)
-     
+
 substSigma :: Int -> PSigma Int -> PSigma Int -> PSigma Int
 substSigma i t (And o1 o2) = And (substSigma i t o1) (substSigma i t o2)
-substSigma i t (Typ (Var x)) 
+substSigma i t (Typ (Var x))
     | x == i    = t
     | otherwise = Typ (Var x)
 substSigma i t (Typ (Forall g)) = Typ (Forall (substSigma i t . g))
 substSigma i t (Typ (Fun o1 o2)) = Typ (Fun (substSigma i t o1) (substSigma i t o2))
-substSigma _i _t (Typ PInt) = Typ PInt 
+substSigma _i _t (Typ PInt) = Typ PInt
 
 substExp :: Int -> PExp Int (PSigma Int) -> PExp Int (PSigma Int) -> PExp Int (PSigma Int)
 substExp i e (EVar (Typ (Var x)))
@@ -134,4 +134,4 @@ substExp i e (ETApp e1 o) = ETApp (substExp i e e1) o
 substExp i e (EAnd e1 e2) = EAnd (substExp i e e1) (substExp i e e2)
 
 -- substTyp :: Int -> PSigma Int -> PTyp Int -> P Int
---substTyp i o (Var x) | i == x 
+--substTyp i o (Var x) | i == x
