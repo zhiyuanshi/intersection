@@ -108,6 +108,24 @@ apply SAnd3.
 apply IHt1_2.
 Defined.
 
+(*
+Inductive Shape : nat -> PTyp nat -> PTyp nat -> Prop :=
+  | ShEqual : forall i t, Shape i t t
+  | ShAnd1 : forall i t t1 t2, Shape i t t1 -> Shape i t t2 -> Shape i t (And nat t1 t2)
+  | ShAnd2 : forall i t t1 t2, Shape i t1 t -> Shape i (And nat t1 t2) t
+  | ShAnd3 : forall i t t1 t2, Shape i t2 t -> Shape i (And nat t1 t2) t.
+
+Lemma shapeSub : forall t1 i t2 (s : sub i t1 t2), Shape i t1 t2.
+Proof.
+intros.
+induction s.
+(* Case Var *)
+apply ShEqual.
+apply ShEqual.
+apply ShEqual.
+apply ShAnd1.
+*)
+
 Lemma invAndS1 : forall t t1 t2 i, sub i t (And nat t1 t2) -> sub i t t1 /\ sub i t t2. 
 Proof.
 induction t; intros.
@@ -199,6 +217,13 @@ left.
 apply SAnd1.
 exact H2.
 exact H3.
+assert (sub i t0 t2 \/ sub i t3 t2).
+apply IHt2.
+exact H1.
+assert (sub i t0 t1 \/ sub i t3 t1).
+apply IHt1.
+exact H0.
+left.
 admit.
 destruct H3.
 admit.
@@ -227,111 +252,220 @@ exact H4.
 Defined.
 *)
 
+(*
+Lemma trans : forall t1 t2 i (s : sub i t1 t2) t3, sub i t2 t3 -> sub i t1 t3.
+induction t1; intros.
+(* Case Var *)
+induction H.
+exact s.
+exact s.
+inversion s.
+inversion s.
+apply SAnd1.
+apply IHsub1.
+exact s.
+apply IHsub2.
+apply s.
+inversion s.
+apply IHsub.
+apply H4.
+inversion s.
+apply IHsub.
+exact H5.
+(* Case Int *)
+induction H.
+exact s.
+exact s.
+inversion s.
+inversion s.
+admit.
+admit.
+admit.
+(* Case Forall *)
+inversion H0.
+rewrite <- H2 in s.
+inversion s.
+rewrite <- H2 in s.
+inversion s.
+rewrite <- H3 in s.
+apply SForall.
+inversion s.
+apply (H _ _ _ H8 _ H1).
+rewrite <- H4 in s; inversion s.
+admit.
+rewrite <- H3 in s; inversion s.
+admit.
+admit.
+(* Case SAnd *)
+inversion H.
+rewrite <- H1 in s; inversion s.
+rewrite <- H1 in s; inversion s.
+rewrite <- H2 in s; inversion s.
+apply SFun.
+
+
+intro. intro. intro. intro.
+induction s; intros.
+(* Case PInt *)
+induction H.
+apply SInt.
+apply SVar.
+apply SForall.
+apply IHsub.
+apply SFun.
+apply IHsub1.
+apply IHsub2.
+apply SAnd1.
+apply IHsub1.
+apply IHsub2.
+apply SAnd2.
+apply IHsub.
+apply SAnd3.
+apply IHsub.
+
+exact H0.
+exact H0.
+inversion H0.
+inversion H0.
+inversion H0.
+apply IHsub1.
+exact H6.
+apply IHsub2.
+exact H6.
+apply SAnd2.
+apply IHsub.
+exact H0.
+apply (SAnd3 _ _ _ _ (IHsub H0)).
+admit.
+(* Case Forall *)
+admit.
+(* Case Fun *)
+induction H.
+inversion H0.
+inversion H0.
+inversion H0.
+apply SFun.
+inversion H0.
+*)
+
+Lemma funnyLemma : forall t1 i t3 (s : sub i t1 t3) t2, (forall t, sub i t2 t -> sub i t3 t) -> sub i t1 t2.
+intro. intro. intro. intro.
+induction s; intros.
+(* Case PInt *)
+apply H.
+apply reflex.
+(* Case Var *)
+apply H.
+apply reflex.
+(* Case Forall *)
+assert (sub i (Forall nat g) t2).
+apply H.
+apply reflex.
+
+
+(* Case Fun *)
+assert (sub i (Fun nat o3 o4) t2).
+apply H.
+apply reflex.
+induction t2; try (inversion H0).
+apply SFun.
+admit.
+apply IHs2.
+intros.
+
+Defined.
 
 Lemma trans : forall t1 t2 i (s : sub i t1 t2) t3, sub i t2 t3 -> sub i t1 t3.
 intro. intro. intro. intro.
 induction s; intros.
+(* Case Var *)
 apply H.
+(* Case PInt *)
 apply H.
-inversion H.
+(* Case Forall *)
+induction t3; try (inversion H).
 apply SForall.
 apply IHs.
-apply H2.
-admit.
-inversion H.
+apply H4.
+apply SAnd1.
+apply IHt3_1.
+exact H4.
+apply IHt3_2.
+exact H5.
+(* Case Fun *)
+induction t3; try (inversion H).
 apply SFun.
-admit.
+apply (funnyLemma _ _ _ _ H4 IHs1). 
+apply IHs2.
+exact H6.
+apply SAnd1.
+apply IHt3_1.
+exact H4.
+apply IHt3_2.
+exact H5.
+(* Case SAnd *)
+(* refactor out *)
+induction t3.
+inversion H.
+apply IHs1.
+exact H4.
+apply IHs2.
+exact H4.
+inversion H.
+apply IHs1.
+exact H4.
+apply IHs2.
+exact H4.
+inversion H.
+apply IHs1.
+exact H5.
 apply IHs2.
 exact H5.
-apply SAnd1.
-
-induction t1; intros.
-(* Case Var *)
 inversion H.
-rewrite <- H2 in H0. 
-rewrite <- H2 in H. 
-inversion H0.
-apply H.
-rewrite <- H8 in H0.
-apply H0.
-rewrite <- H5 in H0.
-rewrite <- H5 in H.
-
-induction t2; intros.
-(* Case Var *)
-inversion H0.
+apply IHs1.
+exact H4.
+apply IHs2.
+exact H4.
+assert (sub i (And nat t1 t2) t3_1 /\ sub i (And nat t1 t2) t3_2).
+apply invAndS1.
 exact H.
-rewrite <- H5 in H0.
-inversion H.
-rewrite H9 in H7.
-rewrite <- H7 in H. 
-apply H0.
-rewrite <- H8 in H.
-
-(*
-
-inversion H0.
-apply SAnd2.
+destruct H0.
+apply SAnd1.
+apply IHt3_1.
+exact H0.
+apply IHt3_2.
 exact H1.
-*)
-(*
-rewrite <- H9 in H0.
-apply SAnd1.
 apply SAnd2.
+apply IHs.
+exact H.
+apply SAnd3.
+apply IHs.
+exact H.
+Defined.
+
+(*
+inversion H.
+apply SAnd1.
+admit.
+apply IHs1.
+exact H4.
+apply IHs2.
+exact H4.
+(* Case SAnd2 *)
+assert (sub i t1 t3).
+apply IHs.
+exact H.
+apply SAnd2.
+exact H0.
+(* Case SAnd3 *)
+assert (sub i t2 t3).
+apply IHs.
+exact H.
+apply SAnd3.
+exact H0.
 *)
-admit.
-rewrite <- H3 in H.
-inversion H0. 
-apply H.
-admit.
-(* Case Int *)
-inversion H.
-apply H0.
-rewrite <- H3 in H.
-inversion H0.
-apply H.
-admit.
-rewrite <- H3 in H.
-inversion H0.
-apply H.
-admit.
-(* Case Forall *)
-inversion H0.
-rewrite <- H4 in H0.
-inversion H1.
-apply SForall.
-apply (H i).
-exact H5.
-exact H8.
-apply SAnd1.
-admit.
-admit.
-admit.
-admit.
-(* Case Fun *)
-inversion H.
-rewrite <- H4 in H.
-inversion H0.
-rewrite <- H11 in H0.
-apply SFun.
-apply (IHt2_1 _ _ _ H10 H5).
-apply (IHt2_2 _ _ _ H6 H12).
-admit.
-admit.
-admit.
-(* Case And *)
-inversion H.
-inversion H0.
-apply SAnd1.
-admit.
-admit.
-apply IHt2_1.
-apply H5.
-apply H11.
-apply IHt2_2.
-apply H6.
-apply H11.
-inversion H0.
+Defined.
+
 
 
 (*
