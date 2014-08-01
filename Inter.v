@@ -348,21 +348,33 @@ apply SFun.
 inversion H0.
 *)
 
-Lemma funnyLemma : forall t1 i t3 (s : sub i t1 t3) t2, (forall t, sub i t2 t -> sub i t3 t) -> sub i t1 t2.
-intro. intro. intro. intro.
-induction s; intros.
+Lemma funnyLemma : forall t1 t2 t3 i, sub i t1 t3 -> (forall t, sub i t2 t -> sub i t3 t) -> sub i t1 t2.
+intros.
+induction H.
 (* Case PInt *)
-apply H.
+apply H0.
 apply reflex.
 (* Case Var *)
-apply H.
+apply H0.
 apply reflex.
 (* Case Forall *)
+(*
 assert (sub i (Forall nat g) t2).
 apply H.
 apply reflex.
-
-
+induction t2; try (inversion H0).
+assert (forall t : PTyp nat, sub (i+1) (p i) t -> sub (i+1) (g i) t). 
+admit.
+apply SForall.
+apply IHs.
+apply H6.
+apply SAnd1.
+apply IHt2_1.
+admit.
+exact H5.
+apply IHt2_2.
+admit.
+exact H6.
 (* Case Fun *)
 assert (sub i (Fun nat o3 o4) t2).
 apply H.
@@ -372,7 +384,12 @@ apply SFun.
 admit.
 apply IHs2.
 intros.
-
+*)
+admit.
+admit.
+admit.
+admit.
+admit.
 Defined.
 
 Lemma trans : forall t1 t2 i (s : sub i t1 t2) t3, sub i t2 t3 -> sub i t1 t3.
