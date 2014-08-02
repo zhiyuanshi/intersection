@@ -86,6 +86,8 @@ Inductive sub : nat -> PTyp nat -> PTyp nat -> Prop :=
   | SAnd2 : forall i t t1 t2, sub i t1 t -> sub i (And nat t1 t2) t
   | SAnd3 : forall i t t1 t2, sub i t2 t -> sub i (And nat t1 t2) t.
 
+Definition equiv i t1 t2 := sub i t1 t2 /\ sub i t2 t1.
+
 Lemma reflex : forall t1 i, sub i t1 t1.
 Proof.
 induction t1; intros.
@@ -107,6 +109,167 @@ apply IHt1_1.
 apply SAnd3.
 apply IHt1_2.
 Defined.
+
+Definition substitutability : 
+  forall t1 t2 i, equiv i t2 t1 -> 
+    (((forall t, sub i t2 t -> sub i t1 t) /\ (forall t, sub i t t2 -> sub i t t1)) /\ 
+    (forall t, sub i t1 t -> sub i t2 t)) /\ (forall t, sub i t t1 -> sub i t t2).
+intro. intro. intro. intro.
+destruct H.
+induction H; split; try split; try split; intros.
+(* Case Int *)
+exact H.
+exact H.
+exact H.
+exact H.
+(* Case Var *)
+exact H.
+exact H.
+exact H.
+exact H.
+(* Case Forall *)
+induction t; try (inversion H1).
+apply SForall.
+apply IHsub.
+inversion H0.
+exact H10.
+exact H6.
+apply SAnd1.
+apply IHt1.
+apply H6.
+apply IHt2.
+apply H7.
+induction t; try (inversion H1).
+apply SForall.
+apply IHsub.
+inversion H0.
+exact H10.
+exact H6.
+apply SAnd2.
+apply IHt1.
+apply H6.
+apply SAnd3.
+apply IHt2.
+apply H6.
+induction t; try (inversion H1).
+apply SForall.
+apply IHsub.
+inversion H0.
+exact H10.
+exact H6.
+apply SAnd1.
+apply IHt1.
+apply H6.
+apply IHt2.
+apply H7.
+induction t; try (inversion H1).
+apply SForall.
+apply IHsub.
+inversion H0.
+exact H10.
+exact H6.
+apply SAnd2.
+apply IHt1.
+apply H6.
+apply SAnd3.
+apply IHt2.
+apply H6.
+(* Case Fun *)
+induction t; try (inversion H2).
+inversion H0.
+inversion H2.
+apply SFun.
+apply IHsub1.
+apply H14.
+apply H7.
+apply IHsub2.
+exact H16.
+exact H23.
+apply SAnd1.
+apply IHt1.
+exact H7. 
+apply IHt2.
+exact H8.
+induction t; try (inversion H2).
+inversion H0.
+inversion H2.
+apply SFun.
+apply IHsub1.
+apply H14.
+apply H7.
+apply IHsub2.
+exact H16.
+exact H23.
+apply SAnd2.
+apply IHt1.
+exact H7. 
+apply SAnd3.
+apply IHt2.
+exact H7.
+induction t; try (inversion H2).
+inversion H0.
+inversion H2.
+apply SFun.
+apply IHsub1.
+apply H14.
+apply H7.
+apply IHsub2.
+exact H16.
+exact H23.
+apply SAnd1.
+apply IHt1.
+exact H7. 
+apply IHt2.
+exact H8.
+induction t; try (inversion H2).
+inversion H0.
+inversion H2.
+apply SFun.
+apply IHsub1.
+apply H14.
+apply H7.
+apply IHsub2.
+exact H16.
+exact H23.
+apply SAnd2.
+apply IHt1.
+exact H7. 
+apply SAnd3.
+apply IHt2.
+exact H7.
+(* Case And1 *)
+induction t.
+inversion H0.
+apply SAnd2.
+apply IHsub1.
+exact H7.
+exact H2.
+apply SAnd3.
+apply IHsub2.
+exact H7.
+exact H2.
+inversion H0.
+apply SAnd2.
+apply IHsub1.
+exact H7.
+exact H2.
+apply SAnd3.
+apply IHsub2.
+exact H7.
+exact H2.
+inversion H0.
+apply SAnd2.
+apply IHsub1.
+exact H8.
+exact H2.
+apply SAnd3. 
+apply IHsub2.
+exact H8.
+exact H2.
+apply IHt1.
+
+
+
 
 (*
 Inductive Shape : nat -> PTyp nat -> PTyp nat -> Prop :=
@@ -233,135 +396,82 @@ exact H2.
 exact H3.
 Defined.
 
-(*
-left.
-apply SAnd1.
 
-inversion H.
-assert (sub i t0 t1 \/ sub i t3 t1).
-apply IHt1.
-apply H4.
-assert (sub i t0 t2 \/ sub i t3 t2).
-apply IHt2.
-apply H5.
-admit.
-left.
-exact H4.
-right.
-exact H4.
-Defined.
-*)
-
-(*
-Lemma trans : forall t1 t2 i (s : sub i t1 t2) t3, sub i t2 t3 -> sub i t1 t3.
-induction t1; intros.
-(* Case Var *)
-induction H.
-exact s.
-exact s.
-inversion s.
-inversion s.
-apply SAnd1.
-apply IHsub1.
-exact s.
-apply IHsub2.
-apply s.
-inversion s.
-apply IHsub.
-apply H4.
-inversion s.
-apply IHsub.
-exact H5.
-(* Case Int *)
-induction H.
-exact s.
-exact s.
-inversion s.
-inversion s.
-admit.
-admit.
-admit.
-(* Case Forall *)
-inversion H0.
-rewrite <- H2 in s.
-inversion s.
-rewrite <- H2 in s.
-inversion s.
-rewrite <- H3 in s.
+Lemma ForallInv : forall t p g i, (forall t : PTyp nat, sub i (Forall nat p) t -> sub i (Forall nat g) t) -> 
+                  sub (i + 1) (p i) t -> sub (i + 1) (g i) t.
+intros.
+assert (sub i (Forall nat g) (Forall nat (fun i => t))).
+apply H.
 apply SForall.
-inversion s.
-apply (H _ _ _ H8 _ H1).
-rewrite <- H4 in s; inversion s.
-admit.
-rewrite <- H3 in s; inversion s.
-admit.
-admit.
-(* Case SAnd *)
-inversion H.
-rewrite <- H1 in s; inversion s.
-rewrite <- H1 in s; inversion s.
-rewrite <- H2 in s; inversion s.
+exact H0.
+inversion H1.
+exact H5.
+Defined.
+
+Lemma FunInv : forall t t1 t2 t3 t4 i, (forall t : PTyp nat, sub i (Fun nat t1 t2) t -> sub i (Fun nat t3 t4) t) -> 
+               sub i t2 t -> sub i t4 t.
+intros.
+assert (exists t10, sub i (Fun nat t3 t4) (Fun nat t10 t)).
+exists t1.
+apply H.
 apply SFun.
+apply reflex.
+exact H0.
+destruct H1.
+inversion H1.
+exact H8.
+Defined.
 
-
+Lemma funnyLemma : forall t1 t3 i (s : sub i t1 t3) t2, (forall t, sub i t2 t -> sub i t3 t) -> sub i t1 t2.
 intro. intro. intro. intro.
 induction s; intros.
 (* Case PInt *)
-induction H.
-apply SInt.
-apply SVar.
-apply SForall.
-apply IHsub.
-apply SFun.
-apply IHsub1.
-apply IHsub2.
-apply SAnd1.
-apply IHsub1.
-apply IHsub2.
-apply SAnd2.
-apply IHsub.
-apply SAnd3.
-apply IHsub.
-
-exact H0.
-exact H0.
-inversion H0.
-inversion H0.
-inversion H0.
-apply IHsub1.
-exact H6.
-apply IHsub2.
-exact H6.
-apply SAnd2.
-apply IHsub.
-exact H0.
-apply (SAnd3 _ _ _ _ (IHsub H0)).
-admit.
-(* Case Forall *)
-admit.
-(* Case Fun *)
-induction H.
-inversion H0.
-inversion H0.
-inversion H0.
-apply SFun.
-inversion H0.
-*)
-
-Lemma funnyLemma : forall t1 t2 t3 i, sub i t1 t3 -> (forall t, sub i t2 t -> sub i t3 t) -> sub i t1 t2.
-intros.
-induction H.
-(* Case PInt *)
-apply H0.
+apply H.
 apply reflex.
 (* Case Var *)
-apply H0.
+apply H.
 apply reflex.
 (* Case Forall *)
-(*
 assert (sub i (Forall nat g) t2).
 apply H.
 apply reflex.
+induction t2; try (inversion H0). 
+assert (sub (i+1) (f i) (p i)).
+apply IHs. intro.
+apply (ForallInv _ _ _ _ H).
+apply SForall.
+exact H6.
+apply SAnd1.
+apply IHt2_1.
+intros.
+apply H.
+apply SAnd2.
+exact H7.
+exact H5.
+apply IHt2_2.
+intros.
+apply H.
+apply SAnd3.
+exact H7.
+exact H6.
+(* Case Fun *)
+assert (sub i (Fun nat o3 o4) t2).
+apply H.
+apply reflex.
+induction t2; try (inversion H0).
+apply SFun.
+assert (sub i o3 t2_1).
+apply IHs1.
+admit.
+apply IHs2.
+intro.
+apply (FunInv _ _ _ _ _ _ H). 
+admit.
+
+
+
+
+(*
 induction t2; try (inversion H0).
 assert (forall t : PTyp nat, sub (i+1) (p i) t -> sub (i+1) (g i) t). 
 admit.
