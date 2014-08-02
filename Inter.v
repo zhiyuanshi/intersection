@@ -88,6 +88,8 @@ Inductive sub : nat -> PTyp nat -> PTyp nat -> Prop :=
 
 Definition equiv i t1 t2 := sub i t1 t2 /\ sub i t2 t1.
 
+Definition contextEq i t1 t2 := (forall t, sub i t1 t -> sub i t2 t) /\ (forall t, sub i t t1 -> sub i t t2).
+
 Lemma reflex : forall t1 i, sub i t1 t1.
 Proof.
 induction t1; intros.
@@ -110,13 +112,107 @@ apply SAnd3.
 apply IHt1_2.
 Defined.
 
+
+Lemma invAndS1 : forall t t1 t2 i, sub i t (And nat t1 t2) -> sub i t t1 /\ sub i t t2. 
+Proof.
+induction t; intros.
+(* Case Var *)
+inversion H.
+split.
+exact H4.
+exact H5.
+(* Case Int *)
+inversion H.
+split.
+exact H4.
+exact H5.
+(* Case Forall *)
+inversion H0.
+split.
+exact H5.
+exact H6.
+(* Case Fun *)
+inversion H.
+split.
+exact H4.
+exact H5.
+(* Case And *)
+inversion H.
+split.
+exact H4.
+exact H5.
+assert (sub i t1 t0 /\ sub i t1 t3).
+apply IHt1.
+exact H4.
+destruct H5.
+split.
+apply SAnd2.
+exact H5.
+apply SAnd2.
+exact H6.
+assert (sub i t2 t0 /\ sub i t2 t3).
+apply IHt2.
+exact H4.
+destruct H5.
+split.
+apply SAnd3.
+exact H5.
+apply SAnd3.
+exact H6.
+Defined.
+
+Lemma invAndS2 : forall t i t1 t2, sub i (And nat t1 t2) t -> sub i t1 t \/ sub i t2 t.
+(* Case Var *)
+induction t; intros.
+inversion H.
+left.
+exact H4.
+right.
+exact H4.
+(* Case Int *)
+inversion H.
+left.
+exact H4.
+right.
+exact H4.
+(* Case Forall *)
+inversion H0.
+left.
+exact H5.
+right.
+exact H5.
+(* Case Fun *)
+inversion H.
+left.
+exact H4.
+right.
+exact H4.
+(* Case And *)
+assert (sub i (And nat t0 t3) t1 /\ sub i (And nat t0 t3) t2).
+apply invAndS1.
+exact H.
+destruct H0.
+assert (sub i t0 t1 \/ sub i t3 t1).
+apply IHt1.
+exact H0.
+assert (sub i t0 t2 \/ sub i t3 t2).
+apply IHt2.
+apply H1.
+destruct H2.
+destruct H3.
+left.
+apply SAnd1.
+exact H2.
+exact H3.
+admit.
+admit.
+Defined.
+
 Definition substitutability : 
-  forall t1 t2 i, equiv i t2 t1 -> 
-    (((forall t, sub i t2 t -> sub i t1 t) /\ (forall t, sub i t t2 -> sub i t t1)) /\ 
-    (forall t, sub i t1 t -> sub i t2 t)) /\ (forall t, sub i t t1 -> sub i t t2).
+  forall t1 t2 i, equiv i t2 t1 -> contextEq i t2 t1 /\ contextEq i t1 t2.
 intro. intro. intro. intro.
 destruct H.
-induction H; split; try split; try split; intros.
+induction H; split; try split; intros.
 (* Case Int *)
 exact H.
 exact H.
@@ -238,7 +334,10 @@ apply SAnd3.
 apply IHt2.
 exact H7.
 (* Case And1 *)
-induction t.
+(*
+generalize i, t1, t2, H, H1, H0, IHsub1, IHsub2, t0, H2.
+clear H2. clear t0. clear IHsub2. clear IHsub1. clear H0. clear H1. clear H. clear t2. clear t1. clear i. *)
+induction t; intros.
 inversion H0.
 apply SAnd2.
 apply IHsub1.
@@ -257,145 +356,37 @@ apply SAnd3.
 apply IHsub2.
 exact H7.
 exact H2.
-inversion H0.
+inversion H0. (*H2*)
 apply SAnd2.
 apply IHsub1.
 exact H8.
-exact H2.
+exact H2. (*H3*)
 apply SAnd3. 
 apply IHsub2.
 exact H8.
-exact H2.
-apply IHt1.
-
-
-
-
-(*
-Inductive Shape : nat -> PTyp nat -> PTyp nat -> Prop :=
-  | ShEqual : forall i t, Shape i t t
-  | ShAnd1 : forall i t t1 t2, Shape i t t1 -> Shape i t t2 -> Shape i t (And nat t1 t2)
-  | ShAnd2 : forall i t t1 t2, Shape i t1 t -> Shape i (And nat t1 t2) t
-  | ShAnd3 : forall i t t1 t2, Shape i t2 t -> Shape i (And nat t1 t2) t.
-
-Lemma shapeSub : forall t1 i t2 (s : sub i t1 t2), Shape i t1 t2.
-Proof.
-intros.
-induction s.
-(* Case Var *)
-apply ShEqual.
-apply ShEqual.
-apply ShEqual.
-apply ShAnd1.
-*)
-
-Lemma invAndS1 : forall t t1 t2 i, sub i t (And nat t1 t2) -> sub i t t1 /\ sub i t t2. 
-Proof.
-induction t; intros.
-(* Case Var *)
-inversion H.
-split.
-exact H4.
-exact H5.
-(* Case Int *)
-inversion H.
-split.
-exact H4.
-exact H5.
-(* Case Forall *)
+exact H2. (*H3*)
 inversion H0.
-split.
-exact H5.
-exact H6.
-(* Case Fun *)
-inversion H.
-split.
-exact H4.
-exact H5.
-(* Case And *)
-inversion H.
-split.
-exact H4.
-exact H5.
-assert (sub i t1 t0 /\ sub i t1 t3).
-apply IHt1.
-exact H4.
-destruct H5.
-split.
 apply SAnd2.
-exact H5.
-apply SAnd2.
-exact H6.
-assert (sub i t2 t0 /\ sub i t2 t3).
-apply IHt2.
-exact H4.
-destruct H5.
-split.
-apply SAnd3.
-exact H5.
-apply SAnd3.
-exact H6.
-Defined.
-
-Lemma invAndS2 : forall t i t1 t2, sub i (And nat t1 t2) t -> sub i t1 t \/ sub i t2 t.
-(* Case Var *)
-induction t; intros.
-inversion H.
-left.
-exact H4.
-right.
-exact H4.
-(* Case Int *)
-inversion H.
-left.
-exact H4.
-right.
-exact H4.
-(* Case Forall *)
-inversion H0.
-left.
-exact H5.
-right.
-exact H5.
-(* Case Fun *)
-inversion H.
-left.
-exact H4.
-right.
-exact H4.
-(* Case And *)
-assert (sub i (And nat t0 t3) t1 /\ sub i (And nat t0 t3) t2).
-apply invAndS1.
-exact H.
-destruct H0.
-assert (sub i t0 t1 \/ sub i t3 t1).
-apply IHt1.
-exact H0.
-assert (sub i t0 t2 \/ sub i t3 t2).
-apply IHt2.
-apply H1.
-destruct H2.
-destruct H3.
-left.
-apply SAnd1.
+apply IHsub1.
+exact H7.
 exact H2.
-exact H3.
-assert (sub i t0 t2 \/ sub i t3 t2).
-apply IHt2.
-exact H1.
-assert (sub i t0 t1 \/ sub i t3 t1).
-apply IHt1.
-exact H0.
-left.
-admit.
-destruct H3.
-admit.
-right.
-apply SAnd1.
+apply SAnd3.
+apply IHsub2.
+exact H7.
 exact H2.
-exact H3.
+admit.
+admit. 
+admit.
+admit.
+admit.
+admit.
+admit.
+admit.
+admit.
+admit.
+admit.
+admit.
 Defined.
-
 
 Lemma ForallInv : forall t p g i, (forall t : PTyp nat, sub i (Forall nat p) t -> sub i (Forall nat g) t) -> 
                   sub (i + 1) (p i) t -> sub (i + 1) (g i) t.
@@ -460,41 +451,16 @@ apply H.
 apply reflex.
 induction t2; try (inversion H0).
 apply SFun.
-assert (sub i o3 t2_1).
-apply IHs1.
-admit.
+admit. 
+
 apply IHs2.
 intro.
-apply (FunInv _ _ _ _ _ _ H). 
-admit.
-
-
-
-
-(*
-induction t2; try (inversion H0).
-assert (forall t : PTyp nat, sub (i+1) (p i) t -> sub (i+1) (g i) t). 
-admit.
-apply SForall.
-apply IHs.
-apply H6.
+apply (FunInv _ t2_1 _ o3).
+apply H.
 apply SAnd1.
 apply IHt2_1.
-admit.
-exact H5.
-apply IHt2_2.
-admit.
-exact H6.
-(* Case Fun *)
-assert (sub i (Fun nat o3 o4) t2).
-apply H.
-apply reflex.
-induction t2; try (inversion H0).
-apply SFun.
-admit.
-apply IHs2.
 intros.
-*)
+admit. 
 admit.
 admit.
 admit.
@@ -504,25 +470,29 @@ Defined.
 
 Lemma trans : forall t1 t2 i (s : sub i t1 t2) t3, sub i t2 t3 -> sub i t1 t3.
 intro. intro. intro. intro.
-induction s; intros.
+induction s.
 (* Case Var *)
+intros.
 apply H.
 (* Case PInt *)
+intros.
 apply H.
 (* Case Forall *)
-induction t3; try (inversion H).
+induction t3; intros; try (inversion H).
 apply SForall.
 apply IHs.
-apply H4.
+inversion H0.
+exact H4.
 apply SAnd1.
 apply IHt3_1.
 exact H4.
 apply IHt3_2.
 exact H5.
 (* Case Fun *)
-induction t3; try (inversion H).
+induction t3; intros; try (inversion H).
+inversion H0.
 apply SFun.
-apply (funnyLemma _ _ _ _ H4 IHs1). 
+apply (funnyLemma _ _ _ H4 _ IHs1). 
 apply IHs2.
 exact H6.
 apply SAnd1.
@@ -532,7 +502,7 @@ apply IHt3_2.
 exact H5.
 (* Case SAnd *)
 (* refactor out *)
-induction t3.
+intros; induction t3.
 inversion H.
 apply IHs1.
 exact H4.
@@ -562,46 +532,15 @@ apply IHt3_1.
 exact H0.
 apply IHt3_2.
 exact H1.
+intros.
 apply SAnd2.
 apply IHs.
 exact H.
+intros.
 apply SAnd3.
 apply IHs.
 exact H.
 Defined.
-
-(*
-inversion H.
-apply SAnd1.
-admit.
-apply IHs1.
-exact H4.
-apply IHs2.
-exact H4.
-(* Case SAnd2 *)
-assert (sub i t1 t3).
-apply IHs.
-exact H.
-apply SAnd2.
-exact H0.
-(* Case SAnd3 *)
-assert (sub i t2 t3).
-apply IHs.
-exact H.
-apply SAnd3.
-exact H0.
-*)
-Defined.
-
-
-
-(*
-Inductive SubWF : nat -> PTyp nat -> PTyp nat -> Prop :=
-  | SubWFBase : forall i t, SubWF i t t
-  | SubWFStep : SubWF i t1 t2 -> SubWF SubWF i t1 (And nat t2 t3)
-
-sub i t1 t2 -> t1 = t2 \/   
-*)
 
 (* A functional definition : algorithm *)
 
