@@ -50,7 +50,6 @@ Inductive sub : nat -> PTyp nat -> PTyp nat -> Prop :=
   | SInt : forall i, sub i (PInt nat) (PInt nat)
   | SVar : forall i x, sub i (Var nat x) (Var nat x)
   | SForall : forall i f g, sub (i+1) (f i) (g i) -> sub i (Forall nat f) (Forall nat g)
-  (* | SAnd : forall i o1 o2 o3 o4, sub i o1 o3 -> sub i o2 o4 -> sub i (And nat o1 o2) (And nat o3 o4) *)
   | SFun : forall i o1 o2 o3 o4, sub i o3 o1 -> sub i o2 o4 -> sub i (Fun nat o1 o2) (Fun nat o3 o4)
   | SAnd1 : forall i t t1 t2, sub i t t1 -> sub i t t2 -> sub i t (And nat t1 t2)
   | SAnd2 : forall i t t1 t2, sub i t1 t -> sub i (And nat t1 t2) t
@@ -61,18 +60,6 @@ Hint Resolve SVar SInt SForall SFun SAnd1 SAnd2 SAnd3.
 Lemma reflex : forall t1 i, sub i t1 t1.
 Proof.
 induction t1; intros; auto.
-Defined.
-
-Definition narrowing_sub P Q X S T := forall i, sub i P Q -> (sub i X Q -> sub i S T) -> sub i X P -> sub i S T.
-
-Definition transitivity_sub S Q T := forall i, sub i S Q -> sub i Q T -> sub i S T.
-
-Lemma narrowing : forall X P Q S T, transitivity_sub X P Q -> narrowing_sub P Q X S T.
-unfold narrowing_sub; intros.
-apply H1.
-apply H.
-exact H2.
-exact H0.
 Defined.
 
 Lemma invAndS1 : forall t t1 t2 i, sub i t (And nat t1 t2) -> sub i t t1 /\ sub i t t2. 
@@ -126,54 +113,9 @@ apply SAnd3.
 exact H6.
 Defined.
 
-Lemma invAndS2 : forall t i t1 t2, sub i (And nat t1 t2) t -> sub i t1 t \/ sub i t2 t.
-(* Case Var *)
-induction t; intros.
-inversion H.
-left.
-exact H4.
-right.
-exact H4.
-(* Case Int *)
-inversion H.
-left.
-exact H4.
-right.
-exact H4.
-(* Case Forall *)
-inversion H0.
-left.
-exact H5.
-right.
-exact H5.
-(* Case Fun *)
-inversion H.
-left.
-exact H4.
-right.
-exact H4.
-(* Case And *)
-assert (sub i (And nat t0 t3) t1 /\ sub i (And nat t0 t3) t2).
-apply invAndS1.
-exact H.
-destruct H0.
-assert (sub i t0 t1 \/ sub i t3 t1).
-apply IHt1.
-exact H0.
-assert (sub i t0 t2 \/ sub i t3 t2).
-apply IHt2.
-apply H1.
-destruct H2.
-destruct H3.
-left.
-apply SAnd1.
-exact H2.
-exact H3.
-admit.
-admit.
-Defined.
+Definition transitivity_sub S Q T := forall i, sub i S Q -> sub i Q T -> sub i S T.
 
-Lemma trans : forall Q S T, transitivity_sub S Q T.
+Lemma trans : forall Q T S, transitivity_sub S Q T.
 induction Q.
 unfold transitivity_sub; intros.
 induction T; try (inversion H0); auto. 
@@ -181,83 +123,47 @@ rewrite H4 in H. auto.
 unfold transitivity_sub; intros.
 induction T; try (inversion H0); auto.
 (* Case Forall *)
-unfold transitivity_sub; intros.
-induction T; try (inversion H1); auto.
-induction S; try (inversion H0); auto.
+unfold transitivity_sub. intros.
+generalize H1 H0. clear H0. clear H1.
+generalize S. clear S. 
+induction T; intro; intro; try (inversion H1); auto.
+induction S; intro; try (inversion H6); intros; auto.
 apply SForall.
-unfold transitivity_sub in H.
+inversion H7.
 apply (H i); auto.
-admit.
-admit.
 (* Case Fun *)
 unfold transitivity_sub; intros.
 generalize H0 H. clear H0. clear H.
 generalize S. clear S.
-induction T; induction S; intros. 
-inversion H0.
-inversion H0.
-inversion H0.
-inversion H0.
-inversion H0.
-inversion H0.
-inversion H0.
-inversion H0.
-inversion H0.
-inversion H0.
-inversion H0.
-inversion H0.
-inversion H1.
-inversion H0.
-inversion H0.
-inversion H.
-inversion H.
-inversion H1.
-(* Case 1 *)
-inversion H0.
-inversion H.
+induction T; intro; intro; try (inversion H0); auto. 
+induction S; intro; try (inversion H7); auto.
+inversion H8.
 apply SFun.
 apply IHQ1; auto.
 apply IHQ2; auto.
-inversion H.
-(* Case 2 *)
-apply SAnd2.
-apply IHS1.
-exact H0.
-exact H5.
-apply SAnd3.
-apply IHS2; auto.
-inversion H.
-inversion H.
-inversion H1.
-(* Case 3 *)
-assert (sub i (Fun nat Q1 Q2) T1 /\ sub i (Fun nat Q1 Q2) T2).
-apply invAndS1; auto.
-destruct H1.
-apply SAnd1.
-apply IHT1; auto.
-apply IHT2; auto.
-assert (sub i (Fun nat Q1 Q2) T1 /\ sub i (Fun nat Q1 Q2) T2).
-apply invAndS1; auto.
-destruct H1.
-assert (sub i S1 (Fun nat Q1 Q2) \/ sub i S2 (Fun nat Q1 Q2)).
-apply invAndS2; auto.
-destruct H3.
-apply SAnd2.
-apply IHS1.
-exact H0.
-exact H3.
-apply SAnd3.
-apply IHS2.
-auto.
-auto.
 (* Case And *)
 unfold transitivity_sub; intros.
 assert (sub i S Q1 /\ sub i S Q2).
 apply invAndS1; auto.
 destruct H1.
-assert (sub i Q1 T \/ sub i Q2 T).
-apply invAndS2; auto.
-destruct H3.
+generalize H1 H2.
+induction T; intros.
+inversion H0. 
+apply IHQ1; auto.
+apply IHQ2; auto.
+inversion H0.
+apply IHQ1; auto.
+apply IHQ2; auto.
+inversion H0.
+apply IHQ1; auto.
+apply IHQ2; auto.
+inversion H0.
+apply IHQ1; auto.
+apply IHQ2; auto.
+inversion H0.
+apply SAnd1.
+apply IHT1; auto.
+apply IHT2; auto.
 apply IHQ1; auto.
 apply IHQ2; auto.
 Defined.
@@ -266,6 +172,15 @@ Definition equiv i t1 t2 := sub i t1 t2 /\ sub i t2 t1.
 
 Definition contextEq i t1 t2 := (forall t, sub i t1 t -> sub i t2 t) /\ (forall t, sub i t t1 -> sub i t t2).
 
+Definition narrowing_sub P Q X S T := forall i, sub i P Q -> (sub i X Q -> sub i S T) -> sub i X P -> sub i S T.
+
+Lemma narrowing : forall X P Q S T, transitivity_sub X P Q -> narrowing_sub P Q X S T.
+unfold narrowing_sub; intros.
+apply H1.
+apply H.
+exact H2.
+exact H0.
+Defined.
 
 
 
@@ -542,96 +457,16 @@ intros.
 apply H.
 
 (* Using H! *) 
-apply (FunInv1 o1 _ t2_1 t2_2 o3 o4). 
-apply H.
 admit.
-apply IHs2.
-intro.
-apply (FunInv2 _ t2_1 _ o3).
-apply H.
-apply SAnd1.
-apply IHt2_1.
-intros.
 admit. 
 admit.
 admit.
 admit.
 admit.
 admit.
-Defined.
-
-Lemma trans : forall t1 t2 i (s : sub i t1 t2) t3, sub i t2 t3 -> sub i t1 t3.
-intro. intro. intro. intro.
-induction s.
-(* Case Var *)
-intros.
-apply H.
-(* Case PInt *)
-intros.
-apply H.
-(* Case Forall *)
-induction t3; intros; try (inversion H).
-apply SForall.
-apply IHs.
-inversion H0.
-exact H4.
-apply SAnd1.
-apply IHt3_1.
-exact H4.
-apply IHt3_2.
-exact H5.
-(* Case Fun *)
-induction t3; intros; try (inversion H).
-inversion H0.
-apply SFun.
-apply (funnyLemma _ _ _ H4 _ IHs1). 
-apply IHs2.
-exact H6.
-apply SAnd1.
-apply IHt3_1.
-exact H4.
-apply IHt3_2.
-exact H5.
-(* Case SAnd *)
-(* refactor out *)
-intros; induction t3.
-inversion H.
-apply IHs1.
-exact H4.
-apply IHs2.
-exact H4.
-inversion H.
-apply IHs1.
-exact H4.
-apply IHs2.
-exact H4.
-inversion H.
-apply IHs1.
-exact H5.
-apply IHs2.
-exact H5.
-inversion H.
-apply IHs1.
-exact H4.
-apply IHs2.
-exact H4.
-assert (sub i (And nat t1 t2) t3_1 /\ sub i (And nat t1 t2) t3_2).
-apply invAndS1.
-exact H.
-destruct H0.
-apply SAnd1.
-apply IHt3_1.
-exact H0.
-apply IHt3_2.
-exact H1.
-intros.
-apply SAnd2.
-apply IHs.
-exact H.
-intros.
-apply SAnd3.
-apply IHs.
-exact H.
+admit.
+admit.
+admit.
 Defined.
 
 (* A functional definition : algorithm *)
