@@ -1,0 +1,100 @@
+\documentclass[prodmode,acmtoplas]{acmsmall}
+
+\usepackage{color}
+\usepackage{graphicx}
+\usepackage{latexsym}
+\usepackage{stmaryrd}
+\usepackage{amsmath}
+\usepackage{amssymb}
+% \usepackage{amsthm}
+\usepackage{stmaryrd}
+\usepackage{mathpartir}
+\usepackage{wasysym}
+\usepackage{url}
+%%\usepackage{algorithm, algpseudocode}
+\usepackage{fancyvrb}
+%\usepackage[[style=1]{mdframed}
+\usepackage{lipsum}
+\usepackage{comment}
+
+\definecolor{light}{gray}{.75}
+
+% \mdfdefinestyle{MyFrame}{%
+%     linecolor=white,
+% %%    outerlinewidth=2pt,
+% %%    roundcorner=20pt,
+% %%    innertopmargin=\baselineskip,
+% %%    innerbottommargin=\baselineskip,
+% %%    innerrightmargin=20pt,
+% %%    innerleftmargin=20pt,
+%     backgroundcolor=light}
+
+\newcommand{\gbox}[1]{\colorbox{light}{$\!\!#1\!\!$}}
+
+%%\bibliographystyle{plain}
+
+%% for comments
+\input{macro-comments}
+\input{macros}
+\input{Preamble}
+%%\input{lemmas}
+
+% \newenvironment{example}{\par\noindent\textit{Example}\quad}{}
+
+% Metadata Information
+\acmVolume{1}
+\acmNumber{1}
+\acmArticle{1}
+\acmYear{2012}
+\acmMonth{1}
+
+% Document starts
+\begin{document}
+
+% Page heads
+%\markboth{B. Oliveira et al.}{The Implicit Calculus: A New Foundation for Generic Programming}
+
+% Title portion
+\title{Formalization of System F to Java Translation}
+\author{DRAFT}
+
+\begin{abstract}
+TODO
+\end{abstract}
+
+\category{D.3.2}{Programming Languages}   
+                {Language Classifications}
+                [Functional Languages, Object-Oriented Languages]
+\category{F.3.3}{Logics and Meanings of Programs}   
+                {Studies of Program Constructs}
+                []
+
+\terms{Languages}
+
+\keywords{
+Implicit parameters, type classes, C++ concepts, generic programming,
+Haskell, Scala}
+
+\acmformat{Oliveira, B. C. d. S., Schrijvers, T., Choi, W., Lee, W., Yi, K., Wadler, P.
+201?. The implicit calculus: a new foundation for generic programming.}
+
+\begin{bottomstuff}
+This work is supported by \ldots.
+
+\end{bottomstuff}
+
+\maketitle
+
+\input{src/SystemF}
+
+
+
+% Bibliography
+\bibliographystyle{acmsmall}
+\bibliography{papers}
+
+
+% History dates
+\received{February 2007}{March 2009}{June 2009}
+
+\end{document}
