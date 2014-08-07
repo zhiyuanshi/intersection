@@ -30,7 +30,7 @@ syntax:
   value contexts     G (same)
 
   normalized types   t ::= a | Int | t1 -> t2 | forall a. t | (t1,...,tn)
-                     s ::= t | (t1 | t2) | (t1 & t2)
+                     s ::= t | (s1 | s2) | (s1 & s2)
 
 {- type-directed translation from system f to system f with intersection types -}
 
