@@ -11,9 +11,8 @@ disjun' (f, g) c = case c of
                      Right y -> g y
 
 -- (A /\ B ) -> C   |-   (A -> C) \/ (B -> C)
-conjun :: ((a, b) -> c) -> Either (a -> c) (b -> c)
-conjun f = Left (\x -> f (x, undefined))
--- Alternatively,
+-- conjun :: ((a, b) -> c) -> Either (a -> c) (b -> c)
+-- conjun f = Left (\x -> f (x, undefined))
 -- conjun g = Right (\y -> g (undefined, y))
 
 -- (A -> C) \/ (B -> C)   |-   (A /\ B) -> C
