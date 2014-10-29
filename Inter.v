@@ -1,3 +1,5 @@
+Require Import String.
+
 (*
 data PTyp a = Var a | Forall (a -> PSigma a) | Fun (PSigma a) (PSigma a) | PInt
 
@@ -9,7 +11,8 @@ Inductive PTyp A :=
   | PInt : PTyp A
   | Forall : (A -> PTyp A) -> PTyp A
   | Fun : PTyp A -> PTyp A -> PTyp A
-  | And : PTyp A -> PTyp A -> PTyp A.
+  | And : PTyp A -> PTyp A -> PTyp A
+  | Rcd : string -> PTyp A -> PTyp A.
 
 (*
 
@@ -53,16 +56,17 @@ Inductive sub : nat -> PTyp nat -> PTyp nat -> Prop :=
   | SFun : forall i o1 o2 o3 o4, sub i o3 o1 -> sub i o2 o4 -> sub i (Fun nat o1 o2) (Fun nat o3 o4)
   | SAnd1 : forall i t t1 t2, sub i t t1 -> sub i t t2 -> sub i t (And nat t1 t2)
   | SAnd2 : forall i t t1 t2, sub i t1 t -> sub i (And nat t1 t2) t
-  | SAnd3 : forall i t t1 t2, sub i t2 t -> sub i (And nat t1 t2) t.
+  | SAnd3 : forall i t t1 t2, sub i t2 t -> sub i (And nat t1 t2) t
+  | SRcd  : forall i s t1 t2, sub i t1 t2 -> sub i (Rcd nat s t1) (Rcd nat s t2).
 
-Hint Resolve SVar SInt SForall SFun SAnd1 SAnd2 SAnd3.
+Hint Resolve SVar SInt SForall SFun SAnd1 SAnd2 SAnd3 SRcd.
 
 Lemma reflex : forall t1 i, sub i t1 t1.
 Proof.
 induction t1; intros; auto.
 Defined.
 
-Lemma invAndS1 : forall t t1 t2 i, sub i t (And nat t1 t2) -> sub i t t1 /\ sub i t t2. 
+Lemma invAndS1 : forall t t1 t2 i, sub i t (And nat t1 t2) -> sub i t t1 /\ sub i t t2.
 Proof.
 (*
 induction t; intros; split; try (inversion H); auto.
@@ -111,6 +115,11 @@ apply SAnd3.
 exact H5.
 apply SAnd3.
 exact H6.
+(* Case Rcd *)
+inversion H.
+split.
+apply H4.
+apply H5.
 Defined.
 
 Definition transitivity_sub S Q T := forall i, sub i S Q -> sub i Q T -> sub i S T.
@@ -118,14 +127,14 @@ Definition transitivity_sub S Q T := forall i, sub i S Q -> sub i Q T -> sub i S
 Lemma trans : forall Q T S, transitivity_sub S Q T.
 induction Q.
 unfold transitivity_sub; intros.
-induction T; try (inversion H0); auto. 
+induction T; try (inversion H0); auto.
 rewrite H4 in H. auto.
 unfold transitivity_sub; intros.
 induction T; try (inversion H0); auto.
 (* Case Forall *)
 unfold transitivity_sub. intros.
 generalize H1 H0. clear H0. clear H1.
-generalize S. clear S. 
+generalize S. clear S.
 induction T; intro; intro; try (inversion H1); auto.
 induction S; intro; try (inversion H6); intros; auto.
 apply SForall.
@@ -135,7 +144,7 @@ apply (H i); auto.
 unfold transitivity_sub; intros.
 generalize H0 H. clear H0. clear H.
 generalize S. clear S.
-induction T; intro; intro; try (inversion H0); auto. 
+induction T; intro; intro; try (inversion H0); auto.
 induction S; intro; try (inversion H7); auto.
 inversion H8.
 apply SFun.
@@ -148,7 +157,7 @@ apply invAndS1; auto.
 destruct H1.
 generalize H1 H2.
 induction T; intros.
-inversion H0. 
+inversion H0.
 apply IHQ1; auto.
 apply IHQ2; auto.
 inversion H0.
@@ -166,6 +175,8 @@ apply IHT1; auto.
 apply IHT2; auto.
 apply IHQ1; auto.
 apply IHQ2; auto.
+(* Case Rcd *)
+unfold transitivity_sub; intros.
 Defined.
 
 Definition equiv i t1 t2 := sub i t1 t2 /\ sub i t2 t1.
@@ -184,7 +195,7 @@ Defined.
 
 
 
-Definition substitutability : 
+Definition substitutability :
   forall t1 t2 i, equiv i t2 t1 -> contextEq i t2 t1 /\ contextEq i t1 t2.
 intro. intro. intro. intro.
 destruct H.
@@ -259,7 +270,7 @@ exact H16.
 exact H23.
 apply SAnd1.
 apply IHt1.
-exact H7. 
+exact H7.
 apply IHt2.
 exact H8.
 induction t; try (inversion H2).
@@ -274,7 +285,7 @@ exact H16.
 exact H23.
 apply SAnd2.
 apply IHt1.
-exact H7. 
+exact H7.
 apply SAnd3.
 apply IHt2.
 exact H7.
@@ -290,7 +301,7 @@ exact H16.
 exact H23.
 apply SAnd1.
 apply IHt1.
-exact H7. 
+exact H7.
 apply IHt2.
 exact H8.
 induction t; try (inversion H2).
@@ -305,7 +316,7 @@ exact H16.
 exact H23.
 apply SAnd2.
 apply IHt1.
-exact H7. 
+exact H7.
 apply SAnd3.
 apply IHt2.
 exact H7.
@@ -337,7 +348,7 @@ apply SAnd2.
 apply IHsub1.
 exact H8.
 exact H2. (*H3*)
-apply SAnd3. 
+apply SAnd3.
 apply IHsub2.
 exact H8.
 exact H2. (*H3*)
@@ -351,7 +362,7 @@ apply IHsub2.
 exact H7.
 exact H2.
 admit.
-admit. 
+admit.
 admit.
 admit.
 admit.
@@ -364,7 +375,7 @@ admit.
 admit.
 Defined.
 
-Lemma ForallInv : forall t p g i, (forall t : PTyp nat, sub i (Forall nat p) t -> sub i (Forall nat g) t) -> 
+Lemma ForallInv : forall t p g i, (forall t : PTyp nat, sub i (Forall nat p) t -> sub i (Forall nat g) t) ->
                   sub (i + 1) (p i) t -> sub (i + 1) (g i) t.
 intros.
 assert (sub i (Forall nat g) (Forall nat (fun i => t))).
@@ -375,14 +386,14 @@ inversion H1.
 exact H5.
 Defined.
 
-Lemma FunInv1 : forall o t t1 t2 t3 t4 i, (forall t : PTyp nat, sub i (Fun nat t1 t2) t -> sub i (Fun nat t3 t4) t) -> 
+Lemma FunInv1 : forall o t t1 t2 t3 t4 i, (forall t : PTyp nat, sub i (Fun nat t1 t2) t -> sub i (Fun nat t3 t4) t) ->
                sub i t1 t -> sub i o t.
 intros.
-(* assert (sub i (Fun nat t3 t4) (Fun )). *) 
+(* assert (sub i (Fun nat t3 t4) (Fun )). *)
 admit.
 Defined.
 
-Lemma FunInv2 : forall t t1 t2 t3 t4 i, (forall t : PTyp nat, sub i (Fun nat t1 t2) t -> sub i (Fun nat t3 t4) t) -> 
+Lemma FunInv2 : forall t t1 t2 t3 t4 i, (forall t : PTyp nat, sub i (Fun nat t1 t2) t -> sub i (Fun nat t3 t4) t) ->
                sub i t2 t -> sub i t4 t.
 intros.
 assert (exists t10, sub i (Fun nat t3 t4) (Fun nat t10 t)).
@@ -409,7 +420,7 @@ apply reflex.
 assert (sub i (Forall nat g) t2).
 apply H.
 apply reflex.
-induction t2; try (inversion H0). 
+induction t2; try (inversion H0).
 assert (sub (i+1) (f i) (p i)).
 apply IHs. intro.
 apply (ForallInv _ _ _ _ H).
@@ -449,16 +460,16 @@ apply SFun.
 assert (sub i o3 t2_1).
 apply IHs1.
 intros.
-assert (sub i (Fun nat o3 o4) (Fun nat (Fun nat o1 o2) t2_1)). 
+assert (sub i (Fun nat o3 o4) (Fun nat (Fun nat o1 o2) t2_1)).
 apply H.
 apply SFun.
 apply IHt2_1.
 intros.
 apply H.
 
-(* Using H! *) 
+(* Using H! *)
 admit.
-admit. 
+admit.
 admit.
 admit.
 admit.
