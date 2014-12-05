@@ -1,0 +1,29 @@
+* Abstract
+* Introduction
+
+** We present a core language, \lambda_{IR} that is able to encode prototype-based object-oriented programming.
+
+** Type preservation
+
+* Informally
+  System F
+  + intersection
+  + records
+    The idea of
+
+* Formally
+
+* Type soundness
+
+Progress
+Preservation
+
+If e : t, then |e| : |t|.
+
+* Related work
+** Lenses
+
+* References
+Girard
+Reynolds
+Prototype inheritance
