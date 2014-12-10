@@ -25,7 +25,16 @@
   This paper ...
 \end{abstract}
 
-\section{Introcution}
+\section{Introduction}
+
+Intersection types are useful for functional programming. In particular for 
+extensibility and allowing new forms of composition. 
+
+We show a polymorphic language with intersection types and records, and 
+how this language can be used to solve various common tasks in functional
+programming in a nicer way.
+
+We have a formalization + implementation + proofs.  
 
 Prototype-based programming is one of the two major styles of object-oriented programming, the other being class-based programming which is featured in languages such as Java and C\#.
 It has gained
@@ -42,6 +51,40 @@ interpreted.
 This paper introduces System $F_{IR}$
 
 Inheritance based
+
+\section{Overview}
+
+There should be a section informally describing the language (System FI) 
+through various examples.
+
+Mention properties informally via examples:
+
+%f : A & A -> A
+%f x = x
+
+\subsection{Algebras}
+
+\subsection{Lenses}
+
+\subsection{Embedded DSLs} 
+
+\section{System FI}
+
+Syntax + Type System 
+
+Talk about properties of the languages 
+(commutativity of intersection types, ...)
+
+\section{Type-Directed Translation to System F}
+
+Type-Directed Translation to System F. 
+Main results: type-preservation + coherence. 
+
+\section{Implementation}
+
+Talk about the implementation + extensions not in the formalization. 
+
+\section{Case Study?}
 
 \section{Properties}
 
@@ -71,6 +114,22 @@ Dunfield: no records
 The idea of encoding records using intersection types is due to ... Reynolds and Castagna. The issue of coherence. Make a note about how part of this problem is mitigated.
 
 Nystrom et. al. OOPSLA 06
+
+
+Applications:
+
+- Object/Fold Algebras. How to support extensibility in an easier way. 
+
+See Datatypes a la Carte
+
+- Mixins
+
+- Lenses? Can intersection types help with lenses? Perhaps making the 
+types more natural and easy to understand/use?
+
+- Embedded DSLs? Extensibility in DSLs? Composing multiple DSL interpretations?
+
+http://www.cs.ox.ac.uk/jeremy.gibbons/publications/embedding.pdf
 
 \framebox{$|\tau| = T$}
 

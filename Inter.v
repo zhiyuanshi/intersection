@@ -17,12 +17,12 @@ Inductive PTyp A :=
 (*
 
 ----------
-|t1 <: t2|
+|t1 <: t2| 
 ----------
 
 a <: a                             Sub-Var
 
-           t1 <: t2
+           t1 <: t2 
 ------------------------------     Sub-Forall
 forall a . t1 <: forall a . t2
 
@@ -177,6 +177,18 @@ apply IHQ1; auto.
 apply IHQ2; auto.
 (* Case Rcd *)
 unfold transitivity_sub; intros.
+Defined.
+
+Lemma p1 : forall (A B C : Prop), (A \/ B -> C) -> ((A -> C) /\ (B -> C)).
+Proof.
+intros.
+split; intros.
+apply H.
+left.
+exact H0.
+apply H.
+right.
+exact H0.
 Defined.
 
 Definition equiv i t1 t2 := sub i t1 t2 /\ sub i t2 t1.

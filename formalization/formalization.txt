@@ -23,16 +23,20 @@ typing:
 
 syntax:
 
-  types              t ::= a | Int | t1 -> t2 | forall a. t | t1 & t2
-  terms              e ::= x | i | \(x:t). e | e1 e2 | /\a. e | e[t] | e1 ,, e2
+  types              T ::= a | Int | T1 -> T2 | forall a. T | T1 & T2
+  terms              E ::= x | i | \(x:T). e | e1 e2 | /\a. e | e[T] | e1 ,, e2
 
   type contexts      D (same)
   value contexts     G (same)
 
-  normalized types   t ::= a | Int | t1 -> t2 | forall a. t | (t1,...,tn)
-                     s ::= t | (s1 | s2) | (s1 & s2)
+  normalized types   tau ::= a | Int | tau1 -> tau2 | forall a. tau | (tau1,...,taun)
+                     s ::= tau | (s1 | s2) | (s1 & s2)
 
 {- type-directed translation from system f to system f with intersection types -}
+
+[[a]] = a
+[[T1 -> T2]] = [[T1]] -> [[T2]]
+[[T1 & T2]] =  ([[T1]], [[T2]]) 
 
   E-Var      (x:t) in G
              -----------------
@@ -42,7 +46,7 @@ syntax:
 
   E-Abs      D;G,(x:t) |- e : t' ~> e'
              ----------------------------------------
-             D;G |- \(x:t). e : t -> t' ~> \(x:t). e'
+             D;G |- \(x:t). e : t -> t' ~> \(x:[[t]]). e'
 
   E-App      D;G |- e1 : t1 -> t2 ~> e1'    D;G |- e2 : t2 ~> e2'
              -----------------------------------------------------
