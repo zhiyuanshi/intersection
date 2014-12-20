@@ -1,10 +1,10 @@
-\documentclass[twocolumn]{article}
+\documentclass[preprint]{sigplanconf}
 
-% Remote packages %
+% Use packages immediately following the \documentclass command
 \usepackage{amsmath}
 \usepackage{amsthm}
-\usepackage{color}
 \usepackage{fixltx2e}
+\usepackage{listings}
 \usepackage{mdframed}
 \usepackage{xcolor}
 
@@ -13,118 +13,179 @@
 
 \definecolor{github}{HTML}{4183C4}
 
+% Define macros immediately before the \begin{document} command
 \input{macros/type_systems.tex}
 \input{macros/systemfi.tex}
+\newcommand{\FI}{\bf FI}
 
 \begin{document}
 
-\title{SystemFI: A Core Language for Delegation-based Programming}
+\special{papersize=8.5in,11in}
+\setlength{\pdfpageheight}{\paperheight}
+\setlength{\pdfpagewidth}{\paperwidth}
+
+\title{\FI}
+
+\authorinfo{Name1}
+           {Affiliation1}
+           {Email1}
+\authorinfo{Name2\and Name3}
+           {Affiliation2/3}
+           {Email2/3}
+
 \maketitle
 
 \begin{abstract}
-  This paper ...
 \end{abstract}
+
+\keywords
+intersecion types, inheritance
 
 \section{Introduction}
 
-Intersection types are useful for functional programming. In particular for 
-extensibility and allowing new forms of composition. 
+Intersection types provides a power mechanism for functional programming, in
+particular for extensibility and allowing new forms of composition.
 
-We show a polymorphic language with intersection types and records, and 
+We present a polymorphic language with intersection types and records, and show
 how this language can be used to solve various common tasks in functional
 programming in a nicer way.
 
-We have a formalization + implementation + proofs.  
+Prototype-based programming is one of the two major styles of object-oriented
+programming, the other being class-based programming which is featured in
+languages such as Java and C\#. It has gained increasing popularity recently
+with the prominence of JavaScript in web applications. Prototype-based
+programming supports highly dynamic behaviors at run time that are not possible
+with traditional class-based programming. However, despite its flexibility,
+prototype-based programming is often criticized over concerns of correctness and
+safety. Furthermore, almost all prototype-based systems rely on the fact that
+the language is dynamically typed and interpreted.
 
-Prototype-based programming is one of the two major styles of object-oriented programming, the other being class-based programming which is featured in languages such as Java and C\#.
-It has gained
-increasing popularity recently with the prominence of JavaScript in
-web applications. Prototype-based programming supports highly dynamic
-behaviors at run time that are not possible with traditional
-class-based programming. However, despite its flexibility,
-prototype-based programming is often criticized over concerns of
-correctness and safety. Furthermore, almost all prototype-based
-systems rely on the fact that the language is dynamically typed and
-interpreted.
+\begin{itemize}
+\item{}
+\end{itemize}
 
 
 This paper introduces System $F_{IR}$
 
-Inheritance based
-
 \section{Overview}
 
-There should be a section informally describing the language (System FI) 
-through various examples.
+There should be a section informally describing the language (System FI) through
+various examples. Intersection types provide a general mechanism for ad-hoc
+polymorphism.
 
 Mention properties informally via examples:
 
 %f : A & A -> A
 %f x = x
 
+Typeclasses
+
+Intersecion types in Scala
+
+show :: (Int -> String) \& (Float -> String)
+
+show
+
 \subsection{Algebras}
 
 \subsection{Lenses}
 
-\subsection{Embedded DSLs} 
+\subsection{Embedded DSLs}
+
+\section{System F}
+
+The target language is System F extended with a base type Int.
+The syntax and typing is completely standard.
 
 \section{System FI}
 
-Syntax + Type System 
+The source language, System FI, is identical to the source language described in
+the previous section, except for the two features: intersection types and
+records.
 
-Talk about properties of the languages 
-(commutativity of intersection types, ...)
+Dunfield has described a language that includes a ``top'' type but it does not appear in our language
 
 \section{Type-Directed Translation to System F}
 
-Type-Directed Translation to System F. 
-Main results: type-preservation + coherence. 
+In this section, we describe a type-directed translation from FI to F. The
+translation consists of four sets of rules.
+
+\begin{itemize}
+
+\item{\bf Coercion}
+
+  The coercion judgment $ \Gamma \vdash \tau_1 <: \tau_2 \yields{C} $ extends
+  the subtyping judgment with a coercion on the right hand side of
+  $ \hookrightarrow $. A coercion, which is just an expression in the target
+  language, is guaranteed to have type $ \tau_1 \to \tau_2 $, as proved by Lemma
+  \ref{type-coerce}. It is read ``In the environment $ \Gamma $, $ \tau_1 $ is a
+  subtype of $ \tau_2 $; and if any expression $ e $ has a type $ t_1 $ that is
+  a subtype of the type of $ t_2 $, the elaborated $ e $, when applied to the
+  corresponding coercion $ C $, has exactly type $ |t_2| $''. For example,
+  $\Gamma \vdash Int \& Bool <: Bool \yields{fst} $, where $ fst $ is the
+  projection of a tuple on the first element. The coercion judgment is only used
+  in the \texttt{TrApp} case.
+
+\item{\bf Elaboration}
+
+  The elaboration judgment $ \Gamma \vdash e : \tau \yields{E} $ extends the
+  typing judgment with an elaborated expression on the right hand side of
+  $ \hookrightarrow $. It is also standard, except for the case of
+  \texttt{TrApp}, in which a coercion from the inferred type of the argument to
+  the expected type of the parameter is inserted before the argument; and the
+  case of \texttt{TrRcdEim} and \texttt{TrRcdUpd}, where the ``get'' and ``put''
+  rules will be used. The two set of rules are explained below.
+
+\item{\bf ``get'' rules}
+
+  The ``get'' judgment can be thought as producing a field accessor.
+
+\item{\bf ``put'' rules}
+
+  The ``put'' judgment can be thought as producing a field updater.
+
+\end{itemize}
+
+Type-Directed Translation to System F.
+Main results: type-preservation + coherence.
 
 \section{Implementation}
 
-Talk about the implementation + extensions not in the formalization. 
+We extend the implementation of the type system extended with type synonyms.
+
+\begin{lstlisting}
+type T A1 A2 = ... in
+\end{lstlisting}
 
 \section{Case Study?}
 
 \section{Properties}
 
-Commutative
-$ A \wedge B = B \wedge A $
-
-$ A = A \wedge A $
-
-Idempotent
-
-Source subtyping
-
-Exclusion of $0$-ary intersection => dynamic typing
-
-subtyping of the arrow
-
-Algebra's \& mixins
-lenses
-
 \section{Case Studies}
 
 \section{Related work}
 
-Write a paragraph.
+\begin{itemize}
 
-Dunfield: no records
-The idea of encoding records using intersection types is due to ... Reynolds and Castagna. The issue of coherence. Make a note about how part of this problem is mitigated.
+\item{\bf Elaborating simply-typed lambda calculus}
+
+  Dunfield has introduced a type system with intersection polymorphism but no
+  parametric polymorphism.
+
+\end{itemize}
 
 Nystrom et. al. OOPSLA 06
 
 
 Applications:
 
-- Object/Fold Algebras. How to support extensibility in an easier way. 
+- Object/Fold Algebras. How to support extensibility in an easier way.
 
 See Datatypes a la Carte
 
 - Mixins
 
-- Lenses? Can intersection types help with lenses? Perhaps making the 
+- Lenses? Can intersection types help with lenses? Perhaps making the
 types more natural and easy to understand/use?
 
 - Embedded DSLs? Extensibility in DSLs? Composing multiple DSL interpretations?
@@ -325,5 +386,33 @@ Applying Lemma \ref{type-put} to the above we have
   $$ |\Gamma| \vdash C : |\tau| \to |\tau|  $$
 Hence by \texttt{(F-App)} we have
   $$ |\Gamma| \vdash C E : |\tau| $$
+
+
+\appendix
+\section{Proofs}
+
+This is the text of the appendix, if you need one.
+
+\acks
+
+Acknowledgments, if needed.
+
+% We recommend abbrvnat bibliography style.
+
+\bibliographystyle{abbrvnat}
+
+% The bibliography should be embedded for final submission.
+
+\bibliography{references}
+
+\begin{thebibliography}{}
+\softraggedright
+
+\bibitem[Smith et~al.(2009)Smith, Jones]{smith02}
+P. Q. Smith, and X. Y. Jones. ...reference text...
+
+\end{thebibliography}
+
+
 
 \end{document}

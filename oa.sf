@@ -1,7 +1,16 @@
-type ExpAlg E = {lit : Int -> E, add : (E, E) -> E} in
-let evalAlg = {lit = \(x:Int). x, add = \(p:(Int, Int)). p._1 + p._2} in
-type SubExpAlg E = (ExpAlg E) & { sub : (E, E) -> E } in
-let subEvalAlg = evalAlg ,, {sub = \(p:(Int, Int)). p._1 - p._2} in
-let exp1 E (alg : ExpAlg E)    = alg.lit 5 in
-let exp2 E (alg : SubExpAlg E) = alg.sub (exp1 E) (alg.lit 2) in
+let evalAlg = { lit = \(x : Int). x, add = \(p : (Int, Int)). p._1 + p._2 } in
+let subEvalAlg = evalAlg ,, { sub = \(p : (Int, Int)). p._1 - p._2 } in
+
+let exp1 E (alg : { lit : Int -> E, add : (E, E) -> E }) = alg.lit 5 in
+let exp2 E (alg : { lit : Int -> E, add : (E, E) -> E } & { sub : (E, E) -> E }) = alg.sub (exp1 E) (alg.lit 2) in
 exp2 Int subEvalAlg
+
+
+-- type ExpAlg E = { lit : Int -> E, add : (E, E) -> E } in
+-- let evalAlg = { lit = \(x : Int). x, add = \(p : (Int, Int)). p._1 + p._2 } in
+-- type SubExpAlg E = (ExpAlg E) & { sub : (E, E) -> E } in
+-- let subEvalAlg = evalAlg ,, { sub = \(p : (Int, Int)). p._1 - p._2 } in
+
+-- let exp1 E (alg : ExpAlg E)    = alg.lit 5 in
+-- let exp2 E (alg : SubExpAlg E) = alg.sub (exp1 E) (alg.lit 2) in
+-- exp2 Int subEvalAlg
