@@ -60,11 +60,6 @@ prototype-based programming is often criticized over concerns of correctness and
 safety. Furthermore, almost all prototype-based systems rely on the fact that
 the language is dynamically typed and interpreted.
 
-\begin{itemize}
-\item{}
-\end{itemize}
-
-
 This paper introduces System $F_{IR}$
 
 \section{Overview}
@@ -77,15 +72,22 @@ While elaboration intersection types has been
 
 In summary, the contributions of this paper are:
 
-* elaboration typing rules which given a source expression with intersection
-types, typecheck and translate it into an ordinary F term. prove a type
-preservation result: if a term $e$ has type $\tau$ in the source language, then
-the translated term $|e|$ is well-typed and has type $|\tau|$ in the target
-language.
+\begin{itemize}
 
-* present an algorithm for detecting incoherence which can be very important in practice.
+\item{elaboration typing rules which given a source expression with intersection
+    types, typecheck and translate it into an ordinary F term. Prove a type
+    preservation result: if a term $e$ has type $\tau$ in the source language,
+    then the translated term $|e|$ is well-typed and has type $|\tau|$ in the
+    target language.}
 
-* explores the connection between intersection types and object algebra by showing various examples of encoding object algebra with intersection types.
+\item{present an algorithm for detecting incoherence which can be very important
+    in practice.}
+
+\item{explores the connection between intersection types and object algebra by
+    showing various examples of encoding object algebra with intersection
+    types.}
+
+\end{itemize}
 
 Mention properties informally via examples:
 
