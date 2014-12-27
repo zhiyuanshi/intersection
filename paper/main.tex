@@ -73,6 +73,20 @@ There should be a section informally describing the language (System FI) through
 various examples. Intersection types provide a general mechanism for ad-hoc
 polymorphism.
 
+While elaboration intersection types has been
+
+In summary, the contributions of this paper are:
+
+* elaboration typing rules which given a source expression with intersection
+types, typecheck and translate it into an ordinary F term. prove a type
+preservation result: if a term $e$ has type $\tau$ in the source language, then
+the translated term $|e|$ is well-typed and has type $|\tau|$ in the target
+language.
+
+* present an algorithm for detecting incoherence which can be very important in practice.
+
+* explores the connection between intersection types and object algebra by showing various examples of encoding object algebra with intersection types.
+
 Mention properties informally via examples:
 
 %f : A & A -> A
@@ -94,21 +108,24 @@ show
 
 \section{System F}
 
-The target language is System F extended with a base type Int.
-The syntax and typing is completely standard.
+The target language is System F extended with a base type Int. The syntax and
+typing is completely standard. The types are function, universal quantification.
 
 \section{System FI}
 
 The source language, System FI, is identical to the source language described in
-the previous section, except for the two features: intersection types and
-records.
+the previous section, except for the two additions: intersection types and
+records. The formalization includes only single records and single record types as the multi-records can be desugared into the merge of multiple single records.
 
-Dunfield has described a language that includes a ``top'' type but it does not appear in our language
+Dunfield has described a language that includes a ``top'' type but it does not appear in our language.
+
+Remark. The operational semantics of FI is not presented in this paper. However,
 
 \section{Type-Directed Translation to System F}
 
-In this section, we describe a type-directed translation from FI to F. The
-translation consists of four sets of rules.
+In this section, we present a relatively lightweight type-directed elaboration
+from FI to F. The elaboration consists of four sets of rules, which are
+explained below:
 
 \begin{itemize}
 
