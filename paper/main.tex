@@ -98,9 +98,37 @@ Typeclasses
 
 Intersecion types in Scala
 
-show :: (Int -> String) \& (Float -> String)
 
-show
+Examples in this paper are written with a Haskell-like syntax. Consider a
+\texttt{show} function that converts either integers or booleans to strings. In
+FI it can be given the type:
+
+\begin{verbatim}
+show :: (Int -> String) & (Bool -> String)
+\end{verbatim}
+
+And can be defined as:
+
+\begin{verbatim}
+show = showInt ,, showBool
+\end{verbatim}
+
+where \texttt{showString} and \texttt{showBool} are ordinary monomorphic
+functions.
+
+The merge construct in the original function is elaborated into a pair in the
+target language:
+
+\begin{verbatim}
+show = (showInt, showBool)
+\end{verbatim}
+
+In the target language where there is no intersection types, the application of
+the integer \texttt{1} to this function does not typecheck. However, we may
+rescue this situtation by inserting a coercion that extracts the first item out
+of this pair.
+
+Thus \texttt{show 1} in FI corresponds to \texttt{(fst show) 1} in F.
 
 \subsection{Algebras}
 
