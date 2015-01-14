@@ -1,0 +1,7 @@
+-- BEGIN_MAX
+let max (x : Int) (y : Int) = if (x > y) then x else y
+-- END_MAX
+in 
+-- BEGIN_EXAMPLE
+max 2 3
+-- END_EXAMPLE

@@ -39,21 +39,21 @@ fileloc = {}
 beginpos = {}
 endpos = {}
 
-Dir['../srcscala/*.scala'].each do |file| 
+Dir['../src/*.sf'].each do |file| 
   scan(file, beginpos, endpos, fileloc)
 end
-Dir['../srcscala/src/*/*.scala'].each do |file| 
-  scan(file, beginpos, endpos, fileloc)
-end
-Dir['../src/*.java'].each do |file| 
-  scan(file, beginpos, endpos, fileloc)
-end
-Dir['../src/*/*.java'].each do |file| 
-  scan(file, beginpos, endpos, fileloc)
-end
-Dir['../code/*/*/*/*/*.java'].each do |file| 
-  scan(file, beginpos, endpos, fileloc)
-end
+#Dir['../srcscala/src/*/*.scala'].each do |file| 
+#  scan(file, beginpos, endpos, fileloc)
+#end
+#Dir['../src/*.java'].each do |file| 
+#  scan(file, beginpos, endpos, fileloc)
+#end
+#Dir['../src/*/*.java'].each do |file| 
+#  scan(file, beginpos, endpos, fileloc)
+#end
+#Dir['../code/*/*/*/*/*.java'].each do |file| 
+#  scan(file, beginpos, endpos, fileloc)
+#end
 
 
 Dir['*.tex'].each do |file| 
