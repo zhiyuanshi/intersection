@@ -1,0 +1,6 @@
+task :default => :paper
+
+task :paper do
+  system("ruby computePositions.rb")
+  system("pdflatex main.tex")
+end
