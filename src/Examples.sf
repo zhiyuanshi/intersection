@@ -1,0 +1,55 @@
+-- BEGIN_MIXIN_LIB
+type Open S = (Unit -> S) -> S;
+type Mixin S = (Unit -> S) -> (Unit -> S) -> S;
+let extends S (f : Mixin S) (g : Mixin S) : Mixin S
+  = \ (super : Unit -> S). \ (this  : Unit -> S). f (\ (d : Unit). g super this) this;
+-- END_MIXIN_LIB
+
+-- BEGIN_IEVAL
+type IEval  = { eval : Int };
+-- END_IEVAL
+
+-- BEGIN_EXPALG
+type ExpAlg E = { lit : Int -> E, add : E -> E -> E };
+let evalAlg : ExpAlg IEval = {
+  lit = \(x : Int).  { eval = x },
+  add = \(x : IEval). \(y : IEval). { eval = x.eval + y.eval }
+};
+-- END_EXPALG
+
+-- BEGIN_SUBEXPALG
+type SubExpAlg E = (ExpAlg E) & { sub : E -> E -> E };
+let subEvalAlg : SubExpAlg IEval = evalAlg ,, { sub = \ (x : IEval). \ (y : IEval). { eval = x.eval - y.eval } };
+-- END_SUBEXPALG
+
+-- BEGIN_IPRINT
+type IPrint = { print : String };
+-- END_IPRINT
+
+-- BEGIN_PRINTALG
+let printAlg : SubExpAlg IPrint = {
+  lit = \(x : Int). { print = x.toString() },
+  add = \(x : IPrint). \(y : IPrint). { print = x.print.concat(" + ").concat(y.print) },
+  sub = \(x : IPrint). \(y : IPrint). { print = x.print.concat(" - ").concat(y.print) }
+};
+-- END_PRINTALG
+
+-- Add an aspect: logging
+
+-- BEGIN_MERGE
+let merge A B (f : ExpAlg A) (g : ExpAlg B) = {
+  lit = \(x : Int). f.lit x ,, g.lit x,
+  add = \(x : A & B). \(y : A & B). f.add x y ,, g.add x y
+};
+-- END_MERGE
+
+-- BEGIN_E1_E2
+-- e1 = 6 + 6
+let e1 E (f : ExpAlg E)    = f.add (f.lit 6) (f.lit 6);
+-- e2 = e1 - 2
+let e2 E (f : SubExpAlg E) = f.sub (e1 E f) (f.lit 2);
+-- END_E1_E2
+
+-- BEGIN_USE
+(e1 (IEval & IPrint) (merge IEval IPrint subEvalAlg printAlg)).print
+-- END_USE

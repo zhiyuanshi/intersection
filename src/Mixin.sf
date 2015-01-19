@@ -1,0 +1,14 @@
+type Mixin S = (Unit -> S) -> (Unit -> S) -> S;
+-- let extends S (f : Mixin S) (g : Mixin S) : Mixin S
+--   = \ (super : Unit -> S). \ (this  : Unit -> S). f (\ (d : Unit). g super this) this;
+type Open S = (Unit -> S) -> S;
+-- let fix f = let x = f x in x
+let rec fix S (f : Open S) : S = f (\ (d : Unit). fix S f);
+type Fact = Int -> Int;
+let fact (this : Unit -> Fact) : Fact = \(n : Int). if n == 0 then 1 else n * this () (n - 1);
+-- (fix Fact fact) 10
+type Exp = { print : Unit -> String, eval : Int };
+let e = { print = \(d : Unit). "1", eval = 1 };
+let add (e1 : Exp) (e2 : Exp) : Open Exp = \(this : Unit -> Exp).
+  { print = \(d : Unit). (this ()).eval.toString(), eval = 1 };
+(fix Exp (add e e)).print ()
