@@ -16,7 +16,12 @@
 % Define macros immediately before the \begin{document} command
 \input{macros/type_systems.tex}
 \input{macros/systemfi.tex}
-\newcommand{\FI}{\bf FI}
+
+\newcommand{\FI}{{\bf FI} }
+\newcommand{\F}{{\bf F} }
+
+\newcommand{\FIend}{{\bf FI}}
+\newcommand{\Fend}{{\bf F}}
 
 % "define" code highlights for Java and Scala
 \lstdefinelanguage{JavaScala}{
@@ -94,14 +99,14 @@ intersecion types, inheritance
 -- type IEval  = { eval :  Int }
 -- type IPrint = { print : String }
 
--- F[_]
+-- F[\_]
+
+We present a polymorphic calculus containing intersection types and records, and show
+how this language can be used to solve various common tasks in functional
+programming in a nicer way.
 
 Intersection types provides a power mechanism for functional programming, in
 particular for extensibility and allowing new forms of composition.
-
-We present a polymorphic language with intersection types and records, and show
-how this language can be used to solve various common tasks in functional
-programming in a nicer way.
 
 Prototype-based programming is one of the two major styles of object-oriented
 programming, the other being class-based programming which is featured in
@@ -118,13 +123,41 @@ This paper introduces System $F_{IR}$
 \section{Overview}
 
 \subsection{Overview of FI}
-Also brief talks about System F.
-Describe intersection types, encoding records with Intersecion types
+\FI is an thin extension on top of \F that is elaborated into \Fend, a variant of
+System F. System F, or polymorphic lambda calculus lays the foundation of
+functional programming languages such as Haskell.
 
-Records, projection, update
+% Describe intersection types, encoding records with Intersecion types
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% What is an intersection type?
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The central addition to the type system of \F in \FI is intersection types. What
+is an intersection type? One classic view is from set-theoretic interpretation
+of types: $ A \& B $ stands for the intersection of the set of values of $ A $
+and $ B $. The other view, adopted in this paper, regards types as a kind of
+interface: a value of type $ A \& B $ satisfies both of the interfaces of $ A $
+and $ B $. For example, $ { eval : Int } $ is the interface that supports
+evaluation to integers, while $ { eval : Int } \& { print : String } $ supports
+both evaluation and pretty printing. Those interfaces are akin to interfaces in
+Java or traits in Scala. But one key difference is that they are unnamed in \FIend.
+
+In addition to introduction of record literals, FI support two more operations
+on records: record elimination and record update.
+
+As a running example, let's consider elaborating a term
 
 \subsection{Using FI for modularity}
-EP: talk about Yanlin's approach
+
+% Introduce the expression problem
+The expression problem refers to the difficulty of adding a new operations and a
+new data variant without changing or duplicating existing code in statically
+typed functional languages.
+
+There has been recently a suprisingly lightweight solution to the expression
+problem that takes advantage of covariant return types in Java. We show that FI
+is able to solve the expression problem in the same spirit. The
 
 Encoding OAs
 Mixins
@@ -160,8 +193,6 @@ In summary, the contributions of this paper are:
     types.}
 
 \end{itemize}
-
-\lstinputlisting[linerange=-]{} % APPLY:linerange=MAX
 
 
 Mention properties informally via examples:
