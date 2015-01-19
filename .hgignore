@@ -8,6 +8,9 @@ systemf/.project
 *Parser.hs
 *Parser.info
 
+# Ignore generated Java source files
+src/*.java
+
 ### Haskell ###
 dist
 cabal-dev
