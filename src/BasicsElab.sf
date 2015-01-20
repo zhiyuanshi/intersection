@@ -1,0 +1,6 @@
+-- BEGIN_ADD
+let e1 = (4, "4");
+let e2 = (7, "7");
+let add (e1 : Int) (e2 : Int) = e1 + e2;
+add (e1._1) (e2._1)
+-- END_ADD

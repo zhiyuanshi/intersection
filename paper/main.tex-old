@@ -123,8 +123,9 @@ This paper introduces System $F_{IR}$
 \section{Overview}
 
 \subsection{Overview of FI}
-\FI is an thin extension on top of \F that is elaborated into \Fend, a variant of
-System F. System F, or polymorphic lambda calculus lays the foundation of
+
+\FI is an thin extension on top of \F that is elaborated into \Fend, a variant
+of System F. System F, or polymorphic lambda calculus lays the foundation of
 functional programming languages such as Haskell.
 
 % Describe intersection types, encoding records with Intersecion types
@@ -143,10 +144,12 @@ evaluation to integers, while $ { eval : Int } \& { print : String } $ supports
 both evaluation and pretty printing. Those interfaces are akin to interfaces in
 Java or traits in Scala. But one key difference is that they are unnamed in \FIend.
 
+\lstinputlisting[linerange=2-5]{../src/Basics.sf} % APPLY:linerange=MIXIN_LIB
+
 In addition to introduction of record literals, FI support two more operations
 on records: record elimination and record update.
 
-As a running example, let's consider elaborating a term
+\lstinputlisting[linerange=2-5]{../src/Basics.sf} % APPLY:linerange=ADD
 
 \subsection{Using FI for modularity}
 
@@ -155,9 +158,9 @@ The expression problem refers to the difficulty of adding a new operations and a
 new data variant without changing or duplicating existing code in statically
 typed functional languages.
 
-There has been recently a suprisingly lightweight solution to the expression
-problem that takes advantage of covariant return types in Java. We show that FI
-is able to solve the expression problem in the same spirit. The
+There has been recently a lightweight solution to the expression problem that
+takes advantage of covariant return types in Java. We show that FI is able to
+solve the expression problem in the same spirit. The
 
 Encoding OAs
 Mixins
