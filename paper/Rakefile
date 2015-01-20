@@ -1,6 +1,6 @@
 task :default => :paper
 
 task :paper do
-  system("ruby computePositions.rb")
+  system("ruby compute_positions.rb")
   system("pdflatex main.tex")
 end
