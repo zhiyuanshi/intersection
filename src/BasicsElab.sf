@@ -1,6 +1,7 @@
--- BEGIN_ADD
-let e1 = (4, "4");
+-- BEGIN_BASICSELAB_ADD
+let e1 = (4, "2 + 2");
 let e2 = (7, "7");
-let add (e1 : Int) (e2 : Int) = e1 + e2;
-add (e1._1) (e2._1)
--- END_ADD
+let add (e1 : Int) (e2 : Int)
+  = e1 + e2;
+add ((\ (x:(Int,String)). x._1) e1) ((\ (x:(Int,String)). x._1) e2)
+-- END_BASICSELAB_ADD
