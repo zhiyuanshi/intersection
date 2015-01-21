@@ -1,0 +1,119 @@
+\section{A Taste of FI}
+
+% State novelty
+
+While elaborating intersection types is not a new idea, this paper is the first
+that presents a type system that incorporates both parametric polymorphism and
+intersection polymorphism and explores the usefulness of such a type system in
+practice.
+
+\subsection{Intersection Types}
+
+\FI is an thin extension on top of \F that is elaborated into \Fend, a variant
+of System F. System F, or polymorphic lambda calculus lays the foundation of
+functional programming languages such as Haskell.
+
+Intersection types provide a general mechanism for ad-hoc polymorphism.
+
+Examples in this paper are written with a Haskell-like syntax. Consider a
+\texttt{show} function that converts either integers or booleans to strings. In
+FI it can be given the type:
+
+\begin{verbatim}
+show :: (Int -> String) & (Bool -> String)
+\end{verbatim}
+
+And can be defined as:
+
+\begin{verbatim}
+show = showInt ,, showBool
+\end{verbatim}
+
+where \texttt{showString} and \texttt{showBool} are ordinary monomorphic
+functions.
+
+The merge construct in the original function is elaborated into a pair in the
+target language:
+
+\begin{verbatim}
+show = (showInt, showBool)
+\end{verbatim}
+
+In the target language where there is no intersection types, the application of
+the integer \texttt{1} to this function does not typecheck. However, we may
+rescue this situtation by inserting a coercion that extracts the first item out
+of this pair.
+
+Thus \texttt{show 1} in FI corresponds to \texttt{(fst show) 1} in F.
+
+% Describe intersection types, encoding records with Intersecion types
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% What is an intersection type?
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The central addition to the type system of \F in \FI is intersection types. What
+is an intersection type? One classic view is from set-theoretic interpretation
+of types: $ A \& B $ stands for the intersection of the set of values of $ A $
+and $ B $. The other view, adopted in this paper, regards types as a kind of
+interface: a value of type $ A \& B $ satisfies both of the interfaces of $ A $
+and $ B $. For example, $ { eval : Int } $ is the interface that supports
+evaluation to integers, while $ { eval : Int } \& { print : String } $ supports
+both evaluation and pretty printing. Those interfaces are akin to interfaces in
+Java or traits in Scala. But one key difference is that they are unnamed in \FIend.
+
+% \lstinputlisting[linerange=-]{} % APPLY:linerange=MIXIN_LIB
+
+In addition to introduction of record literals, FI support two more operations
+on records: record elimination and record update.
+
+This section informally presents \FI programs and the elaboration.
+
+\subsection{Records}
+
+A record type of the form $ \{ l : t \} $ can be thought as a normal type $ t $
+tagged by the label $ l $.
+
+% A basic example
+
+As our first example, the following illustrates the key features of the type
+system of \FI as well as the elaboration of \FI expressions into \F ones.
+
+\lstinputlisting[linerange=2-6]{../src/Basics.sf} % APPLY:linerange=BASICS_ADD
+
+$ e1 $ and $ e2 $ are two expressions that support both evaluation and pretty
+printing and each has type $ \{ eval : Int, print : String \} $. $ add $ takes
+two expressions and computes their sum. Note that in order to compute a sum,
+$ add $ only requires that the two expressions support evaluation and hence the
+type of the parameter $ \{ eval : Int \} $. As a result, the type of $ e1 $ and
+$ e2 $ are not exactly the same with that of the parameters of $ add $. However,
+under a structural type system, this program should typecheck anyway because the
+arguments being passed has more information than required. In other words,
+$ \{ eval : Int, print : String \} $ is a subtype of $ \{ eval : Int \} $.
+
+How is this subtyping relation derived? In \FIend, multi-field record types are
+excluded from the type system because $ \{ eval : Int, print : String \} $ can
+be encoded as $ \{ eval : Int \} \& \{ print : String \} $. And by one of
+subtyping rules derives that $ \{ eval : Int \} \& \{ print : String \} $ is a
+subtype of $ \{ eval : Int \} $.
+
+This example is elaborated into the following in \Fend.
+
+\lstinputlisting[linerange=2-6]{../src/BasicsElab.sf} % APPLY:linerange=BASICSELAB_ADD
+
+In order to give the reader an intuitive idea of how the elaboration works,
+let's first imagine a manual translation.
+
+First, multi-field record literals are desugared into merges of single-field
+record literals. Therefore $ \{ eval = 4, print = ``4'' \} $ becomes
+$ \{ eval = 4 \} ,, \{ print = ``4'' \} $. Merges of two values are elaborated
+into just a pair of them and single-field record literals lose their field
+labels during the elaboration. Hence $ \{ eval = 4 \} ,, \{ print = ``4'' \} $
+becomes $ (4, ``4'') $.
+
+Finally, $ e1 $ and $ e2 $ are both coerced by a projection function
+$ \\(x:(Int,String)). x.\_1 $ before being applied to $ add $. We adopt a
+Scala-like syntax where $ .\_1 $ denotes the projection of a tuple on the first
+element, and so on.
+
+\subsection{Parametric Polymorphism}

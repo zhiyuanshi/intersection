@@ -118,92 +118,30 @@ prototype-based programming is often criticized over concerns of correctness and
 safety. Furthermore, almost all prototype-based systems rely on the fact that
 the language is dynamically typed and interpreted.
 
-This paper introduces System $F_{IR}$
+In summary, the contributions of this paper are:
 
-\section{A Primer on FI}
+\begin{itemize}
 
-% State novelty
+\item{elaboration typing rules which given a source expression with intersection
+    types, typecheck and translate it into an ordinary F term. Prove a type
+    preservation result: if a term $e$ has type $\tau$ in the source language,
+    then the translated term $|e|$ is well-typed and has type $|\tau|$ in the
+    target language.}
 
-While elaborating intersection types is not a new idea, this paper is the first
-that presents a type system that incorporates both parametric polymorphism and
-intersection polymorphism and explores the usefulness of such a type system in
-practice.
+\item{present an algorithm for detecting incoherence which can be very important
+    in practice.}
 
-\subsection{Intersection types}
+\item{explores the connection between intersection types and object algebra by
+    showing various examples of encoding object algebra with intersection
+    types.}
 
-\FI is an thin extension on top of \F that is elaborated into \Fend, a variant
-of System F. System F, or polymorphic lambda calculus lays the foundation of
-functional programming languages such as Haskell.
+\end{itemize}
 
-% Describe intersection types, encoding records with Intersecion types
+\input{sections/taste.tex}
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% What is an intersection type?
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Application}
 
-The central addition to the type system of \F in \FI is intersection types. What
-is an intersection type? One classic view is from set-theoretic interpretation
-of types: $ A \& B $ stands for the intersection of the set of values of $ A $
-and $ B $. The other view, adopted in this paper, regards types as a kind of
-interface: a value of type $ A \& B $ satisfies both of the interfaces of $ A $
-and $ B $. For example, $ { eval : Int } $ is the interface that supports
-evaluation to integers, while $ { eval : Int } \& { print : String } $ supports
-both evaluation and pretty printing. Those interfaces are akin to interfaces in
-Java or traits in Scala. But one key difference is that they are unnamed in \FIend.
-
-% \lstinputlisting[linerange=-]{} % APPLY:linerange=MIXIN_LIB
-
-In addition to introduction of record literals, FI support two more operations
-on records: record elimination and record update.
-
-This section informally presents \FI programs and the elaboration.
-
-\subsection{Encoding records with intersection types}
-
-% A basic example
-
-As our first example, the following illustrates the key features of the type
-system of \FI as well as the elaboration of \FI expressions into \F ones.
-
-\lstinputlisting[linerange=2-6]{../src/Basics.sf} % APPLY:linerange=BASICS_ADD
-
-$ e1 $ and $ e2 $ are two expressions that support both evaluation and pretty
-printing and each has type $ \{ eval : Int, print : String \} $. $ add $ takes
-two expressions and computes their sum. Note that in order to compute a sum,
-$ add $ only requires that the two expressions support evaluation and hence the
-type of the parameter $ \{ eval : Int \} $. As a result, the type of $ e1 $ and
-$ e2 $ are not exactly the same with that of the parameters of $ add $. However,
-under a structural type system, this program should typecheck anyway because the
-arguments being passed has more information than required. In other words,
-$ \{ eval : Int, print : String \} $ is a subtype of $ \{ eval : Int \} $.
-
-How is this subtyping relation derived? In \FIend, multi-field record types are
-excluded from the type system because $ \{ eval : Int, print : String \} $ can
-be encoded as $ \{ eval : Int \} \& \{ print : String \} $. And by one of
-subtyping rules derives that $ \{ eval : Int \} \& \{ print : String \} $ is a
-subtype of $ \{ eval : Int \} $.
-
-This example is elaborated into the following in \Fend.
-
-\lstinputlisting[linerange=2-6]{../src/BasicsElab.sf} % APPLY:linerange=BASICSELAB_ADD
-
-In order to give the reader an intuitive idea of how the elaboration works,
-let's first imagine a manual translation.
-
-First, multi-field record literals are desugared into merges of single-field
-record literals. Therefore $ \{ eval = 4, print = ``4'' \} $ becomes
-$ \{ eval = 4 \} ,, \{ print = ``4'' \} $. Merges of two values are elaborated
-into just a pair of them and single-field record literals lose their field
-labels during the elaboration. Hence $ \{ eval = 4 \} ,, \{ print = ``4'' \} $
-becomes $ (4, ``4'') $.
-
-Finally, $ e1 $ and $ e2 $ are both coerced by a projection function
-$ \\(x:(Int,String)). x.\_1 $ before being applied to $ add $. We adopt a
-Scala-like syntax where $ .\_1 $ denotes the projection of a tuple on the first
-element, and so on.
-
-
-\subsection{Using FI for modularity}
+\subsection{Object Algebras}
 
 % Introduce the expression problem
 
@@ -233,100 +171,30 @@ The merge operator $ ,, $ is used in the definition of $ merge $.
 
 % Mixin
 
+\subsection{Mixins}
+
 In Haskell, one is able to write programs in mixin style using records. However,
 this approach has a serious drawback: it is not possible to refine the mixin by
 adding more fields to the records. This means that the type of the family of the
 mixins has to be determined upfront.
 
 
+\subsection{Composing Mixins and Object Algebras}
 
 Combining mixins and OAs
 
+\subsection{Modular Visitor Components}
 
-% Modular visitor components
-
-
-
-
-There should be a section informally describing the language (System FI) through
-various examples. Intersection types provide a general mechanism for ad-hoc
-polymorphism.
-
-While elaboration intersection types has been
-
-In summary, the contributions of this paper are:
-
-\begin{itemize}
-
-\item{elaboration typing rules which given a source expression with intersection
-    types, typecheck and translate it into an ordinary F term. Prove a type
-    preservation result: if a term $e$ has type $\tau$ in the source language,
-    then the translated term $|e|$ is well-typed and has type $|\tau|$ in the
-    target language.}
-
-\item{present an algorithm for detecting incoherence which can be very important
-    in practice.}
-
-\item{explores the connection between intersection types and object algebra by
-    showing various examples of encoding object algebra with intersection
-    types.}
-
-\end{itemize}
-
-
-Mention properties informally via examples:
-
-%f : A & A -> A
-%f x = x
-
-Typeclasses
-
-Intersecion types in Scala
-
-
-Examples in this paper are written with a Haskell-like syntax. Consider a
-\texttt{show} function that converts either integers or booleans to strings. In
-FI it can be given the type:
-
-\begin{verbatim}
-show :: (Int -> String) & (Bool -> String)
-\end{verbatim}
-
-And can be defined as:
-
-\begin{verbatim}
-show = showInt ,, showBool
-\end{verbatim}
-
-where \texttt{showString} and \texttt{showBool} are ordinary monomorphic
-functions.
-
-The merge construct in the original function is elaborated into a pair in the
-target language:
-
-\begin{verbatim}
-show = (showInt, showBool)
-\end{verbatim}
-
-In the target language where there is no intersection types, the application of
-the integer \texttt{1} to this function does not typecheck. However, we may
-rescue this situtation by inserting a coercion that extracts the first item out
-of this pair.
-
-Thus \texttt{show 1} in FI corresponds to \texttt{(fst show) 1} in F.
-
-\subsection{Algebras}
-
-\subsection{Lenses}
-
-\subsection{Embedded DSLs}
-
-\section{System F}
+\section{Target Language}
 
 The target language is System F extended with a base type Int. The syntax and
 typing is completely standard. The types are function, universal quantification.
 
-\section{System FI}
+\subsection{Target Syntax}
+
+\subsection{Target Typing}
+
+\section{Source Language}
 
 The source language, System FI, is identical to the source language described in
 the previous section, except for the two additions: intersection types and
@@ -336,7 +204,30 @@ Dunfield has described a language that includes a ``top'' type but it does not a
 
 Remark. The operational semantics of FI is not presented in this paper. However,
 
-\section{Type-Directed Translation to System F}
+\subsection{Source Syntax}
+
+\subsection{Source Subtyping}
+
+\subsection{Source Typing}
+
+\subsection{Elaboration Typing}
+
+\framebox{$|\tau| = T$}
+
+\[
+\begin{array}{rcl}
+  |\alpha|               & = & \alpha \\
+  |\tau_1 \to \tau_2|    & = & |\tau_1| \to |\tau_2| \\
+  |\forall \alpha. \tau| & = & \forall \alpha. |\tau| \\
+  |t_1 \& t_2|           & = & \langle |\tau_1|, |\tau_2| \rangle \\
+  |\{ l : \tau \}|       & = & |\tau|
+\end{array}
+\]
+
+\begin{lemma} \label{type-coerce}
+  If $$ \Gamma \vdash \tau_1 <: \tau_2 \yields{C} $$
+  then $$ |\Gamma| \vdash C : |\tau_1| \to |\tau_2| $$
+\end{lemma}
 
 In this section, we present a relatively lightweight type-directed elaboration
 from FI to F. The elaboration consists of four sets of rules, which are
@@ -383,6 +274,8 @@ Main results: type-preservation + coherence.
 
 \section{Implementation}
 
+\subsection{Type Synonyms}
+
 We extend the implementation of the type system extended with type synonyms and
 lazy arguments.
 
@@ -390,13 +283,9 @@ lazy arguments.
 type T A1 A2 = ... in
 \end{lstlisting}
 
-\section{Case Study?}
+\subsection{Optimization}
 
-\section{Properties}
-
-\section{Case Studies}
-
-\section{Related work}
+\section{Related Work}
 
 \begin{itemize}
 
@@ -408,7 +297,6 @@ type T A1 A2 = ... in
 \end{itemize}
 
 Nystrom et. al. OOPSLA 06
-
 
 Applications:
 
@@ -425,22 +313,10 @@ types more natural and easy to understand/use?
 
 http://www.cs.ox.ac.uk/jeremy.gibbons/publications/embedding.pdf
 
-\framebox{$|\tau| = T$}
+\section{Conclusion}
 
-\[
-\begin{array}{rcl}
-  |\alpha|               & = & \alpha \\
-  |\tau_1 \to \tau_2|    & = & |\tau_1| \to |\tau_2| \\
-  |\forall \alpha. \tau| & = & \forall \alpha. |\tau| \\
-  |t_1 \& t_2|           & = & \langle |\tau_1|, |\tau_2| \rangle \\
-  |\{ l : \tau \}|       & = & |\tau|
-\end{array}
-\]
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\begin{lemma} \label{type-coerce}
-  If $$ \Gamma \vdash \tau_1 <: \tau_2 \yields{C} $$
-  then $$ |\Gamma| \vdash C : |\tau_1| \to |\tau_2| $$
-\end{lemma}
 
 \begin{proof}
 By structural induction on the types and the corresponding inference rule. \\
