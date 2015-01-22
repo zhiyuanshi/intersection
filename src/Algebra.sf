@@ -1,8 +1,3 @@
-type Open S = (Unit -> S) -> S;
-type Mixin S = (Unit -> S) -> (Unit -> S) -> S;
-let extends S (f : Mixin S) (g : Mixin S) : Mixin S
-  = \ (super : Unit -> S). \ (this  : Unit -> S). f (\ (d : Unit). g super this) this;
-
 -- BEGIN_IEVAL
 type IEval  = { eval : Int };
 -- END_IEVAL
@@ -31,7 +26,7 @@ let printAlg = {
 
 -- BEGIN_ALGEBRA_E1_E2
 let e1 E (f : ExpAlg E)    = f.add (f.lit 6) (f.lit 6);
-let e2 E (f : SubExpAlg E) = f.sub (exp1 E f) (f.lit 2);
+let e2 E (f : SubExpAlg E) = f.sub (e1 E f) (f.lit 2);
 -- END_ALGEBRA_E1_E2
 
 -- BEGIN_MERGE
@@ -46,5 +41,5 @@ let newAlg = merge IEval IPrint subEvalAlg printAlg in
 -- END_NEWALG
 
 -- BEGIN_PRINT
-(exp1 (IEval & IPrint) newAlg).print
+(e1 (IEval & IPrint) newAlg).print
 -- END_PRINT
