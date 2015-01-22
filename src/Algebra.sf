@@ -1,8 +1,9 @@
--- BEGIN_IEVAL
 type Open S = (Unit -> S) -> S;
 type Mixin S = (Unit -> S) -> (Unit -> S) -> S;
 let extends S (f : Mixin S) (g : Mixin S) : Mixin S
   = \ (super : Unit -> S). \ (this  : Unit -> S). f (\ (d : Unit). g super this) this;
+
+-- BEGIN_IEVAL
 type IEval  = { eval : Int };
 -- END_IEVAL
 
@@ -35,7 +36,7 @@ let e2 E (f : SubExpAlg E) = f.sub (exp1 E f) (f.lit 2);
 
 -- BEGIN_MERGE
 let merge A B (f : ExpAlg A) (g : ExpAlg B) = {
-  lit = \(x : Int). f.lit x ,, g.lit x,
+  lit = \(x : Int). f.lit x ,, g.lit x, -- P1
   add = \(x : A & B). \(y : A & B). f.add x y ,, g.add x y
 };
 -- END_MERGE
