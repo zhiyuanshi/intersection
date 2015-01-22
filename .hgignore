@@ -8,6 +8,8 @@ systemf/.project
 *Parser.hs
 *Parser.info
 
+*.tex-old
+
 # Ignore generated Java source files
 src/*.java
 
