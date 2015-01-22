@@ -9,6 +9,7 @@ systemf/.project
 *Parser.info
 
 *.tex-old
+footempfile.txt
 
 # Ignore generated Java source files
 src/*.java
