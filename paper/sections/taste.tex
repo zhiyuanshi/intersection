@@ -1,56 +1,18 @@
 \section{A Taste of FI}
 
-% State novelty
+This section provides the reader with the intuition of \FIend, while we postpone
+the presentation of the details in later sections.
 
-While elaborating intersection types is not a new idea, this paper is the first
-that presents a type system that incorporates both parametric polymorphism and
-intersection polymorphism and explores the usefulness of such a type system in
-practice.
+In short, \FI generalizes \Fend by adding intersection polymorphism. \FI terms
+are elaborated into \Fend, a variant of System F. System F, or polymorphic
+lambda calculus lays the foundation of functional programming languages such as
+Haskell.
+
+The type system of \FI permits a subtyping relation naturally and enables
+prototype-based inheritance. We will explore the usefulness of such a type
+system in practice by showing various examples.
 
 \subsection{Intersection Types}
-
-\FI is an thin extension on top of \F that is elaborated into \Fend, a variant
-of System F. System F, or polymorphic lambda calculus lays the foundation of
-functional programming languages such as Haskell.
-
-Intersection types provide a general mechanism for ad-hoc polymorphism.
-
-Examples in this paper are written with a Haskell-like syntax. Consider a
-\texttt{show} function that converts either integers or booleans to strings. In
-FI it can be given the type:
-
-\begin{verbatim}
-show :: (Int -> String) & (Bool -> String)
-\end{verbatim}
-
-And can be defined as:
-
-\begin{verbatim}
-show = showInt ,, showBool
-\end{verbatim}
-
-where \texttt{showString} and \texttt{showBool} are ordinary monomorphic
-functions.
-
-The merge construct in the original function is elaborated into a pair in the
-target language:
-
-\begin{verbatim}
-show = (showInt, showBool)
-\end{verbatim}
-
-In the target language where there is no intersection types, the application of
-the integer \texttt{1} to this function does not typecheck. However, we may
-rescue this situtation by inserting a coercion that extracts the first item out
-of this pair.
-
-Thus \texttt{show 1} in FI corresponds to \texttt{(fst show) 1} in F.
-
-% Describe intersection types, encoding records with Intersecion types
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% What is an intersection type?
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 The central addition to the type system of \F in \FI is intersection types. What
 is an intersection type? One classic view is from set-theoretic interpretation
@@ -60,24 +22,60 @@ interface: a value of type $ A \& B $ satisfies both of the interfaces of $ A $
 and $ B $. For example, $ { eval : Int } $ is the interface that supports
 evaluation to integers, while $ { eval : Int } \& { print : String } $ supports
 both evaluation and pretty printing. Those interfaces are akin to interfaces in
-Java or traits in Scala. But one key difference is that they are unnamed in \FIend.
+Java or traits in Scala. But one key difference is that they are unnamed in
+\FIend.
+
+Intersection types provide a simple mechanism for ad-hoc polymorphism, similar
+to what type classes in Haskell achieve. The key constructs are the ``merge''
+operator, denoted by ``$ ,, $'', at the value level and the corresponding type
+intersection operator, denoted by, ``$ \& $'' at the type level.
+
+For example, we can define an (ad-hoc)-polymorphic $ \texttt{show} $ function
+that is able to convert integers and booleans to strings. In \FI such function
+can be given the type
+\begin{lstlisting}
+  (Int -> String) & (Bool -> String)
+\end{lstlisting}
+and be defined using the merge operator $ ,, $ as
+\begin{lstlisting}
+  let show = showInt ,, showBool
+\end{lstlisting}
+where \texttt{showString} and \texttt{showBool} are ordinary monomorphic
+functions. Later suppose the integer $ 1 $ is applied to the $ show $ function,
+the first component $ showInt $ will be picked because the type of $ showInt $
+is compatible with $ 1 $ while $ showBool $ is not.
+
+% The merge construct in the original function is elaborated into a pair in the
+% target language:
+
+% \begin{verbatim}
+% show = (showInt, showBool)
+% \end{verbatim}
+
+% In the target language where there is no intersection types, the application
+% of the integer \texttt{1} to this function does not typecheck. However, we may
+% rescue this situtation by inserting a coercion that extracts the first item
+% out of this pair.
+
+% Thus \texttt{show 1} in FI corresponds to \texttt{(fst show) 1} in F.
+
+% While elaborating intersection types, this paper is the first that presents a
+% type system that incorporates both parametric polymorphism and intersection
+% polymorphism.
+
+% Describe intersection types, encoding records with Intersecion types
 
 % \lstinputlisting[linerange=-]{} % APPLY:linerange=MIXIN_LIB
 
-In addition to introduction of record literals, FI support two more operations
-on records: record elimination and record update.
+\subsection{Encoding Records}
 
-This section informally presents \FI programs and the elaboration.
-
-\subsection{Records}
+In addition to introduction of record literals using the usual notation, \FI
+support two more operations on records: record elimination and record update.
 
 A record type of the form $ \{ l : t \} $ can be thought as a normal type $ t $
 tagged by the label $ l $.
 
 % A basic example
-
-As our first example, the following illustrates the key features of the type
-system of \FI as well as the elaboration of \FI expressions into \F ones.
 
 \lstinputlisting[linerange=2-6]{../src/Basics.sf} % APPLY:linerange=BASICS_ADD
 
@@ -97,23 +95,22 @@ be encoded as $ \{ eval : Int \} \& \{ print : String \} $. And by one of
 subtyping rules derives that $ \{ eval : Int \} \& \{ print : String \} $ is a
 subtype of $ \{ eval : Int \} $.
 
-This example is elaborated into the following in \Fend.
+% This example is elaborated into the following in \Fend.
 
 \lstinputlisting[linerange=2-6]{../src/BasicsElab.sf} % APPLY:linerange=BASICSELAB_ADD
 
-In order to give the reader an intuitive idea of how the elaboration works,
-let's first imagine a manual translation.
-
-First, multi-field record literals are desugared into merges of single-field
-record literals. Therefore $ \{ eval = 4, print = ``4'' \} $ becomes
-$ \{ eval = 4 \} ,, \{ print = ``4'' \} $. Merges of two values are elaborated
-into just a pair of them and single-field record literals lose their field
-labels during the elaboration. Hence $ \{ eval = 4 \} ,, \{ print = ``4'' \} $
-becomes $ (4, ``4'') $.
-
-Finally, $ e1 $ and $ e2 $ are both coerced by a projection function
-$ \\(x:(Int,String)). x.\_1 $ before being applied to $ add $. We adopt a
-Scala-like syntax where $ .\_1 $ denotes the projection of a tuple on the first
-element, and so on.
-
 \subsection{Parametric Polymorphism}
+
+The presence of both parametric polymorphism and intersection is critical, as we
+shall see in the next section, in solving modularity problems. Here is a code
+snippet from the next section (The reader is not required to understand the
+purpose of this code at this stage; just recognizing the two types of
+polymorphism is enough.)
+\begin{lstlisting}
+type SubExpAlg E = (ExpAlg E) \& { sub : E -> E -> E };
+let e2 E (f : SubExpAlg E) = f.sub (exp1 E f) (f.lit 2);
+\end{lstlisting}
+$ SubExpAlg $ is a type synonym (a la Haskell) defined as the intersection of
+$ ExpAlg E $ and $ \{ sub : E -> E -> E \} $, parametrized by a type parameter
+$ E $. $ e2 $ exhibits parametric polymorphism as it takes a type argument
+$ E $.

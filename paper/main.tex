@@ -154,7 +154,7 @@ The source language, System FI, is identical to the source language described in
 the previous section, except for the two additions: intersection types and
 records. The formalization includes only single records and single record types as the multi-records can be desugared into the merge of multiple single records.
 
-Dunfield has described a language that includes a ``top'' type but it does not appear in our language.
+Dunfield has described a language that includes a ``top'' type but it does not appear in our language. Our work differs from Dunfield in that ...
 
 Remark. The operational semantics of FI is not presented in this paper. However,
 
@@ -165,6 +165,21 @@ Remark. The operational semantics of FI is not presented in this paper. However,
 \subsection{Source Typing}
 
 \subsection{Elaboration Typing}
+
+In order to give the reader an intuitive idea of how the elaboration works,
+let's first imagine a manual translation.
+
+First, multi-field record literals are desugared into merges of single-field
+record literals. Therefore $ \{ eval = 4, print = ``4'' \} $ becomes
+$ \{ eval = 4 \} ,, \{ print = ``4'' \} $. Merges of two values are elaborated
+into just a pair of them and single-field record literals lose their field
+labels during the elaboration. Hence $ \{ eval = 4 \} ,, \{ print = ``4'' \} $
+becomes $ (4, ``4'') $.
+
+Finally, $ e1 $ and $ e2 $ are both coerced by a projection function
+$ \\(x:(Int,String)). x.\_1 $ before being applied to $ add $. We adopt a
+Scala-like syntax where $ .\_1 $ denotes the projection of a tuple on the first
+element, and so on.
 
 \framebox{$|\tau| = T$}
 
