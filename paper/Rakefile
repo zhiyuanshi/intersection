@@ -1,5 +1,9 @@
-task :default => :paper
+task :default => [:paper, :clean]
 
 task :paper do
   system("ruby compute_positions.rb && pdflatex main.tex")
+end
+
+task :clean do
+  system("rm -f ../src/*.java")
 end
