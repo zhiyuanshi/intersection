@@ -1,7 +1,0 @@
--- BEGIN_BASICS_ADD
-let e1 = { eval = 4, print = "2 + 2"};
-let e2 = { eval = 7, print = "7"};
-let add (e1 : { eval : Int }) (e2 : { eval : Int })
-  = e1.eval + e2.eval;
-add e1 e2
--- END_BASICS_ADD
