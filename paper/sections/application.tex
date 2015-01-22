@@ -1,0 +1,66 @@
+\section{Application}
+
+Algebra -> P1,2
+Visitor -> P2
+
+Yanlin
+Mixin
+
+This section shows that the features in System FI are enough to encode
+extensible designs, and even improve on those designs. In particular,
+System FI has two main advantages over existing languages:
+
+\begin{itemize}
+\item It supports dynamic composition of intersecting values.
+\item It supports contravariant parameter types in the subtyping relation.
+\end{itemize}
+
+These two features can be used to improve existing designs
+of modular programs.
+
+\subsection{Object Algebras}
+
+% Introduce the expression problem
+
+The expression problem refers to the difficulty of adding a new operations and a
+new data variant without changing or duplicating existing code in statically
+typed functional languages.
+
+There has been recently a lightweight solution to the expression problem that
+takes advantage of covariant return types in Java. We show that FI is able to
+solve the expression problem in the same spirit. The
+A)
+
+% OA
+
+Object algebras allow one to modularly extend the base
+
+We first define the interface capable of evaluation $ IEVAL $.
+
+\lstinputlisting[linerange=10-14]{../src/Algebra.sf} % APPLY:linerange=EXPALG
+\lstinputlisting[linerange=22-28]{../src/Algebra.sf} % APPLY:linerange=SUBEXPALG
+\lstinputlisting[linerange=44-44]{../src/Algebra.sf} % APPLY:linerange=NEWALG
+\lstinputlisting[linerange=37-40]{../src/Algebra.sf} % APPLY:linerange=MERGE
+
+The merge operator $ ,, $ is used in the definition of $ merge $.
+
+\lstinputlisting[linerange=48-48]{../src/Algebra.sf} % APPLY:linerange=PRINT
+
+\subsection{From Algebras Back to Visitors}
+
+Contravariant param type helpers programmers to write more intuitive programs.
+
+\subsection{Yanlin}
+
+% Mixin goes last
+
+\subsection{Mixins}
+
+In Haskell, one is able to write programs in mixin style using records. However,
+this approach has a serious drawback: it is not possible to refine the mixin by
+adding more fields to the records. This means that the type of the family of the
+mixins has to be determined upfront.
+
+\subsection{Composing Mixins and Object Algebras}
+
+Combining mixins and OAs
