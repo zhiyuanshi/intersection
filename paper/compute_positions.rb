@@ -56,7 +56,7 @@ end
 #end
 
 
-Dir["*.tex"].each do |file|
+(Dir["*.tex"] + Dir["sections/*.tex"]).each do |file|
   #temp = Tempfile.new('compute_positions')
   tempname = "footempfile.txt"
   temp = File.new(tempname, "w")
