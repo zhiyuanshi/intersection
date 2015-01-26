@@ -15,13 +15,13 @@
 
 % Define macros immediately before the \begin{document} command
 \input{macros/type_systems.tex}
-\input{macros/systemfi.tex}
+% \input{macros/systemfi.tex}
 
-\newcommand{\FI}{{\bf FI} }
-\newcommand{\F}{{\bf F} }
+\newcommand{\systemf}{{\bf F~}}
+\newcommand{\systemF}{{\bf F}}
 
-\newcommand{\FIend}{{\bf FI}}
-\newcommand{\Fend}{{\bf F}}
+\newcommand{\systemfi}{{\bf FI~}}
+\newcommand{\systemFI}{{\bf FI}}
 
 % "define" code highlights for Java and Scala
 \lstdefinelanguage{JavaScala}{
@@ -43,27 +43,27 @@
 }
 
 \lstset{ %
-language=Haskell,                % choose the language of the code
-columns=flexible,
-lineskip=-1pt,
-basicstyle=\ttfamily\small,       % the size of the fonts that are used for the code
-numbers=none,                   % where to put the line-numbers
-numberstyle=\ttfamily\tiny,      % the size of the fonts that are used for the line-numbers
-stepnumber=1,                   % the step between two line-numbers. If it's 1 each line will be numbered
-numbersep=5pt,                  % how far the line-numbers are from the code
-backgroundcolor=\color{white},  % choose the background color. You must add \usepackage{color}
-showspaces=false,               % show spaces adding particular underscores
-showstringspaces=false,         % underline spaces within strings
-showtabs=false,                 % show tabs within strings adding particular underscores
-morekeywords={var},
+  language=Haskell,                % choose the language of the code
+  columns=flexible,
+  lineskip=-1pt,
+  basicstyle=\ttfamily\small,       % the size of the fonts that are used for the code
+  numbers=none,                   % where to put the line-numbers
+  numberstyle=\ttfamily\tiny,      % the size of the fonts that are used for the line-numbers
+  stepnumber=1,                   % the step between two line-numbers. If it's 1 each line will be numbered
+  numbersep=5pt,                  % how far the line-numbers are from the code
+  backgroundcolor=\color{white},  % choose the background color. You must add \usepackage{color}
+  showspaces=false,               % show spaces adding particular underscores
+  showstringspaces=false,         % underline spaces within strings
+  showtabs=false,                 % show tabs within strings adding particular underscores
+  morekeywords={var},
 %  frame=single,                   % adds a frame around the code
-tabsize=2,                  % sets default tabsize to 2 spaces
-captionpos=none,                   % sets the caption-position to bottom
-breaklines=true,                % sets automatic line breaking
-breakatwhitespace=false,        % sets if automatic breaks should only happen at whitespace
-title=\lstname,                 % show the filename of files included with \lstinputlisting; also try caption instead of title
-escapeinside={(*}{*)},          % if you want to add a comment within your code
-keywordstyle=\ttfamily\bfseries,
+  tabsize=2,                  % sets default tabsize to 2 spaces
+  captionpos=none,                   % sets the caption-position to bottom
+  breaklines=true,                % sets automatic line breaking
+  breakatwhitespace=false,        % sets if automatic breaks should only happen at whitespace
+  title=\lstname,                 % show the filename of files included with \lstinputlisting; also try caption instead of title
+  escapeinside={(*}{*)},          % if you want to add a comment within your code
+  keywordstyle=\ttfamily\bfseries,
 % commentstyle=\color{Gray},
 % stringstyle=\color{Green}
 }
@@ -74,7 +74,7 @@ keywordstyle=\ttfamily\bfseries,
 \setlength{\pdfpageheight}{\paperheight}
 \setlength{\pdfpagewidth}{\paperwidth}
 
-\title{\FI}
+\title{\systemfi}
 
 \authorinfo{Name1}
            {Affiliation1}
@@ -107,7 +107,7 @@ Acknowledgments, if needed.
 
 \appendix
 
-\input{sections/proof.tex}
+% \input{sections/proof.tex}
 
 % We recommend abbrvnat bibliography style.
 
@@ -122,6 +122,9 @@ Acknowledgments, if needed.
 
 \bibitem[Smith et~al.(2009)Smith, Jones]{smith02}
 P. Q. Smith, and X. Y. Jones. ...reference text...
+
+Coppo, M., Dezani-Ciancaglini, M.: A new type-assignment for λ-terms. Archiv.
+Math. Logik 19, 139–156 (1978)
 
 \end{thebibliography}
 

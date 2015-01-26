@@ -1,24 +1,25 @@
 \section{Application}
 
-Algebra -> P1,2
-Visitor -> P2
+% Algebra -> P1,2
+% Visitor -> P2
 
-Yanlin
-Mixin
+% Yanlin
+% Mixin
 
-This section shows that the features in System FI are enough to encode
-extensible designs, and even improve on those designs. In particular,
-System FI has two main advantages over existing languages:
+This section shows that the System F plus intersection types are enough
+for encoding extensible designs, and even improve on those designs. In
+particular, System FI has two main advantages over existing languages:
 
 \begin{itemize}
 \item It supports dynamic composition of intersecting values.
 \item It supports contravariant parameter types in the subtyping relation.
 \end{itemize}
 
-These two features can be used to improve existing designs
-of modular programs.
+Various solutions have been proposed to deal with the extensibility problems and
+many rely on heavyweight language features such as abstract methods and classes
+in Java.
 
-\subsection{Object Algebras}
+These two features can be used to improve existing designs of modular programs.
 
 % Introduce the expression problem
 
@@ -31,22 +32,51 @@ takes advantage of covariant return types in Java. We show that FI is able to
 solve the expression problem in the same spirit. The
 A)
 
-% OA
+\subsection{Object Algebras}
 
-Object algebras allow one to modularly extend the base
+% Explain how our type system solves the limitations in using OA.
 
-We first define the interface capable of evaluation $ IEVAL $.
+we first define an interface that supports the evaluation operation:
+\lstinputlisting[linerange=2-2]{../src/Algebra.sf} % APPLY:linerange=ALGEBRA_IEVAL
+The interface is just a type synonym \lstinline{IEval}. In \systemFI, record
+types are structural and hence any value that satisfies this interface is of
+type \lstinline{IEval} or of a subtype of \lstinline{IEval}.
 
-\lstinputlisting[linerange=10-14]{../src/Algebra.sf} % APPLY:linerange=EXPALG
-\lstinputlisting[linerange=22-28]{../src/Algebra.sf} % APPLY:linerange=SUBEXPALG
-\lstinputlisting[linerange=44-44]{../src/Algebra.sf} % APPLY:linerange=NEWALG
-\lstinputlisting[linerange=37-40]{../src/Algebra.sf} % APPLY:linerange=MERGE
+In the following, \lstinline{ExpAlg} is an object algebra interface of
+expressions with literal and addition case. And \lstinline{evalAlg} is an object
+algebra for evluation of those expressions.
+
+\lstinputlisting[linerange=6-10]{../src/Algebra.sf} % APPLY:linerange=ALGEBRA_EXPALG
+
+\lstinline{evalAlg} has type \lstinline{ExpAlg Int}
+
+\lstinputlisting[linerange=14-14]{../src/Algebra.sf} % APPLY:linerange=ALGEBRA_IPRINT
+\lstinputlisting[linerange=18-24]{../src/Algebra.sf} % APPLY:linerange=ALGEBRA_SUBEXPALG
+
+Provided with the definitions above, we can then create values using the
+appropriate algebras. For example:
+\lstinputlisting[linerange=28-29]{../src/Algebra.sf} % APPLY:linerange=ALGEBRA_E1_E2
+defines two expressions. There are two interesting points that are worth noting here.
+First, the expressions themselves are functions that take an extra argument, the
+algebras, and use the data constructors in the object algebra (factory)
+\lstinline{f} such as \lstinline{lit}, \lstinline{add}  and \lstinline{sub}
+to create values.
+
+\lstinputlisting[linerange=33-36]{../src/Algebra.sf} % APPLY:linerange=ALGEBRA_MERGE
+\lstinputlisting[linerange=40-40]{../src/Algebra.sf} % APPLY:linerange=ALGEBRA_NEWALG
+\lstinputlisting[linerange=44-44]{../src/Algebra.sf} % APPLY:linerange=ALGEBRA_PRINT
+
+\lstinline{e1} is a single object created that supports both evaluation and
+printing, thus achieving full feature-oriented programming.
 
 The merge operator $ ,, $ is used in the definition of $ merge $.
 
-\lstinputlisting[linerange=48-48]{../src/Algebra.sf} % APPLY:linerange=PRINT
-
 \subsection{From Algebras Back to Visitors}
+
+The visitor pattern allows adding new operations to existing structures without
+modifying those structures.
+
+\lstinputlisting{../src/Visitor.sf}
 
 Contravariant param type helpers programmers to write more intuitive programs.
 
@@ -56,11 +86,11 @@ Contravariant param type helpers programmers to write more intuitive programs.
 
 \subsection{Mixins}
 
+\lstinputlisting{../src/Mixin.sf}
+
 In Haskell, one is able to write programs in mixin style using records. However,
 this approach has a serious drawback: it is not possible to refine the mixin by
 adding more fields to the records. This means that the type of the family of the
 mixins has to be determined upfront.
 
 \subsection{Composing Mixins and Object Algebras}
-
-Combining mixins and OAs
