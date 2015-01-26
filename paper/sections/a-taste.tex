@@ -4,21 +4,21 @@
   Change the examples later to something very simple.
 \end{footnote}
 
-This section provides the reader with the intuition of \FIend, while we postpone
+This section provides the reader with the intuition of \systemFI, while we postpone
 the presentation of the details in later sections.
 
-In short, \FI generalizes \Fend by adding intersection polymorphism. \FI terms
-are elaborated into \Fend, a variant of System F. System F, or polymorphic
+In short, \systemfi generalizes \systemf by adding intersection polymorphism. \systemfi terms
+are elaborated into \systemF, a variant of System F. System F, or polymorphic
 lambda calculus lays the foundation of functional programming languages such as
 Haskell.
 
-The type system of \FI permits a subtyping relation naturally and enables
+The type system of \systemfi permits a subtyping relation naturally and enables
 prototype-based inheritance. We will explore the usefulness of such a type
 system in practice by showing various examples.
 
 \subsection{Intersection Types}
 
-The central addition to the type system of \F in \FI is intersection types. What
+The central addition to the type system of \systemf in \systemfi is intersection types. What
 is an intersection type? One classic view is from set-theoretic interpretation
 of types: \lstinline{A \& B} stands for the intersection of the set of values of
 \lstinline{A} and \lstinline{B}. The other view, adopted in this paper, regards
@@ -27,7 +27,7 @@ of the interfaces of \lstinline{A} and \lstinline{B}. For example,
 \lstinline{eval : Int} is the interface that supports evaluation to integers,
 while \lstinline{ eval : Int \& print : String } supports both evaluation and
 pretty printing. Those interfaces are akin to interfaces in Java or traits in
-Scala. But one key difference is that they are unnamed in \FIend.
+Scala. But one key difference is that they are unnamed in \systemFI.
 
 Intersection types provide a simple mechanism for ad-hoc polymorphism, similar
 to what type classes in Haskell achieve. The key constructs are the ``merge''
@@ -35,7 +35,7 @@ operator, denoted by ``\lstinline{,,}'', at the value level and the correspondin
 intersection operator, denoted by, ``\lstinline{\&}'' at the type level.
 
 For example, we can define an (ad-hoc)-polymorphic \lstinline{show} function
-that is able to convert integers and booleans to strings. In \FI such function
+that is able to convert integers and booleans to strings. In \systemfi such function
 can be given the type
 \begin{lstlisting}
   (Int -> String) & (Bool -> String)
@@ -73,7 +73,7 @@ is compatible with \lstinline{1} while \lstinline{showBool} is not.
 
 \subsection{Encoding Records}
 
-In addition to introduction of record literals using the usual notation, \FI
+In addition to introduction of record literals using the usual notation, \systemfi
 support two more operations on records: record elimination and record update.
 
 A record type of the form \lstinline{l : t} can be thought as a normal type \lstinline{t}
@@ -93,13 +93,13 @@ under a structural type system, this program should typecheck anyway because the
 arguments being passed has more information than required. In other words,
 \lstinline{eval : Int, print : String} is a subtype of \lstinline{eval : Int}.
 
-How is this subtyping relation derived? In \FIend, multi-field record types are
+How is this subtyping relation derived? In \systemFI, multi-field record types are
 excluded from the type system because \lstinline{eval : Int, print : String} can
 be encoded as \lstinline{eval : Int \& print : String}. And by one of
 subtyping rules derives that \lstinline{eval : Int \& print : String} is a
 subtype of \lstinline{eval : Int}.
 
-% This example is elaborated into the following in \Fend.
+% This example is elaborated into the following in \systemF.
 
 % \lstinputlisting[linerange=-]{} % APPLY:linerange=BASICSELAB_ADD
 
