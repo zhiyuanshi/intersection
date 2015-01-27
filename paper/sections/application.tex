@@ -34,9 +34,12 @@ A)
 
 \subsection{Object Algebras}
 
-% Explain how our type system solves the limitations in using OA.
+Our type system is an fairely simple extension of System F; yet surprisingly, it
+is able to solve the limitations of using object algebras in languages such as
+Java and Scala. We will illustrate this point with an step-by-step of solving
+the expression problem using \systemFI.
 
-we first define an interface that supports the evaluation operation:
+We first define an interface that supports the evaluation operation:
 \lstinputlisting[linerange=2-2]{../src/Algebra.sf} % APPLY:linerange=ALGEBRA_IEVAL
 The interface is just a type synonym \lstinline{IEval}. In \systemFI, record
 types are structural and hence any value that satisfies this interface is of
@@ -44,11 +47,11 @@ type \lstinline{IEval} or of a subtype of \lstinline{IEval}.
 
 In the following, \lstinline{ExpAlg} is an object algebra interface of
 expressions with literal and addition case. And \lstinline{evalAlg} is an object
-algebra for evluation of those expressions.
+algebra for evluation of those expressions, which has type \lstinline{ExpAlg Int}
 
 \lstinputlisting[linerange=6-10]{../src/Algebra.sf} % APPLY:linerange=ALGEBRA_EXPALG
 
-\lstinline{evalAlg} has type \lstinline{ExpAlg Int}
+Next, we define an interface that supports pretty printing.
 
 \lstinputlisting[linerange=14-14]{../src/Algebra.sf} % APPLY:linerange=ALGEBRA_IPRINT
 \lstinputlisting[linerange=18-24]{../src/Algebra.sf} % APPLY:linerange=ALGEBRA_SUBEXPALG
@@ -69,8 +72,6 @@ to create values.
 \lstinline{e1} is a single object created that supports both evaluation and
 printing, thus achieving full feature-oriented programming.
 
-The merge operator $ ,, $ is used in the definition of $ merge $.
-
 \subsection{From Algebras Back to Visitors}
 
 The visitor pattern allows adding new operations to existing structures without
@@ -80,7 +81,7 @@ modifying those structures.
 
 Contravariant param type helpers programmers to write more intuitive programs.
 
-\subsection{Yanlin}
+% \subsection{Yanlin}
 
 % Mixin goes last
 
@@ -92,5 +93,9 @@ In Haskell, one is able to write programs in mixin style using records. However,
 this approach has a serious drawback: it is not possible to refine the mixin by
 adding more fields to the records. This means that the type of the family of the
 mixins has to be determined upfront.
+
+The figure defines a mini mixin library. The apostrophe in front of types
+denotes call-by-name arguments similar to the \lstinline{=>} notation in the
+Scala language.
 
 \subsection{Composing Mixins and Object Algebras}
