@@ -59,13 +59,25 @@ Next, we define an interface that supports pretty printing.
 Provided with the definitions above, we can then create values using the
 appropriate algebras. For example:
 \lstinputlisting[linerange=28-29]{../src/Algebra.sf} % APPLY:linerange=ALGEBRA_E1_E2
-defines two expressions. There are two interesting points that are worth noting here.
-First, the expressions themselves are functions that take an extra argument, the
-algebras, and use the data constructors in the object algebra (factory)
-\lstinline{f} such as \lstinline{lit}, \lstinline{add}  and \lstinline{sub}
-to create values.
+defines two expressions.
+
+The expressions are unusual in the sense that they are functions that take an
+extra argument \lstinline{f}, the object algebras, and use the data constructors
+provided by the object algebra (factory) \lstinline{f} such as \lstinline{lit},
+\lstinline{add} and \lstinline{sub} to create values. Moreover, The algebras
+themselves are abstracted over the allowed operations such as evaluation and
+pretty printing by requiring the expression functions to take an extra argument
+\lstinline{E}.
 
 \lstinputlisting[linerange=33-36]{../src/Algebra.sf} % APPLY:linerange=ALGEBRA_MERGE
+
+If we would like to have an expression that supports both evaluation and pretty
+printing, we will need a mechanism to combine the evaluation and printing
+algebras. Intersection types allows such composition: the \lstinline{merge}
+function, which takes two expression algebras to create a combined algebra. It
+does so by constructing a new expression algebra, a record whose each field is a
+function that delegates the input to the two algebras taken.
+
 \lstinputlisting[linerange=40-40]{../src/Algebra.sf} % APPLY:linerange=ALGEBRA_NEWALG
 \lstinputlisting[linerange=44-44]{../src/Algebra.sf} % APPLY:linerange=ALGEBRA_PRINT
 
