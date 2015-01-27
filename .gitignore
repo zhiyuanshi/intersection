@@ -21,3 +21,11 @@ cabal.config
 Session.vim
 .netrwhist
 *~
+
+# LaTeX stuff
+*.aux
+*.log
+
+# Files created by the Ruby script
+*.tex-old
+footempfile.txt
