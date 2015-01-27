@@ -4,7 +4,11 @@
 \usepackage{amsmath}
 \usepackage{amsthm}
 \usepackage{fixltx2e}
+
+% For documentation for the `Listings` package,
+% see http://texdoc.net/texmf-dist/doc/latex/listings/listings.pdf
 \usepackage{listings}
+
 \usepackage{mdframed}
 \usepackage{xcolor}
 
@@ -23,27 +27,17 @@
 \newcommand{\systemfi}{{\bf fi~}}
 \newcommand{\systemFI}{{\bf fi}}
 
-% "define" code highlights for Java and Scala
-\lstdefinelanguage{JavaScala}{
-  morekeywords={public,int,interface,implements,default,
-    abstract,case,catch,class,def,%
-    do,else,extends,false,final,finally,%
-    for,if,implicit,import,match,mixin,%
-    new,null,object,override,package,%
-    private,protected,requires,return,sealed,%
-    super,this,throw,trait,true,try,%
-    type,val,var,while,with,yield},
-  otherkeywords={=>,<-,<\%,<:,>:,\#,@},
-  sensitive=true,
-  morecomment=[l]{//},
-  morecomment=[n]{/*}{*/},
-  morestring=[b]",
-  morestring=[b]',
-  morestring=[b]"""
+\lstdefinelanguage{F2J}{
+  morekeywords={let,type,module,end,in},
+  otherkeywords={->},
+  sensitive=false, % whether keywords are case sensitive
+  morecomment=[l]{--},
+  morestring=[b]", % `b' means inside a string delimiters are escaped by a backslash.
+  morestring=[b]'
 }
 
 \lstset{ %
-  language=Haskell,                % choose the language of the code
+  language=F2J,                % choose the language of the code
   columns=flexible,
   lineskip=-1pt,
   basicstyle=\ttfamily\small,       % the size of the fonts that are used for the code
@@ -64,7 +58,7 @@
   title=\lstname,                 % show the filename of files included with \lstinputlisting; also try caption instead of title
   escapeinside={(*}{*)},          % if you want to add a comment within your code
   keywordstyle=\ttfamily\bfseries,
-% commentstyle=\color{Gray},
+% commentstyle=\color{Gray}
 % stringstyle=\color{Green}
 }
 
