@@ -5,6 +5,7 @@ require 'fileutils'
 def scan(filename, beginpos, endpos, fileloc)
   File.open(filename, "r") do |file|
     counter = 1
+    # TODO: use IO#each_line
     while line = file.gets
       if line =~ /BEGIN_(\w+)/
         raise "Symbol '#{$1}' already defined" if fileloc[$1]
