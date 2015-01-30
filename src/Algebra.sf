@@ -1,45 +1,37 @@
--- BEGIN_ALGEBRA_IEVAL
+-- @base
 type IEval  = { eval : Int };
--- END_ALGEBRA_IEVAL
-
--- BEGIN_ALGEBRA_EXPALG
 type ExpAlg E = { lit : Int -> E, add : E -> E -> E };
 let evalAlg = {
   lit = \(x : Int). { eval = x },
   add = \(x : IEval). \(y : IEval). { eval = x.eval + y.eval }
 };
--- END_ALGEBRA_EXPALG
+-- @
 
--- BEGIN_ALGEBRA_IPRINT
-type IPrint = { print : String };
--- END_ALGEBRA_IPRINT
-
--- BEGIN_ALGEBRA_SUBEXPALG
+-- @variant
 type SubExpAlg E = (ExpAlg E) & { sub : E -> E -> E };
 let subEvalAlg = evalAlg ,, { sub = \ (x : IEval). \ (y : IEval). { eval = x.eval - y.eval } };
+-- @
+
+-- @operation
+type IPrint = { print : String };
 let printAlg = {
   lit = \(x : Int). { print = x.toString() },
   add = \(x : IPrint). \(y : IPrint). { print = x.print.concat(" + ").concat(y.print) },
   sub = \(x : IPrint). \(y : IPrint). { print = x.print.concat(" - ").concat(y.print) }
 };
--- END_ALGEBRA_SUBEXPALG
+-- @
 
--- BEGIN_ALGEBRA_E1_E2
 let e1 E (f : ExpAlg E)    = f.add (f.lit 6) (f.lit 6);
 let e2 E (f : SubExpAlg E) = f.sub (e1 E f) (f.lit 2);
--- END_ALGEBRA_E1_E2
 
--- BEGIN_ALGEBRA_MERGE
+-- @merge
 let merge A B (f : ExpAlg A) (g : ExpAlg B) = {
   lit = \(x : Int). f.lit x ,, g.lit x,
   add = \(x : A & B). \(y : A & B). f.add x y ,, g.add x y
 };
--- END_ALGEBRA_MERGE
+-- @
 
--- BEGIN_ALGEBRA_NEWALG
+-- @usage
 let newAlg = merge IEval IPrint subEvalAlg printAlg in
--- END_ALGEBRA_NEWALG
-
--- BEGIN_ALGEBRA_PRINT
 (e1 (IEval & IPrint) newAlg).print
--- END_ALGEBRA_PRINT
+-- @

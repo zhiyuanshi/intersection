@@ -25,6 +25,7 @@ Session.vim
 # LaTeX stuff
 *.aux
 *.log
+*.dvi
 
 # Files created by the Ruby script
 *.tex-old

@@ -6,6 +6,22 @@
 % Yanlin
 % Mixin
 
+% #include ../src/Algebra.sf haskell @merge
+\begin{minted}{haskell}
+let merge A B (f : ExpAlg A) (g : ExpAlg B) = {
+  lit = \(x : Int). f.lit x ,, g.lit x,
+  add = \(x : A & B). \(y : A & B). f.add x y ,, g.add x y
+};
+\end{minted}
+% #end
+
+
+
+
+
+
+
+
 This section shows that the System F plus intersection types are enough
 for encoding extensible designs, and even improve on those designs. In
 particular, System FI has two main advantages over existing languages:
@@ -40,7 +56,22 @@ Java and Scala. We will illustrate this point with an step-by-step of solving
 the expression problem using \systemFI.
 
 We first define an interface that supports the evaluation operation:
-\lstinputlisting[linerange=2-2]{../src/Algebra.sf} % APPLY:linerange=ALGEBRA_IEVAL
+
+% #include ../src/Algebra.sf haskell @base
+\begin{minted}{haskell}
+type IEval  = { eval : Int };
+type ExpAlg E = { lit : Int -> E, add : E -> E -> E };
+let evalAlg = {
+  lit = \(x : Int). { eval = x },
+  add = \(x : IEval). \(y : IEval). { eval = x.eval + y.eval }
+};
+\end{minted}
+% #end
+
+
+
+
+
 The interface is just a type synonym \lstinline{IEval}. In \systemFI, record
 types are structural and hence any value that satisfies this interface is of
 type \lstinline{IEval} or of a subtype of \lstinline{IEval}.
@@ -49,16 +80,36 @@ In the following, \lstinline{ExpAlg} is an object algebra interface of
 expressions with literal and addition case. And \lstinline{evalAlg} is an object
 algebra for evluation of those expressions, which has type \lstinline{ExpAlg Int}
 
-\lstinputlisting[linerange=6-10]{../src/Algebra.sf} % APPLY:linerange=ALGEBRA_EXPALG
+% #include ../src/Algebra.sf haskell @variant
+\begin{minted}{haskell}
+type SubExpAlg E = (ExpAlg E) & { sub : E -> E -> E };
+let subEvalAlg = evalAlg ,, { sub = \ (x : IEval). \ (y : IEval). { eval = x.eval - y.eval } };
+\end{minted}
+% #end
+
+
+
+
 
 Next, we define an interface that supports pretty printing.
 
-\lstinputlisting[linerange=14-14]{../src/Algebra.sf} % APPLY:linerange=ALGEBRA_IPRINT
-\lstinputlisting[linerange=18-24]{../src/Algebra.sf} % APPLY:linerange=ALGEBRA_SUBEXPALG
+% #include ../src/Algebra.sf haskell @operation
+\begin{minted}{haskell}
+type IPrint = { print : String };
+let printAlg = {
+  lit = \(x : Int). { print = x.toString() },
+  add = \(x : IPrint). \(y : IPrint). { print = x.print.concat(" + ").concat(y.print) },
+  sub = \(x : IPrint). \(y : IPrint). { print = x.print.concat(" - ").concat(y.print) }
+};
+\end{minted}
+% #end
+
+
+
+
 
 Provided with the definitions above, we can then create values using the
 appropriate algebras. For example:
-\lstinputlisting[linerange=28-29]{../src/Algebra.sf} % APPLY:linerange=ALGEBRA_E1_E2
 defines two expressions.
 
 The expressions are unusual in the sense that they are functions that take an
@@ -69,7 +120,17 @@ themselves are abstracted over the allowed operations such as evaluation and
 pretty printing by requiring the expression functions to take an extra argument
 \lstinline{E}.
 
-\lstinputlisting[linerange=33-36]{../src/Algebra.sf} % APPLY:linerange=ALGEBRA_MERGE
+% #include ../src/Algebra.sf haskell @merge
+\begin{minted}{haskell}
+let merge A B (f : ExpAlg A) (g : ExpAlg B) = {
+  lit = \(x : Int). f.lit x ,, g.lit x,
+  add = \(x : A & B). \(y : A & B). f.add x y ,, g.add x y
+};
+\end{minted}
+% #end
+
+
+
 
 If we would like to have an expression that supports both evaluation and pretty
 printing, we will need a mechanism to combine the evaluation and printing
@@ -78,8 +139,16 @@ function, which takes two expression algebras to create a combined algebra. It
 does so by constructing a new expression algebra, a record whose each field is a
 function that delegates the input to the two algebras taken.
 
-\lstinputlisting[linerange=40-40]{../src/Algebra.sf} % APPLY:linerange=ALGEBRA_NEWALG
-\lstinputlisting[linerange=44-44]{../src/Algebra.sf} % APPLY:linerange=ALGEBRA_PRINT
+% #include ../src/Algebra.sf haskell @usage
+\begin{minted}{haskell}
+let newAlg = merge IEval IPrint subEvalAlg printAlg in
+(e1 (IEval & IPrint) newAlg).print
+\end{minted}
+% #end
+
+
+
+
 
 \lstinline{e1} is a single object created that supports both evaluation and
 printing, thus achieving full feature-oriented programming.
@@ -89,9 +158,54 @@ printing, thus achieving full feature-oriented programming.
 The visitor pattern allows adding new operations to existing structures without
 modifying those structures.
 
-\lstinputlisting{../src/Visitor.sf}
+% #include ../src/Visitor.sf haskell 
+\begin{minted}{haskell}
+type ExpAlg E = { lit : Int -> E, add : E -> E -> E };
+type Exp = { accept : forall A. ExpAlg A -> A };
 
-Contravariant param type helpers programmers to write more intuitive programs.
+type LitAdd A = { lit : Int -> A, add : A -> A -> A };
+
+let lit (n : Int) = {
+  accept = /\A. \(f : LitAdd A). f.lit n
+};
+
+let add (e1 : Exp) (e2 : Exp) = {
+  accept = /\A. \(f : LitAdd A). f.add (e1.accept A f) (e2.accept A f)
+};
+
+let evalAlg = {
+  lit = \(x : Int). x,
+  add = \(x : Int). \(y : Int). x + y
+};
+let e1 = add (lit 2) (lit 3);
+-- e1.accept Int evalAlg
+
+type SubExpAlg E = (ExpAlg E) & { sub : E -> E -> E };
+type ExpExt = { accept : forall A. SubExpAlg A -> A };
+
+type LitAddSub A = LitAdd A & { sub : A -> A -> A };
+
+let sub (e1 : ExpExt) (e2 : ExpExt) =
+  { accept = /\A. \(f : LitAddSub A).
+               f.sub (e1.accept A f) (e2.accept A f) };
+
+-- Contravariant param type, programmer-friendly usage
+let e2 = sub (lit 2) (lit 3);
+
+-- Note that Exp <: ExpExt
+let f (x : ExpExt) = 1;
+-- let g (x : Exp) = 1;
+e2
+\end{minted}
+% #end
+
+
+One big benefit of using the visitor pattern is that programmers is able to
+write in the same way that would do in Haskell. For example,
+\lstinline{e2 = sub (lit 2) (lit 3)}
+defines an expression.
+
+However, there is the extra task of defining an \lstinline{Exp} interface.
 
 % \subsection{Yanlin}
 
