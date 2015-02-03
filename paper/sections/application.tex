@@ -1,5 +1,7 @@
 \section{Application}
 
+Multiple inheritance?
+
 % Algebra -> P1,2
 % Visitor -> P2
 
@@ -15,16 +17,9 @@ let merge A B (f : ExpAlg A) (g : ExpAlg B) = {
 \end{minted}
 % #end
 
-
-
-
-
-
-
-
-This section shows that the System F plus intersection types are enough
-for encoding extensible designs, and even improve on those designs. In
-particular, System FI has two main advantages over existing languages:
+This section shows that the System F plus intersection types are enough for
+encoding extensible designs, and even improve on those designs. In particular,
+System FI has two main advantages over existing languages:
 
 \begin{itemize}
 \item It supports dynamic composition of intersecting values.
@@ -50,10 +45,43 @@ A)
 
 \subsection{Object Algebras}
 
+Object algebra provides an alternative to \emph{algebraic data types} (ADT). For example, the
+following Haskell definition of the type of simple expressions
+\begin{minted}{haskell}
+data Exp where
+  Lit :: Int -> Exp
+  Add :: Exp -> Exp -> Exp
+\end{minted}
+can be expressed by the \emph{interface} of an object algebra of simple expressions:
+\begin{minted}{scala}
+trait ExpAlg[E] {
+  def lit(x: Int): E
+  def add(e1: E, e2: E): E
+}
+\end{minted}
+Similar to ADT, data constructors in object algebras are represented by functions such as
+\lstinline{lit} and \lstinline{add} inside an interface \lstinline{ExpAlg}.
+Different with ADT, the type of the expression itself is abtracted by a type
+parameter \lstinline{E}.
+
+which can be expressed similarly in \systemfi as:
+\begin{minted}{haskell}
+type ExpAlg E = {
+  lit : Int -> E,
+  add : E -> E -> E
+}
+\end{minted}
+
+Scala supports intersection types via the \lstinline{with} keyword. \lstinline{A with B}
+is the combined interface of \lstinline{A} and \lstinline{B}. The
+value level counterpart is functions of the type \lstinline {A => B => A with B}.
+
 Our type system is an fairely simple extension of System F; yet surprisingly, it
 is able to solve the limitations of using object algebras in languages such as
 Java and Scala. We will illustrate this point with an step-by-step of solving
 the expression problem using \systemFI.
+
+Oliveira noted that composition of object algebras are cumbersome.
 
 We first define an interface that supports the evaluation operation:
 
@@ -67,10 +95,6 @@ let evalAlg = {
 };
 \end{minted}
 % #end
-
-
-
-
 
 The interface is just a type synonym \lstinline{IEval}. In \systemFI, record
 types are structural and hence any value that satisfies this interface is of
@@ -87,10 +111,6 @@ let subEvalAlg = evalAlg ,, { sub = \ (x : IEval). \ (y : IEval). { eval = x.eva
 \end{minted}
 % #end
 
-
-
-
-
 Next, we define an interface that supports pretty printing.
 
 % #include ../src/Algebra.sf haskell @operation
@@ -103,10 +123,6 @@ let printAlg = {
 };
 \end{minted}
 % #end
-
-
-
-
 
 Provided with the definitions above, we can then create values using the
 appropriate algebras. For example:
@@ -129,9 +145,6 @@ let merge A B (f : ExpAlg A) (g : ExpAlg B) = {
 \end{minted}
 % #end
 
-
-
-
 If we would like to have an expression that supports both evaluation and pretty
 printing, we will need a mechanism to combine the evaluation and printing
 algebras. Intersection types allows such composition: the \lstinline{merge}
@@ -146,10 +159,6 @@ let newAlg = merge IEval IPrint subEvalAlg printAlg in
 \end{minted}
 % #end
 
-
-
-
-
 \lstinline{e1} is a single object created that supports both evaluation and
 printing, thus achieving full feature-oriented programming.
 
@@ -158,7 +167,7 @@ printing, thus achieving full feature-oriented programming.
 The visitor pattern allows adding new operations to existing structures without
 modifying those structures.
 
-% #include ../src/Visitor.sf haskell 
+% #include ../src/Visitor.sf haskell
 \begin{minted}{haskell}
 type ExpAlg E = { lit : Int -> E, add : E -> E -> E };
 type Exp = { accept : forall A. ExpAlg A -> A };
@@ -198,7 +207,6 @@ let f (x : ExpExt) = 1;
 e2
 \end{minted}
 % #end
-
 
 One big benefit of using the visitor pattern is that programmers is able to
 write in the same way that would do in Haskell. For example,

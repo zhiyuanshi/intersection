@@ -1,5 +1,3 @@
-# Created by http://www.gitignore.io
-
 ### Haskell ###
 dist
 cabal-dev
@@ -22,11 +20,19 @@ Session.vim
 .netrwhist
 *~
 
-# LaTeX stuff
+
+### LaTeX ###
 *.aux
 *.log
 *.dvi
+*.pyg
 
-# Files created by the Ruby script
+
+### Files created by the Ruby script ###
 *.tex-old
 footempfile.txt
+
+
+### IntelliJ IDEA ###
+.idea
+src.iml

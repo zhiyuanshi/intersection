@@ -10,7 +10,8 @@ task :paper do
   # or it won’t allow such calls."
   latex_options = %w(-shell-escape)
   filenames     = Dir["sections/*.tex"]
-  system("runhaskell Include.hs #{filenames.join(' ')} && pdflatex #{latex_options.join(' ')} main.tex")
+  # system("runhaskell Include.hs #{filenames.join(' ')} && pdflatex #{latex_options.join(' ')} main.tex")
+  system("pdflatex #{latex_options.join(' ')} main.tex")
 end
 
 desc "Update Include.hs from GitHub"
