@@ -72,16 +72,28 @@ type ExpAlg E = {
 }
 \end{minted}
 
-Scala supports intersection types via the \lstinline{with} keyword. \lstinline{A with B}
-is the combined interface of \lstinline{A} and \lstinline{B}. The
-value level counterpart is functions of the type \lstinline {A => B => A with B}.
+% Introduce Scala's intersection types
+
+Scala supports intersection types via the \lstinline{with} keyword. The type
+\lstinline{A with B} expresses the combined interface of \lstinline{A} and
+\lstinline{B}. The idea is similar to
+\begin{minted}{java}
+interface AwithB extends A, B {}
+\end{minted}
+in Java.
+\footnote{However, Java would require the \lstinline{A} and \lstinline{B} to be
+  concrete types, whereas in Scala, there is no such restriction.}
+
+The value level counterpart is functions of the type \lstinline
+{A => B => A with B}.
 
 Our type system is an fairely simple extension of System F; yet surprisingly, it
 is able to solve the limitations of using object algebras in languages such as
 Java and Scala. We will illustrate this point with an step-by-step of solving
 the expression problem using \systemFI.
 
-Oliveira noted that composition of object algebras are cumbersome.
+Oliveira noted that composition of object algebras can be cumbersome and
+intersection types provides a solution to that problem.
 
 We first define an interface that supports the evaluation operation:
 
