@@ -36,3 +36,7 @@ footempfile.txt
 ### IntelliJ IDEA ###
 .idea
 src.iml
+
+
+### Scala ###
+*.class

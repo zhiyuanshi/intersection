@@ -256,31 +256,29 @@ let e2 E (f : SubExpAlg E) = f.sub (exp1 E f) (f.lit 2);
 
 \section{Application}
 
-Multiple inheritance?
-
+% Multiple inheritance?
 % Algebra -> P1,2
 % Visitor -> P2
 
 % Yanlin
 % Mixin
 
-% #include ../src/Algebra.sf haskell @merge
-\begin{minted}{haskell}
-let merge A B (f : ExpAlg A) (g : ExpAlg B) = {
-  lit = \(x : Int). f.lit x ,, g.lit x,
-  add = \(x : A & B). \(y : A & B). f.add x y ,, g.add x y
-};
-\end{minted}
-% #end
+% \begin{minted}{haskell}
+% let merge A B (f : ExpAlg A) (g : ExpAlg B) = {
+%   lit = \(x : Int). f.lit x ,, g.lit x,
+%   add = \(x : A & B). \(y : A & B). f.add x y ,, g.add x y
+% };
+% \end{minted}
 
 This section shows that the System F plus intersection types are enough for
-encoding extensible designs, and even improve on those designs. In particular,
-System FI has two main advantages over existing languages:
+encoding extensible designs, and even beat the designs in languages with a much
+more sophisticated type system. In particular, \systemfi has two main advantages
+over existing languages:
 
-\begin{itemize}
+\begin{enumerate}
 \item It supports dynamic composition of intersecting values.
 \item It supports contravariant parameter types in the subtyping relation.
-\end{itemize}
+\end{enumerate}
 
 Various solutions have been proposed to deal with the extensibility problems and
 many rely on heavyweight language features such as abstract methods and classes
@@ -291,8 +289,7 @@ These two features can be used to improve existing designs of modular programs.
 % Introduce the expression problem
 
 The expression problem refers to the difficulty of adding a new operations and a
-new data variant without changing or duplicating existing code in statically
-typed functional languages.
+new data variant without changing or duplicating existing code.
 
 There has been recently a lightweight solution to the expression problem that
 takes advantage of covariant return types in Java. We show that FI is able to
@@ -340,7 +337,7 @@ in Java.
 \footnote{However, Java would require the \lstinline{A} and \lstinline{B} to be
   concrete types, whereas in Scala, there is no such restriction.}
 
-The value level counterpart is functions of the type \lstinline
+The value level counterpart are functions of the type \lstinline
 {A => B => A with B}.
 
 Our type system is an fairely simple extension of System F; yet surprisingly, it
@@ -408,7 +405,8 @@ pretty printing by requiring the expression functions to take an extra argument
 \begin{minted}{haskell}
 let merge A B (f : ExpAlg A) (g : ExpAlg B) = {
   lit = \(x : Int). f.lit x ,, g.lit x,
-  add = \(x : A & B). \(y : A & B). f.add x y ,, g.add x y
+  add = \(x : A & B). \(y : A & B).
+          f.add x y ,, g.add x y
 };
 \end{minted}
 % #end
@@ -423,67 +421,80 @@ function that delegates the input to the two algebras taken.
 % #include ../src/Algebra.sf haskell @usage
 \begin{minted}{haskell}
 let newAlg = merge IEval IPrint subEvalAlg printAlg in
-(e1 (IEval & IPrint) newAlg).print
+let o1 = e1 (IEval & IPrint) newAlg in
+o1.print
 \end{minted}
 % #end
 
-\lstinline{e1} is a single object created that supports both evaluation and
+\lstinline{o1} is a single object created that supports both evaluation and
 printing, thus achieving full feature-oriented programming.
 
-\subsection{From Algebras Back to Visitors}
+\subsection{Visitors}
 
 The visitor pattern allows adding new operations to existing structures without
-modifying those structures.
+modifying those structures. The type of expressions are defined as follows:
 
-% #include ../src/Visitor.sf haskell
-\begin{minted}{haskell}
-type ExpAlg E = { lit : Int -> E, add : E -> E -> E };
-type Exp = { accept : forall A. ExpAlg A -> A };
+\begin{minted}{scala}
+trait Exp[A] {
+  def accept(f: ExpAlg[A]): A
+}
 
-type LitAdd A = { lit : Int -> A, add : A -> A -> A };
-
-let lit (n : Int) = {
-  accept = /\A. \(f : LitAdd A). f.lit n
-};
-
-let add (e1 : Exp) (e2 : Exp) = {
-  accept = /\A. \(f : LitAdd A). f.add (e1.accept A f) (e2.accept A f)
-};
-
-let evalAlg = {
-  lit = \(x : Int). x,
-  add = \(x : Int). \(y : Int). x + y
-};
-let e1 = add (lit 2) (lit 3);
--- e1.accept Int evalAlg
-
-type SubExpAlg E = (ExpAlg E) & { sub : E -> E -> E };
-type ExpExt = { accept : forall A. SubExpAlg A -> A };
-
-type LitAddSub A = LitAdd A & { sub : A -> A -> A };
-
-let sub (e1 : ExpExt) (e2 : ExpExt) =
-  { accept = /\A. \(f : LitAddSub A).
-               f.sub (e1.accept A f) (e2.accept A f) };
-
--- Contravariant param type, programmer-friendly usage
-let e2 = sub (lit 2) (lit 3);
-
--- Note that Exp <: ExpExt
-let f (x : ExpExt) = 1;
--- let g (x : Exp) = 1;
-e2
+trait SubExp[A] extends Exp[A] {
+  override def accept(f: SubExpAlg[A]): A
+}
 \end{minted}
-% #end
+
+The body of \lstinline{Exp} and \lstinline{SubExp} are almost the same: they
+both contain an \lstinline{accept} method that takes an algebra \lstinline{f}
+and returns a value of the carrier type \lstinline{A}. The only difference is at
+\lstinline{f} --- \lstinline{SubExpAlg[A]} is a subtype of
+\lstinline{ExpAlg[A]}. Since \lstinline{f} appear in parameter position of
+\lstinline{accept} and function parameters are contravariant, naturally we would
+hope that \lstinline{SubExp[A]} is a supertype of \lstinline{Exp[A]}. However,
+such subtyping relation does not fit well in Scala because inheritance implies
+subtyping in such languages \footnote{It is still possible to encode
+  contravariant parameter types in Scala but doing so would require some
+  technique.}. As \lstinline{SubExp[A]} extends \lstinline{Exp[A]}, the former
+becomes a subtype of the latter.
+
+Such limitation does not exist in \systemFI. For example, we can define the similar interfaces \lstinline{Exp} and \lstinline{SubExp}:
+\begin{minted}{haskell}
+type Exp    A = { accept: forall A. ExpAlg A -> A };
+type SubExp A = { accept: forall A. SubExpAlg A -> A };
+\end{minted}
+Then by the typing judgment it holds that \lstinline{SubExp} is a supertype of
+\lstinline{Exp}. This relation gives desired results. To give a concrete example:
+
+First we define two data constructors for simple expressions:
+\begin{minted}{haskell}
+let lit (n : Int): Exp A = {
+  accept = /\A. \(f : ExpAlg A). f.lit n
+};
+
+let add (e1 : Exp) (e2 : Exp): Exp A = {
+  accept = /\A. \(f : ExpAlg A).
+             f.add (e1.accept A f) (e2.accept A f)
+};
+\end{minted}
+
+Suppose later we decide to augment the expressions with subtraction:
+\begin{minted}{haskell}
+let sub (e1 : SubExp) (e2 : SubExp): SubExp A =
+  { accept = /\A. \(f : SubExpAlg A).
+               f.sub (e1.accept A f) (e2.accept A f) };
+\end{minted}
 
 One big benefit of using the visitor pattern is that programmers is able to
-write in the same way that would do in Haskell. For example,
-\lstinline{e2 = sub (lit 2) (lit 3)}
-defines an expression.
+write in the same way that would do in Haskell.
+For example, \lstinline{e2 = sub (lit 2) (lit 3)} defines an expression.
 
-However, there is the extra task of defining an \lstinline{Exp} interface.
+Another important property that does not exist in Scala is that programmer is
+able to pass \lstinline{lit 2}, which is of type \lstinline{Exp A}, to
+\lstinline{sub}, which expects a \lstinline{SubExp A} because of the subtyping
+relation we have. After all, it is known statically that \lstinline{lit 2} can
+be passed into \lstinline{sub} and nothing will go wrong.
 
-% \subsection{Yanlin}
+\subsection{Yanlin}
 
 % Mixin goes last
 
@@ -649,7 +660,7 @@ http://www.cs.ox.ac.uk/jeremy.gibbons/publications/embedding.pdf
 
 \section{Conclusion}
 
-\acks
+% \acks
 
 Acknowledgments, if needed.
 
