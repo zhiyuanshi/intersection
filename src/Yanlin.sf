@@ -2,6 +2,7 @@ type Exp = { eval : Int };
 let lit (n : Int) = { eval = n };
 let add (e1 : Exp) (e2 : Exp)
   = { eval = e1.eval + e2.eval };
+
 type ExpExt = Exp & { print : String };
 let litExt (n : Int) = lit n ,, { print = n.toString() };
 let addExt (e1 : ExpExt) (e2 : ExpExt)

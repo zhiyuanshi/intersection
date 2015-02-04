@@ -40,3 +40,7 @@ src.iml
 
 ### Scala ###
 *.class
+
+
+### F2J ###
+runtime.jar
