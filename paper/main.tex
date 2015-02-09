@@ -1,9 +1,13 @@
 \documentclass[preprint]{sigplanconf}
 
 % Use packages immediately following the \documentclass command
+% Remote packages
 \usepackage{amsmath}
 \usepackage{amsthm}
 \usepackage{fixltx2e}
+\usepackage{mdframed}
+\usepackage{stmaryrd}
+\usepackage{xcolor}
 
 % For documentation for the `Listings` package,
 % see http://texdoc.net/texmf-dist/doc/latex/listings/listings.pdf
@@ -13,8 +17,19 @@
 % Documentation: https://code.google.com/p/minted/downloads/detail?name=minted.pdf
 \usepackage{minted}
 
-\usepackage{mdframed}
-\usepackage{xcolor}
+
+% Local packages
+\usepackage{bcprules}
+\usepackage{cmll}
+\usepackage{mathpartir}
+
+
+% Always load mathastext last
+% http://mirrors.ibiblio.org/CTAN/macros/latex/contrib/mathastext/mathastext.pdf
+\renewcommand\familydefault\ttdefault
+\usepackage{mathastext}
+\renewcommand\familydefault\rmdefault
+
 
 \newmdtheoremenv{theorem}{Theorem}
 \newmdtheoremenv{lemma}{Lemma}
@@ -22,14 +37,7 @@
 \definecolor{github}{HTML}{4183C4}
 
 % Define macros immediately before the \begin{document} command
-\input{macros/type_systems.tex}
-% \input{macros/systemfi.tex}
-
-\newcommand{\systemf}{{\bf f~}}
-\newcommand{\systemF}{{\bf f}}
-
-\newcommand{\systemfi}{{\bf fi~}}
-\newcommand{\systemFI}{{\bf fi}}
+\input{macros.tex}
 
 \lstdefinelanguage{F2J}{
   morekeywords={let,type,module,end,in},
@@ -72,7 +80,7 @@
 \setlength{\pdfpageheight}{\paperheight}
 \setlength{\pdfpagewidth}{\paperwidth}
 
-\title{\systemfi}
+\title{\name}
 
 \authorinfo{Name1}
            {Affiliation1}
@@ -139,21 +147,21 @@ In summary, the contributions of this paper are:
   Change the examples later to something very simple.
 \end{footnote}
 
-This section provides the reader with the intuition of \systemFI, while we postpone
+This section provides the reader with the intuition of \name, while we postpone
 the presentation of the details in later sections.
 
-In short, \systemfi generalizes \systemf by adding intersection polymorphism. \systemfi terms
+In short, \name generalizes \systemf by adding intersection polymorphism. \name terms
 are elaborated into \systemF, a variant of System F. System F, or polymorphic
 lambda calculus lays the foundation of functional programming languages such as
 Haskell.
 
-The type system of \systemfi permits a subtyping relation naturally and enables
+The type system of \name permits a subtyping relation naturally and enables
 prototype-based inheritance. We will explore the usefulness of such a type
 system in practice by showing various examples.
 
 \subsection{Intersection Types}
 
-The central addition to the type system of \systemf in \systemfi is intersection types. What
+The central addition to the type system of \systemf in \name is intersection types. What
 is an intersection type? One classic view is from set-theoretic interpretation
 of types: \lstinline{A \& B} stands for the intersection of the set of values of
 \lstinline{A} and \lstinline{B}. The other view, adopted in this paper, regards
@@ -162,7 +170,7 @@ of the interfaces of \lstinline{A} and \lstinline{B}. For example,
 \lstinline{eval : Int} is the interface that supports evaluation to integers,
 while \lstinline{ eval : Int \& print : String } supports both evaluation and
 pretty printing. Those interfaces are akin to interfaces in Java or traits in
-Scala. But one key difference is that they are unnamed in \systemFI.
+Scala. But one key difference is that they are unnamed in \name.
 
 Intersection types provide a simple mechanism for ad-hoc polymorphism, similar
 to what type classes in Haskell achieve. The key constructs are the ``merge''
@@ -170,7 +178,7 @@ operator, denoted by ``\lstinline{,,}'', at the value level and the correspondin
 intersection operator, denoted by, ``\lstinline{\&}'' at the type level.
 
 For example, we can define an (ad-hoc)-polymorphic \lstinline{show} function
-that is able to convert integers and booleans to strings. In \systemfi such function
+that is able to convert integers and booleans to strings. In \name such function
 can be given the type
 \begin{lstlisting}
   (Int -> String) & (Bool -> String)
@@ -208,7 +216,7 @@ is compatible with \lstinline{1} while \lstinline{showBool} is not.
 
 \subsection{Encoding Records}
 
-In addition to introduction of record literals using the usual notation, \systemfi
+In addition to introduction of record literals using the usual notation, \name
 support two more operations on records: record elimination and record update.
 
 A record type of the form \lstinline{l : t} can be thought as a normal type \lstinline{t}
@@ -228,7 +236,7 @@ under a structural type system, this program should typecheck anyway because the
 arguments being passed has more information than required. In other words,
 \lstinline{eval : Int, print : String} is a subtype of \lstinline{eval : Int}.
 
-How is this subtyping relation derived? In \systemFI, multi-field record types are
+How is this subtyping relation derived? In \name, multi-field record types are
 excluded from the type system because \lstinline{eval : Int, print : String} can
 be encoded as \lstinline{eval : Int \& print : String}. And by one of
 subtyping rules derives that \lstinline{eval : Int \& print : String} is a
@@ -272,7 +280,7 @@ let e2 E (f : SubExpAlg E) = f.sub (exp1 E f) (f.lit 2);
 
 This section shows that the System F plus intersection types are enough for
 encoding extensible designs, and even beat the designs in languages with a much
-more sophisticated type system. In particular, \systemfi has two main advantages
+more sophisticated type system. In particular, \name has two main advantages
 over existing languages:
 
 \begin{enumerate}
@@ -317,7 +325,7 @@ Similar to ADT, data constructors in object algebras are represented by function
 Different with ADT, the type of the expression itself is abtracted by a type
 parameter \lstinline{E}.
 
-which can be expressed similarly in \systemfi as:
+which can be expressed similarly in \name as:
 \begin{minted}{haskell}
 type ExpAlg E = {
   lit : Int -> E,
@@ -343,7 +351,7 @@ The value level counterpart are functions of the type \lstinline
 Our type system is an fairely simple extension of System F; yet surprisingly, it
 is able to solve the limitations of using object algebras in languages such as
 Java and Scala. We will illustrate this point with an step-by-step of solving
-the expression problem using \systemFI.
+the expression problem using \name.
 
 Oliveira noted that composition of object algebras can be cumbersome and
 intersection types provides a solution to that problem.
@@ -361,7 +369,7 @@ let evalAlg = {
 \end{minted}
 % #end
 
-The interface is just a type synonym \lstinline{IEval}. In \systemFI, record
+The interface is just a type synonym \lstinline{IEval}. In \name, record
 types are structural and hence any value that satisfies this interface is of
 type \lstinline{IEval} or of a subtype of \lstinline{IEval}.
 
@@ -457,7 +465,7 @@ subtyping in such languages \footnote{It is still possible to encode
   technique.}. As \lstinline{SubExp[A]} extends \lstinline{Exp[A]}, the former
 becomes a subtype of the latter.
 
-Such limitation does not exist in \systemFI. For example, we can define the similar interfaces \lstinline{Exp} and \lstinline{SubExp}:
+Such limitation does not exist in \name. For example, we can define the similar interfaces \lstinline{Exp} and \lstinline{SubExp}:
 \begin{minted}{haskell}
 type Exp    A = { accept: forall A. ExpAlg A -> A };
 type SubExp A = { accept: forall A. SubExpAlg A -> A };
@@ -557,7 +565,7 @@ Haskell, it is not possible to refine the mixin by adding more fields to the
 records. This means that the type of the family of the mixins has to be
 determined upfront, which undermines extensibility.
 
-\systemfi is able to overcome both of the problems: it allows composing mixins
+\name is able to overcome both of the problems: it allows composing mixins
 that (1) extends the base behavior, (2) while ensuring type safety.
 
 The figure defines a mini mixin library. The apostrophe in front of types
@@ -589,110 +597,8 @@ noisy 5
 
 % \subsection{Composing Mixins and Object Algebras}
 
-\section{Source Language}
-
-The semantics of the source-level language is not defined formally, instead by a
-translation into the target language.
-
-The most central construct of our language is ...
-
-
-The source language, System FI, is identical to the source language described in
-the previous section, except for the two additions: intersection types and
-records. The formalization includes only single records and single record types as the multi-records can be desugared into the merge of multiple single records.
-
-Dunfield has described a language that includes a ``top'' type but it does not appear in our language. Our work differs from Dunfield in that ...
-
-Remark. The operational semantics of FI is not presented in this paper. However,
-
-\subsection{Source Syntax}
-
-\subsection{Source Subtyping}
-
-\subsection{Source Typing}
-
-\section{Elaboration Typing}
-
-\subsection{Target Language}
-
-The target language is System F extended with a base type Int. The syntax and
-typing is completely standard. The types are function, universal quantification.
-
-
-In order to give the reader an intuitive idea of how the elaboration works,
-let's first imagine a manual translation.
-
-First, multi-field record literals are desugared into merges of single-field
-record literals. Therefore $ \{ eval = 4, print = ``4'' \} $ becomes
-$ \{ eval = 4 \} ,, \{ print = ``4'' \} $. Merges of two values are elaborated
-into just a pair of them and single-field record literals lose their field
-labels during the elaboration. Hence $ \{ eval = 4 \} ,, \{ print = ``4'' \} $
-becomes $ (4, ``4'') $.
-
-Finally, $ e1 $ and $ e2 $ are both coerced by a projection function
-$ \\(x:(Int,String)). x.\_1 $ before being applied to $ add $. We adopt a
-Scala-like syntax where $ .\_1 $ denotes the projection of a tuple on the first
-element, and so on.
-
-\framebox{$|\tau| = T$}
-
-\[
-\begin{array}{rcl}
-  |\alpha|               & = & \alpha \\
-  |\tau_1 \to \tau_2|    & = & |\tau_1| \to |\tau_2| \\
-  |\forall \alpha. \tau| & = & \forall \alpha. |\tau| \\
-  |t_1 \& t_2|           & = & \langle |\tau_1|, |\tau_2| \rangle \\
-  |\{ l : \tau \}|       & = & |\tau|
-\end{array}
-\]
-
-\begin{lemma} \label{type-coerce}
-  If $$ \Gamma \vdash \tau_1 <: \tau_2 \yields{C} $$
-  then $$ |\Gamma| \vdash C : |\tau_1| \to |\tau_2| $$
-\end{lemma}
-
-In this section, we present a relatively lightweight type-directed elaboration
-from FI to F. The elaboration consists of four sets of rules, which are
-explained below:
-
-\begin{itemize}
-
-\item{\bf Coercion}
-
-  The coercion judgment $ \Gamma \vdash \tau_1 <: \tau_2 \yields{C} $ extends
-  the subtyping judgment with a coercion on the right hand side of
-  $ \hookrightarrow $. A coercion, which is just an expression in the target
-  language, is guaranteed to have type $ \tau_1 \to \tau_2 $, as proved by Lemma
-  \ref{type-coerce}. It is read ``In the environment $ \Gamma $, $ \tau_1 $ is a
-  subtype of $ \tau_2 $; and if any expression $ e $ has a type $ t_1 $ that is
-  a subtype of the type of $ t_2 $, the elaborated $ e $, when applied to the
-  corresponding coercion $ C $, has exactly type $ |t_2| $''. For example,
-  $\Gamma \vdash Int \& Bool <: Bool \yields{fst} $, where $ fst $ is the
-  projection of a tuple on the first element. The coercion judgment is only used
-  in the \texttt{TrApp} case.
-
-\item{\bf Elaboration}
-
-  The elaboration judgment $ \Gamma \vdash e : \tau \yields{E} $ extends the
-  typing judgment with an elaborated expression on the right hand side of
-  $ \hookrightarrow $. It is also standard, except for the case of
-  \texttt{TrApp}, in which a coercion from the inferred type of the argument to
-  the expected type of the parameter is inserted before the argument; and the
-  case of \texttt{TrRcdEim} and \texttt{TrRcdUpd}, where the ``get'' and ``put''
-  rules will be used. The two set of rules are explained below.
-
-\item{\bf ``get'' rules}
-
-  The ``get'' judgment can be thought as producing a field accessor.
-
-\item{\bf ``put'' rules}
-
-  The ``put'' judgment can be thought as producing a field updater.
-
-\end{itemize}
-
-Type-Directed Translation to System F.
-Main results: type-preservation + coherence.
+\input{sections/source.tex}
+\input{sections/translation.tex}
 
 \section{Implementation}
 

@@ -1,0 +1,39 @@
+\newcommand{\Abs}[2]{\Lambda #1. #2}
+\newcommand{\abs}[2]{\lambda #1. #2}
+\newcommand{\app}[2]{#1 \; #2}
+\newcommand{\dcoloneq}{\dcolon =}
+\newcommand{\dcolon}{:\!\!:}
+\newcommand{\dcomma}{,\!\!,}
+\newcommand{\dom}[1]{\meta{dom}{#1}}
+\newcommand{\dplus}{+\!\!\!+ \;}
+\newcommand{\fields}[1]{\meta{fields}{#1}}
+\newcommand{\fix}[5]{fix \; #1 (\rel{#2}{#3}) \!:\! #4. #5}
+\newcommand{\imageof}[1]{\llbracket #1 \rrbracket}
+\newcommand{\kinding}[3]{#1 \turns #2 \dcolon #3}
+\newcommand{\meta}[2]{{\it{#1}} (#2)}
+\newcommand{\proj}[2]{\app{proj_{#1}}{#2}}
+\newcommand{\propertype}{*}
+
+\newcommand{\recordtype}[2]{\{ \rel{#1}{#2} \}}
+\newcommand{\recordintro}[2]{\{ #1 = #2 \}}
+\newcommand{\recordupdate}[3]{#1 \; with \; \recordintro{#2}{#3}}
+
+\newcommand{\rel}[2]{#1 \!\!:\!\! #2}
+\newcommand{\subst}[2]{\lbrack #1 \! \mapsto \! #2 \rbrack}
+\newcommand{\subtype}{<\!:}
+\newcommand{\tappbrack}[2]{#1 \; \lbrack #2 \rbrack}
+\newcommand{\tupled}[1]{\langle #1 \rangle}
+\newcommand{\turns}{\vdash}
+\newcommand{\typing}[3]{#1 \turns #2 : #3}
+\newcommand{\univquant}[2]{\forall #1. #2}
+\newcommand{\yields}[1]{\textcolor{github}{\; \hookrightarrow #1}}
+
+% \newcommand{\merge}{,\!,}
+\newcommand{\rcdupd}[3]{#1 \; \textrm{with} \; \{#2 = #3\}}
+\newcommand{\ftv}[1]    {\meta{ftv}(#1)}
+
+\newcommand{\systemf}{{\bf f~}}
+\newcommand{\systemF}{{\bf f}}
+
+\newcommand{\name}{{\bf fi~}}
+\newcommand{\Name}{{\bf fi}}

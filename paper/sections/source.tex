@@ -1,0 +1,194 @@
+\section{The \name calculus}
+
+This section formalizes the syntax, subtyping, and typing of \name. In the next
+section, we will go through the type-directed translation from \name to System
+F. Note the semantics of this language is not defined formally, instead, by a
+translation into the target language, System F.
+
+\subsection{Syntax}
+
+The syntax of the \name calculus extends System F by adding the two features:
+intersection types and records. The formalization includes only single records
+because single record types as the multi-records can be desugared into the merge
+of multiple single records.
+
+\[ \begin{array}{lrrl}
+  \text{Types} & t & \dcoloneq &
+    \alpha
+    \mid t \to t
+    \mid \univquant{\alpha}{t}
+    \mid t \with t
+    \mid \recordtype{l}{t} \\
+
+  \text{Terms} & e & \dcoloneq &
+    x
+    \mid \abs{\rel{x}{t}}{e}
+    % \mid \fix{f}{x}{t}{t}{e}
+    \mid \Abs{\alpha}{e}
+    \mid \app{e}{e}
+    \mid \app{e}{t} \\ & & &
+    \mid e \dcomma e
+    \mid \recordintro{l}{e}
+    \mid e.l
+    \mid \recordupdate{e}{l}{e} \\
+
+  \text{Contexts} & \Gamma & \dcoloneq &
+    \epsilon
+    \mid \Gamma, \alpha
+    \mid \Gamma, \rel{x}{t} \\
+
+  \text{Fields} & F & \dcoloneq &
+    \epsilon
+    \mid F, \rel{\cdot}{t}
+    \mid F, \rel{l}{t} \\
+
+  \text{Labels} & l &
+\end{array} \]
+
+% Types
+Types $ t $ have five constructs. The first three are standard (present in
+System F): type variable $ \alpha $, function types $ t \to t $, and type
+abstraction $ \univquant{\alpha}{t} $; while the last two, intersection types
+$ t \with t $ and record types $ \recordtype{l}{t} $, are novel in \Name. In
+record types, $ l $ is the label and $ t $ the type.
+
+% Expressions - standard ones
+First five constructs of expressions are also standard: variables $ x $ and two
+abstraction-elimination pairs. $ \abs{\rel{x}{t}}{e} $ abstracts expression
+$ e $ over values of type $ t $ and is eliminated by application $ \app{e}{e} $;
+$ \Abs{\alpha}{e} $ abstracts expression $ e $ over types and is eliminated by
+type application $ \app{e}{t} $.
+
+% Expressions - new ones
+The last four constructs are novel. $ e \dcomma e $ is the \emph{merge} of two
+terms. $ \recordintro{l}{e} $ introduces a record literal having $ l $ as the
+label for field containing expression $ e $ . $ e.l $ access the field with
+label $ l $ in $ e $. Finally, $ \recordupdate{e}{l}{e} $ updates the field
+labelled $ l $ in expression $ e $. For simplicity, we omit other constructs in
+order to focus on the essence of the calculus. For example, fixpoints can be
+added in standard ways.
+
+% The most central construct of our language is ...
+
+% Dunfield has described a language that includes a ``top'' type but it does not appear in our language. Our work differs from Dunfield in that ...
+
+% Remark. The operational semantics of FI is not presented in this paper. However,
+
+\subsection{Subtyping}
+
+\framebox{\(t \subtype t\)}
+
+\infax[S-Var]
+{\alpha \subtype \alpha}
+
+\infrule[S-Fun]
+{t_3 \subtype t_1 \andalso t_2 \subtype t_4}
+{t_1 \to t_2 \subtype t_3 \to t_4}
+
+\infrule[S-Forall]
+{t_1 \subtype \subst{\alpha_2}{\alpha_1} t_2}
+{\univquant{\alpha_1}{t_1} \subtype \univquant{\alpha_2}{t_2}}
+
+\infrule[S-And-1]
+{t_1 \subtype t_3}
+{t_1 \with t_2 \subtype t_3}
+
+\infrule[S-And-2]
+{t_2 \subtype t_3}
+{t_1 \with t_2 \subtype t_3}
+
+\infrule[S-And-3]
+{t_1 \subtype t_2 \andalso t_1 \subtype t_3}
+{t_1 \subtype t_2 \with t_3}
+
+\infrule[S-Rcd]
+{t_1 \subtype t_2}
+{\recordtype{l}{t_1} \subtype \recordtype{l}{t_2}}
+
+Thanks to intersection types, we have natural subtyping relations among types.
+For example, $ Int \with Bool $ should be a subtype of $ Int $, since the former
+can be viewed as either $ Int $ or $ Bool $. The subtyping rules are standard
+except for three points listed below:
+\begin{enumerate}
+\item $ t_1 \with t_2 $ is a subtype of $ t_3 $, if \emph{either} $ t_1 $ or
+  $ t_2 $ are subtypes of $ t_3 $,
+
+\item $ t_1 $ is a subtype of $ t_2 \with t_3 $, if $ t_1 $ is a subtype of
+  both $ t_2 $ and $ t_3 $.
+
+\item $ \recordtype{l_1}{t_1} $ is a subtype of $ \recordtype{l_2}{t_2} $, if
+  $ l_1 $ and $ l_2 $ are identical and $ t_1 $ is a subtype of $ t_2 $.
+\end{enumerate}
+The first point is captured by two rules \texttt{S-And-1} and \texttt{S-And-2},
+whereas the second point by \texttt{S-And-3}. Note that the last point means
+that record types are covariant in the type of the fields.
+
+\subsection{Typing}
+
+The typing judgment for \name is of the form: $ \typing {\Gamma} {e} {t} $. This
+judgment uses the context $ \Gamma $. The typing rules for our core languages
+are mostly standard ones for System F. In particular we introduce a
+\texttt{T-Merge} rule that applies to \emph{merge} constructs.
+
+The last two rules make use of the $ \texttt{fields} $ function just to make
+sure that the field being accessed (\texttt{T-RcdElim}) or updated
+(\texttt{T-RcdUpd}) actually exists. The function is defined recursively, in
+Haskell pseudocode, as:
+\[ \begin{array}{rll}
+  \fields{\alpha} & = & \rel{\cdot}{\alpha} \\
+  \fields{t_1 \to t_2} & = & \rel{\cdot}{t_1 \to t_2} \\
+  \fields{\univquant{\alpha}{t}} & = & \rel{\cdot}{\univquant{\alpha}{t}} \\
+  \fields{t_1 \with t_2} & = & \fields{t_1} \dplus \fields{t_2} \\
+  \fields{\recordtype{l}{t}} & = & \rel{l}{t}
+\end{array} \]
+where $ \cdot $ means empty list, $ \dplus $ list concatenation, and $ : $ is an
+infix operator that prepend the first argument to the second. The function
+returns an associative list whose domain is field labels and range types.
+
+\textit{dom} reads: ``the domain of''. $ F(l) $ means the result of lookup for
+$ l $ inside the associative list $ F $. The order of lookup can be either from
+left to right or from right to left but has to be consistent inside one
+implementation. We prefer the order from the right to the left because it make
+possible record overriding. For example,
+$ (\recordintro{count}{1} ,, \recordintro{count}{2}).count $ will evaluate to
+$ 2 $ in this case.
+
+\framebox{\(\typing {\Gamma} {e} {t}\)}
+
+\infrule[T-Var]
+{(x,t) \in \Gamma}
+{\typing {\Gamma} {x} {t}}
+
+\infrule[T-Abs]
+{\Gamma \turns t \andalso \typing {\Gamma, \rel{x}{t}} {e} {t_1}}
+{\typing {\Gamma} {\abs{\rel{x}{t}}{e}} {t \to t_1}}
+
+\infrule[T-TAbs]
+{\typing {\Gamma, \alpha} {e} {t}}
+{\typing {\Gamma} {\Abs{\alpha}{e}} {\univquant{\alpha}{t}}}
+
+\infrule[T-App]
+{\typing {\Gamma} {e_1} {t_1 \to t_2} \\
+ \typing {\Gamma} {e_2} {t_3} \andalso t_3 \subtype t_1}
+{\typing {\Gamma} {\app{e_1}{e_2}} {t_2}}
+
+\infrule[T-TApp]
+{\typing {\Gamma} {e} {\univquant{\alpha}{t_1}} \andalso \Gamma \turns t}
+{\typing {\Gamma} {\app{e}{t}} {\subst{\alpha}{t} t_1}}
+
+\infrule[T-Merge]
+{\typing {\Gamma} {e_1} {t_1} \andalso \typing {\Gamma} {e_2} {t_2}}
+{\typing {\Gamma} {e_1 \dcomma e_2} {t_1 \with t_2}}
+
+\infrule[T-RcdIntro]
+{\typing {\Gamma} {e} {t}}
+{\typing {\Gamma} {\recordintro{l}{e}} {\recordtype{l}{t}}}
+
+\infrule[T-RcdElim]
+{\typing {\Gamma} {e} {t} \andalso F = \fields{t} \andalso l \in \dom{F} }
+{\typing {\Gamma} {e.l} {F(l)}}
+
+\infrule[T-RcdUpd]
+{\typing {\Gamma} {e} {t} \andalso \typing {\Gamma} {e'} {t'} \\
+ F = \fields{t} \andalso l \in \dom{F} \andalso t' \subtype F(l)}
+{\typing {\Gamma} {\recordupdate{e}{l}{e'}} {t}}
