@@ -1,4 +1,9 @@
-\section{Elaboration Typing}
+\section{Type-directed Translation to System F}
+
+In this section we define the semantics of \name by means of a type-directed
+translation to System F. This translation removes the labels of records and
+turns intersections into products, much like Dunfield's elaboration. But our
+translation also deals with parametric polymorphism and records.
 
 \begin{figure*}
 
@@ -54,9 +59,10 @@
 
 \subsection{Target Language}
 
-The target language is System F extended with a base type Int. The syntax and
-typing is completely standard. The types are function, universal quantification.
+The target language is System F extended with pairs. The syntax and typing is
+completely standard. The syntax of Systm F is as follows:
 
+\input{formalization/f-syntax.tex}
 
 In order to give the reader an intuitive idea of how the elaboration works,
 let's first imagine a manual translation.
@@ -90,9 +96,7 @@ element, and so on.
   then $$ |\Gamma| \vdash C : |\tau_1| \to |\tau_2| $$
 \end{lemma}
 
-In this section, we present a relatively lightweight type-directed elaboration
-from FI to F. The elaboration consists of four sets of rules, which are
-explained below:
+The translation consists of four sets of rules, which are explained below:
 
 \begin{itemize}
 

@@ -4,8 +4,10 @@
 
 This section formalizes the syntax, subtyping, and typing of \name. In the next
 section, we will go through the type-directed translation from \name to System
-F. Note the semantics of this language is not defined formally, instead, by a
-translation into the target language, System F.
+F.
+
+% Note the semantics of this language is not defined formally, instead, by a
+% translation into the target language, System F.
 
 \subsection{Syntax}
 
@@ -22,7 +24,7 @@ of multiple single records.
     \mid t \with t
     \mid \recordtype{l}{t} \\
 
-  \text{Terms} & e & \dcoloneq &
+  \text{Expressions} & e & \dcoloneq &
     x
     \mid \abs{\rel{x}{t}}{e}
     % \mid \fix{f}{x}{t}{t}{e}

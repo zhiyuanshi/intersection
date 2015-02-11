@@ -1,0 +1,17 @@
+\[ \begin{array}{lrrl}
+  \text{Types} & T & \dcoloneq &
+    \alpha
+    \mid T \to T
+    \mid \univquant{\alpha}{T}
+    \mid \langle T, T \rangle \\
+
+  \text{Expressions} & E & \dcoloneq &
+    x
+    \mid \abs{\rel{x}{T}}{E}
+    \mid \Abs{\alpha}{E}
+    \mid \app{E}{E}
+    \mid \app{E}{T} \\ & & &
+    \mid \langle E, E \rangle
+    \mid \meta{fst} E
+    \mid \meta{snd} E
+\end{array} \]
