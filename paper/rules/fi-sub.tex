@@ -1,0 +1,28 @@
+\framebox{\(t \subtype t\)}
+
+\infax[S-Var]
+{\alpha \subtype \alpha}
+
+\infrule[S-Fun]
+{t_3 \subtype t_1 \andalso t_2 \subtype t_4}
+{t_1 \to t_2 \subtype t_3 \to t_4}
+
+\infrule[S-Forall]
+{t_1 \subtype \subst{\alpha_2}{\alpha_1} t_2}
+{\univquant{\alpha_1}{t_1} \subtype \univquant{\alpha_2}{t_2}}
+
+\infrule[S-And-1]
+{t_1 \subtype t_3}
+{t_1 \with t_2 \subtype t_3}
+
+\infrule[S-And-2]
+{t_2 \subtype t_3}
+{t_1 \with t_2 \subtype t_3}
+
+\infrule[S-And-3]
+{t_1 \subtype t_2 \andalso t_1 \subtype t_3}
+{t_1 \subtype t_2 \with t_3}
+
+\infrule[S-Rcd]
+{t_1 \subtype t_2}
+{\recordtype{l}{t_1} \subtype \recordtype{l}{t_2}}

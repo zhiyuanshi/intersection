@@ -27,63 +27,12 @@ $ \\(x:(Int,String)). x.\_1 $ before being applied to $ add $. We adopt a
 Scala-like syntax where $ .\_1 $ denotes the projection of a tuple on the first
 element, and so on.
 
-\begin{figure*}
-
-\framebox{\(t \subtype t \yields{C}\)}
-
-\infax[S-Var]
-{\alpha \subtype \alpha \yields{\abs{\rel{x}{\imageof{\alpha}}}{x}}}
-
-\infrule[S-Fun]
-{t_3 \subtype t_1 \yields{C_1} \andalso t_2 \subtype t_4 \yields{C_2}}
-{t_1 \to t_2 \subtype t_3 \to t_4
-  \yields
-    {\abs{\rel{f}{\imageof{t_1 \to t_2}}}
-      {\abs{\rel{x}{\imageof{t_3}}}
-        {\app{C_2}{(\app{f}{(\app{C_1}{x})})}}}}}
-
-\infrule[S-Forall]
-{t_1 \subtype \subst{\alpha_2}{\alpha_1} t_2 \yields{C}}
-{\univquant{\alpha_1}{t_1} \subtype \univquant{\alpha_2}{t_2}
-  \yields
-    {\abs{\rel{f}{\imageof{\univquant{\alpha}{t_1}}}}
-      {\Abs{\alpha}{\app{C}{(\app{f}{\alpha})}}}}}
-
-\infrule[S-And-1]
-{t_1 \subtype t_3 \yields{C}}
-{t_1 \with t_2 \subtype t_3
-  \yields
-    {\abs{\rel{x}{\imageof{t_1 \with t_2}}}
-      {\app{C}{(\proj{1}{x})}}}}
-
-\infrule[S-And-2]
-{t_2 \subtype t_3 \yields{C}}
-{t_1 \with t_2 \subtype t_3
-  \yields
-    {\abs{\rel{x}{\imageof{t_1 \with t_2}}}
-      {\app{C}{(\proj{2}{x})}}}}
-
-\infrule[S-And-3]
-{t_1 \subtype t_2 \yields{C_1} \andalso t_1 \subtype t_3 \yields{C_2}}
-{t_1 \subtype t_2 \with t_3
-  \yields
-    {\abs{\rel{x}{\imageof{t_1}}}
-      {\tupled{\app{C_1}{x}, \app{C_2}{x}}}}}
-
-\infrule[S-Rcd]
-{t_1 \subtype t_2 \yields{C}}
-{\recordtype{l}{t_1} \subtype \recordtype{l}{t_2}
-  \yields
-    {\abs{\rel{x}{\imageof{\recordtype{l}{t_1}}}}{\tupled{\app{C}{(\proj{1}{x})}}}}}
-
-\end{figure*}
-
 \subsection{Target Language}
 
 The target language is System F extended with pairs. The syntax and typing is
 completely standard. The syntax of Systm F is as follows:
 
-\input{formalization/f-syntax.tex}
+\input{rules/f-syntax.tex}
 
 The dynamic semantics of System F can be found in ...
 
@@ -98,11 +47,18 @@ $ e $ is of a \name type $ \tau $ and its translation is a System F expression $
 
 We also define the type translation function $ | \cdot | $ from \name types
 $ \tau $ to System F types $ T $.
-\input{formalization/type-translation.tex}
+\input{rules/type-trans.tex}
 The translation is standard, except the intersection of two types are translated
 into a product of them, and the label of record types are erased.
 
 The translation consists of four sets of rules, which are explained below:
+
+\subsection{Translation}
+
+\input{rules/trans-typing.tex}
+\input{rules/trans-sub.tex}
+\input{rules/trans-get.tex}
+\input{rules/trans-put.tex}
 
 \begin{itemize}
 

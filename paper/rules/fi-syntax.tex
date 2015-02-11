@@ -1,0 +1,32 @@
+\[ \begin{array}{lrrl}
+  \text{Types} & t & \dcoloneq &
+    \alpha
+    \mid t \to t
+    \mid \univquant{\alpha}{t}
+    \mid t \with t
+    \mid \recordtype{l}{t} \\
+
+  \text{Expressions} & e & \dcoloneq &
+    x
+    \mid \abs{\rel{x}{t}}{e}
+    % \mid \fix{f}{x}{t}{t}{e}
+    \mid \Abs{\alpha}{e}
+    \mid \app{e}{e}
+    \mid \app{e}{t} \\ & & &
+    \mid e \dcomma e
+    \mid \recordintro{l}{e}
+    \mid e.l
+    \mid \recordupdate{e}{l}{e} \\
+
+  \text{Contexts} & \Gamma & \dcoloneq &
+    \epsilon
+    \mid \Gamma, \alpha
+    \mid \Gamma, \rel{x}{t} \\
+
+  \text{Fields} & F & \dcoloneq &
+    \epsilon
+    \mid F, \rel{\cdot}{t}
+    \mid F, \rel{l}{t} \\
+
+  \text{Labels} & l &
+\end{array} \]
