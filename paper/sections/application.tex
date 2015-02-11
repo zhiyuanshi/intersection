@@ -42,7 +42,7 @@ A)
 
 \subsection{Object Algebras}
 
-Object algebra provides an alternative to \emph{algebraic data types} (ADT). For example, the
+Object algebras provide an alternative to \emph{algebraic data types} (ADT). For example, the
 following Haskell definition of the type of simple expressions
 \begin{minted}{haskell}
 data Exp where
@@ -82,12 +82,12 @@ in Java.
   concrete types, whereas in Scala, there is no such restriction.}
 
 The value level counterpart are functions of the type \lstinline
-{A => B => A with B}.
+{A => B => A with B}. \footnote{FIXME}
 
-Our type system is an fairely simple extension of System F; yet surprisingly, it
+Our type system is a simple extension of System F; yet surprisingly, it
 is able to solve the limitations of using object algebras in languages such as
 Java and Scala. We will illustrate this point with an step-by-step of solving
-the expression problem using \name.
+the expression problem using a source language built on top of \name.
 
 Oliveira noted that composition of object algebras can be cumbersome and
 intersection types provides a solution to that problem.
@@ -107,7 +107,8 @@ let evalAlg = {
 
 The interface is just a type synonym \lstinline{IEval}. In \name, record
 types are structural and hence any value that satisfies this interface is of
-type \lstinline{IEval} or of a subtype of \lstinline{IEval}.
+type \lstinline{IEval} or of a subtype of \lstinline{IEval}. \footnote{Should be
+mentioned in S2.}
 
 In the following, \lstinline{ExpAlg} is an object algebra interface of
 expressions with literal and addition case. And \lstinline{evalAlg} is an object
