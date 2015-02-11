@@ -160,6 +160,31 @@ possible record overriding. For example,
 $ (\recordintro{count}{1} ,, \recordintro{count}{2}).count $ will evaluate to
 $ 2 $ in this case.
 
+% Well-formedness of types
+
+\framebox{\(\Gamma \turns {t}\)}
+
+\infrule[WF-Var]
+{\alpha \in \Gamma}
+{\Gamma \turns \alpha}
+
+\infrule[WF-Fun]
+{\Gamma \turns t_1 \andalso \Gamma \turns t_2}
+{\Gamma \turns t_1 \to t_2}
+
+\infrule[WF-Forall]
+{\Gamma, \alpha \turns t}
+{\Gamma \turns \univquant{\alpha}{t}}
+
+\infrule[WF-And]
+{\Gamma \turns t_1 \andalso \Gamma \turns t_2}
+{\Gamma \turns t_1 \with t_2}
+
+\infrule[WF-Rcd]
+{\Gamma \turns t}
+{\Gamma \turns \recordtype{l}{t}}
+
+
 \framebox{\(\typing {\Gamma} {e} {t}\)}
 
 \infrule[T-Var]
