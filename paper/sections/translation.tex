@@ -5,6 +5,28 @@ translation to System F. This translation removes the labels of records and
 turns intersections into products, much like Dunfield's elaboration. But our
 translation also deals with parametric polymorphism and records.
 
+\subsection{Informal Discussion}
+
+To help the reader have a high-level understanding of how the translation
+works, in this subsection we present the translation informally. Take the \name
+expression for example:
+
+\begin{lstlisting}
+{ eval = 4, print = ``4'' }
+\end{lstlisting}
+
+First, multi-field record literals are desugared into merges of single-field
+record literals. Therefore $ \{ eval = 4, print = ``4'' \} $ becomes
+$ \{ eval = 4 \} ,, \{ print = ``4'' \} $. Merges of two values are elaborated
+into just a pair of them and single-field record literals lose their field
+labels during the elaboration. Hence $ \{ eval = 4 \} ,, \{ print = ``4'' \} $
+becomes $ (4, ``4'') $.
+
+Finally, $ e1 $ and $ e2 $ are both coerced by a projection function
+$ \\(x:(Int,String)). x.\_1 $ before being applied to $ add $. We adopt a
+Scala-like syntax where $ .\_1 $ denotes the projection of a tuple on the first
+element, and so on.
+
 \begin{figure*}
 
 \framebox{\(t \subtype t \yields{C}\)}
@@ -56,7 +78,6 @@ translation also deals with parametric polymorphism and records.
 
 \end{figure*}
 
-
 \subsection{Target Language}
 
 The target language is System F extended with pairs. The syntax and typing is
@@ -64,37 +85,22 @@ completely standard. The syntax of Systm F is as follows:
 
 \input{formalization/f-syntax.tex}
 
-In order to give the reader an intuitive idea of how the elaboration works,
-let's first imagine a manual translation.
-
-First, multi-field record literals are desugared into merges of single-field
-record literals. Therefore $ \{ eval = 4, print = ``4'' \} $ becomes
-$ \{ eval = 4 \} ,, \{ print = ``4'' \} $. Merges of two values are elaborated
-into just a pair of them and single-field record literals lose their field
-labels during the elaboration. Hence $ \{ eval = 4 \} ,, \{ print = ``4'' \} $
-becomes $ (4, ``4'') $.
-
-Finally, $ e1 $ and $ e2 $ are both coerced by a projection function
-$ \\(x:(Int,String)). x.\_1 $ before being applied to $ add $. We adopt a
-Scala-like syntax where $ .\_1 $ denotes the projection of a tuple on the first
-element, and so on.
-
-\framebox{$|\tau| = T$}
-
-\[
-\begin{array}{rcl}
-  |\alpha|               & = & \alpha \\
-  |\tau_1 \to \tau_2|    & = & |\tau_1| \to |\tau_2| \\
-  |\forall \alpha. \tau| & = & \forall \alpha. |\tau| \\
-  |t_1 \& t_2|           & = & \langle |\tau_1|, |\tau_2| \rangle \\
-  |\{ l : \tau \}|       & = & |\tau|
-\end{array}
-\]
+The dynamic semantics of System F can be found in ...
 
 \begin{lemma} \label{type-coerce}
   If $$ \Gamma \vdash \tau_1 <: \tau_2 \yields{C} $$
   then $$ |\Gamma| \vdash C : |\tau_1| \to |\tau_2| $$
 \end{lemma}
+
+The main translation judgment is $ \Gamma \vdash e : \tau \hookrightarrow E $ which
+states that with respect to the environment $ \Gamma $, the \name expression
+$ e $ is of a \name type $ \tau $ and its translation is a System F expression $ E $.
+
+We also define the type translation function $ | \cdot | $ from \name types
+$ \tau $ to System F types $ T $.
+\input{formalization/type-translation.tex}
+The translation is standard, except the intersection of two types are translated
+into a product of them, and the label of record types are erased.
 
 The translation consists of four sets of rules, which are explained below:
 
