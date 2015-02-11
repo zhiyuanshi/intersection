@@ -7,12 +7,12 @@
 % Yanlin
 % Mixin
 
-% \begin{minted}{haskell}
+% \begin{lstlisting}
 % let merge A B (f : ExpAlg A) (g : ExpAlg B) = {
 %   lit = \(x : Int). f.lit x ,, g.lit x,
 %   add = \(x : A & B). \(y : A & B). f.add x y ,, g.add x y
 % };
-% \end{minted}
+% \end{lstlisting}
 
 This section shows that the System F plus intersection types are enough for
 encoding extensible designs, and even beat the designs in languages with a much
@@ -44,39 +44,39 @@ A)
 
 Object algebras provide an alternative to \emph{algebraic data types} (ADT). For example, the
 following Haskell definition of the type of simple expressions
-\begin{minted}{haskell}
+\begin{lstlisting}
 data Exp where
   Lit :: Int -> Exp
   Add :: Exp -> Exp -> Exp
-\end{minted}
+\end{lstlisting}
 can be expressed by the \emph{interface} of an object algebra of simple expressions:
-\begin{minted}{scala}
+\begin{lstlisting}{scala}
 trait ExpAlg[E] {
   def lit(x: Int): E
   def add(e1: E, e2: E): E
 }
-\end{minted}
+\end{lstlisting}
 Similar to ADT, data constructors in object algebras are represented by functions such as
 \lstinline{lit} and \lstinline{add} inside an interface \lstinline{ExpAlg}.
 Different with ADT, the type of the expression itself is abtracted by a type
 parameter \lstinline{E}.
 
 which can be expressed similarly in \name as:
-\begin{minted}{haskell}
+\begin{lstlisting}
 type ExpAlg E = {
   lit : Int -> E,
   add : E -> E -> E
 }
-\end{minted}
+\end{lstlisting}
 
 % Introduce Scala's intersection types
 
 Scala supports intersection types via the \lstinline{with} keyword. The type
 \lstinline{A with B} expresses the combined interface of \lstinline{A} and
 \lstinline{B}. The idea is similar to
-\begin{minted}{java}
+\begin{lstlisting}{java}
 interface AwithB extends A, B {}
-\end{minted}
+\end{lstlisting}
 in Java.
 \footnote{However, Java would require the \lstinline{A} and \lstinline{B} to be
   concrete types, whereas in Scala, there is no such restriction.}
@@ -94,15 +94,15 @@ intersection types provides a solution to that problem.
 
 We first define an interface that supports the evaluation operation:
 
-% #include ../src/Algebra.sf haskell @base
-\begin{minted}{haskell}
+% #include ../src/Algebra.sf  @base
+\begin{lstlisting}
 type IEval  = { eval : Int };
 type ExpAlg E = { lit : Int -> E, add : E -> E -> E };
 let evalAlg = {
   lit = \(x : Int). { eval = x },
   add = \(x : IEval). \(y : IEval). { eval = x.eval + y.eval }
 };
-\end{minted}
+\end{lstlisting}
 % #end
 
 The interface is just a type synonym \lstinline{IEval}. In \name, record
@@ -114,24 +114,24 @@ In the following, \lstinline{ExpAlg} is an object algebra interface of
 expressions with literal and addition case. And \lstinline{evalAlg} is an object
 algebra for evluation of those expressions, which has type \lstinline{ExpAlg Int}
 
-% #include ../src/Algebra.sf haskell @variant
-\begin{minted}{haskell}
+% #include ../src/Algebra.sf  @variant
+\begin{lstlisting}
 type SubExpAlg E = (ExpAlg E) & { sub : E -> E -> E };
 let subEvalAlg = evalAlg ,, { sub = \ (x : IEval). \ (y : IEval). { eval = x.eval - y.eval } };
-\end{minted}
+\end{lstlisting}
 % #end
 
 Next, we define an interface that supports pretty printing.
 
-% #include ../src/Algebra.sf haskell @operation
-\begin{minted}{haskell}
+% #include ../src/Algebra.sf  @operation
+\begin{lstlisting}
 type IPrint = { print : String };
 let printAlg = {
   lit = \(x : Int). { print = x.toString() },
   add = \(x : IPrint). \(y : IPrint). { print = x.print.concat(" + ").concat(y.print) },
   sub = \(x : IPrint). \(y : IPrint). { print = x.print.concat(" - ").concat(y.print) }
 };
-\end{minted}
+\end{lstlisting}
 % #end
 
 Provided with the definitions above, we can then create values using the
@@ -146,14 +146,14 @@ themselves are abstracted over the allowed operations such as evaluation and
 pretty printing by requiring the expression functions to take an extra argument
 \lstinline{E}.
 
-% #include ../src/Algebra.sf haskell @merge
-\begin{minted}{haskell}
+% #include ../src/Algebra.sf  @merge
+\begin{lstlisting}
 let merge A B (f : ExpAlg A) (g : ExpAlg B) = {
   lit = \(x : Int). f.lit x ,, g.lit x,
   add = \(x : A & B). \(y : A & B).
           f.add x y ,, g.add x y
 };
-\end{minted}
+\end{lstlisting}
 % #end
 
 If we would like to have an expression that supports both evaluation and pretty
@@ -163,12 +163,12 @@ function, which takes two expression algebras to create a combined algebra. It
 does so by constructing a new expression algebra, a record whose each field is a
 function that delegates the input to the two algebras taken.
 
-% #include ../src/Algebra.sf haskell @usage
-\begin{minted}{haskell}
+% #include ../src/Algebra.sf  @usage
+\begin{lstlisting}
 let newAlg = merge IEval IPrint subEvalAlg printAlg in
 let o1 = e1 (IEval & IPrint) newAlg in
 o1.print
-\end{minted}
+\end{lstlisting}
 % #end
 
 \lstinline{o1} is a single object created that supports both evaluation and
@@ -179,7 +179,7 @@ printing, thus achieving full feature-oriented programming.
 The visitor pattern allows adding new operations to existing structures without
 modifying those structures. The type of expressions are defined as follows:
 
-\begin{minted}{scala}
+\begin{lstlisting}{scala}
 trait Exp[A] {
   def accept(f: ExpAlg[A]): A
 }
@@ -187,7 +187,7 @@ trait Exp[A] {
 trait SubExp[A] extends Exp[A] {
   override def accept(f: SubExpAlg[A]): A
 }
-\end{minted}
+\end{lstlisting}
 
 The body of \lstinline{Exp} and \lstinline{SubExp} are almost the same: they
 both contain an \lstinline{accept} method that takes an algebra \lstinline{f}
@@ -203,15 +203,15 @@ subtyping in such languages \footnote{It is still possible to encode
 becomes a subtype of the latter.
 
 Such limitation does not exist in \name. For example, we can define the similar interfaces \lstinline{Exp} and \lstinline{SubExp}:
-\begin{minted}{haskell}
+\begin{lstlisting}
 type Exp    A = { accept: forall A. ExpAlg A -> A };
 type SubExp A = { accept: forall A. SubExpAlg A -> A };
-\end{minted}
+\end{lstlisting}
 Then by the typing judgment it holds that \lstinline{SubExp} is a supertype of
 \lstinline{Exp}. This relation gives desired results. To give a concrete example:
 
 First we define two data constructors for simple expressions:
-\begin{minted}{haskell}
+\begin{lstlisting}
 let lit (n : Int): Exp A = {
   accept = /\A. \(f : ExpAlg A). f.lit n
 };
@@ -220,14 +220,14 @@ let add (e1 : Exp) (e2 : Exp): Exp A = {
   accept = /\A. \(f : ExpAlg A).
              f.add (e1.accept A f) (e2.accept A f)
 };
-\end{minted}
+\end{lstlisting}
 
 Suppose later we decide to augment the expressions with subtraction:
-\begin{minted}{haskell}
+\begin{lstlisting}
 let sub (e1 : SubExp) (e2 : SubExp): SubExp A =
   { accept = /\A. \(f : SubExpAlg A).
                f.sub (e1.accept A f) (e2.accept A f) };
-\end{minted}
+\end{lstlisting}
 
 One big benefit of using the visitor pattern is that programmers is able to
 write in the same way that would do in Haskell.
@@ -248,46 +248,46 @@ expressions.
 
 First, we define the type of expressions that support evaluation and implement
 two constructors:
-\begin{minted}{haskell}
+\begin{lstlisting}
 type Exp = { eval: Int }
 let lit (n: Int) = { eval = n }
 let add (e1: Exp) (e2: Exp)
   = { eval = e1.eval + e2.eval }
-\end{minted}
+\end{lstlisting}
 
 If we would like to add a new operation, say pretty printing, it is nothing more
 than refining the original \lstinline{Exp} interface by \emph{intersecting} the
 original type with the new \lstinline{print} interface using the \lstinline{&}
 primitive and \emph{merging} the original data constructors using the \lstinline{,,}
 primitive.
-\begin{minted}{haskell}
+\begin{lstlisting}
 type ExpExt = Exp & { print: String }
 let litExt (n: Int) = lit n ,, { print = n.toString() }
 let addExt (e1: ExpExt) (e2: ExpExt)
   = add e1 e2 ,,
     { print = e1.print.concat(" + ").concat(e2.print) }
-\end{minted}
+\end{lstlisting}
 
 Now we can construct expressions using the constructors defined above:
-\begin{minted}{haskell}
+\begin{lstlisting}
 let e1: ExpExt = addExt (litExt 2) (litExt 3)
 let e2: Exp = add (lit 2) (lit 4)
-\end{minted}
+\end{lstlisting}
 \lstinline{e1} is an expression capable of both evaluation and printing, while
 \lstinline{e2} supports evaluation only.
 
 We can also add a new variant to our expression:
-\begin{minted}{haskell}
+\begin{lstlisting}
 let sub (e1: Exp) (e2: Exp) = { eval = e1.eval - e2.eval }
 let subExt (e1: ExpExt) (e2: ExpExt)
   = sub e1 e2 ,, { print = e1.print.concat(" - ").concat(e2.print) }
-\end{minted}
+\end{lstlisting}
 
 Finally we are able to manipulate our expressions with the power of both
 subtraction and pretty printing.
-\begin{minted}{haskell}
+\begin{lstlisting}
 (subExt e1 e1).print
-\end{minted}
+\end{lstlisting}
 
 \subsection{Mixins}
 
