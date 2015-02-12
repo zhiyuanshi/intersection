@@ -1,39 +1,39 @@
-\framebox{\(\typing {\Gamma} {e} {t}\)}
+% \framebox{\( \Gamma \vdash e t \)}
 
-\infrule[T-Var]
-{(x,t) \in \Gamma}
-{\typing {\Gamma} {x} {t}}
+% \infrule[T-Var]
+% {(x,t) \in \Gamma}
+% {\Gamma \vdash x t}
 
-\infrule[T-Abs]
-{\Gamma \turns t \andalso \typing {\Gamma, \rel{x}{t}} {e} {t_1}}
-{\typing {\Gamma} {\abs{\rel{x}{t}}{e}} {t \to t_1}}
+% \infrule[T-Abs]
+% {\Gamma \vdash t \andalso \Gamma, \rel{x}{t} \vdash e t_1}
+% {\Gamma \vdash \abs{\rel{x}{t}}{e} t \to t_1}
 
-\infrule[T-TAbs]
-{\typing {\Gamma, \alpha} {e} {t}}
-{\typing {\Gamma} {\Abs{\alpha}{e}} {\univquant{\alpha}{t}}}
+% \infrule[T-TAbs]
+% {\Gamma, \alpha \vdash e t}
+% {\Gamma \vdash \Abs{\alpha}{e} \forall \alpha. t}
 
-\infrule[T-App]
-{\typing {\Gamma} {e_1} {t_1 \to t_2} \\
- \typing {\Gamma} {e_2} {t_3} \andalso t_3 \subtype t_1}
-{\typing {\Gamma} {\app{e_1}{e_2}} {t_2}}
+% \infrule[T-App]
+% {\Gamma \vdash e_1 : t_1 \to t_2 \\
+%  \Gamma \vdash e_2 : t_3 \andalso t_3 \subtype t_1}
+% {\Gamma \vdash \app {e_1} {e_2} : t_2}
 
-\infrule[T-TApp]
-{\typing {\Gamma} {e} {\univquant{\alpha}{t_1}} \andalso \Gamma \turns t}
-{\typing {\Gamma} {\app{e}{t}} {\subst{\alpha}{t} t_1}}
+% \infrule[T-TApp]
+% {\Gamma \vdash {e} \forall \alpha. t_1 \andalso \Gamma \vdash t}
+% {\Gamma \vdash \app {e} {t} {\subst {\alpha} {t} t_1}}
 
-\infrule[T-Merge]
-{\typing {\Gamma} {e_1} {t_1} \andalso \typing {\Gamma} {e_2} {t_2}}
-{\typing {\Gamma} {e_1 \dcomma e_2} {t_1 \with t_2}}
+% \infrule[T-Merge]
+% {\Gamma \vdash {e_1} : {t_1} \andalso \Gamma \vdash {e_2} {t_2}}
+% {\Gamma \vdash e_1 \dcomma e_2 : t_1 \with t_2}
 
-\infrule[T-RcdIntro]
-{\typing {\Gamma} {e} {t}}
-{\typing {\Gamma} {\recordintro{l}{e}} {\recordtype{l}{t}}}
+% \infrule[T-RcdIntro]
+% {\Gamma \vdash e : t}
+% {\Gamma \vdash \recordintro {l} {e} : \recordtype {l} {t}}
 
-\infrule[T-RcdElim]
-{\typing {\Gamma} {e} {t} \andalso F = \fields{t} \andalso l \in \dom{F} }
-{\typing {\Gamma} {e.l} {F(l)}}
+% \infrule[T-RcdElim]
+% {\Gamma \vdash {e} : {t} \andalso \andalso}
+% {\Gamma \vdash {e.l} : {F(l)}}
 
-\infrule[T-RcdUpd]
-{\typing {\Gamma} {e} {t} \andalso \typing {\Gamma} {e'} {t'} \\
- F = \fields{t} \andalso l \in \dom{F} \andalso t' \subtype F(l)}
-{\typing {\Gamma} {\recordupdate{e}{l}{e'}} {t}}
+% \infrule[T-RcdUpd]
+% {\Gamma \vdash {e} {t} \andalso \Gamma \vdash e' t' \\
+%  F = \fields{t} \andalso l \in \dom{F} \andalso t' \subtype F(l)}
+% {\Gamma \vdash \recordupdate {e} {l} {e'} : {t}}

@@ -37,7 +37,15 @@
 \definecolor{github}{HTML}{4183C4}
 
 % Define macros immediately before the \begin{document} command
-\input{macros.tex}
+\input{macros/tokens.tex}
+\input{macros/pl.tex}
+\input{macros/fi.tex}
+
+\newcommand{\name}{{\bf fi~}}
+\newcommand{\Name}{{\bf fi}}
+
+\newcommand{\target}{{\bf f~}}
+\newcommand{\Target}{{\bf f}}
 
 \lstdefinelanguage{F2J}{
   morekeywords={let,type,module,end,in},
@@ -150,8 +158,8 @@ In summary, the contributions of this paper are:
 This section provides the reader with the intuition of \name, while we postpone
 the presentation of the details in later sections.
 
-In short, \name generalizes \systemf by adding intersection polymorphism. \name terms
-are elaborated into \systemF, a variant of System F. System F, or polymorphic
+In short, \name generalizes System F by adding intersection polymorphism. \name terms
+are elaborated into \Target, a variant of System F. System F, or polymorphic
 lambda calculus lays the foundation of functional programming languages such as
 Haskell.
 
@@ -161,7 +169,7 @@ system in practice by showing various examples.
 
 \subsection{Intersection Types}
 
-The central addition to the type system of \systemf in \name is intersection types. What
+The central addition to the type system of \target in \name is intersection types. What
 is an intersection type? One classic view is from set-theoretic interpretation
 of types: \lstinline{A \& B} stands for the intersection of the set of values of
 \lstinline{A} and \lstinline{B}. The other view, adopted in this paper, regards
@@ -242,7 +250,7 @@ be encoded as \lstinline{eval : Int \& print : String}. And by one of
 subtyping rules derives that \lstinline{eval : Int \& print : String} is a
 subtype of \lstinline{eval : Int}.
 
-% This example is elaborated into the following in \systemF.
+% This example is elaborated into the following in \Target.
 
 % \lstinputlisting[linerange=-]{} % APPLY:linerange=BASICSELAB_ADD
 

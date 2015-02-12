@@ -2,7 +2,7 @@
   \text{Types} & t & \dcoloneq &
     \alpha
     \mid t \to t
-    \mid \univquant{\alpha}{t}
+    \mid \forall \alpha. t
     \mid t \with t
     \mid \recordtype{l}{t} \\
 
@@ -23,10 +23,10 @@
     \mid \Gamma, \alpha
     \mid \Gamma, \rel{x}{t} \\
 
-  \text{Fields} & F & \dcoloneq &
-    \epsilon
-    \mid F, \rel{\cdot}{t}
-    \mid F, \rel{l}{t} \\
+  % \text{Fields} & F & \dcoloneq &
+  %   \epsilon
+  %   \mid F, \rel{\cdot}{t}
+  %   \mid F, \rel{l}{t} \\
 
   \text{Labels} & l &
 \end{array} \]

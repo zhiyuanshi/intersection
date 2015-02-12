@@ -1,1 +1,44 @@
-typing-super.tex
+\framebox{\( \Gamma \vdash e : t \yields E \)}
+
+\infrule[TrVar]
+{(x,t) \in \Gamma}
+{\Gamma \vdash x : t \yields x}
+
+\infrule[TrAbs]
+{\Gamma, \rel x t \vdash e : t_1 \yields E \andalso
+ \Gamma \vdash_{F} t}
+{\Gamma \vdash \abs {\rel x t} e : t \to t_1 \yields {\abs {\rel x {\imageof t}} E}}
+
+\infrule[TrTAbs]
+{\Gamma, \alpha \vdash e : t \yields E}
+{\Gamma \vdash \Abs \alpha e : \forall \alpha. t \yields {\Abs \alpha E}}
+
+\infrule[TrApp]
+{\Gamma \vdash e_1 : t_1 \to t_2 \yields {E_1} \\
+ \Gamma \vdash e_2 : t_3 \yields {E_2} \\
+ t_3 \subtype t_1 \yields C}
+{\Gamma \vdash \app {e_1} {e_2} : t_2 \yields {\app E_1 {(\app C E_2)}}}
+
+\infrule[TrTApp]
+{\Gamma \vdash e : \forall \alpha. t_1 \yields E \andalso
+ \Gamma \vdash_{F} t}
+{\Gamma \vdash \app e t : \subst \alpha t t_1 \yields {\app E {\imageof t}}}
+
+\infrule[TrMerge]
+{\Gamma \vdash e_1 : t_1 \yields {E_1} \\
+ \Gamma \vdash e_2 : t_2 \yields {E_2}}
+{\Gamma \vdash e_1 \dcomma e_2 : t_1 \with t_2 \yields {\tupled {E_1, E_2}}}
+
+\infrule[TrRcdIntro]
+{\Gamma \vdash e : t \yields E}
+{\Gamma \vdash \recordintro l e : \recordtype l t \yields E}
+
+\infrule[TrRcdElim]
+{\Gamma \vdash e : t \yields E \andalso
+ \Gamma \vdash_{get} (t; l) : t_1 \yields C}
+{\Gamma \vdash e.l : t_1 \yields {\app C E}}
+
+\infrule[TrRcdUpd]
+{\Gamma \vdash e : t \yields E \andalso
+ \Gamma \vdash_{put} (t; l; e_1) : t_1 \yields C}
+{\Gamma \vdash \recordupdate e l {e_1} : t_1 \yields {\app C E}}

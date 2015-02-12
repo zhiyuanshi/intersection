@@ -9,7 +9,7 @@
 
 \infrule[S-Forall]
 {t_1 \subtype \subst{\alpha_2}{\alpha_1} t_2}
-{\univquant{\alpha_1}{t_1} \subtype \univquant{\alpha_2}{t_2}}
+{\forall \alpha_1. t_1 \subtype \forall \alpha_2. t_2}
 
 \infrule[S-And-1]
 {t_1 \subtype t_3}
