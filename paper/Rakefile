@@ -2,14 +2,28 @@
 
 task :default => :paper
 
+desc "Prepare rules"
+  task :prepare_rules do
+    system <<-SHELL
+cd rules
+cp trans-get.tex fi-get.tex &&
+cp trans-put.tex fi-put.tex &&
+cp trans-sub.tex fi-sub.tex &&
+cp trans-typing.tex fi-typing.tex &&
+sed -i 's/\\optional/\\optionalnothing/g'     fi-*.tex &&
+sed -i 's/\\yields/\\yieldsnothing/g'     fi-*.tex &&
+cd -
+    SHELL
+end
+
 desc "Make the paper"
-task :paper do
+task :paper => :prepare_rules do
   # From the documentation of the minted package:
   # "Since minted makes calls to the outside world (i.e. Pygments), you need to
   # tell the LaTeX processor about this by passing it the -shell-escape option
   # or it won’t allow such calls."
-  latex_options = %w(-shell-escape)
-  filenames     = Dir["sections/*.tex"]
+  latex_options = [] # %w(-shell-escape)
+  # filenames     = Dir["sections/*.tex"]
   # system("runhaskell Include.hs #{filenames.join(' ')} && pdflatex #{latex_options.join(' ')} main.tex")
   system("pdflatex #{latex_options.join(' ')} main.tex")
 end

@@ -23,14 +23,14 @@
 {t_1 \with t_2 \subtype t_3
   \yieldsnothing
     {\abs{\rel x {\imageof {t_1 \with t_2}}}
-      {\app C {(\proj 1 x)}}}}
+      {\app C {(\app \fst x)}}}}
 
 \infrule[SAnd2]
 {t_2 \subtype t_3 \yieldsnothing C}
 {t_1 \with t_2 \subtype t_3
   \yieldsnothing
     {\abs {\rel x {\imageof {t_1 \with t_2}}}
-      {\app C {(\proj 2 x)}}}}
+      {\app C {(\app \snd x)}}}}
 
 \infrule[SAnd3]
 {t_1 \subtype t_2 \yieldsnothing {C_1} \andalso t_1 \subtype t_3 \yieldsnothing {C_2}}
@@ -43,4 +43,4 @@
 {t_1 \subtype t_2 \yieldsnothing C}
 {\recordtype l {t_1} \subtype \recordtype l {t_2}
   \yieldsnothing
-    {\abs {\rel x {\imageof {\recordtype l {t_1}}}} {\tupled {\app C {(\proj 1 x)}}}}}
+    {\abs {\rel x {\imageof {\recordtype l {t_1}}}} {\app C x}}}

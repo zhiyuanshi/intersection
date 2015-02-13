@@ -40,5 +40,5 @@
 
 \infrule[TrRcdUpd]
 {\Gamma \vdash e : t \yields E \andalso
- \Gamma \vdash_{put} (t; l; e_1) : t_1 \yields C}
-{\Gamma \vdash \recordupdate e l {e_1} : t_1 \yields {\app C E}}
+ \Gamma \vdash_{put} (t; l; e_1) : t' \yields C}
+{\Gamma \vdash \recordupdate e l {e_1} : t' \yields {\app C E}}
