@@ -7,9 +7,9 @@
 \infrule[GetLeft]
 {\Gamma \vdash_{get} (t_1; l) : t \yields C}
 {\Gamma \vdash_{get} (t_1 \with t_2; l) : t
-  \yields {\abs {\rel x {\imageof {t_1 \with t_2}}} {C (\fst ~ x)}}}
+  \yields {\abs {\rel x {\imageof {t_1 \with t_2}}} {C (\app \fst x)}}}
 
 \infrule[GetRight]
 {\Gamma \vdash_{get} (t_2; l) : t \yields C}
 {\Gamma \vdash_{get} (t_1 \with t_2; l) : t
-  \yields {\abs {\rel x {\imageof {t_1 \with t_2}}} {C (\snd ~ x)}}}
+  \yields {\abs {\rel x {\imageof {t_1 \with t_2}}} {C (\app \snd x)}}}

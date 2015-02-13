@@ -1,16 +1,16 @@
 \framebox{\( \Gamma \vdash_{put} (t; l; e) : t \yieldsnothing C \)}
 
 \infrule[PutBase]
-{\Gamma \vdash e : t \yieldsnothing E}
-{\Gamma \vdash_{put} (\recordtype l t; l; e) : t
+{\Gamma \vdash e : t' \yieldsnothing E \andalso t' \subtype t}
+{\Gamma \vdash_{put} (\recordtype l t; l; e) : \recordtype l {t'}
   \yieldsnothing {\abs {\rel x {\imageof {\recordtype l t}}} E}}
 
 \infrule[PutLeft]
-{\Gamma \vdash_{put} (t_1; l) : t \yieldsnothing C}
-{\Gamma \vdash_{put} (t_1 \with t_2; l) : t
+{\Gamma \vdash_{put} (t_1; l; e) : t_1' \yieldsnothing C}
+{\Gamma \vdash_{put} (t_1 \with t_2; l; e) : t_1' \with t_2
   \yieldsnothing {\abs {\rel x {\imageof {t_1 \with t_2}}} {C (\fst ~ x)}}}
 
 \infrule[PutRight]
-{\Gamma \vdash_{put} (t_2; l) : t \yieldsnothing C}
-{\Gamma \vdash_{put} (t_1 \with t_2; l) : t
+{\Gamma \vdash_{put} (t_2; l; e) : t_2' \yieldsnothing C}
+{\Gamma \vdash_{put} (t_1 \with t_2; l; e) : t_1 \with t_2'
   \yieldsnothing {\abs {\rel x {\imageof {t_1 \with t_2}}} {C (\snd ~ x)}}}

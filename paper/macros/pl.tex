@@ -2,11 +2,16 @@
 \newcommand{\ftv}[1]{\meta{ftv}(#1)}
 \newcommand{\imageof}[1]{\llbracket #1 \rrbracket}
 \newcommand{\meta}[2]{{\it{#1}} (#2)}
-\newcommand{\proj}[2]{\app{proj_{#1}}{#2}}
+% \newcommand{\proj}[2]{\app{proj_{#1}}{#2}}
 \newcommand{\rel}[2]{#1 \!\!:\!\! #2}
 \newcommand{\subst}[2]{\lbrack #1 \! \mapsto \! #2 \rbrack}
 \newcommand{\subtype}{<\!:}
-\newcommand{\yields}[1]{\textcolor{facebook}{\; \hookrightarrow #1}}
+
+\newcommand{\optional}[1]{\textcolor{facebook}{#1}}
+\newcommand{\optionalnothing}[1]{}
+
+\newcommand{\yields}[1]{\optional{\; \hookrightarrow #1}}
 \newcommand{\yieldsnothing}[1]{}
+
 \newcommand{\fst}{\texttt{fst}}
 \newcommand{\snd}{\texttt{snd}}
