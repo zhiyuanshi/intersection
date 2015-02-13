@@ -76,6 +76,11 @@ that record types are covariant in the type of the fields.
 
 \subsection{Typing}
 
+\input{rules/fi-wf.tex}
+\input{rules/fi-typing.tex}
+\input{rules/fi-get.tex}
+\input{rules/fi-put.tex}
+
 The typing judgment for \name is of the form: $ \Gamma \vdash e : t $. This
 judgment uses the context $ \Gamma $. The typing rules for our core languages
 are mostly standard ones for System F. In particular we introduce a
@@ -103,8 +108,3 @@ implementation. We prefer the order from the right to the left because it make
 possible record overriding. For example,
 $ (\recordintro{count}{1} ,, \recordintro{count}{2}).count $ will evaluate to
 $ 2 $ in this case.
-
-% Well-formedness of types
-\input{rules/fi-wf.tex}
-
-\input{rules/fi-typing.tex}
