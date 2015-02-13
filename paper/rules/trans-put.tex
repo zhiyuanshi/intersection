@@ -1,22 +1,9 @@
-rules/trans-put.tex
-
-% Putter rules:  Γ ⊢put t; l(E) => C; t
-
-% Γ ⊢put {l:t} ~~ l(E)   => λ(x:[{l:t}]). E; t                       (PutBase)
-
-% Γ ⊢put t1 ~~ l(E)      => C; t
-% ——————————————————————————————————————————————————————————  (PutLeft)
-% Γ ⊢put t1&t2 ~~ l(E) => λ(x:[t1&t2]). (C (proj_1 x), proj_2 x); t
-
-% Γ ⊢put t2 ~~ l(E)      => C; t
-% ——————————————————————————————————————————————————————————  (PutRight)
-% Γ ⊢put t1&t2 ~~ l(E) => λ(x:[t1&t2]). (proj_1 x, C (proj_2 x)); t
-
 \framebox{\( \Gamma \vdash_{put} (t; l; e) : t \yields C \)}
 
-\infax[PutBase]
+\infrule[PutBase]
+{\Gamma \vdash e : t \yields E}
 {\Gamma \vdash_{put} (\recordtype l t; l; e) : t
-  \yields {\abs {\rel x {\imageof {\recordtype l t}}} {x}}}
+  \yields {\abs {\rel x {\imageof {\recordtype l t}}} E}}
 
 \infrule[PutLeft]
 {\Gamma \vdash_{put} (t_1; l) : t \yields C}
