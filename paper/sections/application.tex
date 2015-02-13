@@ -176,6 +176,8 @@ printing, thus achieving full feature-oriented programming.
 
 \subsection{Visitors}
 
+Constructing instances seems clumsy!
+
 The visitor pattern allows adding new operations to existing structures without
 modifying those structures. The type of expressions are defined as follows:
 
@@ -209,6 +211,8 @@ type SubExp A = { accept: forall A. SubExpAlg A -> A };
 \end{lstlisting}
 Then by the typing judgment it holds that \lstinline{SubExp} is a supertype of
 \lstinline{Exp}. This relation gives desired results. To give a concrete example:
+
+A is called is the \emph{interpretation}. It works for any interpretation you want.
 
 First we define two data constructors for simple expressions:
 \begin{lstlisting}

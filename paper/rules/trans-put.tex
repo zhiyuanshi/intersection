@@ -1,0 +1,16 @@
+\framebox{\( \Gamma \vdash_{put} (t; l; e) : t \yields C \)}
+
+\infrule[PutBase]
+{\Gamma \vdash e : t \yields E}
+{\Gamma \vdash_{put} (\recordtype l t; l; e) : t
+  \yields {\abs {\rel x {\imageof {\recordtype l t}}} E}}
+
+\infrule[PutLeft]
+{\Gamma \vdash_{put} (t_1; l) : t \yields C}
+{\Gamma \vdash_{put} (t_1 \with t_2; l) : t
+  \yields {\abs {\rel x {\imageof {t_1 \with t_2}}} {C (\fst ~ x)}}}
+
+\infrule[PutRight]
+{\Gamma \vdash_{put} (t_2; l) : t \yields C}
+{\Gamma \vdash_{put} (t_1 \with t_2; l) : t
+  \yields {\abs {\rel x {\imageof {t_1 \with t_2}}} {C (\snd ~ x)}}}

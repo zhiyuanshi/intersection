@@ -3,10 +3,10 @@
   \text{Types} & T & \dcoloneq &
     \alpha
     \mid T \to T
-    \mid \univquant{\alpha}{T}
+    \mid \forall \alpha. T
     \mid \langle T, T \rangle \\
 
-  \text{Expressions} & E & \dcoloneq &
+  \text{Expressions} & E, C & \dcoloneq &
     x
     \mid \abs{\rel{x}{T}}{E}
     \mid \Abs{\alpha}{E}

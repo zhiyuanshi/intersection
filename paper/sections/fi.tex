@@ -21,7 +21,7 @@ of multiple single records.
 % Types
 Types $ t $ have five constructs. The first three are standard (present in
 System F): type variable $ \alpha $, function types $ t \to t $, and type
-abstraction $ \univquant{\alpha}{t} $; while the last two, intersection types
+abstraction $ \forall \alpha. t $; while the last two, intersection types
 $ t \with t $ and record types $ \recordtype{l}{t} $, are novel in \Name. In
 record types, $ l $ is the label and $ t $ the type.
 
@@ -76,7 +76,12 @@ that record types are covariant in the type of the fields.
 
 \subsection{Typing}
 
-The typing judgment for \name is of the form: $ \typing {\Gamma} {e} {t} $. This
+\input{rules/fi-wf.tex}
+\input{rules/fi-typing.tex}
+\input{rules/fi-get.tex}
+\input{rules/fi-put.tex}
+
+The typing judgment for \name is of the form: $ \Gamma \vdash e : t $. This
 judgment uses the context $ \Gamma $. The typing rules for our core languages
 are mostly standard ones for System F. In particular we introduce a
 \texttt{T-Merge} rule that applies to \emph{merge} constructs.
@@ -88,7 +93,7 @@ Haskell pseudocode, as:
 \[ \begin{array}{rll}
   \fields{\alpha} & = & \rel{\cdot}{\alpha} \\
   \fields{t_1 \to t_2} & = & \rel{\cdot}{t_1 \to t_2} \\
-  \fields{\univquant{\alpha}{t}} & = & \rel{\cdot}{\univquant{\alpha}{t}} \\
+  \fields{\forall \alpha. t} & = & \rel{\cdot}{\forall \alpha. t} \\
   \fields{t_1 \with t_2} & = & \fields{t_1} \dplus \fields{t_2} \\
   \fields{\recordtype{l}{t}} & = & \rel{l}{t}
 \end{array} \]
@@ -103,8 +108,3 @@ implementation. We prefer the order from the right to the left because it make
 possible record overriding. For example,
 $ (\recordintro{count}{1} ,, \recordintro{count}{2}).count $ will evaluate to
 $ 2 $ in this case.
-
-% Well-formedness of types
-\input{rules/fi-wf.tex}
-
-\input{rules/fi-typing.tex}

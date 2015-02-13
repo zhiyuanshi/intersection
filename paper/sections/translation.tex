@@ -12,20 +12,18 @@ works, in this subsection we present the translation informally. Take the \name
 expression for example:
 
 \begin{lstlisting}
-{ eval = 4, print = ``4'' }
+{ eval = 4, print = ``4'' }.eval
 \end{lstlisting}
 
 First, multi-field record literals are desugared into merges of single-field
 record literals. Therefore $ \{ eval = 4, print = ``4'' \} $ becomes
-$ \{ eval = 4 \} ,, \{ print = ``4'' \} $. Merges of two values are elaborated
-into just a pair of them and single-field record literals lose their field
-labels during the elaboration. Hence $ \{ eval = 4 \} ,, \{ print = ``4'' \} $
+$ \{ eval = 4 \} ,, \{ print = ``4'' \} $. Merges of two values are translated
+into just a pair of them by \texttt{TrMerge} and single-field record literals lose their field
+labels by \texttt{TrRcdIntro}. Hence $ \{ eval = 4 \} ,, \{ print = ``4'' \} $
 becomes $ (4, ``4'') $.
 
 Finally, $ e1 $ and $ e2 $ are both coerced by a projection function
-$ \\(x:(Int,String)). x.\_1 $ before being applied to $ add $. We adopt a
-Scala-like syntax where $ .\_1 $ denotes the projection of a tuple on the first
-element, and so on.
+$ \\(x:(Int,String)). \texttt{fst} x $.
 
 \subsection{Target Language}
 
@@ -55,6 +53,10 @@ The translation consists of four sets of rules, which are explained below:
 
 \subsection{Translation}
 
+In this subsection we now present formally the translation rules that convert
+\name expressions into System F ones. This set of rules essentially extends
+those in the previous section with the light-blue part for the translation.
+
 \input{rules/trans-typing.tex}
 \input{rules/trans-sub.tex}
 \input{rules/trans-get.tex}
@@ -64,7 +66,7 @@ The translation consists of four sets of rules, which are explained below:
 
 \item{\bf Coercion}
 
-  The coercion judgment $ \Gamma \vdash \tau_1 <: \tau_2 \yields{C} $ extends
+  The coercion judgment $ \Gamma \vdash \tau_1 \subtype \tau_2 \yields{C} $ extends
   the subtyping judgment with a coercion on the right hand side of
   $ \hookrightarrow $. A coercion, which is just an expression in the target
   language, is guaranteed to have type $ \tau_1 \to \tau_2 $, as proved by Lemma
@@ -88,11 +90,18 @@ The translation consists of four sets of rules, which are explained below:
 
 \item{\bf ``get'' rules}
 
-  The ``get'' judgment can be thought as producing a field accessor.
+  The ``get'' judgment deals spefically with record elimination and yields a
+  coercion can be thought as a field accessor. For example:
+
+  $ \Gamma \vdash_{get} (\{ eval : Int \}, eval) : \{ eval : Int \} \yields {\abs {\rel x Int} x} $
+
+  The lambda is the field accessor and when applied to a translated expression
+  of type $ \{ eval : Int \}$, it is able to give the desired field.
 
 \item{\bf ``put'' rules}
 
-  The ``put'' judgment can be thought as producing a field updater.
+  The ``put'' judgment deals spefically with record update can be thought as
+  producing a field updater.
 
 \end{itemize}
 

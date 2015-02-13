@@ -1,39 +1,44 @@
-\framebox{\(\typing {\Gamma} {e} {t}\)}
+\framebox{\( \Gamma \vdash e : t \yieldsnothing E \)}
 
-\infrule[T-Var]
+\infrule[TrVar]
 {(x,t) \in \Gamma}
-{\typing {\Gamma} {x} {t}}
+{\Gamma \vdash x : t \yieldsnothing x}
 
-\infrule[T-Abs]
-{\Gamma \turns t \andalso \typing {\Gamma, \rel{x}{t}} {e} {t_1}}
-{\typing {\Gamma} {\abs{\rel{x}{t}}{e}} {t \to t_1}}
+\infrule[TrAbs]
+{\Gamma, \rel x t \vdash e : t_1 \yieldsnothing E \andalso
+ \Gamma \vdash_{F} t}
+{\Gamma \vdash \abs {\rel x t} e : t \to t_1 \yieldsnothing {\abs {\rel x {\imageof t}} E}}
 
-\infrule[T-TAbs]
-{\typing {\Gamma, \alpha} {e} {t}}
-{\typing {\Gamma} {\Abs{\alpha}{e}} {\univquant{\alpha}{t}}}
+\infrule[TrTAbs]
+{\Gamma, \alpha \vdash e : t \yieldsnothing E}
+{\Gamma \vdash \Abs \alpha e : \forall \alpha. t \yieldsnothing {\Abs \alpha E}}
 
-\infrule[T-App]
-{\typing {\Gamma} {e_1} {t_1 \to t_2} \\
- \typing {\Gamma} {e_2} {t_3} \andalso t_3 \subtype t_1}
-{\typing {\Gamma} {\app{e_1}{e_2}} {t_2}}
+\infrule[TrApp]
+{\Gamma \vdash e_1 : t_1 \to t_2 \yieldsnothing {E_1} \\
+ \Gamma \vdash e_2 : t_3 \yieldsnothing {E_2} \\
+ t_3 \subtype t_1 \yieldsnothing C}
+{\Gamma \vdash \app {e_1} {e_2} : t_2 \yieldsnothing {\app E_1 {(\app C E_2)}}}
 
-\infrule[T-TApp]
-{\typing {\Gamma} {e} {\univquant{\alpha}{t_1}} \andalso \Gamma \turns t}
-{\typing {\Gamma} {\app{e}{t}} {\subst{\alpha}{t} t_1}}
+\infrule[TrTApp]
+{\Gamma \vdash e : \forall \alpha. t_1 \yieldsnothing E \andalso
+ \Gamma \vdash_{F} t}
+{\Gamma \vdash \app e t : \subst \alpha t t_1 \yieldsnothing {\app E {\imageof t}}}
 
-\infrule[T-Merge]
-{\typing {\Gamma} {e_1} {t_1} \andalso \typing {\Gamma} {e_2} {t_2}}
-{\typing {\Gamma} {e_1 \dcomma e_2} {t_1 \with t_2}}
+\infrule[TrMerge]
+{\Gamma \vdash e_1 : t_1 \yieldsnothing {E_1} \\
+ \Gamma \vdash e_2 : t_2 \yieldsnothing {E_2}}
+{\Gamma \vdash e_1 \dcomma e_2 : t_1 \with t_2 \yieldsnothing {\tupled {E_1, E_2}}}
 
-\infrule[T-RcdIntro]
-{\typing {\Gamma} {e} {t}}
-{\typing {\Gamma} {\recordintro{l}{e}} {\recordtype{l}{t}}}
+\infrule[TrRcdIntro]
+{\Gamma \vdash e : t \yieldsnothing E}
+{\Gamma \vdash \recordintro l e : \recordtype l t \yieldsnothing E}
 
-\infrule[T-RcdElim]
-{\typing {\Gamma} {e} {t} \andalso F = \fields{t} \andalso l \in \dom{F} }
-{\typing {\Gamma} {e.l} {F(l)}}
+\infrule[TrRcdElim]
+{\Gamma \vdash e : t \yieldsnothing E \andalso
+ \Gamma \vdash_{get} (t; l) : t_1 \yieldsnothing C}
+{\Gamma \vdash e.l : t_1 \yieldsnothing {\app C E}}
 
-\infrule[T-RcdUpd]
-{\typing {\Gamma} {e} {t} \andalso \typing {\Gamma} {e'} {t'} \\
- F = \fields{t} \andalso l \in \dom{F} \andalso t' \subtype F(l)}
-{\typing {\Gamma} {\recordupdate{e}{l}{e'}} {t}}
+\infrule[TrRcdUpd]
+{\Gamma \vdash e : t \yieldsnothing E \andalso
+ \Gamma \vdash_{put} (t; l; e_1) : t_1 \yieldsnothing C}
+{\Gamma \vdash \recordupdate e l {e_1} : t_1 \yieldsnothing {\app C E}}
