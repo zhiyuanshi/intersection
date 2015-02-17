@@ -45,7 +45,12 @@ $ e $ is of a \name type $ \tau $ and its translation is a System F expression $
 
 We also define the type translation function $ | \cdot | $ from \name types
 $ \tau $ to System F types $ T $.
+
+\begin{figure*}
 \input{rules/type-trans.tex}
+\caption{Type translation}
+\end{figure*}
+
 The first three rules of the translation is standard. For the last two, the
 intersection of two types are translated into a product of them, and the label
 of record types are erased.

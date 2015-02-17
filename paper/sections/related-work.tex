@@ -6,18 +6,46 @@ explicit by using the merge operator and elimination is implicit.
 
 \subsection{Intersection Types with Parametric Polymorphism}
 
-Pierce's describes a prototype language with both intersection types and
-parametric polymorphism.
+The closest work to ours is Pierce's work on a prototype compiler for a language
+with both intersection types, union types, and parametric polymorphism. The
+important difference with our system is that in his language there is no
+explicit introduction construct like our merge operator. However, as shown in
+Section 3, this feature is critical in supporting modularity and extensibility
+because it allows dynamic composition of values.
 
 \subsection{Other Type Systems with Intersection Types}
 
-Reynolds, Castagna, and Dunfield all describe elaborating multi-fields records
-into merge of single-field records. However Reynolds and Castagna do not
-consider elaboration and Dunfield do not formalize elaborating records.
+Duunfield describes an elaboration type system that translates unrestricted
+intersection and unions into $\lambda$-calculus terms. Although similar in this
+spirit, our translation uses coercion explicitly in the case of term
+applications. Besides, our translation does not have the undeterministic
+$ \texttt{merge} $ rule. Instead, it is captured by the deteterministic
+\rulename{TrMerge} rule.
+
+Reynolds invented Forsythe in the 1980s. Our merge operator is analogous to
+$ p_1, p_2 $. Castagna, and Dunfield describe elaborating multi-fields records
+into merge of single-field records. As Dunfield has noted, in Forsythe merges
+can be only used unambiguously. For instance, it is not allowed in Forsythe to
+merge two functions. Reynolds and Castagna do not consider elaboration and
+Dunfield do not formalize elaborating records.
+
+Both Pierce and Dunfield's system include a subsumption rule, which states that
+if an expression has been inferred of type $ \tau $, then it is also of any
+supertype of $ \tau $. Our system does not have this rule.
 
 \subsection{Type Systems for Modularity}
 
 \subsection{Extensible Records and Row Types}
+
+The idea of encoding records using intersection types is due to Castagna and
+Reynolds (1996). Although Dunfield considers this idea, he does not proceed to
+formalize elaborating records.
+
+\begin{lstlisting}
+\end{lstlisting}
+
+\begin{lstlisting}
+\end{lstlisting}
 
 \subsection{Other Related Work}
 
