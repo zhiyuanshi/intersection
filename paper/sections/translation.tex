@@ -54,7 +54,10 @@ The translation consists of four sets of rules, which are explained below:
 
 \subsection{Subtyping (Coercion)}
 
+\begin{figure*}
 \input{rules/trans-sub.tex}
+\caption{Coercion}
+\end{figure*}
 
 The coercion judgment $ \Gamma \vdash \tau_1 \subtype \tau_2 \yields{C} $
 extends the subtyping judgment with a coercion on the right hand side of
@@ -83,9 +86,12 @@ In this subsection we now present formally the translation rules that convert
 \name expressions into System F ones. This set of rules essentially extends
 those in the previous section with the light-blue part for the translation.
 
+\begin{figure*}
 \input{rules/trans-typing.tex}
 \input{rules/trans-get.tex}
 \input{rules/trans-put.tex}
+\caption{Type system}
+\end{figure*}
 
 \begin{itemize}
 

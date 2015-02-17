@@ -54,7 +54,10 @@ label and the second the types.
 
 \subsection{Subtyping}
 
+\begin{figure*}
 \input{rules/fi-sub.tex}
+\caption{Subtyping}
+\end{figure*}
 
 Thanks to intersection types, we have natural subtyping relations among types.
 For example, $ Int \with Bool $ should be a subtype of $ Int $, since the former
@@ -76,10 +79,17 @@ that record types are covariant in the type of the fields.
 
 \subsection{Typing}
 
+\begin{figure*}
 \input{rules/fi-wf.tex}
+\caption{Well-formedness}
+\end{figure*}
+
+\begin{figure*}
 \input{rules/fi-typing.tex}
 \input{rules/fi-get.tex}
 \input{rules/fi-put.tex}
+\caption{Typing}
+\end{figure*}
 
 The typing judgment for \name is of the form: $ \Gamma \vdash e : t $. This
 judgment uses the context $ \Gamma $. The typing rules for our core languages
