@@ -52,14 +52,38 @@ of record types are erased.
 
 The translation consists of four sets of rules, which are explained below:
 
-\subsection{Translation}
+\subsection{Subtyping (Coercion)}
+
+\input{rules/trans-sub.tex}
+
+The coercion judgment $ \Gamma \vdash \tau_1 \subtype \tau_2 \yields{C} $
+extends the subtyping judgment with a coercion on the right hand side of
+$ \hookrightarrow $. A coercion $ C $ is an expression in the target language
+and has type $ \tau_1 \to \tau_2 $, as proved by Lemma \ref{type-coerce}. It is
+read ``In the environment $ \Gamma $, $ \tau_1 $ is a subtype of $ \tau_2 $; and
+if any expression $ e $ has a type $ t_1 $ that is a subtype of the type of
+$ t_2 $, the elaborated $ e $, when applied to the corresponding coercion $ C $,
+has exactly type $ |t_2| $''. For example,
+$\Gamma \vdash Int \& Bool <: Bool \yields{fst} $, where $ fst $ is the
+projection of a tuple on the first element. The coercion judgment is only used
+in the \texttt{TrApp} case. As \texttt{SFun} supports contravariant parameter
+type and covariant return type, the coercion of the parameter types and that of
+the return types are used to create a coercion for the function type.
+\texttt{SAnd1}, \texttt{SAnd2}, and \texttt{SAnd3} deal with intersection types.
+The first two are complementary to each other. Take \texttt{SAnd1} for example,
+if we know $ t_1 $ is a subtype of $ t_3 $ and $ C $ is a coercion from $ t_1 $
+to $ t_3 $, then we can conclude that $ t_1 \with t_2 $ is also a subtype of
+$ t_3 $ and the new coercion is a function that takes a value $ x $ of type
+$ t_1 \with t_2 $, project $ x $ on the first item, and apply $ C $ to it.
+\texttt{SAnd3} uses both of two coercions and constructs a pair.
+
+\subsection{Typing (Translation)}
 
 In this subsection we now present formally the translation rules that convert
 \name expressions into System F ones. This set of rules essentially extends
 those in the previous section with the light-blue part for the translation.
 
 \input{rules/trans-typing.tex}
-\input{rules/trans-sub.tex}
 \input{rules/trans-get.tex}
 \input{rules/trans-put.tex}
 
@@ -67,26 +91,7 @@ those in the previous section with the light-blue part for the translation.
 
 \item{\bf Coercion}
 
-  The coercion judgment $ \Gamma \vdash \tau_1 \subtype \tau_2 \yields{C} $
-  extends the subtyping judgment with a coercion on the right hand side of
-  $ \hookrightarrow $. A coercion $ C $ is an expression in the target language
-  and has type $ \tau_1 \to \tau_2 $, as proved by Lemma \ref{type-coerce}. It
-  is read ``In the environment $ \Gamma $, $ \tau_1 $ is a subtype of
-  $ \tau_2 $; and if any expression $ e $ has a type $ t_1 $ that is a subtype
-  of the type of $ t_2 $, the elaborated $ e $, when applied to the
-  corresponding coercion $ C $, has exactly type $ |t_2| $''. For example,
-  $\Gamma \vdash Int \& Bool <: Bool \yields{fst} $, where $ fst $ is the
-  projection of a tuple on the first element. The coercion judgment is only used
-  in the \texttt{TrApp} case. As \texttt{SFun} supports contravariant parameter
-  type and covariant return type, the coercion of the parameter types and that
-  of the return types are used to create a coercion for the function type.
-  \texttt{SAnd1}, \texttt{SAnd2}, and \texttt{SAnd3} deal with intersection
-  types. The first two are complementary to each other. Take \texttt{SAnd1} for
-  example, if we know $ t_1 $ is a subtype of $ t_3 $ and $ C $ is a coercion
-  from $ t_1 $ to $ t_3 $, then we can conclude that $ t_1 \with t_2 $ is also a
-  subtype of $ t_3 $ and the new coercion is a function that takes a value $ x $
-  of type $ t_1 \with t_2 $, project $ x $ on the first item, and apply $ C $ to
-  it. \texttt{SAnd3} uses both of two coercions and constructs a pair.
+  Explained in the previous subsection.
 
 \item{\bf Elaboration}
 
