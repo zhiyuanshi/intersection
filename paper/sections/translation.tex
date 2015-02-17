@@ -131,5 +131,54 @@ those in the previous section with the light-blue part for the translation.
 
 \end{itemize}
 
+\subsection{Meta-theory}
+
+\begin{lemma}{Subtyping is reflexive} \label{sub-refl}
+Given a type $ \tau $, $ \tau \subtype \tau $.
+\end{lemma}
+
+\begin{lemma}{Subtyping is transitive} \label{sub-trans}
+If $ \tau_1 \subtype \tau_2 $ and $ \tau_2 \subtype \tau_3$,
+then $ \tau_1 \subtype \tau_3$.
+\end{lemma}
+
+
+\begin{lemma}[Get rules produce the correct coercion] \label{type-get}
+  If $$ \Gamma \vdash_{get} \tau ; l = C ; \tau_1 $$
+  then $$ |\Gamma| \vdash C : |\tau| \to |\tau_1| $$
+\end{lemma}
+
+\begin{proof}
+By induction on the given derivation.
+\end{proof}
+
+\begin{lemma}[Put rules produce the correct coercion] \label{type-put}
+  If $$ \Gamma \vdash_{put} \tau ; l ; E = C ; \tau_1 $$
+  then $$ |\Gamma| \vdash C : |\tau| \to |\tau| $$
+\end{lemma}
+
+\begin{proof}
+By induction on the given derivation.
+\end{proof}
+
+\begin{lemma}[Translation preserves well-formedness] \label{preserve-wf}
+  If   $$ \Gamma \vdash \tau $$
+  then $$ |\Gamma| \vdash |\tau| $$
+\end{lemma}
+
+\begin{proof}
+By induction on the given derivation.
+\end{proof}
+
+\begin{theorem}[Type preserving translation] \label{preserve-tr}
+  If   $$ \Gamma \vdash e : \tau \yields{E} $$
+  then $$ |\Gamma| \vdash E : \left| \tau \right| $$
+\end{theorem}
+
+\begin{proof}
+(Sketch) By structural induction on the expression and the corresponding
+inference rule. The full proof can be found in the appendix.
+\end{proof}
+
 Type-Directed Translation to System F.
 Main results: type-preservation + coherence.

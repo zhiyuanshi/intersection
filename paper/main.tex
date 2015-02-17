@@ -5,7 +5,6 @@
 \usepackage{amsmath}
 \usepackage{amsthm}
 \usepackage{fixltx2e}
-\usepackage{mdframed}
 \usepackage{stmaryrd}
 \usepackage{xcolor}
 
@@ -31,8 +30,8 @@
 \renewcommand\familydefault\rmdefault
 
 
-\newmdtheoremenv{theorem}{Theorem}
-\newmdtheoremenv{lemma}{Lemma}
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}{Lemma}
 
 \definecolor{facebook}{HTML}{3b5998}
 
@@ -343,7 +342,7 @@ By structural induction on the types and the corresponding inference rule. \\
 
 \end{proof}
 
-\begin{lemma} \label{type-get}
+\begin{lemma}
   If $$ \Gamma \vdash_{get} \tau ; l = C ; \tau_1 $$
   then $$ |\Gamma| \vdash C : |\tau| \to |\tau_1| $$
 \end{lemma}
@@ -361,7 +360,7 @@ $$ |\Gamma| \vdash \lambda (x : |\{ l : \tau \}|). x : |\{ l : \tau \}| \to |\ta
 
 \end{proof}
 
-\begin{lemma} \label{type-put}
+\begin{lemma}
   If $$ \Gamma \vdash_{put} \tau ; l ; E = C ; \tau_1 $$
   then $$ |\Gamma| \vdash C : |\tau| \to |\tau| $$
 \end{lemma}
@@ -389,7 +388,7 @@ By \texttt{(F-WF)} we have
   $$ \Gamma \vdash \tau $$
 \end{proof}
 
-\begin{theorem}[Type preserving translation] \label{preserve-tr}
+\begin{theorem}[Type preserving translation]
   If   $$ \Gamma \vdash e : \tau \yields{E} $$
   then $$ |\Gamma| \vdash E : \left| \tau \right| $$
 \end{theorem}
