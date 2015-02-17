@@ -1,15 +1,15 @@
-\framebox{\( \Gamma \vdash_{get} (t; l) : t \yields C \)}
+\framebox{\( \vdash_{get} (t; l) : t \yields C \)}
 
 \infax[GetBase]
-{\Gamma \vdash_{get} (\recordtype l t; l) : t
+{\vdash_{get} (\recordtype l t; l) : t
   \yields {\abs {\rel x {\imageof {\recordtype l t}}} x}}
 
 \infrule[GetLeft]
-{\Gamma \vdash_{get} (t_1; l) : t \yields C}
-{\Gamma \vdash_{get} (t_1 \with t_2; l) : t
+{\vdash_{get} (t_1; l) : t \yields C}
+{\vdash_{get} (t_1 \with t_2; l) : t
   \yields {\abs {\rel x {\imageof {t_1 \with t_2}}} {C (\app \fst x)}}}
 
 \infrule[GetRight]
-{\Gamma \vdash_{get} (t_2; l) : t \yields C}
-{\Gamma \vdash_{get} (t_1 \with t_2; l) : t
+{\vdash_{get} (t_2; l) : t \yields C}
+{\vdash_{get} (t_1 \with t_2; l) : t
   \yields {\abs {\rel x {\imageof {t_1 \with t_2}}} {C (\app \snd x)}}}
