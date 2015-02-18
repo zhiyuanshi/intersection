@@ -35,16 +35,16 @@ completely standard. The syntax of Systm F is as follows:
 The dynamic semantics of System F can be found in ...
 
 \begin{lemma} \label{type-coerce}
-  If $$ \Gamma \vdash \tau_1 <: \tau_2 \yields{C} $$
-  then $$ |\Gamma| \vdash C : |\tau_1| \to |\tau_2| $$
+  If $$ \Gamma \vdash t_1 <: t_2 \yields{C} $$
+  then $$ |\Gamma| \vdash C : |t_1| \to |t_2| $$
 \end{lemma}
 
-The main translation judgment is $ \Gamma \vdash e : \tau \hookrightarrow E $ which
+The main translation judgment is $ \Gamma \vdash e : t \hookrightarrow E $ which
 states that with respect to the environment $ \Gamma $, the \name expression
-$ e $ is of a \name type $ \tau $ and its translation is a System F expression $ E $.
+$ e $ is of a \name type $ t $ and its translation is a System F expression $ E $.
 
 We also define the type translation function $ | \cdot | $ from \name types
-$ \tau $ to System F types $ T $.
+$ t $ to System F types $ T $.
 
 \begin{figure*}
 \input{rules/type-trans.tex}
@@ -64,11 +64,11 @@ The translation consists of four sets of rules, which are explained below:
 \caption{Coercion}
 \end{figure*}
 
-The coercion judgment $ \Gamma \vdash \tau_1 \subtype \tau_2 \yields{C} $
+The coercion judgment $ \Gamma \vdash t_1 \subtype t_2 \yields{C} $
 extends the subtyping judgment with a coercion on the right hand side of
 $ \hookrightarrow $. A coercion $ C $ is an expression in the target language
-and has type $ \tau_1 \to \tau_2 $, as proved by Lemma \ref{type-coerce}. It is
-read ``In the environment $ \Gamma $, $ \tau_1 $ is a subtype of $ \tau_2 $; and
+and has type $ t_1 \to t_2 $, as proved by Lemma \ref{type-coerce}. It is
+read ``In the environment $ \Gamma $, $ t_1 $ is a subtype of $ t_2 $; and
 if any expression $ e $ has a type $ t_1 $ that is a subtype of the type of
 $ t_2 $, the elaborated $ e $, when applied to the corresponding coercion $ C $,
 has exactly type $ |t_2| $''. For example,
@@ -106,7 +106,7 @@ those in the previous section with the light-blue part for the translation.
 
 \item{\bf Translation}
 
-  The elaboration judgment $ \Gamma \vdash e : \tau \yields{E} $ extends the
+  The elaboration judgment $ \Gamma \vdash e : t \yields{E} $ extends the
   typing judgment with an elaborated expression on the right hand side of
   $ \hookrightarrow $. It is also standard, except for the case of
   \rulename{TrApp}, in which a coercion from the inferred type of the argument,
@@ -142,7 +142,7 @@ those in the previous section with the light-blue part for the translation.
   of type $ \{ eval : Int \}$, it is able to give the desired field.
   \rulename{GetBase} is the base case: the type of the field labelled $ l $ in a $
   \recordtype l t $ is just $ t $ and the coercion is an identity function
-  specialized to type $ \imageof {\recordtype l t} $
+  specialized to type $ \image {\recordtype l t} $
   \rulename{GetLeft} and \rulename{GetRight} are complementary to each other.
 
   Consider the source program:
@@ -159,7 +159,7 @@ those in the previous section with the light-blue part for the translation.
   \[ \vdash_{get} (\recordtype {name} {String}; {name}) : String \]
 
   we have the coercion
-  \[ \abs {\rel {x} {\imageof{\recordtype {name} {String}}}} x \]
+  \[ \abs {\rel {x} {\image{\recordtype {name} {String}}}} x \]
 
   which is just $ \abs {\rel {x} {String}} x $ according to type translation.
 
@@ -167,8 +167,8 @@ those in the previous section with the light-blue part for the translation.
   \[ \vdash_{get} (\recordtype {name} {String} \with \recordtype {age} {Int}; {name}) : String \]
 
   we have the coercion
-  \[ \abs {\rel {x} {\imageof{\recordtype {name} {String} \with \recordtype
-          {age} {Int}}}} \app {(\abs {\rel {x} {\imageof{\recordtype {name} {String}}}} x)} {(\fst ~ x)} \]
+  \[ \abs {\rel {x} {\image{\recordtype {name} {String} \with \recordtype
+          {age} {Int}}}} \app {(\abs {\rel {x} {\image{\recordtype {name} {String}}}} x)} {(\fst ~ x)} \]
   which is just $ \abs {\rel x {(String, Int)}} {\app {(\abs {\rel x {String}} x)} {(\fst ~ x)}} $ by type translation.
 
   By typing rules, the translation of the program is
@@ -195,18 +195,18 @@ those in the previous section with the light-blue part for the translation.
 \subsection{Meta-theory}
 
 \begin{lemma}{Subtyping is reflexive} \label{sub-refl}
-Given a type $ \tau $, $ \tau \subtype \tau $.
+Given a type $ t $, $ t \subtype t $.
 \end{lemma}
 
 \begin{lemma}{Subtyping is transitive} \label{sub-trans}
-If $ \tau_1 \subtype \tau_2 $ and $ \tau_2 \subtype \tau_3$,
-then $ \tau_1 \subtype \tau_3$.
+If $ t_1 \subtype t_2 $ and $ t_2 \subtype t_3$,
+then $ t_1 \subtype t_3$.
 \end{lemma}
 
 
 \begin{lemma}[Get rules produce the correct coercion] \label{type-get}
-  If $$ \Gamma \vdash_{get} \tau ; l = C ; \tau_1 $$
-  then $$ |\Gamma| \vdash C : |\tau| \to |\tau_1| $$
+  If $$ \Gamma \vdash_{get} t ; l = C ; t_1 $$
+  then $$ |\Gamma| \vdash C : |t| \to |t_1| $$
 \end{lemma}
 
 \begin{proof}
@@ -214,8 +214,8 @@ By induction on the given derivation.
 \end{proof}
 
 \begin{lemma}[Put rules produce the correct coercion] \label{type-put}
-  If $$ \Gamma \vdash_{put} \tau ; l ; E = C ; \tau_1 $$
-  then $$ |\Gamma| \vdash C : |\tau| \to |\tau| $$
+  If $$ \Gamma \vdash_{put} t ; l ; E = C ; t_1 $$
+  then $$ |\Gamma| \vdash C : |t| \to |t| $$
 \end{lemma}
 
 \begin{proof}
@@ -223,8 +223,8 @@ By induction on the given derivation.
 \end{proof}
 
 \begin{lemma}[Translation preserves well-formedness] \label{preserve-wf}
-  If   $$ \Gamma \vdash \tau $$
-  then $$ |\Gamma| \vdash |\tau| $$
+  If   $$ \Gamma \vdash t $$
+  then $$ |\Gamma| \vdash |t| $$
 \end{lemma}
 
 \begin{proof}
@@ -232,8 +232,8 @@ By induction on the given derivation.
 \end{proof}
 
 \begin{theorem}[Type preserving translation] \label{preserve-tr}
-  If   $$ \Gamma \vdash e : \tau \yields{E} $$
-  then $$ |\Gamma| \vdash E : \left| \tau \right| $$
+  If   $$ \Gamma \vdash e : t \yields{E} $$
+  then $$ |\Gamma| \vdash E : \left| t \right| $$
 \end{theorem}
 
 \begin{proof}

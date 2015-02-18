@@ -2,14 +2,14 @@
 
 \infax[PutBase]
 {\vdash_{put} (\recordtype l t; l; e : t' \yieldsnothing E) : (t, \recordtype l {t'})
-  \yieldsnothing {\abs {\rel x {\imageof {\recordtype l t}}} E}}
+  \yieldsnothing {\abs {\rel x {\image {\recordtype l t}}} E}}
 
 \infrule[PutLeft]
 {\vdash_{put} (t_1; l; e : t \yieldsnothing E) : (t', t_1') \yieldsnothing C}
 {\vdash_{put} (t_1 \with t_2; l; e : t \yieldsnothing E) : (t', t_1' \with t_2)
-  \yieldsnothing {\abs {\rel x {\imageof {t_1 \with t_2}}} {C (\fst ~ x)}}}
+  \yieldsnothing {\abs {\rel x {\image {t_1 \with t_2}}} {C (\fst ~ x)}}}
 
 \infrule[PutRight]
 {\vdash_{put} (t_2; l; e : t \yieldsnothing E) : (t', t_2') \yieldsnothing C}
 {\vdash_{put} (t_1 \with t_2; l; e : t \yieldsnothing E) : (t', t_1' \with t_2)
-  \yieldsnothing {\abs {\rel x {\imageof {t_1 \with t_2}}} {C (\fst ~ x)}}}
+  \yieldsnothing {\abs {\rel x {\image {t_1 \with t_2}}} {C (\fst ~ x)}}}

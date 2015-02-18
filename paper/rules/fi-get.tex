@@ -2,14 +2,14 @@
 
 \infax[GetBase]
 {\vdash_{get} (\recordtype l t; l) : t
-  \yieldsnothing {\abs {\rel x {\imageof {\recordtype l t}}} x}}
+  \yieldsnothing {\abs {\rel x {\image {\recordtype l t}}} x}}
 
 \infrule[GetLeft]
 {\vdash_{get} (t_1; l) : t \yieldsnothing C}
 {\vdash_{get} (t_1 \with t_2; l) : t
-  \yieldsnothing {\abs {\rel x {\imageof {t_1 \with t_2}}} {C (\app \fst x)}}}
+  \yieldsnothing {\abs {\rel x {\image {t_1 \with t_2}}} {C (\app \fst x)}}}
 
 \infrule[GetRight]
 {\vdash_{get} (t_2; l) : t \yieldsnothing C}
 {\vdash_{get} (t_1 \with t_2; l) : t
-  \yieldsnothing {\abs {\rel x {\imageof {t_1 \with t_2}}} {C (\app \snd x)}}}
+  \yieldsnothing {\abs {\rel x {\image {t_1 \with t_2}}} {C (\app \snd x)}}}

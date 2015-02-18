@@ -7,7 +7,7 @@
 \infrule[TrAbs]
 {\Gamma, \rel x t \vdash e : t_1 \yieldsnothing E \andalso
  \Gamma \vdash_{F} t}
-{\Gamma \vdash \abs {\rel x t} e : t \to t_1 \yieldsnothing {\abs {\rel x {\imageof t}} E}}
+{\Gamma \vdash \abs {\rel x t} e : t \to t_1 \yieldsnothing {\abs {\rel x {\image t}} E}}
 
 \infrule[TrTAbs]
 {\Gamma, \alpha \vdash e : t \yieldsnothing E}
@@ -22,7 +22,7 @@
 \infrule[TrTApp]
 {\Gamma \vdash e : \forall \alpha. t_1 \yieldsnothing E \andalso
  \Gamma \vdash_{F} t}
-{\Gamma \vdash \app e t : \subst \alpha t t_1 \yieldsnothing {\app E {\imageof t}}}
+{\Gamma \vdash \app e t : \subst \alpha t t_1 \yieldsnothing {\app E {\image t}}}
 
 \infrule[TrMerge]
 {\Gamma \vdash e_1 : t_1 \yieldsnothing {E_1} \\
