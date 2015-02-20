@@ -94,7 +94,7 @@
 \doi{nnnnnnn.nnnnnnn}
 
 \titlebanner{banner above paper title}        % These are ignored unless
-\preprintfooter{short description of paper}   % 'preprint' option specified.
+\preprintfooter{\name}                        % 'preprint' option specified.
 
 \title{\name}
 \subtitle{Subtitle Text, if any}
@@ -155,8 +155,8 @@ In summary, the contributions of this paper are:
 
 \item{elaboration typing rules which given a source expression with intersection
     types, typecheck and translate it into an ordinary F term. Prove a type
-    preservation result: if a term $e$ has type $t$ in the source language,
-    then the translated term $|e|$ is well-typed and has type $|t|$ in the
+    preservation result: if a term $ e $ has type $ t $ in the source language,
+    then the translated term $ \image e $ is well-typed and has type $ \image t $ in the
     target language.}
 
 \item{present an algorithm for detecting incoherence which can be very important
@@ -189,12 +189,12 @@ system in practice by showing various examples.
 
 The central addition to the type system of \target in \name is intersection types. What
 is an intersection type? One classic view is from set-theoretic interpretation
-of types: \lstinline{A \& B} stands for the intersection of the set of values of
+of types: \lstinline{A & B} stands for the intersection of the set of values of
 \lstinline{A} and \lstinline{B}. The other view, adopted in this paper, regards
-types as a kind of interface: a value of type \lstinline{A \& B} satisfies both
+types as a kind of interface: a value of type \lstinline{A & B} satisfies both
 of the interfaces of \lstinline{A} and \lstinline{B}. For example,
 \lstinline{eval : Int} is the interface that supports evaluation to integers,
-while \lstinline{ eval : Int \& print : String } supports both evaluation and
+while \lstinline{ eval : Int & print : String } supports both evaluation and
 pretty printing. Those interfaces are akin to interfaces in Java or traits in
 Scala. But one key difference is that they are unnamed in \name.
 
@@ -264,8 +264,8 @@ arguments being passed has more information than required. In other words,
 
 How is this subtyping relation derived? In \name, multi-field record types are
 excluded from the type system because \lstinline{eval : Int, print : String} can
-be encoded as \lstinline{eval : Int \& print : String}. And by one of
-subtyping rules derives that \lstinline{eval : Int \& print : String} is a
+be encoded as \lstinline{eval : Int & print : String}. And by one of
+subtyping rules derives that \lstinline{eval : Int & print : String} is a
 subtype of \lstinline{eval : Int}.
 
 % This example is elaborated into the following in \Target.

@@ -1,15 +1,15 @@
-\framebox{\( \vdash_{get} (t; l) : t \yields C \)}
+\framebox{\( \turnsget (t; l) : t \yields C \)}
 
 \infax[GetBase]
-{\vdash_{get} (\recordtype l t; l) : t
+{\turnsget (\recordtype l t; l) : t
   \yields {\abs {\rel x {\image {\recordtype l t}}} x}}
 
 \infrule[GetLeft]
-{\vdash_{get} (t_1; l) : t \yields C}
-{\vdash_{get} (t_1 \with t_2; l) : t
+{\turnsget (t_1; l) : t \yields C}
+{\turnsget (t_1 \with t_2; l) : t
   \yields {\abs {\rel x {\image {t_1 \with t_2}}} {C (\app \fst x)}}}
 
 \infrule[GetRight]
-{\vdash_{get} (t_2; l) : t \yields C}
-{\vdash_{get} (t_1 \with t_2; l) : t
+{\turnsget (t_2; l) : t \yields C}
+{\turnsget (t_1 \with t_2; l) : t
   \yields {\abs {\rel x {\image {t_1 \with t_2}}} {C (\app \snd x)}}}

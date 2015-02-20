@@ -35,11 +35,11 @@ completely standard. The syntax of Systm F is as follows:
 The dynamic semantics of System F can be found in ...
 
 \begin{lemma} \label{type-coerce}
-  If $$ \Gamma \vdash t_1 <: t_2 \yields{C} $$
-  then $$ |\Gamma| \vdash C : |t_1| \to |t_2| $$
+  If $$ \Gamma \turns t_1 <: t_2 \yields{C} $$
+  then $$ \image \Gamma \turns C : |t_1| \to |t_2| $$
 \end{lemma}
 
-The main translation judgment is $ \Gamma \vdash e : t \hookrightarrow E $ which
+The main translation judgment is $ \Gamma \turns e : t \hookrightarrow E $ which
 states that with respect to the environment $ \Gamma $, the \name expression
 $ e $ is of a \name type $ t $ and its translation is a System F expression $ E $.
 
@@ -64,15 +64,15 @@ The translation consists of four sets of rules, which are explained below:
 \caption{Coercion}
 \end{figure*}
 
-The coercion judgment $ \Gamma \vdash t_1 \subtype t_2 \yields{C} $
+The coercion judgment $ \Gamma \turns t_1 \subtype t_2 \yields C $
 extends the subtyping judgment with a coercion on the right hand side of
 $ \hookrightarrow $. A coercion $ C $ is an expression in the target language
 and has type $ t_1 \to t_2 $, as proved by Lemma \ref{type-coerce}. It is
 read ``In the environment $ \Gamma $, $ t_1 $ is a subtype of $ t_2 $; and
 if any expression $ e $ has a type $ t_1 $ that is a subtype of the type of
 $ t_2 $, the elaborated $ e $, when applied to the corresponding coercion $ C $,
-has exactly type $ |t_2| $''. For example,
-$\Gamma \vdash Int \& Bool <: Bool \yields{fst} $, where $ fst $ is the
+has exactly type $ \image t_2 $''. For example,
+$\Gamma \turns Int \& Bool <: Bool \yields {fst} $, where $ fst $ is the
 projection of a tuple on the first element. The coercion judgment is only used
 in the \rulename{TrApp} case. As \rulename{SFun} supports contravariant parameter
 type and covariant return type, the coercion of the parameter types and that of
@@ -106,7 +106,7 @@ those in the previous section with the light-blue part for the translation.
 
 \item{\bf Translation}
 
-  The elaboration judgment $ \Gamma \vdash e : t \yields{E} $ extends the
+  The elaboration judgment $ \Gamma \turns e : t \yields E $ extends the
   typing judgment with an elaborated expression on the right hand side of
   $ \hookrightarrow $. It is also standard, except for the case of
   \rulename{TrApp}, in which a coercion from the inferred type of the argument,
@@ -136,7 +136,7 @@ those in the previous section with the light-blue part for the translation.
   The ``get'' judgment deals spefically with record elimination and yields a
   coercion can be thought as a field accessor. For example:
 
-  $ \Gamma \vdash_{get} (\{ eval : Int \}, eval) : \{ eval : Int \} \yields {\abs {\rel x Int} x} $
+  $ \Gamma \turnsget (\{ eval : Int \}, eval) : \{ eval : Int \} \yields {\abs {\rel x Int} x} $
 
   The lambda is the field accessor and when applied to a translated expression
   of type $ \{ eval : Int \}$, it is able to give the desired field.
@@ -156,19 +156,19 @@ those in the previous section with the light-blue part for the translation.
   \end{lstlisting}
 
   By \rulename{GetBase},
-  \[ \vdash_{get} (\recordtype {name} {String}; {name}) : String \]
+  \[ \turnsget (\recordtype {name} {String}; {name}) : String \]
 
   we have the coercion
-  \[ \abs {\rel {x} {\image{\recordtype {name} {String}}}} x \]
+  \[ \abs {\rel x {\image {\recordtype {name} {String}}}} x \]
 
-  which is just $ \abs {\rel {x} {String}} x $ according to type translation.
+  which is just $ \abs {\rel x {String}} x $ according to type translation.
 
   By \rulename{GetLeft},
-  \[ \vdash_{get} (\recordtype {name} {String} \with \recordtype {age} {Int}; {name}) : String \]
+  \[ \turnsget (\recordtype {name} {String} \with \recordtype {age} {Int}; {name}) : String \]
 
   we have the coercion
-  \[ \abs {\rel {x} {\image{\recordtype {name} {String} \with \recordtype
-          {age} {Int}}}} \app {(\abs {\rel {x} {\image{\recordtype {name} {String}}}} x)} {(\fst ~ x)} \]
+  \[ \abs {\rel x {\image {\recordtype {name} {String} \with \recordtype
+          {age} {Int}}}} \app {(\abs {\rel x {\image {\recordtype {name} {String}}}} x)} {(\fst ~ x)} \]
   which is just $ \abs {\rel x {(String, Int)}} {\app {(\abs {\rel x {String}} x)} {(\fst ~ x)}} $ by type translation.
 
   By typing rules, the translation of the program is
@@ -199,14 +199,14 @@ Given a type $ t $, $ t \subtype t $.
 \end{lemma}
 
 \begin{lemma}{Subtyping is transitive} \label{sub-trans}
-If $ t_1 \subtype t_2 $ and $ t_2 \subtype t_3$,
-then $ t_1 \subtype t_3$.
+If $ t_1 \subtype t_2 $ and $ t_2 \subtype t_3 $,
+then $ t_1 \subtype t_3 $.
 \end{lemma}
 
 
 \begin{lemma}[Get rules produce the type-correct coercion] \label{type-get}
-  If $$ \Gamma \vdash_{get} t ; l = C ; t_1 $$
-  then $$ |\Gamma| \vdash C : |t| \to |t_1| $$
+  If $$ \Gamma \turnsget t ; l = C ; t_1 $$
+  then $$ \image \Gamma \turns C : \image t \to \image {t_1} $$
 \end{lemma}
 
 \begin{proof}
@@ -214,8 +214,8 @@ By induction on the given derivation.
 \end{proof}
 
 \begin{lemma}[Put rules produce the type-correct coercion] \label{type-put}
-  If $$ \Gamma \vdash_{put} t ; l ; E = C ; t_1 $$
-  then $$ |\Gamma| \vdash C : |t| \to |t| $$
+  If $$ \Gamma \turnsput t ; l ; E = C ; t_1 $$
+  then $$ \image \Gamma \turns C : \image t \to \image t $$
 \end{lemma}
 
 \begin{proof}
@@ -223,8 +223,8 @@ By induction on the given derivation.
 \end{proof}
 
 \begin{lemma}[Translation preserves well-formedness] \label{preserve-wf}
-  If   $$ \Gamma \vdash t $$
-  then $$ |\Gamma| \vdash |t| $$
+  If   $$ \Gamma \turns t $$
+  then $$ \image \Gamma \turns \image t $$
 \end{lemma}
 
 \begin{proof}
@@ -232,8 +232,8 @@ By induction on the given derivation.
 \end{proof}
 
 \begin{theorem}[Type preserving translation] \label{preserve-tr}
-  If   $$ \Gamma \vdash e : t \yields{E} $$
-  then $$ |\Gamma| \vdash E : \left| t \right| $$
+  If   $$ \Gamma \turns e : t \yields E $$
+  then $$ \image \Gamma \turns E : \image t $$
 \end{theorem}
 
 \begin{proof}

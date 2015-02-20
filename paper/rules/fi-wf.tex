@@ -1,21 +1,21 @@
-\framebox{\(\Gamma \vdash {t}\)}
+\framebox{\(\Gamma \turns {t}\)}
 
 \infrule[WF-Var]
 {\alpha \in \Gamma}
-{\Gamma \vdash \alpha}
+{\Gamma \turns \alpha}
 
 \infrule[WF-Fun]
-{\Gamma \vdash t_1 \andalso \Gamma \vdash t_2}
-{\Gamma \vdash t_1 \to t_2}
+{\Gamma \turns t_1 \andalso \Gamma \turns t_2}
+{\Gamma \turns t_1 \to t_2}
 
 \infrule[WF-Forall]
-{\Gamma, \alpha \vdash t}
-{\Gamma \vdash \forall \alpha. t}
+{\Gamma, \alpha \turns t}
+{\Gamma \turns \forall \alpha. t}
 
 \infrule[WF-And]
-{\Gamma \vdash t_1 \andalso \Gamma \vdash t_2}
-{\Gamma \vdash t_1 \with t_2}
+{\Gamma \turns t_1 \andalso \Gamma \turns t_2}
+{\Gamma \turns t_1 \with t_2}
 
 \infrule[WF-Rcd]
-{\Gamma \vdash t}
-{\Gamma \vdash \recordtype{l}{t}}
+{\Gamma \turns t}
+{\Gamma \turns \recordtype{l}{t}}

@@ -1,3 +1,5 @@
+\newcommand{\turns}{\vdash}
+
 \newcommand{\dom}[1]{\meta{dom}{#1}}
 \newcommand{\ftv}[1]{\meta{ftv}(#1)}
 \newcommand{\image}[1]{\llbracket #1 \rrbracket}
@@ -18,3 +20,13 @@
 \newcommand{\snd}{\texttt{snd}}
 
 \newcommand{\rulename}[1]{(\texttt{#1})}
+
+% Common data constructors
+
+\newcommand{\abs}[2]{\lambda (#1). #2}
+\newcommand{\Abs}[2]{\Lambda #1. #2}
+
+\newcommand{\app}[2]{#1 \; #2}
+\newcommand{\App}[2]{#1 \; #2}
+
+\newcommand{\fix}[5]{fix \; #1 (\rel{#2}{#3}) \!:\! #4. #5}
