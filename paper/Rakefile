@@ -25,12 +25,12 @@ task :paper => :prepare_rules do
   latex_options = [] # %w(-shell-escape)
   # filenames     = Dir["sections/*.tex"]
   # system("runhaskell Include.hs #{filenames.join(' ')} && pdflatex #{latex_options.join(' ')} main.tex")
-  system("pdflatex #{latex_options.join(' ')} main.tex")
-end
-
-desc "Update Include.hs from GitHub"
-task :update do
-  system("curl -OL https://raw.githubusercontent.com/zhiyuanshi/include/master/Include.hs")
+  system <<-SHELL
+pdflatex #{latex_options.join(' ')} main.tex &&
+bibtex   main &&
+pdflatex #{latex_options.join(' ')} main.tex &&
+pdflatex #{latex_options.join(' ')} main.tex
+  SHELL
 end
 
 desc "Remove generated Java source files"
