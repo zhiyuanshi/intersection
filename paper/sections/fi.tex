@@ -36,10 +36,11 @@ type application $ \app{e}{t} $.
 The last four constructs are novel. $ e \dcomma e $ is the \emph{merge} of two
 terms. $ \recordintro{l}{e} $ introduces a record literal having $ l $ as the
 label for field containing expression $ e $ . $ e.l $ access the field with
-label $ l $ in $ e $. Finally, $ \recordupdate{e}{l}{e} $ updates the field
-labelled $ l $ in expression $ e $. For simplicity, we omit other constructs in
-order to focus on the essence of the calculus. For example, fixpoints can be
-added in standard ways.
+label $ l $ in $ e $. Finally, $ \recordupdate e l {e_1} $ is a \emph{new}
+record which is exactly the same as $ e $ except the field labelled $ l $ is
+updated to become $ e1 $. For simplicity, we omit other constructs in order to
+focus on the essence of the calculus. For example, fixpoints can be added in
+standard ways.
 
 % Fields
 The field $ F $ is non-standard and introduced to deal with records. It is an

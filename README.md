@@ -1,6 +1,3 @@
-# Intersection
+# intersection
 
-## To make the PDF version of the paper
-
-    cd paper
-    rake
+[Paper (PDF)](https://github.com/zhiyuanshi/intersection/blob/master/paper/main.pdf?raw=true)

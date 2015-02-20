@@ -204,7 +204,7 @@ then $ t_1 \subtype t_3$.
 \end{lemma}
 
 
-\begin{lemma}[Get rules produce the correct coercion] \label{type-get}
+\begin{lemma}[Get rules produce the type-correct coercion] \label{type-get}
   If $$ \Gamma \vdash_{get} t ; l = C ; t_1 $$
   then $$ |\Gamma| \vdash C : |t| \to |t_1| $$
 \end{lemma}
@@ -213,7 +213,7 @@ then $ t_1 \subtype t_3$.
 By induction on the given derivation.
 \end{proof}
 
-\begin{lemma}[Put rules produce the correct coercion] \label{type-put}
+\begin{lemma}[Put rules produce the type-correct coercion] \label{type-put}
   If $$ \Gamma \vdash_{put} t ; l ; E = C ; t_1 $$
   then $$ |\Gamma| \vdash C : |t| \to |t| $$
 \end{lemma}

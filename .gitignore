@@ -28,6 +28,7 @@ Session.vim
 *.dvi
 *.log
 *.pyg
+/out
 
 
 ### Files created by the Ruby script ###
@@ -37,7 +38,7 @@ footempfile.txt
 
 ### IntelliJ IDEA ###
 .idea
-src.iml
+*.iml
 
 
 ### Scala ###

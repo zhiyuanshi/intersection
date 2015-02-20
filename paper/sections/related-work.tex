@@ -6,27 +6,28 @@ explicit by using the merge operator and elimination is implicit.
 
 \subsection{Intersection Types with Parametric Polymorphism}
 
-The closest work to ours is Pierce's work on a prototype compiler for a language
-with both intersection types, union types, and parametric polymorphism. The
-important difference with our system is that in his language there is no
-explicit introduction construct like our merge operator. However, as shown in
-Section 3, this feature is critical in supporting modularity and extensibility
-because it allows dynamic composition of values.
+Our type system combines intersection types and polymorphism. The closest work
+to ours is Pierce\cite{pierce1991programming}'s work on a prototype compiler for
+a language with both intersection types, union types, and parametric
+polymorphism. The important difference with our system is that in his language
+there is no explicit introduction construct like our merge operator. However, as
+shown in Section 3, this feature is critical in supporting modularity and
+extensibility because it allows dynamic composition of values. Pierce does not
+include any proof.
 
 \subsection{Other Type Systems with Intersection Types}
-
-Pierce does not include any proof.
 
 % Write a comprehensive F_{<:}
 % The dot calculus
 % Foundations of path-dependent types
 
-Dunfield describes an elaboration type system that translates unrestricted
-intersection and unions into $\lambda$-calculus terms. Although similar in this
-spirit, our translation uses coercion explicitly in the case of term
-applications. Besides, our translation does not have the undeterministic
-$ \texttt{merge} $ rule. Instead, it is captured by the deteterministic
-\rulename{TrMerge} rule.
+Dunfield \cite{dunfield2014elaborating} describes a similar approach to ours:
+compiling a system with intersection types into ordinary $\lambda$-calculus
+terms. But his system does not include parametric polymorphism, while ours does
+not include unions. Although similar in this spirit, our translation uses
+coercion explicitly in the case of term applications. Besides, our translation
+does not have the undeterministic $ \texttt{merge} $ rule. Instead, it is
+captured by the deteterministic \rulename{TrMerge} rule.
 
 Reynolds invented Forsythe in the 1980s. Our merge operator is analogous to
 $ p_1, p_2 $. Castagna, and Dunfield describe elaborating multi-fields records
@@ -43,9 +44,12 @@ supertype of $ t $. Our system does not have this rule.
 
 \subsection{Extensible Records and Row Types}
 
+\cite{cardelli1992extensible}
+
 The idea of encoding records using intersection types is due to Castagna and
-Reynolds (1996). Although Dunfield considers this idea, he does not proceed to
-formalize elaborating records.
+Reynolds (1996). Although Dunfield also discusses this idea in his paper
+\cite{dunfield2014elaborating} and provides an implementation, he does not
+proceed to propose a set of elaboration typing rules for records.
 
 \begin{lstlisting}
 \end{lstlisting}

@@ -1,5 +1,20 @@
 \section{Application}
 
+\subsection{F-bounded Polymorphism}
+
+\begin{lstlisting}
+let getName A (v : A & {name:String}) = v.name in
+getName [{name:String}] {name = "Ek", age = 10}
+\end{lstlisting}
+
+Scala
+
+\begin{minted}[fontsize=\footnotesize]{scala}
+def getName[A <: { def name: String }](v: A) = v.name
+case class Person(name: String)
+getName[Person](Person("Ek"))
+\end{minted}
+
 % Multiple inheritance?
 % Algebra -> P1,2
 % Visitor -> P2
@@ -44,18 +59,18 @@ A)
 
 Object algebras provide an alternative to \emph{algebraic data types} (ADT). For example, the
 following Haskell definition of the type of simple expressions
-\begin{lstlisting}
+\begin{minted}[fontsize=\footnotesize]{haskell}
 data Exp where
   Lit :: Int -> Exp
   Add :: Exp -> Exp -> Exp
-\end{lstlisting}
+\end{minted}
 can be expressed by the \emph{interface} of an object algebra of simple expressions:
-\begin{lstlisting}{scala}
+\begin{minted}[fontsize=\footnotesize]{scala}
 trait ExpAlg[E] {
   def lit(x: Int): E
   def add(e1: E, e2: E): E
 }
-\end{lstlisting}
+\end{minted}
 Similar to ADT, data constructors in object algebras are represented by functions such as
 \lstinline{lit} and \lstinline{add} inside an interface \lstinline{ExpAlg}.
 Different with ADT, the type of the expression itself is abtracted by a type
@@ -74,9 +89,9 @@ type ExpAlg E = {
 Scala supports intersection types via the \lstinline{with} keyword. The type
 \lstinline{A with B} expresses the combined interface of \lstinline{A} and
 \lstinline{B}. The idea is similar to
-\begin{lstlisting}{java}
+\begin{minted}[fontsize=\footnotesize]{java}
 interface AwithB extends A, B {}
-\end{lstlisting}
+\end{minted}
 in Java.
 \footnote{However, Java would require the \lstinline{A} and \lstinline{B} to be
   concrete types, whereas in Scala, there is no such restriction.}
@@ -181,7 +196,7 @@ Constructing instances seems clumsy!
 The visitor pattern allows adding new operations to existing structures without
 modifying those structures. The type of expressions are defined as follows:
 
-\begin{lstlisting}{scala}
+\begin{minted}[fontsize=\footnotesize]{scala}
 trait Exp[A] {
   def accept(f: ExpAlg[A]): A
 }
@@ -189,7 +204,7 @@ trait Exp[A] {
 trait SubExp[A] extends Exp[A] {
   override def accept(f: SubExpAlg[A]): A
 }
-\end{lstlisting}
+\end{minted}
 
 The body of \lstinline{Exp} and \lstinline{SubExp} are almost the same: they
 both contain an \lstinline{accept} method that takes an algebra \lstinline{f}
