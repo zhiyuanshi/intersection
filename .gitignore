@@ -23,8 +23,10 @@ Session.vim
 
 ### LaTeX ###
 *.aux
-*.log
+*.bbl
+*.blg
 *.dvi
+*.log
 *.pyg
 
 
