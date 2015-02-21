@@ -27,7 +27,7 @@
 \infrule[TrMerge]
 {\Gamma \turns e_1 : \ty_1 \yieldsnothing {E_1} \\
  \Gamma \turns e_2 : \ty_2 \yieldsnothing {E_2}}
-{\Gamma \turns e_1 \dcomma e_2 : \ty_1 \with \ty_2 \yieldsnothing {\tupled {E_1, E_2}}}
+{\Gamma \turns e_1 \dcomma e_2 : \ty_1 \intersects \ty_2 \yieldsnothing {\tupled {E_1, E_2}}}
 
 \infrule[TrRcdIntro]
 {\Gamma \turns e : \ty \yieldsnothing E}

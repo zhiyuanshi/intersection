@@ -20,21 +20,21 @@
 
 \infrule[SAnd1]
 {\ty_1 \subtype \ty_3 \yieldsnothing C}
-{\ty_1 \with \ty_2 \subtype \ty_3
+{\ty_1 \intersects \ty_2 \subtype \ty_3
   \yieldsnothing
-    {\abs {\rel x {\image {\ty_1 \with \ty_2}}}
+    {\abs {\rel x {\image {\ty_1 \intersects \ty_2}}}
       {\app C {(\app \fst x)}}}}
 
 \infrule[SAnd2]
 {\ty_2 \subtype \ty_3 \yieldsnothing C}
-{\ty_1 \with \ty_2 \subtype \ty_3
+{\ty_1 \intersects \ty_2 \subtype \ty_3
   \yieldsnothing
-    {\abs {\rel x {\image {\ty_1 \with \ty_2}}}
+    {\abs {\rel x {\image {\ty_1 \intersects \ty_2}}}
       {\app C {(\app \snd x)}}}}
 
 \infrule[SAnd3]
 {\ty_1 \subtype \ty_2 \yieldsnothing {C_1} \andalso \ty_1 \subtype \ty_3 \yieldsnothing {C_2}}
-{\ty_1 \subtype \ty_2 \with \ty_3
+{\ty_1 \subtype \ty_2 \intersects \ty_3
   \yieldsnothing
     {\abs {\rel x {\image {\ty_1}}}
       {\tupled {\app {C_1} x, \app {C_2} x}}}}

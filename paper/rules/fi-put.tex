@@ -6,10 +6,10 @@
 
 \infrule[PutLeft]
 {\turnsput (\ty_1; l; e : \ty \yieldsnothing E) : (\ty', \ty_1') \yieldsnothing C}
-{\turnsput (\ty_1 \with \ty_2; l; e : \ty \yieldsnothing E) : (\ty', \ty_1' \with \ty_2)
-  \yieldsnothing {\absty x {\image {\ty_1 \with \ty_2}} {C (\fst ~ x)}}}
+{\turnsput (\ty_1 \intersects \ty_2; l; e : \ty \yieldsnothing E) : (\ty', \ty_1' \intersects \ty_2)
+  \yieldsnothing {\absty x {\image {\ty_1 \intersects \ty_2}} {C (\fst ~ x)}}}
 
 \infrule[PutRight]
 {\turnsput (\ty_2; l; e : \ty \yieldsnothing E) : (\ty', \ty_2') \yieldsnothing C}
-{\turnsput (\ty_1 \with \ty_2; l; e : \ty \yieldsnothing E) : (\ty', \ty_1' \with \ty_2)
-  \yieldsnothing {\absty x {\image {\ty_1 \with \ty_2}} {C (\snd ~ x)}}}
+{\turnsput (\ty_1 \intersects \ty_2; l; e : \ty \yieldsnothing E) : (\ty', \ty_1' \intersects \ty_2)
+  \yieldsnothing {\absty x {\image {\ty_1 \intersects \ty_2}} {C (\snd ~ x)}}}

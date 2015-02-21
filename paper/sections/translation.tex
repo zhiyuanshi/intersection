@@ -80,9 +80,9 @@ the return types are used to create a coercion for the function type.
 \rulename{SAnd1}, \rulename{SAnd2}, and \rulename{SAnd3} deal with intersection types.
 The first two are complementary to each other. Take \rulename{SAnd1} for example,
 if we know $ \ty_1 $ is a subtype of $ \ty_3 $ and $ C $ is a coercion from $ \ty_1 $
-to $ \ty_3 $, then we can conclude that $ \ty_1 \with \ty_2 $ is also a subtype of
+to $ \ty_3 $, then we can conclude that $ \ty_1 \intersects \ty_2 $ is also a subtype of
 $ \ty_3 $ and the new coercion is a function that takes a value $ x $ of type
-$ \ty_1 \with \ty_2 $, project $ x $ on the first item, and apply $ C $ to it.
+$ \ty_1 \intersects \ty_2 $, project $ x $ on the first item, and apply $ C $ to it.
 \rulename{SAnd3} uses both of two coercions and constructs a pair.
 
 \subsection{Typing (Translation)}
@@ -164,10 +164,10 @@ those in the previous section with the light-blue part for the translation.
   which is just $ \abs {\rel x {String}} x $ according to type translation.
 
   By \rulename{GetLeft},
-  \[ \turnsget (\recordtype {name} {String} \with \recordtype {age} {Int}; {name}) : String \]
+  \[ \turnsget (\recordtype {name} {String} \intersects \recordtype {age} {Int}; {name}) : String \]
 
   % we have the coercion
-  % \[ \abs {\rel x {\image {\recordtype {name} {String} \with \recordtype
+  % \[ \abs {\rel x {\image {\recordtype {name} {String} \intersects \recordtype
   %         {age} {Int}}}} \app {(\abs {\rel x {\image {\recordtype {name} {String}}}} x)} {(\fst ~ x)} \]
   % which is just $ \abs {\rel x {(String, Int)}} {\app {(\abs {\rel x {String}} x)} {(\fst ~ x)}} $ by type translation.
 
