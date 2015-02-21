@@ -1,39 +1,32 @@
 # -*- coding: utf-8 -*-
-
 task :default => :paper
 
 desc "Prepare rules"
   task :prepare_rules do
     system <<-SHELL
-cd rules
+cd rules &&
 cp trans-get.tex fi-get.tex &&
 cp trans-put.tex fi-put.tex &&
 cp trans-sub.tex fi-sub.tex &&
 cp trans-typing.tex fi-typing.tex &&
-sed -i 's/\\optional/\\optionalnothing/g'     fi-*.tex &&
+sed -i 's/\\optional/\\optionalnothing/g' fi-*.tex &&
 sed -i 's/\\yields/\\yieldsnothing/g'     fi-*.tex &&
 cd -
     SHELL
 end
 
-desc "Make the paper"
-task :paper => :prepare_rules do
-  # From the documentation of the minted package:
+def latexmk_cmd(options = "")
   # "Since minted makes calls to the outside world (i.e. Pygments), you need to
   # tell the LaTeX processor about this by passing it the -shell-escape option
   # or it won’t allow such calls."
-  latex = "pdflatex -shell-escape"
-  # filenames     = Dir["sections/*.tex"]
-  # system("runhaskell Include.hs #{filenames.join(' ')} && pdflatex #{latex_options.join(' ')} main.tex")
-  system <<-SHELL
-#{latex} main.tex &&
-bibtex   main &&
-#{latex} main.tex &&
-#{latex} main.tex
-  SHELL
+  "latexmk #{options} -pdf -pdflatex='pdflatex -shell-escape %O %S' main.tex"
 end
 
-desc "Remove generated Java source files"
-task :clean do
-  system("rm -f ../src/*.java")
-end
+desc "Generate the PDF of the paper"
+task(:paper => :prepare_rules) { system(latexmk_cmd) }
+
+desc "Watch for changes and re-generate the PDF if necessary"
+task(:watch) { system(latexmk_cmd("-pvc")) }
+
+desc "Clean"
+task(:clean) { system("latexmk -c") }
