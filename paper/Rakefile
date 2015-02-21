@@ -28,5 +28,5 @@ task(:paper => :prepare_rules) { system(latexmk_cmd) }
 desc "Watch for changes and re-generate the PDF if necessary"
 task(:watch) { system(latexmk_cmd("-pvc")) }
 
-desc "Remove generated Java source files"
-task(:clean) { system("rm -f ../src/*.java") }
+desc "Clean"
+task(:clean) { system("latexmk -c") }
