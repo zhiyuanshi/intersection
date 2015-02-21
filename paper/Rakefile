@@ -22,14 +22,14 @@ task :paper => :prepare_rules do
   # "Since minted makes calls to the outside world (i.e. Pygments), you need to
   # tell the LaTeX processor about this by passing it the -shell-escape option
   # or it won’t allow such calls."
-  latex_options = %w(-shell-escape)
+  latex = "pdflatex -shell-escape"
   # filenames     = Dir["sections/*.tex"]
   # system("runhaskell Include.hs #{filenames.join(' ')} && pdflatex #{latex_options.join(' ')} main.tex")
   system <<-SHELL
-pdflatex #{latex_options.join(' ')} main.tex &&
+#{latex} main.tex &&
 bibtex   main &&
-pdflatex #{latex_options.join(' ')} main.tex &&
-pdflatex #{latex_options.join(' ')} main.tex
+#{latex} main.tex &&
+#{latex} main.tex
   SHELL
 end
 

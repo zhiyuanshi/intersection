@@ -1,0 +1,45 @@
+\section{Introduction}
+
+-- Compare Scala:
+-- merge[A,B] = new A with B
+
+-- type IEval  = { eval :  Int }
+-- type IPrint = { print : String }
+
+-- F[\_]
+
+We present a polymorphic calculus containing intersection types and records, and show
+how this language can be used to solve various common tasks in functional
+programming in a nicer way.
+
+Intersection types provides a power mechanism for functional programming, in
+particular for extensibility and allowing new forms of composition.
+
+Prototype-based programming is one of the two major styles of object-oriented
+programming, the other being class-based programming which is featured in
+languages such as Java and C\#. It has gained increasing popularity recently
+with the prominence of JavaScript in web applications. Prototype-based
+programming supports highly dynamic behaviors at run time that are not possible
+with traditional class-based programming. However, despite its flexibility,
+prototype-based programming is often criticized over concerns of correctness and
+safety. Furthermore, almost all prototype-based systems rely on the fact that
+the language is dynamically typed and interpreted.
+
+In summary, the contributions of this paper are:
+
+\begin{itemize}
+
+\item{elaboration typing rules which given a source expression with intersection
+    types, typecheck and translate it into an ordinary F term. Prove a type
+    preservation result: if a term $ e $ has type $ \ty $ in the source language,
+    then the translated term $ \image e $ is well-typed and has type $ \image \ty $ in the
+    target language.}
+
+\item{present an algorithm for detecting incoherence which can be very important
+    in practice.}
+
+\item{explores the connection between intersection types and object algebra by
+    showing various examples of encoding object algebra with intersection
+    types.}
+
+\end{itemize}

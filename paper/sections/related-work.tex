@@ -7,7 +7,7 @@ explicit by using the merge operator and elimination is implicit.
 \subsection{Intersection Types with Parametric Polymorphism}
 
 Our type system combines intersection types and polymorphism. The closest work
-to ours is Pierce\cite{pierce1991programming}'s work on a prototype compiler for
+to ours is Pierce~\cite{pierce1991programming}'s work on a prototype compiler for
 a language with both intersection types, union types, and parametric
 polymorphism. The important difference with our system is that in his language
 there is no explicit introduction construct like our merge operator. However, as
@@ -21,7 +21,7 @@ include any proof.
 % The dot calculus
 % Foundations of path-dependent types
 
-Dunfield \cite{dunfield2014elaborating} describes a similar approach to ours:
+Dunfield~\cite{dunfield2014elaborating} describes a similar approach to ours:
 compiling a system with intersection types into ordinary $\lambda$-calculus
 terms. But his system does not include parametric polymorphism, while ours does
 not include unions. Although similar in this spirit, our translation uses
@@ -37,8 +37,8 @@ merge two functions. Reynolds and Castagna do not consider elaboration and
 Dunfield do not formalize elaborating records.
 
 Both Pierce and Dunfield's system include a subsumption rule, which states that
-if an expression has been inferred of type $ t $, then it is also of any
-supertype of $ t $. Our system does not have this rule.
+if an expression has been inferred of type $ \ty $, then it is also of any
+supertype of $ \ty $. Our system does not have this rule.
 
 \subsection{Type Systems for Modularity}
 

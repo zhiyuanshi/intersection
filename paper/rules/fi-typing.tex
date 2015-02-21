@@ -1,46 +1,46 @@
-\framebox{\( \Gamma \turns e : t \yieldsnothing E \)}
+\framebox{\( \Gamma \turns e : \ty \yieldsnothing E \)}
 
 \infrule[TrVar]
-{(x,t) \in \Gamma}
-{\Gamma \turns x : t \yieldsnothing x}
+{(x,\ty) \in \Gamma}
+{\Gamma \turns x : \ty \yieldsnothing x}
 
 \infrule[TrAbs]
-{\Gamma, \rel x t \turns e : t_1 \yieldsnothing E \andalso
- \Gamma \turns_{F} t}
-{\Gamma \turns \abs {\rel x t} e : t \to t_1 \yieldsnothing {\abs {\rel x {\image t}} E}}
+{\Gamma, \rel x \ty \turns e : \ty_1 \yieldsnothing E \andalso
+ \Gamma \turns \ty}
+{\Gamma \turns \abs {\rel x \ty} e : \ty \to \ty_1 \yieldsnothing {\abs {\rel x {\image \ty}} E}}
 
 \infrule[TrTAbs]
-{\Gamma, \alpha \turns e : t \yieldsnothing E}
-{\Gamma \turns \Abs \alpha e : \forall \alpha. t \yieldsnothing {\Abs \alpha E}}
+{\Gamma, \alpha \turns e : \ty \yieldsnothing E}
+{\Gamma \turns \Abs \alpha e : \forall \alpha. \ty \yieldsnothing {\Abs \alpha E}}
 
 \infrule[TrApp]
-{\Gamma \turns e_1 : t_1 \to t_2 \yieldsnothing {E_1} \\
- \Gamma \turns e_2 : t_3 \yieldsnothing {E_2} \\
- t_3 \subtype t_1 \yieldsnothing C}
-{\Gamma \turns \app {e_1} {e_2} : t_2 \yieldsnothing {\app E_1 {(\app C E_2)}}}
+{\Gamma \turns e_1 : \ty_1 \to \ty_2 \yieldsnothing {E_1} \\
+ \Gamma \turns e_2 : \ty_3 \yieldsnothing {E_2} \\
+ \ty_3 \subtype \ty_1 \yieldsnothing C}
+{\Gamma \turns \app {e_1} {e_2} : \ty_2 \yieldsnothing {\app {E_1} {(\app C E_2)}}}
 
 \infrule[TrTApp]
-{\Gamma \turns e : \forall \alpha. t_1 \yieldsnothing E \andalso
- \Gamma \turns_{F} t}
-{\Gamma \turns \app e t : \subst \alpha t t_1 \yieldsnothing {\app E {\image t}}}
+{\Gamma \turns e : \forall \alpha. \ty_1 \yieldsnothing E \andalso
+ \Gamma \turns \ty}
+{\Gamma \turns \app e \ty : \subst \alpha \ty \ty_1 \yieldsnothing {\app E {\image \ty}}}
 
 \infrule[TrMerge]
-{\Gamma \turns e_1 : t_1 \yieldsnothing {E_1} \\
- \Gamma \turns e_2 : t_2 \yieldsnothing {E_2}}
-{\Gamma \turns e_1 \dcomma e_2 : t_1 \with t_2 \yieldsnothing {\tupled {E_1, E_2}}}
+{\Gamma \turns e_1 : \ty_1 \yieldsnothing {E_1} \\
+ \Gamma \turns e_2 : \ty_2 \yieldsnothing {E_2}}
+{\Gamma \turns e_1 \dcomma e_2 : \ty_1 \with \ty_2 \yieldsnothing {\tupled {E_1, E_2}}}
 
 \infrule[TrRcdIntro]
-{\Gamma \turns e : t \yieldsnothing E}
-{\Gamma \turns \recordintro l e : \recordtype l t \yieldsnothing E}
+{\Gamma \turns e : \ty \yieldsnothing E}
+{\Gamma \turns \recordintro l e : \recordtype l \ty \yieldsnothing E}
 
 \infrule[TrRcdElim]
-{\Gamma \turns e : t \yieldsnothing E \andalso
- \Gamma \turnsget (t; l) : t_1 \yieldsnothing C}
-{\Gamma \turns e.l : t_1 \yieldsnothing {\app C E}}
+{\Gamma \turns e : \ty \yieldsnothing E \andalso
+ \Gamma \turnsget (\ty; l) : \ty_1 \yieldsnothing C}
+{\Gamma \turns e.l : \ty_1 \yieldsnothing {\app C E}}
 
 \infrule[TrRcdUpd]
-{\Gamma \turns e : t \yieldsnothing E \andalso
- \Gamma \turns e_1 : t_1 \yieldsnothing {E_1} \\
- \turnsput (t; l; e_1 : t_1 \yieldsnothing {E_1}) : (t_1', t') \yieldsnothing C \andalso
- t_1 \subtype t_1'}
-{\Gamma \turns \recordupdate e l {e_1} : t' \yieldsnothing {\app C E}}
+{\Gamma \turns e : \ty \yieldsnothing E \andalso
+ \Gamma \turns e_1 : \ty_1 \yieldsnothing {E_1} \\
+ \turnsput (t; l; e_1 : \ty_1 \yieldsnothing {E_1}) : (\ty_1', \ty') \yieldsnothing C \andalso
+ \ty_1 \subtype \ty_1'}
+{\Gamma \turns \recordupdate e l {e_1} : \ty' \yieldsnothing {\app C E}}

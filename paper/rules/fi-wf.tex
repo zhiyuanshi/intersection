@@ -5,17 +5,17 @@
 {\Gamma \turns \alpha}
 
 \infrule[WF-Fun]
-{\Gamma \turns t_1 \andalso \Gamma \turns t_2}
-{\Gamma \turns t_1 \to t_2}
+{\Gamma \turns \ty_1 \andalso \Gamma \turns \ty_2}
+{\Gamma \turns \ty_1 \to \ty_2}
 
 \infrule[WF-Forall]
-{\Gamma, \alpha \turns t}
-{\Gamma \turns \forall \alpha. t}
+{\Gamma, \alpha \turns \ty}
+{\Gamma \turns \forall \alpha. \ty}
 
 \infrule[WF-And]
-{\Gamma \turns t_1 \andalso \Gamma \turns t_2}
-{\Gamma \turns t_1 \with t_2}
+{\Gamma \turns \ty_1 \andalso \Gamma \turns \ty_2}
+{\Gamma \turns \ty_1 \with \ty_2}
 
 \infrule[WF-Rcd]
-{\Gamma \turns t}
-{\Gamma \turns \recordtype{l}{t}}
+{\Gamma \turns \ty}
+{\Gamma \turns \recordtype l \ty}

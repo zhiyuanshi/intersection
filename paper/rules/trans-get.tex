@@ -1,15 +1,15 @@
-\framebox{\( \turnsget (t; l) : t \yields C \)}
+\framebox{\( \turnsget (\ty; l) : \ty \yields C \)}
 
 \infax[GetBase]
-{\turnsget (\recordtype l t; l) : t
-  \yields {\abs {\rel x {\image {\recordtype l t}}} x}}
+{\turnsget (\recordtype l \ty; l) : \ty
+  \yields {\idmono {\image {\recordtype l \ty}}}}
 
 \infrule[GetLeft]
-{\turnsget (t_1; l) : t \yields C}
-{\turnsget (t_1 \with t_2; l) : t
-  \yields {\abs {\rel x {\image {t_1 \with t_2}}} {C (\app \fst x)}}}
+{\turnsget (\ty_1; l) : \ty \yields C}
+{\turnsget (\ty_1 \with \ty_2; l) : \ty
+  \yields {\absty x {\image {\ty_1 \with \ty_2}} {C (\app \fst x)}}}
 
 \infrule[GetRight]
-{\turnsget (t_2; l) : t \yields C}
-{\turnsget (t_1 \with t_2; l) : t
-  \yields {\abs {\rel x {\image {t_1 \with t_2}}} {C (\app \snd x)}}}
+{\turnsget (\ty_2; l) : \ty \yields C}
+{\turnsget (\ty_1 \with \ty_2; l) : \ty
+  \yields {\absty x {\image {\ty_1 \with \ty_2}} {C (\app \snd x)}}}

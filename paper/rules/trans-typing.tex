@@ -1,46 +1,46 @@
-\framebox{\( \Gamma \turns e : t \yields E \)}
+\framebox{\( \Gamma \turns e : \ty \yields E \)}
 
 \infrule[TrVar]
-{(x,t) \in \Gamma}
-{\Gamma \turns x : t \yields x}
+{(x,\ty) \in \Gamma}
+{\Gamma \turns x : \ty \yields x}
 
 \infrule[TrAbs]
-{\Gamma, \rel x t \turns e : t_1 \yields E \andalso
- \Gamma \turns_{F} t}
-{\Gamma \turns \abs {\rel x t} e : t \to t_1 \yields {\abs {\rel x {\image t}} E}}
+{\Gamma, \rel x \ty \turns e : \ty_1 \yields E \andalso
+ \Gamma \turns \ty}
+{\Gamma \turns \abs {\rel x \ty} e : \ty \to \ty_1 \yields {\abs {\rel x {\image \ty}} E}}
 
 \infrule[TrTAbs]
-{\Gamma, \alpha \turns e : t \yields E}
-{\Gamma \turns \Abs \alpha e : \forall \alpha. t \yields {\Abs \alpha E}}
+{\Gamma, \alpha \turns e : \ty \yields E}
+{\Gamma \turns \Abs \alpha e : \forall \alpha. \ty \yields {\Abs \alpha E}}
 
 \infrule[TrApp]
-{\Gamma \turns e_1 : t_1 \to t_2 \yields {E_1} \\
- \Gamma \turns e_2 : t_3 \yields {E_2} \\
- t_3 \subtype t_1 \yields C}
-{\Gamma \turns \app {e_1} {e_2} : t_2 \yields {\app E_1 {(\app C E_2)}}}
+{\Gamma \turns e_1 : \ty_1 \to \ty_2 \yields {E_1} \\
+ \Gamma \turns e_2 : \ty_3 \yields {E_2} \\
+ \ty_3 \subtype \ty_1 \yields C}
+{\Gamma \turns \app {e_1} {e_2} : \ty_2 \yields {\app {E_1} {(\app C E_2)}}}
 
 \infrule[TrTApp]
-{\Gamma \turns e : \forall \alpha. t_1 \yields E \andalso
- \Gamma \turns_{F} t}
-{\Gamma \turns \app e t : \subst \alpha t t_1 \yields {\app E {\image t}}}
+{\Gamma \turns e : \forall \alpha. \ty_1 \yields E \andalso
+ \Gamma \turns \ty}
+{\Gamma \turns \app e \ty : \subst \alpha \ty \ty_1 \yields {\app E {\image \ty}}}
 
 \infrule[TrMerge]
-{\Gamma \turns e_1 : t_1 \yields {E_1} \\
- \Gamma \turns e_2 : t_2 \yields {E_2}}
-{\Gamma \turns e_1 \dcomma e_2 : t_1 \with t_2 \yields {\tupled {E_1, E_2}}}
+{\Gamma \turns e_1 : \ty_1 \yields {E_1} \\
+ \Gamma \turns e_2 : \ty_2 \yields {E_2}}
+{\Gamma \turns e_1 \dcomma e_2 : \ty_1 \with \ty_2 \yields {\tupled {E_1, E_2}}}
 
 \infrule[TrRcdIntro]
-{\Gamma \turns e : t \yields E}
-{\Gamma \turns \recordintro l e : \recordtype l t \yields E}
+{\Gamma \turns e : \ty \yields E}
+{\Gamma \turns \recordintro l e : \recordtype l \ty \yields E}
 
 \infrule[TrRcdElim]
-{\Gamma \turns e : t \yields E \andalso
- \Gamma \turnsget (t; l) : t_1 \yields C}
-{\Gamma \turns e.l : t_1 \yields {\app C E}}
+{\Gamma \turns e : \ty \yields E \andalso
+ \Gamma \turnsget (\ty; l) : \ty_1 \yields C}
+{\Gamma \turns e.l : \ty_1 \yields {\app C E}}
 
 \infrule[TrRcdUpd]
-{\Gamma \turns e : t \yields E \andalso
- \Gamma \turns e_1 : t_1 \yields {E_1} \\
- \turnsput (t; l; e_1 : t_1 \yields {E_1}) : (t_1', t') \yields C \andalso
- t_1 \subtype t_1'}
-{\Gamma \turns \recordupdate e l {e_1} : t' \yields {\app C E}}
+{\Gamma \turns e : \ty \yields E \andalso
+ \Gamma \turns e_1 : \ty_1 \yields {E_1} \\
+ \turnsput (t; l; e_1 : \ty_1 \yields {E_1}) : (\ty_1', \ty') \yields C \andalso
+ \ty_1 \subtype \ty_1'}
+{\Gamma \turns \recordupdate e l {e_1} : \ty' \yields {\app C E}}

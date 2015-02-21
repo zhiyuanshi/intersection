@@ -4,16 +4,16 @@
     \alpha
     \mid T \to T
     \mid \forall \alpha. T
-    \mid \langle T, T \rangle \\
+    \mid \tupled {T, T} \\
 
-  \text{Expressions} & E, C & \dcoloneq &
+  \text{Terms} & E, C & \dcoloneq &
     x
-    \mid \abs{\rel{x}{T}}{E}
-    \mid \Abs{\alpha}{E}
-    \mid \app{E}{E}
-    \mid \app{E}{T} \\ & & &
-    \mid \langle E, E \rangle
-    \mid \meta{fst} E
-    \mid \meta{snd} E
+    \mid \abs {\rel x T} {E}
+    \mid \Abs {\alpha} {E}
+    \mid \app E E
+    \mid \app E T \\ & & &
+    \mid \tupled {E, E}
+    \mid \fst E
+    \mid \snd E
 \end{array}
 \]

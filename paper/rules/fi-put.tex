@@ -1,15 +1,15 @@
-\framebox{\( \turnsput (t; l; e : t \yieldsnothing E) : (t, t) \yieldsnothing C \)}
+\framebox{\( \turnsput (\ty; l; e : \ty \yieldsnothing E) : (\ty, \ty) \yieldsnothing C \)}
 
 \infax[PutBase]
-{\turnsput (\recordtype l t; l; e : t' \yieldsnothing E) : (t, \recordtype l {t'})
-  \yieldsnothing {\abs {\rel x {\image {\recordtype l t}}} E}}
+{\turnsput (\recordtype l \ty; l; e : \ty' \yieldsnothing E) : (\ty, \recordtype l {\ty'})
+  \yieldsnothing {\absty x {\image {\recordtype l \ty}} E}}
 
 \infrule[PutLeft]
-{\turnsput (t_1; l; e : t \yieldsnothing E) : (t', t_1') \yieldsnothing C}
-{\turnsput (t_1 \with t_2; l; e : t \yieldsnothing E) : (t', t_1' \with t_2)
-  \yieldsnothing {\abs {\rel x {\image {t_1 \with t_2}}} {C (\fst ~ x)}}}
+{\turnsput (\ty_1; l; e : \ty \yieldsnothing E) : (\ty', \ty_1') \yieldsnothing C}
+{\turnsput (\ty_1 \with \ty_2; l; e : \ty \yieldsnothing E) : (\ty', \ty_1' \with \ty_2)
+  \yieldsnothing {\absty x {\image {\ty_1 \with \ty_2}} {C (\fst ~ x)}}}
 
 \infrule[PutRight]
-{\turnsput (t_2; l; e : t \yieldsnothing E) : (t', t_2') \yieldsnothing C}
-{\turnsput (t_1 \with t_2; l; e : t \yieldsnothing E) : (t', t_1' \with t_2)
-  \yieldsnothing {\abs {\rel x {\image {t_1 \with t_2}}} {C (\fst ~ x)}}}
+{\turnsput (\ty_2; l; e : \ty \yieldsnothing E) : (\ty', \ty_2') \yieldsnothing C}
+{\turnsput (\ty_1 \with \ty_2; l; e : \ty \yieldsnothing E) : (\ty', \ty_1' \with \ty_2)
+  \yieldsnothing {\absty x {\image {\ty_1 \with \ty_2}} {C (\snd ~ x)}}}

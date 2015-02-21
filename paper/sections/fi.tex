@@ -16,25 +16,28 @@ intersection types and records. The formalization includes only single records
 because single record types as the multi-records can be desugared into the merge
 of multiple single records.
 
+\begin{figure}
 \input{rules/fi-syntax.tex}
+\caption{Syntax of \name}
+\end{figure}
 
 % Types
-Types $ t $ have five constructs. The first three are standard (present in
-System F): type variable $ \alpha $, function types $ t \to t $, and type
-abstraction $ \forall \alpha. t $; while the last two, intersection types
-$ t \with t $ and record types $ \recordtype{l}{t} $, are novel in \Name. In
-record types, $ l $ is the label and $ t $ the type.
+Types $ \ty $ have five constructs. The first three are standard (present in
+System F): type variable $ \alpha $, function types $ \ty \to \ty $, and type
+abstraction $ \forall \alpha. \ty $; while the last two, intersection types
+$ \ty \with \ty $ and record types $ \recordtype l \ty $, are novel in \Name. In
+record types, $ l $ is the label and $ \ty $ the type.
 
 % Expressions - standard ones
 First five constructs of expressions are also standard: variables $ x $ and two
-abstraction-elimination pairs. $ \abs{\rel{x}{t}}{e} $ abstracts expression
-$ e $ over values of type $ t $ and is eliminated by application $ \app{e}{e} $;
-$ \Abs{\alpha}{e} $ abstracts expression $ e $ over types and is eliminated by
-type application $ \app{e}{t} $.
+abstraction-elimination pairs. $ \abs {\rel x \ty} e $ abstracts expression
+$ e $ over values of type $ \ty $ and is eliminated by application $ \app e e $;
+$ \Abs \alpha e $ abstracts expression $ e $ over types and is eliminated by
+type application $ \app e \ty $.
 
 % Expressions - new ones
 The last four constructs are novel. $ e \dcomma e $ is the \emph{merge} of two
-terms. $ \recordintro{l}{e} $ introduces a record literal having $ l $ as the
+terms. $ \recordintro l e $ introduces a record literal having $ l $ as the
 label for field containing expression $ e $ . $ e.l $ access the field with
 label $ l $ in $ e $. Finally, $ \recordupdate e l {e_1} $ is a \emph{new}
 record which is exactly the same as $ e $ except the field labelled $ l $ is
@@ -65,17 +68,17 @@ For example, $ Int \with Bool $ should be a subtype of $ Int $, since the former
 can be viewed as either $ Int $ or $ Bool $. The subtyping rules are standard
 except for three points listed below:
 \begin{enumerate}
-\item $ t_1 \with t_2 $ is a subtype of $ t_3 $, if \emph{either} $ t_1 $ or
-  $ t_2 $ are subtypes of $ t_3 $,
+\item $ \ty_1 \with \ty_2 $ is a subtype of $ \ty_3 $, if \emph{either} $ \ty_1 $ or
+  $ \ty_2 $ are subtypes of $ \ty_3 $,
 
-\item $ t_1 $ is a subtype of $ t_2 \with t_3 $, if $ t_1 $ is a subtype of
-  both $ t_2 $ and $ t_3 $.
+\item $ \ty_1 $ is a subtype of $ \ty_2 \with \ty_3 $, if $ \ty_1 $ is a subtype of
+  both $ \ty_2 $ and $ \ty_3 $.
 
-\item $ \recordtype{l_1}{t_1} $ is a subtype of $ \recordtype{l_2}{t_2} $, if
-  $ l_1 $ and $ l_2 $ are identical and $ t_1 $ is a subtype of $ t_2 $.
+\item $ \recordtype {l_1} {\ty_1} $ is a subtype of $ \recordtype {l_2} {\ty_2} $, if
+  $ l_1 $ and $ l_2 $ are identical and $ \ty_1 $ is a subtype of $ \ty_2 $.
 \end{enumerate}
-The first point is captured by two rules \texttt{S-And-1} and \texttt{S-And-2},
-whereas the second point by \texttt{S-And-3}. Note that the last point means
+The first point is captured by two rules \rulename{S-And-1} and \rulename{S-And-2},
+whereas the second point by \rulename{S-And-3}. Note that the last point means
 that record types are covariant in the type of the fields.
 
 \subsection{Typing}
@@ -92,30 +95,30 @@ that record types are covariant in the type of the fields.
 \caption{Typing}
 \end{figure*}
 
-The typing judgment for \name is of the form: $ \Gamma \turns e : t $. This
+The typing judgment for \name is of the form: $ \Gamma \turns e : \ty $. This
 judgment uses the context $ \Gamma $. The typing rules for our core languages
 are mostly standard ones for System F. In particular we introduce a
-\texttt{T-Merge} rule that applies to \emph{merge} constructs.
+\rulename{T-Merge} rule that applies to \emph{merge} constructs.
 
-The last two rules make use of the $ \texttt{fields} $ function just to make
-sure that the field being accessed (\texttt{T-RcdElim}) or updated
-(\texttt{T-RcdUpd}) actually exists. The function is defined recursively, in
-Haskell pseudocode, as:
-\[ \begin{array}{rll}
-  \fields{\alpha} & = & \rel{\cdot}{\alpha} \\
-  \fields{t_1 \to t_2} & = & \rel{\cdot}{t_1 \to t_2} \\
-  \fields{\forall \alpha. t} & = & \rel{\cdot}{\forall \alpha. t} \\
-  \fields{t_1 \with t_2} & = & \fields{t_1} \dplus \fields{t_2} \\
-  \fields{\recordtype{l}{t}} & = & \rel{l}{t}
-\end{array} \]
-where $ \cdot $ means empty list, $ \dplus $ list concatenation, and $ : $ is an
-infix operator that prepend the first argument to the second. The function
-returns an associative list whose domain is field labels and range types.
+% The last two rules make use of the $ \rulename{fields} $ function just to make
+% sure that the field being accessed (\rulename{T-RcdElim}) or updated
+% (\rulename{T-RcdUpd}) actually exists. The function is defined recursively, in
+% Haskell pseudocode, as:
+% \[ \begin{array}{rll}
+%   \fields{\alpha} & = & \rel{\cdot} {\alpha} \\
+%   \fields{\ty_1 \to \ty_2} & = & \rel{\cdot} {\ty_1 \to \ty_2} \\
+%   \fields{\forall \alpha. \ty} & = & \rel{\cdot} {\forall \alpha. \ty} \\
+%   \fields{\ty_1 \with \ty_2} & = & \fields{\ty_1} \dplus \fields{\ty_2} \\
+%   \fields{\recordtype l \ty} & = & \rel l t
+% \end{array} \]
+% where $ \cdot $ means empty list, $ \dplus $ list concatenation, and $ : $ is an
+% infix operator that prepend the first argument to the second. The function
+% returns an associative list whose domain is field labels and range types.
 
 \textit{dom} reads: ``the domain of''. $ F(l) $ means the result of lookup for
 $ l $ inside the associative list $ F $. The order of lookup can be either from
 left to right or from right to left but has to be consistent inside one
 implementation. We prefer the order from the right to the left because it make
 possible record overriding. For example,
-$ (\recordintro{count}{1} ,, \recordintro{count}{2}).count $ will evaluate to
+$ (\recordintro{count} {1} ,, \recordintro{count} {2}).count $ will evaluate to
 $ 2 $ in this case.

@@ -1,46 +1,46 @@
-\framebox{\( t \subtype t \yields C \)}
+\framebox{\( \ty \subtype \ty \yields C \)}
 
 \infax[SVar]
 {\alpha \subtype \alpha \yields {\abs {\rel x {\image \alpha}} x}}
 
 \infrule[SFun]
-{t_3 \subtype t_1 \yields {C_1} \andalso t_2 \subtype t_4 \yields {C_2}}
-{t_1 \to t_2 \subtype t_3 \to t_4
+{\ty_3 \subtype \ty_1 \yields {C_1} \andalso \ty_2 \subtype \ty_4 \yields {C_2}}
+{\ty_1 \to \ty_2 \subtype \ty_3 \to \ty_4
   \yields
-    {\abs {\rel f {\image {t_1 \to t_2}}}
-      {\abs {\rel x {\image {t_3}}}
-        {\app {C_2} {(\app{f} {(\app{C_1} {x})})}}}}}
+    {\abs {\rel f {\image {\ty_1 \to \ty_2}}}
+      {\abs {\rel x {\image {\ty_3}}}
+        {\app {C_2} {(\app {f} {(\app {C_1} {x})})}}}}}
 
 \infrule[SForall]
-{t_1 \subtype \subst {\alpha_2} {\alpha_1} t_2 \yields{C}}
-{\forall \alpha_1. t_1 \subtype \forall \alpha_2. t_2
+{\ty_1 \subtype \subst {\alpha_2} {\alpha_1} \ty_2 \yields C}
+{\forall \alpha_1. \ty_1 \subtype \forall \alpha_2. \ty_2
   \yields
-    {\abs{\rel{f} {\image {\forall \alpha. t_1}}}
+    {\abs {\rel{f} {\image {\forall \alpha. \ty_1}}}
       {\Abs \alpha {\app C {(\app f \alpha)}}}}}
 
 \infrule[SAnd1]
-{t_1 \subtype t_3 \yields C}
-{t_1 \with t_2 \subtype t_3
+{\ty_1 \subtype \ty_3 \yields C}
+{\ty_1 \with \ty_2 \subtype \ty_3
   \yields
-    {\abs{\rel x {\image {t_1 \with t_2}}}
+    {\abs {\rel x {\image {\ty_1 \with \ty_2}}}
       {\app C {(\app \fst x)}}}}
 
 \infrule[SAnd2]
-{t_2 \subtype t_3 \yields C}
-{t_1 \with t_2 \subtype t_3
+{\ty_2 \subtype \ty_3 \yields C}
+{\ty_1 \with \ty_2 \subtype \ty_3
   \yields
-    {\abs {\rel x {\image {t_1 \with t_2}}}
+    {\abs {\rel x {\image {\ty_1 \with \ty_2}}}
       {\app C {(\app \snd x)}}}}
 
 \infrule[SAnd3]
-{t_1 \subtype t_2 \yields {C_1} \andalso t_1 \subtype t_3 \yields {C_2}}
-{t_1 \subtype t_2 \with t_3
+{\ty_1 \subtype \ty_2 \yields {C_1} \andalso \ty_1 \subtype \ty_3 \yields {C_2}}
+{\ty_1 \subtype \ty_2 \with \ty_3
   \yields
-    {\abs {\rel x {\image {t_1}}}
+    {\abs {\rel x {\image {\ty_1}}}
       {\tupled {\app {C_1} x, \app {C_2} x}}}}
 
 \infrule[SRcd]
-{t_1 \subtype t_2 \yields C}
-{\recordtype l {t_1} \subtype \recordtype l {t_2}
+{\ty_1 \subtype \ty_2 \yields C}
+{\recordtype l {\ty_1} \subtype \recordtype l {\ty_2}
   \yields
-    {\abs {\rel x {\image {\recordtype l {t_1}}}} {\app C x}}}
+    {\abs {\rel x {\image {\recordtype l {\ty_1}}}} {\app C x}}}
