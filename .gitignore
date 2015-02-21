@@ -26,6 +26,8 @@ Session.vim
 *.bbl
 *.blg
 *.dvi
+*.fdb_latexmk
+*.fls
 *.log
 *.pyg
 /out
