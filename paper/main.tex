@@ -1,99 +1,5 @@
 \documentclass[preprint]{sigplanconf}
-
-% Use packages immediately following the \documentclass command
-% Remote packages
-
-% Font
-\usepackage{XCharter}
-\usepackage[T1]{fontenc}
-
-\usepackage{amsmath}
-\usepackage{amsthm}
-\usepackage{fixltx2e}
-
-\usepackage{stmaryrd}
-\usepackage{xcolor}
-
-% For documentation for the `Listings` package,
-% see http://texdoc.net/texmf-dist/doc/latex/listings/listings.pdf
-\usepackage{listings}
-
-% Use the minted package to format code snippets
-% Documentation: https://code.google.com/p/minted/downloads/detail?name=minted.pdf
-\usepackage{minted}
-\usemintedstyle{murphy}
-
-% Figures with borders
-% http://en.wikibooks.org/wiki/LaTeX/Floats,_Figures_and_Captions
-\usepackage{float}
-\floatstyle{boxed}
-\restylefloat{figure}
-
-% Local packages
-
-\usepackage{bcprules}
-\usepackage{cmll}
-\usepackage{mathpartir}
-
-
-% Always load mathastext last
-% http://mirrors.ibiblio.org/CTAN/macros/latex/contrib/mathastext/mathastext.pdf
-% \renewcommand\familydefault\ttdefault
-% \usepackage{mathastext}
-% \renewcommand\familydefault\rmdefault
-
-
-\newtheorem{theorem}{Theorem}
-\newtheorem{lemma}{Lemma}
-
-\definecolor{facebook}{HTML}{3b5998}
-
-% Define macros immediately before the \begin{document} command
-\input{macros/tokens.tex}
-\input{macros/pl.tex}
-\input{macros/fi.tex}
-
-\newcommand{\name}{{\bf fi~}}
-\newcommand{\Name}{{\bf fi}}
-
-\newcommand{\target}{{\bf f~}}
-\newcommand{\Target}{{\bf f}}
-
-\lstdefinelanguage{F2J}{
-  morekeywords={let,type,module,end,in},
-  otherkeywords={->},
-  sensitive=false, % whether keywords are case sensitive
-  morecomment=[l]{--},
-  morestring=[b]", % `b' means inside a string delimiters are escaped by a backslash.
-  morestring=[b]'
-}
-
-\lstset{ %
-  language=F2J,                % choose the language of the code
-  columns=flexible,
-  lineskip=-1pt,
-  basicstyle=\ttfamily\small,       % the size of the fonts that are used for the code
-  numbers=none,                   % where to put the line-numbers
-  numberstyle=\ttfamily\tiny,      % the size of the fonts that are used for the line-numbers
-  stepnumber=1,                   % the step between two line-numbers. If it's 1 each line will be numbered
-  numbersep=5pt,                  % how far the line-numbers are from the code
-  backgroundcolor=\color{white},  % choose the background color. You must add \usepackage{color}
-  showspaces=false,               % show spaces adding particular underscores
-  showstringspaces=false,         % underline spaces within strings
-  showtabs=false,                 % show tabs within strings adding particular underscores
-  morekeywords={var},
-%  frame=single,                   % adds a frame around the code
-  tabsize=2,                  % sets default tabsize to 2 spaces
-  captionpos=none,                   % sets the caption-position to bottom
-  breaklines=true,                % sets automatic line breaking
-  breakatwhitespace=false,        % sets if automatic breaks should only happen at whitespace
-  title=\lstname,                 % show the filename of files included with \lstinputlisting; also try caption instead of title
-  escapeinside={(*}{*)},          % if you want to add a comment within your code
-  keywordstyle=\ttfamily\bfseries,
-% commentstyle=\color{Gray}
-% stringstyle=\color{Green}
-}
-
+\input{preamble.tex}
 \begin{document}
 
 \special{papersize=8.5in,11in}
@@ -141,8 +47,7 @@ Intersecion Types, Polymorphism, Inheritance
 \input{sections/translation.tex}
 \input{sections/implementation.tex}
 \input{sections/related-work.tex}
-
-\section{Conclusion}
+\input{sections/conclusion.tex}
 
 \appendix
 

@@ -44,6 +44,27 @@ supertype of $ \ty $. Our system does not have this rule.
 
 \subsection{Extensible Records and Row Types}
 
+Our system can be adapted to allow only intersection of record types by
+requiring that both sides of the merge are records.
+
+$ \turnsrec \ty $ states that $ \ty $ is a record type, or the intersection of
+record types, and so forth.
+
+\infax[RecBase]{\turnsrec \recordtype l \ty}
+
+\infrule[RecStep]
+{\turnsrec \ty_1 \andalso \turnsrec \ty_2}
+{\turnsrec \ty_1 \intersects \ty_2}
+
+\infrule
+{\Gamma \turns e_1 : \ty_1 \yields {E_1} \andalso \turnsrec \ty_1 \\
+ \Gamma \turns e_2 : \ty_2 \yields {E_2} \andalso \turnsrec \ty_2}
+{\Gamma \turns e_1 \dcomma e_2 : \ty_1 \intersects \ty_2 \yields {\tupled {E_1, E_2}}}
+
+Reynolds~\cite{reynolds1997design} and Castagna~\cite{castagna1995calculus} encoding records as intersection types.
+
+To forbid expressions with duplicate labels
+
 \cite{cardelli1992extensible}
 
 The idea of encoding records using intersection types is due to Castagna and
@@ -58,6 +79,9 @@ proceed to propose a set of elaboration typing rules for records.
 \end{lstlisting}
 
 \subsection{Other Related Work}
+
+Amin et al. mentions the idea that type refinement is a special case of
+intersection. \cite{amin2014foundations,amin2012dependent}
 
 \begin{itemize}
 

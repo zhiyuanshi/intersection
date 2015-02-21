@@ -14,7 +14,7 @@ Install extra fonts:
     sudo apt-get update
     sudo apt-get install texlive-fonts-extra
 
-Get and install non-free fonts:
+Get and install non-free fonts according to https://www.tug.org/fonts/getnonfreefonts/:
 
     wget http://tug.org/fonts/getnonfreefonts/install-getnonfreefonts
     sudo texlua install-getnonfreefonts

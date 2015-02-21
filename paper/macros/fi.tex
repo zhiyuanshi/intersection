@@ -1,7 +1,7 @@
 \newcommand{\intersects}{\wedge}
 \newcommand{\ty}        {\tau}
 
-\newcommand{\recordtype}[2]{\{ \rel{#1}{#2} \}}
+\newcommand{\recordtype}[2]{\{ #1 : #2 \}}
 \newcommand{\recordintro}[2]{\{ #1 = #2 \}}
 \newcommand{\recordupdate}[3]{#1 ~ \texttt{with} ~ \recordintro{#2} {#3}}
 
@@ -9,5 +9,6 @@
 
 \newcommand{\fields}[1]{\meta{fields}{#1}}
 
-\newcommand{\turnsget}{\vdash_{\texttt{get}}}
-\newcommand{\turnsput}{\vdash_{\texttt{put}}}
+\newcommand{\turnsget}{\vdash_{\textrm{get}}}
+\newcommand{\turnsput}{\vdash_{\textrm{put}}}
+\newcommand{\turnsrec}{\vdash_{\textrm{rec}}}

@@ -1,19 +1,28 @@
 \section{Application}
 
+\subsection{Overloading}
+
+Dunfield~\cite{dunfield2014elaborating} notes that using merges as a mechanism
+of overloading is not as powerful as type classes.
+
 \subsection{F-bounded Polymorphism}
 
-\begin{lstlisting}
-let getName A (v : A & {name:String}) = v.name in
-getName [{name:String}] {name = "Ek", age = 10}
-\end{lstlisting}
+\begin{figure}
+  \begin{minted}{scala}
+  def getName[A <: { def name: String }](v: A) = v.name
+  case class Person(name: String)
+  getName[Person](Person("Ek"))
+  \end{minted}
 
-Scala
+  \begin{minted}{ocaml}
+  let getName A (v : A & {name:String}) = v.name in
+  getName [{name:String}] {name = "Ek", age = 10}
+  \end{minted}
 
-\begin{minted}[fontsize=\footnotesize]{scala}
-def getName[A <: { def name: String }](v: A) = v.name
-case class Person(name: String)
-getName[Person](Person("Ek"))
-\end{minted}
+  \caption{Example of encoding records}
+  \label{fig:encoding-records}
+\end{figure}
+
 
 % Multiple inheritance?
 % Algebra -> P1,2

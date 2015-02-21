@@ -3,19 +3,19 @@
 \begin{proof}
 By structural induction on the types and the corresponding inference rule. \\
 
-\texttt{(SubVar)}
+\rulename{SubVar}
 
-\texttt{(SubFun)}
+\rulename{SubFun}
 
-\texttt{(SubForall)}
+\rulename{SubForall}
 
-\texttt{(SubAnd1)}
+\rulename{SubAnd1}
 
-\texttt{(SubAnd2)}
+\rulename{SubAnd2}
 
-\texttt{(SubAnd3)}
+\rulename{SubAnd3}
 
-\texttt{(SubRcd)}
+\rulename{SubRcd}
 
 \end{proof}
 
@@ -27,13 +27,13 @@ By structural induction on the types and the corresponding inference rule. \\
 \begin{proof}
 By structural induction on the type and the corresponding inference rule. \\
 
-\texttt{(Get-Base)} $ \Gamma \turnsget \recordtype l \ty ; l = \idmono {\image {\recordtype l \ty})} ; \ty $ \\
+\rulename{Get-Base} $ \Gamma \turnsget \recordtype l \ty ; l = \idmono {\image {\recordtype l \ty})} ; \ty $ \\
 
 By the induction hypothesis
 $$ \image \Gamma \turns \idmono {\image {\recordtype l \ty}} : \image {\recordtype l \ty} \to \image \ty $$
 
-\texttt{(Get-Left)} \\
-\texttt{(Get-Right)} \\
+\rulename{Get-Left} \\
+\rulename{Get-Right} \\
 
 \end{proof}
 
@@ -45,9 +45,9 @@ $$ \image \Gamma \turns \idmono {\image {\recordtype l \ty}} : \image {\recordty
 \begin{proof}
 By structural induction on the type and the corresponding inference rule. \\
 
-\texttt{(Put-Base)} \\
-\texttt{(Put-Left)} \\
-\texttt{(Put-Right)} \\
+\rulename{Put-Base} \\
+\rulename{Put-Left} \\
+\rulename{Put-Right} \\
 \end{proof}
 
 \begin{lemma} \label{preserve-wf}
@@ -57,11 +57,11 @@ By structural induction on the type and the corresponding inference rule. \\
 
 \begin{proof}
 Since $$ \Gamma \turns \ty $$
-It follows from \texttt{(FI-WF)} that
+It follows from \rulename{FI-WF} that
   $$ \ftv \ty  \subseteq \ftv {\Gamma} $$
 And hence
   $$ \ftv {\image \ty} \subseteq \ftv {\image \Gamma} $$
-By \texttt{(F-WF)} we have
+By \rulename{F-WF} we have
   $$ \Gamma \turns \ty $$
 \end{proof}
 
@@ -73,107 +73,105 @@ By \texttt{(F-WF)} we have
 \begin{proof}
 By structural induction on the expression and the corresponding inference rule. \\
 
-\texttt{(TrVar)} $ \Gamma \turns x : \ty \yields x $ \\
+\rulename{TrVar} $ \Gamma \turns x : \ty \yields x $ \\
 
-It follows from \texttt{(TrVar)} that
+It follows from \rulename{TrVar} that
   $$ (x : t) \in \Gamma $$
 Based on the definition of $ \image \cdot $,
   $$ (x : \image t) \in \image \Gamma $$
-Thus we have by \texttt{(F-Var)} that
+Thus we have by \rulename{F-Var} that
   $$ \image \Gamma \turns x : \image \ty $$
 
-\texttt{(TrAbs)} $ \Gamma \turns \lambda (x : \ty_1). e : \ty_1 \to \ty_2 \yields {\absty x {\image {\ty_1}} E} $ \\
+\rulename{TrAbs} $ \Gamma \turns \lambda (x : \ty_1). e : \ty_1 \to \ty_2 \yields {\absty x {\image {\ty_1}} E} $ \\
 
-It follows from \texttt{(TrAbs)} that
+It follows from \rulename{TrAbs} that
   $$ \Gamma, x : \ty_1 \turns e : \ty_2 \yields E $$
 And by the induction hypothesis that
   $$ \image \Gamma, x : \image {\ty_1} \turns E : \image {\ty_2} $$
-By \texttt{(TrAbs)} we also have
+By \rulename{TrAbs} we also have
   $$ \Gamma \turns \ty_1 $$
 It follows from Lemma \ref{preserve-wf} that
   $$ \image \Gamma \turns \image {\ty_1} $$
-Hence by \texttt{(F-Abs)} and the definition of $ \image \cdot $ we have
+Hence by \rulename{F-Abs} and the definition of $ \image \cdot $ we have
   $$ \image \Gamma \turns \absty x {\image {\ty_1}} E : \image {\ty_1 \to \ty_2} $$
 
-\texttt{(TrApp)} $ \Gamma \turns \app {e_1} {e_2} : \ty_2 \yields {E_1 (\app C {E_2})} $ \\
+\rulename{(TrApp)} $ \Gamma \turns \app {e_1} {e_2} : \ty_2 \yields {E_1 (\app C {E_2})} $ \\
 
-From \texttt{(TrApp)} we have
+From \rulename{(TrApp)} we have
   $$ \Gamma \turns \ty_3 <: \ty_1 \yields C $$
 Applying Lemma \ref{type-coerce} to the above we have
   $$ \image \Gamma \turns C : \image {\ty_3} \to \image {\ty_1} $$
-Also from \texttt{(TrApp)} and the induction hypothesis
+Also from \rulename{(TrApp)} and the induction hypothesis
   $$ \image \Gamma \turns E_1 : \image {\ty_1} \to \image {\ty_2} $$
-Also from \texttt{(TrApp)} and the induction hypothesis
+Also from \rulename{(TrApp)} and the induction hypothesis
   $$ \image \Gamma \turns E_2 : \image {\ty_3} $$
-Assembling those parts using \texttt{(F-App)} we come to
+Assembling those parts using \rulename{(F-App)} we come to
   $$ \image \Gamma \turns E_1 (\app C {E_2}) : \image {\ty_2} $$
 \end{proof}
 
-\texttt{(TrTAbs)} $ \Gamma \turns \Lambda \alpha. e : \forall \alpha. \ty \yields {\forall \alpha. E} $ \\
+\rulename{TrTAbs} $ \Gamma \turns \Lambda \alpha. e : \forall \alpha. \ty \yields {\forall \alpha. E} $ \\
 
-From \texttt{(TrTAbs)} we have
+From \rulename{TrTAbs} we have
   $$ \Gamma \turns e : \ty \yields E $$
 By the induction hypothesis we have
   $$ \image \Gamma \turns E : \image \ty $$
-Thus by \texttt{(F-TAbs)} and the definition of $ \image \cdot $
+Thus by \rulename{F-TAbs} and the definition of $ \image \cdot $
   $$ \Gamma \turns \Lambda \alpha. E : \image {\forall \alpha. \ty} $$
 
 
-\texttt{(TrTApp)} $ \Gamma \turns e \; \ty  : [\alpha := t] \ty_1 \yields {E \; \image \ty} $ \\
+\rulename{TrTAp} $ \Gamma \turns e \; \ty  : [\alpha := t] \ty_1 \yields {E \; \image \ty} $ \\
 
-From \texttt{(TrTApp)} we have
+From \rulename{TrTApp} we have
   $$ \Gamma \turns e : \forall \alpha. \ty_1 \yields E $$
 And by the induction hypothesis that
   $$ \image \Gamma \turns E : \forall \alpha. \image {\ty_1} $$
-Also from \texttt{(TrTApp)} and Lemma \ref{preserve-wf} we have
+Also from \rulename{TrTApp} and Lemma \ref{preserve-wf} we have
   $$ \image \Gamma \turns \image \ty $$
-Then by \texttt{(F-TApp)} that
+Then by \rulename{F-TApp} that
   $$ \image \Gamma \turns E \; \image \ty : [\alpha := \image \ty ] \image {\ty_1} $$
 Therefore
   $$ \image \Gamma \turns E \; \image \ty : \image {[\alpha := \ty ] \image {\ty_1}} $$
 
-% \texttt{(TrMerge)} $ \Gamma \turns e_1 \merge e_2 : \ty_1 \& \ty_2 % % \yields {\tupled {E1, E2} $ \\
+% \rulename{(TrMerge)} $ \Gamma \turns e_1 \merge e_2 : \ty_1 \& \ty_2 % % \yields {\tupled {E1, E2} $ \\
 
-From \texttt{(TrMerge)} and the induction hypothesis we have
+From \rulename{(TrMerge)} and the induction hypothesis we have
   $$ \image \Gamma \turns E_1 : \image {\ty_1} $$
 and
   $$ \image \Gamma \turns E_2 : \image {\ty_2} $$
-Hence by \texttt{(F-Pair)}
+Hence by \rulename{F-Pair}
   $$ \image \Gamma \turns \tupled {E_1, E_2} : \tupled {\image {\ty_1}, \image {\ty_2}} $$
 Hence by the definition of $ \image \cdot $
   $$ \image \Gamma \turns \tupled {E_1, E_2} : \image {\ty_1 \& \ty_2} $$
 
-\texttt{(TrRcdIntro)} $ \Gamma \turns \recordintro l e : \recordtype l \ty \yields E $ \\
+\rulename{TrRcdIntro} $ \Gamma \turns \recordintro l e : \recordtype l \ty \yields E $ \\
 
-From \texttt{(TrRcdIntro)} we have
+From \rulename{TrRcdIntro} we have
   $$ \Gamma \turns e : \ty \yields E $$
 And by the induction hypothesis that
   $$ \image \Gamma \turns E : \image \ty $$
 Thus by the definition of $ \image \cdot $
   $$ \image \Gamma \turns E : \image {\recordtype l \ty} $$
 
-\texttt{(TrRcdElim)} $ \Gamma \turns e.l : \ty_1 \yields {\app C E} $ \\
+\rulename{TrRcdElim} $ \Gamma \turns e.l : \ty_1 \yields {\app C E} $ \\
 
-From \texttt{(TrRcdElim)}
+From \rulename{TrRcdElim}
   $$ \Gamma \turns e : \ty \yields E $$
 And by the induction hypothesis that
   $$ \image \Gamma \turns E : \image \ty $$
-Also from \texttt{(TrRcdEim)}
+Also from \rulename{TrRcdEim}
   $$ \Gamma \turnsget e ; l = C ; \ty_1 $$
 Applying Lemma \ref{type-get} to the above we have
   $$ \image \Gamma \turns C : \image \ty \to \image {\ty_1}  $$
-Hence by \texttt{(F-App)} we have
+Hence by \rulename{F-App} we have
   $$ \image \Gamma \turns \app C E : \image {\ty_1} $$
 
-% \texttt{(TrRcdUpd)} $ \Gamma \turns \rcdupd{e} {l} {e_1} : \ty \yields {\app C E} $ \\
-
-From \texttt{(TrRcdUpd)}
+From \rulename{TrRcdUpd}
   $$ \Gamma \turns e : \ty \yields E $$
 And by the induction hypothesis that
   $$ \image \Gamma \turns E : \image \ty $$
-Also from \texttt{(TrRcdUpd)}
+Also from \rulename{TrRcdUpd}
   $$ \Gamma \turnsput \ty ; l; E = C ; \ty_1 $$
 Applying Lemma \ref{type-put} to the above we have
   $$ \image \Gamma \turns C : \image \ty \to \image \ty  $$
-Hence by \texttt{(F-App)} we have
+Hence by \rulename{F-App} we have
   $$ \image \Gamma \turns \app C E : \image \ty $$

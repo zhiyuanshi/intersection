@@ -11,14 +11,15 @@ F.
 
 \subsection{Syntax}
 
-The syntax of the \name calculus extends System F by adding the two features:
-intersection types and records. The formalization includes only single records
-because single record types as the multi-records can be desugared into the merge
-of multiple single records.
+Figure~\ref{fig:fi-syntax} specifies the syntax of \Name. It extends the syntax
+of System F by adding the two features: intersection types and records. The
+formalization includes only single records because single record types as the
+multi-records can be desugared into the merge of multiple single records.
 
 \begin{figure}
-\input{rules/fi-syntax.tex}
-\caption{Syntax of \name}
+  \input{rules/fi-syntax.tex}
+  \caption{Syntax of \name}
+  \label{fig:fi-syntax}
 \end{figure}
 
 % Types
@@ -57,6 +58,8 @@ label and the second the types.
 % Remark. The operational semantics of FI is not presented in this paper. However,
 
 \subsection{Subtyping}
+
+Subtyping is transitive and forms a lattice?
 
 \begin{figure*}
 \input{rules/fi-sub.tex}

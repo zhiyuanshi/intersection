@@ -30,3 +30,6 @@ task(:watch) { system(latexmk_cmd("-pvc")) }
 
 desc "Clean"
 task(:clean) { system("latexmk -c") }
+
+desc "Clean, including generated PDF files"
+task(:Clean) { system("latexmk -C") }
