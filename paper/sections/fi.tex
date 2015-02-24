@@ -7,23 +7,24 @@ section, we will go through the type-directed translation from \name to System
 F.
 
 % Note the semantics of this language is not defined formally, instead, by a
-% translation into the target language, System F.
+% translation into the target language, System $ F $.
 
 \subsection{Syntax}
 
-The syntax of the \name calculus extends System F by adding the two features:
-intersection types and records. The formalization includes only single records
-because single record types as the multi-records can be desugared into the merge
-of multiple single records.
+Figure~\ref{fig:fi-syntax} specifies the syntax of \Name. It extends the syntax
+of System $ F $ by adding the two features: intersection types and records. The
+formalization includes only single records because single record types as the
+multi-records can be desugared into the merge of multiple single records.
 
 \begin{figure}
-\input{rules/fi-syntax.tex}
-\caption{Syntax of \name}
+  \input{rules/fi-syntax.tex}
+  \caption{Syntax of \name}
+  \label{fig:fi-syntax}
 \end{figure}
 
 % Types
 Types $ \ty $ have five constructs. The first three are standard (present in
-System F): type variable $ \alpha $, function types $ \ty \to \ty $, and type
+System $ F $): type variable $ \alpha $, function types $ \ty \to \ty $, and type
 abstraction $ \forall \alpha. \ty $; while the last two, intersection types
 $ \ty \intersects \ty $ and record types $ \recordtype l \ty $, are novel in \Name. In
 record types, $ l $ is the label and $ \ty $ the type.
@@ -57,6 +58,9 @@ label and the second the types.
 % Remark. The operational semantics of FI is not presented in this paper. However,
 
 \subsection{Subtyping}
+
+Subtyping is transitive and forms a lattice?
+Do we have a subtyping lattice?
 
 \begin{figure*}
 \input{rules/fi-sub.tex}
@@ -97,7 +101,7 @@ that record types are covariant in the type of the fields.
 
 The typing judgment for \name is of the form: $ \Gamma \turns e : \ty $. This
 judgment uses the context $ \Gamma $. The typing rules for our core languages
-are mostly standard ones for System F. In particular we introduce a
+are mostly standard ones for System $ F $. In particular we introduce a
 \rulename{T-Merge} rule that applies to \emph{merge} constructs.
 
 % The last two rules make use of the $ \rulename{fields} $ function just to make

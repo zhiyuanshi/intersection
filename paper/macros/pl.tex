@@ -2,11 +2,13 @@
 
 \newcommand{\dom}[1]    {\meta{dom} {#1}}
 \newcommand{\ftv}[1]    {\meta{ftv}({#1})}
+
 \newcommand{\image}[1]  {\llbracket {#1} \rrbracket}
+% \newcommand{\image}[1]  {\left| {#1} \right|}
 
 \newcommand{\meta}[2]   {{\textit{#1}} (#2)}
 % \newcommand{\proj}[2]{\app{proj_#1}{#2}}
-\newcommand{\rel}[2]    {{#1} \!\!:\!\! {#2}}
+\newcommand{\rel}[2]    {#1 \!:\! #2}
 \newcommand{\subst}[2]  {\lbrack {#1} \! \mapsto \! {#2} \rbrack}
 \newcommand{\subtype}   {<\!:}
 
@@ -19,12 +21,12 @@
 \newcommand{\fst}                       {\texttt{fst}}
 \newcommand{\snd}                       {\texttt{snd}}
 
-\newcommand{\rulename}[1]               {(\texttt{#1})}
+\newcommand{\rulename}[1]               {(\textrm{#1})}
 
-\newcommand{\abs}[2]    {\lambda (#1). {#2}}
+\newcommand{\abs}[2]    {\lambda (#1).~ #2}
 \newcommand{\absty}[3]  {\abs {\rel {#1} {#2}} {#3}}
 \newcommand{\idmono}[1] {\absty x {#1} x}
-\newcommand{\Abs}[2]    {\Lambda {#1}. {#2}}
+\newcommand{\Abs}[2]    {\Lambda #1.~ #2}
 
 \newcommand{\app}[2]    {{#1} ~ {#2}}
 \newcommand{\App}[2]    {{#1} ~ {#2}}

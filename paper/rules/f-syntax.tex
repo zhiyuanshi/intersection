@@ -1,12 +1,12 @@
 \[
 \begin{array}{lrrl}
-  \text{Types} & T & \dcoloneq &
+  \text{Types} & T & \Coloneqq &
     \alpha
     \mid T \to T
     \mid \forall \alpha. T
     \mid \tupled {T, T} \\
 
-  \text{Terms} & E, C & \dcoloneq &
+  \text{Terms} & E, C & \Coloneqq &
     x
     \mid \abs {\rel x T} {E}
     \mid \Abs {\alpha} {E}

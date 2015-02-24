@@ -29,6 +29,7 @@ Session.vim
 *.fdb_latexmk
 *.fls
 *.log
+*.out
 *.pyg
 /out
 

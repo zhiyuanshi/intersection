@@ -1,19 +1,55 @@
 \section{Application}
 
+% - Object/Fold Algebras. How to support extensibility in an easier way.
+
+% See Datatypes a la Carte
+
+% - Mixins
+
+% - Lenses? Can intersection types help with lenses? Perhaps making the
+% types more natural and easy to understand/use?
+
+% - Embedded DSLs? Extensibility in DSLs? Composing multiple DSL interpretations?
+
+% http://www.cs.ox.ac.uk/jeremy.gibbons/publications/embedding.pdf
+
+\begin{minted}{scala}
+trait Expr {
+  def eval: Int
+}
+
+class Lit(n: Int) extends Expr {
+  def eval: Int = n
+}
+
+class Add(n: Int) extends Expr {
+  def eval: Int = e1.eval + e2.eval
+}
+\end{minted}
+
+\subsection{Overloading}
+
+Dunfield~\cite{dunfield2014elaborating} notes that using merges as a mechanism
+of overloading is not as powerful as type classes.
+
 \subsection{F-bounded Polymorphism}
 
-\begin{lstlisting}
-let getName A (v : A & {name:String}) = v.name in
-getName [{name:String}] {name = "Ek", age = 10}
-\end{lstlisting}
+\begin{figure}
+  \begin{minted}{scala}
+  def getName[A <: { def name: String }](v: A) = v.name
+  case class Person(name: String)
+  getName[Person](Person("Ek"))
+  \end{minted}
 
-Scala
+  \begin{minted}{ocaml}
+  let getName A (v : A & {name:String}) = v.name in
+  getName [{name:String}] {name = "Ek", age = 10}
+  \end{minted}
 
-\begin{minted}[fontsize=\footnotesize]{scala}
-def getName[A <: { def name: String }](v: A) = v.name
-case class Person(name: String)
-getName[Person](Person("Ek"))
-\end{minted}
+  \caption{Example of encoding records}
+  \label{fig:encoding-records}
+\end{figure}
+
 
 % Multiple inheritance?
 % Algebra -> P1,2
@@ -29,7 +65,7 @@ getName[Person](Person("Ek"))
 % };
 % \end{lstlisting}
 
-This section shows that the System F plus intersection types are enough for
+This section shows that the System $ F $ plus intersection types are enough for
 encoding extensible designs, and even beat the designs in languages with a much
 more sophisticated type system. In particular, \name has two main advantages
 over existing languages:
@@ -99,7 +135,7 @@ in Java.
 The value level counterpart are functions of the type \lstinline
 {A => B => A with B}. \footnote{FIXME}
 
-Our type system is a simple extension of System F; yet surprisingly, it
+Our type system is a simple extension of System $ F $; yet surprisingly, it
 is able to solve the limitations of using object algebras in languages such as
 Java and Scala. We will illustrate this point with an step-by-step of solving
 the expression problem using a source language built on top of \name.

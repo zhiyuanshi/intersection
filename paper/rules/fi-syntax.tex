@@ -3,14 +3,14 @@
 
     \textbf{Types} \\
     \begin{array}{rcll}
-        \ty & \dcoloneq & \alpha \mid \ty \to \ty \mid \forall \alpha. \ty & \\
+        \ty & \Coloneqq & \alpha \mid \ty \to \ty \mid \forall \alpha. \ty & \\
           & \mid      & \ty \intersects \ty                                  & \text{Intersection type} \\
           & \mid      & \recordtype l \ty                            & \text{Record type}
     \end{array} \\ \\
 
     \textbf{Terms} \\
     \begin{array}{rcll}
-        e & \dcoloneq & x                               & \\
+        e & \Coloneqq & x                               & \\
           & \mid      & \Abs \alpha     e \mid \app e \ty & \text{Type abstraction/application} \\
           & \mid      & \abs {\rel x \ty} e \mid \app e e & \text{Term abstraction/application} \\
           & \mid      & e \dcomma e                     & \text{Merge} \\
@@ -21,7 +21,7 @@
 
     \textbf{Contexts} \\
     \begin{array}{rcl}
-        \Gamma & \dcoloneq & \epsilon \mid \Gamma, \alpha \mid \Gamma, \rel x \ty
+        \Gamma & \Coloneqq & \epsilon \mid \Gamma, \alpha \mid \Gamma, \rel x \ty
     \end{array} \\ \\
 
     \textbf{Labels} \\

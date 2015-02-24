@@ -7,18 +7,20 @@
 Make sure you have the following installed:
 
 * [Ruby](https://www.ruby-lang.org/)
+* [xelatex](http://www.xelatex.org/)
 * [latexmk](http://www.ctan.org/pkg/latexmk/)
 
-Install extra fonts:
+Install Microsoft TrueType core fonts:
 
     sudo apt-get update
-    sudo apt-get install texlive-fonts-extra
+    sudo apt-get install -y msttcorefonts
 
-Get and install non-free fonts:
+## Generating PDF
 
-    wget http://tug.org/fonts/getnonfreefonts/install-getnonfreefonts
-    sudo texlua install-getnonfreefonts
+To make the PDF just once:
 
-After successful installation, run:
+    rake
 
-    getnonfreefonts --all
+To watch for changes of source files and re-generate the PDF if necessary:
+
+    rake watch

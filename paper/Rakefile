@@ -19,14 +19,21 @@ def latexmk_cmd(options = "")
   # "Since minted makes calls to the outside world (i.e. Pygments), you need to
   # tell the LaTeX processor about this by passing it the -shell-escape option
   # or it won’t allow such calls."
-  "latexmk #{options} -pdf -pdflatex='pdflatex -shell-escape %O %S' main.tex"
+  # engine = "pdflatex"
+  engine = "xelatex"
+  # engine = "lualatex"
+
+  "latexmk #{options} -pdf -pdflatex='#{engine} -shell-escape %O %S' main.tex"
 end
 
 desc "Generate the PDF of the paper"
-task(:paper => :prepare_rules) { system(latexmk_cmd) }
+task(:paper => [:clean, :prepare_rules]) { system(latexmk_cmd) }
 
 desc "Watch for changes and re-generate the PDF if necessary"
-task(:watch) { system(latexmk_cmd("-pvc")) }
+task(:watch => :clean) { system(latexmk_cmd("-pvc")) }
 
 desc "Clean"
 task(:clean) { system("latexmk -c") }
+
+desc "Clean, including PDFs"
+task(:Clean) { system("latexmk -C") }
