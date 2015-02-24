@@ -67,10 +67,10 @@ Do we have a subtyping lattice?
 \caption{Subtyping}
 \end{figure*}
 
-Thanks to intersection types, we have natural subtyping relations among types.
-For example, $ Int \intersects Bool $ should be a subtype of $ Int $, since the former
-can be viewed as either $ Int $ or $ Bool $. The subtyping rules are standard
-except for three points listed below:
+Intersection types introduce natural subtyping relations among types. For
+example, $ Int \intersects Bool $ should be a subtype of $ Int $, since the
+former can be viewed as either $ Int $ or $ Bool $. The subtyping rules are
+standard except for three points listed below:
 \begin{enumerate}
 \item $ \ty_1 \intersects \ty_2 $ is a subtype of $ \ty_3 $, if \emph{either} $ \ty_1 $ or
   $ \ty_2 $ are subtypes of $ \ty_3 $,
