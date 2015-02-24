@@ -1,5 +1,17 @@
 \section{Related Work}
 
+% http://research.microsoft.com/en-us/people/daan/
+
+% Object: self, mutable, inheritance, recursive records
+
+% Scala:
+% (1) Already intersection in the language
+% (2) Attempts to formalize: DOT calculus
+% Intersection types in existing OO languages: Ceylon, Grace
+% Pierce Ph.D thesis: F<: + /|
+%        technical report: F + /|, closer to ours
+% Discuss encoding bounded-poly
+
 Intersection types date back to Coppo et al.~\cite{coppo1981functional}. From
 another viewpoint, one can regard intersections as ``implicit pairs'' whose
 introduction is explicit by using the merge operator and elimination is implicit
@@ -45,7 +57,9 @@ into one rule:
 Reynolds invented Forsythe in the 1980s. Our merge operator is analogous to
 $ p_1, p_2 $. Castagna, and Dunfield describe elaborating multi-fields records
 into merge of single-field records. As Dunfield has noted, in Forsythe merges
-can be only used unambiguously. For instance, it is not allowed in Forsythe to
+can be only used unambiguously.
+% Why the restriction?
+For instance, it is not allowed in Forsythe to
 merge two functions. Reynolds and Castagna do not consider elaboration and
 Dunfield do not formalize elaborating records.
 
@@ -73,6 +87,11 @@ support modularity.~\cite{nystrom2006j}
 
 \paragraph{Encoding Records and Objects.}
 
+\cite{harper1991record}
+
+% Don't want to impose restriction on what can be merge. In the example, there
+% is A&B.
+
 Extensible records were introduced by Wand~\cite{wand1987complete}. Encoding
 records using intersection types appear in Reynolds~\cite{reynolds1997design}
 and Castagna et al.~\cite{castagna1995calculus}. Although Dunfield also
@@ -87,6 +106,14 @@ heavyweight. Crary~\cite{crary1998simple} uses intersection types and
 existential types to address the problem that arises when interpreting method
 dispatch as self-application. But in his paper, intersection types are not used
 to encode multi-field records.
+
+% How about this line of work related to inheritance?
+
+% Existential types
+%
+% class Exp {
+%   m(x: Exp): t
+% }
 
 Indeed, our system can be adapted to simulate systems that support extensible
 records but not intersection of ordinary types like \texttt{Int} and
