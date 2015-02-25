@@ -1,11 +1,11 @@
-\section{Type-directed Translation to System $ F $}
+\section{Type-directed translation to System $ F $}
 
 In this section we define the semantics of \name by means of a type-directed
 translation to System $ F $. This translation removes the labels of records and
 turns intersections into products, much like Dunfield's elaboration. But our
 translation also deals with parametric polymorphism and records.
 
-\subsection{Informal Discussion}
+\subsection{Informal discussion}
 
 To help the reader have a high-level understanding of how the translation
 works, in this subsection we present the translation informally. Take the \name
@@ -25,7 +25,7 @@ becomes $ (4, ``4'') $.
 Finally, $ e1 $ and $ e2 $ are both coerced by a projection function
 $ \\(x:(Int,String)). \fst ~ x $.
 
-\subsection{Target Language}
+\subsection{Target language}
 
 The target language is System $ F $ extended with pairs. The syntax and typing is
 completely standard. The syntax of Systm F is as follows:
@@ -57,7 +57,7 @@ of record types are erased.
 
 The translation consists of four sets of rules, which are explained below:
 
-\subsection{Subtyping (Coercion)}
+\subsection{Subtyping (coercion)}
 
 Talk about $ \eta $-expansion.
 
@@ -87,7 +87,7 @@ $ \ty_3 $ and the new coercion is a function that takes a value $ x $ of type
 $ \ty_1 \intersects \ty_2 $, project $ x $ on the first item, and apply $ C $ to it.
 \rulename{SAnd3} uses both of two coercions and constructs a pair.
 
-\subsection{Typing (Translation)}
+\subsection{Typing (translation)}
 
 In this subsection we now present formally the translation rules that convert
 \name expressions into System $ F $ ones. This set of rules essentially extends

@@ -29,11 +29,11 @@
  \Gamma \turns e_2 : \ty_2 \yields {E_2}}
 {\Gamma \turns e_1 \dcomma e_2 : \ty_1 \intersects \ty_2 \yields {\tupled {E_1, E_2}}}
 
-\infrule[RcdIntro]
+\infrule[RcdCon]
 {\Gamma \turns e : \ty \yields E}
 {\Gamma \turns \recordintro l e : \recordtype l \ty \yields E}
 
-\infrule[RcdElim]
+\infrule[RcdProj]
 {\Gamma \turns e : \ty \yields E \andalso
  \Gamma \turnsget (\ty; l) : \ty_1 \yields C}
 {\Gamma \turns e.l : \ty_1 \yields {\app C E}}

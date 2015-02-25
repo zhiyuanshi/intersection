@@ -1,4 +1,4 @@
-\section{A Taste of fi}
+\section{A Taste of $ \name $}
 
 \begin{footnote}
   Change the examples later to something very simple.
@@ -18,16 +18,14 @@ system in practice by showing various examples.
 
 \subsection{Intersection Types}
 
-The central addition to the type system of \target in \name is intersection types. What
-is an intersection type? One classic view is from set-theoretic interpretation
-of types: $ A \intersects B $ stands for the intersection of the set of values of
-$ A $ and $ B $. The other view, adopted in this paper, regards
+The central addition to the type system of \target in \name is intersection
+types. What is an intersection type? One classic view is from set-theoretic
+interpretation of types: $ A \intersects B $ stands for the intersection of the
+set of values of $ A $ and $ B $. The other view, adopted in this paper, regards
 types as a kind of interface: a value of type $ A \intersects B $ satisfies both
-of the interfaces of $ A $ and $ B $. For example,
-\lstinline{eval : Int} is the interface that supports evaluation to integers,
-while \lstinline{ eval : Int & print : String } supports both evaluation and
-pretty printing. Those interfaces are akin to interfaces in Java or traits in
-Scala. But one key difference is that they are unnamed in \name.
+of the interfaces of $ A $ and $ B $. For example, \lstinline{eval : Int} is the
+interface that supports evaluation to integers, while \lstinline{ eval : Int & print : String } supports both evaluation and pretty printing. Those interfaces are akin to interfaces in Java or traits in Scala. But one key
+difference is that they are unnamed in \name.
 
 Intersection types provide a simple mechanism for ad-hoc polymorphism, similar
 to what type classes in Haskell achieve. The key constructs are the ``merge''
@@ -37,13 +35,17 @@ intersection operator, denoted by, $ \intersects $ at the type level.
 For example, we can define an (ad-hoc)-polymorphic \lstinline{show} function
 that is able to convert integers and booleans to strings. In \name such function
 can be given the type
+
 \begin{lstlisting}
   (Int -> String) & (Bool -> String)
 \end{lstlisting}
+
 and be defined using the merge operator $ \dcomma $ as
+
 \begin{lstlisting}
   let show = showInt ,, showBool
 \end{lstlisting}
+
 where \lstinline{showString} and \lstinline{showBool} are ordinary monomorphic
 functions. Later suppose the integer \lstinline{1} is applied to the \lstinline{show} function,
 the first component \lstinline{showInt} will be picked because the type of \lstinline{showInt}
@@ -110,10 +112,12 @@ shall see in the next section, in solving modularity problems. Here is a code
 snippet from the next section (The reader is not required to understand the
 purpose of this code at this stage; just recognizing the two types of
 polymorphism is enough.)
+
 \begin{lstlisting}
 type SubExpAlg E = (ExpAlg E) \& { sub : E -> E -> E };
 let e2 E (f : SubExpAlg E) = f.sub (exp1 E f) (f.lit 2);
 \end{lstlisting}
+
 \lstinline{SubExpAlg} is a type synonym (a la Haskell) defined as the intersection of
 \lstinline{ExpAlg E} and \lstinline{sub : E -> E -> E}, parametrized by a type parameter
 \lstinline{E}. \lstinline{e2} exhibits parametric polymorphism as it takes a type argument

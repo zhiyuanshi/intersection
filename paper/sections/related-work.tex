@@ -1,4 +1,4 @@
-\section{Related Work}
+\section{Related work}
 
 % http://research.microsoft.com/en-us/people/daan/
 
@@ -21,7 +21,7 @@ elaborate records in terms of System $ F $.
 
 \cite{barbanera1995intersection}
 
-\paragraph{Intersection Types with Polymorphism.}
+\paragraph{Intersection types with polymorphism.}
 
 Our type system combines intersection types and polymorphism. The closest to
 ours is Pierce's Ph.D. thesis~\cite{pierce1991programming} on a prototype compiler for a
@@ -31,7 +31,7 @@ explicit introduction construct like our merge operator. However, as shown in
 Section 3, this feature is critical in supporting modularity and extensibility
 because it allows dynamic composition of values.
 
-\paragraph{Other Type Systems with Intersection Types.}
+\paragraph{Other type systems with intersection types.}
 
 % Write a comprehensive F_{<:}
 % The dot calculus Foundations of path-dependent types
@@ -78,26 +78,54 @@ possible to encode various language features. \cite{davies2005practical}
 
 Semantic subtyping. Frisch et al.~\cite{frisch2008semantic}
 
-\paragraph{Type Systems for Modularity.}
+\paragraph{Type systems for modularity.}
 
 Intersection types have been shown to be useful in designing languages that
 support modularity.~\cite{nystrom2006j}
 
 \cite{oliveira2013feature}
 
-\paragraph{Encoding Records and Objects.}
+\paragraph{Extensible records.}
+
+Wand~\cite{wand1987complete} started the work on extensible records and proposes
+row types~\cite{wand1989type} for records.
+
+Leijen define record update in terms of restriction and extension but in our
+record system record update is a primitive operation. Both Leijen's
+system~\cite{leijen2005extensible} and ours allows records that contain
+duplicate labels.
+
+Construction, projection, and update, while
+
+Cardelli and
+Mitchell~\cite{cardelli1990operations} define three primitive operations on
+records: \emph{selection}, \emph{restriction}, and \emph{extension}.
+
+Leijen
+Does the opposite: encode intersection types.
+\cite{leijen2004first}
+
+Remy~\cite{remy1993type}
+
+
+
+Chlipala's \texttt{Ur}~\cite{chlipala2010ur}
+
+In \Name, records are extensible, meaning that...
+
+http://blog.ezyang.com/2012/04/how-urweb-records-work-and-what-it-might-mean-for-haskell/
 
 \cite{harper1991record}
 
 % Don't want to impose restriction on what can be merge. In the example, there
 % is A&B.
 
-Extensible records were introduced by Wand~\cite{wand1987complete}. Encoding
-records using intersection types appear in Reynolds~\cite{reynolds1997design}
-and Castagna et al.~\cite{castagna1995calculus}. Although Dunfield also
-discusses this idea in his paper \cite{dunfield2014elaborating} and provides an
-implementation, he does not proceed to propose a set of elaboration typing rules
-for records. Very similar to our treatment of elaborating records is Cardelli's
+Encoding records using intersection types appear in
+Reynolds~\cite{reynolds1997design} and Castagna et
+al.~\cite{castagna1995calculus}. Although Dunfield also discusses this idea in
+his paper \cite{dunfield2014elaborating} and provides an implementation, he does
+not proceed to propose a set of elaboration typing rules for records. Very
+similar to our treatment of elaborating records is Cardelli's
 work~\cite{cardelli1992extensible} on translating a calculus, named
 $ F_{\subtype \rho}$, with extensible records to a simpler calculus that without
 records primitives (in which case is $ F_{\subtype} $). But he does not consider
@@ -139,7 +167,7 @@ Dunfield~\cite{dunfield2014elaborating}.
 
 R{\'e}my~\cite{remy1989type}
 
-\paragraph{Other Related Work.}
+\paragraph{Other related work.}
 
 Compagnoni and Pierce~\cite{compagnoni1996higher} add intersection types to
 System $ F^{\omega} $ and use the new calculus, $ F^{\omega}_{\intersects} $, to
