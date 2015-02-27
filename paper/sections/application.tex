@@ -1,4 +1,4 @@
-\section{Application}
+\section{Application} \label{sec:application}
 
 This section shows that the System $ F $ plus intersection types are enough for
 encoding extensible designs, and even beat the designs in languages with a much
@@ -106,6 +106,8 @@ that via intersection types:
 def id [A] (user: A & {name: String}) = user in
 (id [{admin: Bool}] user).admin
 \end{minted}
+
+Polymorphism plus intersecion types is as powerful as bounded polymorphism.
 
 \cite{pierce1997intersection}
 
