@@ -1,5 +1,32 @@
 \section{Application}
 
+This section shows that the System $ F $ plus intersection types are enough for
+encoding extensible designs, and even beat the designs in languages with a much
+more sophisticated type system. In particular, \name has two main advantages
+over existing languages:
+
+\begin{enumerate}
+\item It supports dynamic composition of intersecting values.
+\item It supports contravariant parameter types in the subtyping relation.
+\end{enumerate}
+
+Various solutions have been proposed to deal with the extensibility problems and
+many rely on heavyweight language features such as abstract methods and classes
+in Java.
+
+These two features can be used to improve existing designs of modular programs.
+
+% Introduce the expression problem
+
+The expression problem refers to the difficulty of adding a new operations and a
+new data variant without changing or duplicating existing code.
+
+There has been recently a lightweight solution to the expression problem that
+takes advantage of covariant return types in Java. We show that FI is able to
+solve the expression problem in the same spirit. The
+A)
+
+
 % - Object/Fold Algebras. How to support extensibility in an easier way.
 
 % See Datatypes a la Carte
@@ -32,32 +59,55 @@ class Add(n: Int) extends Expr {
 Dunfield~\cite{dunfield2014elaborating} notes that using merges as a mechanism
 of overloading is not as powerful as type classes.
 
-\subsection{Encoding $ F_{\subtype} $}
+\subsection{Encoding bounded polymorphism}
 
-Ceylon
+As \name extends System $ F $ with intersection types, $ F_{\subtype} $ extends
+System $ F $ with bounded polymorphism. $ F_{\subtype} $~\cite{pierce2002types}
+allows giving an upper bound to the type variable in type abstractions. The idea
+of bounded universal quantification was discussed in the seminal paper by
+Cardelli and Wegner ~\cite{cardelli1985understanding}. They show that bounded
+quantifiers are useful because it is able to solve the ``loss of information''
+problem.
 
-% motivate
+In fact, the extension of System $ F $ in the other direction, i.e., with
+intersection types, is able to address the same problem effectively. Suppose we
+have the following definitions:
+\begin{minted}{scala}
+def user = { name = "George", admin = true }
+def id(user: {name: String}) = user
+\end{minted}
+Under a structural type system, programmers would expect that passing the user
+to the function is allowed. They are correct. Note that in the source language
+multi-field records are just syntatic sugars for merges of single-field records.
+Therefore, user is of a subtype of the parameter due to subtyping introduced by
+intersection types. So far so good. But there is a problem: what if programmers
+wants to access the \texttt{admin} field later, like:
+\begin{minted}{scala}
+(id user).admin
+\end{minted}
+They cannot do so as the above will not typecheck. After going through the
+function, the user now has only the type
+\begin{minted}{scala}
+{name: String}
+\end{minted}
+This is rather undesired because it indeed has an \texttt{admin} field!
 
-Bounded polymorphism ...
+Bounded polymorphism enable the function to return the exact type of the
+argument so that we have no problem in accessing the \texttt{admin} field later.
+Consider the example below:
+\begin{minted}{scala}
+def id [A <: {name: String}] (user: A) = user
+(id [{name: String, admin: Bool}] user).admin
+\end{minted}
+
+We do not have bounded polymorphism in the source language. But we can encode
+that via intersection types:
+\begin{minted}{scala}
+def id [A] (user: A & {name: String}) = user in
+(id [{admin: Bool}] user).admin
+\end{minted}
 
 \cite{pierce1997intersection}
-
-\begin{figure}
-  \begin{minted}{scala}
-  def getName[A <: { def name: String }](v: A) = v.name
-  case class Person(name: String)
-  getName[Person](Person("Ek"))
-  \end{minted}
-
-  \begin{minted}{ocaml}
-  let getName A (v : A & {name:String}) = v.name in
-  getName [{name:String}] {name = "Ek", age = 10}
-  \end{minted}
-
-  \caption{Example of encoding records}
-  \label{fig:encoding-records}
-\end{figure}
-
 
 % Multiple inheritance?
 % Algebra -> P1,2
@@ -73,43 +123,17 @@ Bounded polymorphism ...
 % };
 % \end{lstlisting}
 
-This section shows that the System $ F $ plus intersection types are enough for
-encoding extensible designs, and even beat the designs in languages with a much
-more sophisticated type system. In particular, \name has two main advantages
-over existing languages:
-
-\begin{enumerate}
-\item It supports dynamic composition of intersecting values.
-\item It supports contravariant parameter types in the subtyping relation.
-\end{enumerate}
-
-Various solutions have been proposed to deal with the extensibility problems and
-many rely on heavyweight language features such as abstract methods and classes
-in Java.
-
-These two features can be used to improve existing designs of modular programs.
-
-% Introduce the expression problem
-
-The expression problem refers to the difficulty of adding a new operations and a
-new data variant without changing or duplicating existing code.
-
-There has been recently a lightweight solution to the expression problem that
-takes advantage of covariant return types in Java. We show that FI is able to
-solve the expression problem in the same spirit. The
-A)
-
 \subsection{Object algebras}
 
 Object algebras provide an alternative to \emph{algebraic data types} (ADT). For example, the
 following Haskell definition of the type of simple expressions
-\begin{minted}[fontsize=\footnotesize]{haskell}
+\begin{minted}{haskell}
 data Exp where
   Lit :: Int -> Exp
   Add :: Exp -> Exp -> Exp
 \end{minted}
 can be expressed by the \emph{interface} of an object algebra of simple expressions:
-\begin{minted}[fontsize=\footnotesize]{scala}
+\begin{minted}{scala}
 trait ExpAlg[E] {
   def lit(x: Int): E
   def add(e1: E, e2: E): E
@@ -133,7 +157,7 @@ type ExpAlg E = {
 Scala supports intersection types via the \lstinline{with} keyword. The type
 \lstinline{A with B} expresses the combined interface of \lstinline{A} and
 \lstinline{B}. The idea is similar to
-\begin{minted}[fontsize=\footnotesize]{java}
+\begin{minted}{java}
 interface AwithB extends A, B {}
 \end{minted}
 in Java.
@@ -240,7 +264,7 @@ Constructing instances seems clumsy!
 The visitor pattern allows adding new operations to existing structures without
 modifying those structures. The type of expressions are defined as follows:
 
-\begin{minted}[fontsize=\footnotesize]{scala}
+\begin{minted}{scala}
 trait Exp[A] {
   def accept(f: ExpAlg[A]): A
 }
