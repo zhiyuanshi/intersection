@@ -46,6 +46,10 @@ and be defined using the merge operator $ \dcomma $ as
   let show = showInt ,, showBool
 \end{lstlisting}
 
+From another viewpoint, one can regard intersections in our system as ``implicit
+pairs'' whose introduction is explicit by using the merge operator and
+elimination is implicit (with no source-level construct for elimination).
+
 where \lstinline{showString} and \lstinline{showBool} are ordinary monomorphic
 functions. Later suppose the integer \lstinline{1} is applied to the \lstinline{show} function,
 the first component \lstinline{showInt} will be picked because the type of \lstinline{showInt}
