@@ -1,5 +1,11 @@
 \section{Related work} \label{sec:related-work}
 
+http://homepages.inf.ed.ac.uk/gdp/publications/Sub_Par.pdf
+
+\cite{plotkin1994subtyping}
+
+Also discussed intersection types!~\cite{malayeri2008integrating}.
+
 % Pierce Ph.D thesis: F<: + /|
 %        technical report: F + /|, closer to ours
 
@@ -27,10 +33,10 @@ for Scala that incorporates intersection
 types~\cite{amin2014foundations,amin2012dependent}.
 
 Our type system combines intersection types and polymorphism. The closest to
-ours is Pierce's~\cite{pierce1991programming1} on a prototype compiler for a
-language with both intersection types, union types, and parametric polymorphism.
-The important difference with our system is that in his language there is no
-explicit introduction construct like our merge operator. As shown in
+ours is Pierce's work~\cite{pierce1991programming1} on a prototype compiler for
+a language with both intersection types, union types, and parametric
+polymorphism. The important difference with our system is that in his language
+there is no explicit introduction construct like our merge operator. As shown in
 Section~\ref{sec:application}, this feature is pivotal in supporting modularity
 and extensibility because it allows dynamic composition of values. Pierce has
 also studied a system where both intersection types and bounded polymorphism are
@@ -95,10 +101,17 @@ Frisch et al.~\cite{frisch2008semantic} study semantic subtyping.
 
 \paragraph{Type systems for modularity.}
 
+Goto http://i.cs.hku.hk/~bruno/papers/ecoop2012.pdf Language-based
+
+* http://www.informatik.uni-marburg.de/~kos/papers/popl06-virtualclasses.pdf
+* Poly variants
+
 Intersection types have been shown to be useful in designing languages that
 support modularity.~\cite{nystrom2006j}
 
 \paragraph{Extensible records.}
+
+http://elm-lang.org/learn/Records.elm
 
 Understanding records is important for understanding object-oriented languages.
 And we are the first to elaborate records to System $ F $. Encoding records
