@@ -1,31 +1,34 @@
-\section{A Taste of $ \name $}
+\section{An Overview of $ \name $}
 
-\begin{footnote}
-  Change the examples later to something very simple.
-\end{footnote}
+\george{
+  Change the examples later to something very simple.}
 
-This section provides the reader with the intuition of \name, while we postpone
-the presentation of the details in later sections.
+This section provides the reader with the intuition of \name, while we
+postpone the presentation of the details in later sections.
 
-In short, \name generalizes System $ F $ by adding intersection polymorphism. \name terms
-are elaborated into \Target, a variant of System $ F $. System $ F $, or polymorphic
-lambda calculus lays the foundation of functional programming languages such as
-Haskell.
+In short, \name generalizes System $ F $ by adding intersection
+polymorphism. \name terms are elaborated into \Target, a variant of
+System $ F $. System $ F $, or polymorphic lambda calculus lays the
+foundation of functional programming languages such as Haskell.
 
-The type system of \name permits a subtyping relation naturally and enables
-prototype-based inheritance. We will explore the usefulness of such a type
-system in practice by showing various examples.
+The type system of \name permits a subtyping relation naturally and
+enables prototype-based inheritance. We will explore the usefulness of
+such a type system in practice by showing various examples.
 
 \subsection{Intersection Types}
 
-The central addition to the type system of \target in \name is intersection
-types. What is an intersection type? One classic view is from set-theoretic
-interpretation of types: $ A \intersects B $ stands for the intersection of the
-set of values of $ A $ and $ B $. The other view, adopted in this paper, regards
-types as a kind of interface: a value of type $ A \intersects B $ satisfies both
-of the interfaces of $ A $ and $ B $. For example, \lstinline{eval : Int} is the
-interface that supports evaluation to integers, while \lstinline{ eval : Int & print : String } supports both evaluation and pretty printing. Those interfaces are akin to interfaces in Java or traits in Scala. But one key
-difference is that they are unnamed in \name.
+The central addition to the type system of \target in \name is
+intersection types. What is an intersection type? One classic view is
+from set-theoretic interpretation of types: $ A \intersects B $ stands
+for the intersection of the set of values of $ A $ and $ B $. The
+other view, adopted in this paper, regards types as a kind of
+interface: a value of type $ A \intersects B $ satisfies both of the
+interfaces of $ A $ and $ B $. For example, \lstinline{eval : Int} is
+the interface that supports evaluation to integers, while
+\lstinline{eval : Int & print : String } 
+supports both evaluation and pretty
+printing. Those interfaces are akin to interfaces in Java or traits in
+Scala. But one key difference is that they are unnamed in \name.
 
 Intersection types provide a simple mechanism for ad-hoc polymorphism, similar
 to what type classes in Haskell achieve. The key constructs are the ``merge''

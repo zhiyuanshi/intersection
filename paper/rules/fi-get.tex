@@ -1,17 +1,17 @@
-\framebox{\( \turnsget (\ty_1; l) : \ty_2 \yieldsnothing C \)}
+\framebox{\( \turnsget (\ty_1; l) : \ty_2 \yields C \)}
 
 The field with label $ l $ inside $ \ty_1 $ is of type $ \ty_2 $.
 
 \infax[GetBase]
 {\turnsget (\recordtype l \ty; l) : \ty
-  \yieldsnothing {\idmono {\image {\recordtype l \ty}}}}
+  \yields {\idmono {\image {\recordtype l \ty}}}}
 
 \infrule[GetLeft]
-{\turnsget (\ty_1; l) : \ty \yieldsnothing C}
+{\turnsget (\ty_1; l) : \ty \yields C}
 {\turnsget (\ty_1 \intersects \ty_2; l) : \ty
-  \yieldsnothing {\absty x {\image {\ty_1 \intersects \ty_2}} {C (\app \fst x)}}}
+  \yields {\absty x {\image {\ty_1 \intersects \ty_2}} {C (\app \fst x)}}}
 
 \infrule[GetRight]
-{\turnsget (\ty_2; l) : \ty \yieldsnothing C}
+{\turnsget (\ty_2; l) : \ty \yields C}
 {\turnsget (\ty_1 \intersects \ty_2; l) : \ty
-  \yieldsnothing {\absty x {\image {\ty_1 \intersects \ty_2}} {C (\app \snd x)}}}
+  \yields {\absty x {\image {\ty_1 \intersects \ty_2}} {C (\app \snd x)}}}
