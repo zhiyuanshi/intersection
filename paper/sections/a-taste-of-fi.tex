@@ -12,13 +12,18 @@ System $ F $. System $ F $, or polymorphic lambda calculus lays the
 foundation of functional programming languages such as Haskell.
 
 The type system of \name permits a subtyping relation naturally and
-enables prototype-based inheritance. We will explore the usefulness of
+enables prototype-based inheritance\bruno{Don't mention
+  prototype-based inheritance in the summary, unless you are going to
+  mention it later in the section. \emph{More generally don't mention 
+things that you don't talk about later!}}. We will explore the usefulness of
 such a type system in practice by showing various examples.
 
 \subsection{Intersection Types}
 
 The central addition to the type system of \target in \name is
-intersection types. What is an intersection type? One classic view is
+intersection types. \bruno{mention (and cite) that there are a number
+  of OO languages supporting intersection types }
+What is an intersection type? One classic view is
 from set-theoretic interpretation of types: $ A \intersects B $ stands
 for the intersection of the set of values of $ A $ and $ B $. The
 other view, adopted in this paper, regards types as a kind of
@@ -30,10 +35,15 @@ supports both evaluation and pretty
 printing. Those interfaces are akin to interfaces in Java or traits in
 Scala. But one key difference is that they are unnamed in \name.
 
+\paragraph{Intersection Types and Overloading}
 Intersection types provide a simple mechanism for ad-hoc polymorphism, similar
 to what type classes in Haskell achieve. The key constructs are the ``merge''
 operator, denoted by $ \dcomma $, at the value level and the corresponding type
-intersection operator, denoted by, $ \intersects $ at the type level.
+intersection operator, denoted by, $ \intersects $ at the type
+level.\bruno{We take a particular approach to intersection types,
+  namely that of Dundfield. Some other approaches are different. The
+  \emph{key feature} in Dunfield's approach is the $\dcomma$ operator,
+which allows for run-time value/object composition.}
 
 For example, we can define an (ad-hoc)-polymorphic \lstinline{show} function
 that is able to convert integers and booleans to strings. In \name such function
@@ -51,8 +61,10 @@ and be defined using the merge operator $ \dcomma $ as
 
 From another viewpoint, one can regard intersections in our system as ``implicit
 pairs'' whose introduction is explicit by using the merge operator and
-elimination is implicit (with no source-level construct for elimination).
+elimination is implicit (with no source-level construct for
+elimination). 
 
+\bruno{This is not a proper sentence. Polish text.}
 where \lstinline{showString} and \lstinline{showBool} are ordinary monomorphic
 functions. Later suppose the integer \lstinline{1} is applied to the \lstinline{show} function,
 the first component \lstinline{showInt} will be picked because the type of \lstinline{showInt}
@@ -80,21 +92,29 @@ is compatible with \lstinline{1} while \lstinline{showBool} is not.
 
 % \lstinputlisting[linerange=-]{} % APPLY:linerange=MIXIN_LIB
 
-\subsection{Encoding Records}
+\subsection{Labels and a Record Encoding}
+\bruno{The title of this section needs adjusting. Moreover 
+we do not want to talk about record elimination and update. \name
+supports a \emph{generalization} of record elimination and update 
+that \emph{works for any type}. That's what we want to mention instead.}
 
-In addition to introduction of record literals using the usual notation, \name
-support two more operations on records: record elimination and record update.
+In addition to introduction of record literals using the usual
+notation, \name support two more operations on records: record
+elimination and record update.
 
 A record type of the form $ \recordtype l \ty $ can be thought as a normal type \lstinline{t}
-tagged by the label \lstinline{l}.
+tagged by the label \lstinline{l}.\bruno{I would call this a labelled
+  type. Record types can be viewed as intersections of labelled types.}
 
 % A basic example
 
 % \lstinputlisting[linerange=-]{} % APPLY:linerange=BASICS_ADD
 
+\bruno{Not a proper sentence! }
 \lstinline{e1} and \lstinline{e2} are two expressions that support both evaluation and pretty
 printing and each has type \lstinline{eval : Int, print : String}. \lstinline{add} takes
-two expressions and computes their sum. Note that in order to compute a sum,
+two expressions and computes their sum\bruno{Don't inline examples in the text. Give
+  proper separate code examples.}. Note that in order to compute a sum,
 \lstinline{add} only requires that the two expressions support evaluation and hence the
 type of the parameter \lstinline{eval : Int}. As a result, the type of \lstinline{e1} and
 \lstinline{e2} are not exactly the same with that of the parameters of \lstinline{add}. However,
@@ -108,17 +128,20 @@ be encoded as \lstinline{eval : Int & print : String}. And by one of
 subtyping rules derives that \lstinline{eval : Int & print : String} is a
 subtype of \lstinline{eval : Int}.
 
+\bruno{Examples illustrating update and elimination of intersections
+  are missing!}
+
 % This example is elaborated into the following in \Target.
 
 % \lstinputlisting[linerange=-]{} % APPLY:linerange=BASICSELAB_ADD
 
-\subsection{Parametric Polymorphism}
+\subsection{Intersection Types and Parametric Polymorphism}
 
 The presence of both parametric polymorphism and intersection is critical, as we
 shall see in the next section, in solving modularity problems. Here is a code
 snippet from the next section (The reader is not required to understand the
 purpose of this code at this stage; just recognizing the two types of
-polymorphism is enough.)
+polymorphism is enough.)\bruno{use the join example here.}
 
 \begin{lstlisting}
 type SubExpAlg E = (ExpAlg E) \& { sub : E -> E -> E };

@@ -20,10 +20,13 @@ record literals. Therefore $ \{ eval = 4, print = ``4'' \} $ becomes
 $ \{ eval = 4 \} ,, \{ print = ``4'' \} $. Merges of two values are translated
 into just a pair of them by \rulename{Merge} and single-field record literals lose their field
 labels by \rulename{RcdIntro}. Hence $ \{ eval = 4 \} ,, \{ print = ``4'' \} $
-becomes $ (4, ``4'') $.
+becomes $ (4, ``4'') $.\bruno{Don't abuse inlining of examples in the
+  text!}
 
 Finally, $ e1 $ and $ e2 $ are both coerced by a projection function
 $ \\(x:(Int,String)). \fst ~ x $.
+\bruno{Show the source program, and the program that it gets
+  translated to. Then explain how that translation works.}
 
 \subsection{Target language}
 
@@ -32,13 +35,14 @@ completely standard. The syntax of Systm F is as follows:
 
 \input{rules/f-syntax.tex}
 
-The dynamic semantics of System $ F $ can be found in ...
+The dynamic semantics of System $ F $ can be found in ...\bruno{fill!}
 
 \begin{lemma} \label{type-coerce}
   If $$ \Gamma \turns \ty_1 <: \ty_2 \yields C $$
   then $$ \image \Gamma \turns C : \image {\ty_1} \to \image {\ty_2} $$
-\end{lemma}
+\end{lemma}\bruno{Why is this lemma placed here?}
 
+\bruno{Generaly Speaking this text seems out of place.Move to 5.4, maybe?}
 The main translation judgment is $ \Gamma \turns e : \ty \hookrightarrow E $ which
 states that with respect to the environment $ \Gamma $, the \name expression
 $ e $ is of a \name type $ \ty $ and its translation is a System $ F $ expression $ E $.
@@ -86,6 +90,7 @@ to $ \ty_3 $, then we can conclude that $ \ty_1 \intersects \ty_2 $ is also a su
 $ \ty_3 $ and the new coercion is a function that takes a value $ x $ of type
 $ \ty_1 \intersects \ty_2 $, project $ x $ on the first item, and apply $ C $ to it.
 \rulename{SAnd3} uses both of two coercions and constructs a pair.
+\bruno{Give a couple of concrete examples when explaining the rules.}
 
 \subsection{Typing (translation)}
 
@@ -100,6 +105,9 @@ those in the previous section with the light-blue part for the translation.
 \caption{Type-directed translation from \name to System $ F $.}
 \end{figure*}
 
+\bruno{Badly structured. Don't mention Coercion here,
+    as it was already explained in the previous section.}
+\bruno{Don't use itemize and items. Use paragraphs instead!}
 \begin{itemize}
 
 \item{\bf Coercion}
@@ -136,7 +144,8 @@ those in the previous section with the light-blue part for the translation.
 \item{\bf ``get'' rules}
 
   The ``get'' judgment deals spefically with record elimination and yields a
-  coercion can be thought as a field accessor. For example:
+  coercion can be thought as a field accessor. For
+  example:\bruno{Still not showing the derivations!}
 
   $ \Gamma \turnsget (\{ eval : Int \}, eval) : \{ eval : Int \} \yields {\abs {\rel x Int} x} $
 
@@ -178,7 +187,7 @@ those in the previous section with the light-blue part for the translation.
   \[ ``Isaac'' \]
 
 
-\item{\bf ``put'' rules}
+\item{\bf ``put'' rules}\bruno{Missing example (and derivation)}
 
   The ``put'' judgment deals spefically with record update can be thought as
   producing a field updater. Compared to the ``get'' rules, the ``put'' rules
