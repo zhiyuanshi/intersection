@@ -108,13 +108,12 @@ those in the previous section with the light-blue part for the translation.
 \bruno{Badly structured. Don't mention Coercion here,
     as it was already explained in the previous section.}
 \bruno{Don't use itemize and items. Use paragraphs instead!}
-\begin{itemize}
 
-\item{\bf Coercion}
+\paragraph{Coercion}
 
   Explained in the previous subsection.
 
-\item{\bf Translation}
+\paragraph{Translation}
 
   The elaboration judgment $ \Gamma \turns e : \ty \yields E $ extends the
   typing judgment with an elaborated expression on the right hand side of
@@ -141,7 +140,7 @@ those in the previous section with the light-blue part for the translation.
 
   The two set of rules are explained below.
 
-\item{\bf ``get'' rules}
+\paragraph{``get'' rules}
 
   The ``get'' judgment deals spefically with record elimination and yields a
   coercion can be thought as a field accessor. For
@@ -187,7 +186,7 @@ those in the previous section with the light-blue part for the translation.
   \[ ``Isaac'' \]
 
 
-\item{\bf ``put'' rules}\bruno{Missing example (and derivation)}
+\paragraph{``put'' rules}\bruno{Missing example (and derivation)}
 
   The ``put'' judgment deals spefically with record update can be thought as
   producing a field updater. Compared to the ``get'' rules, the ``put'' rules
@@ -200,8 +199,6 @@ those in the previous section with the light-blue part for the translation.
   \rulename{PutRight} are complementary to each other: the idea is exactly the
   same as \rulename{GetLeft} and \rulename{GetRight} except that the refined type
   $ \ty_1' $ and $ \ty_2' $ is used.
-
-\end{itemize}
 
 \subsection{Meta-theory}
 
