@@ -1,46 +1,46 @@
-\framebox{\( \ty \subtype \ty \yieldsnothing C \)}
+\framebox{\( \ty \subtype \ty \yields C \)}
 
 \infax[SVar]
-{\alpha \subtype \alpha \yieldsnothing {\abs {\rel x {\image \alpha}} x}}
+{\alpha \subtype \alpha \yields {\abs {\rel x {\image \alpha}} x}}
 
 \infrule[SFun]
-{\ty_3 \subtype \ty_1 \yieldsnothing {C_1} \andalso \ty_2 \subtype \ty_4 \yieldsnothing {C_2}}
+{\ty_3 \subtype \ty_1 \yields {C_1} \andalso \ty_2 \subtype \ty_4 \yields {C_2}}
 {\ty_1 \to \ty_2 \subtype \ty_3 \to \ty_4
-  \yieldsnothing
+  \yields
     {\abs {\rel f {\image {\ty_1 \to \ty_2}}}
       {\abs {\rel x {\image {\ty_3}}}
         {\app {C_2} {(\app {f} {(\app {C_1} {x})})}}}}}
 
 \infrule[SForall]
-{\ty_1 \subtype \subst {\alpha_2} {\alpha_1} \ty_2 \yieldsnothing C}
+{\ty_1 \subtype \subst {\alpha_2} {\alpha_1} \ty_2 \yields C}
 {\forall \alpha_1. \ty_1 \subtype \forall \alpha_2. \ty_2
-  \yieldsnothing
+  \yields
     {\abs {\rel{f} {\image {\forall \alpha. \ty_1}}}
       {\Abs \alpha {\app C {(\app f \alpha)}}}}}
 
 \infrule[SAnd1]
-{\ty_1 \subtype \ty_3 \yieldsnothing C}
+{\ty_1 \subtype \ty_3 \yields C}
 {\ty_1 \intersects \ty_2 \subtype \ty_3
-  \yieldsnothing
+  \yields
     {\abs {\rel x {\image {\ty_1 \intersects \ty_2}}}
       {\app C {(\app \fst x)}}}}
 
 \infrule[SAnd2]
-{\ty_2 \subtype \ty_3 \yieldsnothing C}
+{\ty_2 \subtype \ty_3 \yields C}
 {\ty_1 \intersects \ty_2 \subtype \ty_3
-  \yieldsnothing
+  \yields
     {\abs {\rel x {\image {\ty_1 \intersects \ty_2}}}
       {\app C {(\app \snd x)}}}}
 
 \infrule[SAnd3]
-{\ty_1 \subtype \ty_2 \yieldsnothing {C_1} \andalso \ty_1 \subtype \ty_3 \yieldsnothing {C_2}}
+{\ty_1 \subtype \ty_2 \yields {C_1} \andalso \ty_1 \subtype \ty_3 \yields {C_2}}
 {\ty_1 \subtype \ty_2 \intersects \ty_3
-  \yieldsnothing
+  \yields
     {\abs {\rel x {\image {\ty_1}}}
       {\tupled {\app {C_1} x, \app {C_2} x}}}}
 
 \infrule[SRcd]
-{\ty_1 \subtype \ty_2 \yieldsnothing C}
+{\ty_1 \subtype \ty_2 \yields C}
 {\recordtype l {\ty_1} \subtype \recordtype l {\ty_2}
-  \yieldsnothing
+  \yields
     {\abs {\rel x {\image {\recordtype l {\ty_1}}}} {\app C x}}}

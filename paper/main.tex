@@ -1,4 +1,4 @@
-\documentclass[preprint,times,10pt]{sigplanconf}
+\documentclass[times,10pt]{sigplanconf}
 
 \input{preamble.tex}
 
@@ -16,8 +16,8 @@
 \titlebanner{banner above paper title}        % These are ignored unless
 \preprintfooter{\name}                        % 'preprint' option specified.
 
-\title{\name}
-\subtitle{Subtitle Text, if any}
+\title{System \name: A Simple Core Language for Extensibility}
+%%\subtitle{Subtitle Text, if any}
 
 \authorinfo{Name1}
            {Affiliation1}
@@ -29,7 +29,34 @@
 \maketitle
 
 \begin{abstract}
-This is the text of the abstract.
+  
+  Over the years there have been various proposals for \emph{design
+    patterns} aimed at improved \emph{extensibility} of programs.
+  Examples include \emph{Object Algebras}, \emph{Modular Visitors} or
+  Torgersen's four design patterns using generics.
+%  Such design patterns typically rely on generics and subtyping and
+%  can be encoded in existing mainstream Object-Oriented Programming
+%  (OOP) languages. 
+  Although those design patterns give practical
+  benefits in terms of extensibility, they also expose limitations in
+  existing mainstream OOP languages. In particular two pressing
+  limitations are: 1) the lack of good mechanisms for
+  \emph{object-level} composition; 2) the \emph{conflation of 
+    (type) extension with subtyping}.
+
+  This paper presents System \name: an extension of System F with
+  intersection types and a merge operator.  The goal of
+  System \name is to study the foundational language constructs that
+  are needed to support various extensible designs, while at the same
+  time addressing the limitations of existing OOP languages. To
+  address the lack of good object-level composition mechanisms, System
+  \name uses the merge operator to allow dynamic composition of
+  values/objects. Moreover, in System \name (type-level) extension is
+  independent of subtyping, and it is possible for an extension to be
+  a supertype of a base object type.  System \name is formalized and 
+  implemented. Moreover the paper illustrates how various extensible designs   
+  can be encoded in System \name.
+
 \end{abstract}
 
 \category{CR-number}{subcategory}{third-level}
