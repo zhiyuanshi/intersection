@@ -1,23 +1,26 @@
 \section{Introduction}
 
 \bruno{The following are just some loose notes for the paper.}
-Modularity has always been a hot topic on OOP research. 
 
-Looking for new programming language models with increased
-expressiveness in terms of modularity. 
+There has been a remarkable number of works aimed at improving 
+support for extensibility in programming languages. One line of work
+is simply visions of new programming models, such as 
+\cite{family polymorphism and virtual
+classes.}. Another line of work are proposals for precise formal models or new 
+programming languages. Yet another line are \emph{design patterns}
+that can be used  with existing mainstream languages. 
 
-Two previous lines of work: 
+%%Part of the motivation behind 
 
-\begin{itemize}
-
-\item development of new languages with more 
-expressive mechanisms. Examples: family polymorphism and virtual
-classes.
-
-\item Use of existing languages to express more modular designs 
-with existing features. In particular Object Algebras. 
-
-\end{itemize} 
+Over the years there have been various proposals for \emph{design
+  patterns} for improved \emph{extensibility} of programs.  Examples
+include \emph{Object Algebras}, \emph{Modular Visitors} or Torgersen's
+four design patterns using generics.  Although those design patterns
+give practical benefits in terms of extensibility, they also expose
+limitations in existing mainstream OOP languages. In particular two
+pressing limitations are: 1) the lack of good mechanisms for
+\emph{object-level} composition; 2) the \emph{conflation of (type)
+  extension with subtyping}.
 
 The use of existing languages has shown that we can get quite far, but 
 it has also exposed some limitations. For example, work on object
@@ -35,19 +38,18 @@ provides a better foundational model for statically typed
 delegation-based OOP? We show that Object Algebras fit nicely in this
 model. 
 
-
-Lots of work on developing new languages 
-
-finitary overloading: yes
-but have other merits of intersection been explored?
-
--- Compare Scala:
--- merge[A,B] = new A with B
-
--- type IEval  = { eval :  Int }
--- type IPrint = { print : String }
-
--- F[\_]
+This paper presents System \name: an extension of System F with
+intersection types and a merge operator.  The goal of System \name is
+to study the foundational language constructs that are needed to
+support various extensible designs, while at the same time addressing
+the limitations of existing OOP languages. To address the lack of good
+object-level composition mechanisms, System \name uses the merge
+operator to allow dynamic composition of values/objects. Moreover, in
+System \name (type-level) extension is independent of subtyping, and
+it is possible for an extension to be a supertype of a base object
+type.  System \name is formalized and implemented. Furthermore the
+paper illustrates how various extensible designs can be encoded in
+System \name.
 
 We present a polymorphic calculus containing intersection types and records, and show
 how this language can be used to solve various common tasks in functional
@@ -70,6 +72,8 @@ In summary, the contributions of this paper are:
 
 \begin{itemize}
 
+\item {\bf System $name$:} 
+
 \item{elaboration typing rules which given a source expression with intersection
     types, typecheck and translate it into an ordinary F term. Prove a type
     preservation result: if a term $ e $ has type $ \ty $ in the source language,
@@ -84,3 +88,16 @@ In summary, the contributions of this paper are:
     types.}
 
 \end{itemize}
+
+\subsection{Other Notes}
+
+finitary overloading: yes
+but have other merits of intersection been explored?
+
+-- Compare Scala:
+-- merge[A,B] = new A with B
+
+-- type IEval  = { eval :  Int }
+-- type IPrint = { print : String }
+
+-- F[\_]
