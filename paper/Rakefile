@@ -31,7 +31,7 @@ def latexmk_cmd(options = "")
 end
 
 desc "Generate the PDF of the paper"
-task(:paper => [:clean, :prepare_rules]) { system(latexmk_cmd) }
+task(:paper => [:clean]) { system(latexmk_cmd) }
 
 desc "Watch for changes and re-generate the PDF if necessary"
 task(:watch => :clean) { system(latexmk_cmd("-pvc")) }
