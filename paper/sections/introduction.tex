@@ -2,25 +2,41 @@
 
 \bruno{The following are just some loose notes for the paper.}
 
-There has been a remarkable number of works aimed at improving 
-support for extensibility in programming languages. One line of work
-is simply visions of new programming models, such as 
-\cite{family polymorphism and virtual
-classes.}. Another line of work are proposals for precise formal models or new 
-programming languages. Yet another line are \emph{design patterns}
-that can be used  with existing mainstream languages. 
+There has been a remarkable number of works aimed at improving support
+for extensibility in programming languages. These works include:
+visions of new programming models\cite{}; new programming languages or
+language extensions\cite{}, and \emph{design patterns} that can be
+used with existing mainstream languages.
 
+%\cite{family polymorphism and virtual
+%classes.}. Another line of work are proposals for precise formal models or new 
+%programming languages. Yet another line are \emph{design patterns}
+%that can be used  with existing mainstream languages. 
 %%Part of the motivation behind 
 
-Over the years there have been various proposals for \emph{design
-  patterns} for improved \emph{extensibility} of programs.  Examples
-include \emph{Object Algebras}, \emph{Modular Visitors} or Torgersen's
-four design patterns using generics.  Although those design patterns
-give practical benefits in terms of extensibility, they also expose
-limitations in existing mainstream OOP languages. In particular two
-pressing limitations are: 1) the lack of good mechanisms for
-\emph{object-level} composition; 2) the \emph{conflation of (type)
-  extension with subtyping}.
+Some of the more recent work on extensibility includes various
+proposals for design patterns.  Examples include \emph{Object
+  Algebras}~\cite{}, \emph{Modular Visitors}~\cite{} or
+Torgersen's~\cite{} four design patterns using generics. In those
+approaches the idea is to use some advanced (but already available)
+features, such as generics, in combination with conventional OOP
+features to model more extensible designs. Those designs work in
+modern OOP languages such as Java, C\# or Scala. 
+
+Although those design patterns give practical benefits in terms of
+extensibility, they also expose limitations in existing mainstream OOP
+languages. One limitation is that existing OOP languages lack
+good mechanisms for \emph{object-level} composition.  As illustrated
+by Oliveira et al.~\cite{}, highly modular programs using Object
+Algebras are best expressed using a form of \emph{type-safe},
+\emph{dynamic}, \emph{delegation}-based composition. Although such
+form of composition can be encoded in Scala, it requires the use of
+low-level reflection techniques, such as dynamic proxies, reflection
+or other forms of meta-programming~\cite{}. Moreover, the vast 
+majority of modern OOP languages follows a model where 
+
+ 2) the
+\emph{conflation of (type) extension with subtyping}.
 
 The use of existing languages has shown that we can get quite far, but 
 it has also exposed some limitations. For example, work on object
@@ -72,7 +88,24 @@ In summary, the contributions of this paper are:
 
 \begin{itemize}
 
-\item {\bf System $name$:} 
+\item {\bf A Minimal Core Language for Extensibility:} This paper
+  identifies a minimal core language, System \name, capable of
+  expressing various extensibility designs in the literature.
+  System \name also addresses limitations of existing OOP
+  languages that complicate extensible designs. 
+  
+\item {\bf Formalization of System \name:} An elaboration semantics of
+  System \name into System F is given, and type-soundness is proved.
+
+\item {\bf Encodings of Extensible Designs:} Various encodings of
+  extensible designs into System \name, including \emph{Object
+    Algebras} and \emph{Modular Visitors}. 
+
+\item {\bf Implementation and Examples:} An implementation of an
+  extension of System \name, as well as the examples presented in the
+  paper, are publicly available. 
+
+\begin{comment}
 
 \item{elaboration typing rules which given a source expression with intersection
     types, typecheck and translate it into an ordinary F term. Prove a type
@@ -86,6 +119,8 @@ In summary, the contributions of this paper are:
 \item{explores the connection between intersection types and object algebra by
     showing various examples of encoding object algebra with intersection
     types.}
+
+\end{comment}
 
 \end{itemize}
 
