@@ -147,8 +147,8 @@ those in the previous section with the light-blue part for the translation.
   The lambda is the field accessor and when applied to a translated expression
   of type $ \{ eval : Int \}$, it is able to give the desired field.
   \rulename{GetBase} is the base case: the type of the field labelled $ l $ in a $
-  \recordtype l \ty $ is just $ \ty $ and the coercion is an identity function
-  specialized to type $ \image {\recordtype l \ty} $
+  \recty l \ty $ is just $ \ty $ and the coercion is an identity function
+  specialized to type $ \image {\recty l \ty} $
   \rulename{GetLeft} and \rulename{GetRight} are complementary to each other.
 
   Consider the source program:
@@ -162,19 +162,19 @@ those in the previous section with the light-blue part for the translation.
   \end{lstlisting}
 
   By \rulename{GetBase},
-  \[ \turnsget (\recordtype {name} {String}; {name}) : String \]
+  \[ \turnsget (\recty {name} {String}; {name}) : String \]
 
   we have the coercion
-  \[ \abs {\rel x {\image {\recordtype {name} {String}}}} x \]
+  \[ \abs {\rel x {\image {\recty {name} {String}}}} x \]
 
   which is just $ \abs {\rel x {String}} x $ according to type translation.
 
   By \rulename{GetLeft},
-  \[ \turnsget (\recordtype {name} {String} \intersects \recordtype {age} {Int}; {name}) : String \]
+  \[ \turnsget (\recty {name} {String} \intersects \recty {age} {Int}; {name}) : String \]
 
   % we have the coercion
-  % \[ \abs {\rel x {\image {\recordtype {name} {String} \intersects \recordtype
-  %         {age} {Int}}}} \app {(\abs {\rel x {\image {\recordtype {name} {String}}}} x)} {(\fst ~ x)} \]
+  % \[ \abs {\rel x {\image {\recty {name} {String} \intersects \recty
+  %         {age} {Int}}}} \app {(\abs {\rel x {\image {\recty {name} {String}}}} x)} {(\fst ~ x)} \]
   % which is just $ \abs {\rel x {(String, Int)}} {\app {(\abs {\rel x {String}} x)} {(\fst ~ x)}} $ by type translation.
 
   By typing rules, the translation of the program is
@@ -190,7 +190,7 @@ those in the previous section with the light-blue part for the translation.
   field lablled $ l $ in values of type $ \ty $. \rulename{PutBase} is the base
   case. This rule allows refinement of record fields in the sense that the type
   of $ e $ can be a subtype of the type of the field labelled by $ l $. The
-  resulting type is $ \recordtype l {\ty'} $ and the generated coercion is a
+  resulting type is $ \recty l {\ty'} $ and the generated coercion is a
   constant function that always returns $ E $. \rulename{PutLeft} and
   \rulename{PutRight} are complementary to each other: the idea is exactly the
   same as \rulename{GetLeft} and \rulename{GetRight} except that the refined type

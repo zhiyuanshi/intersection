@@ -27,10 +27,10 @@ By structural induction on the types and the corresponding inference rule. \\
 \begin{proof}
 By structural induction on the type and the corresponding inference rule. \\
 
-\rulename{Get-Base} $ \Gamma \turnsget \recordtype l \ty ; l = \idmono {\image {\recordtype l \ty})} ; \ty $ \\
+\rulename{Get-Base} $ \Gamma \turnsget \recty l \ty ; l = \idmono {\image {\recty l \ty})} ; \ty $ \\
 
 By the induction hypothesis
-$$ \image \Gamma \turns \idmono {\image {\recordtype l \ty}} : \image {\recordtype l \ty} \to \image \ty $$
+$$ \image \Gamma \turns \idmono {\image {\recty l \ty}} : \image {\recty l \ty} \to \image \ty $$
 
 \rulename{Get-Left} \\
 \rulename{Get-Right} \\
@@ -143,14 +143,14 @@ Hence by \rulename{F-Pair}
 Hence by the definition of $ \image \cdot $
   $$ \image \Gamma \turns \tupled {E_1, E_2} : \image {\ty_1 \& \ty_2} $$
 
-\rulename{RcdIntro} $ \Gamma \turns ecordcon l e : \recordtype l \ty \yields E $ \\
+\rulename{RcdIntro} $ \Gamma \turns ecordcon l e : \recty l \ty \yields E $ \\
 
 From \rulename{RcdIntro} we have
   $$ \Gamma \turns e : \ty \yields E $$
 And by the induction hypothesis that
   $$ \image \Gamma \turns E : \image \ty $$
 Thus by the definition of $ \image \cdot $
-  $$ \image \Gamma \turns E : \image {\recordtype l \ty} $$
+  $$ \image \Gamma \turns E : \image {\recty l \ty} $$
 
 \rulename{RcdElim} $ \Gamma \turns e.l : \ty_1 \yields {\app C E} $ \\
 

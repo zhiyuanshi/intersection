@@ -34,7 +34,7 @@ $ \alpha $, function types $ \ty \to \ty $, and type abstraction
 $ \forall \alpha. \ty $. The last two are novel. $ \ty_1 \intersects \ty_1 $ is
 the intersection of type $ \ty_1 $ and $ \ty_2 $, \bruno{be consistent: in the
   source language we use \&, and in the formalization we use $\intersects$} and
-$ \recordtype l \ty $ are the types for single-field records.
+$ \recty l \ty $ are the types for single-field records.
 
 \paragraph{Expressions.} The first five constructs of expressions are also
 standard: variables $ x $, and two abstraction-elimination pairs: lambda
@@ -53,7 +53,7 @@ $ \ty_1 \intersects \ty_2 $. $ ecordcon l e $ constructs a single-field
 record. $ e.l $ access the field labelled $ l $ in $ e $. Note that $ e $ does
 not need to be a record type. For example, the merge of two records
 $ ecordcon l_1 e_1 \dcomma ecordcon l_1 e_2 $ is an intersection type.
-Functional update $ \recordupdate e l {e_1} $ a \emph{new} record which is
+Functional update $ \recupd e l {e_1} $ a \emph{new} record which is
 exactly the same as $ e $ except the field labelled $ l $ is updated to become
 $ e1 $. \bruno{What field $F$? I don't know what this is refering to!}
 
@@ -97,7 +97,7 @@ standard except for three points listed below:
 \item $ \ty_1 $ is a subtype of $ \ty_2 \intersects \ty_3 $, if $ \ty_1 $ is a subtype of
   both $ \ty_2 $ and $ \ty_3 $.
 
-\item $ \recordtype {l_1} {\ty_1} $ is a subtype of $ \recordtype {l_2} {\ty_2} $, if
+\item $ \recty {l_1} {\ty_1} $ is a subtype of $ \recty {l_2} {\ty_2} $, if
   $ l_1 $ and $ l_2 $ are identical and $ \ty_1 $ is a subtype of $ \ty_2 $.
 \end{enumerate}
 The first point is captured by two rules \rulename{S-And-1} and \rulename{S-And-2},
@@ -138,7 +138,7 @@ constructs.\bruno{A lot more explanation needed here! You want to
 %   \fields{\ty_1 \to \ty_2} & = & \rel{\cdot} {\ty_1 \to \ty_2} \\
 %   \fields{\forall \alpha. \ty} & = & \rel{\cdot} {\forall \alpha. \ty} \\
 %   \fields{\ty_1 \intersects \ty_2} & = & \fields{\ty_1} \dplus \fields{\ty_2} \\
-%   \fields{\recordtype l \ty} & = & \rel l t
+%   \fields{\recty l \ty} & = & \rel l t
 % \end{array} \]
 % where $ \cdot $ means empty list, $ \dplus $ list concatenation, and $ : $ is an
 % infix operator that prepend the first argument to the second. The function

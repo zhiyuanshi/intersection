@@ -5,7 +5,7 @@
     \begin{array}{rcll}
         \ty & \Coloneqq & \alpha \mid \ty \to \ty \mid \forall \alpha. \ty & \\
           & \mid      & \ty \intersects \ty                                  & \text{Intersection type} \\
-          & \mid      & \recordtype l \ty                            & \text{Record type}
+          & \mid      & \recty l \ty                            & \text{Record type}
     \end{array} \\ \\
 
     \textbf{Terms} \\
@@ -14,9 +14,9 @@
           & \mid      & \Abs \alpha     e \mid \app e \ty & \text{Type abstraction/application} \\
           & \mid      & \abs {\rel x \ty} e \mid \app e e & \text{Term abstraction/application} \\
           & \mid      & e \dcomma e                     & \text{Merge} \\
-          & \mid      & \recordcon l e                & \text{Record construction} \\
+          & \mid      & \reccon l e                & \text{Record construction} \\
           & \mid      & e.l                             & \text{Record projection} \\
-          & \mid      & \recordupdate e l e             & \text{Record update}
+          & \mid      & \recupd e l e             & \text{Record update}
     \end{array} \\ \\
 
     \textbf{Contexts} \\

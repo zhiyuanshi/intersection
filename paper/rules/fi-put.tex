@@ -1,8 +1,8 @@
 \framebox{\( \turnsput (\ty; l; e : \ty \yieldsnothing E) : (\ty, \ty) \yieldsnothing C \)}
 
 \infax[PutBase]
-{\turnsput (\recordtype l \ty; l; e : \ty' \yieldsnothing E) : (\ty, \recordtype l {\ty'})
-  \yieldsnothing {\absty x {\image {\recordtype l \ty}} E}}
+{\turnsput (\recty l \ty; l; e : \ty' \yieldsnothing E) : (\ty, \recty l {\ty'})
+  \yieldsnothing {\absty x {\image {\recty l \ty}} E}}
 
 \infrule[PutLeft]
 {\turnsput (\ty_1; l; e : \ty \yieldsnothing E) : (\ty', \ty_1') \yieldsnothing C}

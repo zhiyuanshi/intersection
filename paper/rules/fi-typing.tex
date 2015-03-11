@@ -31,7 +31,7 @@
 
 \infrule[RcdCon]
 {\Gamma \turns e : \ty \yieldsnothing E}
-{\Gamma \turns \recordcon l e : \recordtype l \ty \yieldsnothing E}
+{\Gamma \turns \reccon l e : \recty l \ty \yieldsnothing E}
 
 \infrule[RcdProj]
 {\Gamma \turns e : \ty \yieldsnothing E \andalso
@@ -43,4 +43,4 @@
  \Gamma \turns e_1 : \ty_1 \yieldsnothing {E_1} \\
  \turnsput (t; l; e_1 : \ty_1 \yieldsnothing {E_1}) : (\ty_1', \ty') \yieldsnothing C \andalso
  \ty_1 \subtype \ty_1'}
-{\Gamma \turns \recordupdate e l {e_1} : \ty' \yieldsnothing {\app C E}}
+{\Gamma \turns \recupd e l {e_1} : \ty' \yieldsnothing {\app C E}}
