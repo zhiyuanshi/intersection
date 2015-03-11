@@ -21,13 +21,13 @@ intersections of concrete types (classes), whereas our language allows
 intersections of type variables, such as \texttt{A \& B}. Without that vehicle,
 we would not be able to define the generic \texttt{merge} function (below) for
 all interpretations of a given algebra, and would incur boilerplate code:
-\begin{minted}{haskell}
+\begin{lstlisting}{haskell}
 let merge [A, B] (f: ExpAlg A) (g: ExpAlg B) = {
   lit (x : Int) = f.lit x ,, g.lit x,
   add (x : A & B) (y : A & B) =
     f.add x y ,, g.add x y
 }
-\end{minted}
+\end{lstlisting}
 In Scala community, there have been attempts to provide a foundational calculus
 for Scala that incorporates intersection
 types~\cite{amin2014foundations,amin2012dependent}.
