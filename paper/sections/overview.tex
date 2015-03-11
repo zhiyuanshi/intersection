@@ -34,7 +34,7 @@ integers, while \lstinline{eval : Int & print : String } supports both
 evaluation and pretty printing. Those interfaces are akin to interfaces in Java
 or traits in Scala. But one key difference is that they are unnamed in \name.
 
-\paragraph{Overloading.} Intersection types provide a simple mechanism for
+\paragraph{An example of overloading.} Intersection types provide a simple mechanism for
 ad-hoc polymorphism, similar to what type classes in Haskell achieve. As a
 result, programmers can use the same operation on different types and delegate
 the task of choosing a concrete implementation to the type system. For example,
@@ -55,12 +55,10 @@ let show = showInt ,, showBool
 \bruno{This is not a proper sentence. Polish text.}
 
 To illustrate the usage, consider the function application \lstinline{show 100}.
-The type system will pick the first component of \lstinline{show},
+The type system will pick the first component of \lstinline{show}, namely
 \lstinline{showInt}, as the implementation being applied to \lstinline{100}
 because the type of \lstinline{showInt} is compatible with \lstinline{100}, but
 \lstinline{showBool} is not.
-
-% <<< Overloading <<<
 
 The key constructs are the ``merge'' operator, denoted by $ \dcomma $, at the
 value level and the corresponding type intersection operator, denoted by,
