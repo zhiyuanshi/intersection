@@ -4,8 +4,9 @@
 
 This section provides the reader with necessary intuition of \name. In \name,
 the central addition to the type system of System $ F $ is intersection types.
-\bruno{mention (and cite) that there are a number of OO languages supporting
-  intersection types } A number of OO languages, such as Java, Scala, and
+% \bruno{mention (and cite) that there are a number of OO languages supporting
+% intersection types }
+A number of OO languages, such as Java, Scala, and
 Ceylon\george{cite?}, already support intersection types to different degrees. A
 common limitation in those languages, though, is that there is no introduction
 construct at the term level for intersection types. In contrast, there are
@@ -15,17 +16,17 @@ two terms at run time using a \emph{merge} operator, similar to
 Dunfield's~\cite{dunfield2014elaborating} approach. The key constructs are the
 ``merge'' operator, denoted by $ \dcomma $ at the term level and the
 corresponding type intersection operator, denoted by $ \intersects $ at the type
-level.\bruno{We take a particular approach to intersection types, namely that of
-  Dundfield. Some other approaches are different. The \emph{key feature} in
-  Dunfield's approach is the $\dcomma$ operator, which allows for run-time
-  value/object composition.}
+level.
+% \bruno{We take a particular approach to intersection types, namely that of
+% Dundfield. Some other approaches are different. The \emph{key feature} in
+% Dunfield's approach is the $\dcomma$ operator, which allows for run-time
+% value/object composition.}
 
 The addition of intersection types to System $ F $ has a number of consequences,
 which we will explore one by one in the following subsections.
-
-\bruno{Don't mention prototype-based inheritance in the summary, unless you are
-  going to mention it later in the section. \emph{More generally don't mention
-    things that you don't talk about later!}}. 
+% \bruno{Don't mention prototype-based inheritance in the summary, unless you
+% are going to mention it later in the section. \emph{More generally don't
+% mention things that you don't talk about later!}}.
 
 \subsection{Intersection Types}
 
@@ -62,7 +63,7 @@ We may define \lstinline{show} by merging the them using the merge operator
 \begin{lstlisting}
 let show = showInt ,, showBool
 \end{lstlisting}
-\bruno{This is not a proper sentence. Polish text.}
+% \bruno{This is not a proper sentence. Polish text.}
 
 To illustrate the usage, consider the function application \lstinline{show 100}.
 The type system will pick the first component of \lstinline{show}, namely
@@ -102,18 +103,19 @@ relation naturally. We will explore the usefulness of such a type system in
 practice by showing various examples.
 
 \subsection{Intersection Types and Records}
-\bruno{The title of this section needs adjusting. Moreover 
-we do not want to talk about record elimination and update. \name
-supports a \emph{generalization} of record elimination and update 
-that \emph{works for any type}. That's what we want to mention instead.}
+\bruno{The title of this section needs adjusting. Moreover we do not want to
+  talk about record elimination and update. \name supports a
+  \emph{generalization} of record elimination and update that \emph{works for
+    any type}. That's what we want to mention instead.}
 
 In addition to introduction of record literals using the usual
 notation, \name support two more operations on records: record
 elimination and record update.
 
 A record type of the form $ \recty l \ty $ can be thought as a normal type \lstinline{t}
-tagged by the label \lstinline{l}.\bruno{I would call this a labelled
-  type. Record types can be viewed as intersections of labelled types.}
+tagged by the label \lstinline{l}.
+% \bruno{I would call this a labelled type. Record types can be viewed as
+% intersections of labelled types.}
 
 % A basic example
 

@@ -32,9 +32,10 @@ desugared into the merge of multiple single records.
 Figure~\ref{fig:fi-syntax} are standard in System $ F $: type variable
 $ \alpha $, function types $ \ty \to \ty $, and type abstraction
 $ \forall \alpha. \ty $. The last two are novel. $ \ty_1 \intersects \ty_1 $ is
-the intersection of type $ \ty_1 $ and $ \ty_2 $, \bruno{be consistent: in the
-  source language we use \&, and in the formalization we use $\intersects$} and
-$ \recty l \ty $ are the types for single-field records.
+the intersection of type $ \ty_1 $ and $ \ty_2 $, 
+% \bruno{be consistent: in the source language we use \&, and in the
+% formalization we use $\intersects$}
+and $ \recty l \ty $ are the types for single-field records.
 
 \paragraph{Expressions.} The first five constructs of expressions are also
 standard: variables $ x $, and two abstraction-elimination pairs: lambda
@@ -49,13 +50,18 @@ expressions $ e_1 $ and $ e_2 $.\bruno{explain further, after all this is new.}
 It can be used as either $ e_1 $ or $ e_2 $. Particarly, if one regard $ e_1 $
 and $ e_2 $ as objects, their merge will responds to every method that one or
 both of them have. Merge of expressions correspond to intersection types
-$ \ty_1 \intersects \ty_2 $. $ ecordcon l e $ constructs a single-field
-record. $ e.l $ access the field labelled $ l $ in $ e $. Note that $ e $ does
-not need to be a record type. For example, the merge of two records
-$ ecordcon l_1 e_1 \dcomma ecordcon l_1 e_2 $ is an intersection type.
-Functional update $ \recupd e l {e_1} $ a \emph{new} record which is
-exactly the same as $ e $ except the field labelled $ l $ is updated to become
-$ e1 $. \bruno{What field $F$? I don't know what this is refering to!}
+$ \ty_1 \intersects \ty_2 $. $ \reccon l e $ constructs a single-field record.
+$ e.l $ accesses the field labelled $ l $ in $ e $. Note that $ e $ does not
+need to be a record type in this case. For example, although the merge of two
+records
+\[
+x = \reccon {l_1} {e_1} \dcomma \reccon {l_1} {e_2} 
+\]
+is of an intersection type, $ x.{l_1} $ still gives $ e_1 $. On the other hand,
+$ x.{l_3} $ does not type check. Functional update $ \recupd e l {e_1} $ a
+\emph{new} record which is exactly the same as $ e $ except the field labelled
+$ l $ is updated to become $ e1 $.
+% \bruno{What field $F$? I don't know what this is refering to!}
 
 \paragraph{Context.} Context $ \Gamma $ is also standard. It maps variables to
 their types and keeps bound type variables.
@@ -143,11 +149,3 @@ constructs.\bruno{A lot more explanation needed here! You want to
 % where $ \cdot $ means empty list, $ \dplus $ list concatenation, and $ : $ is an
 % infix operator that prepend the first argument to the second. The function
 % returns an associative list whose domain is field labels and range types.
-
-\textit{dom} reads: ``the domain of''. $ F(l) $ means the result of lookup for
-$ l $ inside the associative list $ F $. The order of lookup can be either from
-left to right or from right to left but has to be consistent inside one
-implementation. We prefer the order from the right to the left because it make
-possible record overriding. For example,
-$ (ecordcon{count} {1} ,, ecordcon{count} {2}).count $ will evaluate to
-$ 2 $ in this case.

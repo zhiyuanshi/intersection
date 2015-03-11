@@ -61,16 +61,15 @@ class Add(n: Int) extends Expr {
   def eval: Int = e1.eval + e2.eval
 }
 \end{lstlisting}
-
-\bruno{You already talk about overloading in
-  the previous section. Need to decide where to put the text!}
+% \bruno{You already talk about overloading in the previous section. Need to
+% decide where to put the text!}
 
 Dunfield~\cite{dunfield2014elaborating} notes that using merges as a mechanism
 of overloading is not as powerful as type classes.
 
-\subsection{Encoding Bounded Polymorphism}\bruno{IMPORTANT: 
-Always capitalize the relevant words in a title!. This title should be
-"Encoding Bounded Polymorphism''}
+\subsection{Encoding Bounded Polymorphism}
+% \bruno{IMPORTANT: Always capitalize the relevant words in a title!. This title
+% should be "Encoding Bounded Polymorphism''}
 
 As \name extends System $ F $ with intersection types, $ F_{\subtype} $ extends
 System $ F $ with bounded polymorphism. $ F_{\subtype} $~\cite{pierce2002types}
@@ -84,8 +83,8 @@ In fact, the extension of System $ F $ in the other direction, i.e., with
 intersection types, is able to address the same problem effectively. Suppose we
 have the following definitions:
 \begin{lstlisting}{scala}
-def user = { name = "George", admin = true }
-def id(user: {name: String}) = user
+let user = { name = "George", admin = true }
+let id(user: {name: String}) = user
 \end{lstlisting}
 Under a structural type system, programmers would expect that passing the user
 to the function is allowed. They are correct. Note that in the source language
@@ -107,18 +106,16 @@ Bounded polymorphism enable the function to return the exact type of the
 argument so that we have no problem in accessing the \texttt{admin} field later.
 Consider the example below:
 \begin{lstlisting}{scala}
-def id [A <: {name: String}] (user: A) = user
+def id[A <: {name: String}] (user: A) = user
 (id [{name: String, admin: Bool}] user).admin
 \end{lstlisting}
 
 We do not have bounded polymorphism in the source language. But we can encode
 that via intersection types:
 \begin{lstlisting}{scala}
-def id [A] (user: A & {name: String}) = user in
+let id[A] (user: A & {name: String}) = user in
 (id [{admin: Bool}] user).admin
 \end{lstlisting}
-
-Polymorphism plus intersecion types is as powerful as bounded polymorphism.
 
 \cite{pierce1997intersection}\bruno{I don't think this has been
   shown. What we can say is: we can encode a form of bounded
