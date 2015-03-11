@@ -1,55 +1,59 @@
 \section{An Overview of \name}
 
-\george{
-  Change the examples later to something very simple.}
+\george{Change the examples later to something very simple.}
 
-This section provides the reader with the intuition of \name, while we
-postpone the presentation of the details to later sections.
-
-In short, \name generalizes System $ F $ by adding intersection polymorphism.
-\name terms are elaborated into a variant of System $ F $ extended with tuples.
-System $ F $, or polymorphic lambda calculus lays the foundation of functional
-programming languages such as Haskell.
+This section provides the reader with necessary intuition of \name. In \name,
+the central addition to the type system of System $ F $ is intersection types.
+\bruno{mention (and cite) that there are a number of OO languages supporting
+  intersection types } A number of OO languages, such as Java, Scala, and
+Ceylon\george{cite?}, already support intersection types to different degrees. A
+common limitation in those languages, though, is that there is no introduction
+construct at the term level for intersection types. In contrast, there are
+introduction construct for function types (lambdas) and universal quantification
+(big lambdas) in most core calculi. To fill this gap, we allow intersecting any
+two terms using a \emph{merge} operator. The addition of intersection types to
+System $ F $ has a number of consequences, which we will explore one by one in
+the following subsections.
 
 \bruno{Don't mention prototype-based inheritance in the summary, unless you are
   going to mention it later in the section. \emph{More generally don't mention
-    things that you don't talk about later!}}. As a result of intersection
-types, the type system of \name permits a subtyping relation naturally. We will
-explore the usefulness of such a type system in practice by showing various
-examples.
+    things that you don't talk about later!}}. 
 
 \subsection{Intersection Types}
 
-The central addition to the type system of \target in \name is intersection
-types. \bruno{mention (and cite) that there are a number of OO languages
-  supporting intersection types } A number of OO languages already support
-intersection types, such as Java, Scala, and Ceylon, although mostly with some
-limitations. What is an intersection type? One classic view is from
-set-theoretic interpretation of types: $ A \intersects B $ stands for the
-intersection of the set of values of $ A $ and $ B $. A more practical view,
-adopted in this paper, regards types as a kind of interface: a value of type
-$ A \intersects B $ satisfies both of the interfaces of $ A $ and $ B $. For
-example, \lstinline{eval : Int} is the interface that supports evaluation to
-integers, while \lstinline{eval : Int & print : String } supports both
-evaluation and pretty printing. Those interfaces are akin to interfaces in Java
-or traits in Scala. But one key difference is that they are unnamed in \name.
+% What is an intersection type? One classic view is from set-theoretic
+% interpretation of types: $ A \intersects B $ stands for the intersection of
+% the set of values of $ A $ and $ B $. A more practical view, adopted in this
+% paper, regards types as a kind of interface: a value of type
+% $ A \intersects B $ satisfies both of the interfaces of $ A $ and $ B $. For
+% example, \lstinline{eval : Int} is the interface that supports evaluation to
+% integers, while \lstinline{eval : Int & print : String } supports both
+% evaluation and pretty printing. Those interfaces are akin to interfaces in
+% Java or traits in Scala. But one key difference is that they are unnamed in
+% \name.
 
-\paragraph{An example of overloading.} Intersection types provide a simple mechanism for
-ad-hoc polymorphism, similar to what type classes in Haskell achieve. As a
-result, programmers can use the same operation on different types and delegate
-the task of choosing a concrete implementation to the type system. For example,
-we can define an \lstinline{show} function that takes either an integer or a
-boolean and return its string representation. In other words, it is also
-\emph{both} a function from integers to strings as well as a function from
-boolean to strings. Therefore, in \name it should be of following type:
+We motivate the use of intersection types with an example of overloaded
+function.
+
+Intersection types provide a simple mechanism for ad-hoc polymorphism, similar
+to what type classes in Haskell achieve. As a result, programmers can use the
+same operation on different types and delegate the task of choosing a concrete
+implementation to the type system. For example, we can define an
+\lstinline{show} function that takes either an integer or a boolean and return
+its string representation. In other words, it is also \emph{both} a function
+from integers to strings as well as a function from boolean to strings.
+Therefore, in \name it should be of following type:
 \begin{lstlisting}
 (Int -> String) & (Bool -> String)
 \end{lstlisting}
-And we may define \lstinline{show} by merging two monomorphic functions with the
-following signature using the merge operator ({\lstinline{,,}):
+Assuming we have the following two functions available,
 \begin{lstlisting}
-showInt  : Int  -> String
-showBool : Bool -> String
+let showInt : Int  -> String = ...
+let showBool : Bool -> String = ...
+\end{lstlisting}
+We may define \lstinline{show} by merging the them using the merge operator
+({\lstinline{,,}):
+\begin{lstlisting}
 let show = showInt ,, showBool
 \end{lstlisting}
 \bruno{This is not a proper sentence. Polish text.}
@@ -94,7 +98,13 @@ elimination).
 
 % \lstinputlisting[linerange=-]{} % APPLY:linerange=MIXIN_LIB
 
-\subsection{Labels and a Record Encoding}
+\subsection{Subtyping}
+
+As a result of intersection types, the type system of \name permits a subtyping
+relation naturally. We will explore the usefulness of such a type system in
+practice by showing various examples.
+
+\subsection{Intersection Types and Records}
 \bruno{The title of this section needs adjusting. Moreover 
 we do not want to talk about record elimination and update. \name
 supports a \emph{generalization} of record elimination and update 
