@@ -34,40 +34,45 @@ integers, while \lstinline{eval : Int & print : String } supports both
 evaluation and pretty printing. Those interfaces are akin to interfaces in Java
 or traits in Scala. But one key difference is that they are unnamed in \name.
 
-\paragraph{Intersection Types and Overloading}
-Intersection types provide a simple mechanism for ad-hoc polymorphism, similar
-to what type classes in Haskell achieve. The key constructs are the ``merge''
-operator, denoted by $ \dcomma $, at the value level and the corresponding type
-intersection operator, denoted by, $ \intersects $ at the type
-level.\bruno{We take a particular approach to intersection types,
-  namely that of Dundfield. Some other approaches are different. The
-  \emph{key feature} in Dunfield's approach is the $\dcomma$ operator,
-which allows for run-time value/object composition.}
-
-For example, we can define an (ad-hoc)-polymorphic \lstinline{show} function
-that is able to convert integers and booleans to strings. In \name such function
-can be given the type
-
+\paragraph{Overloading.} Intersection types provide a simple mechanism for
+ad-hoc polymorphism, similar to what type classes in Haskell achieve. As a
+result, programmers can use the same operation on different types and delegate
+the task of choosing a concrete implementation to the type system. For example,
+we can define an \lstinline{show} function that takes either an integer or a
+boolean and return its string representation. In other words, it is also
+\emph{both} a function from integers to strings as well as a function from
+boolean to strings. Therefore, in \name it should be of following type:
 \begin{lstlisting}
-  (Int -> String) & (Bool -> String)
+(Int -> String) & (Bool -> String)
 \end{lstlisting}
-
-and be defined using the merge operator $ \dcomma $ as
-
+And we may define \lstinline{show} by merging two monomorphic functions with the
+following signature using the merge operator ({\lstinline{,,}):
 \begin{lstlisting}
-  let show = showInt ,, showBool
+showInt  : Int  -> String
+showBool : Bool -> String
+let show = showInt ,, showBool
 \end{lstlisting}
+\bruno{This is not a proper sentence. Polish text.}
+
+To illustrate the usage, consider the function application \lstinline{show 100}.
+The type system will pick the first component of \lstinline{show},
+\lstinline{showInt}, as the implementation being applied to \lstinline{100}
+because the type of \lstinline{showInt} is compatible with \lstinline{100}, but
+\lstinline{showBool} is not.
+
+% <<< Overloading <<<
+
+The key constructs are the ``merge'' operator, denoted by $ \dcomma $, at the
+value level and the corresponding type intersection operator, denoted by,
+$ \intersects $ at the type level.\bruno{We take a particular approach to
+  intersection types, namely that of Dundfield. Some other approaches are
+  different. The \emph{key feature} in Dunfield's approach is the $\dcomma$
+  operator, which allows for run-time value/object composition.}
 
 From another viewpoint, one can regard intersections in our system as ``implicit
 pairs'' whose introduction is explicit by using the merge operator and
 elimination is implicit (with no source-level construct for
 elimination). 
-
-\bruno{This is not a proper sentence. Polish text.}
-where \lstinline{showString} and \lstinline{showBool} are ordinary monomorphic
-functions. Later suppose the integer \lstinline{1} is applied to the \lstinline{show} function,
-the first component \lstinline{showInt} will be picked because the type of \lstinline{showInt}
-is compatible with \lstinline{1} while \lstinline{showBool} is not.
 
 % The merge construct in the original function is elaborated into a pair in the
 % target language:
