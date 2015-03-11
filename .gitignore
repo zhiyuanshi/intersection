@@ -1,3 +1,7 @@
+# Emacs
+.#*
+
+
 # LaTeX 
 *.aux
 *.bbl
@@ -15,11 +19,12 @@
 *.el
 
 
+# Java source and class files
+*.class
+*.java
+
+
 # IntelliJ IDEA 
 *.iml
 .idea
 
-
-# Java source and class files
-*.class
-*.java

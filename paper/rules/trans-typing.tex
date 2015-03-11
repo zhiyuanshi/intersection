@@ -29,16 +29,16 @@
  \Gamma \turns e_2 : \ty_2 \yields {E_2}}
 {\Gamma \turns e_1 \dcomma e_2 : \ty_1 \intersects \ty_2 \yields {\tupled {E_1, E_2}}}
 
-\infrule[RcdCon]
+\infrule[RecCon]
 {\Gamma \turns e : \ty \yields E}
 {\Gamma \turns \reccon l e : \recty l \ty \yields E}
 
-\infrule[RcdProj]
+\infrule[RecProj]
 {\Gamma \turns e : \ty \yields E \andalso
  \Gamma \turnsget (\ty; l) : \ty_1 \yields C}
 {\Gamma \turns e.l : \ty_1 \yields {\app C E}}
 
-\infrule[RcdUpd]
+\infrule[RecUpd]
 {\Gamma \turns e : \ty \yields E \andalso
  \Gamma \turns e_1 : \ty_1 \yields {E_1} \\
  \turnsput (t; l; e_1 : \ty_1 \yields {E_1}) : (\ty_1', \ty') \yields C \andalso
