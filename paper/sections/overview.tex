@@ -11,9 +11,17 @@ common limitation in those languages, though, is that there is no introduction
 construct at the term level for intersection types. In contrast, there are
 introduction construct for function types (lambdas) and universal quantification
 (big lambdas) in most core calculi. To fill this gap, we allow intersecting any
-two terms using a \emph{merge} operator. The addition of intersection types to
-System $ F $ has a number of consequences, which we will explore one by one in
-the following subsections.
+two terms at run time using a \emph{merge} operator, similar to
+Dunfield's~\cite{dunfield2014elaborating} approach. The key constructs are the
+``merge'' operator, denoted by $ \dcomma $ at the term level and the
+corresponding type intersection operator, denoted by $ \intersects $ at the type
+level.\bruno{We take a particular approach to intersection types, namely that of
+  Dundfield. Some other approaches are different. The \emph{key feature} in
+  Dunfield's approach is the $\dcomma$ operator, which allows for run-time
+  value/object composition.}
+
+The addition of intersection types to System $ F $ has a number of consequences,
+which we will explore one by one in the following subsections.
 
 \bruno{Don't mention prototype-based inheritance in the summary, unless you are
   going to mention it later in the section. \emph{More generally don't mention
@@ -32,13 +40,11 @@ the following subsections.
 % Java or traits in Scala. But one key difference is that they are unnamed in
 % \name.
 
-We motivate the use of intersection types with an example of overloaded
-function.
-
-Intersection types provide a simple mechanism for ad-hoc polymorphism, similar
-to what type classes in Haskell achieve. As a result, programmers can use the
-same operation on different types and delegate the task of choosing a concrete
-implementation to the type system. For example, we can define an
+We motivate the use of intersection types with overloaded function, as
+intersection types provide a simple mechanism for ad-hoc polymorphism, similar
+to what type classes in Haskell achieve. The benefit is that programmers can use
+the same operation on different types and delegate the task of choosing a
+concrete implementation to the type system. For example, we can define a
 \lstinline{show} function that takes either an integer or a boolean and return
 its string representation. In other words, it is also \emph{both} a function
 from integers to strings as well as a function from boolean to strings.
@@ -62,19 +68,10 @@ To illustrate the usage, consider the function application \lstinline{show 100}.
 The type system will pick the first component of \lstinline{show}, namely
 \lstinline{showInt}, as the implementation being applied to \lstinline{100}
 because the type of \lstinline{showInt} is compatible with \lstinline{100}, but
-\lstinline{showBool} is not.
-
-The key constructs are the ``merge'' operator, denoted by $ \dcomma $, at the
-value level and the corresponding type intersection operator, denoted by,
-$ \intersects $ at the type level.\bruno{We take a particular approach to
-  intersection types, namely that of Dundfield. Some other approaches are
-  different. The \emph{key feature} in Dunfield's approach is the $\dcomma$
-  operator, which allows for run-time value/object composition.}
-
-From another viewpoint, one can regard intersections in our system as ``implicit
-pairs'' whose introduction is explicit by using the merge operator and
-elimination is implicit (with no source-level construct for
-elimination). 
+\lstinline{showBool} is not. This example shows that one may regard
+intersections in our system as ``implicit pairs'' whose introduction is explicit
+by the merge operator and elimination is implicit (with no source-level
+construct for elimination).
 
 % The merge construct in the original function is elaborated into a pair in the
 % target language:
