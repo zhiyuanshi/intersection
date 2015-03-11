@@ -1,12 +1,5 @@
 \section{The \name calculus}
 
-\paragraph{Why no union types?}
-
-\paragraph{Why no empty records?}
-
-Limitations of encoding records as intersections
-Local type inference
-
 % { instruction = ``Buy'' } ,, { instruction = ``Sell'' }
 % def merge[A,B](x: A)(y: B) = x ,, y
 % id { instruction = ``Buy'' } { instruction = ``Sell'' }
@@ -23,11 +16,11 @@ F.\bruno{Mention Dundfield}
 
 \subsection{Syntax}
 
-Figure~\ref{fig:fi-syntax} specifies the syntax of \name. It extends the syntax
-of System $ F $ by adding the two features: intersection types and
-records\bruno{labelled types (single field records are fine too)}. The
-formalization includes only single records because single record types as the
-multi-records can be desugared into the merge of multiple single records.
+Figure~\ref{fig:fi-syntax} shows the syntax of \name. It is System $ F $ at its
+core. To System $ F $, we add two features: intersection types and single-field
+records~\bruno{labelled types (single field records are fine too)}. We include
+only single records because single record types as the multi-records can be
+desugared into the merge of multiple single records.
 
 \begin{figure}
   \input{rules/fi-syntax.tex}
@@ -35,52 +28,57 @@ multi-records can be desugared into the merge of multiple single records.
   \label{fig:fi-syntax}
 \end{figure}
 
-% Types
-Types $ \ty $ have five constructs. The first three are standard (present in
-System $ F $): type variable $ \alpha $, function types $ \ty \to \ty $, and type
-abstraction $ \forall \alpha. \ty $; while the last two, intersection types
-$ \ty \intersects \ty $\bruno{be consistent: in the source language we
-use \&, and in the formalization we use $\intersects$} and record types $ \recordtype l \ty $, are novel in \name. In
-record types, $ l $ is the label and $ \ty $ the type.
+\paragraph{Types.} The constructs in the first row of types in
+Figure~\ref{fig:fi-syntax} are standard in System $ F $: type variable
+$ \alpha $, function types $ \ty \to \ty $, and type abstraction
+$ \forall \alpha. \ty $. The last two are novel. $ \ty_1 \intersects \ty_1 $ is
+the intersection of type $ \ty_1 $ and $ \ty_2 $, \bruno{be consistent: in the
+  source language we use \&, and in the formalization we use $\intersects$} and
+$ \recordtype l \ty $ are the types for single-field records.
 
-% Expressions - standard ones
-The first five constructs of expressions are also standard: variables $ x $ and two
-abstraction-elimination pairs: $ \abs {\rel x \ty} e $ abstracts expression
-$ e $ over values of type $ \ty $ and is eliminated by application $ \app e e $;
-$ \Abs \alpha e $ abstracts expression $ e $ over types and is eliminated by
-type application $ \app e \ty $.
+\paragraph{Expressions.} The first five constructs of expressions are also
+standard: variables $ x $, and two abstraction-elimination pairs: lambda
+expressions $ \abs {\rel x \ty} e $ abstract expression $ e $ over values of
+type $ \ty $ and are eliminated by application $ \app e e $; Big lambdas
+$ \Abs \alpha e $ abstract expression $ e $ over types and are eliminated by
+type application $ \app e \ty $. In the source language, lambdas are written as
+\george{TODO} and big lambdas as \george{TODO}.
 
-% Expressions - new ones
-The last four constructs are novel. $ e \dcomma e $ is the \emph{merge} of two
-terms\bruno{explain further, after all this is new.}. 
-$ \recordintro l e $ introduces a record literal having $ l $ as the
-label for field containing expression $ e $ . $ e.l $ access the field with
-label $ l $ in $ e $. Finally, $ \recordupdate e l {e_1} $ is a \emph{new}
-record which is exactly the same as $ e $ except the field labelled $ l $ is
-updated to become $ e1 $. For simplicity, we omit other constructs in order to
-focus on the essence of the calculus. For example, fixpoints can be added in
-standard ways.
+The last four constructs are new: $ e_1 \dcomma e_2 $ is the \emph{merge} of two
+expressions $ e_1 $ and $ e_2 $.\bruno{explain further, after all this is new.}
+It can be used as either $ e_1 $ or $ e_2 $. Particarly, if one regard $ e_1 $
+and $ e_2 $ as objects, their merge will responds to every method that one or
+both of them have. Merge of expressions correspond to intersection types
+$ \ty_1 \intersects \ty_2 $. $ ecordcon l e $ constructs a single-field
+record. $ e.l $ access the field labelled $ l $ in $ e $. Note that $ e $ does
+not need to be a record type. For example, the merge of two records
+$ ecordcon l_1 e_1 \dcomma ecordcon l_1 e_2 $ is an intersection type.
+Functional update $ \recordupdate e l {e_1} $ a \emph{new} record which is
+exactly the same as $ e $ except the field labelled $ l $ is updated to become
+$ e1 $. \bruno{What field $F$? I don't know what this is refering to!}
 
-% Fields
-The field $ F $ is non-standard and introduced to deal with records. It is an
-associative list. Each item is a pair whose first item is either empty or a
-label and the second the types.\bruno{What field $F$? I don't know
-  what this is refering to!}
+\paragraph{Context.} Context $ \Gamma $ is also standard. It maps variables to
+their types and keeps bound type variables.
 
-% The most central construct of our language is ...
-
-% Dunfield has described a language that includes a ``top'' type but it does not appear in our language. Our work differs from Dunfield in that ...
-
-% Remark. The operational semantics of FI is not presented in this paper. However,
+\paragraph{Discussion.} A natural question the reader might ask is that why we
+have excluded union types from the language. The answer is we found that
+intersection types alone are enough support extensible designs. To focus on the
+key features that make this language interesting, we also omit other common
+constructs. For example, fixpoints can be added in standard ways.
+% Dunfield has described a language that includes a ``top'' type but it does not
+% appear in our language. Our work differs from Dunfield in that ...
 
 \subsection{Subtyping}
 
-Subtyping is transitive and forms a lattice?
-Do we have a subtyping lattice?\bruno{Intersection types require a
-  simple form of subtyping. The subtyping relation is reflexive and
-  transitive. Our subtyping relation follows previous work. Need to
-  cite! The main difference is the interaction with parametric polymorphism
-}
+\george{Explain the subst syntax.}
+
+Due to intersection types, the types form a subtyping relation. The subtyping
+relation is reflexive and transitive.
+
+\bruno{Intersection types require a simple form of subtyping. The subtyping
+  relation is reflexive and transitive. Our subtyping relation follows previous
+  work. Need to cite! The main difference is the interaction with parametric
+  polymorphism }
 
 \begin{figure}
 \input{rules/fi-sub.tex}
@@ -151,5 +149,5 @@ $ l $ inside the associative list $ F $. The order of lookup can be either from
 left to right or from right to left but has to be consistent inside one
 implementation. We prefer the order from the right to the left because it make
 possible record overriding. For example,
-$ (\recordintro{count} {1} ,, \recordintro{count} {2}).count $ will evaluate to
+$ (ecordcon{count} {1} ,, ecordcon{count} {2}).count $ will evaluate to
 $ 2 $ in this case.

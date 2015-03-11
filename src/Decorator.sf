@@ -1,0 +1,48 @@
+-- Library
+type Open[S,A,B] = (Unit -> S) -> A -> B
+type Base[S,A]   = (Unit -> S) -> A
+
+let compose[S,A,B,C] (f : Open[S,B,C]) (g : Open[S,A,B]) : Open[S,A,C]
+  = \(self: Unit -> S) (parent: A) -> f self (g self parent);
+
+let fix[S,A] (f : Open[S,A,S]) (s : Base[S,A]) : S = (let rec r : Unit -> S = f r (s r); r ());
+
+-- Client code
+-- An initial Object & Interface
+type O = { fact: Int -> Int }
+
+-- let base : Base[O,O] = \(s: Unit -> O) -> {
+-- fact (x : Int) = if x == 0 then 1 else x * s.fact(x-1)
+-- }
+
+-- One Decorator & Interface
+type Log = { log: String -> Unit }
+
+-- let logI : Open[Log,O,Log] = \(s: Unit -> Log) (p: O) -> {
+-- fact (x: Int)   = {log("Entering fact!"); p.fact(x)},
+-- log (x: String) = System.out.println(x)
+-- }
+
+--   -- An instantiation of the object with the decorator
+-- let test: Log = fix(logI,base);
+
+  -- A 2nd decorator & interface
+type Log2 = { log2: String -> Unit }
+
+1
+
+--   let logII : Open[Log2,O,Log2] = \(s: Unit -> Log2) (p: O) -> {
+--   let fact(x : Int) = { let r = p.fact(x); log2("Exiting fact!"); r}
+--   let log2(x : String) = System.out.println(x)
+--   }
+
+--   -- An object with the right interface: merged interfaces
+--   let lift(o : Open[Log & Log2, O, Log]) : Open[Log & Log2,O,Log & Log2] =
+--   s -> p -> new Log with Log2 {
+--   let fact(x : Int) = o(s)(p).fact(x)
+--   let log(x : String) = o(s)(p).log(x)
+--   let log2(x : String) = logII(s)(p).log2(x)
+--   }
+
+--   -- A composed object with 2 decorators
+-- let test2 : Log & Log2 = fix(lift(compose(logI,logII)),base)
