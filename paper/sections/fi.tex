@@ -83,13 +83,18 @@ constructs. For example, fixpoints can be added in standard ways.
 
 \george{Explain the subst syntax.}
 
-Due to intersection types, the types form a subtyping relation. The subtyping
-relation is reflexive and transitive.
+\george{However, have we forbidden the interplay of subtyping relations
+  explicitly declared by programmers as seen in class-based OO languages?}
 
 \bruno{Intersection types require a simple form of subtyping. The subtyping
   relation is reflexive and transitive. Our subtyping relation follows previous
   work. Need to cite! The main difference is the interaction with parametric
-  polymorphism }
+  polymorphism.}
+
+In some calculi such as System $ F_{\subtype} $, the subtyping relation is
+orthogoal to other language features: those calculi are indifferent with how the
+subtyping relation is defined. In \name, we take a syntatic approach, that is,
+subtyping is due to solely of intersection and function types.
 
 \begin{figure}
 \input{rules/fi-sub.tex}
@@ -101,9 +106,9 @@ relation is reflexive and transitive.
 % \bruno{Subtyping figure is doing the translation already?}
 
 Intersection types introduce natural subtyping relations among types. For
-example, $ Int \intersects Bool $ should be a subtype of $ Int $, since the
-former can be viewed as either $ Int $ or $ Bool $. The subtyping rules are
-standard except for three points listed below:
+example, $ \Int \intersects \Bool $ should be a subtype of $ \Int $, since the
+former can be viewed as either $ \Int $ or $ \Bool $. To summarize, the
+subtyping rules are standard except for three points listed below:
 \begin{enumerate}
 \item $ \ty_1 \intersects \ty_2 $ is a subtype of $ \ty_3 $, if \emph{either} $ \ty_1 $ or
   $ \ty_2 $ are subtypes of $ \ty_3 $,
@@ -114,9 +119,11 @@ standard except for three points listed below:
 \item $ \recty {l_1} {\ty_1} $ is a subtype of $ \recty {l_2} {\ty_2} $, if
   $ l_1 $ and $ l_2 $ are identical and $ \ty_1 $ is a subtype of $ \ty_2 $.
 \end{enumerate}
-The first point is captured by two rules \rulename{S-And-1} and \rulename{S-And-2},
-whereas the second point by \rulename{S-And-3}. Note that the last point means
-that record types are covariant in the type of the fields.
+The first point is captured by two rules \rulename{S-And1} and
+\rulename{S-And2}, whereas the second point by \rulename{S-And3}. Note that the
+last point means that record types are covariant in the type of the fields.
+
+% The subtyping relation is reflexive and transitive.
 
 \subsection{Typing}
 
