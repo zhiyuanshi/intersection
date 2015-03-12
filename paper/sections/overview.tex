@@ -105,10 +105,14 @@ will explore the usefulness of such a type system in practice by showing various
 examples.
 
 \subsection{Intersection Types and Records}
-\bruno{The title of this section needs adjusting. Moreover we do not want to
-  talk about record elimination and update. \name supports a
-  \emph{generalization} of record elimination and update that \emph{works for
-    any type}. That's what we want to mention instead.}
+
+\name supports a generalization of record elimination and update that works for
+any type.
+
+% \bruno{The title of this section needs adjusting. Moreover we do not want to
+%   talk about record elimination and update. \name supports a
+%   \emph{generalization} of record elimination and update that \emph{works for
+%     any type}. That's what we want to mention instead.}
 
 In addition to introduction of record literals using the usual
 notation, \name support two more operations on records: record
@@ -124,6 +128,7 @@ tagged by the label \lstinline{l}.
 % \lstinputlisting[linerange=-]{} % APPLY:linerange=BASICS_ADD
 
 \bruno{Not a proper sentence! }
+
 \lstinline{e1} and \lstinline{e2} are two expressions that support both evaluation and pretty
 printing and each has type \lstinline{eval : Int, print : String}. \lstinline{add} takes
 two expressions and computes their sum\bruno{Don't inline examples in the text. Give
@@ -151,17 +156,11 @@ subtype of \lstinline{eval : Int}.
 \subsection{Intersection Types and Parametric Polymorphism}
 
 The presence of both parametric polymorphism and intersection is critical, as we
-shall see in the next section, in solving modularity problems. Here is a code
-snippet from the next section (The reader is not required to understand the
-purpose of this code at this stage; just recognizing the two types of
-polymorphism is enough.)\bruno{use the join example here.}
-
+shall see in the next section, in solving modularity problems. The most simple
+example is a function that just uses the merge operator:
+% \bruno{use the join example here.}
 \begin{lstlisting}
-type SubExpAlg E = (ExpAlg E) \& { sub : E -> E -> E };
-let e2 E (f : SubExpAlg E) = f.sub (exp1 E f) (f.lit 2);
+let merge[A,B] (x: A) (y: B) : A & B = x ,, y
 \end{lstlisting}
-
-\lstinline{SubExpAlg} is a type synonym (a la Haskell) defined as the intersection of
-\lstinline{ExpAlg E} and \lstinline{sub : E -> E -> E}, parametrized by a type parameter
-\lstinline{E}. \lstinline{e2} exhibits parametric polymorphism as it takes a type argument
-\lstinline{E}.
+The key novel feature is that in our language we allow the intersection of type
+parameters.
