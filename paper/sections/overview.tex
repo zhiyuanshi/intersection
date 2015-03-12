@@ -106,52 +106,62 @@ examples.
 
 \subsection{Intersection Types and Records}
 
-\name supports a generalization of record elimination and update that works for
-any type.
-
 % \bruno{The title of this section needs adjusting. Moreover we do not want to
 %   talk about record elimination and update. \name supports a
 %   \emph{generalization} of record elimination and update that \emph{works for
 %     any type}. That's what we want to mention instead.}
 
-In addition to introduction of record literals using the usual
-notation, \name support two more operations on records: record
-elimination and record update.
+With intersection types, we are able to regard multi-field records as just
+merges of single-field records, for example:
+\begin{lstlisting}
+{ x = 1, y = 2 }
+\end{lstlisting}
+is just syntatic sugar for
+\begin{lstlisting}
+{ x = 1 } ,, { y = 2 }
+\end{lstlisting}
+In addition, a record is just a normal type and can be merged with any other
+terms, for example, this is a also valid expression
+\begin{lstlisting}
+1 ,, { x = 2 }
+\end{lstlisting}
+and we can further extract a field out of it, such as
+\begin{lstlisting}
+(1 ,, { x = 2 }).x
+\end{lstlisting}
+That is because a record type of the form $ \recty l \ty $ can be thought as a
+normal type \lstinline{t} tagged by the label \lstinline{l}. In consequence,
+\name supports a generalization of record elimination and update that works for
+any type. Functional update can be done using the \emph{with} keyword:
+\begin{lstlisting}
+(1 ,, { x = 2 }) with { x = 1 }
+\end{lstlisting}
 
-A record type of the form $ \recty l \ty $ can be thought as a normal type \lstinline{t}
-tagged by the label \lstinline{l}.
 % \bruno{I would call this a labelled type. Record types can be viewed as
 % intersections of labelled types.}
+% \bruno{Not a proper sentence! }
 
-% A basic example
+% \lstinline{e1} and \lstinline{e2} are two expressions that support both
+% evaluation and pretty printing and each has type \lstinline{eval : Int, print :
+%   String}. \lstinline{add} takes two expressions and computes their
+% sum\bruno{Don't inline examples in the text. Give proper separate code
+%   examples.}. Note that in order to compute a sum, \lstinline{add} only requires
+% that the two expressions support evaluation and hence the type of the parameter
+% \lstinline{eval : Int}. As a result, the type of \lstinline{e1} and
+% \lstinline{e2} are not exactly the same with that of the parameters of
+% \lstinline{add}. However, under a structural type system, this program should
+% typecheck anyway because the arguments being passed has more information than
+% required. In other words, \lstinline{eval : Int, print : String} is a subtype of
+% \lstinline{eval : Int}.
 
-% \lstinputlisting[linerange=-]{} % APPLY:linerange=BASICS_ADD
+% How is this subtyping relation derived? In \name, multi-field record types are
+% excluded from the type system because \lstinline{eval : Int, print : String} can
+% be encoded as \lstinline{eval : Int & print : String}. And by one of subtyping
+% rules derives that \lstinline{eval : Int & print : String} is a subtype of
+% \lstinline{eval : Int}.
 
-\bruno{Not a proper sentence! }
-
-\lstinline{e1} and \lstinline{e2} are two expressions that support both evaluation and pretty
-printing and each has type \lstinline{eval : Int, print : String}. \lstinline{add} takes
-two expressions and computes their sum\bruno{Don't inline examples in the text. Give
-  proper separate code examples.}. Note that in order to compute a sum,
-\lstinline{add} only requires that the two expressions support evaluation and hence the
-type of the parameter \lstinline{eval : Int}. As a result, the type of \lstinline{e1} and
-\lstinline{e2} are not exactly the same with that of the parameters of \lstinline{add}. However,
-under a structural type system, this program should typecheck anyway because the
-arguments being passed has more information than required. In other words,
-\lstinline{eval : Int, print : String} is a subtype of \lstinline{eval : Int}.
-
-How is this subtyping relation derived? In \name, multi-field record types are
-excluded from the type system because \lstinline{eval : Int, print : String} can
-be encoded as \lstinline{eval : Int & print : String}. And by one of
-subtyping rules derives that \lstinline{eval : Int & print : String} is a
-subtype of \lstinline{eval : Int}.
-
-\bruno{Examples illustrating update and elimination of intersections
-  are missing!}
-
-% This example is elaborated into the following in \Target.
-
-% \lstinputlisting[linerange=-]{} % APPLY:linerange=BASICSELAB_ADD
+% \bruno{Examples illustrating update and elimination of intersections
+%   are missing!}
 
 \subsection{Intersection Types and Parametric Polymorphism}
 
