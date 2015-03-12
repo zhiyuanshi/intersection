@@ -1,14 +1,37 @@
 \section{Implementation}
 
-Our implementation currently supports multi-field records.
+We implemented all the functionalities of the \name as a contribution to the
+open source community. Besides, we built a language on top of \name to
+facilitate programming. We adopted a three-phase design to compile source
+programs built into System $ F $ terms.
 
-\subsection{Type Synonyms}
+\begin{enumerate}
+\item A \emph{type checking} phase that checks the usage of \name and other
+  source features against an abstract syntax tree that follows strictly with the
+  source syntax.
 
-We extend the implementation of the type system extended with type synonyms and
-lazy arguments.
+\item A \emph{desugaring} phase that translates well-typed source terms into
+  \name terms. A number of source-level features such as multi-field records,
+  recursive \texttt{let} definitions, type synonyms are rewritten at this phase.
+  The resulting program is just \name expressions with other minor features.
+
+\item A \emph{compilation} phase that translates well-typed \name terms
+  into System $ F $ ones.
+\end{enumerate}
+
+Phase 3 is what we have formalized in this paper.
+
+\paragraph{Type synonyms.}
+
+We implement \emph{type synonym} as in Scala and Haskell.
+
+In fact, to make future adaptations easier, we implemented this feature on top
+of the more general System $ F_{\omega} $.
+
 
 \begin{lstlisting}
-type T A1 A2 = ... in
+type T[A, B] = t
+e
 \end{lstlisting}
 
-\subsection{Optimization}
+\subsection{Optimization.}
