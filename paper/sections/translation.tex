@@ -1,4 +1,4 @@
-\section{Type-directed translation to System $ F $}
+\section{Type-directed Translation to System $ F $}
 
 In this section we define the semantics of \name by means of a type-directed
 translation to a variant of System $ F $ extended with tuples. This translation
@@ -6,7 +6,7 @@ removes the labels of records and turns intersections into products, much like
 Dunfield's elaboration. But our translation also deals with parametric
 polymorphism and records.
 
-\subsection{Informal discussion}
+\subsection{Informal Discussion}
 
 To help the reader have a high-level understanding of how the translation
 works, in this subsection we present the translation informally. Take the \name
@@ -29,14 +29,13 @@ $ \\(x:(Int,String)). \fst ~ x $.
 \bruno{Show the source program, and the program that it gets
   translated to. Then explain how that translation works.}
 
-\subsection{Target language}
+\subsection{Target Language}
 
-The target language is System $ F $ extended with pairs. The syntax and typing is
-completely standard. The syntax of Systm F is as follows:
-
-\input{rules/f-syntax.tex}
-
-The dynamic semantics of System $ F $ can be found in ...\bruno{fill!}
+The target language is System $ F $ extended with pairs. The syntax and typing
+is completely standard. The syntax of System $ F $ is as follows:
+% \bruno{fill!}
+\input{rules/f-syntax.tex} 
+while its semantics can be found in standard texts~\cite{pierce2002types}.
 
 % \bruno{Why is this lemma placed here?}
 % \bruno{Generaly Speaking this text seems out of place.Move to 5.4, maybe?}
@@ -59,7 +58,7 @@ of record types are erased.
 
 The translation consists of four sets of rules, which are explained below:
 
-\subsection{Subtyping (coercion)}
+\subsection{Subtyping (Coercion)}
 
 Talk about $ \eta $-expansion.
 
@@ -90,7 +89,7 @@ $ \ty_1 \intersects \ty_2 $, project $ x $ on the first item, and apply $ C $ to
 \rulename{SAnd3} uses both of two coercions and constructs a pair.
 \bruno{Give a couple of concrete examples when explaining the rules.}
 
-\subsection{Typing (translation)}
+\subsection{Typing (Translation)}
 
 In this subsection we now present formally the translation rules that convert
 \name expressions into System $ F $ ones. This set of rules essentially extends
@@ -134,7 +133,7 @@ those in the previous section with the light-blue part for the translation.
 
   The two set of rules are explained below.
 
-\paragraph{``get'' rules}
+\paragraph{``get'' Rules}
 
   The ``get'' judgment deals spefically with record elimination and yields a
   coercion can be thought as a field accessor. For
@@ -180,7 +179,7 @@ those in the previous section with the light-blue part for the translation.
   \[ ``Isaac'' \]
 
 
-\paragraph{``put'' rules}\bruno{Missing example (and derivation)}
+\paragraph{``put'' Rules}\bruno{Missing example (and derivation)}
 
   The ``put'' judgment deals spefically with record update can be thought as
   producing a field updater. Compared to the ``get'' rules, the ``put'' rules
