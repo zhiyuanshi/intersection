@@ -8,21 +8,28 @@ polymorphism and records.
 
 \subsection{Informal Discussion}
 
-To help the reader have a high-level understanding of how the translation
-works, in this subsection we present the translation informally. Take the \name
+To help the reader have a high-level understanding of how the translation works,
+in this subsection we present the translation informally. Take the \name
 expression for example:
-
 \begin{lstlisting}
-{ eval = 4, print = ``4'' }.eval
+{ eval = 4, print = "4" }.eval
 \end{lstlisting}
 
 First, multi-field record literals are desugared into merges of single-field
-record literals. Therefore $ \{ eval = 4, print = ``4'' \} $ becomes
-$ \{ eval = 4 \} ,, \{ print = ``4'' \} $. Merges of two values are translated
-into just a pair of them by \rulename{Merge} and single-field record literals lose their field
-labels by \rulename{RecCon}. Hence $ \{ eval = 4 \} ,, \{ print = ``4'' \} $
-becomes $ (4, ``4'') $.\bruno{Don't abuse inlining of examples in the
-  text!}
+record literals. Therefore 
+\begin{lstlisting}
+{ eval = 4, print = "4" } 
+\end{lstlisting}
+becomes
+\begin{lstlisting}
+{ eval = 4 } ,, { print = "4" } 
+\end{lstlisting}
+Merges of two values are translated into just a pair of them by \rulename{Merge}
+and single-field record literals lose their field labels by \rulename{RecCon}.
+Hence \lstinline $ { eval = 4 } ,, { print = "4" } $ becomes \lstinline
+$ (4, "4") $.
+
+\bruno{Don't abuse inlining of examples in the text!}
 
 Finally, $ e1 $ and $ e2 $ are both coerced by a projection function
 $ \\(x:(Int,String)). \fst ~ x $.
