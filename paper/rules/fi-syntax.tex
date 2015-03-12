@@ -1,33 +1,31 @@
 \[
 \begin{array}{l}
 
-    \textbf{Types} \\
-    \begin{array}{rcll}
-        \ty & \Coloneqq & \alpha \mid \ty \to \ty \mid \forall \alpha. \ty & \\
-          & \mid      & \ty \intersects \ty                                  & \text{Intersection type} \\
-          & \mid      & \recty l \ty                            & \text{Record type}
-    \end{array} \\ \\
+  \textbf{Types} \\
+  \begin{array}{rrll}
+    \ty & \Coloneqq & \alpha \mid \ty \to \ty \mid \forall \alpha. \ty & \text{System F} \\
+        & \mid      & \ty \intersects \ty                              & \text{intersection type} \\
+        & \mid      & \recty l \ty                                     & \text{record type}
+  \end{array} \\ \\
 
-    \textbf{Terms} \\
-    \begin{array}{rcll}
-        e & \Coloneqq & x                               & \\
-          & \mid      & \Abs \alpha     e \mid \app e \ty & \text{Type abstraction/application} \\
-          & \mid      & \abs {\rel x \ty} e \mid \app e e & \text{Term abstraction/application} \\
-          & \mid      & e \dcomma e                     & \text{Merge} \\
-          & \mid      & \reccon l e                & \text{Record construction} \\
-          & \mid      & e.l                             & \text{Record projection} \\
-          & \mid      & \recupd e l e             & \text{Record update}
-    \end{array} \\ \\
+  \textbf{Terms} \\
+  \begin{array}{rrll}
+    e & \Coloneqq & x \mid \Abs \alpha e \mid \app e \ty \mid \abs {\rel x \ty} e \mid \app e e & \text{System F} \\
+      & \mid      & e \dcomma e   & \text{merge} \\
+      & \mid      & \reccon l e   & \text{record construction} \\
+      & \mid      & e.l           & \text{record projection} \\
+      & \mid      & \recupd e l e & \text{record update}
+  \end{array} \\ \\
 
-    \textbf{Contexts} \\
-    \begin{array}{rcl}
-        \Gamma & \Coloneqq & \epsilon \mid \Gamma, \alpha \mid \Gamma, \rel x \ty
-    \end{array} \\ \\
+  \textbf{Contexts} \\
+  \begin{array}{rrl}
+    \Gamma & \Coloneqq & \epsilon \mid \Gamma, \alpha \mid \Gamma, \rel x \ty
+  \end{array} \\ \\
 
-    \textbf{Labels} \\
-    \begin{array}{r}
-        l
-    \end{array}
+  \textbf{Labels} \\
+  \begin{array}{r}
+    l
+  \end{array}
 
 \end{array}
 \]
