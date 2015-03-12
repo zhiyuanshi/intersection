@@ -4,6 +4,8 @@
 
 ## Dependencies
 
+We use the true Times New Roman font and hence require XeLaTeX.
+
 * [Ruby](https://www.ruby-lang.org/)
 * [xelatex](http://www.xelatex.org/)
 * [latexmk](http://www.ctan.org/pkg/latexmk/)
@@ -11,10 +13,7 @@
 
 All-in-one installation script for Ubuntu:
 
-    sudo apt-get update
-    sudo apt-get install -y texlive-xetex
-    sudo apt-get install -y latexmk
-    sudo apt-get install -y msttcorefonts
+    sudo apt-get update && sudo apt-get install -y texlive-xetex latexmk msttcorefonts
 
 ## Generating PDF
 
