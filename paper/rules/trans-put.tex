@@ -1,15 +1,15 @@
 \framebox{\( \turnsput (\ty; l; e : \ty \yields E) : (\ty, \ty) \yields C \)}
 
 \infax[PutBase]
-{\turnsput (\recty l \ty; l; e : \ty' \yields E) : (\ty, \recty l {\ty'})
+{\turnsput (\recty l \ty; l; e : \ty_1 \yields E) : (\ty, \recty l {\ty_1})
   \yields {\absty x {\image {\recty l \ty}} E}}
 
 \infrule[PutLeft]
-{\turnsput (\ty_1; l; e : \ty \yields E) : (\ty', \ty_1') \yields C}
-{\turnsput (\ty_1 \intersects \ty_2; l; e : \ty \yields E) : (\ty', \ty_1' \intersects \ty_2)
+{\turnsput (\ty_1; l; e : \ty \yields E) : (\ty_3, \ty_4) \yields C}
+{\turnsput (\ty_1 \intersects \ty_2; l; e : \ty \yields E) : (\ty_3, \ty_4 \intersects \ty_2)
   \yields {\absty x {\image {\ty_1 \intersects \ty_2}} {C (\fst ~ x)}}}
 
 \infrule[PutRight]
-{\turnsput (\ty_2; l; e : \ty \yields E) : (\ty', \ty_2') \yields C}
-{\turnsput (\ty_1 \intersects \ty_2; l; e : \ty \yields E) : (\ty', \ty_1' \intersects \ty_2)
+{\turnsput (\ty_2; l; e : \ty \yields E) : (\ty_3, \ty_4) \yields C}
+{\turnsput (\ty_1 \intersects \ty_2; l; e : \ty \yields E) : (\ty_3, \ty_1 \intersects \ty_4)
   \yields {\absty x {\image {\ty_1 \intersects \ty_2}} {C (\snd ~ x)}}}

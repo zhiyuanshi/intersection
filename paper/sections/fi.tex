@@ -133,15 +133,29 @@ that record types are covariant in the type of the fields.
 \end{figure}
 
 The typing judgment for \name is of the form: $ \Gamma \turns e : \ty $. This
-judgment uses the context $ \Gamma $. The typing rules for our core languages
-are mostly standard ones for System $ F $. \bruno{Sort the rules by
-  those, which are exactly the same as System F, following by those
-  which are different (application) and finally the rules for the new constructs.}
+judgment uses the context $ \Gamma $. The rules for variables, abstraction, type
+abstraction, and type application are standard in System $ F $. To cater to the
+subtyping relations and avoid having undeterministic rules, in \rulename{App},
+we additionally require the type of the argument be a subtype of the parameter.
+The rule for record construction is also standard. For record projection and
+update, we resort to the auxiliary ``get'' and ``put'' rules. The ``get''
+judgment checks if a field $ l $ indeed exists in a type $ \ty $ and fetches the
+type of the field if so. The ``put'' judgment is almost similar, except that it
+takes the intended update (both expression and type), and returns in addition a
+new type of the expression. In record updates, we allow refining the type of the
+field in question.
+
+% \bruno{Sort the rules by those, which are exactly the same as System F,
+%   following by those which are different (application) and finally the rules for
+%   the new constructs.}
+
 In particular we introduce a
 \rulename{T-Merge} rule that applies to \emph{merge}
-constructs.\bruno{A lot more explanation needed here! You want to
-  explain: 1) the rules which are different, and why they are
-  different; 2) the new rules and the intuition for the new rules.}
+constructs.
+
+% \bruno{A lot more explanation needed here! You want to
+%   explain: 1) the rules which are different, and why they are
+%   different; 2) the new rules and the intuition for the new rules.}
 
 % The last two rules make use of the $ \rulename{fields} $ function just to make
 % sure that the field being accessed (\rulename{T-RecProj}) or updated

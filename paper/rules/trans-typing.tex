@@ -41,6 +41,6 @@
 \infrule[RecUpd]
 {\Gamma \turns e : \ty \yields E \andalso
  \Gamma \turns e_1 : \ty_1 \yields {E_1} \\
- \turnsput (t; l; e_1 : \ty_1 \yields {E_1}) : (\ty_1', \ty') \yields C \andalso
- \ty_1 \subtype \ty_1'}
-{\Gamma \turns \recupd e l {e_1} : \ty' \yields {\app C E}}
+ \turnsput (t; l; e_1 : \ty_1 \yields {E_1}) : (\ty_2, \ty_3) \yields C \andalso
+ \ty_1 \subtype \ty_2}
+{\Gamma \turns \recupd e l {e_1} : \ty_3 \yields {\app C E}}
