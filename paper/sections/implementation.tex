@@ -8,7 +8,9 @@ programs built into System $ F $ terms.
 \begin{enumerate}
 \item A \emph{type checking} phase that checks the usage of \name and other
   source features against an abstract syntax tree that follows strictly with the
-  source syntax.
+  source syntax. We intentionally made type checking happen first, so as to make
+  the error messages relevant for programmers, although such an approach has
+  obviously complicated the implementation.
 
 \item A \emph{desugaring} phase that translates well-typed source terms into
   \name terms. A number of source-level features such as multi-field records,
@@ -35,3 +37,17 @@ e
 \end{lstlisting}
 
 \subsection{Optimization.}
+
+The reader might argue that translating merges as pairs can be inefficient in
+practice. That is indeed the case. For example, the ternary merge
+\begin{lstlisting}
+1,,2,,3 
+\end{lstlisting}
+is elaborated into a nested tuple
+\begin{lstlisting}
+((1,2),3)
+\end{lstlisting}
+as the merge operator associates to the left.
+
+Another issue is that every time a coercion is generated, an application will be
+incurred at run-time.
