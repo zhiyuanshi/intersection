@@ -38,12 +38,9 @@ completely standard. The syntax of Systm F is as follows:
 
 The dynamic semantics of System $ F $ can be found in ...\bruno{fill!}
 
-\begin{lemma} \label{type-coerce}
-  If $$ \Gamma \turns \ty_1 <: \ty_2 \yields C $$
-  then $$ \image \Gamma \turns C : \image {\ty_1} \to \image {\ty_2} $$
-\end{lemma}\bruno{Why is this lemma placed here?}
+% \bruno{Why is this lemma placed here?}
+% \bruno{Generaly Speaking this text seems out of place.Move to 5.4, maybe?}
 
-\bruno{Generaly Speaking this text seems out of place.Move to 5.4, maybe?}
 The main translation judgment is $ \Gamma \turns e : \ty \hookrightarrow E $ which
 states that with respect to the environment $ \Gamma $, the \name expression
 $ e $ is of a \name type $ \ty $ and its translation is a System $ F $ expression $ E $.
@@ -199,17 +196,21 @@ those in the previous section with the light-blue part for the translation.
 
 \subsection{Meta-theory}
 
-\begin{lemma}{Subtyping is reflexive} \label{sub-refl}
+\begin{lemma}[Subtyping is reflexive.] \label{sub-refl}
 Given a type $ \ty $, $ \ty \subtype \ty $.
 \end{lemma}
 
-\begin{lemma}{Subtyping is transitive} \label{sub-trans}
+\begin{lemma}[Subtyping is transitive.] \label{sub-trans}
 If $ \ty_1 \subtype \ty_2 $ and $ \ty_2 \subtype \ty_3 $,
 then $ \ty_1 \subtype \ty_3 $.
 \end{lemma}
 
+\begin{lemma} \label{type-coerce}
+  If $$ \Gamma \turns \ty_1 <: \ty_2 \yields C $$
+  then $$ \image \Gamma \turns C : \image {\ty_1} \to \image {\ty_2} $$
+\end{lemma}
 
-\begin{lemma}[Get rules produce the type-correct coercion] \label{type-get}
+\begin{lemma}[Get rules produce the type-correct coercion.] \label{type-get}
   If $$ \Gamma \turnsget \ty ; l = C ; \ty_1 $$
   then $$ \image \Gamma \turns C : \image \ty \to \image {\ty_1} $$
 \end{lemma}
@@ -218,7 +219,7 @@ then $ \ty_1 \subtype \ty_3 $.
 By induction on the given derivation.
 \end{proof}
 
-\begin{lemma}[Put rules produce the type-correct coercion] \label{type-put}
+\begin{lemma}[Put rules produce the type-correct coercion.] \label{type-put}
   If $$ \Gamma \turnsput \ty ; l ; E = C ; \ty_1 $$
   then $$ \image \Gamma \turns C : \image \ty \to \image \ty $$
 \end{lemma}
@@ -227,7 +228,7 @@ By induction on the given derivation.
 By induction on the given derivation.
 \end{proof}
 
-\begin{lemma}[Translation preserves well-formedness] \label{preserve-wf}
+\begin{lemma}[Translation preserves well-formedness.] \label{preserve-wf}
   If   $$ \Gamma \turns \ty $$
   then $$ \image \Gamma \turns \image \ty $$
 \end{lemma}
@@ -236,7 +237,7 @@ By induction on the given derivation.
 By induction on the given derivation.
 \end{proof}
 
-\begin{theorem}[Type preserving translation] \label{preserve-tr}
+\begin{theorem}[Type preserving translation.] \label{preserve-tr}
   If   $$ \Gamma \turns e : \ty \yields E $$
   then $$ \image \Gamma \turns E : \image \ty $$
 \end{theorem}

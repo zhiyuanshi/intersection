@@ -1,7 +1,7 @@
 \section{Application} \label{sec:application}
 
-Structural subtyping facilitates reuse~\cite{malayeri2008integrating}.
-\bruno{orphan sentence!}
+% Structural subtyping facilitates reuse~\cite{malayeri2008integrating}.
+% \bruno{orphan sentence!}
 
 This section shows that the System $ F $ plus intersection types are enough for
 encoding extensible designs, and even beat the designs in languages with a much
@@ -116,10 +116,14 @@ that via intersection types:
 let id[A] (user: A & {name: String}) = user in
 (id [{admin: Bool}] user).admin
 \end{lstlisting}
+By requiring the type of the argument to be an intersection type of a type
+parameter and the upper bound and passing the type information, we make sure
+that we can still access the \lstinline{admin} field later.
 
-\cite{pierce1997intersection}\bruno{I don't think this has been
-  shown. What we can say is: we can encode a form of bounded
-  polymorphism with intersection types.}
+% \cite{pierce1997intersection}
+
+% \bruno{I don't think this has been shown. What we can say is: we can encode a
+% form of bounded polymorphism with intersection types.}
 
 % Multiple inheritance?
 % Algebra -> P1,2
@@ -261,18 +265,14 @@ algebras. Intersection types allows such composition: the \lstinline{merge}
 function, which takes two expression algebras to create a combined algebra. It
 does so by constructing a new expression algebra, a record whose each field is a
 function that delegates the input to the two algebras taken.
-
-% #include ../src/Algebra.sf  @usage
 \begin{lstlisting}
 let newAlg = merge IEval IPrint subEvalAlg printAlg in
 let o1 = e1 (IEval & IPrint) newAlg in
 o1.print
 \end{lstlisting}
-% #end
-
-\bruno{Don't start a sentence with \lstinline{o1}.}
-\lstinline{o1} is a single object created that supports both evaluation and
-printing, thus achieving full feature-oriented programming.
+% \bruno{Don't start a sentence with \lstinline{o1}.}
+Note that \lstinline{o1} is a single object created that supports both
+evaluation and printing, thus achieving full feature-oriented programming.
 
 \subsection{Visitors}
 
