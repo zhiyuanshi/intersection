@@ -1,6 +1,8 @@
 \section{An Overview of \name}
 
 \george{Change the examples later to something very simple.}
+\bruno{Mention that we use some syntactic sugar, which is part 
+of our implementation.}
 
 This section provides the reader with necessary intuition of \name. In \name,
 the central addition to the type system of System $ F $ is intersection types.
@@ -97,7 +99,7 @@ construct for elimination).
 % \lstinputlisting[linerange=-]{} % APPLY:linerange=MIXIN_LIB
 
 \subsection{Subtyping}
-
+\bruno{Use the show example to illustrate subtyping in our language; and show other forms of subtyping.}
 As a result of intersection types, the type system of \name permits a subtyping
 relation naturally. The subtyping also arises from contravariant paramter types
 and covariant return types for functions. Subtyping in \name is structual. We
@@ -111,6 +113,9 @@ examples.
 %   \emph{generalization} of record elimination and update that \emph{works for
 %     any type}. That's what we want to mention instead.}
 
+\bruno{Show and talk about the record types too!}
+\bruno{we support ``object/value-level composition''. Contrast with 
+class-level or trait level composition in Scala.}
 With intersection types, we are able to regard multi-field records as just
 merges of single-field records, for example:
 \begin{lstlisting}
@@ -174,3 +179,16 @@ let merge[A,B] (x: A) (y: B) : A & B = x ,, y
 \end{lstlisting}
 The key novel feature is that in our language we allow the intersection of type
 parameters.
+\bruno{Show also how to use merge.}
+\bruno{Syntax for type applications looks uncurried.}
+
+\bruno{Talk about Inheritance is not Subtyping. 
+Describe type inheritance and subtyping, show that they don't necessarelly 
+go along together in our language. You may need to write some Java code, to 
+illustrate differences. \emph{We support contravariant argument types!}
+}
+
+\bruno{Related to the previous point, don't forget to mention that 
+there are nominal languages, that also separate inheritance from subtyping!
+See Klaus Ostermann's paper \& ``Inheritance is not Subtyping''.
+}

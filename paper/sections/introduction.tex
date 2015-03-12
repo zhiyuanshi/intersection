@@ -19,11 +19,11 @@ proposals for design patterns.  Examples include \emph{Object
   Algebras}~\cite{}, \emph{Modular Visitors}~\cite{} or
 Torgersen's~\cite{} four design patterns using generics. In those
 approaches the idea is to use some advanced (but already available)
-features, such as generics, in combination with conventional OOP
+features, such as \emph{generics}, in combination with conventional OOP
 features to model more extensible designs. Those designs work in
 modern OOP languages such as Java, C\# or Scala. 
 
-Although those design patterns give practical benefits in terms of
+Although such design patterns give practical benefits in terms of
 extensibility, they also expose limitations in existing mainstream OOP
 languages. One limitation is that existing OOP languages lack
 good mechanisms for \emph{object-level} composition.  As illustrated
@@ -32,8 +32,19 @@ Algebras are best expressed using a form of \emph{type-safe},
 \emph{dynamic}, \emph{delegation}-based composition. Although such
 form of composition can be encoded in Scala, it requires the use of
 low-level reflection techniques, such as dynamic proxies, reflection
-or other forms of meta-programming~\cite{}. Moreover, the vast 
-majority of modern OOP languages follows a model where 
+or other forms of meta-programming~\cite{}. It is clear that better 
+language support would be desirable. Moreover, the vast 
+majority of modern OOP languages follows a model where where 
+type inheritance and subtyping are conflated. That is a type extension 
+induces a subtype. However as Cook et al.~\cite{} famously argued there 
+are programs where ``\emph{subtyping is not inheritance}''. Although 
+previously not many practical programs have been reported in the literature 
+where the distinction between subtyping and inheritance is relevant, 
+this difference does show up in practice when designing extensible 
+programs\bruno{Improve English}. In particular, modular (extensible)  
+visitors provide a compeling practical example where inheritance 
+and subtyping should not be conflated.
+ 
 
  2) the
 \emph{conflation of (type) extension with subtyping}.

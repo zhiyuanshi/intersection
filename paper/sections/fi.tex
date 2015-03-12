@@ -66,6 +66,7 @@ is of an intersection type, $ x.{l_1} $ still gives $ e_1 $. On the other hand,
 $ x.{l_3} $ does not type check. Functional update $ \recupd e l {e_1} $ a
 \emph{new} record which is exactly the same as $ e $ except the field labelled
 $ l $ is updated to become $ e1 $.
+\bruno{Talking about type-checking before type-checking is discussed!}
 % \bruno{What field $F$? I don't know what this is refering to!}
 
 \paragraph{Context.} Context $ \Gamma $ is also standard. It maps variables to
@@ -81,10 +82,15 @@ constructs. For example, fixpoints can be added in standard ways.
 
 \subsection{Subtyping}
 
-\george{Explain the subst syntax.}
+\george{Explain the subst syntax.}\bruno{Just say, in 1 sentence: 
+the syntax means substitution, and the substitution function is standard 
+and thus ommitted.}
 
 \george{However, have we forbidden the interplay of subtyping relations
   explicitly declared by programmers as seen in class-based OO languages?}
+\bruno{Discuss somewhere (perhaps in related work) that although 
+our system is structural, we could apply the idea of separating 
+inheritance and subtyping to a nominal language. Point out related work.}
 
 \bruno{Intersection types require a simple form of subtyping. The subtyping
   relation is reflexive and transitive. Our subtyping relation follows previous
@@ -160,9 +166,10 @@ In particular we introduce a
 \rulename{T-Merge} rule that applies to \emph{merge}
 constructs.
 
-% \bruno{A lot more explanation needed here! You want to
-%   explain: 1) the rules which are different, and why they are
-%   different; 2) the new rules and the intuition for the new rules.}
+\bruno{A lot more explanation needed here! You want to
+   explain: 1) the rules which are different, and why they are
+   different; 2) the new rules and the intuition for the new rules.
+   For the new rules have text for each of them.}
 
 % The last two rules make use of the $ \rulename{fields} $ function just to make
 % sure that the field being accessed (\rulename{T-RecProj}) or updated
