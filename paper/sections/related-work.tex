@@ -99,19 +99,23 @@ construct like ``merge'', it is not possible to encode various language
 features. As an alternative to syntatic subtyping described in this paper,
 Frisch et al.~\cite{frisch2008semantic} study semantic subtyping.
 
-\paragraph{Type systems for modularity.}\bruno{fill me in!}
+\paragraph{Type systems for modularity.}
 
-Goto http://i.cs.hku.hk/~bruno/papers/ecoop2012.pdf Language-based
+To address the problem of extensibility, some researchers have designed new type
+system features such as virtual classes~\cite{ernst2006virtual}, polymorphic
+variants~\cite{garrigue1998programming}, while others have shown employing
+programming pattern such as object algebras~\cite{oliveira2012extensibility} by
+using features within existing programming languages. Both of the two approaches
+have drawbacks of some kind. The first approach often involves heavyweight
+designs, while the second approach still sacrifices the readability for
+extensibility.
 
-* http://www.informatik.uni-marburg.de/~kos/papers/popl06-virtualclasses.pdf
-* Poly variants
-
-Intersection types have been shown to be useful in designing languages that
-support modularity.~\cite{nystrom2006j}
+% Intersection types have been shown to be useful in designing languages that
+% support modularity.~\cite{nystrom2006j}
 
 \paragraph{Extensible records.}
 
-http://elm-lang.org/learn/Records.elm
+% http://elm-lang.org/learn/Records.elm
 
 Understanding records is important for understanding object-oriented languages.
 And we are the first to elaborate records to System $ F $. Encoding records
