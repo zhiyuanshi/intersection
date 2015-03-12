@@ -4,21 +4,17 @@
 
 ## Dependencies
 
-Make sure you have the following installed:
-
 * [Ruby](https://www.ruby-lang.org/)
 * [xelatex](http://www.xelatex.org/)
 * [latexmk](http://www.ctan.org/pkg/latexmk/)
-* [Pygments](http://pygments.org/)
+* Microsoft TrueType core fonts
 
-Install Microsoft TrueType core fonts:
+All-in-one installation script for Ubuntu:
 
     sudo apt-get update
+    sudo apt-get install -y texlive-xetex
+    sudo apt-get install -y latexmk
     sudo apt-get install -y msttcorefonts
-
-Install dependency for tlmgr:
-
-    sudo apt-get install -y xzdec
 
 ## Generating PDF
 
