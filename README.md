@@ -24,3 +24,8 @@ To make the PDF just once:
 To watch for changes of source files and re-generate the PDF if necessary:
 
     rake watch
+
+## Note for viewing the PDF
+
+The default PDF viewer on Ubuntu, evince, renders PDF poorly. Google Chrome does
+it better.
