@@ -6,12 +6,12 @@
   {}
   {\turnsget (\recty l \ty; l) : \ty \yields {\idmono {\image {\recty l \ty}}}}
 
-\infrule[GetLeft]
+\inferrule [GetLeft]
 {\turnsget (\ty_1; l) : \ty \yields C}
 {\turnsget (\ty_1 \intersects \ty_2; l) : \ty
   \yields {\absty x {\image {\ty_1 \intersects \ty_2}} {C (\app \fst x)}}}
 
-\infrule[GetRight]
+\inferrule [GetRight]
 {\turnsget (\ty_2; l) : \ty \yields C}
 {\turnsget (\ty_1 \intersects \ty_2; l) : \ty
   \yields {\absty x {\image {\ty_1 \intersects \ty_2}} {C (\app \snd x)}}}

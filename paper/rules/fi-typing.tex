@@ -1,44 +1,44 @@
 \framebox{\( \Gamma \turns e : \ty \yieldsnothing E \)}
 
-\infrule[Var]
+\inferrule [Var]
 {(x,\ty) \in \Gamma}
 {\Gamma \turns x : \ty \yieldsnothing x}
 
-\infrule[Abs]
+\inferrule [Abs]
 {\Gamma, \rel x \ty \turns e : \ty_1 \yieldsnothing E \andalso
  \Gamma \turns \ty}
 {\Gamma \turns \abs {\rel x \ty} e : \ty \to \ty_1 \yieldsnothing {\abs {\rel x {\image \ty}} E}}
 
-\infrule[TAbs]
+\inferrule [TAbs]
 {\Gamma, \alpha \turns e : \ty \yieldsnothing E}
 {\Gamma \turns \Abs \alpha e : \forall \alpha. \ty \yieldsnothing {\Abs \alpha E}}
 
-\infrule[App]
+\inferrule [App]
 {\Gamma \turns e_1 : \ty_1 \to \ty_2 \yieldsnothing {E_1} \\
  \Gamma \turns e_2 : \ty_3 \yieldsnothing {E_2} \andalso
  \ty_3 \subtype \ty_1 \yieldsnothing C}
 {\Gamma \turns \app {e_1} {e_2} : \ty_2 \yieldsnothing {\app {E_1} {(\app C E_2)}}}
 
-\infrule[TApp]
+\inferrule [TApp]
 {\Gamma \turns e : \forall \alpha. \ty_1 \yieldsnothing E \andalso
  \Gamma \turns \ty}
 {\Gamma \turns \app e \ty : \subst \alpha \ty \ty_1 \yieldsnothing {\app E {\image \ty}}}
 
-\infrule[Merge]
+\inferrule [Merge]
 {\Gamma \turns e_1 : \ty_1 \yieldsnothing {E_1} \andalso
  \Gamma \turns e_2 : \ty_2 \yieldsnothing {E_2}}
 {\Gamma \turns e_1 \dcomma e_2 : \ty_1 \intersects \ty_2 \yieldsnothing {\tupled {E_1, E_2}}}
 
-\infrule[RecCon]
+\inferrule [RecCon]
 {\Gamma \turns e : \ty \yieldsnothing E}
 {\Gamma \turns \reccon l e : \recty l \ty \yieldsnothing E}
 
-\infrule[RecProj]
+\inferrule [RecProj]
 {\Gamma \turns e : \ty \yieldsnothing E \andalso
  \Gamma \turnsget (\ty; l) : \ty_1 \yieldsnothing C}
 {\Gamma \turns e.l : \ty_1 \yieldsnothing {\app C E}}
 
-\infrule[RecUpd]
+\inferrule [RecUpd]
 {\Gamma \turns e : \ty \yieldsnothing E \andalso
  \Gamma \turns e_1 : \ty_1 \yieldsnothing {E_1} \\
  \turnsput (t; l; e_1 : \ty_1 \yieldsnothing {E_1}) : (\ty_2, \ty_3) \yieldsnothing C \andalso

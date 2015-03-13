@@ -1,21 +1,21 @@
 \framebox{\(\Gamma \turns {t}\)}
 
-\infrule[WF-Var]
+\inferrule [WF-Var]
 {\alpha \in \Gamma}
 {\Gamma \turns \alpha}
 
-\infrule[WF-Fun]
+\inferrule [WF-Fun]
 {\Gamma \turns \ty_1 \andalso \Gamma \turns \ty_2}
 {\Gamma \turns \ty_1 \to \ty_2}
 
-\infrule[WF-Forall]
+\inferrule [WF-Forall]
 {\Gamma, \alpha \turns \ty}
 {\Gamma \turns \forall \alpha. \ty}
 
-\infrule[WF-And]
+\inferrule [WF-And]
 {\Gamma \turns \ty_1 \andalso \Gamma \turns \ty_2}
 {\Gamma \turns \ty_1 \intersects \ty_2}
 
-\infrule[WF-Rec]
+\inferrule [WF-Rec]
 {\Gamma \turns \ty}
 {\Gamma \turns \recty l \ty}

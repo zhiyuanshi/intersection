@@ -2,16 +2,17 @@
 
 % The field with label $ l $ inside $ \ty_1 $ is of type $ \ty_2 $.
 
-\infax[GetBase]
+\inferrule [GetBase]
+{}
 {\turnsget (\recty l \ty; l) : \ty
   \yieldsnothing {\idmono {\image {\recty l \ty}}}}
 
-\infrule[GetLeft]
+\inferrule [GetLeft]
 {\turnsget (\ty_1; l) : \ty \yieldsnothing C}
 {\turnsget (\ty_1 \intersects \ty_2; l) : \ty
   \yieldsnothing {\absty x {\image {\ty_1 \intersects \ty_2}} {C (\app \fst x)}}}
 
-\infrule[GetRight]
+\inferrule [GetRight]
 {\turnsget (\ty_2; l) : \ty \yieldsnothing C}
 {\turnsget (\ty_1 \intersects \ty_2; l) : \ty
   \yieldsnothing {\absty x {\image {\ty_1 \intersects \ty_2}} {C (\app \snd x)}}}

@@ -65,15 +65,15 @@ algorithmic.
 % our elaboration typing is simpler: we require subtyping in the case of
 % applications, thus avoiding the subsumption rule. Besides, our treatment
 % combines the merge rules ($ k $ ranges over $ \{1, 2\} $)
-% \infrule
+% \inferrule 
 % {\Gamma \turns e_k : \ty}
 % {\Gamma \turns e_1 \dcomma e_2 : \ty}
 % and the standard intersection-introduction rule
-% \infrule
+% \inferrule 
 % {\Gamma \turns e : \ty_1 \andalso \Gamma \turns e : \ty_2}
 % {\Gamma \turns e : \ty_1 \intersects \ty_2}
 % into one rule:
-% \infrule[Merge]
+% \inferrule [Merge]
 % {\Gamma \turns e_1 : \ty_1 \andalso \Gamma \turns e_2 : \ty_2}
 % {\Gamma \turns e_1 \dcomma e_2 : \ty_1 \intersects \ty_2}
 
@@ -158,13 +158,13 @@ records but not intersection of ordinary types like \texttt{Int} and
 $ \turnsrec \ty $ states that $ \ty $ is a record type, or the intersection of
 record types, and so forth.
 
-\infax[RecBase]{\turnsrec \recty l \ty}
+\inferrule [RecBase] {} {\turnsrec \recty l \ty}
 
-\infrule[RecStep]
+\inferrule [RecStep]
 {\turnsrec \ty_1 \andalso \turnsrec \ty_2}
 {\turnsrec \ty_1 \intersects \ty_2}
 
-\infrule[Merge']
+\inferrule [Merge']
 {\Gamma \turns e_1 : \ty_1 \yields {E_1} \andalso \turnsrec \ty_1 \\
  \Gamma \turns e_2 : \ty_2 \yields {E_2} \andalso \turnsrec \ty_2}
 {\Gamma \turns e_1 \dcomma e_2 : \ty_1 \intersects \ty_2 \yields {\tupled {E_1, E_2}}}
