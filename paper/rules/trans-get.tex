@@ -2,9 +2,9 @@
 
 % The field with label $ l $ inside $ \ty_1 $ is of type $ \ty_2 $.
 
-\infax[GetBase]
-{\turnsget (\recty l \ty; l) : \ty
-  \yields {\idmono {\image {\recty l \ty}}}}
+\inferrule [GetBase]
+  {}
+  {\turnsget (\recty l \ty; l) : \ty \yields {\idmono {\image {\recty l \ty}}}}
 
 \infrule[GetLeft]
 {\turnsget (\ty_1; l) : \ty \yields C}

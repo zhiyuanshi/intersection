@@ -1,5 +1,25 @@
 \section{Proofs}
 
+\begin{lemma}
+  If $ \Gamma \turnsget (\ty; l) : \ty_1 \yields C $, then $ \image \Gamma \turns C : \image \ty \to \image {\ty_1} $.
+\end{lemma}
+\begin{proof}
+  By induction of the derivation.
+\begin{itemize}
+  \item \textbf{GetBase}
+    Trivial.
+
+  \item \textbf{GetLeft} By i.h., $ C $ is of type
+    $ \image {\ty_1} \to \image \ty $. $ x $ is of type $ \tupled {\ty_1, \ty_2} $.
+    Thus $ fst x $ is of type $ \ty_1 $ and $ C (fst x) : \ty $.
+
+  \item \textbf{GetRight}
+    Symmetric to the above case.
+\end{itemize}
+\end{proof}
+
+
+
 \begin{proof}
 By structural induction on the types and the corresponding inference rule. \\
 
