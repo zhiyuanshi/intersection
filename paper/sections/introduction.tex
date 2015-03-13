@@ -25,64 +25,69 @@ modern OOP languages such as Java, C\# or Scala.
 
 Although such design patterns give practical benefits in terms of
 extensibility, they also expose limitations in existing mainstream OOP
-languages. One limitation is that existing OOP languages lack
-good mechanisms for \emph{object-level} composition.  As illustrated
-by Oliveira et al.~\cite{}, highly modular programs using Object
-Algebras are best expressed using a form of \emph{type-safe},
-\emph{dynamic}, \emph{delegation}-based composition. Although such
-form of composition can be encoded in Scala, it requires the use of
-low-level reflection techniques, such as dynamic proxies, reflection
-or other forms of meta-programming~\cite{}. It is clear that better 
-language support would be desirable. Moreover, the vast 
-majority of modern OOP languages follows a model where where 
-type inheritance and subtyping are conflated. That is a type extension 
-induces a subtype. However as Cook et al.~\cite{} famously argued there 
-are programs where ``\emph{subtyping is not inheritance}''. Although 
-previously not many practical programs have been reported in the literature 
-where the distinction between subtyping and inheritance is relevant, 
-this difference does show up in practice when designing extensible 
-programs\bruno{Improve English}. In particular, modular (extensible)  
-visitors provide a compeling practical example where inheritance 
-and subtyping should not be conflated.
- 
+languages. One limitation is that existing OOP languages lack good
+mechanisms for \emph{object-level} composition.  As illustrated by
+Oliveira et al.~\cite{}, highly modular programs using Object Algebras
+are best expressed using a form of \emph{type-safe}, \emph{dynamic},
+\emph{delegation}-based composition. Although such form of composition
+can be encoded in Scala, it requires the use of low-level reflection
+techniques, such as dynamic proxies, reflection or other forms of
+meta-programming~\cite{}. It is clear that better language support
+would be desirable. Moreover, the vast majority of modern OOP
+languages follows a model where where type inheritance and subtyping
+are conflated. That is a type extension induces a subtype. However as
+Cook et al.~\cite{} famously argued there are programs where
+``\emph{subtyping is not inheritance}''. Interestingly previously not
+many practical programs have been reported in the literature where the
+distinction between subtyping and inheritance is relevant. However it
+turns out that this difference does show up in practice when designing
+extensible programs. In particular, as shown later, modular
+(extensible) visitors provide a compeling practical example where
+inheritance and subtyping should not be conflated!
 
- 2) the
-\emph{conflation of (type) extension with subtyping}.
-
-The use of existing languages has shown that we can get quite far, but
-it has also exposed some limitations. For example, work on object
-algebras has shown that a delegation-based OO model would be better
-suited for OAs. Moreover, Object Algebra composition can benefit from
-intersection types. Additionally Object Algebras suffer from the
-``Inheritance is not Subtyping'' problem~\cite{cook1989inheritance}.
-Although there are very few examples in the literature illustrating
-programs where the separating inheritance from subtyping is desirable,
-object algebras illustrate a particularly compelling example of this.
-
+\begin{comment}
 Motivated by the insights gained in previous work, this paper presents 
 a minimal core calculus that addresses current limitations and
 provides a better foundational model for statically typed
 delegation-based OOP? We show that Object Algebras fit nicely in this
 model. 
+\end{comment}
 
-This paper presents System \name: an extension of System F with
-intersection types and a merge operator.  The goal of System \name is
-to study the foundational language constructs that are needed to
-support various extensible designs, while at the same time addressing
-the limitations of existing OOP languages. To address the lack of good
-object-level composition mechanisms, System \name uses the merge
-operator to allow dynamic composition of values/objects. Moreover, in
-System \name (type-level) extension is independent of subtyping, and
-it is possible for an extension to be a supertype of a base object
-type.  System \name is formalized and implemented. Furthermore the
-paper illustrates how various extensible designs can be encoded in
-System \name.
+This paper presents System \name: an extension of System F~\cite{}
+with intersection types and a merge operator~\cite{}.  
+The goal of System \name is to study the foundational language
+constructs that are needed to support various extensible designs,
+while at the same time addressing the limitations of existing OOP
+languages. To address the lack of good object-level composition
+mechanisms, System \name uses the merge operator to allow dynamic
+composition of values/objects. Moreover, in System \name (type-level)
+extension is independent of subtyping, and it is possible for an
+extension to be a supertype of a base object type.
 
+Technically speaking System \name is mainly inspired by the work of
+Dundfield~\cite{}.  Dundfield shows how to model a simply typed
+calculus with intersection types and a merge operator. The presence of
+a merge operator adds significant expressiveness to the language,
+allowing encodings for many other language constructs as syntactic
+sugar. System \name differs from Dundfield's work in a few
+ways. Firstly it adds parametric polymorphism and formalizes a
+extension for records to support a basic form of objects. Secondly,
+the elaboration semantics into System F is done directly from the
+source calculus with subtyping. In contrast Dunfield has an additional
+step which eliminates subtyping.  Finally a non-technical difference
+is that System \name is aimed at studying issues of OOP languages,
+whereas Dunfield's work was aimed at Functional Programming.  Like
+many other foundational formal models for OOP (for example~\cite{}),
+System \name is purely functional and it uses structural typing. 
+
+System \name is
+formalized and implemented. Furthermore the paper illustrates how
+various extensible designs can be encoded in System \name.
+
+\begin{comment}
 We present a polymorphic calculus containing intersection types and records, and show
 how this language can be used to solve various common tasks in functional
-programming in a nicer way.
-
-Intersection types provides a power mechanism for functional programming, in
+programming in a nicer way.Intersection types provides a power mechanism for functional programming, in
 particular for extensibility and allowing new forms of composition.
 
 Prototype-based programming is one of the two major styles of object-oriented
@@ -94,6 +99,7 @@ with traditional class-based programming. However, despite its flexibility,
 prototype-based programming is often criticized over concerns of correctness and
 safety. Furthermore, almost all prototype-based systems rely on the fact that
 the language is dynamically typed and interpreted.
+\end{comment}
 
 In summary, the contributions of this paper are:
 
@@ -135,6 +141,7 @@ In summary, the contributions of this paper are:
 
 \end{itemize}
 
+\begin{comment}
 \subsection{Other Notes}
 
 finitary overloading: yes
@@ -147,3 +154,4 @@ but have other merits of intersection been explored?
 -- type IPrint = { print : String }
 
 -- F[\_]
+\end{comment}
