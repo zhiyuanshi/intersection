@@ -66,16 +66,16 @@ algorithmic.
 % applications, thus avoiding the subsumption rule. Besides, our treatment
 % combines the merge rules ($ k $ ranges over $ \{1, 2\} $)
 % \inferrule 
-% {\Gamma \turns e_k : \ty}
-% {\Gamma \turns e_1 \Merge e_2 : \ty}
+% {\Gamma \turns e_k : \tau}
+% {\Gamma \turns e_1 \Merge e_2 : \tau}
 % and the standard intersection-introduction rule
 % \inferrule 
-% {\Gamma \turns e : \ty_1 \andalso \Gamma \turns e : \ty_2}
-% {\Gamma \turns e : \ty_1 \Intersect \ty_2}
+% {\Gamma \turns e : \tau_1 \andalso \Gamma \turns e : \tau_2}
+% {\Gamma \turns e : \tau_1 \Intersect \tau_2}
 % into one rule:
 % \inferrule [Merge]
-% {\Gamma \turns e_1 : \ty_1 \andalso \Gamma \turns e_2 : \ty_2}
-% {\Gamma \turns e_1 \Merge e_2 : \ty_1 \Intersect \ty_2}
+% {\Gamma \turns e_1 : \tau_1 \andalso \Gamma \turns e_2 : \tau_2}
+% {\Gamma \turns e_1 \Merge e_2 : \tau_1 \Intersect \tau_2}
 
 Reynolds invented Forsythe~\cite{reynolds1997design} in the 1980s. Our merge
 operator is analogous to his $ p_1, p_2 $. Castagna, and Dunfield describe
@@ -88,8 +88,8 @@ functions.
 % formalize elaborating records.
 
 % Both Pierce and Dunfield's system include a subsumption rule, which states that
-% if an expression has been inferred of type $ \ty $, then it is also of any
-% supertype of $ \ty $. Our system does not have this rule.
+% if an expression has been inferred of type $ \tau $, then it is also of any
+% supertype of $ \tau $. Our system does not have this rule.
 
 Refinement
 intersection~\cite{dunfield2007refined,davies2005practical,freeman1991refinement}
@@ -155,19 +155,19 @@ Indeed, our system can be adapted to simulate systems that support extensible
 records but not intersection of ordinary types like \texttt{Int} and
 \texttt{Float} by allowing only intersection of record types.
 
-$ \turnsrec \ty $ states that $ \ty $ is a record type, or the intersection of
+$ \turnsrec \tau $ states that $ \tau $ is a record type, or the intersection of
 record types, and so forth.
 
-\inferrule [RecBase] {} {\turnsrec \RecTy l \ty}
+\inferrule [RecBase] {} {\turnsrec \RecTy l \tau}
 
 \inferrule [RecStep]
-{\turnsrec \ty_1 \andalso \turnsrec \ty_2}
-{\turnsrec \ty_1 \Intersect \ty_2}
+{\turnsrec \tau_1 \andalso \turnsrec \tau_2}
+{\turnsrec \tau_1 \Intersect \tau_2}
 
 \inferrule [Merge']
-{\Gamma \turns e_1 : \ty_1 \yields {E_1} \andalso \turnsrec \ty_1 \\
- \Gamma \turns e_2 : \ty_2 \yields {E_2} \andalso \turnsrec \ty_2}
-{\Gamma \turns e_1 \Merge e_2 : \ty_1 \Intersect \ty_2 \yields {\Pair {E_1} {E_2}}}
+{\Gamma \turns e_1 : \tau_1 \yields {E_1} \andalso \turnsrec \tau_1 \\
+ \Gamma \turns e_2 : \tau_2 \yields {E_2} \andalso \turnsrec \tau_2}
+{\Gamma \turns e_1 \Merge e_2 : \tau_1 \Intersect \tau_2 \yields {\Pair {E_1} {E_2}}}
 
 Of course our approach has its limitation as duplicated labels in a record are
 allowed. This has been discussed in a larger issue by

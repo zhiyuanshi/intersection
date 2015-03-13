@@ -1,7 +1,7 @@
 \section{Proofs}
 
 \begin{lemma}
-  If $ \Gamma \turnsget (\ty; l) : \ty_1 \yields C $, then $ \image \Gamma \turns C : \image \ty \to \image {\ty_1} $.
+  If $ \Gamma \turnsget (\tau; l) : \tau_1 \yields C $, then $ \image \Gamma \turns C : \image \tau \to \image {\tau_1} $.
 \end{lemma}
 \begin{proof}
   By induction of the derivation.
@@ -10,8 +10,8 @@
     Trivial.
 
   \item \textbf{GetLeft} By i.h., $ C $ is of type
-    $ \image {\ty_1} \to \image \ty $. $ x $ is of type $ \Pair {\ty_1} {\ty_2} $.
-    Thus $ fst x $ is of type $ \ty_1 $ and $ C (fst x) : \ty $.
+    $ \image {\tau_1} \to \image \tau $. $ x $ is of type $ \Pair {\tau_1} {\tau_2} $.
+    Thus $ fst x $ is of type $ \tau_1 $ and $ C (fst x) : \tau $.
 
   \item \textbf{GetRight}
     Symmetric to the above case.
@@ -40,17 +40,17 @@ By structural induction on the types and the corresponding inference rule. \\
 \end{proof}
 
 \begin{lemma}
-  If $$ \Gamma \turnsget \ty ; l = C ; \ty_1 $$
-  then $$ \image \Gamma \turns C : \image \ty \to \image {\ty_1} $$
+  If $$ \Gamma \turnsget \tau ; l = C ; \tau_1 $$
+  then $$ \image \Gamma \turns C : \image \tau \to \image {\tau_1} $$
 \end{lemma}
 
 \begin{proof}
 By structural induction on the type and the corresponding inference rule. \\
 
-\rulename{Get-Base} $ \Gamma \turnsget \RecTy l \ty ; l = \Lam x {\image {\RecTy l \ty})} x ; \ty $ \\
+\rulename{Get-Base} $ \Gamma \turnsget \RecTy l \tau ; l = \Lam x {\image {\RecTy l \tau})} x ; \tau $ \\
 
 By the induction hypothesis
-$$ \image \Gamma \turns \Lam x {\image {\RecTy l \ty}} x : \image {\RecTy l \ty} \to \image \ty $$
+$$ \image \Gamma \turns \Lam x {\image {\RecTy l \tau}} x : \image {\RecTy l \tau} \to \image \tau $$
 
 \rulename{Get-Left} \\
 \rulename{Get-Right} \\
@@ -58,8 +58,8 @@ $$ \image \Gamma \turns \Lam x {\image {\RecTy l \ty}} x : \image {\RecTy l \ty}
 \end{proof}
 
 \begin{lemma}
-  If $$ \Gamma \turnsput \ty ; l ; E = C ; \ty_1 $$
-  then $$ \image \Gamma \turns C : \image \ty \to \image \ty $$
+  If $$ \Gamma \turnsput \tau ; l ; E = C ; \tau_1 $$
+  then $$ \image \Gamma \turns C : \image \tau \to \image \tau $$
 \end{lemma}
 
 \begin{proof}
@@ -71,127 +71,127 @@ By structural induction on the type and the corresponding inference rule. \\
 \end{proof}
 
 \begin{lemma} \label{preserve-wf}
-  If   $$ \Gamma \turns \ty $$
-  then $$ \image \Gamma \turns \image \ty $$
+  If   $$ \Gamma \turns \tau $$
+  then $$ \image \Gamma \turns \image \tau $$
 \end{lemma}
 
 \begin{proof}
-Since $$ \Gamma \turns \ty $$
+Since $$ \Gamma \turns \tau $$
 It follows from \rulename{FI-WF} that
-  $$ \ftv \ty  \subseteq \ftv {\Gamma} $$
+  $$ \ftv \tau  \subseteq \ftv {\Gamma} $$
 And hence
-  $$ \ftv {\image \ty} \subseteq \ftv {\image \Gamma} $$
+  $$ \ftv {\image \tau} \subseteq \ftv {\image \Gamma} $$
 By \rulename{F-WF} we have
-  $$ \Gamma \turns \ty $$
+  $$ \Gamma \turns \tau $$
 \end{proof}
 
 \begin{theorem}[Type preserving translation]
-  If   $$ \Gamma \turns e : \ty \yields E  $$
-  then $$ \image \Gamma \turns E : \image \ty $$
+  If   $$ \Gamma \turns e : \tau \yields E  $$
+  then $$ \image \Gamma \turns E : \image \tau $$
 \end{theorem}
 
 \begin{proof}
 By structural induction on the expression and the corresponding inference rule. \\
 
-\rulename{Var} $ \Gamma \turns x : \ty \yields x $ \\
+\rulename{Var} $ \Gamma \turns x : \tau \yields x $ \\
 
 It follows from \rulename{Var} that
   $$ (x : t) \in \Gamma $$
 Based on the definition of $ \image \cdot $,
   $$ (x : \image t) \in \image \Gamma $$
 Thus we have by \rulename{F-Var} that
-  $$ \image \Gamma \turns x : \image \ty $$
+  $$ \image \Gamma \turns x : \image \tau $$
 
-\rulename{Abs} $ \Gamma \turns \lambda (x : \ty_1). e : \ty_1 \to \ty_2 \yields {\Lam x {\image {\ty_1}} E} $ \\
+\rulename{Abs} $ \Gamma \turns \lambda (x : \tau_1). e : \tau_1 \to \tau_2 \yields {\Lam x {\image {\tau_1}} E} $ \\
 
 It follows from \rulename{Abs} that
-  $$ \Gamma, x : \ty_1 \turns e : \ty_2 \yields E $$
+  $$ \Gamma, x : \tau_1 \turns e : \tau_2 \yields E $$
 And by the induction hypothesis that
-  $$ \image \Gamma, x : \image {\ty_1} \turns E : \image {\ty_2} $$
+  $$ \image \Gamma, x : \image {\tau_1} \turns E : \image {\tau_2} $$
 By \rulename{Abs} we also have
-  $$ \Gamma \turns \ty_1 $$
+  $$ \Gamma \turns \tau_1 $$
 It follows from Lemma \ref{preserve-wf} that
-  $$ \image \Gamma \turns \image {\ty_1} $$
+  $$ \image \Gamma \turns \image {\tau_1} $$
 Hence by \rulename{F-Abs} and the definition of $ \image \cdot $ we have
-  $$ \image \Gamma \turns \Lam x {\image {\ty_1}} E : \image {\ty_1 \to \ty_2} $$
+  $$ \image \Gamma \turns \Lam x {\image {\tau_1}} E : \image {\tau_1 \to \tau_2} $$
 
-\rulename{(TrApp)} $ \Gamma \turns \App {e_1} {e_2} : \ty_2 \yields {E_1 (\App C {E_2})} $ \\
+\rulename{(TrApp)} $ \Gamma \turns \App {e_1} {e_2} : \tau_2 \yields {E_1 (\App C {E_2})} $ \\
 
 From \rulename{(TrApp)} we have
-  $$ \Gamma \turns \ty_3 <: \ty_1 \yields C $$
+  $$ \Gamma \turns \tau_3 <: \tau_1 \yields C $$
 Applying Lemma \ref{type-coerce} to the above we have
-  $$ \image \Gamma \turns C : \image {\ty_3} \to \image {\ty_1} $$
+  $$ \image \Gamma \turns C : \image {\tau_3} \to \image {\tau_1} $$
 Also from \rulename{(TrApp)} and the induction hypothesis
-  $$ \image \Gamma \turns E_1 : \image {\ty_1} \to \image {\ty_2} $$
+  $$ \image \Gamma \turns E_1 : \image {\tau_1} \to \image {\tau_2} $$
 Also from \rulename{(TrApp)} and the induction hypothesis
-  $$ \image \Gamma \turns E_2 : \image {\ty_3} $$
+  $$ \image \Gamma \turns E_2 : \image {\tau_3} $$
 Assembling those parts using \rulename{(F-App)} we come to
-  $$ \image \Gamma \turns E_1 (\App C {E_2}) : \image {\ty_2} $$
+  $$ \image \Gamma \turns E_1 (\App C {E_2}) : \image {\tau_2} $$
 \end{proof}
 
-\rulename{TAbs} $ \Gamma \turns \Lambda \alpha. e : \forall \alpha. \ty \yields {\forall \alpha. E} $ \\
+\rulename{TAbs} $ \Gamma \turns \Lambda \alpha. e : \forall \alpha. \tau \yields {\forall \alpha. E} $ \\
 
 From \rulename{TAbs} we have
-  $$ \Gamma \turns e : \ty \yields E $$
+  $$ \Gamma \turns e : \tau \yields E $$
 By the induction hypothesis we have
-  $$ \image \Gamma \turns E : \image \ty $$
+  $$ \image \Gamma \turns E : \image \tau $$
 Thus by \rulename{F-TAbs} and the definition of $ \image \cdot $
-  $$ \Gamma \turns \Lambda \alpha. E : \image {\forall \alpha. \ty} $$
+  $$ \Gamma \turns \Lambda \alpha. E : \image {\forall \alpha. \tau} $$
 
 
-\rulename{TAp} $ \Gamma \turns e \; \ty  : \subst \tau \alpha  \ty_1 \yields {E \; \image \ty} $ \\
+\rulename{TAp} $ \Gamma \turns e \; \tau  : \subst \tau \alpha  \tau_1 \yields {E \; \image \tau} $ \\
 
 From \rulename{TApp} we have
-  $$ \Gamma \turns e : \forall \alpha. \ty_1 \yields E $$
+  $$ \Gamma \turns e : \forall \alpha. \tau_1 \yields E $$
 And by the induction hypothesis that
-  $$ \image \Gamma \turns E : \forall \alpha. \image {\ty_1} $$
+  $$ \image \Gamma \turns E : \forall \alpha. \image {\tau_1} $$
 Also from \rulename{TApp} and Lemma \ref{preserve-wf} we have
-  $$ \image \Gamma \turns \image \ty $$
+  $$ \image \Gamma \turns \image \tau $$
 Then by \rulename{F-TApp} that
-  $$ \image \Gamma \turns E \; \image \ty : \subst {\image \tau} \alpha \image {\ty_1} $$
+  $$ \image \Gamma \turns E \; \image \tau : \subst {\image \tau} \alpha \image {\tau_1} $$
 Therefore
-  $$ \image \Gamma \turns E \; \image \ty : \image {\subst \tau \alpha \image {\ty_1}} $$
+  $$ \image \Gamma \turns E \; \image \tau : \image {\subst \tau \alpha \image {\tau_1}} $$
 
-% \rulename{(TrMerge)} $ \Gamma \turns e_1 \merge e_2 : \ty_1 \& \ty_2 % % \yields {\Pair {E1} {E2} $ \\
+% \rulename{(TrMerge)} $ \Gamma \turns e_1 \merge e_2 : \tau_1 \& \tau_2 % % \yields {\Pair {E1} {E2} $ \\
 
 From \rulename{(TrMerge)} and the induction hypothesis we have
-  $$ \image \Gamma \turns E_1 : \image {\ty_1} $$
+  $$ \image \Gamma \turns E_1 : \image {\tau_1} $$
 and
-  $$ \image \Gamma \turns E_2 : \image {\ty_2} $$
+  $$ \image \Gamma \turns E_2 : \image {\tau_2} $$
 Hence by \rulename{F-Pair}
-  $$ \image \Gamma \turns \Pair {E_1} {E_2} : \Pair {\image {\ty_1}} {\image {\ty_2}} $$
+  $$ \image \Gamma \turns \Pair {E_1} {E_2} : \Pair {\image {\tau_1}} {\image {\tau_2}} $$
 Hence by the definition of $ \image \cdot $
-  $$ \image \Gamma \turns \Pair {E_1} {E_2} : \image {\ty_1 \& \ty_2} $$
+  $$ \image \Gamma \turns \Pair {E_1} {E_2} : \image {\tau_1 \& \tau_2} $$
 
-\rulename{RecIntro} $ \Gamma \turns \RecCon l e : \RecTy l \ty \yields E $ \\
+\rulename{RecIntro} $ \Gamma \turns \RecCon l e : \RecTy l \tau \yields E $ \\
 
 From \rulename{RcdIntro} we have
-  $$ \Gamma \turns e : \ty \yields E $$
+  $$ \Gamma \turns e : \tau \yields E $$
 And by the induction hypothesis that
-  $$ \image \Gamma \turns E : \image \ty $$
+  $$ \image \Gamma \turns E : \image \tau $$
 Thus by the definition of $ \image \cdot $
-  $$ \image \Gamma \turns E : \image {\RecTy l \ty} $$
+  $$ \image \Gamma \turns E : \image {\RecTy l \tau} $$
 
-\rulename{RcdElim} $ \Gamma \turns e.l : \ty_1 \yields {\App C E} $ \\
+\rulename{RcdElim} $ \Gamma \turns e.l : \tau_1 \yields {\App C E} $ \\
 
 From \rulename{RcdElim}
-  $$ \Gamma \turns e : \ty \yields E $$
+  $$ \Gamma \turns e : \tau \yields E $$
 And by the induction hypothesis that
-  $$ \image \Gamma \turns E : \image \ty $$
+  $$ \image \Gamma \turns E : \image \tau $$
 Also from \rulename{RcdEim}
-  $$ \Gamma \turnsget e ; l = C ; \ty_1 $$
+  $$ \Gamma \turnsget e ; l = C ; \tau_1 $$
 Applying Lemma \ref{type-get} to the above we have
-  $$ \image \Gamma \turns C : \image \ty \to \image {\ty_1}  $$
+  $$ \image \Gamma \turns C : \image \tau \to \image {\tau_1}  $$
 Hence by \rulename{F-App} we have
-  $$ \image \Gamma \turns \App C E : \image {\ty_1} $$
+  $$ \image \Gamma \turns \App C E : \image {\tau_1} $$
 
 From \rulename{RcdUpd}
-  $$ \Gamma \turns e : \ty \yields E $$
+  $$ \Gamma \turns e : \tau \yields E $$
 And by the induction hypothesis that
-  $$ \image \Gamma \turns E : \image \ty $$
+  $$ \image \Gamma \turns E : \image \tau $$
 Also from \rulename{RcdUpd}
-  $$ \Gamma \turnsput \ty ; l; E = C ; \ty_1 $$
+  $$ \Gamma \turnsput \tau ; l; E = C ; \tau_1 $$
 Applying Lemma \ref{type-put} to the above we have
-  $$ \image \Gamma \turns C : \image \ty \to \image \ty  $$
+  $$ \image \Gamma \turns C : \image \tau \to \image \tau  $$
 Hence by \rulename{F-App} we have
-  $$ \image \Gamma \turns \App C E : \image \ty $$
+  $$ \image \Gamma \turns \App C E : \image \tau $$

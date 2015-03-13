@@ -1,11 +1,11 @@
-\framebox{\( \turnsput (\ty; l; e : \ty \yields E) : (\ty, \ty) \yields C \)}
+\framebox{\( \turnsput (\tau; l; e : \tau \yields E) : (\tau, \tau) \yields C \)}
 
 \inferrule [PutBase]
 {}
-{\turnsput (\RecTy l \ty; l; e : \ty_1 \yields E) : (\ty, \RecTy l {\ty_1})
-  \yields {\Lam x {\image {\RecTy l \ty}} E}}
+{\turnsput (\RecTy l \tau; l; e : \tau_1 \yields E) : (\tau, \RecTy l {\tau_1})
+  \yields {\Lam x {\image {\RecTy l \tau}} E}}
 
 \inferrule [PutLeft]
-{\turnsput (\ty_1; l; e : \ty \yields E) : (\ty_3, \ty_4) \yields C}
-{\turnsput (\ty_1 \Intersect \ty_2; l; e : \ty \yields E) : (\ty_3, \ty_4 \Intersect \ty_2)
-  \yields {\Lam x {\image {\ty_1 \Intersect \ty_2}} {C (\Proj k x)}}}
+{\turnsput (\tau_1; l; e : \tau \yields E) : (\tau_3, \tau_4) \yields C}
+{\turnsput (\tau_1 \Intersect \tau_2; l; e : \tau \yields E) : (\tau_3, \tau_4 \Intersect \tau_2)
+  \yields {\Lam x {\image {\tau_1 \Intersect \tau_2}} {C (\Proj k x)}}}

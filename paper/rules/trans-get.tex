@@ -1,12 +1,12 @@
-\framebox{\( \turnsget (\ty_1; l) : \ty_2 \yields C \)}
+\framebox{\( \turnsget (\tau_1; l) : \tau_2 \yields C \)}
 
-% The field with label $ l $ inside $ \ty_1 $ is of type $ \ty_2 $.
+% The field with label $ l $ inside $ \tau_1 $ is of type $ \tau_2 $.
 
 \inferrule [GetBase]
   {}
-  {\turnsget (\RecTy l \ty; l) : \ty \yields {\Lam x {\image {\RecTy l \ty}} x}}
+  {\turnsget (\RecTy l \tau; l) : \tau \yields {\Lam x {\image {\RecTy l \tau}} x}}
 
 \inferrule [GetLeft]
-{\turnsget (\ty_1; l) : \ty \yields C}
-{\turnsget (\ty_1 \Intersect \ty_2; l) : \ty
-  \yields {\Lam x {\image {\ty_1 \Intersect \ty_2}} {C (\Proj k x)}}}
+{\turnsget (\tau_1; l) : \tau \yields C}
+{\turnsget (\tau_1 \Intersect \tau_2; l) : \tau
+  \yields {\Lam x {\image {\tau_1 \Intersect \tau_2}} {C (\Proj k x)}}}

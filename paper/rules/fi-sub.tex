@@ -1,25 +1,25 @@
-\framebox{\( \ty \subtype \ty \yieldsnothing C \)}
+\framebox{\( \tau \subtype \tau \yieldsnothing C \)}
 
 \inferrule [SVar]
 {}
 {\alpha \subtype \alpha \yieldsnothing {\Lam x {\image \alpha} x}}
 
 \inferrule [SFun]
-{\ty_3 \subtype \ty_1 \yieldsnothing {C_1} \andalso \ty_2 \subtype \ty_4}
-{\ty_1 \to \ty_2 \subtype \ty_3 \to \ty_4}
+{\tau_3 \subtype \tau_1 \yieldsnothing {C_1} \andalso \tau_2 \subtype \tau_4}
+{\tau_1 \to \tau_2 \subtype \tau_3 \to \tau_4}
 
 \inferrule [SForall]
-{\ty_1 \subtype \subst {\alpha_2} {\alpha_1} \ty_2}
-{\Forall {\alpha_1} \ty_1 \subtype \Forall {\alpha_2} \ty_2}
+{\tau_1 \subtype \subst {\alpha_2} {\alpha_1} \tau_2}
+{\Forall {\alpha_1} \tau_1 \subtype \Forall {\alpha_2} \tau_2}
 
 \inferrule [SAnd1]
-{\ty_k \subtype \ty_3}
-{\ty_1 \Intersect \ty_2 \subtype \ty_3}
+{\tau_k \subtype \tau_3}
+{\tau_1 \Intersect \tau_2 \subtype \tau_3}
 
 \inferrule [SAnd3]
-{\ty_1 \subtype \ty_2 \andalso \ty_1 \subtype \ty_3}
-{\ty_1 \subtype \ty_2 \Intersect \ty_3}
+{\tau_1 \subtype \tau_2 \andalso \tau_1 \subtype \tau_3}
+{\tau_1 \subtype \tau_2 \Intersect \tau_3}
 
 \inferrule [SRec]
-{\ty_1 \subtype \ty_2}
-{\RecTy l {\ty_1} \subtype \RecTy l {\ty_2}}
+{\tau_1 \subtype \tau_2}
+{\RecTy l {\tau_1} \subtype \RecTy l {\tau_2}}

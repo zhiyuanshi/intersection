@@ -1,46 +1,46 @@
-\framebox{\( \Gamma \turns e : \ty \yields E \)}
+\framebox{\( \Gamma \turns e : \tau \yields E \)}
 
 \inferrule [Var]
-{(x,\ty) \in \Gamma}
-{\Gamma \turns x : \ty \yields x}
+{(x,\tau) \in \Gamma}
+{\Gamma \turns x : \tau \yields x}
 
 \inferrule [Lam]
-{\Gamma, x \hast \ty \turns e : \ty_1 \yields E \andalso
- \Gamma \turns \ty}
-{\Gamma \turns \Lam x \ty e : \ty \to \ty_1 \yields {\Lam x {\image \ty} E}}
+{\Gamma, x \hast \tau \turns e : \tau_1 \yields E \andalso
+ \Gamma \turns \tau}
+{\Gamma \turns \Lam x \tau e : \tau \to \tau_1 \yields {\Lam x {\image \tau} E}}
 
 \inferrule [BLam]
-{\Gamma, \alpha \turns e : \ty \yields E}
-{\Gamma \turns \BLam \alpha e : \Forall \alpha \ty \yields {\BLam \alpha E}}
+{\Gamma, \alpha \turns e : \tau \yields E}
+{\Gamma \turns \BLam \alpha e : \Forall \alpha \tau \yields {\BLam \alpha E}}
 
 \inferrule [App]
-{\Gamma \turns e_1 : \ty_1 \to \ty_2 \yields {E_1} \\
- \Gamma \turns e_2 : \ty_3 \yields {E_2} \andalso
- \ty_3 \subtype \ty_1 \yields C}
-{\Gamma \turns \App {e_1} {e_2} : \ty_2 \yields {\App {E_1} {(\App C E_2)}}}
+{\Gamma \turns e_1 : \tau_1 \to \tau_2 \yields {E_1} \\
+ \Gamma \turns e_2 : \tau_3 \yields {E_2} \andalso
+ \tau_3 \subtype \tau_1 \yields C}
+{\Gamma \turns \App {e_1} {e_2} : \tau_2 \yields {\App {E_1} {(\App C E_2)}}}
 
 \inferrule [TApp]
-{\Gamma \turns e : \Forall \alpha \ty_1 \yields E \andalso
- \Gamma \turns \ty}
-{\Gamma \turns \App e \ty : \subst \alpha \ty \ty_1 \yields {\App E {\image \ty}}}
+{\Gamma \turns e : \Forall \alpha \tau_1 \yields E \andalso
+ \Gamma \turns \tau}
+{\Gamma \turns \App e \tau : \subst \alpha \tau \tau_1 \yields {\App E {\image \tau}}}
 
 \inferrule [Merge]
-{\Gamma \turns e_1 : \ty_1 \yields {E_1} \andalso
- \Gamma \turns e_2 : \ty_2 \yields {E_2}}
-{\Gamma \turns e_1 \Merge e_2 : \ty_1 \Intersect \ty_2 \yields {\Pair {E_1} {E_2}}}
+{\Gamma \turns e_1 : \tau_1 \yields {E_1} \andalso
+ \Gamma \turns e_2 : \tau_2 \yields {E_2}}
+{\Gamma \turns e_1 \Merge e_2 : \tau_1 \Intersect \tau_2 \yields {\Pair {E_1} {E_2}}}
 
 \inferrule [RecCon]
-{\Gamma \turns e : \ty \yields E}
-{\Gamma \turns \RecCon l e : \RecTy l \ty \yields E}
+{\Gamma \turns e : \tau \yields E}
+{\Gamma \turns \RecCon l e : \RecTy l \tau \yields E}
 
 \inferrule [RecProj]
-{\Gamma \turns e : \ty \yields E \andalso
- \Gamma \turnsget (\ty; l) : \ty_1 \yields C}
-{\Gamma \turns e.l : \ty_1 \yields {\App C E}}
+{\Gamma \turns e : \tau \yields E \andalso
+ \Gamma \turnsget (\tau; l) : \tau_1 \yields C}
+{\Gamma \turns e.l : \tau_1 \yields {\App C E}}
 
 \inferrule [RecUpd]
-{\Gamma \turns e : \ty \yields E \andalso
- \Gamma \turns e_1 : \ty_1 \yields {E_1} \\
- \turnsput (t; l; e_1 : \ty_1 \yields {E_1}) : (\ty_2, \ty_3) \yields C \andalso
- \ty_1 \subtype \ty_2}
-{\Gamma \turns \RecUpd e l {e_1} : \ty_3 \yields {\App C E}}
+{\Gamma \turns e : \tau \yields E \andalso
+ \Gamma \turns e_1 : \tau_1 \yields {E_1} \\
+ \turnsput (t; l; e_1 : \tau_1 \yields {E_1}) : (\tau_2, \tau_3) \yields C \andalso
+ \tau_1 \subtype \tau_2}
+{\Gamma \turns \RecUpd e l {e_1} : \tau_3 \yields {\App C E}}

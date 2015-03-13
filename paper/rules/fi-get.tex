@@ -1,11 +1,11 @@
-\framebox{\( \turnsget (\ty_1; l) : \ty_2 \yieldsnothing C \)}
+\framebox{\( \turnsget (\tau_1; l) : \tau_2 \yieldsnothing C \)}
 
-% The field with label $ l $ inside $ \ty_1 $ is of type $ \ty_2 $.
+% The field with label $ l $ inside $ \tau_1 $ is of type $ \tau_2 $.
 
 \inferrule [GetBase]
 {}
-{\turnsget (\RecTy l \ty; l) : \ty}
+{\turnsget (\RecTy l \tau; l) : \tau}
 
 \inferrule [GetLeft]
-{\turnsget (\ty_1; l) : \ty}
-{\turnsget (\ty_1 \Intersect \ty_2; l) : \ty}
+{\turnsget (\tau_1; l) : \tau}
+{\turnsget (\tau_1 \Intersect \tau_2; l) : \tau}

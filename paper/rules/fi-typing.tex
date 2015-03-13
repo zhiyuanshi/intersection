@@ -1,39 +1,39 @@
-\framebox{\( \Gamma \turns e : \ty \yieldsnothing E \)}
+\framebox{\( \Gamma \turns e : \tau \yieldsnothing E \)}
 
 \inferrule [Var]
-{(x,\ty) \in \Gamma}
-{\Gamma \turns x : \ty}
+{(x,\tau) \in \Gamma}
+{\Gamma \turns x : \tau}
 
 \inferrule [Lam]
-{\Gamma, x \hast \ty \turns e : \ty_1 \andalso \Gamma \turns \ty}
-{\Gamma \turns \Lam x \ty e : \ty \to \ty_1}
+{\Gamma, x \hast \tau \turns e : \tau_1 \andalso \Gamma \turns \tau}
+{\Gamma \turns \Lam x \tau e : \tau \to \tau_1}
 
 \inferrule [BLam]
-{\Gamma, \alpha \turns e : \ty}
-{\Gamma \turns \BLam \alpha e : \Forall \alpha \ty}
+{\Gamma, \alpha \turns e : \tau}
+{\Gamma \turns \BLam \alpha e : \Forall \alpha \tau}
 
 \inferrule [App]
-{\Gamma \turns e_1 : \ty_1 \to \ty_2 \\
- \Gamma \turns e_2 : \ty_3 \andalso \ty_3 \subtype \ty_1}
-{\Gamma \turns \App {e_1} {e_2} : \ty_2}
+{\Gamma \turns e_1 : \tau_1 \to \tau_2 \\
+ \Gamma \turns e_2 : \tau_3 \andalso \tau_3 \subtype \tau_1}
+{\Gamma \turns \App {e_1} {e_2} : \tau_2}
 
 \inferrule [TApp]
-{\Gamma \turns e : \forall \alpha. \ty_1 \andalso \Gamma \turns \ty}
-{\Gamma \turns \App e \ty : \subst \alpha \ty \ty_1}
+{\Gamma \turns e : \forall \alpha. \tau_1 \andalso \Gamma \turns \tau}
+{\Gamma \turns \App e \tau : \subst \alpha \tau \tau_1}
 
 \inferrule [Merge]
-{\Gamma \turns e_1 : \ty_1 \andalso \Gamma \turns e_2 : \ty_2}
-{\Gamma \turns e_1 \Merge e_2 : \ty_1 \Intersect \ty_2}
+{\Gamma \turns e_1 : \tau_1 \andalso \Gamma \turns e_2 : \tau_2}
+{\Gamma \turns e_1 \Merge e_2 : \tau_1 \Intersect \tau_2}
 
 \inferrule [RecCon]
-{\Gamma \turns e : \ty}
-{\Gamma \turns \RecCon l e : \RecTy l \ty}
+{\Gamma \turns e : \tau}
+{\Gamma \turns \RecCon l e : \RecTy l \tau}
 
 \inferrule [RecProj]
-{\Gamma \turns e : \ty \andalso \Gamma \turnsget (\ty; l) : \ty_1}
-{\Gamma \turns e.l : \ty_1}
+{\Gamma \turns e : \tau \andalso \Gamma \turnsget (\tau; l) : \tau_1}
+{\Gamma \turns e.l : \tau_1}
 
 \inferrule [RecUpd]
-{\Gamma \turns e : \ty \andalso \Gamma \turns e_1 : \ty_1 \\
- \turnsput (t; l; e_1 : \ty_1) : (\ty_2, \ty_3) \andalso \ty_1 \subtype \ty_2}
-{\Gamma \turns \RecUpd e l {e_1} : \ty_3}
+{\Gamma \turns e : \tau \andalso \Gamma \turns e_1 : \tau_1 \\
+ \turnsput (t; l; e_1 : \tau_1) : (\tau_2, \tau_3) \andalso \tau_1 \subtype \tau_2}
+{\Gamma \turns \RecUpd e l {e_1} : \tau_3}

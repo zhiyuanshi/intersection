@@ -134,7 +134,7 @@ and we can further extract a field out of it, such as
 \begin{lstlisting}
 (1 ,, { x = 2 }).x
 \end{lstlisting}
-That is because a record type of the form $ \RecTy l \ty $ can be thought as a
+That is because a record type of the form $ \RecTy l \tau $ can be thought as a
 normal type \lstinline{t} tagged by the label \lstinline{l}. In consequence,
 \name supports a generalization of record elimination and update that works for
 any type. Functional update can be done using the \emph{with} keyword:

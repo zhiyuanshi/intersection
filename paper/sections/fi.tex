@@ -34,19 +34,19 @@ can be desugared into the merge of multiple single records.
 
 \paragraph{Types.} The constructs in the first row of types in
 Figure~\ref{fig:fi-syntax} are standard in System $ F $: type variable
-$ \alpha $, function types $ \ty \to \ty $, and type abstraction
-$ \Forall \alpha \ty $. The last two are novel. $ \ty_1 \Intersect \ty_1 $ is
-the intersection of type $ \ty_1 $ and $ \ty_2 $, 
+$ \alpha $, function types $ \tau \to \tau $, and type abstraction
+$ \Forall \alpha \tau $. The last two are novel. $ \tau_1 \Intersect \tau_1 $ is
+the intersection of type $ \tau_1 $ and $ \tau_2 $, 
 % \bruno{be consistent: in the source language we use \&, and in the
 % formalization we use $\Intersect$}
-and $ \RecTy l \ty $ are the types for single-field records.
+and $ \RecTy l \tau $ are the types for single-field records.
 
 \paragraph{Expressions.} The first five constructs of expressions are also
 standard: variables $ x $, and two abstraction-elimination pairs: lambda
-expressions $ \Lam x \ty e $ abstract expression $ e $ over values of
-type $ \ty $ and are eliminated by application $ \App e e $; Big lambdas
+expressions $ \Lam x \tau e $ abstract expression $ e $ over values of
+type $ \tau $ and are eliminated by application $ \App e e $; Big lambdas
 $ \BLam \alpha e $ abstract expression $ e $ over types and are eliminated by
-type application $ \App e \ty $. In the source language, lambdas are written as
+type application $ \App e \tau $. In the source language, lambdas are written as
 \george{TODO} and big lambdas as \george{TODO}.
 
 The last four constructs are new: $ e_1 \Merge e_2 $ is the \emph{merge} of two
@@ -55,7 +55,7 @@ expressions $ e_1 $ and $ e_2 $.
 It can be used as either $ e_1 $ or $ e_2 $. Particarly, if one regard $ e_1 $
 and $ e_2 $ as objects, their merge will responds to every method that one or
 both of them have. Merge of expressions correspond to intersection types
-$ \ty_1 \Intersect \ty_2 $. $ \RecCon l e $ constructs a single-field record.
+$ \tau_1 \Intersect \tau_2 $. $ \RecCon l e $ constructs a single-field record.
 $ e.l $ accesses the field labelled $ l $ in $ e $. Note that $ e $ does not
 need to be a record type in this case. For example, although the merge of two
 records
@@ -116,14 +116,14 @@ example, $ \Int \Intersect \Bool $ should be a subtype of $ \Int $, since the
 former can be viewed as either $ \Int $ or $ \Bool $. To summarize, the
 subtyping rules are standard except for three points listed below:
 \begin{enumerate}
-\item $ \ty_1 \Intersect \ty_2 $ is a subtype of $ \ty_3 $, if \emph{either} $ \ty_1 $ or
-  $ \ty_2 $ are subtypes of $ \ty_3 $,
+\item $ \tau_1 \Intersect \tau_2 $ is a subtype of $ \tau_3 $, if \emph{either} $ \tau_1 $ or
+  $ \tau_2 $ are subtypes of $ \tau_3 $,
 
-\item $ \ty_1 $ is a subtype of $ \ty_2 \Intersect \ty_3 $, if $ \ty_1 $ is a subtype of
-  both $ \ty_2 $ and $ \ty_3 $.
+\item $ \tau_1 $ is a subtype of $ \tau_2 \Intersect \tau_3 $, if $ \tau_1 $ is a subtype of
+  both $ \tau_2 $ and $ \tau_3 $.
 
-\item $ \RecTy {l_1} {\ty_1} $ is a subtype of $ \RecTy {l_2} {\ty_2} $, if
-  $ l_1 $ and $ l_2 $ are identical and $ \ty_1 $ is a subtype of $ \ty_2 $.
+\item $ \RecTy {l_1} {\tau_1} $ is a subtype of $ \RecTy {l_2} {\tau_2} $, if
+  $ l_1 $ and $ l_2 $ are identical and $ \tau_1 $ is a subtype of $ \tau_2 $.
 \end{enumerate}
 The first point is captured by two rules \rulename{S-And1} and
 \rulename{S-And2}, whereas the second point by \rulename{S-And3}. Note that the
@@ -145,14 +145,14 @@ last point means that record types are covariant in the type of the fields.
 \caption{Typing}
 \end{figure}
 
-The typing judgment for \name is of the form: $ \Gamma \turns e : \ty $. This
+The typing judgment for \name is of the form: $ \Gamma \turns e : \tau $. This
 judgment uses the context $ \Gamma $. The rules for variables, abstraction, type
 abstraction, and type application are standard in System $ F $. To cater to the
 subtyping relations and avoid having undeterministic rules, in \rulename{App},
 we additionally require the type of the argument be a subtype of the parameter.
 The rule for record construction is also standard. For record projection and
 update, we resort to the auxiliary ``get'' and ``put'' rules. The ``get''
-judgment checks if a field $ l $ indeed exists in a type $ \ty $ and fetches the
+judgment checks if a field $ l $ indeed exists in a type $ \tau $ and fetches the
 type of the field if so. The ``put'' judgment is almost similar, except that it
 takes the intended update (both expression and type), and returns in addition a
 new type of the expression. In record updates, we allow refining the type of the
@@ -177,10 +177,10 @@ constructs.
 % Haskell pseudocode, as:
 % \[ \begin{array}{rll}
 %   \fields{\alpha} & = & \rel{\cdot} {\alpha} \\
-%   \fields{\ty_1 \to \ty_2} & = & \rel{\cdot} {\ty_1 \to \ty_2} \\
-%   \fields{\forall \alpha. \ty} & = & \rel{\cdot} {\forall \alpha. \ty} \\
-%   \fields{\ty_1 \Intersect \ty_2} & = & \fields{\ty_1} \dplus \fields{\ty_2} \\
-%   \fields{\RecTy l \ty} & = & \rel l t
+%   \fields{\tau_1 \to \tau_2} & = & \rel{\cdot} {\tau_1 \to \tau_2} \\
+%   \fields{\forall \alpha. \tau} & = & \rel{\cdot} {\forall \alpha. \tau} \\
+%   \fields{\tau_1 \Intersect \tau_2} & = & \fields{\tau_1} \dplus \fields{\tau_2} \\
+%   \fields{\RecTy l \tau} & = & \rel l t
 % \end{array} \]
 % where $ \cdot $ means empty list, $ \dplus $ list concatenation, and $ : $ is an
 % infix operator that prepend the first argument to the second. The function
