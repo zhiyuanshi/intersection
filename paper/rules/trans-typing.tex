@@ -4,43 +4,43 @@
 {(x,\ty) \in \Gamma}
 {\Gamma \turns x : \ty \yields x}
 
-\inferrule [Abs]
-{\Gamma, \rel x \ty \turns e : \ty_1 \yields E \andalso
+\inferrule [Lam]
+{\Gamma, x \hast \ty \turns e : \ty_1 \yields E \andalso
  \Gamma \turns \ty}
-{\Gamma \turns \abs {\rel x \ty} e : \ty \to \ty_1 \yields {\abs {\rel x {\image \ty}} E}}
+{\Gamma \turns \Lam x \ty e : \ty \to \ty_1 \yields {\Lam x {\image \ty} E}}
 
-\inferrule [TAbs]
+\inferrule [BLam]
 {\Gamma, \alpha \turns e : \ty \yields E}
-{\Gamma \turns \Abs \alpha e : \forall \alpha. \ty \yields {\Abs \alpha E}}
+{\Gamma \turns \BLam \alpha e : \Forall \alpha \ty \yields {\BLam \alpha E}}
 
 \inferrule [App]
 {\Gamma \turns e_1 : \ty_1 \to \ty_2 \yields {E_1} \\
  \Gamma \turns e_2 : \ty_3 \yields {E_2} \andalso
  \ty_3 \subtype \ty_1 \yields C}
-{\Gamma \turns \app {e_1} {e_2} : \ty_2 \yields {\app {E_1} {(\app C E_2)}}}
+{\Gamma \turns \App {e_1} {e_2} : \ty_2 \yields {\App {E_1} {(\App C E_2)}}}
 
 \inferrule [TApp]
-{\Gamma \turns e : \forall \alpha. \ty_1 \yields E \andalso
+{\Gamma \turns e : \Forall \alpha \ty_1 \yields E \andalso
  \Gamma \turns \ty}
-{\Gamma \turns \app e \ty : \subst \alpha \ty \ty_1 \yields {\app E {\image \ty}}}
+{\Gamma \turns \App e \ty : \subst \alpha \ty \ty_1 \yields {\App E {\image \ty}}}
 
 \inferrule [Merge]
 {\Gamma \turns e_1 : \ty_1 \yields {E_1} \andalso
  \Gamma \turns e_2 : \ty_2 \yields {E_2}}
-{\Gamma \turns e_1 \dcomma e_2 : \ty_1 \intersects \ty_2 \yields {\tupled {E_1, E_2}}}
+{\Gamma \turns e_1 \Merge e_2 : \ty_1 \Intersect \ty_2 \yields {\Pair {E_1} {E_2}}}
 
 \inferrule [RecCon]
 {\Gamma \turns e : \ty \yields E}
-{\Gamma \turns \reccon l e : \recty l \ty \yields E}
+{\Gamma \turns \RecCon l e : \RecTy l \ty \yields E}
 
 \inferrule [RecProj]
 {\Gamma \turns e : \ty \yields E \andalso
  \Gamma \turnsget (\ty; l) : \ty_1 \yields C}
-{\Gamma \turns e.l : \ty_1 \yields {\app C E}}
+{\Gamma \turns e.l : \ty_1 \yields {\App C E}}
 
 \inferrule [RecUpd]
 {\Gamma \turns e : \ty \yields E \andalso
  \Gamma \turns e_1 : \ty_1 \yields {E_1} \\
  \turnsput (t; l; e_1 : \ty_1 \yields {E_1}) : (\ty_2, \ty_3) \yields C \andalso
  \ty_1 \subtype \ty_2}
-{\Gamma \turns \recupd e l {e_1} : \ty_3 \yields {\app C E}}
+{\Gamma \turns \RecUpd e l {e_1} : \ty_3 \yields {\App C E}}

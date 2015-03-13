@@ -1,21 +1,21 @@
-\framebox{\(\Gamma \turns {t}\)}
+\framebox{\(\gamma \turns \ty\)}
 
 \inferrule [WF-Var]
-{\alpha \in \Gamma}
-{\Gamma \turns \alpha}
+{\alpha \in \gamma}
+{\gamma \turns \alpha}
 
 \inferrule [WF-Fun]
-{\Gamma \turns \ty_1 \andalso \Gamma \turns \ty_2}
-{\Gamma \turns \ty_1 \to \ty_2}
+{\gamma \turns \ty_1 \andalso \gamma \turns \ty_2}
+{\gamma \turns \ty_1 \to \ty_2}
 
 \inferrule [WF-Forall]
-{\Gamma, \alpha \turns \ty}
-{\Gamma \turns \forall \alpha. \ty}
+{\gamma, \alpha \turns \ty}
+{\gamma \turns \Forall \alpha \ty}
 
 \inferrule [WF-And]
-{\Gamma \turns \ty_1 \andalso \Gamma \turns \ty_2}
-{\Gamma \turns \ty_1 \intersects \ty_2}
+{\gamma \turns \ty_1 \andalso \gamma \turns \ty_2}
+{\gamma \turns \ty_1 \Intersect \ty_2}
 
 \inferrule [WF-Rec]
-{\Gamma \turns \ty}
-{\Gamma \turns \recty l \ty}
+{\gamma \turns \ty}
+{\gamma \turns \RecTy l \ty}

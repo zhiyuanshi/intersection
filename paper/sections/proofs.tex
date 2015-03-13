@@ -10,7 +10,7 @@
     Trivial.
 
   \item \textbf{GetLeft} By i.h., $ C $ is of type
-    $ \image {\ty_1} \to \image \ty $. $ x $ is of type $ \tupled {\ty_1, \ty_2} $.
+    $ \image {\ty_1} \to \image \ty $. $ x $ is of type $ \Pair {\ty_1} {\ty_2} $.
     Thus $ fst x $ is of type $ \ty_1 $ and $ C (fst x) : \ty $.
 
   \item \textbf{GetRight}
@@ -47,10 +47,10 @@ By structural induction on the types and the corresponding inference rule. \\
 \begin{proof}
 By structural induction on the type and the corresponding inference rule. \\
 
-\rulename{Get-Base} $ \Gamma \turnsget \recty l \ty ; l = \idmono {\image {\recty l \ty})} ; \ty $ \\
+\rulename{Get-Base} $ \Gamma \turnsget \RecTy l \ty ; l = \Lam x {\image {\RecTy l \ty})} x ; \ty $ \\
 
 By the induction hypothesis
-$$ \image \Gamma \turns \idmono {\image {\recty l \ty}} : \image {\recty l \ty} \to \image \ty $$
+$$ \image \Gamma \turns \Lam x {\image {\RecTy l \ty}} x : \image {\RecTy l \ty} \to \image \ty $$
 
 \rulename{Get-Left} \\
 \rulename{Get-Right} \\
@@ -102,7 +102,7 @@ Based on the definition of $ \image \cdot $,
 Thus we have by \rulename{F-Var} that
   $$ \image \Gamma \turns x : \image \ty $$
 
-\rulename{Abs} $ \Gamma \turns \lambda (x : \ty_1). e : \ty_1 \to \ty_2 \yields {\absty x {\image {\ty_1}} E} $ \\
+\rulename{Abs} $ \Gamma \turns \lambda (x : \ty_1). e : \ty_1 \to \ty_2 \yields {\Lam x {\image {\ty_1}} E} $ \\
 
 It follows from \rulename{Abs} that
   $$ \Gamma, x : \ty_1 \turns e : \ty_2 \yields E $$
@@ -113,9 +113,9 @@ By \rulename{Abs} we also have
 It follows from Lemma \ref{preserve-wf} that
   $$ \image \Gamma \turns \image {\ty_1} $$
 Hence by \rulename{F-Abs} and the definition of $ \image \cdot $ we have
-  $$ \image \Gamma \turns \absty x {\image {\ty_1}} E : \image {\ty_1 \to \ty_2} $$
+  $$ \image \Gamma \turns \Lam x {\image {\ty_1}} E : \image {\ty_1 \to \ty_2} $$
 
-\rulename{(TrApp)} $ \Gamma \turns \app {e_1} {e_2} : \ty_2 \yields {E_1 (\app C {E_2})} $ \\
+\rulename{(TrApp)} $ \Gamma \turns \App {e_1} {e_2} : \ty_2 \yields {E_1 (\App C {E_2})} $ \\
 
 From \rulename{(TrApp)} we have
   $$ \Gamma \turns \ty_3 <: \ty_1 \yields C $$
@@ -126,7 +126,7 @@ Also from \rulename{(TrApp)} and the induction hypothesis
 Also from \rulename{(TrApp)} and the induction hypothesis
   $$ \image \Gamma \turns E_2 : \image {\ty_3} $$
 Assembling those parts using \rulename{(F-App)} we come to
-  $$ \image \Gamma \turns E_1 (\app C {E_2}) : \image {\ty_2} $$
+  $$ \image \Gamma \turns E_1 (\App C {E_2}) : \image {\ty_2} $$
 \end{proof}
 
 \rulename{TAbs} $ \Gamma \turns \Lambda \alpha. e : \forall \alpha. \ty \yields {\forall \alpha. E} $ \\
@@ -139,7 +139,7 @@ Thus by \rulename{F-TAbs} and the definition of $ \image \cdot $
   $$ \Gamma \turns \Lambda \alpha. E : \image {\forall \alpha. \ty} $$
 
 
-\rulename{TAp} $ \Gamma \turns e \; \ty  : [\alpha := t] \ty_1 \yields {E \; \image \ty} $ \\
+\rulename{TAp} $ \Gamma \turns e \; \ty  : \subst \tau \alpha  \ty_1 \yields {E \; \image \ty} $ \\
 
 From \rulename{TApp} we have
   $$ \Gamma \turns e : \forall \alpha. \ty_1 \yields E $$
@@ -148,31 +148,31 @@ And by the induction hypothesis that
 Also from \rulename{TApp} and Lemma \ref{preserve-wf} we have
   $$ \image \Gamma \turns \image \ty $$
 Then by \rulename{F-TApp} that
-  $$ \image \Gamma \turns E \; \image \ty : [\alpha := \image \ty ] \image {\ty_1} $$
+  $$ \image \Gamma \turns E \; \image \ty : \subst {\image \tau} \alpha \image {\ty_1} $$
 Therefore
-  $$ \image \Gamma \turns E \; \image \ty : \image {[\alpha := \ty ] \image {\ty_1}} $$
+  $$ \image \Gamma \turns E \; \image \ty : \image {\subst \tau \alpha \image {\ty_1}} $$
 
-% \rulename{(TrMerge)} $ \Gamma \turns e_1 \merge e_2 : \ty_1 \& \ty_2 % % \yields {\tupled {E1, E2} $ \\
+% \rulename{(TrMerge)} $ \Gamma \turns e_1 \merge e_2 : \ty_1 \& \ty_2 % % \yields {\Pair {E1} {E2} $ \\
 
 From \rulename{(TrMerge)} and the induction hypothesis we have
   $$ \image \Gamma \turns E_1 : \image {\ty_1} $$
 and
   $$ \image \Gamma \turns E_2 : \image {\ty_2} $$
 Hence by \rulename{F-Pair}
-  $$ \image \Gamma \turns \tupled {E_1, E_2} : \tupled {\image {\ty_1}, \image {\ty_2}} $$
+  $$ \image \Gamma \turns \Pair {E_1} {E_2} : \Pair {\image {\ty_1}} {\image {\ty_2}} $$
 Hence by the definition of $ \image \cdot $
-  $$ \image \Gamma \turns \tupled {E_1, E_2} : \image {\ty_1 \& \ty_2} $$
+  $$ \image \Gamma \turns \Pair {E_1} {E_2} : \image {\ty_1 \& \ty_2} $$
 
-\rulename{RcdIntro} $ \Gamma \turns ecordcon l e : \recty l \ty \yields E $ \\
+\rulename{RecIntro} $ \Gamma \turns \RecCon l e : \RecTy l \ty \yields E $ \\
 
 From \rulename{RcdIntro} we have
   $$ \Gamma \turns e : \ty \yields E $$
 And by the induction hypothesis that
   $$ \image \Gamma \turns E : \image \ty $$
 Thus by the definition of $ \image \cdot $
-  $$ \image \Gamma \turns E : \image {\recty l \ty} $$
+  $$ \image \Gamma \turns E : \image {\RecTy l \ty} $$
 
-\rulename{RcdElim} $ \Gamma \turns e.l : \ty_1 \yields {\app C E} $ \\
+\rulename{RcdElim} $ \Gamma \turns e.l : \ty_1 \yields {\App C E} $ \\
 
 From \rulename{RcdElim}
   $$ \Gamma \turns e : \ty \yields E $$
@@ -183,7 +183,7 @@ Also from \rulename{RcdEim}
 Applying Lemma \ref{type-get} to the above we have
   $$ \image \Gamma \turns C : \image \ty \to \image {\ty_1}  $$
 Hence by \rulename{F-App} we have
-  $$ \image \Gamma \turns \app C E : \image {\ty_1} $$
+  $$ \image \Gamma \turns \App C E : \image {\ty_1} $$
 
 From \rulename{RcdUpd}
   $$ \Gamma \turns e : \ty \yields E $$
@@ -194,4 +194,4 @@ Also from \rulename{RcdUpd}
 Applying Lemma \ref{type-put} to the above we have
   $$ \image \Gamma \turns C : \image \ty \to \image \ty  $$
 Hence by \rulename{F-App} we have
-  $$ \image \Gamma \turns \app C E : \image \ty $$
+  $$ \image \Gamma \turns \App C E : \image \ty $$

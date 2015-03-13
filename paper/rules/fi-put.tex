@@ -2,15 +2,8 @@
 
 \inferrule [PutBase]
 {}
-{\turnsput (\recty l \ty; l; e : \ty_1 \yieldsnothing E) : (\ty, \recty l {\ty_1})
-  \yieldsnothing {\absty x {\image {\recty l \ty}} E}}
+{\turnsput (\RecTy l \ty; l; e : \ty_1) : (\ty, \RecTy l {\ty_1})}
 
 \inferrule [PutLeft]
-{\turnsput (\ty_1; l; e : \ty \yieldsnothing E) : (\ty_3, \ty_4) \yieldsnothing C}
-{\turnsput (\ty_1 \intersects \ty_2; l; e : \ty \yieldsnothing E) : (\ty_3, \ty_4 \intersects \ty_2)
-  \yieldsnothing {\absty x {\image {\ty_1 \intersects \ty_2}} {C (\fst ~ x)}}}
-
-\inferrule [PutRight]
-{\turnsput (\ty_2; l; e : \ty \yieldsnothing E) : (\ty_3, \ty_4) \yieldsnothing C}
-{\turnsput (\ty_1 \intersects \ty_2; l; e : \ty \yieldsnothing E) : (\ty_3, \ty_1 \intersects \ty_4)
-  \yieldsnothing {\absty x {\image {\ty_1 \intersects \ty_2}} {C (\snd ~ x)}}}
+{\turnsput (\ty_1; l; e : \ty) : (\ty_3, \ty_4)}
+{\turnsput (\ty_1 \Intersect \ty_2; l; e : \ty) : (\ty_3, \ty_4 \Intersect \ty_2)}

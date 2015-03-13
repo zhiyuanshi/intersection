@@ -2,46 +2,39 @@
 
 \inferrule [SVar]
 {}
-{\alpha \subtype \alpha \yields {\abs {\rel x {\image \alpha}} x}}
+{\alpha \subtype \alpha \yields {\Lam x {\image \alpha} x}}
 
 \inferrule [SFun]
 {\ty_3 \subtype \ty_1 \yields {C_1} \andalso \ty_2 \subtype \ty_4 \yields {C_2}}
 {\ty_1 \to \ty_2 \subtype \ty_3 \to \ty_4
   \yields
-    {\abs {\rel f {\image {\ty_1 \to \ty_2}}}
-      {\abs {\rel x {\image {\ty_3}}}
-        {\app {C_2} {(\app {f} {(\app {C_1} {x})})}}}}}
+    {\Lam f {\image {\ty_1 \to \ty_2}}
+      {\Lam x {\image {\ty_3}}
+        {\App {C_2} {(\App f {(\App {C_1} x)})}}}}}
 
 \inferrule [SForall]
 {\ty_1 \subtype \subst {\alpha_2} {\alpha_1} \ty_2 \yields C}
-{\forall \alpha_1. \ty_1 \subtype \forall \alpha_2. \ty_2
+{\Forall \alpha_1 \ty_1 \subtype \Forall \alpha_2 \ty_2
   \yields
-    {\abs {\rel{f} {\image {\forall \alpha. \ty_1}}}
-      {\Abs \alpha {\app C {(\app f \alpha)}}}}}
+    {\Lam f {\image {\Forall \alpha \ty_1}}
+      {\BLam \alpha {\App C {(\App f \alpha)}}}}}
 
-\inferrule [SAnd1]
-{\ty_1 \subtype \ty_3 \yields C}
-{\ty_1 \intersects \ty_2 \subtype \ty_3
+\inferrule [$ \Intersect_k $]
+{\ty_k \subtype \ty_3 \yields C}
+{\ty_1 \Intersect \ty_2 \subtype \ty_3
   \yields
-    {\abs {\rel x {\image {\ty_1 \intersects \ty_2}}}
-      {\app C {(\app \fst x)}}}}
-
-\inferrule [SAnd2]
-{\ty_2 \subtype \ty_3 \yields C}
-{\ty_1 \intersects \ty_2 \subtype \ty_3
-  \yields
-    {\abs {\rel x {\image {\ty_1 \intersects \ty_2}}}
-      {\app C {(\app \snd x)}}}}
+    {\Lam x {\image {\ty_1 \Intersect \ty_2}}
+      {\App C {(\Proj k x)}}}}
 
 \inferrule [SAnd3]
 {\ty_1 \subtype \ty_2 \yields {C_1} \andalso \ty_1 \subtype \ty_3 \yields {C_2}}
-{\ty_1 \subtype \ty_2 \intersects \ty_3
+{\ty_1 \subtype \ty_2 \Intersect \ty_3
   \yields
-    {\abs {\rel x {\image {\ty_1}}}
-      {\tupled {\app {C_1} x, \app {C_2} x}}}}
+    {\Lam x {\image {\ty_1}}
+      {\Pair {\App {C_1} x} {\App {C_2} x}}}}
 
 \inferrule [SRec]
 {\ty_1 \subtype \ty_2 \yields C}
-{\recty l {\ty_1} \subtype \recty l {\ty_2}
+{\RecTy l {\ty_1} \subtype \RecTy l {\ty_2}
   \yields
-    {\abs {\rel x {\image {\recty l {\ty_1}}}} {\app C x}}}
+    {\Lam x {\image {\RecTy l {\ty_1}}} {\App C x}}}

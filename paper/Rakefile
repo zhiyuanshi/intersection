@@ -1,20 +1,6 @@
 # -*- coding: utf-8 -*-
 task :default => :paper
 
-desc "Prepare rules"
-  task :prepare_rules do
-    system <<-SHELL
-cd rules &&
-cp trans-get.tex fi-get.tex &&
-cp trans-put.tex fi-put.tex &&
-cp trans-sub.tex fi-sub.tex &&
-cp trans-typing.tex fi-typing.tex &&
-sed -i 's/\\optional/\\optionalnothing/g' fi-*.tex &&
-sed -i 's/\\yields/\\yieldsnothing/g'     fi-*.tex &&
-cd -
-    SHELL
-end
-
 def latexmk_cmd(options = "")
   # "Since minted makes calls to the outside world (i.e. Pygments), you need to
   # tell the LaTeX processor about this by passing it the -shell-escape option
@@ -27,7 +13,8 @@ def latexmk_cmd(options = "")
   engine = "xelatex"
   # engine = "lualatex"
 
-  "latexmk #{options} -pdf -pdflatex='#{engine} -shell-escape %O %S' main.tex"
+  # -f     Force latexmk to continue document processing despite errors.
+  "latexmk -f #{options} -pdf -pdflatex='#{engine} -shell-escape %O %S' main.tex"
 end
 
 desc "Generate the PDF of the paper"

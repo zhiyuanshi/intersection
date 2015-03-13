@@ -4,15 +4,8 @@
 
 \inferrule [GetBase]
 {}
-{\turnsget (\recty l \ty; l) : \ty
-  \yieldsnothing {\idmono {\image {\recty l \ty}}}}
+{\turnsget (\RecTy l \ty; l) : \ty}
 
 \inferrule [GetLeft]
-{\turnsget (\ty_1; l) : \ty \yieldsnothing C}
-{\turnsget (\ty_1 \intersects \ty_2; l) : \ty
-  \yieldsnothing {\absty x {\image {\ty_1 \intersects \ty_2}} {C (\app \fst x)}}}
-
-\inferrule [GetRight]
-{\turnsget (\ty_2; l) : \ty \yieldsnothing C}
-{\turnsget (\ty_1 \intersects \ty_2; l) : \ty
-  \yieldsnothing {\absty x {\image {\ty_1 \intersects \ty_2}} {C (\app \snd x)}}}
+{\turnsget (\ty_1; l) : \ty}
+{\turnsget (\ty_1 \Intersect \ty_2; l) : \ty}

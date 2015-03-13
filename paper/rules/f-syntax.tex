@@ -1,19 +1,8 @@
 \[
-\begin{array}{lrrl}
-  \text{Types} & T & \Coloneqq &
-    \alpha
-    \mid T \to T
-    \mid \forall \alpha. T
-    \mid \tupled {T, T} \\
-
-  \text{Terms} & E, C & \Coloneqq &
-    x
-    \mid \abs {\rel x T} {E}
-    \mid \Abs {\alpha} {E}
-    \mid \app E E
-    \mid \app E T \\ & & &
-    \mid \tupled {E, E}
-    \mid \fst E
-    \mid \snd E
+\begin{array}{llrl}
+  \text{Types}       & T    & \Coloneqq & \alpha \mid T \to T \mid \Forall \alpha T \mid \Pair T T \\ 
+  \text{Expressions} & E, C & \Coloneqq & x \mid \Lam x T E \mid \App E E \mid \BLam \alpha E \mid \TApp E T \\ 
+                     &      & \mid      & \Pair E E \mid \Proj k E \\
+  \text{Contexts} & \Gamma & \Coloneqq & \epsilon \mid \Gamma, \alpha \mid \Gamma, x \hast T \\
 \end{array}
 \]
