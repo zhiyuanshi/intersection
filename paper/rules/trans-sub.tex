@@ -13,8 +13,8 @@
         {\App {C_2} {(\App f {(\App {C_1} x)})}}}}}
 
 \inferrule [SForall]
-{\tau_1 \subtype \subst {\alpha_2} {\alpha_1} \tau_2 \yields C}
-{\Forall \alpha_1 \tau_1 \subtype \Forall \alpha_2 \tau_2
+{\tau_1 \subtype \subst {\alpha_1} {\alpha_2} \tau_2 \yields C}
+{\Forall {\alpha_1} \tau_1 \subtype \Forall {\alpha_2} \tau_2
   \yields
     {\Lam f {\image {\Forall \alpha \tau_1}}
       {\BLam \alpha {\App C {(\App f \alpha)}}}}}
