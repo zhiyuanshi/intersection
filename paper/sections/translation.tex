@@ -55,7 +55,7 @@ The main translation judgment is $ \Gamma \turns e : \tau \hookrightarrow E $ wh
 states that with respect to the environment $ \Gamma $, the \name expression
 $ e $ is of a \name type $ \tau $ and its translation is a System $ F $ expression $ E $.
 
-We also define the type translation function $ \image \cdot $ from \name types
+We also define the type translation function $ \im \cdot $ from \name types
 $ \tau $ to System $ F $ types $ T $.
 
 \begin{figure}
@@ -85,7 +85,7 @@ and has type $ \tau_1 \to \tau_2 $, as proved by Lemma \ref{type-coerce}. It is
 read ``In the environment $ \Gamma $, $ \tau_1 $ is a subtype of $ \tau_2 $; and
 if any expression $ e $ has a type $ \tau_1 $ that is a subtype of the type of
 $ \tau_2 $, the elaborated $ e $, when applied to the corresponding coercion $ C $,
-has exactly type $ \image \tau_2 $''. For example,
+has exactly type $ \im \tau_2 $''. For example,
 $\Gamma \turns Int \& Bool <: Bool \yields {fst} $, where $ fst $ is the
 projection of a tuple on the first element. The coercion judgment is only used
 in the \rulename{App} case. As \rulename{SFun} supports contravariant parameter
@@ -122,7 +122,7 @@ those in the previous section with the light-blue part for the translation.
   The elaboration judgment $ \Gamma \turns e : \tau \yields E $ extends the
   typing judgment with an elaborated expression on the right hand side of
   $ \hookrightarrow $. The translation ensures that $ E $ has type
-  $ \image \tau $. It is also standard, except for the case of \rulename{App}, in
+  $ \im \tau $. It is also standard, except for the case of \rulename{App}, in
   which a coercion from the inferred type of the argument, $ e_2 $ , to the
   expected type of the parameter, $ \tau_1 $, is inserted before the argument;
   \rulename{Merge} translates merges into pairs. \rulename{RecCon} uses the
@@ -156,7 +156,7 @@ those in the previous section with the light-blue part for the translation.
   of type $ \{ \code{eval} : \code{Int} \}$, it is able to give the desired
   field. \rulename{GetBase} is the base case: the type of the field labelled
   $ l $ in a $ \RecTy l \tau $ is just $ \tau $ and the coercion is an identity
-  function specialized to type $ \image {\RecTy l \tau} $ \rulename{GetLeft} and
+  function specialized to type $ \im {\RecTy l \tau} $ \rulename{GetLeft} and
   \rulename{GetRight} are complementary to each other.
 
   Consider the source program:
@@ -173,7 +173,7 @@ those in the previous section with the light-blue part for the translation.
   \[ \turnsget (\RecTy {name} {String}; {name}) : String \]
 
   we have the coercion
-  \[ \Lam x {\image {\RecTy {name} {String}}} x \]
+  \[ \Lam x {\im {\RecTy {name} {String}}} x \]
 
   which is just $ \Lam x {String} x $ according to type translation.
 
@@ -181,8 +181,8 @@ those in the previous section with the light-blue part for the translation.
   \[ \turnsget (\RecTy {name} {String} \Intersect \RecTy {age} {Int}; {name}) : String \]
 
   % we have the coercion
-  % \[ \abs {\rel x {\image {\RecTy {name} {String} \Intersect \RecTy
-  %         {age} {Int}}}} \App {(\abs {\rel x {\image {\RecTy {name} {String}}}} x)} {(\fst ~ x)} \]
+  % \[ \abs {\rel x {\im {\RecTy {name} {String} \Intersect \RecTy
+  %         {age} {Int}}}} \App {(\abs {\rel x {\im {\RecTy {name} {String}}}} x)} {(\fst ~ x)} \]
   % which is just $ \abs {\rel x {(String, Int)}} {\App {(\abs {\rel x {String}} x)} {(\fst ~ x)}} $ by type translation.
 
   By typing rules, the translation of the program is
@@ -217,12 +217,12 @@ then $ \tau_1 \subtype \tau_3 $.
 
 \begin{lemma} \label{type-coerce}
   If $$ \Gamma \turns \tau_1 <: \tau_2 \yields C $$
-  then $$ \image \Gamma \turns C : \image {\tau_1} \to \image {\tau_2} $$
+  then $$ \im \Gamma \turns C : \im {\tau_1} \to \im {\tau_2} $$
 \end{lemma}
 
 \begin{lemma}[Get rules produce the type-correct coercion.] \label{type-get}
   If $$ \Gamma \turnsget \tau ; l = C ; \tau_1 $$
-  then $$ \image \Gamma \turns C : \image \tau \to \image {\tau_1} $$
+  then $$ \im \Gamma \turns C : \im \tau \to \im {\tau_1} $$
 \end{lemma}
 
 \begin{proof}
@@ -231,7 +231,7 @@ By induction on the given derivation.
 
 \begin{lemma}[Put rules produce the type-correct coercion.] \label{type-put}
   If $$ \Gamma \turnsput \tau ; l ; E = C ; \tau_1 $$
-  then $$ \image \Gamma \turns C : \image \tau \to \image \tau $$
+  then $$ \im \Gamma \turns C : \im \tau \to \im \tau $$
 \end{lemma}
 
 \begin{proof}
@@ -240,7 +240,7 @@ By induction on the given derivation.
 
 \begin{lemma}[Translation preserves well-formedness.] \label{preserve-wf}
   If   $$ \Gamma \turns \tau $$
-  then $$ \image \Gamma \turns \image \tau $$
+  then $$ \im \Gamma \turns \im \tau $$
 \end{lemma}
 
 \begin{proof}
@@ -249,7 +249,7 @@ By induction on the given derivation.
 
 \begin{theorem}[Type preserving translation.] \label{preserve-tr}
   If   $$ \Gamma \turns e : \tau \yields E $$
-  then $$ \image \Gamma \turns E : \image \tau $$
+  then $$ \im \Gamma \turns E : \im \tau $$
 \end{theorem}
 
 \begin{proof}

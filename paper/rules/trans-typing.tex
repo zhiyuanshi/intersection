@@ -8,7 +8,7 @@
 \inferrule* [right=$\ruleelam$]
   {\gamma, x \hast \tau \turns e : \tau_1 \yields E \andalso
    \gamma \turns \tau}
-  {\gamma \turns \Lam x \tau e : \tau \to \tau_1 \yields {\Lam x {\image \tau} E}}
+  {\gamma \turns \Lam x \tau e : \tau \to \tau_1 \yields {\Lam x {\im \tau} E}}
 
 \inferrule* [right=$\ruleeapp$]
   {\gamma \turns e_1 : \tau_1 \to \tau_2 \yields {E_1} \\
@@ -23,7 +23,7 @@
 \inferrule* [right=$\ruleetapp$]
   {\gamma \turns e : \Forall \alpha \tau_1 \yields E \andalso
    \gamma \turns \tau}
-  {\gamma \turns \TApp e \tau : \subst \alpha \tau \tau_1 \yields {\App E {\image \tau}}}
+  {\gamma \turns \TApp e \tau : \subst \alpha \tau \tau_1 \yields {\App E {\im \tau}}}
 
 \inferrule* [right=$\ruleemerge$]
   {\gamma \turns e_1 : \tau_1 \yields {E_1} \andalso

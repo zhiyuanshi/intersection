@@ -3,47 +3,47 @@
 
 \inferrule* [right=$\rulesubvar$]
   { }
-  {\alpha \subtype \alpha \yields {\Lam x {\image \alpha} x}}
+  {\alpha \subtype \alpha \yields {\Lam x {\im \alpha} x}}
 
 \inferrule* [right=$\rulesubfun$]
   {\tau_3 \subtype \tau_1 \yields {C_1} \andalso \tau_2 \subtype \tau_4 \yields {C_2}}
   {\tau_1 \to \tau_2 \subtype \tau_3 \to \tau_4
   \yields
-      {\Lam f {\image {\tau_1 \to \tau_2}}
-      {\Lam x {\image {\tau_3}}
+      {\Lam f {\im {\tau_1 \to \tau_2}}
+      {\Lam x {\im {\tau_3}}
           {\App {C_2} {(\App f {(\App {C_1} x)})}}}}}
 
 \inferrule* [right=$\rulesubforall$]
   {\tau_1 \subtype \subst {\alpha_1} {\alpha_2} \tau_2 \yields C}
   {\Forall {\alpha_1} \tau_1 \subtype \Forall {\alpha_2} \tau_2
     \yields
-      {\Lam f {\image {\Forall \alpha \tau_1}}
+      {\Lam f {\im {\Forall \alpha \tau_1}}
         {\BLam \alpha {\App C {(\App f \alpha)}}}}}
 
 \inferrule* [right=$\rulesubintersect$]
   {\tau_1 \subtype \tau_2 \yields {C_1} \andalso \tau_1 \subtype \tau_3 \yields {C_2}}
   {\tau_1 \subtype \tau_2 \Intersect \tau_3
     \yields
-      {\Lam x {\image {\tau_1}}
+      {\Lam x {\im {\tau_1}}
         {\Pair {\App {C_1} x} {\App {C_2} x}}}}
 
 \inferrule* [right=$\rulesubintersectl$]
   {\tau_1 \subtype \tau_3 \yields C}
   {\tau_1 \Intersect \tau_2 \subtype \tau_3
     \yields
-      {\Lam x {\image {\tau_1 \Intersect \tau_2}}
+      {\Lam x {\im {\tau_1 \Intersect \tau_2}}
         {\App C {(\Proj 1 x)}}}}
 
 \inferrule* [right=$\rulesubintersectr$]
   {\tau_2 \subtype \tau_3 \yields C}
   {\tau_1 \Intersect \tau_2 \subtype \tau_3
     \yields
-      {\Lam x {\image {\tau_1 \Intersect \tau_2}}
+      {\Lam x {\im {\tau_1 \Intersect \tau_2}}
         {\App C {(\Proj 2 x)}}}}
 
 \inferrule* [right=$\rulesubrec$]
   {\tau_1 \subtype \tau_2 \yields C}
   {\RecTy l {\tau_1} \subtype \RecTy l {\tau_2}
     \yields
-      {\Lam x {\image {\RecTy l {\tau_1}}} {\App C x}}}
+      {\Lam x {\im {\RecTy l {\tau_1}}} {\App C x}}}
 \end{mathpar}

@@ -3,13 +3,13 @@
 
 \inferrule* [right=$\ruleget$]
   { }
-  {\judgeget {\RecTy l \tau} l \tau \yields {\Lam x {\image {\RecTy l \tau}} x}}
+  {\judgeget {\RecTy l \tau} l \tau \yields {\Lam x {\im {\RecTy l \tau}} x}}
 
 \inferrule* [right=$\rulegetl$]
   {\judgeget {\tau_1} l \tau \yields C}
-  {\judgeget {\tau_1 \Intersect \tau_2} l \tau \yields {\Lam x {\image {\tau_1 \Intersect \tau_2}} {C (\Proj 1 x)}}}
+  {\judgeget {\tau_1 \Intersect \tau_2} l \tau \yields {\Lam x {\im {\tau_1 \Intersect \tau_2}} {C (\Proj 1 x)}}}
 
 \inferrule* [right=$\rulegetr$]
   {\judgeget {\tau_2} l \tau \yields C}
-  {\judgeget {\tau_1 \Intersect \tau_2} l \tau \yields {\Lam x {\image {\tau_1 \Intersect \tau_2}} {C (\Proj 2 x)}}}
+  {\judgeget {\tau_1 \Intersect \tau_2} l \tau \yields {\Lam x {\im {\tau_1 \Intersect \tau_2}} {C (\Proj 2 x)}}}
 \end{mathpar}
