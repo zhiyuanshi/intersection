@@ -1,8 +1,8 @@
 \section{Proofs}
 
-\begin{lemma}[\rulelabelget~rules produces type-correct coercion]
-  If $ \judgeget \tau l {\tau_1} \yields C $, then $ \im \gamma \turns C :
-  \im \tau \to \im {\tau_1} $ for any $\gamma$.
+\begin{lemma}[\rulelabelget~rules produce type-correct coercion]
+  If $ \judgeget \tau l {\tau_1} \yields C $, then $ \epsilon \turns C :
+  \im \tau \to \im {\tau_1} $.
 \end{lemma}
 
 \begin{proof}
@@ -16,8 +16,8 @@
     \end{flalign*}
 
     \begin{tabular}{ll}
-      $ \Gamma \turns \Lam x {\im {\RecTy l \tau}} x : \im {\RecTy l \tau} \to \im {\RecTy l \tau} $ & By $\rulelabeltlam$ and $\rulelabeltvar$ \\
-      $ \im \gamma \turns \Lam x {\im {\RecTy l \tau}} x : \im {\RecTy l \tau} \to \im \tau $ & By the definition of $\im \cdot$
+      $ \epsilon \turns \Lam x {\im {\RecTy l \tau}} x : \im {\RecTy l \tau} \to \im {\RecTy l \tau} $ & By $\rulelabeltlam$ and $\rulelabeltvar$ \\
+      $ \epsilon \turns \Lam x {\im {\RecTy l \tau}} x : \im {\RecTy l \tau} \to \im \tau $ & By the definition of $\im \cdot$
     \end{tabular} \\
 
   \item \textbf{Case}
@@ -26,12 +26,14 @@
     \end{flalign*}
 
     \begin{tabular}{ll}
-      $\im \gamma, x \hast \im {\tau_1 \Intersect \tau_2} \turns x : \im {\tau_1 \Intersect \tau_2}$ & By $\rulelabeltvar$ \\
-      $\im \gamma, x \hast \im {\tau_1 \Intersect \tau_2} \turns x : \Pair {\im {\tau_1}} {\im {\tau_2}}$ & By the definition of $\im \cdot$ \\
-      $\im \gamma, x \hast \im {\tau_1 \Intersect \tau_2} \turns \Proj 1 x : \im {\tau_1}$ & By $\rulelabeltprojl$ \\
-      $\im \gamma \turns C : \im {\tau_1} \to \im \tau$ & By i.h. \\
-      $\im \gamma, x \hast \im {\tau_1 \Intersect \tau_2} \turns \App C (\Proj 1 x) : \im {\tau}$ & By $\rulelabeltapp$ \\
-      $\im \gamma \turns \Lam x {\im {\tau_1 \Intersect \tau_2}} {C (\Proj 1 x)} : \im {\tau_1 \Intersect \tau_2} \to \im {\tau}$ & By $\rulelabeltlam$
+      $\epsilon, x \hast \im {\tau_1 \Intersect \tau_2} \turns x : \im {\tau_1 \Intersect \tau_2}$ & By $\rulelabeltvar$ \\
+      $\epsilon, x \hast \im {\tau_1 \Intersect \tau_2} \turns x : \Pair {\im {\tau_1}} {\im {\tau_2}}$ & By the definition of $\im \cdot$ \\
+      $\epsilon, x \hast \im {\tau_1 \Intersect \tau_2} \turns \Proj 1 x : \im {\tau_1}$ & By $\rulelabeltprojleft$ \\
+      $\epsilon \turns C : \im {\tau_1} \to \im \tau$ & By i.h. \\
+      $\epsilon, x \hast \im {\tau_1 \Intersect \tau_2} \turns C : \im
+      {\tau_1} \to \im \tau$ & \george{What should this be called?} \\
+      $\epsilon, x \hast \im {\tau_1 \Intersect \tau_2} \turns \App C (\Proj 1 x) : \im {\tau}$ & By $\rulelabeltapp$ \\
+      $\epsilon \turns \Lam x {\im {\tau_1 \Intersect \tau_2}} {C (\Proj 1 x)} : \im {\tau_1 \Intersect \tau_2} \to \im {\tau}$ & By $\rulelabeltlam$
     \end{tabular} \\
 
   \item \textbf{Case}
@@ -39,15 +41,16 @@
       & \rulegetrightelab &
     \end{flalign*}
 
-    Symmetric with the above case. \\
+    By symmetry with the above case. \\
 
 \end{itemize}
 \end{proof}
 
 
-\begin{lemma}[\rulelabelput~rules produces type-correct coercion]
-  If $ \judgeput \tau l {\tau_1 \yields E} {\tau_2} {\tau_3} \yields C $, then
-  $ \im \gamma \turns C : \im \tau \to \im {\tau_2} $ for any $\gamma$.
+\begin{lemma}[\rulelabelput~rules produce type-correct coercion]
+  If $ \judgeput \tau l {\tau_1 \yields E} {\tau_2} {\tau_3} \yields C $ and $
+  \Gamma \turns E : \im {\tau_1} $ for some $ \Gamma $, then
+  $ \Gamma \turns C : \im \tau \to \im {\tau_2} $.
 \end{lemma}
 
 \begin{proof}
@@ -61,6 +64,8 @@
     \end{flalign*}
 
     \begin{tabular}{ll}
+      $ \Gamma \turns \Lam \_ {\im {\RecTy l \tau}} E : \im {\RecTy l \tau} \to
+      \im {\tau_1} $ & By $\rulelabeltlam$, $\rulelabeltvar$, and the hypothesis \\
     \end{tabular} \\
 
   \item \textbf{Case}
@@ -69,6 +74,13 @@
     \end{flalign*}
 
     \begin{tabular}{ll}
+      $\Gamma, x \hast \im {\tau_1 \Intersect \tau_2} \turns x : \im {\tau_1 \Intersect \tau_2} $ & By $\rulelabeltvar$ \\
+      $\Gamma, x \hast \im {\tau_1 \Intersect \tau_2} \turns x : \Pair {\im {\tau_1}} {\im {\tau_2}} $ & By the definition of $\im \cdot$ \\
+      $\Gamma, x \hast \im {\tau_1 \Intersect \tau_2} \turns \Proj 1 x : \im {\tau_1} $ & By $\rulelabeltprojleft$ \\
+      $\Gamma \turns C : \im {\tau_1} \to \im {\tau_3}$ & By i.h. \\ 
+      $\Gamma, x \hast \im {\tau_1 \Intersect \tau_2} \turns C : \im {\tau_1} \to \im {\tau_3}$ & \george{Really?} \\ 
+      $\Gamma, x \hast \im {\tau_1 \Intersect \tau_2} \turns \App C {(\Proj 1 x)} : \im {\tau_3} $ & By $\rulelabeltapp$ \\
+      $\Gamma \turns \Lam x {\im {\tau_1 \Intersect \tau_2}} {\App C {(\Proj 1 x)}} : \im {\tau_1 \Intersect \tau_2} \to \im {\tau_3} $ & By $\rulelabeltlam$ \\
     \end{tabular} \\
 
   \item \textbf{Case}
@@ -76,7 +88,7 @@
       & \ruleputrightelab &
     \end{flalign*}
 
-    Symmetric with the above case. \\
+    By symmetry with the above case. \\
 
 \end{itemize}
 \end{proof}

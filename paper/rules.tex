@@ -19,7 +19,8 @@
 \newcommand{\rulegetleftelab}{
   \inferrule* [right=$\rulelabelgetleft$]
   {\judgeget {\tau_1} l \tau \yields C}
-  {\judgeget {\tau_1 \Intersect \tau_2} l \tau \yields {\Lam x {\im {\tau_1 \Intersect \tau_2}} {C (\Proj 1 x)}}}
+  {\judgeget {\tau_1 \Intersect \tau_2} l \tau \yields {\Lam x {\im {\tau_1
+          \Intersect \tau_2}} {\App C {(\Proj 1 x)}}}}
 }
 
 \newcommand{\rulegetright}{
@@ -31,20 +32,21 @@
 \newcommand{\rulegetrightelab}{
   \inferrule* [right=$\rulelabelgetright$]
   {\judgeget {\tau_2} l \tau \yields C}
-  {\judgeget {\tau_1 \Intersect \tau_2} l \tau \yields {\Lam x {\im {\tau_1 \Intersect \tau_2}} {C (\Proj 2 x)}}}
+  {\judgeget {\tau_1 \Intersect \tau_2} l \tau \yields {\Lam x {\im {\tau_1
+          \Intersect \tau_2}} {\App C {(\Proj 2 x)}}}}
 }
 
 \newcommand{\ruleput}{
 \inferrule* [right=$\rulelabelput$]
   { }
-  {\judgeput {\RecTy l \tau} l \tau_1 {\RecTy l {\tau_1}} \tau}
+  {\judgeput {\RecTy l \tau} l {\tau_1} {\RecTy l {\tau_1}} \tau}
 }
 
 \newcommand{\ruleputelab}{
 \inferrule* [right=$\rulelabelput$]
   { }
   {\judgeput {\RecTy l \tau} l {\tau_1 \yields E} {\RecTy l {\tau_1}} \tau
-  \yields {\Lam x {\im {\RecTy l \tau}} E}}
+  \yields {\Lam \_ {\im {\RecTy l \tau}} E}}
 }
 
 \newcommand{\ruleputleft}{
@@ -57,7 +59,7 @@
 \inferrule* [right=$\rulelabelputleft$]
   {\judgeput {\tau_1} l {\tau \yields E} {\tau_3} {\tau_4} \yields C}
   {\judgeput {\tau_1 \Intersect \tau_2} l {\tau \yields E} {\tau_3 \Intersect \tau_2} {\tau_4}
-  \yields {\Lam x {\im {\tau_1 \Intersect \tau_2}} {C (\Proj 1 x)}}}
+  \yields {\Lam x {\im {\tau_1 \Intersect \tau_2}} {\App C {(\Proj 1 x)}}}}
 }
 
 \newcommand{\ruleputright}{
@@ -70,5 +72,5 @@
 \inferrule* [right=$\rulelabelputright$]
   {\judgeput {\tau_2} l {\tau \yields E} {\tau_3} {\tau_4} \yields C}
   {\judgeput {\tau_1 \Intersect \tau_2} l {\tau \yields E} {\tau_1 \Intersect \tau_3} {\tau_4}
-  \yields {\Lam x {\im {\tau_1 \Intersect \tau_2}} {C (\Proj 2 x)}}}
+  \yields {\Lam x {\im {\tau_1 \Intersect \tau_2}} {\App C {(\Proj 2 x)}}}}
 }
