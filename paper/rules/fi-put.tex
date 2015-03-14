@@ -1,15 +1,15 @@
 \begin{mathpar}
-\framebox{\( \turnsput (\tau; l; e : \tau \yieldsnothing E) : (\tau, \tau) \yieldsnothing C \)}
+\framebox{$\judgeput \tau l {\tau_1} {\tau_2} {\tau_3}$}
 
-\inferrule* [right=Put]
-{ }
-{\turnsput (\RecTy l \tau; l; e : \tau_1) : (\tau, \RecTy l {\tau_1})}
+\inferrule* [right=$\ruleput$]
+  { }
+  {\judgeput {\RecTy l \tau} l {\tau_1} {\RecTy l {\tau_1}} \tau}
 
-\inferrule* [right=Put1]
-{\turnsput (\tau_1; l; e : \tau) : (\tau_3, \tau_4)}
-{\turnsput (\tau_1 \Intersect \tau_2; l; e : \tau) : (\tau_3, \tau_4 \Intersect \tau_2)}
+\inferrule* [right=$\ruleputl$]
+  {\judgeput {\tau_1} l \tau {\tau_3} {\tau_4}}
+  {\judgeput {\tau_1 \Intersect \tau_2} l \tau {\tau_3 \Intersect \tau_2} {\tau_4}}
 
-\inferrule* [right=Put2]
-{\turnsput (\tau_2; l; e : \tau) : (\tau_3, \tau_4)}
-{\turnsput (\tau_1 \Intersect \tau_2; l; e : \tau) : (\tau_3, \tau_1 \Intersect \tau_4)}
+\inferrule* [right=$\ruleputr$]
+  {\judgeput {\tau_2} l \tau {\tau_3} {\tau_4}}
+  {\judgeput {\tau_1 \Intersect \tau_2} l \tau {\tau_1 \Intersect \tau_3} {\tau_4}}
 \end{mathpar}

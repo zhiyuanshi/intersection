@@ -1,20 +1,83 @@
 \section{Proofs}
 
-\begin{lemma}
-  If $ \Gamma \turnsget (\tau; l) : \tau_1 \yields C $, then $ \image \Gamma \turns C : \image \tau \to \image {\tau_1} $.
+\begin{lemma}[\ruleget]
+  If $ \judgeget \tau l {\tau_1} \yields C $, then $ \image \gamma \turns C :
+  \image \tau \to \image {\tau_1} $ for any $\gamma$.
 \end{lemma}
+
 \begin{proof}
   By induction of the derivation.
-\begin{itemize}
-  \item \textbf{GetBase}
-    Trivial.
 
-  \item \textbf{GetLeft} By i.h., $ C $ is of type
-    $ \image {\tau_1} \to \image \tau $. $ x $ is of type $ \Pair {\tau_1} {\tau_2} $.
-    Thus $ fst x $ is of type $ \tau_1 $ and $ C (fst x) : \tau $.
+  \begin{itemize}
 
-  \item \textbf{GetRight}
-    Symmetric to the above case.
+  \item \textbf{Case}
+
+    \begin{mathpar}
+      \inferrule* [right=$\ruleget$] { } {\judgeget {\RecTy l \tau} l \tau
+        \yields {\Lam x {\image {\RecTy l \tau}} x}}
+    \end{mathpar}
+
+    By $\ruletlam$ and $\ruletvar$, for any $\Gamma$,
+    \[
+    \Gamma \turns \Lam x {\image {\RecTy l \tau}} x : \image {\RecTy l \tau} \to
+    \image {\RecTy l \tau}
+    \]
+    
+    By the definition of $\image \cdot$,
+    \[
+    \image \gamma \turns \Lam x {\image {\RecTy l \tau}} x : \image {\RecTy l \tau} \to
+    \image \tau
+    \]
+
+  \item \textbf{Case} 
+
+    \begin{mathpar}
+      \inferrule* [right=$\rulegetl$] {\judgeget {\tau_1} l \tau \yields C}
+      {\judgeget {\tau_1 \Intersect \tau_2} l \tau \yields {\Lam x {\image
+            {\tau_1 \Intersect \tau_2}} {C (\Proj 1 x)}}}
+    \end{mathpar}
+
+    By $\ruletvar$, for any $\gamma$,
+    \[
+    \image \gamma, x \hast \image {\tau_1 \Intersect \tau_2} \turns x : \image {\tau_1 \Intersect \tau_2}
+    \]
+
+    By the definition of $\image \cdot$,
+    \[
+    \image \gamma, x \hast \image {\tau_1 \Intersect \tau_2} \turns x : \Pair {\image {\tau_1}} {\image {\tau_2}}
+    \]
+
+    By $\ruletprojl$,
+    \[
+    \image \gamma, x \hast \image {\tau_1 \Intersect \tau_2} \turns \Proj 1 x : \image {\tau_1} 
+    \]
+
+    By i.h.,
+    \[
+    \image \gamma \turns C : \image {\tau_1} \to \image \tau
+    \]
+
+    By $\ruletapp$,
+    \[
+    \image \gamma, x \hast \image {\tau_1 \Intersect \tau_2} \turns \App C (\Proj 1 x) : \image {\tau} 
+    \]
+
+    By $\ruletlam$,
+    \[
+    \image \gamma \turns \Lam x {\image {\tau_1 \Intersect \tau_2}} {C (\Proj 1
+      x)} : \image {\tau_1 \Intersect \tau_2} \to \image {\tau}
+    \]
+    
+  \item \textbf{Case}
+
+    \begin{mathpar}
+      \inferrule* [right=$\rulegetr$] {\judgeget {\tau_2} l \tau \yields C}
+      {\judgeget {\tau_1 \Intersect \tau_2} l \tau \yields {\Lam x {\image
+            {\tau_1 \Intersect \tau_2}} {C (\Proj 2 x)}}}
+    \end{mathpar}
+
+    Symmetric with the above case.
+
 \end{itemize}
 \end{proof}
 

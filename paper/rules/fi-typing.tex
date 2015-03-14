@@ -1,41 +1,41 @@
 \begin{mathpar}
-\framebox{\( \Gamma \turns e : \tau \yieldsnothing E \)}
+\framebox{$\gamma \turns e : \tau$}
 
-\inferrule* [right=Var]
-{(x,\tau) \in \Gamma}
-{\Gamma \turns x : \tau}
+\inferrule* [right=$\ruleevar$]
+{(x,\tau) \in \gamma}
+{\gamma \turns x : \tau}
 
-\inferrule* [right=Lam]
-{\Gamma, x \hast \tau \turns e : \tau_1 \andalso \Gamma \turns \tau}
-{\Gamma \turns \Lam x \tau e : \tau \to \tau_1}
+\inferrule* [right=$\ruleelam$]
+{\gamma, x \hast \tau \turns e : \tau_1 \andalso \gamma \turns \tau}
+{\gamma \turns \Lam x \tau e : \tau \to \tau_1}
 
-\inferrule* [right=BLam]
-{\Gamma, \alpha \turns e : \tau}
-{\Gamma \turns \BLam \alpha e : \Forall \alpha \tau}
+\inferrule* [right=$\ruleeapp$]
+{\gamma \turns e_1 : \tau_1 \to \tau_2 \\
+ \gamma \turns e_2 : \tau_3 \andalso \tau_3 \subtype \tau_1}
+{\gamma \turns \App {e_1} {e_2} : \tau_2}
 
-\inferrule* [right=App]
-{\Gamma \turns e_1 : \tau_1 \to \tau_2 \\
- \Gamma \turns e_2 : \tau_3 \andalso \tau_3 \subtype \tau_1}
-{\Gamma \turns \App {e_1} {e_2} : \tau_2}
+\inferrule* [right=$\ruleeblam$]
+{\gamma, \alpha \turns e : \tau}
+{\gamma \turns \BLam \alpha e : \Forall \alpha \tau}
 
-\inferrule* [right=TApp]
-{\Gamma \turns e : \forall \alpha. \tau_1 \andalso \Gamma \turns \tau}
-{\Gamma \turns \App e \tau : \subst \alpha \tau \tau_1}
+\inferrule* [right=$\ruleetapp$]
+{\gamma \turns e : \forall \alpha. \tau_1 \andalso \gamma \turns \tau}
+{\gamma \turns \TApp e \tau : \subst \alpha \tau \tau_1}
 
-\inferrule* [right=Merge]
-{\Gamma \turns e_1 : \tau_1 \andalso \Gamma \turns e_2 : \tau_2}
-{\Gamma \turns e_1 \Merge e_2 : \tau_1 \Intersect \tau_2}
+\inferrule* [right=$\ruleemerge$]
+{\gamma \turns e_1 : \tau_1 \andalso \gamma \turns e_2 : \tau_2}
+{\gamma \turns e_1 \Merge e_2 : \tau_1 \Intersect \tau_2}
 
-\inferrule* [right=RecCon]
-{\Gamma \turns e : \tau}
-{\Gamma \turns \RecCon l e : \RecTy l \tau}
+\inferrule* [right=$\ruleereccon$]
+{\gamma \turns e : \tau}
+{\gamma \turns \RecCon l e : \RecTy l \tau}
 
-\inferrule* [right=RecProj]
-{\Gamma \turns e : \tau \andalso \Gamma \turnsget (\tau; l) : \tau_1}
-{\Gamma \turns e.l : \tau_1}
+\inferrule* [right=$\ruleerecproj$]
+{\gamma \turns e : \tau \andalso \judgeget \tau l {\tau_1}}
+{\gamma \turns e.l : \tau_1}
 
-\inferrule* [right=RecUpd]
-{\Gamma \turns e : \tau \andalso \Gamma \turns e_1 : \tau_1 \\
- \turnsput (t; l; e_1 : \tau_1) : (\tau_2, \tau_3) \andalso \tau_1 \subtype \tau_2}
-{\Gamma \turns \RecUpd e l {e_1} : \tau_3}
+\inferrule* [right=$\ruleerecupd$]
+{\gamma \turns e : \tau \andalso \gamma \turns e_1 : \tau_1 \\
+ \judgeput \tau l {\tau_1} {\tau_2} {\tau_3} \andalso \tau_1 \subtype \tau_3}
+{\gamma \turns \RecUpd e l {e_1} : \tau_2}
 \end{mathpar}

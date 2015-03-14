@@ -1,24 +1,15 @@
 \newcommand{\turns}     {\vdash}
 
-% \newcommand{\dom}[1]    {\meta{dom} {#1}}
-\newcommand{\ftv}[1]    {\meta{ftv}({#1})}
+\newcommand{\image}[1]  {\lvert #1 \rvert}
 
-% \newcommand{\image}[1]  {\llbracket {#1} \rrbracket}
-\newcommand{\image}[1]  {\left| {#1} \right|}
-
-\newcommand{\meta}[2]   {{\textit{#1}} (#2)}
-% \newcommand{\proj}[2]{\App{proj_#1}{#2}}
 \newcommand{\hast}{\!:\!}
 \newcommand{\subst}[2]  {\lbrack #1 / #2 \rbrack}
 
 % Relations
 \newcommand{\subtype}   {<:}
 
-\newcommand{\optional}[1]               {\textcolor{facebook}{#1}}
-\newcommand{\optionalnothing}[1]        {}
-
-\newcommand{\yields}[1]                 {\optional{\; \hookrightarrow {#1}}}
-\newcommand{\yieldsnothing}[1]          {}
+\definecolor{facebook}{HTML}{3B5998}
+\newcommand{\yields}[1]{\textcolor{facebook}{\; \hookrightarrow {#1}}}
 
 \newcommand{\rulename}[1]               {(\textrm{#1})}
 
@@ -37,17 +28,76 @@
 \newcommand{\BLam}[2]{\Lambda #1.\binderspacing #2}
 \newcommand{\App}[2]{#1 \appspacing #2}
 \newcommand{\TApp}[2]{#1 \appspacing #2}
-\newcommand{\Merge}{,\!,}
+\newcommand{\Merge}{,,}
 \newcommand{\RecCon}[2]{\{ #1 = #2 \}}
 \newcommand{\RecUpd}[3]{#1 \; \mathbf{with} \; \{#2 = #3\}}
 \newcommand{\Proj}[2]{{\texttt{proj}}_{#1} #2}
-
-\newcommand{\turnsget}{\vdash_{\textrm{get}}}
-\newcommand{\turnsput}{\vdash_{\textrm{put}}}
-\newcommand{\turnsrec}{\vdash_{\textrm{rec}}}
 
 \newcommand{\code}[1]{\texttt{#1}}
 
 % Types
 \newcommand{\Int}{\code{Int}}
 \newcommand{\Bool}{\code{Bool}}
+
+% Judgments
+\newcommand{\judgeget}[3]{#1 \bullet #2 = #3}
+\newcommand{\judgeput}[5]{#1 \blacktriangleleft \RecTy {#2} {#3} = #4 \lfloor #5 \rfloor}
+
+% Rules
+
+% Subtyping rules
+\newcommand{\rulesub}{\bm{\textcolor{OliveGreen}{\subtype}}}
+\newcommand{\rulesubvar}{\rulesub\text{var}}
+\newcommand{\rulesubfun}{\rulesub\to}
+\newcommand{\rulesubforall}{\rulesub\forall}
+\newcommand{\rulesubintersect}{\rulesub\Intersect}
+\newcommand{\rulesubintersectl}{\rulesub{\Intersect}_1}
+\newcommand{\rulesubintersectr}{\rulesub{\Intersect}_2}
+\newcommand{\rulesubrec}{\rulesub\{\}}
+
+% Source/elaboration typing rules
+\newcommand{\rulee}{\bm{\textcolor{Blue}{E}}}
+\newcommand{\ruleevar}{\rulee\text{var}}
+\newcommand{\ruleelam}{\rulee\text{lam}}
+\newcommand{\ruleeapp}{\rulee\text{app}}
+\newcommand{\ruleeblam}{\rulee\text{blam}}
+\newcommand{\ruleetapp}{\rulee\text{tapp}}
+\newcommand{\ruleemerge}{\rulee\text{merge}}
+\newcommand{\ruleereccon}{\rulee\text{rec-con}}
+\newcommand{\ruleerecproj}{\rulee\text{rec-proj}}
+\newcommand{\ruleerecupd}{\rulee\text{rec-upd}}
+
+% Target typing rules
+\newcommand{\rulet}{\bm{\textcolor{Magenta}{T}}}
+\newcommand{\ruletvar}{\rulet\text{var}}
+\newcommand{\ruletlam}{\rulet\text{lam}}
+\newcommand{\ruletapp}{\rulet\text{app}}
+\newcommand{\ruletblam}{\rulet\text{blam}}
+\newcommand{\rulettapp}{\rulet\text{tapp}}
+\newcommand{\ruletpair}{\rulet\text{pair}}
+\newcommand{\ruletprojl}{\rulet\text{proj}_1}
+\newcommand{\ruletprojr}{\rulet\text{proj}_2}
+
+% Get rules
+\newcommand{\ruleget}{\textcolor{Brown}{\text{get}}}
+\newcommand{\rulegetl}{{\ruleget}_1}
+\newcommand{\rulegetr}{{\ruleget}_2}
+
+% Put rules
+\newcommand{\ruleput}{\textcolor{Brown}{\text{put}}}
+\newcommand{\ruleputl}{{\ruleput}_1}
+\newcommand{\ruleputr}{{\ruleput}_2}
+
+
+% Presentation
+\definecolor{lightyellow}{HTML}{FFFFE0}
+\newcommand{\highlight}[1]{\colorbox{lightyellow}{#1}}
+
+
+% To be retired
+\newcommand{\meta}[2]{{\textit{#1}} (#2)}
+\newcommand{\ftv}[1]{\meta{ftv}({#1})}
+\newcommand{\turnsget}{\vdash_{\textrm{get}}}
+\newcommand{\turnsput}{\vdash_{\textrm{put}}}
+\newcommand{\turnsrec}{\vdash_{\textrm{rec}}}
+

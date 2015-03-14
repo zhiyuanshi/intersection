@@ -1,13 +1,15 @@
 \begin{mathpar}
-\framebox{\( \turnsget (\tau_1; l) : \tau_2 \yieldsnothing C \)}
+\framebox{$\judgeget {\tau_1} l {\tau_2}$}
 
-% The field with label $ l $ inside $ \tau_1 $ is of type $ \tau_2 $.
+\inferrule* [right=$\ruleget$]
+  { }
+  {\judgeget {\RecTy l \tau} l \tau}
 
-\inferrule* [right=Get]
-{ }
-{\turnsget (\RecTy l \tau; l) : \tau}
+\inferrule* [right=$\rulegetl$]
+  {\judgeget {\tau_1} l \tau}
+  {\judgeget {\tau_1 \Intersect \tau_2} l \tau}
 
-\inferrule* [right=Getk]
-{\turnsget (\tau_1; l) : \tau}
-{\turnsget (\tau_1 \Intersect \tau_2; l) : \tau}
+\inferrule* [right=$\rulegetr$]
+  {\judgeget {\tau_2} l \tau}
+  {\judgeget {\tau_1 \Intersect \tau_2} l \tau}
 \end{mathpar}
