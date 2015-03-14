@@ -1,12 +1,10 @@
 \section{Introduction}
 
-\bruno{The following are just some loose notes for the paper.}
-
 There has been a remarkable number of works aimed at improving support
 for extensibility in programming languages. These works include:
-visions of new programming models\cite{}; new programming languages or
-language extensions\cite{}, and \emph{design patterns} that can be
-used with existing mainstream languages.
+visions of new programming models~\cite{}; new programming languages or
+language extensions~\cite{}, and \emph{design patterns} that can be
+used with existing mainstream languages~\cite{}.
 
 %\cite{family polymorphism and virtual
 %classes.}. Another line of work are proposals for precise formal models or new 
@@ -14,36 +12,53 @@ used with existing mainstream languages.
 %that can be used  with existing mainstream languages. 
 %%Part of the motivation behind 
 
-Some of the more recent work on extensibility includes various
+Some of the more recent work on extensibility is focused on various
 proposals for design patterns.  Examples include \emph{Object
   Algebras}~\cite{}, \emph{Modular Visitors}~\cite{} or
 Torgersen's~\cite{} four design patterns using generics. In those
 approaches the idea is to use some advanced (but already available)
-features, such as \emph{generics}, in combination with conventional OOP
-features to model more extensible designs. Those designs work in
-modern OOP languages such as Java, C\# or Scala. 
+features, such as \emph{generics}, in combination with conventional
+OOP features to model more extensible designs.  Those designs work in
+modern OOP languages such as Java, C\# or Scala.
 
 Although such design patterns give practical benefits in terms of
 extensibility, they also expose limitations in existing mainstream OOP
-languages. One limitation is that existing OOP languages lack good
-mechanisms for \emph{object-level} composition.  As illustrated by
-Oliveira et al.~\cite{}, highly modular programs using Object Algebras
-are best expressed using a form of \emph{type-safe}, \emph{dynamic},
-\emph{delegation}-based composition. Although such form of composition
-can be encoded in Scala, it requires the use of low-level reflection
-techniques, such as dynamic proxies, reflection or other forms of
-meta-programming~\cite{}. It is clear that better language support
-would be desirable. Moreover, the vast majority of modern OOP
-languages follows a model where where type inheritance and subtyping
-are conflated. That is a type extension induces a subtype. However as
-Cook et al.~\cite{} famously argued there are programs where
-``\emph{subtyping is not inheritance}''. Interestingly previously not
-many practical programs have been reported in the literature where the
-distinction between subtyping and inheritance is relevant. However it
-turns out that this difference does show up in practice when designing
-extensible programs. In particular, as shown later, modular
-(extensible) visitors provide a compeling practical example where
-inheritance and subtyping should not be conflated!
+languages. In particular there are three pressing limitations: 
+1) lack of good mechanisms for
+  \emph{object-level} composition; 2) \emph{conflation of 
+    (type) inheritance with subtyping}; 3) \emph{heavy reliance on generics}.
+
+  The first limitation shows up, for example, in Oliveira et
+  al.~\cite{} encodings of Feature-Oriented Programming using Object
+  Algebras~\cite{}. These programs are best expressed using a form of
+  \emph{type-safe}, \emph{dynamic}, \emph{delegation}-based
+  composition. Although such form of composition can be encoded in
+  languages like Scala, it requires the use of low-level reflection
+  techniques, such as dynamic proxies, reflection or other forms of
+  meta-programming~\cite{}. It is clear that better language support
+  would be desirable.
+
+  The second limitation shows up in designs for modelling
+  modular or extensible visitors~\cite{}.  The vast majority of modern
+  OOP languages combines type inheritance and subtyping. 
+  That is a type extension induces a subtype. However
+  as Cook et al.~\cite{} famously argued there are programs where
+  ``\emph{subtyping is not inheritance}''. Interestingly previously
+  not many practical programs have been reported in the literature
+  where the distinction between subtyping and inheritance is
+  relevant. However, as shown in this paper, it turns out that this
+  difference does show up in practice when designing modular
+  (extensible) visitors.  We believe that modular visitors provide a
+  compeling practical example where inheritance and subtyping should
+  not be conflated!
+
+  Finally, the third limitation is prevalent in many extensible
+  designs~\cite{}. Such designs rely on advanced features of generics,
+  such as \emph{f-bounded polymorphism}~\cite{}, \emph{variance
+    annotations}~\cite{}, \emph{wildcards}~\cite{} and/or \emph{higher-kinded
+    types}~\cite{} to achieve type-safety. Sadly, the amount of
+  type-annotations, combined with the lack of understanding of these
+  features, usually deters programmers from using such designs.
 
 \begin{comment}
 Motivated by the insights gained in previous work, this paper presents 
@@ -55,7 +70,7 @@ model.
 
 This paper presents System \name: an extension of System F~\cite{}
 with intersection types and a merge operator~\cite{}.  
-The goal of System \name is to study the foundational language
+The goal of System \name is to study the \emph{minimal} foundational language
 constructs that are needed to support various extensible designs,
 while at the same time addressing the limitations of existing OOP
 languages. To address the lack of good object-level composition
@@ -63,6 +78,7 @@ mechanisms, System \name uses the merge operator to allow dynamic
 composition of values/objects. Moreover, in System \name (type-level)
 extension is independent of subtyping, and it is possible for an
 extension to be a supertype of a base object type.
+
 
 Technically speaking System \name is mainly inspired by the work of
 Dundfield~\cite{}.  Dundfield shows how to model a simply typed
@@ -75,10 +91,12 @@ extension for records to support a basic form of objects. Secondly,
 the elaboration semantics into System F is done directly from the
 source calculus with subtyping. In contrast Dunfield has an additional
 step which eliminates subtyping.  Finally a non-technical difference
-is that System \name is aimed at studying issues of OOP languages,
-whereas Dunfield's work was aimed at Functional Programming.  Like
-many other foundational formal models for OOP (for example~\cite{}),
-System \name is purely functional and it uses structural typing. 
+is that System \name is aimed at studying issues of OOP languages and
+extensibility, whereas Dunfield's work was aimed at Functional
+Programming and he did not consider applications to extensibility.
+Like many other foundational formal models for OOP (for
+example~\cite{}), System \name is purely functional and it uses
+structural typing.
 
 System \name is
 formalized and implemented. Furthermore the paper illustrates how
