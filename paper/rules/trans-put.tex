@@ -1,11 +1,18 @@
+\begin{mathpar}
 \framebox{\( \turnsput (\tau; l; e : \tau \yields E) : (\tau, \tau) \yields C \)}
 
-\inferrule [PutBase]
-{}
+\inferrule* [right=Put]
+{ }
 {\turnsput (\RecTy l \tau; l; e : \tau_1 \yields E) : (\tau, \RecTy l {\tau_1})
   \yields {\Lam x {\image {\RecTy l \tau}} E}}
 
-\inferrule [PutLeft]
+\inferrule* [right=Put1]
 {\turnsput (\tau_1; l; e : \tau \yields E) : (\tau_3, \tau_4) \yields C}
 {\turnsput (\tau_1 \Intersect \tau_2; l; e : \tau \yields E) : (\tau_3, \tau_4 \Intersect \tau_2)
-  \yields {\Lam x {\image {\tau_1 \Intersect \tau_2}} {C (\Proj k x)}}}
+  \yields {\Lam x {\image {\tau_1 \Intersect \tau_2}} {C (\Proj 1 x)}}}
+
+\inferrule* [right=Put2]
+{\turnsput (\tau_2; l; e : \tau \yields E) : (\tau_3, \tau_4) \yields C}
+{\turnsput (\tau_1 \Intersect \tau_2; l; e : \tau \yields E) : (\tau_3, \tau_1 \Intersect \tau_4)
+  \yields {\Lam x {\image {\tau_1 \Intersect \tau_2}} {C (\Proj 2 x)}}}
+\end{mathpar}

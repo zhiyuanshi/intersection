@@ -1,9 +1,15 @@
+\begin{mathpar}
 \framebox{\( \turnsput (\tau; l; e : \tau \yieldsnothing E) : (\tau, \tau) \yieldsnothing C \)}
 
-\inferrule [PutBase]
-{}
+\inferrule* [right=Put]
+{ }
 {\turnsput (\RecTy l \tau; l; e : \tau_1) : (\tau, \RecTy l {\tau_1})}
 
-\inferrule [PutLeft]
+\inferrule* [right=Put1]
 {\turnsput (\tau_1; l; e : \tau) : (\tau_3, \tau_4)}
 {\turnsput (\tau_1 \Intersect \tau_2; l; e : \tau) : (\tau_3, \tau_4 \Intersect \tau_2)}
+
+\inferrule* [right=Put2]
+{\turnsput (\tau_2; l; e : \tau) : (\tau_3, \tau_4)}
+{\turnsput (\tau_1 \Intersect \tau_2; l; e : \tau) : (\tau_3, \tau_1 \Intersect \tau_4)}
+\end{mathpar}

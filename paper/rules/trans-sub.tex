@@ -1,10 +1,11 @@
+\begin{mathpar}
 \framebox{\( \tau \subtype \tau \yields C \)}
 
-\inferrule [SVar]
-{}
+\inferrule* [right=Sub-Var]
+{ }
 {\alpha \subtype \alpha \yields {\Lam x {\image \alpha} x}}
 
-\inferrule [SFun]
+\inferrule* [right=Sub-Fun]
 {\tau_3 \subtype \tau_1 \yields {C_1} \andalso \tau_2 \subtype \tau_4 \yields {C_2}}
 {\tau_1 \to \tau_2 \subtype \tau_3 \to \tau_4
   \yields
@@ -12,29 +13,30 @@
       {\Lam x {\image {\tau_3}}
         {\App {C_2} {(\App f {(\App {C_1} x)})}}}}}
 
-\inferrule [SForall]
+\inferrule* [right=Sub-Forall]
 {\tau_1 \subtype \subst {\alpha_1} {\alpha_2} \tau_2 \yields C}
 {\Forall {\alpha_1} \tau_1 \subtype \Forall {\alpha_2} \tau_2
   \yields
     {\Lam f {\image {\Forall \alpha \tau_1}}
       {\BLam \alpha {\App C {(\App f \alpha)}}}}}
 
-\inferrule [$ \Intersect_k $]
+\inferrule* [right=Sub-Andk]
 {\tau_k \subtype \tau_3 \yields C}
 {\tau_1 \Intersect \tau_2 \subtype \tau_3
   \yields
     {\Lam x {\image {\tau_1 \Intersect \tau_2}}
       {\App C {(\Proj k x)}}}}
 
-\inferrule [SAnd3]
+\inferrule* [right=Sub-And]
 {\tau_1 \subtype \tau_2 \yields {C_1} \andalso \tau_1 \subtype \tau_3 \yields {C_2}}
 {\tau_1 \subtype \tau_2 \Intersect \tau_3
   \yields
     {\Lam x {\image {\tau_1}}
       {\Pair {\App {C_1} x} {\App {C_2} x}}}}
 
-\inferrule [SRec]
+\inferrule* [right=Sub-Rec]
 {\tau_1 \subtype \tau_2 \yields C}
 {\RecTy l {\tau_1} \subtype \RecTy l {\tau_2}
   \yields
     {\Lam x {\image {\RecTy l {\tau_1}}} {\App C x}}}
+\end{mathpar}

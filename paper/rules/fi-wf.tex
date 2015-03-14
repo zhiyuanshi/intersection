@@ -1,21 +1,23 @@
 \framebox{\(\gamma \turns \tau\)}
 
-\inferrule [WF-Var]
+\begin{mathpar}
+\inferrule* [right=WF-Var]
 {\alpha \in \gamma}
 {\gamma \turns \alpha}
 
-\inferrule [WF-Fun]
+\inferrule* [right=WF-Fun]
 {\gamma \turns \tau_1 \andalso \gamma \turns \tau_2}
 {\gamma \turns \tau_1 \to \tau_2}
 
-\inferrule [WF-Forall]
+\inferrule* [right=WF-Forall]
 {\gamma, \alpha \turns \tau}
 {\gamma \turns \Forall \alpha \tau}
 
-\inferrule [WF-And]
+\inferrule* [right=WF-And]
 {\gamma \turns \tau_1 \andalso \gamma \turns \tau_2}
 {\gamma \turns \tau_1 \Intersect \tau_2}
 
-\inferrule [WF-Rec]
+\inferrule* [right=WF-Rec]
 {\gamma \turns \tau}
 {\gamma \turns \RecTy l \tau}
+\end{mathpar}

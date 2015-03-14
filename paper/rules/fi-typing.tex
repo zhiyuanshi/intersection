@@ -1,39 +1,41 @@
+\begin{mathpar}
 \framebox{\( \Gamma \turns e : \tau \yieldsnothing E \)}
 
-\inferrule [Var]
+\inferrule* [right=Var]
 {(x,\tau) \in \Gamma}
 {\Gamma \turns x : \tau}
 
-\inferrule [Lam]
+\inferrule* [right=Lam]
 {\Gamma, x \hast \tau \turns e : \tau_1 \andalso \Gamma \turns \tau}
 {\Gamma \turns \Lam x \tau e : \tau \to \tau_1}
 
-\inferrule [BLam]
+\inferrule* [right=BLam]
 {\Gamma, \alpha \turns e : \tau}
 {\Gamma \turns \BLam \alpha e : \Forall \alpha \tau}
 
-\inferrule [App]
+\inferrule* [right=App]
 {\Gamma \turns e_1 : \tau_1 \to \tau_2 \\
  \Gamma \turns e_2 : \tau_3 \andalso \tau_3 \subtype \tau_1}
 {\Gamma \turns \App {e_1} {e_2} : \tau_2}
 
-\inferrule [TApp]
+\inferrule* [right=TApp]
 {\Gamma \turns e : \forall \alpha. \tau_1 \andalso \Gamma \turns \tau}
 {\Gamma \turns \App e \tau : \subst \alpha \tau \tau_1}
 
-\inferrule [Merge]
+\inferrule* [right=Merge]
 {\Gamma \turns e_1 : \tau_1 \andalso \Gamma \turns e_2 : \tau_2}
 {\Gamma \turns e_1 \Merge e_2 : \tau_1 \Intersect \tau_2}
 
-\inferrule [RecCon]
+\inferrule* [right=RecCon]
 {\Gamma \turns e : \tau}
 {\Gamma \turns \RecCon l e : \RecTy l \tau}
 
-\inferrule [RecProj]
+\inferrule* [right=RecProj]
 {\Gamma \turns e : \tau \andalso \Gamma \turnsget (\tau; l) : \tau_1}
 {\Gamma \turns e.l : \tau_1}
 
-\inferrule [RecUpd]
+\inferrule* [right=RecUpd]
 {\Gamma \turns e : \tau \andalso \Gamma \turns e_1 : \tau_1 \\
  \turnsput (t; l; e_1 : \tau_1) : (\tau_2, \tau_3) \andalso \tau_1 \subtype \tau_2}
 {\Gamma \turns \RecUpd e l {e_1} : \tau_3}
+\end{mathpar}
