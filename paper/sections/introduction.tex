@@ -4,7 +4,7 @@ There has been a remarkable number of works aimed at improving support
 for extensibility in programming languages. These works include:
 visions of new programming models~\cite{}; new programming languages or
 language extensions~\cite{}, and \emph{design patterns} that can be
-used with existing mainstream languages~\cite{}.
+used with existing mainstream languages~\cite{togersen:2004,Zenger-Odersky2005,oliveira09modular,oliveira2012extensibility}.
 
 %\cite{family polymorphism and virtual
 %classes.}. Another line of work are proposals for precise formal models or new 
@@ -14,10 +14,10 @@ used with existing mainstream languages~\cite{}.
 
 Some of the more recent work on extensibility is focused on various
 proposals for design patterns.  Examples include \emph{Object
-  Algebras}~\cite{}, \emph{Modular Visitors}~\cite{} or
-Torgersen's~\cite{} four design patterns using generics. In those
+  Algebras}~\cite{oliveira2012extensibility}, \emph{Modular Visitors}~\cite{oliveira09modular,togersen:2004} or
+Torgersen's~\cite{togersen:2004} four design patterns using generics. In those
 approaches the idea is to use some advanced (but already available)
-features, such as \emph{generics}, in combination with conventional
+features, such as \emph{generics}~\cite{}, in combination with conventional
 OOP features to model more extensible designs.  Those designs work in
 modern OOP languages such as Java, C\# or Scala.
 
@@ -28,21 +28,21 @@ languages. In particular there are three pressing limitations:
   \emph{object-level} composition; 2) \emph{conflation of 
     (type) inheritance with subtyping}; 3) \emph{heavy reliance on generics}.
 
-  The first limitation shows up, for example, in Oliveira et
-  al.~\cite{} encodings of Feature-Oriented Programming using Object
-  Algebras~\cite{}. These programs are best expressed using a form of
-  \emph{type-safe}, \emph{dynamic}, \emph{delegation}-based
-  composition. Although such form of composition can be encoded in
-  languages like Scala, it requires the use of low-level reflection
-  techniques, such as dynamic proxies, reflection or other forms of
-  meta-programming~\cite{}. It is clear that better language support
-  would be desirable.
+  The first limitation shows up, for example, encodings of Feature-Oriented
+  Programming~\cite{} or Attribute Grammars using Object
+  Algebras~\cite{oliveira2013feature,rendel14attributes}. These programs are best
+  expressed using a form of \emph{type-safe}, \emph{dynamic},
+  \emph{delegation}-based composition. Although such form of
+  composition can be encoded in languages like Scala, it requires the
+  use of low-level reflection techniques, such as dynamic proxies,
+  reflection or other forms of meta-programming. It is clear
+  that better language support would be desirable.
 
   The second limitation shows up in designs for modelling
-  modular or extensible visitors~\cite{}.  The vast majority of modern
+  modular or extensible visitors~\cite{oliveira09modular}.  The vast majority of modern
   OOP languages combines type inheritance and subtyping. 
   That is a type extension induces a subtype. However
-  as Cook et al.~\cite{} famously argued there are programs where
+  as Cook et al.~\cite{cook1989inheritance} famously argued there are programs where
   ``\emph{subtyping is not inheritance}''. Interestingly previously
   not many practical programs have been reported in the literature
   where the distinction between subtyping and inheritance is
@@ -69,7 +69,7 @@ model.
 \end{comment}
 
 This paper presents System \name: an extension of System F~\cite{}
-with intersection types and a merge operator~\cite{}.  The goal of
+with intersection types and a merge operator~\cite{dunfield2014elaborating}.  The goal of
 System \name is to study the \emph{minimal} foundational language
 constructs that are needed to support various extensible designs,
 while at the same time addressing the limitations of existing OOP
@@ -85,7 +85,7 @@ without such advanced features of generics.
 
 
 Technically speaking System \name is mainly inspired by the work of
-Dundfield~\cite{}.  Dundfield shows how to model a simply typed
+Dundfield~\cite{dunfield2014elaborating}.  Dundfield shows how to model a simply typed
 calculus with intersection types and a merge operator. The presence of
 a merge operator adds significant expressiveness to the language,
 allowing encodings for many other language constructs as syntactic
@@ -142,9 +142,10 @@ In summary, the contributions of this paper are:
 
 \item {\bf A Practical Example where ``Inheritance is not Subtyping''
     Matters:} This paper shows that in modular/extensible visitors
-  suffer from the ``inheritance is not subtyping problem''. Moreover 
-  with extensible visitors the extension should become a
-  \emph{supertype}, not a subtype. \bruno{extension with accept method}
+  suffer from the ``inheritance is not subtyping problem''. 
+%% Moreover 
+%% with extensible visitors the extension should become a
+%% \emph{supertype}, not a subtype. \bruno{extension with accept method}
 
 \item {\bf Implementation and Examples:} An implementation of an
   extension of System \name, as well as the examples presented in the
