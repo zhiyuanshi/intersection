@@ -1,6 +1,6 @@
 \section{Proofs}
 
-\begin{lemma}[\ruleget~produces type-correct coercion]
+\begin{lemma}[\rulelabelget~rules produces type-correct coercion]
   If $ \judgeget \tau l {\tau_1} \yields C $, then $ \im \gamma \turns C :
   \im \tau \to \im {\tau_1} $ for any $\gamma$.
 \end{lemma}
@@ -11,43 +11,72 @@
   \begin{itemize}
 
   \item \textbf{Case}
-
-    \begin{mathpar}
-      \inferrule* [right=$\ruleget$] { } {\judgeget {\RecTy l \tau} l \tau
-        \yields {\Lam x {\im {\RecTy l \tau}} x}}
-    \end{mathpar}
+    \begin{flalign*}
+      & \rulegetelab &
+    \end{flalign*}
 
     \begin{tabular}{ll}
-      $ \Gamma \turns \Lam x {\im {\RecTy l \tau}} x : \im {\RecTy l \tau} \to \im {\RecTy l \tau} $ & By $\ruletlam$ and $\ruletvar$ \\
+      $ \Gamma \turns \Lam x {\im {\RecTy l \tau}} x : \im {\RecTy l \tau} \to \im {\RecTy l \tau} $ & By $\rulelabeltlam$ and $\rulelabeltvar$ \\
       $ \im \gamma \turns \Lam x {\im {\RecTy l \tau}} x : \im {\RecTy l \tau} \to \im \tau $ & By the definition of $\im \cdot$
-    \end{tabular}
+    \end{tabular} \\
 
   \item \textbf{Case}
-
-    \begin{mathpar}
-      \inferrule* [right=$\rulegetl$] {\judgeget {\tau_1} l \tau \yields C}
-      {\judgeget {\tau_1 \Intersect \tau_2} l \tau \yields {\Lam x {\im
-            {\tau_1 \Intersect \tau_2}} {C (\Proj 1 x)}}}
-    \end{mathpar}
+    \begin{flalign*}
+      & \rulegetleftelab &
+    \end{flalign*}
 
     \begin{tabular}{ll}
-      $\im \gamma, x \hast \im {\tau_1 \Intersect \tau_2} \turns x : \im {\tau_1 \Intersect \tau_2}$ & By $\ruletvar$ \\
+      $\im \gamma, x \hast \im {\tau_1 \Intersect \tau_2} \turns x : \im {\tau_1 \Intersect \tau_2}$ & By $\rulelabeltvar$ \\
       $\im \gamma, x \hast \im {\tau_1 \Intersect \tau_2} \turns x : \Pair {\im {\tau_1}} {\im {\tau_2}}$ & By the definition of $\im \cdot$ \\
-      $\im \gamma, x \hast \im {\tau_1 \Intersect \tau_2} \turns \Proj 1 x : \im {\tau_1}$ & By $\ruletprojl$ \\
+      $\im \gamma, x \hast \im {\tau_1 \Intersect \tau_2} \turns \Proj 1 x : \im {\tau_1}$ & By $\rulelabeltprojl$ \\
       $\im \gamma \turns C : \im {\tau_1} \to \im \tau$ & By i.h. \\
-      $\im \gamma, x \hast \im {\tau_1 \Intersect \tau_2} \turns \App C (\Proj 1 x) : \im {\tau}$ & By $\ruletapp$ \\
-      $\im \gamma \turns \Lam x {\im {\tau_1 \Intersect \tau_2}} {C (\Proj 1 x)} : \im {\tau_1 \Intersect \tau_2} \to \im {\tau}$ & By $\ruletlam$
-    \end{tabular}
+      $\im \gamma, x \hast \im {\tau_1 \Intersect \tau_2} \turns \App C (\Proj 1 x) : \im {\tau}$ & By $\rulelabeltapp$ \\
+      $\im \gamma \turns \Lam x {\im {\tau_1 \Intersect \tau_2}} {C (\Proj 1 x)} : \im {\tau_1 \Intersect \tau_2} \to \im {\tau}$ & By $\rulelabeltlam$
+    \end{tabular} \\
 
   \item \textbf{Case}
+    \begin{flalign*}
+      & \rulegetrightelab &
+    \end{flalign*}
 
-    \begin{mathpar}
-      \inferrule* [right=$\rulegetr$] {\judgeget {\tau_2} l \tau \yields C}
-      {\judgeget {\tau_1 \Intersect \tau_2} l \tau \yields {\Lam x {\im
-            {\tau_1 \Intersect \tau_2}} {C (\Proj 2 x)}}}
-    \end{mathpar}
+    Symmetric with the above case. \\
 
-    Symmetric with the above case.
+\end{itemize}
+\end{proof}
+
+
+\begin{lemma}[\rulelabelput~rules produces type-correct coercion]
+  If $ \judgeput \tau l {\tau_1 \yields E} {\tau_2} {\tau_3} \yields C $, then
+  $ \im \gamma \turns C : \im \tau \to \im {\tau_2} $ for any $\gamma$.
+\end{lemma}
+
+\begin{proof}
+  By induction of the derivation.
+
+  \begin{itemize}
+
+  \item \textbf{Case}
+    \begin{flalign*}
+      & \ruleputelab &
+    \end{flalign*}
+
+    \begin{tabular}{ll}
+    \end{tabular} \\
+
+  \item \textbf{Case}
+    \begin{flalign*}
+      & \ruleputleftelab &
+    \end{flalign*}
+
+    \begin{tabular}{ll}
+    \end{tabular} \\
+
+  \item \textbf{Case}
+    \begin{flalign*}
+      & \ruleputrightelab &
+    \end{flalign*}
+
+    Symmetric with the above case. \\
 
 \end{itemize}
 \end{proof}

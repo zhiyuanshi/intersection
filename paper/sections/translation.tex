@@ -108,8 +108,24 @@ those in the previous section with the light-blue part for the translation.
 
 \begin{figure*}
 \input{rules/trans-typing.tex}
-\input{rules/trans-get.tex}
-\input{rules/trans-put.tex}
+\begin{mathpar}
+\framebox{$\judgeget {\tau_1} l \tau_2 \yields C$}
+
+\rulegetelab
+
+\rulegetleftelab
+
+\rulegetrightelab
+\end{mathpar}
+\begin{mathpar}
+\framebox{$\judgeput \tau l {\tau \yields E} {\tau_2} {\tau_3} \yields C$}
+
+\ruleputelab
+
+\ruleputleftelab
+
+\ruleputrightelab
+\end{mathpar}
 \caption{Elaboration from \name to System $ F $.}
 \end{figure*}
 

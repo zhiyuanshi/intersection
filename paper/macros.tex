@@ -11,8 +11,6 @@
 \definecolor{facebook}{HTML}{3B5998}
 \newcommand{\yields}[1]{\textcolor{facebook}{\; \hookrightarrow {#1}}}
 
-\newcommand{\rulename}[1]               {(\textrm{#1})}
-
 % Spacing
 \newcommand{\binderspacing}{\,}
 \newcommand{\appspacing}{\;}
@@ -56,37 +54,37 @@
 \newcommand{\rulesubrec}{\rulesub\{\}}
 
 % Source/elaboration typing rules
-\newcommand{\rulee}{\bm{\textcolor{Blue}{E}}}
-\newcommand{\ruleevar}{\rulee\text{var}}
-\newcommand{\ruleelam}{\rulee\text{lam}}
-\newcommand{\ruleeapp}{\rulee\text{app}}
-\newcommand{\ruleeblam}{\rulee\text{blam}}
-\newcommand{\ruleetapp}{\rulee\text{tapp}}
-\newcommand{\ruleemerge}{\rulee\text{merge}}
-\newcommand{\ruleereccon}{\rulee\text{rec-con}}
-\newcommand{\ruleerecproj}{\rulee\text{rec-proj}}
-\newcommand{\ruleerecupd}{\rulee\text{rec-upd}}
+\newcommand{\rulelabele}{\bm{\textcolor{Blue}{E}}}
+\newcommand{\rulelabelevar}{\rulelabele\text{var}}
+\newcommand{\rulelabelelam}{\rulelabele\text{lam}}
+\newcommand{\rulelabeleapp}{\rulelabele\text{app}}
+\newcommand{\rulelabeleblam}{\rulelabele\text{blam}}
+\newcommand{\rulelabeletapp}{\rulelabele\text{tapp}}
+\newcommand{\rulelabelemerge}{\rulelabele\text{merge}}
+\newcommand{\rulelabelereccon}{\rulelabele\text{rec-con}}
+\newcommand{\rulelabelerecproj}{\rulelabele\text{rec-proj}}
+\newcommand{\rulelabelerecupd}{\rulelabele\text{rec-upd}}
 
 % Target typing rules
-\newcommand{\rulet}{\bm{\textcolor{Magenta}{T}}}
-\newcommand{\ruletvar}{\rulet\text{var}}
-\newcommand{\ruletlam}{\rulet\text{lam}}
-\newcommand{\ruletapp}{\rulet\text{app}}
-\newcommand{\ruletblam}{\rulet\text{blam}}
-\newcommand{\rulettapp}{\rulet\text{tapp}}
-\newcommand{\ruletpair}{\rulet\text{pair}}
-\newcommand{\ruletprojl}{\rulet\text{proj}_1}
-\newcommand{\ruletprojr}{\rulet\text{proj}_2}
+\newcommand{\rulelabelt}{\bm{\textcolor{Magenta}{T}}}
+\newcommand{\rulelabeltvar}{\rulelabelt\text{var}}
+\newcommand{\rulelabeltlam}{\rulelabelt\text{lam}}
+\newcommand{\rulelabeltapp}{\rulelabelt\text{app}}
+\newcommand{\rulelabeltblam}{\rulelabelt\text{blam}}
+\newcommand{\rulelabelttapp}{\rulelabelt\text{tapp}}
+\newcommand{\rulelabeltpair}{\rulelabelt\text{pair}}
+\newcommand{\rulelabeltprojl}{\rulelabelt\text{proj}_1}
+\newcommand{\rulelabeltprojr}{\rulelabelt\text{proj}_2}
 
 % Get rules
-\newcommand{\ruleget}{\textcolor{Brown}{\text{get}}}
-\newcommand{\rulegetl}{{\ruleget}_1}
-\newcommand{\rulegetr}{{\ruleget}_2}
+\newcommand{\rulelabelget}{\textcolor{Brown}{\text{get}}}
+\newcommand{\rulelabelgetleft}{{\rulelabelget}_1}
+\newcommand{\rulelabelgetright}{{\rulelabelget}_2}
 
 % Put rules
-\newcommand{\ruleput}{\textcolor{Brown}{\text{put}}}
-\newcommand{\ruleputl}{{\ruleput}_1}
-\newcommand{\ruleputr}{{\ruleput}_2}
+\newcommand{\rulelabelput}{\textcolor{Brown}{\text{put}}}
+\newcommand{\rulelabelputleft}{{\rulelabelput}_1}
+\newcommand{\rulelabelputright}{{\rulelabelput}_2}
 
 
 % Presentation
@@ -100,4 +98,5 @@
 \newcommand{\turnsget}{\vdash_{\textrm{get}}}
 \newcommand{\turnsput}{\vdash_{\textrm{put}}}
 \newcommand{\turnsrec}{\vdash_{\textrm{rec}}}
+\newcommand{\rulename}[1]{(\textrm{#1})}
 
