@@ -1,12 +1,17 @@
 \section{Proofs}
 
-\begin{lemma}[\rulelabelget~rules produce type-correct coercion]
-  If $ \judgeget \tau l {\tau_1} \yields C $, then $ \epsilon \turns C :
-  \im \tau \to \im {\tau_1} $.
+\paragraph{Notation.} We present our proofs in two-column style: on the left is
+the intermediate result and on the right is the justification for the previous
+intermediate result (one line above) to reach the left-hand side.
+
+\subsection{Elaboration}
+
+\begin{lemma}[\rulelabelget~rules produce type-correct coercion] \label{lemma:get-correct}
+  If $ \judgeget \tau l {\tau_1} \yields C $, then $ \judget \epsilon C {\im \tau \to \im {\tau_1}} $.
 \end{lemma}
 
 \begin{proof}
-  By induction of the derivation.
+  By structural induction of the derivation.
 
   \begin{itemize}
 
@@ -16,8 +21,8 @@
     \end{flalign*}
 
     \begin{tabular}{ll}
-      $ \epsilon \turns \Lam x {\im {\RecTy l \tau}} x : \im {\RecTy l \tau} \to \im {\RecTy l \tau} $ & By $\rulelabeltlam$ and $\rulelabeltvar$ \\
-      $ \epsilon \turns \Lam x {\im {\RecTy l \tau}} x : \im {\RecTy l \tau} \to \im \tau $ & By the definition of $\im \cdot$
+      $ \judget \epsilon {\lam x {\im {\recty l \tau}} x} {\im {\recty l \tau} \to \im {\recty l \tau}} $ & By $ \rulelabeltlam $ and $\rulelabeltvar$ \\
+      $ \judget \epsilon {\lam x {\im {\recty l \tau}} x} {\im {\recty l \tau} \to \im \tau} $ & By the definition of $ \im \cdot $
     \end{tabular} \\
 
   \item \textbf{Case}
@@ -26,14 +31,13 @@
     \end{flalign*}
 
     \begin{tabular}{ll}
-      $\epsilon, x \hast \im {\tau_1 \Intersect \tau_2} \turns x : \im {\tau_1 \Intersect \tau_2}$ & By $\rulelabeltvar$ \\
-      $\epsilon, x \hast \im {\tau_1 \Intersect \tau_2} \turns x : \Pair {\im {\tau_1}} {\im {\tau_2}}$ & By the definition of $\im \cdot$ \\
-      $\epsilon, x \hast \im {\tau_1 \Intersect \tau_2} \turns \Proj 1 x : \im {\tau_1}$ & By $\rulelabeltprojleft$ \\
-      $\epsilon \turns C : \im {\tau_1} \to \im \tau$ & By i.h. \\
-      $\epsilon, x \hast \im {\tau_1 \Intersect \tau_2} \turns C : \im
-      {\tau_1} \to \im \tau$ & \george{What should this be called?} \\
-      $\epsilon, x \hast \im {\tau_1 \Intersect \tau_2} \turns \App C (\Proj 1 x) : \im {\tau}$ & By $\rulelabeltapp$ \\
-      $\epsilon \turns \Lam x {\im {\tau_1 \Intersect \tau_2}} {C (\Proj 1 x)} : \im {\tau_1 \Intersect \tau_2} \to \im {\tau}$ & By $\rulelabeltlam$
+      $ \judget {\epsilon, x \hast \im {\tau_1 \andop \tau_2}} x {\im {\tau_1 \andop \tau_2}} $ & By $ \rulelabeltvar $ \\
+      $ \judget {\epsilon, x \hast \im {\tau_1 \andop \tau_2}} x {\pair {\im {\tau_1}} {\im {\tau_2}}} $ & By the definition of $\im \cdot$ \\
+      $ \judget {\epsilon, x \hast \im {\tau_1 \andop \tau_2}} {\proj 1 x} {\im {\tau_1}} $ & By $\rulelabeltprojleft$ \\
+      $ \judget \epsilon C {\im {\tau_1} \to \im \tau} $ & By i.h. \\
+      $ \judget {\epsilon, x \hast \im {\tau_1 \andop \tau_2}} C {\im {\tau_1} \to \im \tau} $ & \george{What should this be called?} \\
+      $ \judget {\epsilon, x \hast \im {\tau_1 \andop \tau_2}} {\app C {(\proj 1 x)}} {\im \tau} $ & By $\rulelabeltapp$ \\
+      $ \judget \epsilon {\lam x {\im {\tau_1 \andop \tau_2}} {\app C {(\proj 1 x)}}} {\im {\tau_1 \andop \tau_2} \to \im \tau} $ & By $ \rulelabeltlam $
     \end{tabular} \\
 
   \item \textbf{Case}
@@ -47,14 +51,14 @@
 \end{proof}
 
 
-\begin{lemma}[\rulelabelput~rules produce type-correct coercion]
+\begin{lemma}[\rulelabelput~rules produce type-correct coercion] \label{lemma:put-correct}
   If $ \judgeput \tau l {\tau_1 \yields E} {\tau_2} {\tau_3} \yields C $ and $
-  \Gamma \turns E : \im {\tau_1} $ for some $ \Gamma $, then
-  $ \Gamma \turns C : \im \tau \to \im {\tau_2} $.
+  \judget \Gamma E {\im {\tau_1}} $ for some $ \Gamma $, then
+  $ \judget \Gamma C {\im \tau \to \im {\tau_2}} $.
 \end{lemma}
 
 \begin{proof}
-  By induction of the derivation.
+  By structural induction of the derivation.
 
   \begin{itemize}
 
@@ -64,8 +68,8 @@
     \end{flalign*}
 
     \begin{tabular}{ll}
-      $ \Gamma \turns \Lam \_ {\im {\RecTy l \tau}} E : \im {\RecTy l \tau} \to
-      \im {\tau_1} $ & By $\rulelabeltlam$, $\rulelabeltvar$, and the hypothesis \\
+      $ \judget \Gamma {\lam \_ {\im {\recty l \tau}} E} {\im {\recty l \tau}} \to
+      \im {\tau_1} $ & By $ \rulelabeltlam $, $ \rulelabeltvar $, and the hypothesis
     \end{tabular} \\
 
   \item \textbf{Case}
@@ -74,13 +78,13 @@
     \end{flalign*}
 
     \begin{tabular}{ll}
-      $\Gamma, x \hast \im {\tau_1 \Intersect \tau_2} \turns x : \im {\tau_1 \Intersect \tau_2} $ & By $\rulelabeltvar$ \\
-      $\Gamma, x \hast \im {\tau_1 \Intersect \tau_2} \turns x : \Pair {\im {\tau_1}} {\im {\tau_2}} $ & By the definition of $\im \cdot$ \\
-      $\Gamma, x \hast \im {\tau_1 \Intersect \tau_2} \turns \Proj 1 x : \im {\tau_1} $ & By $\rulelabeltprojleft$ \\
-      $\Gamma \turns C : \im {\tau_1} \to \im {\tau_3}$ & By i.h. \\ 
-      $\Gamma, x \hast \im {\tau_1 \Intersect \tau_2} \turns C : \im {\tau_1} \to \im {\tau_3}$ & \george{Really?} \\ 
-      $\Gamma, x \hast \im {\tau_1 \Intersect \tau_2} \turns \App C {(\Proj 1 x)} : \im {\tau_3} $ & By $\rulelabeltapp$ \\
-      $\Gamma \turns \Lam x {\im {\tau_1 \Intersect \tau_2}} {\App C {(\Proj 1 x)}} : \im {\tau_1 \Intersect \tau_2} \to \im {\tau_3} $ & By $\rulelabeltlam$ \\
+      $ \judget {\Gamma, x \hast \im {\tau_1 \andop \tau_2}} x {\im {\tau_1 \andop \tau_2}} $ & By $\rulelabeltvar$ \\
+      $ \judget {\Gamma, x \hast \im {\tau_1 \andop \tau_2}} x {\pair {\im {\tau_1}} {\im {\tau_2}}} $ & By the definition of $\im \cdot$ \\
+      $ \judget {\Gamma, x \hast \im {\tau_1 \andop \tau_2}} {\proj 1 x} {\im {\tau_1}} $ & By $\rulelabeltprojleft$ \\
+      $ \judget \Gamma C {\im {\tau_1} \to \im {\tau_3}} $ & By i.h. \\ 
+      $ \judget {\Gamma, x \hast \im {\tau_1 \andop \tau_2}} C {{\im {\tau_1}} \to \im {\tau_3}} $ & \george{Seems to need to assume $x$ fresh} \\ 
+      $ \judget {\Gamma, x \hast \im {\tau_1 \andop \tau_2}} {\app C {(\proj 1 x)}} {\im {\tau_3}} $ & By $\rulelabeltapp$ \\
+      $ \judget \Gamma {\lam x {\im {\tau_1 \andop \tau_2}} {\app C {(\proj 1 x)}}} {\im {\tau_1 \andop \tau_2} \to \im {\tau_3}} $ & By $\rulelabeltlam$
     \end{tabular} \\
 
   \item \textbf{Case}
@@ -90,165 +94,146 @@
 
     By symmetry with the above case. \\
 
-\end{itemize}
+  \end{itemize}
 \end{proof}
 
-
-
-\begin{proof}
-By structural induction on the types and the corresponding inference rule. \\
-
-\rulename{SubVar}
-
-\rulename{SubFun}
-
-\rulename{SubForall}
-
-\rulename{SubAnd1}
-
-\rulename{SubAnd2}
-
-\rulename{SubAnd3}
-
-\rulename{SubRcd}
-
-\end{proof}
-
-\begin{lemma}
-  If $$ \Gamma \turnsput \tau ; l ; E = C ; \tau_1 $$
-  then $$ \im \Gamma \turns C : \im \tau \to \im \tau $$
+\begin{lemma}[Preservation of well-formedness under type translation] \label{lemma:preserve-wf}
+  If $ \judgeewf \gamma \tau $, then $ \judgetwf {\im \gamma} {\im \tau} $.
 \end{lemma}
 
 \begin{proof}
-By structural induction on the type and the corresponding inference rule. \\
-
-\rulename{Put-Base} \\
-\rulename{Put-Left} \\
-\rulename{Put-Right} \\
+  Standard.
 \end{proof}
 
-\begin{lemma} \label{preserve-wf}
-  If   $$ \Gamma \turns \tau $$
-  then $$ \im \Gamma \turns \im \tau $$
-\end{lemma}
-
-\begin{proof}
-Since $$ \Gamma \turns \tau $$
-It follows from \rulename{FI-WF} that
-  $$ \ftv \tau  \subseteq \ftv {\Gamma} $$
-And hence
-  $$ \ftv {\im \tau} \subseteq \ftv {\im \Gamma} $$
-By \rulename{F-WF} we have
-  $$ \Gamma \turns \tau $$
-\end{proof}
-
-\begin{theorem}[Type preserving translation]
-  If   $$ \Gamma \turns e : \tau \yields E  $$
-  then $$ \im \Gamma \turns E : \im \tau $$
+\begin{theorem}[Type-preserving translation]
+  If $ \judgee \gamma e \tau \yields E $, then $ \judget {\im \gamma} E {\im \tau} $.
 \end{theorem}
 
 \begin{proof}
-By structural induction on the expression and the corresponding inference rule. \\
+  By structural induction of the derivation.
 
-\rulename{Var} $ \Gamma \turns x : \tau \yields x $ \\
+  \begin{itemize}
 
-It follows from \rulename{Var} that
-  $$ (x : t) \in \Gamma $$
-Based on the definition of $ \im \cdot $,
-  $$ (x : \im t) \in \im \Gamma $$
-Thus we have by \rulename{F-Var} that
-  $$ \im \Gamma \turns x : \im \tau $$
+  \item \textbf{Case}
+    \begin{flalign*}
+      & \ruleevarelab &
+    \end{flalign*}
 
-\rulename{Abs} $ \Gamma \turns \lambda (x : \tau_1). e : \tau_1 \to \tau_2 \yields {\Lam x {\im {\tau_1}} E} $ \\
+    \begin{tabular}{ll}
+     $ (x,\tau) \in \gamma $ & Premise \\
+     $ (x,\im \tau) \in \im \gamma $ & \\
+     $ \judget {\im \gamma} x {\im \tau} $ & By $ \rulelabeltvar $
+    \end{tabular} \\
 
-It follows from \rulename{Abs} that
-  $$ \Gamma, x : \tau_1 \turns e : \tau_2 \yields E $$
-And by the induction hypothesis that
-  $$ \im \Gamma, x : \im {\tau_1} \turns E : \im {\tau_2} $$
-By \rulename{Abs} we also have
-  $$ \Gamma \turns \tau_1 $$
-It follows from Lemma \ref{preserve-wf} that
-  $$ \im \Gamma \turns \im {\tau_1} $$
-Hence by \rulename{F-Abs} and the definition of $ \im \cdot $ we have
-  $$ \im \Gamma \turns \Lam x {\im {\tau_1}} E : \im {\tau_1 \to \tau_2} $$
+  \item \textbf{Case}
+    \begin{flalign*}
+      & \ruleelamelab &
+    \end{flalign*}
 
-\rulename{(TrApp)} $ \Gamma \turns \App {e_1} {e_2} : \tau_2 \yields {E_1 (\App C {E_2})} $ \\
+    \begin{tabular}{ll}
+      $ \judgee {\gamma, x \hast \tau} e {\tau_1} \yields E $ & Premise \\
+      $ \judget {\im {\gamma, x \hast \tau}} E {\im {\tau_1}} $ & By i.h. \\
+      $ \judget {\im \gamma, x \hast \im \tau} E {\im {\tau_1}} $ & \\
+      $ \judget {\im \gamma} {\lam x {\im \tau} E} {\im \tau \to \im {\tau_1}} $ & By $ \rulelabeltlam $ \\
+      $ \judget {\im \gamma} {\lam x {\im \tau} E} {\im {\tau \to \tau_1}} $ & By the definition of $ \im \cdot $ 
+    \end{tabular} \\
 
-From \rulename{(TrApp)} we have
-  $$ \Gamma \turns \tau_3 <: \tau_1 \yields C $$
-Applying Lemma \ref{type-coerce} to the above we have
-  $$ \im \Gamma \turns C : \im {\tau_3} \to \im {\tau_1} $$
-Also from \rulename{(TrApp)} and the induction hypothesis
-  $$ \im \Gamma \turns E_1 : \im {\tau_1} \to \im {\tau_2} $$
-Also from \rulename{(TrApp)} and the induction hypothesis
-  $$ \im \Gamma \turns E_2 : \im {\tau_3} $$
-Assembling those parts using \rulename{(F-App)} we come to
-  $$ \im \Gamma \turns E_1 (\App C {E_2}) : \im {\tau_2} $$
+  \item \textbf{Case}
+    \begin{flalign*}
+      & \ruleeappelab &
+    \end{flalign*}
+
+    \begin{tabular}{ll}
+     $ \judgee \gamma {e_1} {\tau_1 \to \tau_2} \yields {E_1} $  & Premise \\
+     $ \judget {\im \gamma} {E_1} {\im {\tau_1 \to \tau_2}} $ & By i.h. \\
+     $ \judgee \gamma {e_2} {\tau_3} \yields {E_2} $ & Premise \\
+     $ \judget {\im \gamma} {E_2} {\im {\tau_3}} $ & By i.h. \\
+     $ \tau_3 \subtype \tau_1 \yields C $ & Premise \\
+     $ \judget \epsilon C {\im {\tau_3} \to \im {\tau_1}} $ & \george{one lemma about coercion} \\
+     $ \judget {\im \gamma} {\app {E_1} {(\app C E_2)}} {\im {\tau_2}} $ & By $ \rulelabeltapp $ and the definition of $ \im \cdot $
+    \end{tabular} \\
+
+  \item \textbf{Case}
+    \begin{flalign*}
+      & \ruleeblamelab &
+    \end{flalign*}
+
+    \begin{tabular}{ll}
+      $ \judgee {\gamma, \alpha} e \tau \yields E $ & Premise \\
+      $ \judget {\im {\gamma, \alpha}} E {\im \tau} $ & By i.h. \\
+      $ \judget {\im \gamma, \alpha} E {\im \tau} $ &  \\
+      $ \judget {\im \gamma} {\blam \alpha E} {\for \alpha {\im \tau}} $ & By $ \rulelabeltblam $ \\
+      $ \judget {\im \gamma} {\blam \alpha E} {\im {\for \alpha \tau}} $ & By the definition of $ \im \cdot $
+    \end{tabular} \\
+
+  \item \textbf{Case}
+    \begin{flalign*}
+      & \ruleetappelab &
+    \end{flalign*}
+
+    \begin{tabular}{ll}
+     $ \judgee \gamma e {\for \alpha \tau_1} \yields E $ & Premise \\
+     $ \judget {\im \gamma} E {\im {\for \alpha \tau_1}} $ & By i.h. \\
+     $ \judget {\im \gamma} E {\for \alpha \im {\tau_1}} $ & By the definition of $ \im \cdot $ \\
+     $ \judgeewf \gamma \tau $ & Premise \\
+     $ \judgetwf {\im \gamma} {\im \tau} $ & By Lemma~\ref{lemma:preserve-wf} \\
+     $ \judget \gamma {\tapp E {\im \tau}} {\subst {\im \tau} \alpha {\im {\tau_1}}} $ & By $ \rulelabelttapp $ \\
+     $ \judget \gamma {\tapp E {\im \tau}} {\im {\subst \tau \alpha {\tau_1}}} $ &  
+    \end{tabular} \\
+
+  \item \textbf{Case}
+    \begin{flalign*}
+      & \ruleemergeelab &
+    \end{flalign*}
+
+    \begin{tabular}{ll}
+      $ \judgee \gamma {e_1} {\tau_1} \yields {E_1} $ & Premise \\
+      $ \judget {\im \gamma} {E_1} {\im {\tau_1}} $ & By i.h. \\
+      $ \judget {\im \gamma} {E_2} {\im {\tau_2}} $ & Similar \\
+      $ \judget {\im \gamma} {\pair {E_1} {E_2}} {\pair {\im {\tau_1}} {\im {\tau_2}}} $ & By $ \rulelabeltpair $ \\
+      $ \judget {\im \gamma} {\pair {E_1} {E_2}} {\im {\tau_1 \andop \tau_2}} $ & By the definition of $ \im \cdot $ 
+    \end{tabular} \\
+
+  \item \textbf{Case}
+    \begin{flalign*}
+      & \ruleerecconelab &
+    \end{flalign*}
+
+    \begin{tabular}{ll}
+      $ \judgee \gamma e \tau \yields E $ & Premise \\
+      $ \judget {\im \gamma} E {\im \tau} $ & By i.h. \\
+      $ \judget {\im \gamma} E {\im {\recty l \tau}} $ & By the definition of $ \im \cdot $ 
+    \end{tabular} \\
+
+  \item \textbf{Case}
+    \begin{flalign*}
+      & \ruleerecprojelab &
+    \end{flalign*}
+
+    \begin{tabular}{ll}
+     $ \judgeget \tau l {\tau_1} \yields C $ & Premise \\
+     $ \judget \epsilon C {\im \tau \to \im {\tau_1}} $ & By Lemma~\ref{lemma:get-correct} \\
+     $ \judget {\im \gamma} C {\im \tau \to \im {\tau_1}} $ &  \\
+     $ \judgee \gamma e \tau \yields E $ & Premise \\
+     $ \judget {\im \gamma} E {\im \tau} $ & By i.h. \\
+     $ \judget {\im \gamma} {\app C E} {\im {\tau_1}} $ & By $ \rulelabeltapp $
+    \end{tabular} \\
+
+  \item \textbf{Case}
+    \begin{flalign*}
+      & \ruleerecupdelab &
+    \end{flalign*}
+
+    \begin{tabular}{ll}
+      $ \judgee \gamma {e_1} {\tau_1} \yields {E_1} $ & Premise \\
+      $ \judget {\im \gamma} {E_1} {\im {\tau_1}} $ & By i.h. \\
+      $ \judgeput \tau l {\tau_1 \yields {E_1}} {\tau_2} {\tau_3} \yields C $ & Premise \\
+      $ \judget {\im \gamma} C {\im \tau \to \im {\tau_2}} $ & By Lemma~\ref{lemma:put-correct} \\
+      $ \judgee \gamma e \tau \yields E $ & Premise \\
+      $ \judget {\im \gamma} E {\im \tau} $ & By i.h. \\
+      $ \judget {\im \gamma} {\app C E} {\im {\tau_2}} $ & By $ \rulelabeltapp $
+    \end{tabular} \\
+
+  \end{itemize}
 \end{proof}
 
-\rulename{TAbs} $ \Gamma \turns \Lambda \alpha. e : \forall \alpha. \tau \yields {\forall \alpha. E} $ \\
-
-From \rulename{TAbs} we have
-  $$ \Gamma \turns e : \tau \yields E $$
-By the induction hypothesis we have
-  $$ \im \Gamma \turns E : \im \tau $$
-Thus by \rulename{F-TAbs} and the definition of $ \im \cdot $
-  $$ \Gamma \turns \Lambda \alpha. E : \im {\forall \alpha. \tau} $$
-
-
-\rulename{TAp} $ \Gamma \turns e \; \tau  : \subst \tau \alpha  \tau_1 \yields {E \; \im \tau} $ \\
-
-From \rulename{TApp} we have
-  $$ \Gamma \turns e : \forall \alpha. \tau_1 \yields E $$
-And by the induction hypothesis that
-  $$ \im \Gamma \turns E : \forall \alpha. \im {\tau_1} $$
-Also from \rulename{TApp} and Lemma \ref{preserve-wf} we have
-  $$ \im \Gamma \turns \im \tau $$
-Then by \rulename{F-TApp} that
-  $$ \im \Gamma \turns E \; \im \tau : \subst {\im \tau} \alpha \im {\tau_1} $$
-Therefore
-  $$ \im \Gamma \turns E \; \im \tau : \im {\subst \tau \alpha \im {\tau_1}} $$
-
-% \rulename{(TrMerge)} $ \Gamma \turns e_1 \merge e_2 : \tau_1 \& \tau_2 % % \yields {\Pair {E1} {E2} $ \\
-
-From \rulename{(TrMerge)} and the induction hypothesis we have
-  $$ \im \Gamma \turns E_1 : \im {\tau_1} $$
-and
-  $$ \im \Gamma \turns E_2 : \im {\tau_2} $$
-Hence by \rulename{F-Pair}
-  $$ \im \Gamma \turns \Pair {E_1} {E_2} : \Pair {\im {\tau_1}} {\im {\tau_2}} $$
-Hence by the definition of $ \im \cdot $
-  $$ \im \Gamma \turns \Pair {E_1} {E_2} : \im {\tau_1 \& \tau_2} $$
-
-\rulename{RecIntro} $ \Gamma \turns \RecCon l e : \RecTy l \tau \yields E $ \\
-
-From \rulename{RcdIntro} we have
-  $$ \Gamma \turns e : \tau \yields E $$
-And by the induction hypothesis that
-  $$ \im \Gamma \turns E : \im \tau $$
-Thus by the definition of $ \im \cdot $
-  $$ \im \Gamma \turns E : \im {\RecTy l \tau} $$
-
-\rulename{RcdElim} $ \Gamma \turns e.l : \tau_1 \yields {\App C E} $ \\
-
-From \rulename{RcdElim}
-  $$ \Gamma \turns e : \tau \yields E $$
-And by the induction hypothesis that
-  $$ \im \Gamma \turns E : \im \tau $$
-Also from \rulename{RcdEim}
-  $$ \Gamma \turnsget e ; l = C ; \tau_1 $$
-Applying Lemma \ref{type-get} to the above we have
-  $$ \im \Gamma \turns C : \im \tau \to \im {\tau_1}  $$
-Hence by \rulename{F-App} we have
-  $$ \im \Gamma \turns \App C E : \im {\tau_1} $$
-
-From \rulename{RcdUpd}
-  $$ \Gamma \turns e : \tau \yields E $$
-And by the induction hypothesis that
-  $$ \im \Gamma \turns E : \im \tau $$
-Also from \rulename{RcdUpd}
-  $$ \Gamma \turnsput \tau ; l; E = C ; \tau_1 $$
-Applying Lemma \ref{type-put} to the above we have
-  $$ \im \Gamma \turns C : \im \tau \to \im \tau  $$
-Hence by \rulename{F-App} we have
-  $$ \im \Gamma \turns \App C E : \im \tau $$

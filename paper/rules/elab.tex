@@ -1,0 +1,60 @@
+\newcommand{\ruleevarelab} {
+\inferrule* [right=$\rulelabelevar$]
+  {(x,\tau) \in \gamma}
+  {\judgee \gamma x \tau \yields x}
+}
+
+\newcommand{\ruleelamelab} {
+\inferrule* [right=$\rulelabelelam$]
+  {\judgee {\gamma, x \hast \tau} e {\tau_1} \yields E \andalso \judgeewf \gamma \tau}
+  {\judgee \gamma {\lam x \tau e} {\tau \to \tau_1} \yields {\lam x {\im \tau} E}}
+}
+
+\newcommand{\ruleeappelab}{
+\inferrule* [right=$\rulelabeleapp$]
+  {\judgee \gamma {e_1} {\tau_1 \to \tau_2} \yields {E_1} \\
+   \judgee \gamma {e_2} {\tau_3} \yields {E_2} \andalso
+   \tau_3 \subtype \tau_1 \yields C}
+  {\judgee \gamma {\app {e_1} {e_2}} {\tau_2} \yields {\app {E_1} {(\app C E_2)}}}
+}
+
+\newcommand{\ruleeblamelab}{
+\inferrule* [right=$\rulelabeleblam$]
+  {\judgee {\gamma, \alpha} e \tau \yields E}
+  {\judgee \gamma {\blam \alpha e} {\for \alpha \tau} \yields {\blam \alpha E}}
+}
+
+\newcommand{\ruleetappelab}{
+\inferrule* [right=$\rulelabeletapp$]
+  {\judgee \gamma e {\for \alpha \tau_1} \yields E \andalso \judgeewf \gamma \tau}
+  {\judgee \gamma {\tapp e \tau} {\subst \tau \alpha \tau_1} \yields {\tapp E {\im \tau}}}
+}
+
+\newcommand{\ruleemergeelab}{
+\inferrule* [right=$\rulelabelemerge$]
+  {\judgee \gamma {e_1} {\tau_1} \yields {E_1} \andalso
+   \judgee \gamma {e_2} {\tau_2} \yields {E_2}}
+  {\judgee \gamma {e_1 \mergeop e_2} {\tau_1 \andop \tau_2} \yields {\pair {E_1} {E_2}}}
+}
+
+\newcommand{\ruleerecconelab}{
+\inferrule* [right=$\rulelabelereccon$]
+  {\judgee \gamma e \tau \yields E}
+  {\judgee \gamma {\reccon l e} {\recty l \tau} \yields E}
+}
+
+\newcommand{\ruleerecprojelab}{
+\inferrule* [right=$\rulelabelerecproj$]
+  {\judgee \gamma e \tau \yields E \andalso
+   \judgeget \tau l {\tau_1} \yields C}
+  {\judgee \gamma {e.l} {\tau_1} \yields {\app C E}}
+}
+
+\newcommand{\ruleerecupdelab}{
+\inferrule* [right=$\rulelabelerecupd$]
+  {\judgee \gamma e \tau \yields E \andalso
+   \judgee \gamma {e_1} {\tau_1} \yields {E_1} \\
+   \judgeput \tau l {\tau_1 \yields {E_1}} {\tau_2} {\tau_3} \yields C \andalso
+   \tau_1 \subtype \tau_3}
+  {\judgee \gamma {\recupd e l {e_1}} {\tau_2} \yields {\app C E}}
+}

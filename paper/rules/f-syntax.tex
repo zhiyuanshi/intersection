@@ -1,8 +1,8 @@
 \[
 \begin{array}{llrl}
-  \text{Types}       & T    & \Coloneqq & \alpha \mid T \to T \mid \Forall \alpha T \mid \Pair T T \\ 
-  \text{Expressions} & E, C & \Coloneqq & x \mid \Lam x T E \mid \App E E \mid \BLam \alpha E \mid \TApp E T \\ 
-                     &      & \mid      & \Pair E E \mid \Proj k E \\
+  \text{Types}       & T    & \Coloneqq & \alpha \mid T \to T \mid \for \alpha T \mid \pair T T \\ 
+  \text{Expressions} & E, C & \Coloneqq & x \mid \lam x T E \mid \app E E \mid \blam \alpha E \mid \tapp E T \\ 
+                     &      & \mid      & \pair E E \mid \proj k E \\
   \text{Contexts} & \Gamma & \Coloneqq & \epsilon \mid \Gamma, \alpha \mid \Gamma, x \hast T \\
 \end{array}
 \]

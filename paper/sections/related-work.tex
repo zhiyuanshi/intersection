@@ -67,15 +67,15 @@ algorithmic.
 % combines the merge rules ($ k $ ranges over $ \{1, 2\} $)
 % \inferrule 
 % {\Gamma \turns e_k : \tau}
-% {\Gamma \turns e_1 \Merge e_2 : \tau}
+% {\Gamma \turns e_1 \mergeop e_2 : \tau}
 % and the standard intersection-introduction rule
 % \inferrule 
 % {\Gamma \turns e : \tau_1 \andalso \Gamma \turns e : \tau_2}
-% {\Gamma \turns e : \tau_1 \Intersect \tau_2}
+% {\Gamma \turns e : \tau_1 \andop \tau_2}
 % into one rule:
 % \inferrule [Merge]
 % {\Gamma \turns e_1 : \tau_1 \andalso \Gamma \turns e_2 : \tau_2}
-% {\Gamma \turns e_1 \Merge e_2 : \tau_1 \Intersect \tau_2}
+% {\Gamma \turns e_1 \mergeop e_2 : \tau_1 \andop \tau_2}
 
 Reynolds invented Forsythe~\cite{reynolds1997design} in the 1980s. Our merge
 operator is analogous to his $ p_1, p_2 $. Castagna, and Dunfield describe
@@ -158,16 +158,16 @@ records but not intersection of ordinary types like \texttt{Int} and
 $ \turnsrec \tau $ states that $ \tau $ is a record type, or the intersection of
 record types, and so forth.
 
-\inferrule [RecBase] {} {\turnsrec \RecTy l \tau}
+\inferrule [RecBase] {} {\turnsrec \recty l \tau}
 
 \inferrule [RecStep]
 {\turnsrec \tau_1 \andalso \turnsrec \tau_2}
-{\turnsrec \tau_1 \Intersect \tau_2}
+{\turnsrec \tau_1 \andop \tau_2}
 
 \inferrule [Merge']
 {\Gamma \turns e_1 : \tau_1 \yields {E_1} \andalso \turnsrec \tau_1 \\
  \Gamma \turns e_2 : \tau_2 \yields {E_2} \andalso \turnsrec \tau_2}
-{\Gamma \turns e_1 \Merge e_2 : \tau_1 \Intersect \tau_2 \yields {\Pair {E_1} {E_2}}}
+{\Gamma \turns e_1 \mergeop e_2 : \tau_1 \andop \tau_2 \yields {\pair {E_1} {E_2}}}
 
 Of course our approach has its limitation as duplicated labels in a record are
 allowed. This has been discussed in a larger issue by

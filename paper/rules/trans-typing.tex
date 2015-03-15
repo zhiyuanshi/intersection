@@ -1,48 +1,22 @@
 \begin{mathpar}
-\framebox{\( \gamma \turns e : \tau \yields E \)}
+\framebox{$ \judgee \gamma e \tau \yields E $}
 
-\inferrule* [right=$\rulelabelevar$]
-  {(x,\tau) \in \gamma}
-  {\gamma \turns x : \tau \yields x}
+\ruleevarelab
 
-\inferrule* [right=$\rulelabelelam$]
-  {\gamma, x \hast \tau \turns e : \tau_1 \yields E \andalso
-   \gamma \turns \tau}
-  {\gamma \turns \Lam x \tau e : \tau \to \tau_1 \yields {\Lam x {\im \tau} E}}
+\ruleelamelab
 
-\inferrule* [right=$\rulelabeleapp$]
-  {\gamma \turns e_1 : \tau_1 \to \tau_2 \yields {E_1} \\
-   \gamma \turns e_2 : \tau_3 \yields {E_2} \andalso
-   \tau_3 \subtype \tau_1 \yields C}
-  {\gamma \turns \App {e_1} {e_2} : \tau_2 \yields {\App {E_1} {(\App C E_2)}}}
+\ruleeappelab
 
-\inferrule* [right=$\rulelabeleblam$]
-  {\gamma, \alpha \turns e : \tau \yields E}
-  {\gamma \turns \BLam \alpha e : \Forall \alpha \tau \yields {\BLam \alpha E}}
+\ruleeblamelab
 
-\inferrule* [right=$\rulelabeletapp$]
-  {\gamma \turns e : \Forall \alpha \tau_1 \yields E \andalso
-   \gamma \turns \tau}
-  {\gamma \turns \TApp e \tau : \subst \alpha \tau \tau_1 \yields {\App E {\im \tau}}}
+\ruleetappelab
 
-\inferrule* [right=$\rulelabelemerge$]
-  {\gamma \turns e_1 : \tau_1 \yields {E_1} \andalso
-   \gamma \turns e_2 : \tau_2 \yields {E_2}}
-  {\gamma \turns e_1 \Merge e_2 : \tau_1 \Intersect \tau_2 \yields {\Pair {E_1} {E_2}}}
+\ruleemergeelab
 
-\inferrule* [right=$\rulelabelereccon$]
-  {\gamma \turns e : \tau \yields E}
-  {\gamma \turns \RecCon l e : \RecTy l \tau \yields E}
+\ruleerecconelab
 
-\inferrule* [right=$\rulelabelerecproj$]
-  {\gamma \turns e : \tau \yields E \andalso
-   \judgeget \tau l {\tau_1} \yields C}
-  {\gamma \turns e.l : \tau_1 \yields {\App C E}}
+\ruleerecprojelab
 
-\inferrule* [right=$\rulelabelerecupd$]
-  {\gamma \turns e : \tau \yields E \andalso
-   \gamma \turns e_1 : \tau_1 \yields {E_1} \\
-   \judgeput \tau l {\tau_1 \yields {E_1}} {\tau_2} {\tau_3} \yields C \andalso
-   \tau_1 \subtype \tau_3}
-  {\gamma \turns \RecUpd e l {e_1} : \tau_2 \yields {\App C E}}
+\ruleerecupdelab
+
 \end{mathpar}

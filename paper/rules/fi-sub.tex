@@ -11,21 +11,21 @@
 
 \inferrule* [right=$\rulesubforall$]
   {\tau_1 \subtype \subst {\alpha_1} {\alpha_2} \tau_2}
-  {\Forall {\alpha_1} \tau_1 \subtype \Forall {\alpha_2} \tau_2}
+  {\for {\alpha_1} \tau_1 \subtype \for {\alpha_2} \tau_2}
 
 \inferrule* [right=$\rulesubintersect$]
   {\tau_1 \subtype \tau_2 \andalso \tau_1 \subtype \tau_3}
-  {\tau_1 \subtype \tau_2 \Intersect \tau_3}
+  {\tau_1 \subtype \tau_2 \andop \tau_3}
 
 \inferrule* [right=$\rulesubintersectl$]
   {\tau_1 \subtype \tau_3}
-  {\tau_1 \Intersect \tau_2 \subtype \tau_3}
+  {\tau_1 \andop \tau_2 \subtype \tau_3}
 
 \inferrule* [right=$\rulesubintersectr$]
   {\tau_2 \subtype \tau_3}
-  {\tau_1 \Intersect \tau_2 \subtype \tau_3}
+  {\tau_1 \andop \tau_2 \subtype \tau_3}
 
 \inferrule* [right=$\rulesubrec$]
   {\tau_1 \subtype \tau_2}
-  {\RecTy l {\tau_1} \subtype \RecTy l {\tau_2}}
+  {\recty l {\tau_1} \subtype \recty l {\tau_2}}
 \end{mathpar}

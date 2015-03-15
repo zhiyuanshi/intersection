@@ -3,39 +3,39 @@
 
 \inferrule* [right=$\rulelabelevar$]
 {(x,\tau) \in \gamma}
-{\gamma \turns x : \tau}
+{\judgee \gamma x \tau}
 
 \inferrule* [right=$\rulelabelelam$]
-{\gamma, x \hast \tau \turns e : \tau_1 \andalso \gamma \turns \tau}
-{\gamma \turns \Lam x \tau e : \tau \to \tau_1}
+{\judgee {\gamma, x \hast \tau} e {\tau_1} \andalso \gamma \turns \tau}
+{\judgee \gamma {\lam x \tau e} {\tau \to \tau_1}}
 
 \inferrule* [right=$\rulelabeleapp$]
-{\gamma \turns e_1 : \tau_1 \to \tau_2 \\
- \gamma \turns e_2 : \tau_3 \andalso \tau_3 \subtype \tau_1}
-{\gamma \turns \App {e_1} {e_2} : \tau_2}
+{\judgee \gamma {e_1} {\tau_1 \to \tau_2} \\
+ \judgee \gamma {e_2} {\tau_3} \andalso \tau_3 \subtype \tau_1}
+{\judgee \gamma {\app {e_1} {e_2}} {\tau_2}}
 
 \inferrule* [right=$\rulelabeleblam$]
-{\gamma, \alpha \turns e : \tau}
-{\gamma \turns \BLam \alpha e : \Forall \alpha \tau}
+{\judgee {\gamma, \alpha} e \tau}
+{\judgee \gamma {\blam \alpha e} {\for \alpha \tau}}
 
 \inferrule* [right=$\rulelabeletapp$]
-{\gamma \turns e : \forall \alpha. \tau_1 \andalso \gamma \turns \tau}
-{\gamma \turns \TApp e \tau : \subst \alpha \tau \tau_1}
+{\judgee \gamma e {\for \alpha \tau_1} \andalso \gamma \turns \tau}
+{\judgee \gamma {\tapp e \tau} {\subst \tau \alpha \tau_1}}
 
 \inferrule* [right=$\rulelabelemerge$]
-{\gamma \turns e_1 : \tau_1 \andalso \gamma \turns e_2 : \tau_2}
-{\gamma \turns e_1 \Merge e_2 : \tau_1 \Intersect \tau_2}
+{\judgee \gamma {e_1} {\tau_1} \andalso \judgee \gamma {e_2} {\tau_2}}
+{\judgee \gamma {e_1 \mergeop e_2} {\tau_1 \andop \tau_2}}
 
 \inferrule* [right=$\rulelabelereccon$]
-{\gamma \turns e : \tau}
-{\gamma \turns \RecCon l e : \RecTy l \tau}
+{\judgee \gamma e \tau}
+{\judgee \gamma {\reccon l e} {\recty l \tau}}
 
 \inferrule* [right=$\rulelabelerecproj$]
-{\gamma \turns e : \tau \andalso \judgeget \tau l {\tau_1}}
-{\gamma \turns e.l : \tau_1}
+{\judgee \gamma e \tau \andalso \judgeget \tau l {\tau_1}}
+{\judgee \gamma {e.l} {\tau_1}}
 
 \inferrule* [right=$\rulelabelerecupd$]
-{\gamma \turns e : \tau \andalso \gamma \turns e_1 : \tau_1 \\
+{\judgee \gamma e \tau \andalso \judgee \gamma {e_1} {\tau_1} \\
  \judgeput \tau l {\tau_1} {\tau_2} {\tau_3} \andalso \tau_1 \subtype \tau_3}
-{\gamma \turns \RecUpd e l {e_1} : \tau_2}
+{\judgee \gamma {\recupd e l {e_1}} {\tau_2}}
 \end{mathpar}

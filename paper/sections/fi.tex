@@ -35,35 +35,35 @@ can be desugared into the merge of multiple single records.
 \paragraph{Types.} The constructs in the first row of types in
 Figure~\ref{fig:fi-syntax} are standard in System $ F $: type variable
 $ \alpha $, function types $ \tau \to \tau $, and type abstraction
-$ \Forall \alpha \tau $. The last two are novel. $ \tau_1 \Intersect \tau_1 $ is
+$ \for \alpha \tau $. The last two are novel. $ \tau_1 \andop \tau_1 $ is
 the intersection of type $ \tau_1 $ and $ \tau_2 $, 
 % \bruno{be consistent: in the source language we use \&, and in the
-% formalization we use $\Intersect$}
-and $ \RecTy l \tau $ are the types for single-field records.
+% formalization we use $\andop$}
+and $ \recty l \tau $ are the types for single-field records.
 
 \paragraph{Expressions.} The first five constructs of expressions are also
 standard: variables $ x $, and two abstraction-elimination pairs: lambda
-expressions $ \Lam x \tau e $ abstract expression $ e $ over values of
-type $ \tau $ and are eliminated by application $ \App e e $; Big lambdas
-$ \BLam \alpha e $ abstract expression $ e $ over types and are eliminated by
-type application $ \App e \tau $. In the source language, lambdas are written as
+expressions $ \lam x \tau e $ abstract expression $ e $ over values of
+type $ \tau $ and are eliminated by application $ \app e e $; Big lambdas
+$ \blam \alpha e $ abstract expression $ e $ over types and are eliminated by
+type application $ \app e \tau $. In the source language, lambdas are written as
 \george{TODO} and big lambdas as \george{TODO}.
 
-The last four constructs are new: $ e_1 \Merge e_2 $ is the \emph{merge} of two
+The last four constructs are new: $ e_1 \mergeop e_2 $ is the \emph{merge} of two
 expressions $ e_1 $ and $ e_2 $.
 % \bruno{explain further, after all this is new.}
 It can be used as either $ e_1 $ or $ e_2 $. Particarly, if one regard $ e_1 $
 and $ e_2 $ as objects, their merge will responds to every method that one or
 both of them have. Merge of expressions correspond to intersection types
-$ \tau_1 \Intersect \tau_2 $. $ \RecCon l e $ constructs a single-field record.
+$ \tau_1 \andop \tau_2 $. $ \reccon l e $ constructs a single-field record.
 $ e.l $ accesses the field labelled $ l $ in $ e $. Note that $ e $ does not
 need to be a record type in this case. For example, although the merge of two
 records
 \[
-x = \RecCon {l_1} {e_1} \Merge \RecCon {l_1} {e_2} 
+x = \reccon {l_1} {e_1} \mergeop \reccon {l_1} {e_2} 
 \]
 is of an intersection type, $ x.{l_1} $ still gives $ e_1 $. On the other hand,
-$ x.{l_3} $ does not type check. Functional update $ \RecUpd e l {e_1} $ a
+$ x.{l_3} $ does not type check. Functional update $ \recupd e l {e_1} $ a
 \emph{new} record which is exactly the same as $ e $ except the field labelled
 $ l $ is updated to become $ e1 $.
 \bruno{Talking about type-checking before type-checking is discussed!}
@@ -112,17 +112,17 @@ subtyping is due to solely of intersection and function types.
 % \bruno{Subtyping figure is doing the translation already?}
 
 Intersection types introduce natural subtyping relations among types. For
-example, $ \Int \Intersect \Bool $ should be a subtype of $ \Int $, since the
+example, $ \Int \andop \Bool $ should be a subtype of $ \Int $, since the
 former can be viewed as either $ \Int $ or $ \Bool $. To summarize, the
 subtyping rules are standard except for three points listed below:
 \begin{enumerate}
-\item $ \tau_1 \Intersect \tau_2 $ is a subtype of $ \tau_3 $, if \emph{either} $ \tau_1 $ or
+\item $ \tau_1 \andop \tau_2 $ is a subtype of $ \tau_3 $, if \emph{either} $ \tau_1 $ or
   $ \tau_2 $ are subtypes of $ \tau_3 $,
 
-\item $ \tau_1 $ is a subtype of $ \tau_2 \Intersect \tau_3 $, if $ \tau_1 $ is a subtype of
+\item $ \tau_1 $ is a subtype of $ \tau_2 \andop \tau_3 $, if $ \tau_1 $ is a subtype of
   both $ \tau_2 $ and $ \tau_3 $.
 
-\item $ \RecTy {l_1} {\tau_1} $ is a subtype of $ \RecTy {l_2} {\tau_2} $, if
+\item $ \recty {l_1} {\tau_1} $ is a subtype of $ \recty {l_2} {\tau_2} $, if
   $ l_1 $ and $ l_2 $ are identical and $ \tau_1 $ is a subtype of $ \tau_2 $.
 \end{enumerate}
 The first point is captured by two rules \rulename{S-And1} and
@@ -132,11 +132,6 @@ last point means that record types are covariant in the type of the fields.
 % The subtyping relation is reflexive and transitive.
 
 \subsection{Typing}
-
-\begin{figure}
-\input{rules/fi-wf.tex}
-\caption{Well-formedness}
-\end{figure}
 
 \begin{figure*}
 \input{rules/fi-typing.tex}
@@ -195,8 +190,8 @@ constructs.
 %   \fields{\alpha} & = & \rel{\cdot} {\alpha} \\
 %   \fields{\tau_1 \to \tau_2} & = & \rel{\cdot} {\tau_1 \to \tau_2} \\
 %   \fields{\forall \alpha. \tau} & = & \rel{\cdot} {\forall \alpha. \tau} \\
-%   \fields{\tau_1 \Intersect \tau_2} & = & \fields{\tau_1} \dplus \fields{\tau_2} \\
-%   \fields{\RecTy l \tau} & = & \rel l t
+%   \fields{\tau_1 \andop \tau_2} & = & \fields{\tau_1} \dplus \fields{\tau_2} \\
+%   \fields{\recty l \tau} & = & \rel l t
 % \end{array} \]
 % where $ \cdot $ means empty list, $ \dplus $ list concatenation, and $ : $ is an
 % infix operator that prepend the first argument to the second. The function

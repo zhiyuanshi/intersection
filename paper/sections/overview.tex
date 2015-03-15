@@ -34,12 +34,12 @@ introduction construct for function types (lambdas) and universal quantification
 (big lambdas) in most core calculi. To fill this gap, we allow intersecting any
 two terms at run time using a \emph{merge} operator, similar to
 Dunfield's~\cite{dunfield2014elaborating} approach. The key constructs are the
-``merge'' operator, denoted by $ \Merge $ at the term level and the
-corresponding type intersection operator, denoted by $ \Intersect $ at the type
+``merge'' operator, denoted by $ \mergeop $ at the term level and the
+corresponding type intersection operator, denoted by $ \andop $ at the type
 level.
 % \bruno{We take a particular approach to intersection types, namely that of
 % Dundfield. Some other approaches are different. The \emph{key feature} in
-% Dunfield's approach is the $\Merge$ operator, which allows for run-time
+% Dunfield's approach is the $\mergeop$ operator, which allows for run-time
 % value/object composition.}
 
 The addition of intersection types to System $ F $ has a number of consequences,
@@ -51,10 +51,10 @@ which we will explore one by one in the following subsections.
 \subsection{Intersection Types}
 
 % What is an intersection type? One classic view is from set-theoretic
-% interpretation of types: $ A \Intersect B $ stands for the intersection of
+% interpretation of types: $ A \andop B $ stands for the intersection of
 % the set of values of $ A $ and $ B $. A more practical view, adopted in this
 % paper, regards types as a kind of interface: a value of type
-% $ A \Intersect B $ satisfies both of the interfaces of $ A $ and $ B $. For
+% $ A \andop B $ satisfies both of the interfaces of $ A $ and $ B $. For
 % example, \lstinline{eval : Int} is the interface that supports evaluation to
 % integers, while \lstinline{eval : Int & print : String } supports both
 % evaluation and pretty printing. Those interfaces are akin to interfaces in
@@ -152,7 +152,7 @@ and we can further extract a field out of it, such as
 \begin{lstlisting}
 (1 ,, { x = 2 }).x
 \end{lstlisting}
-That is because a record type of the form $ \RecTy l \tau $ can be thought as a
+That is because a record type of the form $ \recty l \tau $ can be thought as a
 normal type \lstinline{t} tagged by the label \lstinline{l}. In consequence,
 \name supports a generalization of record elimination and update that works for
 any type. Functional update can be done using the \emph{with} keyword:

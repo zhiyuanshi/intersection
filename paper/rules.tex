@@ -1,76 +1,106 @@
 \newcommand{\ruleget}{
   \inferrule* [right=$\rulelabelget$]
   { }
-  {\judgeget {\RecTy l \tau} l \tau}
+  {\judgeget {\recty l \tau} l \tau}
 }
 
 \newcommand{\rulegetelab}{
   \inferrule* [right=$\rulelabelget$]
   { }
-  {\judgeget {\RecTy l \tau} l \tau \yields {\Lam x {\im {\RecTy l \tau}} x}}
+  {\judgeget {\recty l \tau} l \tau \yields {\lam x {\im {\recty l \tau}} x}}
 }
 
 \newcommand{\rulegetleft}{
   \inferrule* [right=$\rulelabelgetleft$]
   {\judgeget {\tau_1} l \tau}
-  {\judgeget {\tau_1 \Intersect \tau_2} l \tau}
+  {\judgeget {\tau_1 \andop \tau_2} l \tau}
 }
 
 \newcommand{\rulegetleftelab}{
   \inferrule* [right=$\rulelabelgetleft$]
   {\judgeget {\tau_1} l \tau \yields C}
-  {\judgeget {\tau_1 \Intersect \tau_2} l \tau \yields {\Lam x {\im {\tau_1
-          \Intersect \tau_2}} {\App C {(\Proj 1 x)}}}}
+  {\judgeget {\tau_1 \andop \tau_2} l \tau \yields {\lam x {\im {\tau_1
+          \andop \tau_2}} {\app C {(\proj 1 x)}}}}
 }
 
 \newcommand{\rulegetright}{
   \inferrule* [right=$\rulelabelgetright$]
   {\judgeget {\tau_2} l \tau}
-  {\judgeget {\tau_1 \Intersect \tau_2} l \tau}
+  {\judgeget {\tau_1 \andop \tau_2} l \tau}
 }
 
 \newcommand{\rulegetrightelab}{
   \inferrule* [right=$\rulelabelgetright$]
   {\judgeget {\tau_2} l \tau \yields C}
-  {\judgeget {\tau_1 \Intersect \tau_2} l \tau \yields {\Lam x {\im {\tau_1
-          \Intersect \tau_2}} {\App C {(\Proj 2 x)}}}}
+  {\judgeget {\tau_1 \andop \tau_2} l \tau \yields {\lam x {\im {\tau_1
+          \andop \tau_2}} {\app C {(\proj 2 x)}}}}
 }
 
 \newcommand{\ruleput}{
 \inferrule* [right=$\rulelabelput$]
   { }
-  {\judgeput {\RecTy l \tau} l {\tau_1} {\RecTy l {\tau_1}} \tau}
+  {\judgeput {\recty l \tau} l {\tau_1} {\recty l {\tau_1}} \tau}
 }
 
 \newcommand{\ruleputelab}{
 \inferrule* [right=$\rulelabelput$]
   { }
-  {\judgeput {\RecTy l \tau} l {\tau_1 \yields E} {\RecTy l {\tau_1}} \tau
-  \yields {\Lam \_ {\im {\RecTy l \tau}} E}}
+  {\judgeput {\recty l \tau} l {\tau_1 \yields E} {\recty l {\tau_1}} \tau
+  \yields {\lam \_ {\im {\recty l \tau}} E}}
 }
 
 \newcommand{\ruleputleft}{
 \inferrule* [right=$\rulelabelputleft$]
   {\judgeput {\tau_1} l \tau {\tau_3} {\tau_4}}
-  {\judgeput {\tau_1 \Intersect \tau_2} l \tau {\tau_3 \Intersect \tau_2} {\tau_4}}
+  {\judgeput {\tau_1 \andop \tau_2} l \tau {\tau_3 \andop \tau_2} {\tau_4}}
 }
 
 \newcommand{\ruleputleftelab}{
 \inferrule* [right=$\rulelabelputleft$]
   {\judgeput {\tau_1} l {\tau \yields E} {\tau_3} {\tau_4} \yields C}
-  {\judgeput {\tau_1 \Intersect \tau_2} l {\tau \yields E} {\tau_3 \Intersect \tau_2} {\tau_4}
-  \yields {\Lam x {\im {\tau_1 \Intersect \tau_2}} {\App C {(\Proj 1 x)}}}}
+  {\judgeput {\tau_1 \andop \tau_2} l {\tau \yields E} {\tau_3 \andop \tau_2} {\tau_4}
+  \yields {\lam x {\im {\tau_1 \andop \tau_2}} {\app C {(\proj 1 x)}}}}
 }
 
 \newcommand{\ruleputright}{
 \inferrule* [right=$\rulelabelputright$]
   {\judgeput {\tau_2} l \tau {\tau_3} {\tau_4}}
-  {\judgeput {\tau_1 \Intersect \tau_2} l \tau {\tau_1 \Intersect \tau_3} {\tau_4}}
+  {\judgeput {\tau_1 \andop \tau_2} l \tau {\tau_1 \andop \tau_3} {\tau_4}}
 }
 
 \newcommand{\ruleputrightelab}{
 \inferrule* [right=$\rulelabelputright$]
   {\judgeput {\tau_2} l {\tau \yields E} {\tau_3} {\tau_4} \yields C}
-  {\judgeput {\tau_1 \Intersect \tau_2} l {\tau \yields E} {\tau_1 \Intersect \tau_3} {\tau_4}
-  \yields {\Lam x {\im {\tau_1 \Intersect \tau_2}} {\App C {(\Proj 2 x)}}}}
+  {\judgeput {\tau_1 \andop \tau_2} l {\tau \yields E} {\tau_1 \andop \tau_3} {\tau_4}
+  \yields {\lam x {\im {\tau_1 \andop \tau_2}} {\app C {(\proj 2 x)}}}}
+}
+
+\newcommand{\ruleewfvar}{
+\inferrule* 
+  {\alpha \in \gamma}
+  {\judgeewf \gamma \alpha}
+}
+
+\newcommand{\ruleewffun}{
+\inferrule* 
+  {\judgeewf \gamma \tau_1 \andalso \judgeewf \gamma \tau_2}
+  {\judgeewf \gamma {\tau_1 \to \tau_2}}
+}
+
+\newcommand{\ruleewfforall}{
+\inferrule* 
+  {\judgeewf {\gamma, \alpha} \tau}
+  {\judgeewf \gamma {\for \alpha \tau}}
+}
+
+\newcommand{\ruleewfand}{
+\inferrule* 
+  {\judgeewf \gamma \tau_1 \andalso \judgeewf \gamma \tau_2}
+  {\judgeewf \gamma {\tau_1 \andop \tau_2}}
+}
+
+\newcommand{\ruleewfrec}{
+\inferrule* 
+  {\judgeewf \gamma \tau}
+  {\judgeewf \gamma {\recty l \tau}}
 }

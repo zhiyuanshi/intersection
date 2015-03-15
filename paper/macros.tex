@@ -1,4 +1,4 @@
-\newcommand{\turns}     {\vdash}
+\newcommand{\turns}{\vdash}
 
 \newcommand{\im}[1]{\lvert #1 \rvert}
 
@@ -16,20 +16,20 @@
 \newcommand{\appspacing}{\;}
 
 % Types
-\newcommand{\Forall}[2]{\forall #1. \binderspacing #2}
-\newcommand{\RecTy}[2]{\{ #1 \hast #2 \}}
-\newcommand{\Intersect}{\with}
-\newcommand{\Pair}[2]{(#1, #2)}
+\newcommand{\for}[2]{\forall #1. \binderspacing #2}
+\newcommand{\recty}[2]{\{ #1 \hast #2 \}}
+\newcommand{\andop}{\with}
+\newcommand{\pair}[2]{(#1, #2)}
 
 % Expressions
-\newcommand{\Lam}[3]{\lambda (#1 \hast #2).\binderspacing #3}
-\newcommand{\BLam}[2]{\Lambda #1.\binderspacing #2}
-\newcommand{\App}[2]{#1 \appspacing #2}
-\newcommand{\TApp}[2]{#1 \appspacing #2}
-\newcommand{\Merge}{,,}
-\newcommand{\RecCon}[2]{\{ #1 = #2 \}}
-\newcommand{\RecUpd}[3]{#1 \; \mathbf{with} \; \{#2 = #3\}}
-\newcommand{\Proj}[2]{{\texttt{proj}}_{#1} #2}
+\newcommand{\lam}[3]{\lambda (#1 \hast #2).\binderspacing #3}
+\newcommand{\blam}[2]{\lambda #1.\binderspacing #2}
+\newcommand{\app}[2]{#1 \appspacing #2}
+\newcommand{\tapp}[2]{#1 \appspacing #2}
+\newcommand{\mergeop}{,,}
+\newcommand{\reccon}[2]{\{ #1 = #2 \}}
+\newcommand{\recupd}[3]{#1 \; \mathbf{with} \; \{#2 = #3\}}
+\newcommand{\proj}[2]{{\texttt{proj}}_{#1} #2}
 
 \newcommand{\code}[1]{\texttt{#1}}
 
@@ -38,23 +38,24 @@
 \newcommand{\Bool}{\code{Bool}}
 
 % Judgments
-\newcommand{\judgeget}[3]{#1 \bullet #2 = #3}
-\newcommand{\judgeput}[5]{#1 \blacktriangleleft \RecTy {#2} {#3} = #4 \lfloor #5 \rfloor}
 
 % Rules
 
-% Subtyping rules
+% Subtyping labels
 \newcommand{\rulesub}{\bm{\textcolor{OliveGreen}{\subtype}}}
 \newcommand{\rulesubvar}{\rulesub\text{var}}
 \newcommand{\rulesubfun}{\rulesub\to}
 \newcommand{\rulesubforall}{\rulesub\forall}
-\newcommand{\rulesubintersect}{\rulesub\Intersect}
-\newcommand{\rulesubintersectl}{\rulesub{\Intersect}_1}
-\newcommand{\rulesubintersectr}{\rulesub{\Intersect}_2}
+\newcommand{\rulesubintersect}{\rulesub\andop}
+\newcommand{\rulesubintersectl}{\rulesub{\andop}_1}
+\newcommand{\rulesubintersectr}{\rulesub{\andop}_2}
 \newcommand{\rulesubrec}{\rulesub\{\}}
 
-% Source/elaboration typing rules
-\newcommand{\rulelabele}{\bm{\textcolor{Blue}{E}}}
+% Source/elaboration and labels
+\colorlet{elabcolor}{Blue}
+\newcommand{\judgeewf}[2]{#1 \; \textcolor{elabcolor}{\turns} \; #2}
+\newcommand{\judgee}[3]{#1 \; \textcolor{elabcolor}{\turns} \; #2 \; \textcolor{elabcolor}{:} \; #3}
+\newcommand{\rulelabele}{\bm{\textcolor{elabcolor}{E}}}
 \newcommand{\rulelabelevar}{\rulelabele\text{var}}
 \newcommand{\rulelabelelam}{\rulelabele\text{lam}}
 \newcommand{\rulelabeleapp}{\rulelabele\text{app}}
@@ -65,8 +66,11 @@
 \newcommand{\rulelabelerecproj}{\rulelabele\text{rec-proj}}
 \newcommand{\rulelabelerecupd}{\rulelabele\text{rec-upd}}
 
-% Target typing rules
-\newcommand{\rulelabelt}{\bm{\textcolor{Magenta}{T}}}
+% Target typing judgment and labels
+\colorlet{targetcolor}{BrickRed}
+\newcommand{\judgetwf}[2]{#1 \; \textcolor{targetcolor}{\turns} \; #2}
+\newcommand{\judget}[3]{#1 \; \textcolor{targetcolor}{\turns} \; #2 \; \textcolor{targetcolor}{:} \; #3}
+\newcommand{\rulelabelt}{\bm{\textcolor{targetcolor}{T}}}
 \newcommand{\rulelabeltvar}{\rulelabelt\text{var}}
 \newcommand{\rulelabeltlam}{\rulelabelt\text{lam}}
 \newcommand{\rulelabeltapp}{\rulelabelt\text{app}}
@@ -76,12 +80,16 @@
 \newcommand{\rulelabeltprojleft}{\rulelabelt\text{proj}_1}
 \newcommand{\rulelabeltprojright}{\rulelabelt\text{proj}_2}
 
-% Get rules
+% Get judgment and labels
+\newcommand{\judgeget}[3]{#1 \bullet #2 = #3}
+
 \newcommand{\rulelabelget}{\textcolor{Brown}{\text{get}}}
 \newcommand{\rulelabelgetleft}{{\rulelabelget}_1}
 \newcommand{\rulelabelgetright}{{\rulelabelget}_2}
 
-% Put rules
+% Put judgment and labels
+\newcommand{\judgeput}[5]{#1 \blacktriangleleft \recty {#2} {#3} = #4 \lfloor #5 \rfloor}
+
 \newcommand{\rulelabelput}{\textcolor{Brown}{\text{put}}}
 \newcommand{\rulelabelputleft}{{\rulelabelput}_1}
 \newcommand{\rulelabelputright}{{\rulelabelput}_2}
