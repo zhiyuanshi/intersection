@@ -10,10 +10,12 @@
 
 \usepackage{amsmath}
 \usepackage{amsthm}
+\usepackage{amssymb}
 \usepackage{mathtools} % For \Coloneqq
+\usepackage{bm}        % Bold symbols in maths mode
 \usepackage{fixltx2e}
 \usepackage{stmaryrd}
-\usepackage{xcolor}
+\usepackage[dvipsnames]{xcolor}
 \usepackage{listings} % For code listings
 % \usepackage{minted}
 % \usemintedstyle{murphy}
@@ -52,10 +54,9 @@
 \newtheorem{theorem}{Theorem}
 \newtheorem{lemma}{Lemma}
 
-\definecolor{facebook}{HTML}{3b5998}
-
 % Define macros immediately before the \begin{document} command
 \input{macros.tex}
+\input{rules.tex}
 
 \newcommand{\name}{{\bf $F_{\&}$}\xspace}
 %%\newcommand{\Name}{{\bf fi}}

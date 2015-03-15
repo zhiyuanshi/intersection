@@ -1,17 +1,35 @@
 \section{An Overview of \name}
 
+% \bruno{mention (and cite) that there are a number of OO languages supporting
+% intersection types }
 \george{Change the examples later to something very simple.}
 \bruno{Mention that we use some syntactic sugar, which is part 
 of our implementation.}
 
 This section provides the reader with necessary intuition of \name. In \name,
 the central addition to the type system of System $ F $ is intersection types.
-% \bruno{mention (and cite) that there are a number of OO languages supporting
-% intersection types }
-A number of OO languages, such as Java, Scala, and
-Ceylon\george{cite?}, already support intersection types to different degrees. A
-common limitation in those languages, though, is that there is no introduction
-construct at the term level for intersection types. In contrast, there are
+A number of OO languages, such as Java, C\#, Scala, and Ceylon\george{cite?}, already
+support intersection types to different degrees. Both Java and Scala supports
+intersection types via \lstinline{&} and \lstinline{with}, respectively. For
+example,
+\begin{lstlisting}
+ 
+\end{lstlisting}
+
+\begin{tabular}{ l | c | c | c }
+  & Java & Scala & \name \\
+  \hline
+  Intersection without a nominal type & & \checkmark & \checkmark  \\
+  \hline
+  Intersection of type parameters & & \checkmark & \checkmark \\
+  \hline
+  Term-level intersection & & & \checkmark \\
+\end{tabular}
+
+A common limitation in those languages, though, is that there is no introduction
+construct at the term level for intersection types.
+
+In contrast, there are
 introduction construct for function types (lambdas) and universal quantification
 (big lambdas) in most core calculi. To fill this gap, we allow intersecting any
 two terms at run time using a \emph{merge} operator, similar to

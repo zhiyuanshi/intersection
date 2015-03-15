@@ -1,0 +1,76 @@
+\newcommand{\ruleget}{
+  \inferrule* [right=$\rulelabelget$]
+  { }
+  {\judgeget {\RecTy l \tau} l \tau}
+}
+
+\newcommand{\rulegetelab}{
+  \inferrule* [right=$\rulelabelget$]
+  { }
+  {\judgeget {\RecTy l \tau} l \tau \yields {\Lam x {\im {\RecTy l \tau}} x}}
+}
+
+\newcommand{\rulegetleft}{
+  \inferrule* [right=$\rulelabelgetleft$]
+  {\judgeget {\tau_1} l \tau}
+  {\judgeget {\tau_1 \Intersect \tau_2} l \tau}
+}
+
+\newcommand{\rulegetleftelab}{
+  \inferrule* [right=$\rulelabelgetleft$]
+  {\judgeget {\tau_1} l \tau \yields C}
+  {\judgeget {\tau_1 \Intersect \tau_2} l \tau \yields {\Lam x {\im {\tau_1
+          \Intersect \tau_2}} {\App C {(\Proj 1 x)}}}}
+}
+
+\newcommand{\rulegetright}{
+  \inferrule* [right=$\rulelabelgetright$]
+  {\judgeget {\tau_2} l \tau}
+  {\judgeget {\tau_1 \Intersect \tau_2} l \tau}
+}
+
+\newcommand{\rulegetrightelab}{
+  \inferrule* [right=$\rulelabelgetright$]
+  {\judgeget {\tau_2} l \tau \yields C}
+  {\judgeget {\tau_1 \Intersect \tau_2} l \tau \yields {\Lam x {\im {\tau_1
+          \Intersect \tau_2}} {\App C {(\Proj 2 x)}}}}
+}
+
+\newcommand{\ruleput}{
+\inferrule* [right=$\rulelabelput$]
+  { }
+  {\judgeput {\RecTy l \tau} l {\tau_1} {\RecTy l {\tau_1}} \tau}
+}
+
+\newcommand{\ruleputelab}{
+\inferrule* [right=$\rulelabelput$]
+  { }
+  {\judgeput {\RecTy l \tau} l {\tau_1 \yields E} {\RecTy l {\tau_1}} \tau
+  \yields {\Lam \_ {\im {\RecTy l \tau}} E}}
+}
+
+\newcommand{\ruleputleft}{
+\inferrule* [right=$\rulelabelputleft$]
+  {\judgeput {\tau_1} l \tau {\tau_3} {\tau_4}}
+  {\judgeput {\tau_1 \Intersect \tau_2} l \tau {\tau_3 \Intersect \tau_2} {\tau_4}}
+}
+
+\newcommand{\ruleputleftelab}{
+\inferrule* [right=$\rulelabelputleft$]
+  {\judgeput {\tau_1} l {\tau \yields E} {\tau_3} {\tau_4} \yields C}
+  {\judgeput {\tau_1 \Intersect \tau_2} l {\tau \yields E} {\tau_3 \Intersect \tau_2} {\tau_4}
+  \yields {\Lam x {\im {\tau_1 \Intersect \tau_2}} {\App C {(\Proj 1 x)}}}}
+}
+
+\newcommand{\ruleputright}{
+\inferrule* [right=$\rulelabelputright$]
+  {\judgeput {\tau_2} l \tau {\tau_3} {\tau_4}}
+  {\judgeput {\tau_1 \Intersect \tau_2} l \tau {\tau_1 \Intersect \tau_3} {\tau_4}}
+}
+
+\newcommand{\ruleputrightelab}{
+\inferrule* [right=$\rulelabelputright$]
+  {\judgeput {\tau_2} l {\tau \yields E} {\tau_3} {\tau_4} \yields C}
+  {\judgeput {\tau_1 \Intersect \tau_2} l {\tau \yields E} {\tau_1 \Intersect \tau_3} {\tau_4}
+  \yields {\Lam x {\im {\tau_1 \Intersect \tau_2}} {\App C {(\Proj 2 x)}}}}
+}

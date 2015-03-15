@@ -1,27 +1,31 @@
-\framebox{\( \tau \subtype \tau \yieldsnothing C \)}
+\framebox{$\tau \subtype \tau$}
 
 \begin{mathpar}
-\inferrule* [right=Sub-Var]
-{ }
-{\alpha \subtype \alpha \yieldsnothing {\Lam x {\image \alpha} x}}
+\inferrule* [right=$\rulesubvar$]
+  { }
+  {\alpha \subtype \alpha}
 
-\inferrule* [right=Sub-Fun]
-{\tau_3 \subtype \tau_1 \yieldsnothing {C_1} \andalso \tau_2 \subtype \tau_4}
-{\tau_1 \to \tau_2 \subtype \tau_3 \to \tau_4}
+\inferrule* [right=$\rulesubfun$]
+  {\tau_3 \subtype \tau_1 \andalso \tau_2 \subtype \tau_4}
+  {\tau_1 \to \tau_2 \subtype \tau_3 \to \tau_4}
 
-\inferrule* [right=Sub-Forall]
-{\tau_1 \subtype \subst {\alpha_1} {\alpha_2} \tau_2}
-{\Forall {\alpha_1} \tau_1 \subtype \Forall {\alpha_2} \tau_2}
+\inferrule* [right=$\rulesubforall$]
+  {\tau_1 \subtype \subst {\alpha_1} {\alpha_2} \tau_2}
+  {\Forall {\alpha_1} \tau_1 \subtype \Forall {\alpha_2} \tau_2}
 
-\inferrule* [right=Sub-Andk]
-{\tau_k \subtype \tau_3}
-{\tau_1 \Intersect \tau_2 \subtype \tau_3}
+\inferrule* [right=$\rulesubintersect$]
+  {\tau_1 \subtype \tau_2 \andalso \tau_1 \subtype \tau_3}
+  {\tau_1 \subtype \tau_2 \Intersect \tau_3}
 
-\inferrule* [right=Sub-And]
-{\tau_1 \subtype \tau_2 \andalso \tau_1 \subtype \tau_3}
-{\tau_1 \subtype \tau_2 \Intersect \tau_3}
+\inferrule* [right=$\rulesubintersectl$]
+  {\tau_1 \subtype \tau_3}
+  {\tau_1 \Intersect \tau_2 \subtype \tau_3}
 
-\inferrule* [right=Sub-Rec]
-{\tau_1 \subtype \tau_2}
-{\RecTy l {\tau_1} \subtype \RecTy l {\tau_2}}
+\inferrule* [right=$\rulesubintersectr$]
+  {\tau_2 \subtype \tau_3}
+  {\tau_1 \Intersect \tau_2 \subtype \tau_3}
+
+\inferrule* [right=$\rulesubrec$]
+  {\tau_1 \subtype \tau_2}
+  {\RecTy l {\tau_1} \subtype \RecTy l {\tau_2}}
 \end{mathpar}
