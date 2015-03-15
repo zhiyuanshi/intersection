@@ -41,7 +41,7 @@ $ \\(x:(Int,String)). \proj 1 x $.
 The target language is System $ F $ extended with pairs. The syntax and typing
 is completely standard. The syntax of System $ F $ is as follows:
 % \bruno{fill!}
-\begin{figure}
+\begin{figure}[h]
   \input{rules/f-syntax.tex}
   \caption{Target syntax.}
   \label{fig:f-syntax}
@@ -58,9 +58,9 @@ $ e $ is of a \name type $ \tau $ and its translation is a System $ F $ expressi
 We also define the type translation function $ \im \cdot $ from \name types
 $ \tau $ to System $ F $ types $ T $.
 
-\begin{figure}
+\begin{figure}[h]
 \input{rules/type-trans.tex}
-\caption{Type translation}
+\caption{Type translation.}
 \end{figure}
 
 The first three rules of the translation is standard. For the last two, the

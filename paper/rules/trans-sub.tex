@@ -20,21 +20,21 @@
       {\lam f {\im {\for \alpha \tau_1}}
         {\blam \alpha {\app C {(\app f \alpha)}}}}}
 
-\inferrule* [right=$\rulelabelsubintersect$]
+\inferrule* [right=$\rulelabelsuband$]
   {\tau_1 \subtype \tau_2 \yields {C_1} \andalso \tau_1 \subtype \tau_3 \yields {C_2}}
   {\tau_1 \subtype \tau_2 \andop \tau_3
     \yields
       {\lam x {\im {\tau_1}}
         {\pair {\app {C_1} x} {\app {C_2} x}}}}
 
-\inferrule* [right=$\rulelabelsubintersectl$]
+\inferrule* [right=$\rulelabelsubandleft$]
   {\tau_1 \subtype \tau_3 \yields C}
   {\tau_1 \andop \tau_2 \subtype \tau_3
     \yields
       {\lam x {\im {\tau_1 \andop \tau_2}}
         {\app C {(\proj 1 x)}}}}
 
-\inferrule* [right=$\rulelabelsubintersectr$]
+\inferrule* [right=$\rulelabelsubandright$]
   {\tau_2 \subtype \tau_3 \yields C}
   {\tau_1 \andop \tau_2 \subtype \tau_3
     \yields

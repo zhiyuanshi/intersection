@@ -13,15 +13,15 @@
   {\tau_1 \subtype \subst {\alpha_1} {\alpha_2} \tau_2}
   {\for {\alpha_1} \tau_1 \subtype \for {\alpha_2} \tau_2}
 
-\inferrule* [right=$\rulelabelsubintersect$]
+\inferrule* [right=$\rulelabelsuband$]
   {\tau_1 \subtype \tau_2 \andalso \tau_1 \subtype \tau_3}
   {\tau_1 \subtype \tau_2 \andop \tau_3}
 
-\inferrule* [right=$\rulelabelsubintersectl$]
+\inferrule* [right=$\rulelabelsubandleft$]
   {\tau_1 \subtype \tau_3}
   {\tau_1 \andop \tau_2 \subtype \tau_3}
 
-\inferrule* [right=$\rulelabelsubintersectr$]
+\inferrule* [right=$\rulelabelsubandright$]
   {\tau_2 \subtype \tau_3}
   {\tau_1 \andop \tau_2 \subtype \tau_3}
 
