@@ -1,11 +1,11 @@
 \begin{mathpar}
 \framebox{$ \tau \subtype \tau \yields C $}
 
-\inferrule* [right=$\rulesubvar$]
+\inferrule* [right=$\rulelabelsubvar$]
   { }
   {\alpha \subtype \alpha \yields {\lam x {\im \alpha} x}}
 
-\inferrule* [right=$\rulesubfun$]
+\inferrule* [right=$\rulelabelsubfun$]
   {\tau_3 \subtype \tau_1 \yields {C_1} \andalso \tau_2 \subtype \tau_4 \yields {C_2}}
   {\tau_1 \to \tau_2 \subtype \tau_3 \to \tau_4
   \yields
@@ -13,35 +13,35 @@
       {\lam x {\im {\tau_3}}
           {\app {C_2} {(\app f {(\app {C_1} x)})}}}}}
 
-\inferrule* [right=$\rulesubforall$]
+\inferrule* [right=$\rulelabelsubforall$]
   {\tau_1 \subtype \subst {\alpha_1} {\alpha_2} \tau_2 \yields C}
   {\for {\alpha_1} \tau_1 \subtype \for {\alpha_2} \tau_2
     \yields
       {\lam f {\im {\for \alpha \tau_1}}
         {\blam \alpha {\app C {(\app f \alpha)}}}}}
 
-\inferrule* [right=$\rulesubintersect$]
+\inferrule* [right=$\rulelabelsubintersect$]
   {\tau_1 \subtype \tau_2 \yields {C_1} \andalso \tau_1 \subtype \tau_3 \yields {C_2}}
   {\tau_1 \subtype \tau_2 \andop \tau_3
     \yields
       {\lam x {\im {\tau_1}}
         {\pair {\app {C_1} x} {\app {C_2} x}}}}
 
-\inferrule* [right=$\rulesubintersectl$]
+\inferrule* [right=$\rulelabelsubintersectl$]
   {\tau_1 \subtype \tau_3 \yields C}
   {\tau_1 \andop \tau_2 \subtype \tau_3
     \yields
       {\lam x {\im {\tau_1 \andop \tau_2}}
         {\app C {(\proj 1 x)}}}}
 
-\inferrule* [right=$\rulesubintersectr$]
+\inferrule* [right=$\rulelabelsubintersectr$]
   {\tau_2 \subtype \tau_3 \yields C}
   {\tau_1 \andop \tau_2 \subtype \tau_3
     \yields
       {\lam x {\im {\tau_1 \andop \tau_2}}
         {\app C {(\proj 2 x)}}}}
 
-\inferrule* [right=$\rulesubrec$]
+\inferrule* [right=$\rulelabelsubrec$]
   {\tau_1 \subtype \tau_2 \yields C}
   {\recty l {\tau_1} \subtype \recty l {\tau_2}
     \yields
