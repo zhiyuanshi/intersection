@@ -6,6 +6,14 @@ intermediate result (one line above) to reach the left-hand side.
 
 \subsection{Elaboration}
 
+\begin{lemma}[\rulesub~rules produce type-correct coercion] \label{lemma:sub-correct}
+  If $ \tau_1 \subtype \tau_2 \yields C $, then $ \judget \epsilon C {\im {\tau_1} \to \im {\tau_2}} $.
+\end{lemma}
+
+\begin{proof}
+  \george{TODO}
+\end{proof}
+
 \begin{lemma}[\rulelabelget~rules produce type-correct coercion] \label{lemma:get-correct}
   If $ \judgeget \tau l {\tau_1} \yields C $, then $ \judget \epsilon C {\im \tau \to \im {\tau_1}} $.
 \end{lemma}
