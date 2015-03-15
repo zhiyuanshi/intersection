@@ -17,7 +17,7 @@ proposals for design patterns.  Examples include \emph{Object
   Algebras}~\cite{oliveira2012extensibility}, \emph{Modular Visitors}~\cite{oliveira09modular,togersen:2004} or
 Torgersen's~\cite{togersen:2004} four design patterns using generics. In those
 approaches the idea is to use some advanced (but already available)
-features, such as \emph{generics}~\cite{}, in combination with conventional
+features, such as \emph{generics}~\cite{Bracha98making}, in combination with conventional
 OOP features to model more extensible designs.  Those designs work in
 modern OOP languages such as Java, C\# or Scala.
 
@@ -53,10 +53,11 @@ languages. In particular there are three pressing limitations:
   not be conflated!
 
   Finally, the third limitation is prevalent in many extensible
-  designs~\cite{}. Such designs rely on advanced features of generics,
-  such as \emph{f-bounded polymorphism}~\cite{}, \emph{variance
-    annotations}~\cite{}, \emph{wildcards}~\cite{} and/or \emph{higher-kinded
-    types}~\cite{} to achieve type-safety. Sadly, the amount of
+  designs~\cite{togersen:2004,Zenger-Odersky2005,oliveira09modular,oliveira2013feature,rendel14attributes}.
+  Such designs rely on advanced features of generics,
+  such as \emph{f-bounded polymorphism}~\cite{Canning89f-bounded}, \emph{variance
+    annotations}~\cite{Igarashi06variant}, \emph{wildcards}~\cite{Torgersen04wildcards} and/or \emph{higher-kinded
+    types}~\cite{Moors08generics} to achieve type-safety. Sadly, the amount of
   type-annotations, combined with the lack of understanding of these
   features, usually deters programmers from using such designs.
 
@@ -68,7 +69,7 @@ delegation-based OOP? We show that Object Algebras fit nicely in this
 model. 
 \end{comment}
 
-This paper presents System \name: an extension of System F~\cite{}
+This paper presents System \name: an extension of System F~\cite{Reynolds74f}
 with intersection types and a merge operator~\cite{dunfield2014elaborating}.  The goal of
 System \name is to study the \emph{minimal} foundational language
 constructs that are needed to support various extensible designs,
