@@ -74,33 +74,3 @@
   {\judgeput {\tau_1 \andop \tau_2} l {\tau \yields E} {\tau_1 \andop \tau_3} {\tau_4}
   \yields {\lam x {\im {\tau_1 \andop \tau_2}} {\app C {(\proj 2 x)}}}}
 }
-
-\newcommand{\ruleewfvar}{
-\inferrule* 
-  {\alpha \in \gamma}
-  {\judgeewf \gamma \alpha}
-}
-
-\newcommand{\ruleewffun}{
-\inferrule* 
-  {\judgeewf \gamma \tau_1 \andalso \judgeewf \gamma \tau_2}
-  {\judgeewf \gamma {\tau_1 \to \tau_2}}
-}
-
-\newcommand{\ruleewfforall}{
-\inferrule* 
-  {\judgeewf {\gamma, \alpha} \tau}
-  {\judgeewf \gamma {\for \alpha \tau}}
-}
-
-\newcommand{\ruleewfand}{
-\inferrule* 
-  {\judgeewf \gamma \tau_1 \andalso \judgeewf \gamma \tau_2}
-  {\judgeewf \gamma {\tau_1 \andop \tau_2}}
-}
-
-\newcommand{\ruleewfrec}{
-\inferrule* 
-  {\judgeewf \gamma \tau}
-  {\judgeewf \gamma {\recty l \tau}}
-}
