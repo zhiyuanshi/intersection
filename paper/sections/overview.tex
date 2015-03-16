@@ -6,44 +6,61 @@
 \bruno{Mention that we use some syntactic sugar, which is part 
 of our implementation.}
 
-This section provides the reader with necessary intuition of \name. In \name,
-the central addition to the type system of System $ F $ is intersection types.
-A number of OO languages, such as Java, C\#, Scala, and Ceylon\george{cite?}, already
-support intersection types to different degrees. Both Java and Scala supports
-intersection types via \lstinline{&} and \lstinline{with}, respectively. For
-example,
-\begin{lstlisting}
- 
-\end{lstlisting}
+In this section we provide the reader with necessary intuition of \name. We will
+do so by introducing a simple source language, which will be used in
+Section~\ref{sec:application}. \george{From the practice of similar papers, I
+  think a figure listing the source syntax is neccessary.}
 
-\begin{tabular}{ l | c | c | c }
-  & Java & Scala & \name \\
-  \hline
-  Intersection without a nominal type & & \checkmark & \checkmark  \\
-  \hline
-  Intersection of type parameters & & \checkmark & \checkmark \\
-  \hline
-  Term-level intersection & & & \checkmark \\
-\end{tabular}
+In \name, the central addition to the type system of System $ F $ is
+intersection types. A number of OO languages, such as Java, C\#, Scala, and
+Ceylon\footnote{\url{http://ceylon-lang.org/}}, already support intersection
+types to different degrees. In Java, for example,
+\begin{lstlisting}
+interface AwithB extends A, B 
+\end{lstlisting}
+introduces a new interface \lstinline{AwithB} that satisfies the interfaces of
+both \lstinline{A} and \lstinline{B}, which can be considered as a nominal
+intersection type. Scala steps further by eliminating the need of a nominal type
+and allowing intersection of type parameters, for example,
+\begin{lstlisting}
+def merge[A,B] (x: A) (y: B) : A with B = ...
+\end{lstlisting}
+uses the annonymous intersection of two type parameters \lstinline{A} and
+\lstinline{B}.
 
 A common limitation in those languages, though, is that there is no introduction
-construct at the term level for intersection types.
+construct at the term level for intersection types. In Java and Scala, we cannot
+create an instance of class type \lstinline{A & B} with
+\begin{lstlisting}
+  new A() & B()
+\end{lstlisting}
 
-In contrast, there are
-introduction construct for function types (lambdas) and universal quantification
-(big lambdas) in most core calculi. To fill this gap, we allow intersecting any
-two terms at run time using a \emph{merge} operator, similar to
-Dunfield's~\cite{dunfield2014elaborating} approach. The key constructs are the
-``merge'' operator, denoted by $ \mergeop $ at the term level and the
-corresponding type intersection operator, denoted by $ \andop $ at the type
-level.
+The limitation essentially put intersection types in a second-class status. In
+contrast, there are term-level introduction construct for function types (with
+lambdas) and universal quantification (with big lambdas) in most core calculi.
+To fill this gap, we allow intersecting any two terms at run time using a
+\emph{merge} operator (denoted by $ \mergeop $), similar to
+Dunfield's~\cite{dunfield2014elaborating} approach.
+
+In summary,
+
+\begin{tabular}{ l | c | c | c }
+                                      & Java & Scala      & \name      \\ \hline
+  Intersection without a nominal type &      & \checkmark & \checkmark \\ \hline
+  Intersection of type parameters     &      & \checkmark & \checkmark \\ \hline
+  Term-level intersection             &      &            & \checkmark 
+\end{tabular} \\
+
+% The key constructs are the ``merge'' operator, denoted by $ \mergeop $
+% at the term level and the corresponding type intersection operator, denoted by
+% $ \andop $ at the type level.
 % \bruno{We take a particular approach to intersection types, namely that of
 % Dundfield. Some other approaches are different. The \emph{key feature} in
 % Dunfield's approach is the $\mergeop$ operator, which allows for run-time
 % value/object composition.}
 
-The addition of intersection types to System $ F $ has a number of consequences,
-which we will explore one by one in the following subsections.
+% The addition of intersection types to System $ F $ has a number of consequences,
+% which we will explore one by one in the following subsections.
 % \bruno{Don't mention prototype-based inheritance in the summary, unless you
 % are going to mention it later in the section. \emph{More generally don't
 % mention things that you don't talk about later!}}.
