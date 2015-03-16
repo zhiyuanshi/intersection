@@ -1,0 +1,35 @@
+\newcommand{\ruletvar} {
+\inferrule* [right=$\rulelabeltvar$]
+  {(x,T) \in \Gamma}
+  {\judget \Gamma x T}
+}
+
+\newcommand{\ruletlam} {
+\inferrule* [right=$\rulelabeltlam$]
+  {\judget {\Gamma, x \hast T} E {T_1} \andalso \judgetwf \Gamma T}
+  {\judget \Gamma {\lam x T E} {T \to T_1}}
+}
+
+\newcommand{\ruletapp}{
+\inferrule* [right=$\rulelabeltapp$]
+  {\judget \Gamma {E_1} {T_1 \to T_2} \andalso \judget \Gamma {E_2} {T_1}}
+  {\judget \Gamma {\app {E_1} {E_2}} {T_2}}
+}
+
+\newcommand{\ruletblam}{
+\inferrule* [right=$\rulelabeltblam$]
+  {\judgee {\Gamma, \alpha} E T}
+  {\judgee \Gamma {\blam \alpha E} {\for \alpha T}}
+}
+
+\newcommand{\rulettapp}{
+\inferrule* [right=$\rulelabelttapp$]
+  {\judget \Gamma E {\for \alpha {T_1}} \andalso \judgetwf \Gamma T}
+  {\judget \Gamma {\tapp E T} {\subst T \alpha T_1}}
+}
+
+\newcommand{\ruletpair}{
+\inferrule* [right=$\rulelabeltpair$]
+  {\judget \Gamma {E_1} {T_1} \andalso \judget \Gamma {E_2} {T_2}}
+  {\judget \Gamma {\pair {E_1} {E_2}} {\pair {T_1} {T_2}}}
+}

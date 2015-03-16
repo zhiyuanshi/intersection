@@ -26,7 +26,7 @@
 
 \newcommand{\ruleetappelab}{
 \inferrule* [right=$\rulelabeletapp$]
-  {\judgee \gamma e {\for \alpha \tau_1} \yields E \andalso \judgeewf \gamma \tau}
+  {\judgee \gamma e {\for \alpha {\tau_1}} \yields E \andalso \judgeewf \gamma \tau}
   {\judgee \gamma {\tapp e \tau} {\subst \tau \alpha \tau_1} \yields {\tapp E {\im \tau}}}
 }
 
