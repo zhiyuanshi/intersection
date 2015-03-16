@@ -42,13 +42,15 @@ To fill this gap, we allow intersecting any two terms at run time using a
 \emph{merge} operator (denoted by $ \mergeop $), similar to
 Dunfield's~\cite{dunfield2014elaborating} approach.
 
-In summary,
+The following table summarizes the extent of support for intersection types in
+Java, Scala, and \name.
 
-\begin{tabular}{ l | c | c | c }
-                                      & Java & Scala      & \name      \\ \hline
-  Intersection without a nominal type &      & \checkmark & \checkmark \\ \hline
-  Intersection of type parameters     &      & \checkmark & \checkmark \\ \hline
-  Term-level intersection             &      &            & \checkmark 
+\begin{tabular}{ l | c | c | c | c }
+                                   & Java       & Scala      & \name      \\ \hline
+  Basic intersection types         & \checkmark & \checkmark & \checkmark \\ \hline
+  Anonymous intersection types     &            & \checkmark & \checkmark \\ \hline
+  Intersection of type parameters  &            & \checkmark & \checkmark \\ \hline
+  Term-level intersection          &            &            & \checkmark 
 \end{tabular} \\
 
 % The key constructs are the ``merge'' operator, denoted by $ \mergeop $
