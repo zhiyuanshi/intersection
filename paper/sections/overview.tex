@@ -174,15 +174,17 @@ are orthogonal addition to the existing type system and a more general notion of
 records. 
 
 We define three primitive operations related to records: \emph{construction},
-\emph{projection}, and \emph{update}. The merge operator, discussed previously,
-takes the place of record extension described in many other record systems.
-Working with records is type-safe: the type system prevents accessing or
-updating a field that does not exist.
+\emph{projection}, and \emph{update}. \emph{Extension}, described in many other
+record systems, is replaced the merge operator, discussed earlier. Working with
+records is type-safe: the type system prevents accessing or updating a field
+that does not exist.
 
 Conventionally, record operations work only on record types. But \name
 generalizes them, allowing operations to occur on \emph{any} type. This makes
 sense in the context of record encoding, because multi-field records in \name do
 not have a proper record type. They are intersections.
+
+\subsubsection{Record Operations}
 
 \paragraph{Construction.}
 The notation for record construction and record types is standard in the source
@@ -209,11 +211,6 @@ one.~\footnote{The subtyping restriction is not required for the \name to be
 \begin{lstlisting}
 point with { x = 0, y = 0 }
 \end{lstlisting}
-Besides, subtyping of record types is in both width and depth, as one might
-expect: \lstinline$ { x: Int, y: Int } $ is a subtype of
-\lstinline$ { x: Int } $; and if \lstinline$ T1 $ is a subtype of
-\lstinline$ T2 $, then \lstinline$ { l: T1 } $ is also a subtype of
-\lstinline$ { l: T2 } $.
 
 \paragraph{Extension.}
 With intersection types, we are able to regard multi-field records as just
@@ -237,6 +234,14 @@ mixed.x
 That is because a record type of the form $ \recty l \tau $ can be thought as a
 normal type $ \tau $ tagged by the label $ l $. In consequence, \name supports a
 generalization of record projection and update that works for any type.
+
+\subsubsection{Record Subtyping}
+
+Besides, subtyping of record types is in both width and depth, as one might
+expect: \lstinline$ { x: Int, y: Int } $ is a subtype of
+\lstinline$ { x: Int } $; and if \lstinline$ T1 $ is a subtype of
+\lstinline$ T2 $, then \lstinline$ { l: T1 } $ is also a subtype of
+\lstinline$ { l: T2 } $.
 
 % \bruno{I would call this a labelled type. Record types can be viewed as
 % intersections of labelled types.}
