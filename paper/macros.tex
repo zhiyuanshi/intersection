@@ -37,22 +37,25 @@
 \newcommand{\Int}{\code{Int}}
 \newcommand{\Bool}{\code{Bool}}
 
-% Judgments
-
 % Rules
 
+% Couleurs
+\colorlet{subcolor}{OliveGreen}
+\colorlet{elabcolor}{Blue}
+\colorlet{getputcolor}{DarkOrchid}
+\colorlet{targetcolor}{BrickRed}
+
 % Subtyping labels
-\newcommand{\rulelabelsub}{\bm{\textcolor{OliveGreen}{\subtype}}}
+\newcommand{\rulelabelsub}{\bm{\textcolor{subcolor}{sub}}}
 \newcommand{\rulelabelsubvar}{\rulelabelsub\text{var}}
-\newcommand{\rulelabelsubfun}{\rulelabelsub\to}
-\newcommand{\rulelabelsubforall}{\rulelabelsub\forall}
-\newcommand{\rulelabelsuband}{\rulelabelsub\andop}
-\newcommand{\rulelabelsubandleft}{\rulelabelsub{\andop}_1}
-\newcommand{\rulelabelsubandright}{\rulelabelsub{\andop}_2}
-\newcommand{\rulelabelsubrec}{\rulelabelsub\{\}}
+\newcommand{\rulelabelsubfun}{\rulelabelsub\text{fun}}
+\newcommand{\rulelabelsubforall}{\rulelabelsub\text{forall}}
+\newcommand{\rulelabelsuband}{\rulelabelsub\text{and}}
+\newcommand{\rulelabelsubandleft}{\rulelabelsub{\text{and}_1}}
+\newcommand{\rulelabelsubandright}{\rulelabelsub{\text{and}_2}}
+\newcommand{\rulelabelsubrec}{\rulelabelsub\text{rec}}
 
 % Source/elaboration and labels
-\colorlet{elabcolor}{Blue}
 \newcommand{\judgeewf}[2]{#1 \; \textcolor{elabcolor}{\turns} \; #2}
 \newcommand{\judgee}[3]{#1 \; \textcolor{elabcolor}{\turns} \; #2 \; \textcolor{elabcolor}{:} \; #3}
 \newcommand{\rulelabele}{\bm{\textcolor{elabcolor}{E}}}
@@ -67,7 +70,6 @@
 \newcommand{\rulelabelerecupd}{\rulelabele\text{rec-upd}}
 
 % Target typing judgment and labels
-\colorlet{targetcolor}{BrickRed}
 \newcommand{\judgetwf}[2]{#1 \; \textcolor{targetcolor}{\turns} \; #2}
 \newcommand{\judget}[3]{#1 \; \textcolor{targetcolor}{\turns} \; #2 \; \textcolor{targetcolor}{:} \; #3}
 \newcommand{\rulelabelt}{\bm{\textcolor{targetcolor}{T}}}
@@ -83,14 +85,14 @@
 % Get judgment and labels
 \newcommand{\judgeget}[3]{#1 \bullet #2 = #3}
 
-\newcommand{\rulelabelget}{\textcolor{Brown}{\text{get}}}
+\newcommand{\rulelabelget}{\bm{\textcolor{getputcolor}{get}}}
 \newcommand{\rulelabelgetleft}{{\rulelabelget}_1}
 \newcommand{\rulelabelgetright}{{\rulelabelget}_2}
 
 % Put judgment and labels
 \newcommand{\judgeput}[5]{#1 \blacktriangleleft \recty {#2} {#3} = #4 \lfloor #5 \rfloor}
 
-\newcommand{\rulelabelput}{\textcolor{Brown}{\text{put}}}
+\newcommand{\rulelabelput}{\bm{\textcolor{getputcolor}{put}}}
 \newcommand{\rulelabelputleft}{{\rulelabelput}_1}
 \newcommand{\rulelabelputright}{{\rulelabelput}_2}
 
