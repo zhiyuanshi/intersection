@@ -207,7 +207,7 @@ mixed.x
 \end{lstlisting}
 That is because a record type of the form $ \recty l \tau $ can be thought as a
 normal type $ \tau $ tagged by the label $ l $. In consequence, \name supports a
-generalization of record elimination and update that works for any type.
+generalization of record projection and update that works for any type.
 
 % \bruno{I would call this a labelled type. Record types can be viewed as
 % intersections of labelled types.}
@@ -237,15 +237,21 @@ generalization of record elimination and update that works for any type.
 
 \paragraph{Intersection Types and Parametric Polymorphism}
 
-The presence of both parametric polymorphism and intersection is critical, as we
-shall see in the next section, in solving modularity problems. The most simple
-example is a function that just uses the merge operator:
+% The presence of both parametric polymorphism and intersection is critical, as we
+% shall see in the next section, in solving modularity problems. 
+
+The simplest example that involves both intersection and polymorphism is a
+function that just uses the merge operator:
 % \bruno{use the join example here.}
 \begin{lstlisting}
 let merge [A] [B] (x: A) (y: B) : A & B = x ,, y
 \end{lstlisting}
-The key novel feature is that in our language we allow the intersection of type
-parameters.
+If we try to port the code to Scala we will get stuck on the right-hand side
+because there is no counterpart of \lstinline{with} at the term level:
+\begin{lstlisting}
+def merge[A,B] (x: A) (y: B) : A with B = // stuck here
+\end{lstlisting}
+
 \bruno{Show also how to use merge.}
 \bruno{Syntax for type applications looks uncurried.}
 
@@ -259,3 +265,7 @@ illustrate differences. \emph{We support contravariant argument types!}
 there are nominal languages, that also separate inheritance from subtyping!
 See Klaus Ostermann's paper \& ``Inheritance is not Subtyping''.
 }
+
+\george{I think all those points should prob. be addressed somewhere else. The
+  purpose of this section is just introducing the source language and preparing
+  the reader for the next section.}
