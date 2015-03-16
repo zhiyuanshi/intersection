@@ -65,7 +65,7 @@ In summary,
 % are going to mention it later in the section. \emph{More generally don't
 % mention things that you don't talk about later!}}.
 
-\paragraph{Intersection Types}
+\paragraph{Intersection types.}
 
 % What is an intersection type? One classic view is from set-theoretic
 % interpretation of types: $ A \andop B $ stands for the intersection of
@@ -133,7 +133,7 @@ construct for elimination).
 
 % \lstinputlisting[linerange=-]{} % APPLY:linerange=MIXIN_LIB
 
-\paragraph{Subtyping}
+\paragraph{Subtyping.}
 
 \bruno{Use the show example to illustrate subtyping in our language; and show other forms of subtyping.}
 
@@ -152,7 +152,7 @@ and therefore can take \lstinline{100} as its argument.
 
 % Subtyping in \name is syntactical and structual.
 
-\paragraph{Records}
+\paragraph{Records.}
 
 % \bruno{The title of this section needs adjusting. Moreover we do not want to
 %   talk about record elimination and update. \name supports a
@@ -235,7 +235,7 @@ generalization of record projection and update that works for any type.
 % \bruno{Examples illustrating update and elimination of intersections
 %   are missing!}
 
-\paragraph{Intersection Types and Parametric Polymorphism}
+\paragraph{Parametric polymorphism.}
 
 % The presence of both parametric polymorphism and intersection is critical, as we
 % shall see in the next section, in solving modularity problems. 
@@ -249,7 +249,7 @@ let merge [A] [B] (x: A) (y: B) : A & B = x ,, y
 If we try to port the code to Scala we will get stuck on the right-hand side
 because there is no counterpart of \lstinline{with} at the term level:
 \begin{lstlisting}
-def merge[A,B] (x: A) (y: B) : A with B = // stuck here
+def merge[A,B] (x: A) (y: B) : A with B = // stuck
 \end{lstlisting}
 
 \bruno{Show also how to use merge.}
