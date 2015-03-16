@@ -1,8 +1,8 @@
 \section{Proofs}
 
-\paragraph{Notation.} We present our proofs in two-column style: on the left is
-the intermediate result and on the right is the justification for the previous
-intermediate result (one line above) to reach the left-hand side.
+\paragraph{Notation.} We present our proofs in two-column style: on the left are
+the intermediate results and on the right are the justification (for the
+previous intermediate result to reach the corresponding left-hand side).
 
 \subsection{Elaboration}
 
@@ -20,7 +20,8 @@ intermediate result (one line above) to reach the left-hand side.
       & \rulesubvar &
     \end{flalign*}
 
-    \begin{tabular}{ll}
+    \begin{tabular}{rll}
+      & $ \judget {\epsilon} {\lam x {\im \alpha} x} {\alpha \to \alpha} $ & By $ \rulelabeltvar $ and $ \rulelabeltlam $
     \end{tabular} \\
 
   \item \textbf{Case}
@@ -28,7 +29,11 @@ intermediate result (one line above) to reach the left-hand side.
       & \rulesubfun &
     \end{flalign*}
 
-    \begin{tabular}{ll}
+    \begin{tabular}{rll}
+      & $ \tau_3 \subtype \tau_1 \yields {C_1} $ & Premise \\
+      & $ \judget \epsilon {C_1} {\im {\tau_3} \to \im {\tau_1}} $ & By i.h. \\
+      & $ \judget \epsilon {C_2} {\im {\tau_2} \to \im {\tau_4}} $ & Similar to the above \\
+      \george{TODO} &
     \end{tabular} \\
 
   \item \textbf{Case}
@@ -36,7 +41,8 @@ intermediate result (one line above) to reach the left-hand side.
       & \rulesubforall &
     \end{flalign*}
 
-    \begin{tabular}{ll}
+    \begin{tabular}{rll}
+      & \george{TODO} &
     \end{tabular} \\
 
   \item \textbf{Case}
@@ -44,7 +50,8 @@ intermediate result (one line above) to reach the left-hand side.
       & \rulesuband &
     \end{flalign*}
 
-    \begin{tabular}{ll}
+    \begin{tabular}{rll}
+      & \george{TODO} &
     \end{tabular} \\
 
   \item \textbf{Case}
@@ -52,7 +59,8 @@ intermediate result (one line above) to reach the left-hand side.
       & \rulesubandleft &
     \end{flalign*}
 
-    \begin{tabular}{ll}
+    \begin{tabular}{rll}
+      & \george{TODO} &
     \end{tabular} \\
 
   \item \textbf{Case}
@@ -60,15 +68,21 @@ intermediate result (one line above) to reach the left-hand side.
       & \rulesubandright &
     \end{flalign*}
 
-    \begin{tabular}{ll}
-    \end{tabular} \\
+    By symmetry with the above case. \\
 
   \item \textbf{Case}
     \begin{flalign*}
       & \rulesubrec &
     \end{flalign*}
 
-    \begin{tabular}{ll}
+    \begin{tabular}{rll}
+      & $ \tau_1 \subtype \tau_2 \yields C $ & Premise \\
+      (a) & $ \judget \epsilon C {\im {\tau_1} \to \im {\tau_2}} $ & By i.h. \\
+      & $ \judget {\epsilon, x \hast \im {\recty l {\tau_1}}} x {\im {\recty l {\tau_1}}} $ & By $ \rulelabeltvar $ \\
+      & $ \judget {\epsilon, x \hast \im {\recty l {\tau_1}}} x {\im {\tau_1}} $ & By the definition of $ \im \cdot $ \\
+      & $ \judget {\epsilon, x \hast \im {\recty l {\tau_1}}} {\app C x} {\im {\tau_2}} $ & By $ \rulelabeltapp $ and (a) \\
+      & $ \judget {\epsilon, x \hast \im {\recty l {\tau_1}}} {\app C x} {\im {\recty l {\tau_2}}} $ & By the definition of $ \im \cdot $ \\
+      & $ \judget \epsilon {\lam x {\im {\recty l {\tau_1}}} {\app C x}} {\im {\recty l {\tau_1}} \to \im {\recty l {\tau_2}}} $ & By $ \rulelabeltlam $ 
     \end{tabular} \\
 
   \end{itemize}
@@ -89,9 +103,9 @@ intermediate result (one line above) to reach the left-hand side.
       & \rulegetelab &
     \end{flalign*}
 
-    \begin{tabular}{ll}
-      $ \judget \epsilon {\lam x {\im {\recty l \tau}} x} {\im {\recty l \tau} \to \im {\recty l \tau}} $ & By $ \rulelabeltlam $ and $\rulelabeltvar$ \\
-      $ \judget \epsilon {\lam x {\im {\recty l \tau}} x} {\im {\recty l \tau} \to \im \tau} $ & By the definition of $ \im \cdot $
+    \begin{tabular}{rll}
+      & $ \judget \epsilon {\lam x {\im {\recty l \tau}} x} {\im {\recty l \tau} \to \im {\recty l \tau}} $ & By $ \rulelabeltlam $ and $\rulelabeltvar$ \\
+      & $ \judget \epsilon {\lam x {\im {\recty l \tau}} x} {\im {\recty l \tau} \to \im \tau} $ & By the definition of $ \im \cdot $
     \end{tabular} \\
 
   \item \textbf{Case}
@@ -99,14 +113,14 @@ intermediate result (one line above) to reach the left-hand side.
       & \rulegetleftelab &
     \end{flalign*}
 
-    \begin{tabular}{ll}
-      $ \judget {\epsilon, x \hast \im {\tau_1 \andop \tau_2}} x {\im {\tau_1 \andop \tau_2}} $ & By $ \rulelabeltvar $ \\
-      $ \judget {\epsilon, x \hast \im {\tau_1 \andop \tau_2}} x {\pair {\im {\tau_1}} {\im {\tau_2}}} $ & By the definition of $\im \cdot$ \\
-      $ \judget {\epsilon, x \hast \im {\tau_1 \andop \tau_2}} {\proj 1 x} {\im {\tau_1}} $ & By $\rulelabeltprojleft$ \\
-      $ \judget \epsilon C {\im {\tau_1} \to \im \tau} $ & By i.h. \\
-      $ \judget {\epsilon, x \hast \im {\tau_1 \andop \tau_2}} C {\im {\tau_1} \to \im \tau} $ & \george{What should this be called?} \\
-      $ \judget {\epsilon, x \hast \im {\tau_1 \andop \tau_2}} {\app C {(\proj 1 x)}} {\im \tau} $ & By $\rulelabeltapp$ \\
-      $ \judget \epsilon {\lam x {\im {\tau_1 \andop \tau_2}} {\app C {(\proj 1 x)}}} {\im {\tau_1 \andop \tau_2} \to \im \tau} $ & By $ \rulelabeltlam $
+    \begin{tabular}{rll}
+      & $ \judget {\epsilon, x \hast \im {\tau_1 \andop \tau_2}} x {\im {\tau_1 \andop \tau_2}} $ & By $ \rulelabeltvar $ \\
+      & $ \judget {\epsilon, x \hast \im {\tau_1 \andop \tau_2}} x {\pair {\im {\tau_1}} {\im {\tau_2}}} $ & By the definition of $\im \cdot$ \\
+      & $ \judget {\epsilon, x \hast \im {\tau_1 \andop \tau_2}} {\proj 1 x} {\im {\tau_1}} $ & By $\rulelabeltprojleft$ \\
+      & $ \judget \epsilon C {\im {\tau_1} \to \im \tau} $ & By i.h. \\
+      & $ \judget {\epsilon, x \hast \im {\tau_1 \andop \tau_2}} C {\im {\tau_1} \to \im \tau} $ & \george{What should this be called?} \\
+      & $ \judget {\epsilon, x \hast \im {\tau_1 \andop \tau_2}} {\app C {(\proj 1 x)}} {\im \tau} $ & By $\rulelabeltapp$ \\
+      & $ \judget \epsilon {\lam x {\im {\tau_1 \andop \tau_2}} {\app C {(\proj 1 x)}}} {\im {\tau_1 \andop \tau_2} \to \im \tau} $ & By $ \rulelabeltlam $
     \end{tabular} \\
 
   \item \textbf{Case}
@@ -136,9 +150,8 @@ intermediate result (one line above) to reach the left-hand side.
       & \ruleputelab &
     \end{flalign*}
 
-    \begin{tabular}{ll}
-      $ \judget \Gamma {\lam \_ {\im {\recty l \tau}} E} {\im {\recty l \tau}} \to
-      \im {\tau_1} $ & By $ \rulelabeltlam $, $ \rulelabeltvar $, and the hypothesis
+    \begin{tabular}{rll}
+      & $ \judget \Gamma {\lam \_ {\im {\recty l \tau}} E} {\im {\recty l \tau}} \to \im {\tau_1} $ & By $ \rulelabeltlam $, $ \rulelabeltvar $, and the hypothesis
     \end{tabular} \\
 
   \item \textbf{Case}
@@ -146,14 +159,14 @@ intermediate result (one line above) to reach the left-hand side.
       & \ruleputleftelab &
     \end{flalign*}
 
-    \begin{tabular}{ll}
-      $ \judget {\Gamma, x \hast \im {\tau_1 \andop \tau_2}} x {\im {\tau_1 \andop \tau_2}} $ & By $\rulelabeltvar$ \\
-      $ \judget {\Gamma, x \hast \im {\tau_1 \andop \tau_2}} x {\pair {\im {\tau_1}} {\im {\tau_2}}} $ & By the definition of $\im \cdot$ \\
-      $ \judget {\Gamma, x \hast \im {\tau_1 \andop \tau_2}} {\proj 1 x} {\im {\tau_1}} $ & By $\rulelabeltprojleft$ \\
-      $ \judget \Gamma C {\im {\tau_1} \to \im {\tau_3}} $ & By i.h. \\ 
-      $ \judget {\Gamma, x \hast \im {\tau_1 \andop \tau_2}} C {{\im {\tau_1}} \to \im {\tau_3}} $ & \george{Seems to need to assume $x$ fresh} \\ 
-      $ \judget {\Gamma, x \hast \im {\tau_1 \andop \tau_2}} {\app C {(\proj 1 x)}} {\im {\tau_3}} $ & By $\rulelabeltapp$ \\
-      $ \judget \Gamma {\lam x {\im {\tau_1 \andop \tau_2}} {\app C {(\proj 1 x)}}} {\im {\tau_1 \andop \tau_2} \to \im {\tau_3}} $ & By $\rulelabeltlam$
+    \begin{tabular}{rll}
+      & $ \judget {\Gamma, x \hast \im {\tau_1 \andop \tau_2}} x {\im {\tau_1 \andop \tau_2}} $ & By $\rulelabeltvar$ \\
+      & $ \judget {\Gamma, x \hast \im {\tau_1 \andop \tau_2}} x {\pair {\im {\tau_1}} {\im {\tau_2}}} $ & By the definition of $\im \cdot$ \\
+      & $ \judget {\Gamma, x \hast \im {\tau_1 \andop \tau_2}} {\proj 1 x} {\im {\tau_1}} $ & By $\rulelabeltprojleft$ \\
+      & $ \judget \Gamma C {\im {\tau_1} \to \im {\tau_3}} $ & By i.h. \\ 
+      & $ \judget {\Gamma, x \hast \im {\tau_1 \andop \tau_2}} C {{\im {\tau_1}} \to \im {\tau_3}} $ & \george{Seems to need to assume $x$ fresh} \\ 
+      & $ \judget {\Gamma, x \hast \im {\tau_1 \andop \tau_2}} {\app C {(\proj 1 x)}} {\im {\tau_3}} $ & By $\rulelabeltapp$ \\
+      & $ \judget \Gamma {\lam x {\im {\tau_1 \andop \tau_2}} {\app C {(\proj 1 x)}}} {\im {\tau_1 \andop \tau_2} \to \im {\tau_3}} $ & By $\rulelabeltlam$
     \end{tabular} \\
 
   \item \textbf{Case}
@@ -188,10 +201,10 @@ intermediate result (one line above) to reach the left-hand side.
       & \ruleevarelab &
     \end{flalign*}
 
-    \begin{tabular}{ll}
-     $ (x,\tau) \in \gamma $ & Premise \\
-     $ (x,\im \tau) \in \im \gamma $ & \\
-     $ \judget {\im \gamma} x {\im \tau} $ & By $ \rulelabeltvar $
+    \begin{tabular}{rll}
+     & $ (x,\tau) \in \gamma $ & Premise \\
+     & $ (x,\im \tau) \in \im \gamma $ & \\
+     & $ \judget {\im \gamma} x {\im \tau} $ & By $ \rulelabeltvar $
     \end{tabular} \\
 
   \item \textbf{Case}
@@ -199,12 +212,12 @@ intermediate result (one line above) to reach the left-hand side.
       & \ruleelamelab &
     \end{flalign*}
 
-    \begin{tabular}{ll}
-      $ \judgee {\gamma, x \hast \tau} e {\tau_1} \yields E $ & Premise \\
-      $ \judget {\im {\gamma, x \hast \tau}} E {\im {\tau_1}} $ & By i.h. \\
-      $ \judget {\im \gamma, x \hast \im \tau} E {\im {\tau_1}} $ & \\
-      $ \judget {\im \gamma} {\lam x {\im \tau} E} {\im \tau \to \im {\tau_1}} $ & By $ \rulelabeltlam $ \\
-      $ \judget {\im \gamma} {\lam x {\im \tau} E} {\im {\tau \to \tau_1}} $ & By the definition of $ \im \cdot $ 
+    \begin{tabular}{rll}
+      & $ \judgee {\gamma, x \hast \tau} e {\tau_1} \yields E $ & Premise \\
+      & $ \judget {\im {\gamma, x \hast \tau}} E {\im {\tau_1}} $ & By i.h. \\
+      & $ \judget {\im \gamma, x \hast \im \tau} E {\im {\tau_1}} $ & \\
+      & $ \judget {\im \gamma} {\lam x {\im \tau} E} {\im \tau \to \im {\tau_1}} $ & By $ \rulelabeltlam $ \\
+      & $ \judget {\im \gamma} {\lam x {\im \tau} E} {\im {\tau \to \tau_1}} $ & By the definition of $ \im \cdot $ 
     \end{tabular} \\
 
   \item \textbf{Case}
@@ -212,14 +225,14 @@ intermediate result (one line above) to reach the left-hand side.
       & \ruleeappelab &
     \end{flalign*}
 
-    \begin{tabular}{ll}
-     $ \judgee \gamma {e_1} {\tau_1 \to \tau_2} \yields {E_1} $  & Premise \\
-     $ \judget {\im \gamma} {E_1} {\im {\tau_1 \to \tau_2}} $ & By i.h. \\
-     $ \judgee \gamma {e_2} {\tau_3} \yields {E_2} $ & Premise \\
-     $ \judget {\im \gamma} {E_2} {\im {\tau_3}} $ & By i.h. \\
-     $ \tau_3 \subtype \tau_1 \yields C $ & Premise \\
-     $ \judget \epsilon C {\im {\tau_3} \to \im {\tau_1}} $ & \george{one lemma about coercion} \\
-     $ \judget {\im \gamma} {\app {E_1} {(\app C E_2)}} {\im {\tau_2}} $ & By $ \rulelabeltapp $ and the definition of $ \im \cdot $
+    \begin{tabular}{rll}
+     & $ \judgee \gamma {e_1} {\tau_1 \to \tau_2} \yields {E_1} $  & Premise \\
+     & $ \judget {\im \gamma} {E_1} {\im {\tau_1 \to \tau_2}} $ & By i.h. \\
+     & $ \judgee \gamma {e_2} {\tau_3} \yields {E_2} $ & Premise \\
+     & $ \judget {\im \gamma} {E_2} {\im {\tau_3}} $ & By i.h. \\
+     & $ \tau_3 \subtype \tau_1 \yields C $ & Premise \\
+     & $ \judget \epsilon C {\im {\tau_3} \to \im {\tau_1}} $ & \george{one lemma about coercion} \\
+     & $ \judget {\im \gamma} {\app {E_1} {(\app C E_2)}} {\im {\tau_2}} $ & By $ \rulelabeltapp $ and the definition of $ \im \cdot $
     \end{tabular} \\
 
   \item \textbf{Case}
@@ -227,12 +240,12 @@ intermediate result (one line above) to reach the left-hand side.
       & \ruleeblamelab &
     \end{flalign*}
 
-    \begin{tabular}{ll}
-      $ \judgee {\gamma, \alpha} e \tau \yields E $ & Premise \\
-      $ \judget {\im {\gamma, \alpha}} E {\im \tau} $ & By i.h. \\
-      $ \judget {\im \gamma, \alpha} E {\im \tau} $ &  \\
-      $ \judget {\im \gamma} {\blam \alpha E} {\for \alpha {\im \tau}} $ & By $ \rulelabeltblam $ \\
-      $ \judget {\im \gamma} {\blam \alpha E} {\im {\for \alpha \tau}} $ & By the definition of $ \im \cdot $
+    \begin{tabular}{rll}
+      & $ \judgee {\gamma, \alpha} e \tau \yields E $ & Premise \\
+      & $ \judget {\im {\gamma, \alpha}} E {\im \tau} $ & By i.h. \\
+      & $ \judget {\im \gamma, \alpha} E {\im \tau} $ &  \\
+      & $ \judget {\im \gamma} {\blam \alpha E} {\for \alpha {\im \tau}} $ & By $ \rulelabeltblam $ \\
+      & $ \judget {\im \gamma} {\blam \alpha E} {\im {\for \alpha \tau}} $ & By the definition of $ \im \cdot $
     \end{tabular} \\
 
   \item \textbf{Case}
@@ -240,14 +253,14 @@ intermediate result (one line above) to reach the left-hand side.
       & \ruleetappelab &
     \end{flalign*}
 
-    \begin{tabular}{ll}
-     $ \judgee \gamma e {\for \alpha \tau_1} \yields E $ & Premise \\
-     $ \judget {\im \gamma} E {\im {\for \alpha \tau_1}} $ & By i.h. \\
-     $ \judget {\im \gamma} E {\for \alpha \im {\tau_1}} $ & By the definition of $ \im \cdot $ \\
-     $ \judgeewf \gamma \tau $ & Premise \\
-     $ \judgetwf {\im \gamma} {\im \tau} $ & By Lemma~\ref{lemma:preserve-wf} \\
-     $ \judget \gamma {\tapp E {\im \tau}} {\subst {\im \tau} \alpha {\im {\tau_1}}} $ & By $ \rulelabelttapp $ \\
-     $ \judget \gamma {\tapp E {\im \tau}} {\im {\subst \tau \alpha {\tau_1}}} $ &  
+    \begin{tabular}{rll}
+     & $ \judgee \gamma e {\for \alpha \tau_1} \yields E $ & Premise \\
+     & $ \judget {\im \gamma} E {\im {\for \alpha \tau_1}} $ & By i.h. \\
+     & $ \judget {\im \gamma} E {\for \alpha \im {\tau_1}} $ & By the definition of $ \im \cdot $ \\
+     & $ \judgeewf \gamma \tau $ & Premise \\
+     & $ \judgetwf {\im \gamma} {\im \tau} $ & By Lemma~\ref{lemma:preserve-wf} \\
+     & $ \judget \gamma {\tapp E {\im \tau}} {\subst {\im \tau} \alpha {\im {\tau_1}}} $ & By $ \rulelabelttapp $ \\
+     & $ \judget \gamma {\tapp E {\im \tau}} {\im {\subst \tau \alpha {\tau_1}}} $ &  
     \end{tabular} \\
 
   \item \textbf{Case}
@@ -255,12 +268,12 @@ intermediate result (one line above) to reach the left-hand side.
       & \ruleemergeelab &
     \end{flalign*}
 
-    \begin{tabular}{ll}
-      $ \judgee \gamma {e_1} {\tau_1} \yields {E_1} $ & Premise \\
-      $ \judget {\im \gamma} {E_1} {\im {\tau_1}} $ & By i.h. \\
-      $ \judget {\im \gamma} {E_2} {\im {\tau_2}} $ & Similar \\
-      $ \judget {\im \gamma} {\pair {E_1} {E_2}} {\pair {\im {\tau_1}} {\im {\tau_2}}} $ & By $ \rulelabeltpair $ \\
-      $ \judget {\im \gamma} {\pair {E_1} {E_2}} {\im {\tau_1 \andop \tau_2}} $ & By the definition of $ \im \cdot $ 
+    \begin{tabular}{rll}
+      & $ \judgee \gamma {e_1} {\tau_1} \yields {E_1} $ & Premise \\
+      & $ \judget {\im \gamma} {E_1} {\im {\tau_1}} $ & By i.h. \\
+      & $ \judget {\im \gamma} {E_2} {\im {\tau_2}} $ & Similar to the above \\
+      & $ \judget {\im \gamma} {\pair {E_1} {E_2}} {\pair {\im {\tau_1}} {\im {\tau_2}}} $ & By $ \rulelabeltpair $ \\
+      & $ \judget {\im \gamma} {\pair {E_1} {E_2}} {\im {\tau_1 \andop \tau_2}} $ & By the definition of $ \im \cdot $ 
     \end{tabular} \\
 
   \item \textbf{Case}
@@ -268,10 +281,10 @@ intermediate result (one line above) to reach the left-hand side.
       & \ruleerecconelab &
     \end{flalign*}
 
-    \begin{tabular}{ll}
-      $ \judgee \gamma e \tau \yields E $ & Premise \\
-      $ \judget {\im \gamma} E {\im \tau} $ & By i.h. \\
-      $ \judget {\im \gamma} E {\im {\recty l \tau}} $ & By the definition of $ \im \cdot $ 
+    \begin{tabular}{rll}
+      & $ \judgee \gamma e \tau \yields E $ & Premise \\
+      & $ \judget {\im \gamma} E {\im \tau} $ & By i.h. \\
+      & $ \judget {\im \gamma} E {\im {\recty l \tau}} $ & By the definition of $ \im \cdot $ 
     \end{tabular} \\
 
   \item \textbf{Case}
@@ -279,13 +292,13 @@ intermediate result (one line above) to reach the left-hand side.
       & \ruleerecprojelab &
     \end{flalign*}
 
-    \begin{tabular}{ll}
-     $ \judgeget \tau l {\tau_1} \yields C $ & Premise \\
-     $ \judget \epsilon C {\im \tau \to \im {\tau_1}} $ & By Lemma~\ref{lemma:get-correct} \\
-     $ \judget {\im \gamma} C {\im \tau \to \im {\tau_1}} $ &  \\
-     $ \judgee \gamma e \tau \yields E $ & Premise \\
-     $ \judget {\im \gamma} E {\im \tau} $ & By i.h. \\
-     $ \judget {\im \gamma} {\app C E} {\im {\tau_1}} $ & By $ \rulelabeltapp $
+    \begin{tabular}{rll}
+     & $ \judgeget \tau l {\tau_1} \yields C $ & Premise \\
+     & $ \judget \epsilon C {\im \tau \to \im {\tau_1}} $ & By Lemma~\ref{lemma:get-correct} \\
+     & $ \judget {\im \gamma} C {\im \tau \to \im {\tau_1}} $ &  \\
+     & $ \judgee \gamma e \tau \yields E $ & Premise \\
+     & $ \judget {\im \gamma} E {\im \tau} $ & By i.h. \\
+     & $ \judget {\im \gamma} {\app C E} {\im {\tau_1}} $ & By $ \rulelabeltapp $
     \end{tabular} \\
 
   \item \textbf{Case}
@@ -293,14 +306,14 @@ intermediate result (one line above) to reach the left-hand side.
       & \ruleerecupdelab &
     \end{flalign*}
 
-    \begin{tabular}{ll}
-      $ \judgee \gamma {e_1} {\tau_1} \yields {E_1} $ & Premise \\
-      $ \judget {\im \gamma} {E_1} {\im {\tau_1}} $ & By i.h. \\
-      $ \judgeput \tau l {\tau_1 \yields {E_1}} {\tau_2} {\tau_3} \yields C $ & Premise \\
-      $ \judget {\im \gamma} C {\im \tau \to \im {\tau_2}} $ & By Lemma~\ref{lemma:put-correct} \\
-      $ \judgee \gamma e \tau \yields E $ & Premise \\
-      $ \judget {\im \gamma} E {\im \tau} $ & By i.h. \\
-      $ \judget {\im \gamma} {\app C E} {\im {\tau_2}} $ & By $ \rulelabeltapp $
+    \begin{tabular}{rll}
+      & $ \judgee \gamma {e_1} {\tau_1} \yields {E_1} $ & Premise \\
+      & $ \judget {\im \gamma} {E_1} {\im {\tau_1}} $ & By i.h. \\
+      & $ \judgeput \tau l {\tau_1 \yields {E_1}} {\tau_2} {\tau_3} \yields C $ & Premise \\
+      & $ \judget {\im \gamma} C {\im \tau \to \im {\tau_2}} $ & By Lemma~\ref{lemma:put-correct} \\
+      & $ \judgee \gamma e \tau \yields E $ & Premise \\
+      & $ \judget {\im \gamma} E {\im \tau} $ & By i.h. \\
+      & $ \judget {\im \gamma} {\app C E} {\im {\tau_2}} $ & By $ \rulelabeltapp $
     \end{tabular} \\
 
   \end{itemize}
