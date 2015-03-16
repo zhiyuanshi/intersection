@@ -251,7 +251,7 @@ function that just uses the merge operator:
 \begin{lstlisting}
 let merge [A] [B] (x: A) (y: B) : A & B = x ,, y
 \end{lstlisting}
-If we try to port the code to Scala we will get stuck on the right-hand side
+Had we tried to port the code to Scala we would get stuck on the right-hand side
 because there is no counterpart of \lstinline{with} at the term level:
 \begin{lstlisting}
 def merge[A,B] (x: A) (y: B) : A with B = // stuck
