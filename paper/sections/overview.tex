@@ -152,7 +152,7 @@ and therefore can take \lstinline{100} as its argument.
 
 % Subtyping in \name is syntactical and structual.
 
-\paragraph{Records.}
+\paragraph{Extensible records.}
 
 % \bruno{The title of this section needs adjusting. Moreover we do not want to
 %   talk about record elimination and update. \name supports a
@@ -165,9 +165,11 @@ and therefore can take \lstinline{100} as its argument.
   or trait level composition in Scala.}\george{Already addressed in the
   beginning of this section.}
 
-We offer three primitives for records: \emph{construction}, \emph{projection},
-and \emph{update}. The notation for record construction and record types is
-standard in the source language. For example:
+We offer four operations for records: \emph{construction}, \emph{projection}, ,
+\emph{update}, and \emph{extension}. Working with records is type-safe: the type
+system prevents accessing or updating a field that does not exist. The notation
+for record construction and record types is standard in the source language. For
+example:
 \begin{lstlisting}
 let point : { x = 3, y = 4, z = 0 } 
   = { x: Int, y : Int, z : Int } 
@@ -178,11 +180,11 @@ can be extracted using dot notation:
 \begin{lstlisting}
 point.x
 \end{lstlisting}
-Record updates allow creating a new record based on an existing one, with one or
-more fields updated. Refinement of fields is also possible, in the sense that
-the type of a new value can be a subtype of that of the old one.~\footnote{The
-  subtyping restriction is not required for the \name to be coherent and it
-  leaves option open for language designers.} For example,
+(Functional) update allows creating a new record based on an existing one, with
+one or more fields replaced. Refinement of fields is also possible, in the sense
+that the type of a new value can be a subtype of that of the old
+one.~\footnote{The subtyping restriction is not required for the \name to be
+  coherent and it leaves option open for language designers.} For example,
 \begin{lstlisting}
 point with { x = 0, y = 0 }
 \end{lstlisting}
