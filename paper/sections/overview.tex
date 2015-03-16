@@ -186,6 +186,11 @@ the type of a new value can be a subtype of that of the old one.~\footnote{The
 \begin{lstlisting}
 point with { x = 0, y = 0 }
 \end{lstlisting}
+Besides, subtyping of record types is in both width and depth, as one might
+expect: \lstinline$ { x: Int, y: Int } $ is a subtype of
+\lstinline$ { x: Int } $; and if \lstinline$ T1 $ is a subtype of
+\lstinline$ T2 $, then \lstinline$ { l: T1 } $ is also a subtype of
+\lstinline$ { l: T2 } $.
 
 With intersection types, we are able to regard multi-field records as just
 merges of single-field records~\cite{}, for example:
