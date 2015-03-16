@@ -48,7 +48,7 @@ A)
 
 % http://www.cs.ox.ac.uk/jeremy.gibbons/publications/embedding.pdf
 
-\begin{lstlisting}{scala}
+\begin{lstlisting}[language=scala]
 trait Expr {
   def eval: Int
 }
@@ -82,7 +82,7 @@ problem.
 In fact, the extension of System $ F $ in the other direction, i.e., with
 intersection types, is able to address the same problem effectively. Suppose we
 have the following definitions:
-\begin{lstlisting}{scala}
+\begin{lstlisting}{language=scala}
 let user = { name = "George", admin = true }
 let id(user: {name: String}) = user
 \end{lstlisting}
@@ -92,12 +92,12 @@ multi-field records are just syntatic sugars for merges of single-field records.
 Therefore, user is of a subtype of the parameter due to subtyping introduced by
 intersection types. So far so good. But there is a problem: what if programmers
 wants to access the \texttt{admin} field later, like:
-\begin{lstlisting}{scala}
+\begin{lstlisting}{language=scala}
 (id user).admin
 \end{lstlisting}
 They cannot do so as the above will not typecheck. After going through the
 function, the user now has only the type
-\begin{lstlisting}{scala}
+\begin{lstlisting}{language=scala}
 {name: String}
 \end{lstlisting}
 This is rather undesired because it indeed has an \texttt{admin} field!
@@ -105,14 +105,14 @@ This is rather undesired because it indeed has an \texttt{admin} field!
 Bounded polymorphism enable the function to return the exact type of the
 argument so that we have no problem in accessing the \texttt{admin} field later.
 Consider the example below:
-\begin{lstlisting}{scala}
+\begin{lstlisting}{language=scala}
 def id[A <: {name: String}] (user: A) = user
 (id [{name: String, admin: Bool}] user).admin
 \end{lstlisting}
 
 We do not have bounded polymorphism in the source language. But we can encode
 that via intersection types:
-\begin{lstlisting}{scala}
+\begin{lstlisting}{language=scala}
 let id[A] (user: A & {name: String}) = user in
 (id [{admin: Bool}] user).admin
 \end{lstlisting}
@@ -146,14 +146,14 @@ Object algebras provide an alternative to \emph{algebraic data types}
   datatypes is not going to be very useful there.}
  For example, the
 following Haskell definition of the type of simple expressions
-\begin{lstlisting}{haskell}
+\begin{lstlisting}{language=haskell}
 data Exp where
   Lit :: Int -> Exp
   Add :: Exp -> Exp -> Exp
 \end{lstlisting}
 can be expressed by the \emph{interface} of an object algebra of
 simple expressions:
-\begin{lstlisting}{scala}
+\begin{lstlisting}{language=scala}
 trait ExpAlg[E] {
   def lit(x: Int): E
   def add(e1: E, e2: E): E
@@ -177,7 +177,7 @@ type ExpAlg E = {
 Scala supports intersection types via the \lstinline{with} keyword. The type
 \lstinline{A with B} expresses the combined interface of \lstinline{A} and
 \lstinline{B}. The idea is similar to
-\begin{lstlisting}{java}
+\begin{lstlisting}{language=java}
 interface AwithB extends A, B {}
 \end{lstlisting}
 in Java.
@@ -281,7 +281,7 @@ Constructing instances seems clumsy!
 The visitor pattern allows adding new operations to existing structures without
 modifying those structures. The type of expressions are defined as follows:
 
-\begin{lstlisting}{scala}
+\begin{lstlisting}{language=scala}
 trait Exp[A] {
   def accept(f: ExpAlg[A]): A
 }
