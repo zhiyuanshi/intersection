@@ -152,12 +152,12 @@ and therefore can take \lstinline{100} as its argument.
 
 % Subtyping in \name is syntactical and structual.
 
-\subsection{Extensible Records}
+\subsection{Generalized Records}
 
-% \bruno{The title of this section needs adjusting. Moreover we do not want to
-%   talk about record elimination and update. \name supports a
-%   \emph{generalization} of record elimination and update that \emph{works for
-%     any type}. That's what we want to mention instead.}
+\bruno{The title of this section needs adjusting. Moreover we do not want to
+  talk about record elimination and update. \name supports a
+  \emph{generalization} of record elimination and update that \emph{works for
+    any type}. That's what we want to mention instead.}
 
 \bruno{Show and talk about the record types too!}
 
@@ -165,21 +165,42 @@ and therefore can take \lstinline{100} as its argument.
   or trait level composition in Scala.}\george{Already addressed in the
   beginning of this section.}
 
-We offer four operations for records: \emph{construction}, \emph{projection}, ,
-\emph{update}, and \emph{extension}. Working with records is type-safe: the type
-system prevents accessing or updating a field that does not exist. The notation
-for record construction and record types is standard in the source language. For
-example:
+Following Reynolds~\cite{reynolds1997design} and Castagna et
+al.~\cite{castagna1995calculus}, we leverage intersection types to type
+extensible records. The idea is that a multi-field record can be encoded as
+merges of single-field records, and multi-field record types as intersections.
+Therefore in \name, there are only single-field record constructs. The result
+are orthogonal addition to the existing type system and a more general notion of
+records. 
+
+We define three primitive operations related to records: \emph{construction},
+\emph{projection}, and \emph{update}. The merge operator, discussed previously,
+takes the place of record extension described in many other record systems.
+Working with records is type-safe: the type system prevents accessing or
+updating a field that does not exist.
+
+Conventionally, record operations work only on record types. But \name
+generalizes them, allowing operations to occur on \emph{any} type. This makes
+sense in the context of record encoding, because multi-field records in \name do
+not have a proper record type. They are intersections.
+
+\paragraph{Construction.}
+The notation for record construction and record types is standard in the source
+language. For example:
 \begin{lstlisting}
 let point : { x = 3, y = 4, z = 0 } 
   = { x: Int, y : Int, z : Int } 
 in ...
 \end{lstlisting}
-The type ascription \lstinline$ { x = 3, y = 4, z = 0 } $ is optional. Fields
-can be extracted using dot notation:
+The type ascription \lstinline$ { x = 3, y = 4, z = 0 } $ is optional. 
+
+\paragraph{Generalized projection.}
+Fields can be extracted using dot notation:
 \begin{lstlisting}
 point.x
 \end{lstlisting}
+
+\paragraph{Generalized update.}
 (Functional) update allows creating a new record based on an existing one, with
 one or more fields replaced. Refinement of fields is also possible, in the sense
 that the type of a new value can be a subtype of that of the old
@@ -194,6 +215,7 @@ expect: \lstinline$ { x: Int, y: Int } $ is a subtype of
 \lstinline$ T2 $, then \lstinline$ { l: T1 } $ is also a subtype of
 \lstinline$ { l: T2 } $.
 
+\paragraph{Extension.}
 With intersection types, we are able to regard multi-field records as just
 merges of single-field records~\cite{}, for example:
 \begin{lstlisting}
