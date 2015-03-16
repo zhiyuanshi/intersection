@@ -187,53 +187,51 @@ not have a proper record type. They are intersections.
 \subsubsection{Record Operations}
 
 \paragraph{Construction.}
-The notation for record construction and record types is standard in the source
-language. For example:
+The usual notation for constructing records
 \begin{lstlisting}
-let point : { x = 3, y = 4, z = 0 } 
-  = { x: Int, y : Int, z : Int } 
-in ...
+{ open = 192, high = 195, low = 189 } 
 \end{lstlisting}
-The type ascription \lstinline$ { x = 3, y = 4, z = 0 } $ is optional. 
+is a shorthand for the merges of single-field records
+\begin{lstlisting}
+{ open = 192 } ,, { high = 195 } ,, { low = 189 } 
+\end{lstlisting}
 
 \paragraph{Generalized projection.}
-Fields can be extracted using dot notation:
+Fields are extracted using the dot notation. For example,
 \begin{lstlisting}
-point.x
+{ open = 192, high = 195, low = 189 }.open
 \end{lstlisting}
+selects the value of the field labelled \lstinline{open} from \lstinline{quote}.
 
 \paragraph{Generalized update.}
 (Functional) update allows creating a new record based on an existing one, with
 one or more fields replaced. Refinement of fields is also possible, in the sense
 that the type of a new value can be a subtype of that of the old
 one.~\footnote{The subtyping restriction is not required for the \name to be
-  coherent and it leaves option open for language designers.} For example,
+  coherent and it leaves option open for language designers.} For example, we
+can get a new quote with incremented \lstinline{high} with:
 \begin{lstlisting}
-point with { x = 0, y = 0 }
+{ open = 192, high = 195, low = 189 } with { high = 196 }
 \end{lstlisting}
 
 \paragraph{Extension.}
-With intersection types, we are able to regard multi-field records as just
-merges of single-field records~\cite{}, for example:
+Extension is performed with the merge operator ($ \mergeop $). The following,
+for example, adds the \lstinline{close} field to the record:
 \begin{lstlisting}
-{ x = 1, y = 2 }
+{ open = 192, high = 195, low = 189 } ,, { close = 195 }
 \end{lstlisting}
-is just syntatic sugar for
+
+In addition, a record is just a normal term and can be merged with any other
+term, for example, this is also valid
 \begin{lstlisting}
-{ x = 1 } ,, { y = 2 }
-\end{lstlisting}
-In addition, a record is just a normal type and can be merged with any other
-terms, for example, this is also valid
-\begin{lstlisting}
-let mixed : Int & { x : Int } : 1 ,, { x = 2 } in ...
+let mixed = 1 ,, { x = 2 } in ...
 \end{lstlisting}
 and we can further extract a field out of it, such as
 \begin{lstlisting}
 mixed.x
 \end{lstlisting}
 That is because a record type of the form $ \recty l \tau $ can be thought as a
-normal type $ \tau $ tagged by the label $ l $. In consequence, \name supports a
-generalization of record projection and update that works for any type.
+normal type $ \tau $ tagged by the label $ l $.
 
 \subsubsection{Record Subtyping}
 
