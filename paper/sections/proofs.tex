@@ -184,7 +184,23 @@ previous intermediate result to reach the corresponding left-hand side).
 \end{lemma}
 
 \begin{proof}
-  Standard.
+  By structural induction of the derivation. The only case to consider is $ \rulelabelewf $.
+
+  \begin{itemize}
+
+  \item \textbf{Case}
+
+    \begin{flalign*}
+      & \ruleewf &
+    \end{flalign*}
+
+    \begin{tabular}{rll}
+      & $ \ftv \tau \in \gamma $ & Premise \\
+      & $ \ftv {\im \tau} \in \im \gamma $ & By the definition of $ \im \cdot $ \\
+      & $ \judgetwf {\im \gamma} {\im \tau} $ & By $ \rulelabeltwf $
+    \end{tabular} \\
+
+  \end{itemize}
 \end{proof}
 
 \begin{theorem}[Type-preserving translation]
