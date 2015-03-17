@@ -125,8 +125,8 @@ subtyping rules are standard except for three points listed below:
 \item $ \recty {l_1} {\tau_1} $ is a subtype of $ \recty {l_2} {\tau_2} $, if
   $ l_1 $ and $ l_2 $ are identical and $ \tau_1 $ is a subtype of $ \tau_2 $.
 \end{enumerate}
-The first point is captured by two rules \rulename{S-And1} and
-\rulename{S-And2}, whereas the second point by \rulename{S-And3}. Note that the
+The first point is captured by two rules $ \rulelabelsubandleft $ and
+$ \rulelabelsubandright $, whereas the second point by $ \rulelabelsuband $. Note that the
 last point means that record types are covariant in the type of the fields.
 
 % The subtyping relation is reflexive and transitive.
@@ -159,7 +159,7 @@ last point means that record types are covariant in the type of the fields.
 The typing judgment for \name is of the form: $ \Gamma \turns e : \tau $. This
 judgment uses the context $ \Gamma $. The rules for variables, abstraction, type
 abstraction, and type application are standard in System $ F $. To cater to the
-subtyping relations and avoid having undeterministic rules, in \rulename{App},
+subtyping relations and avoid having undeterministic rules, in $ \rulelabeleapp $,
 we additionally require the type of the argument be a subtype of the parameter.
 The rule for record construction is also standard. For record projection and
 update, we resort to the auxiliary ``get'' and ``put'' rules. The ``get''
@@ -174,7 +174,7 @@ field in question.
 %   the new constructs.}
 
 In particular we introduce a
-\rulename{T-Merge} rule that applies to \emph{merge}
+$ \rulelabelemerge $ rule that applies to \emph{merge}
 constructs.
 
 \bruno{A lot more explanation needed here! You want to
@@ -183,8 +183,8 @@ constructs.
    For the new rules have text for each of them.}
 
 % The last two rules make use of the $ \rulename{fields} $ function just to make
-% sure that the field being accessed (\rulename{T-RecProj}) or updated
-% (\rulename{T-RcdUpd}) actually exists. The function is defined recursively, in
+% sure that the field being accessed ($ \rulelabelerecproj $) or updated
+% ($ \rulelabelerecupd $) actually exists. The function is defined recursively, in
 % Haskell pseudocode, as:
 % \[ \begin{array}{rll}
 %   \fields{\alpha} & = & \rel{\cdot} {\alpha} \\
