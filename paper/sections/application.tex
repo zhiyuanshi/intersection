@@ -5,8 +5,8 @@
 
 This section shows that the System $ F $ plus intersection types are enough for
 encoding extensible designs, and even beat the designs in languages with a much
-more sophisticated type system. In particular, \name has two main advantages
-over existing languages:
+more sophisticated type system (such as Scala). In particular, \name has two
+main advantages over existing languages:
 
 \begin{enumerate}
 \item It supports dynamic composition of intersecting values.
@@ -15,25 +15,22 @@ over existing languages:
 
 Various solutions have been proposed to deal with the extensibility problems and
 many rely on heavyweight language features such as abstract methods and classes
-in Java.
+in Java. These two features can be used to improve existing designs of modular
+programs.
 
 \bruno{I would like to see a story about Church Encodings in
   \name. Can you look at Pierce's papers and try to write something
   along those lines? That will be a good intro for object algebras and
 visitors!}
 
-These two features can be used to improve existing designs of modular programs.
-
 % Introduce the expression problem
 
 The expression problem refers to the difficulty of adding a new operations and a
 new data variant without changing or duplicating existing code.
 
-There has been recently a lightweight solution to the expression problem that
-takes advantage of covariant return types in Java. We show that FI is able to
-solve the expression problem in the same spirit. The
-A)
-
+% There has been recently a lightweight solution to the expression problem that
+% takes advantage of covariant return types in Java. We show that \name is able
+% to solve the expression problem in the same spirit.
 
 % - Object/Fold Algebras. How to support extensibility in an easier way.
 
@@ -52,11 +49,9 @@ A)
 trait Expr {
   def eval: Int
 }
-
 class Lit(n: Int) extends Expr {
   def eval: Int = n
 }
-
 class Add(n: Int) extends Expr {
   def eval: Int = e1.eval + e2.eval
 }
@@ -64,8 +59,8 @@ class Add(n: Int) extends Expr {
 % \bruno{You already talk about overloading in the previous section. Need to
 % decide where to put the text!}
 
-Dunfield~\cite{dunfield2014elaborating} notes that using merges as a mechanism
-of overloading is not as powerful as type classes.
+% Dunfield~\cite{dunfield2014elaborating} notes that using merges as a mechanism
+% of overloading is not as powerful as type classes.
 
 \subsection{Encoding Bounded Polymorphism}
 % \bruno{IMPORTANT: Always capitalize the relevant words in a title!. This title
@@ -112,7 +107,7 @@ def id[A <: {name: String}] (user: A) = user
 
 We do not have bounded polymorphism in the source language. But we can encode
 that via intersection types:
-\begin{lstlisting}{language=scala}
+\begin{lstlisting}{language=F2J}
 let id[A] (user: A & {name: String}) = user in
 (id [{admin: Bool}] user).admin
 \end{lstlisting}
@@ -141,105 +136,130 @@ that we can still access the \lstinline{admin} field later.
 
 \subsection{Object Algebras}
 
-Object algebras provide an alternative to \emph{algebraic data types}
-(ADT).\bruno{We are targeting an OO crowd. Mentioning algebraic
-  datatypes is not going to be very useful there.}
- For example, the
-following Haskell definition of the type of simple expressions
-\begin{lstlisting}{language=haskell}
-data Exp where
-  Lit :: Int -> Exp
-  Add :: Exp -> Exp -> Exp
-\end{lstlisting}
-can be expressed by the \emph{interface} of an object algebra of
-simple expressions:
-\begin{lstlisting}{language=scala}
-trait ExpAlg[E] {
-  def lit(x: Int): E
-  def add(e1: E, e2: E): E
-}
-\end{lstlisting}
-Similar to ADT, data constructors in object algebras are represented by functions such as
-\lstinline{lit} and \lstinline{add} inside an interface \lstinline{ExpAlg}.
-Different with ADT, the type of the expression itself is abtracted by a type
-parameter \lstinline{E}.
+% Object algebras provide an alternative to \emph{algebraic data types}
+% (ADT).\bruno{We are targeting an OO crowd. Mentioning algebraic
+%   datatypes is not going to be very useful there.}
 
-which can be expressed similarly in \name as:
-\begin{lstlisting}
-type ExpAlg E = {
-  lit : Int -> E,
-  add : E -> E -> E
-}
-\end{lstlisting}
+%  For example, the
+% following Haskell definition of the type of simple expressions
+% \begin{lstlisting}{language=haskell}
+% data Exp where
+%   Lit :: Int -> Exp
+%   Add :: Exp -> Exp -> Exp
+% \end{lstlisting}
+% can be expressed by the \emph{interface} of an object algebra of
+% simple expressions:
+% \begin{lstlisting}{language=scala}
+% trait ExpAlg[E] {
+%   def lit(x: Int): E
+%   def add(e1: E, e2: E): E
+% }
+% \end{lstlisting}
+% Similar to ADT, data constructors in object algebras are represented by functions such as
+% \lstinline{lit} and \lstinline{add} inside an interface \lstinline{ExpAlg}.
+% Different with ADT, the type of the expression itself is abtracted by a type
+% parameter \lstinline{E}.
+
+% which can be expressed similarly in \name as:
+% \begin{lstlisting}{language=F2J}
+% type ExpAlg E = {
+%   lit : Int -> E,
+%   add : E -> E -> E
+% }
+% \end{lstlisting}
 
 % Introduce Scala's intersection types
 
-Scala supports intersection types via the \lstinline{with} keyword. The type
-\lstinline{A with B} expresses the combined interface of \lstinline{A} and
-\lstinline{B}. The idea is similar to
-\begin{lstlisting}{language=java}
-interface AwithB extends A, B {}
+% Scala supports intersection types via the \lstinline{with} keyword. The type
+% \lstinline{A with B} expresses the combined interface of \lstinline{A} and
+% \lstinline{B}. The idea is similar to
+% \begin{lstlisting}{language=java}
+% interface AwithB extends A, B {}
+% \end{lstlisting}
+% in Java.
+% \footnote{However, Java would require the \lstinline{A} and \lstinline{B} to be
+%   concrete types, whereas in Scala, there is no such restriction.}
+
+% The value level counterpart are functions of the type \lstinline
+% {A => B => A with B}. \footnote{FIXME}
+
+Oliveira~\cite{} noted that composition of object algebras can be cumbersome and
+language support for intersection types would solve that problem. Our type
+system is just a simple extension of System $ F $; yet surprisingly, it is able
+to solve the limitations of using object algebras in languages such as Java and
+Scala. We will illustrate this point with an step-by-step of solving the
+Expression Problem~\cite{wadler1998expression}.
+
+\paragraph{Base scenario.}
+In the base scenario, we consider expressions with two variants (literal and
+addition) and one operation (evaluation). Here is an interface that supports
+evaluation:
+\begin{lstlisting}{language=F2J}
+type IEval = {eval : Int}
 \end{lstlisting}
-in Java.
-\footnote{However, Java would require the \lstinline{A} and \lstinline{B} to be
-  concrete types, whereas in Scala, there is no such restriction.}
-
-The value level counterpart are functions of the type \lstinline
-{A => B => A with B}. \footnote{FIXME}
-
-Our type system is a simple extension of System $ F $; yet surprisingly, it
-is able to solve the limitations of using object algebras in languages such as
-Java and Scala. We will illustrate this point with an step-by-step of solving
-the expression problem using a source language built on top of \name.
-
-Oliveira noted that composition of object algebras can be cumbersome and
-intersection types provides a solution to that problem.
-
-We first define an interface that supports the evaluation operation:
-
-% #include ../src/Algebra.sf  @base
-\begin{lstlisting}
-type IEval  = { eval : Int };
-type ExpAlg E = { lit : Int -> E, add : E -> E -> E };
-let evalAlg = {
-  lit = \(x : Int). { eval = x },
-  add = \(x : IEval). \(y : IEval). { eval = x.eval + y.eval }
-};
+and an object algebra interface, \lstinline{ExpAlg}, for expression types with
+the two variants. \lstinline{ExpAlg} is abstracted over the the type of the
+interpretation, \lstinline{E}.
+\begin{lstlisting}{language=F2J}
+type ExpAlg[E] = {lit : Int -> E, add : E -> E -> E}
 \end{lstlisting}
-% #end
-
-The interface is just a type synonym \lstinline{IEval}. In \name, record
-types are structural and hence any value that satisfies this interface is of
-type \lstinline{IEval} or of a subtype of \lstinline{IEval}. \footnote{Should be
-mentioned in S2.}
-
-In the following, \lstinline{ExpAlg} is an object algebra interface of
-expressions with literal and addition case. And \lstinline{evalAlg} is an object
-algebra for evluation of those expressions, which has type \lstinline{ExpAlg Int}
-
-% #include ../src/Algebra.sf  @variant
-\begin{lstlisting}
-type SubExpAlg E = (ExpAlg E) & { sub : E -> E -> E };
-let subEvalAlg = evalAlg ,, { sub = \ (x : IEval). \ (y : IEval). { eval = x.eval - y.eval } };
+To illustrate the point,
+\begin{lstlisting}{language=F2J}
+ExpAlg[IEval]
 \end{lstlisting}
-% #end
-
-Next, we define an interface that supports pretty printing.
-
-% #include ../src/Algebra.sf  @operation
-\begin{lstlisting}
-type IPrint = { print : String };
-let printAlg = {
-  lit = \(x : Int). { print = x.toString() },
-  add = \(x : IPrint). \(y : IPrint). { print = x.print.concat(" + ").concat(y.print) },
-  sub = \(x : IPrint). \(y : IPrint). { print = x.print.concat(" - ").concat(y.print) }
-};
+will be the type of object algebras with evaluation as the interpretation, whereas
+\begin{lstlisting}{language=F2J}
+ExpAlg[IEval & IPrint]
 \end{lstlisting}
-% #end
+will be the type of object algebras that support both evaluation and pretty
+printing.
 
+% In \name, record types are structural and hence any value that satisfies this
+% interface is of type \lstinline{IEval} or of a subtype of \lstinline{IEval}.
+% \footnote{Should be mentioned in S2.}
+
+Having defined the interfaces, we can implement that object algebra interface
+with \lstinline{evalAlg}, which is an object algebra for evluation. Contrary to
+nominal type systems as in most statically typed OO languages, the interface
+being implemented here, \lstinline{ExpAlg[Int]}, is not required. But we put the
+type ascription nonetheless for clarity and comparison.
+\begin{lstlisting}{language=F2J}
+let evalAlg : ExpAlg[E] = {
+  lit = \(x : Int) -> {eval = x},
+  add = \(x : IEval) (y : IEval) -> {eval = x.eval + y.eval}
+}
+\end{lstlisting}
+
+\paragraph{Add a subtraction variant.}
+The first evolution is adding a new variant, say, subtraction. We can do so by
+simply intersecting the original types and merging with the original values.
+\begin{lstlisting}{language=F2J}
+type SubExpAlg[E] = ExpAlg[E] & {sub : E -> E -> E}
+let subEvalAlg = evalAlg ,, {sub = \(x : IEval) (y : IEval) -> { eval = x.eval - y.eval }};
+\end{lstlisting}
+
+\paragraph{Add a pretty printing operation.}
+As the second evolution, we add pretty printing. Similar to how we have defined
+evaluation, we can describe the pretty printing feature as:
+\begin{lstlisting}{language=F2J}
+type IPrint = {print : String}
+\end{lstlisting}
+We can implement pretty printing for expressions that support literals,
+addition, and subtraction:
+\begin{lstlisting}{language=F2J}
+let printAlg : SubExpAlg[String] = {
+  lit = \(x: Int) -> {print = x.toString()},
+  add = \(x: IPrint) (y: IPrint) -> {print = x.print ++ " + " ++ y.print},
+  sub = \(x: IPrint) (y: IPrint) -> {print = x.print ++ " - " ++ y.print}
+}
+\end{lstlisting}
+
+\paragraph{Usage.}
 Provided with the definitions above, we can then create values using the
 appropriate algebras. For example:
-defines two expressions.
+\begin{lstlisting}{language=F2J}
+let e1[E] (f: SubExpAlg[E]) = f.sub (f.lit 7) (f.lit 2)
+\end{lstlisting}
 
 The expressions are unusual in the sense that they are functions that take an
 extra argument \lstinline{f}, the object algebras, and use the data constructors
@@ -249,15 +269,13 @@ themselves are abstracted over the allowed operations such as evaluation and
 pretty printing by requiring the expression functions to take an extra argument
 \lstinline{E}.
 
-% #include ../src/Algebra.sf  @merge
-\begin{lstlisting}
-let merge A B (f : ExpAlg A) (g : ExpAlg B) = {
-  lit = \(x : Int). f.lit x ,, g.lit x,
-  add = \(x : A & B). \(y : A & B).
+\begin{lstlisting}{language=F2J}
+let merge [A] [B] (f : ExpAlg[A]) (g : ExpAlg[B]) = {
+  lit = \(x : Int) -> f.lit x ,, g.lit x,
+  add = \(x : A & B) (y : A & B) ->
           f.add x y ,, g.add x y
-};
+}
 \end{lstlisting}
-% #end
 
 If we would like to have an expression that supports both evaluation and pretty
 printing, we will need a mechanism to combine the evaluation and printing
@@ -265,9 +283,9 @@ algebras. Intersection types allows such composition: the \lstinline{merge}
 function, which takes two expression algebras to create a combined algebra. It
 does so by constructing a new expression algebra, a record whose each field is a
 function that delegates the input to the two algebras taken.
-\begin{lstlisting}
-let newAlg = merge IEval IPrint subEvalAlg printAlg in
-let o1 = e1 (IEval & IPrint) newAlg in
+\begin{lstlisting}{language=F2J}
+let newAlg = merge[IEval] [IPrint] subEvalAlg printAlg in
+let o1 = e1 [IEval & IPrint] newAlg in
 o1.print
 \end{lstlisting}
 % \bruno{Don't start a sentence with \lstinline{o1}.}
@@ -305,7 +323,7 @@ subtyping in such languages \footnote{It is still possible to encode
 becomes a subtype of the latter.
 
 Such limitation does not exist in \name. For example, we can define the similar interfaces \lstinline{Exp} and \lstinline{SubExp}:
-\begin{lstlisting}
+\begin{lstlisting}{language=F2J}
 type Exp    A = { accept: forall A. ExpAlg A -> A };
 type SubExp A = { accept: forall A. SubExpAlg A -> A };
 \end{lstlisting}
@@ -315,7 +333,7 @@ Then by the typing judgment it holds that \lstinline{SubExp} is a supertype of
 A is called is the \emph{interpretation}. It works for any interpretation you want.
 
 First we define two data constructors for simple expressions:
-\begin{lstlisting}
+\begin{lstlisting}{language=F2J}
 let lit (n : Int): Exp A = {
   accept = /\A. \(f : ExpAlg A). f.lit n
 };
@@ -327,7 +345,7 @@ let add (e1 : Exp) (e2 : Exp): Exp A = {
 \end{lstlisting}
 
 Suppose later we decide to augment the expressions with subtraction:
-\begin{lstlisting}
+\begin{lstlisting}{language=F2J}
 let sub (e1 : SubExp) (e2 : SubExp): SubExp A =
   { accept = /\A. \(f : SubExpAlg A).
                f.sub (e1.accept A f) (e2.accept A f) };
@@ -417,7 +435,7 @@ The figure defines a mini mixin library. The apostrophe in front of types
 denotes call-by-name arguments similar to the \lstinline{=>} notation in the
 Scala language.
 
-\begin{lstlisting}
+\begin{lstlisting}{language=F2J}
 type Mixin S = 'S -> 'S -> S;
 let zero S (super : 'S) (this : 'S) : S = super;
 let rec mixin S (f : Mixin S) : S
@@ -431,7 +449,7 @@ that prints ``Hello'' and delegates to its superclass. Then the two functions
 are composed using the \lstinline{mixin} and \lstinline{extends} combinators.
 The result is the \lstinline{noisyFact} function that prints ``Hello'' every
 time it is called and computes factorial.
-\begin{lstlisting}
+\begin{lstlisting}{language=F2J}
 let fact (super : 'Int -> Int) (this : 'Int -> Int) : Int -> Int
   = \ (n : Int). if n == 0 then 1 else n * this (n - 1)
 let noisy (super : 'Int -> Int) (this : 'Int -> Int) : Int -> Int
