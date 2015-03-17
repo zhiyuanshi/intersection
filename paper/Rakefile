@@ -10,8 +10,7 @@ def latexmk_cmd(options = "")
   # xelatex is said to be more stable than lualatex and ShareLaTeX does not
   # offer the latter.
   # http://tex.stackexchange.com/a/111625
-  engine = "pdflatex"
-  # engine = "xelatex"
+  engine = "xelatex"
   # engine = "lualatex"
 
   # -f     Force latexmk to continue document processing despite errors.
