@@ -1,36 +1,37 @@
-type ExpAlg E = { lit : Int -> E, add : E -> E -> E };
-type Exp = { accept : forall A. ExpAlg A -> A };
+let (++) (s: String) (t: String) = s.concat(t);
 
-type LitAdd A = { lit : Int -> A, add : A -> A -> A };
+type ExpVisitor[E] = {lit: Int -> E, add: E -> E -> E};
+type Exp = {accept: forall E. ExpVisitor[E] -> E};
 
-let lit (n : Int) = {
-  accept = /\A. \(f : LitAdd A). f.lit n
+let evalVisitor: ExpVisitor[Int] = {
+  lit = \(x: Int) -> x,
+  add = \(x: Int) (y: Int) -> x + y
 };
 
-let add (e1 : Exp) (e2 : Exp) = {
-  accept = /\A. \(f : LitAdd A). f.add (e1.accept A f) (e2.accept A f)
+-- Define "constructors"
+let lit (n: Int): Exp = {
+  accept = /\E -> \(f: ExpVisitor[E]) -> f.lit n
+};
+let add (e1: Exp) (e2: Exp): Exp = {
+  accept = /\E -> \(f: ExpVisitor[E]) -> f.add (e1.accept[E] f) (e2.accept[E] f)
 };
 
-let evalAlg = {
-  lit = \(x : Int). x,
-  add = \(x : Int). \(y : Int). x + y
+type SubExpVisitor[E] = ExpVisitor[E] & {sub: E -> E -> E};
+type SubExp = {accept: forall E. SubExpVisitor[E] -> E};
+let sub (e1: SubExp) (e2: SubExp): SubExp = {
+  accept = /\E -> \(f: SubExpVisitor[E]) -> f.sub (e1.accept[E] f) (e2.accept[E] f)
 };
-let e1 = add (lit 2) (lit 3);
--- e1.accept Int evalAlg
 
-type SubExpAlg E = (ExpAlg E) & { sub : E -> E -> E };
-type ExpExt = { accept : forall A. SubExpAlg A -> A };
-
-type LitAddSub A = LitAdd A & { sub : A -> A -> A };
-
-let sub (e1 : ExpExt) (e2 : ExpExt) =
-  { accept = /\A. \(f : LitAddSub A).
-               f.sub (e1.accept A f) (e2.accept A f) };
+let printVisitor: SubExpVisitor[String] = {
+  lit = \(x: Int) -> x.toString(),
+  add = \(x: String) (y: String) -> x ++ " + " ++ y,
+  sub = \(x: String) (y: String) -> x ++ " - " ++ y
+};
 
 -- Contravariant param type, programmer-friendly usage
+let e1 = add (lit 2) (lit 3);
 let e2 = sub (lit 2) (lit 3);
 
--- Note that Exp <: ExpExt
-let f (x : ExpExt) = 1;
--- let g (x : Exp) = 1;
-e2
+-- Client code
+-- e1.accept[Int] evalVisitor
+e2.accept[String] printVisitor 
