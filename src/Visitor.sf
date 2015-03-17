@@ -18,6 +18,9 @@ let add (e1: Exp) (e2: Exp): Exp = {
 
 type SubExpVisitor[E] = ExpVisitor[E] & {sub: E -> E -> E};
 type SubExp = {accept: forall E. SubExpVisitor[E] -> E};
+
+-- Check SubExp :> Exp
+
 let sub (e1: SubExp) (e2: SubExp): SubExp = {
   accept = /\E -> \(f: SubExpVisitor[E]) -> f.sub (e1.accept[E] f) (e2.accept[E] f)
 };
@@ -28,7 +31,6 @@ let printVisitor: SubExpVisitor[String] = {
   sub = \(x: String) (y: String) -> x ++ " - " ++ y
 };
 
--- Contravariant param type, programmer-friendly usage
 let e1 = add (lit 2) (lit 3);
 let e2 = sub (lit 2) (lit 3);
 

@@ -5,7 +5,7 @@
 
 This section shows that the System $ F $ plus intersection types are enough for
 encoding extensible designs, and even beat the designs in languages with a much
-more sophisticated type system (such as Scala). In particular, \name has two
+more sophisticated type system (such as Scala). That is because \name has two
 main advantages over existing languages:
 
 \begin{enumerate}
@@ -23,10 +23,14 @@ programs.
   along those lines? That will be a good intro for object algebras and
 visitors!}
 
+Church encoding modelling ADT using folds
+
 % Introduce the expression problem
 
-The expression problem refers to the difficulty of adding a new operations and a
-new data variant without changing or duplicating existing code.
+The Expression Problem~\cite{wadler1998expression} refers to the difficulty of
+adding a new operations and a new data variant without changing or duplicating
+existing code. We will be solving the Expression Problem to demonstrate the
+capability of our language.
 
 % There has been recently a lightweight solution to the expression problem that
 % takes advantage of covariant return types in Java. We show that \name is able
@@ -45,17 +49,6 @@ new data variant without changing or duplicating existing code.
 
 % http://www.cs.ox.ac.uk/jeremy.gibbons/publications/embedding.pdf
 
-\begin{lstlisting}[language=scala]
-trait Expr {
-  def eval: Int
-}
-class Lit(n: Int) extends Expr {
-  def eval: Int = n
-}
-class Add(n: Int) extends Expr {
-  def eval: Int = e1.eval + e2.eval
-}
-\end{lstlisting}
 % \bruno{You already talk about overloading in the previous section. Need to
 % decide where to put the text!}
 
@@ -189,8 +182,7 @@ language support for intersection types would solve that problem.
 % is able to solve the limitations of using object algebras in languages such as
 % Java and Scala.
 We will illustrate this point with an step-by-step of solving the Expression
-Problem~\cite{wadler1998expression}. Prior knowledge of object algebra is not
-assumed.
+Problem. Prior knowledge of object algebra is not assumed.
 
 \paragraph{Initial features.}
 As the base scenario, we consider expressions with two variants (literal and
@@ -291,74 +283,99 @@ sense.
 
 \subsection{Visitors}
 
-Constructing instances seems clumsy!
-
-The visitor pattern allows adding new operations to existing structures without
-modifying those structures. The type of expressions are defined as follows:
-
+The visitor pattern~\cite{gamma1994design} is another design pattern that
+facilitates extensibility. The gist of this pattern is to decouple an object
+hierarchy from the behaviors of each object. In other words, objects no longer
+contain operations but instead ``accept'' visitors to perform operations on
+them. The visitor pattern tackles at the very problem that makes programming in
+traditional OO styles hard to add a new operation, since operations are defined
+inside object classes that represent data structures. As a result, using the
+visitor pattern allows adding new operations to existing structures without
+modifying code of structures, a style enjoyed by functional programming. To see
+this in action, we define the type of expressions as:
 \begin{lstlisting}{language=scala}
-trait Exp[A] {
-  def accept(f: ExpAlg[A]): A
-}
-
-trait SubExp[A] extends Exp[A] {
-  override def accept(f: SubExpAlg[A]): A
+trait Exp {
+  def accept(v: ExpVisitor[A]): A
 }
 \end{lstlisting}
+It has only one method \lstinline$accept$. The actual shape of the expressions
+(i.e., variants) is determined by the type of the visitor, which we define in
+another trait:
+\begin{lstlisting}{language=scala}
+trait ExpVisitor[E] {
+  def lit(x: Int): E
+  def add(e1: E, e2: E): E
+}
+\end{lstlisting}
+
+One serious problem that prevents using the visitor pattern modularly in
+languages such as Scala arises when later when we want to add more cases to the
+expression type. For example, \lstinline$SubExp$ and \lstinline$SubExpVisitor$
+together represent the type of expressions supporting subtraction, in addition
+to literal and addition.
+\begin{lstlisting}{language=scala}
+trait SubExp extends Exp {
+  override def accept[E](v: SubExpVisitor[E]): E
+}
+trait SubExpVisitor[E] extends ExpVisitor[E] {
+  def sub(e1: E, e2: E): E
+}
+\end{lstlisting}
+We extend the original visitor and add the new case.
 
 The body of \lstinline{Exp} and \lstinline{SubExp} are almost the same: they
 both contain an \lstinline{accept} method that takes an algebra \lstinline{f}
-and returns a value of the carrier type \lstinline{A}. The only difference is at
-\lstinline{f} --- \lstinline{SubExpAlg[A]} is a subtype of
+and returns a value of the type \lstinline{E}. The only difference is at
+\lstinline{f} --- \lstinline{SubExpAlg[E]} is a subtype of
 \lstinline{ExpAlg[A]}. Since \lstinline{f} appear in parameter position of
 \lstinline{accept} and function parameters are contravariant, naturally we would
-hope that \lstinline{SubExp[A]} is a supertype of \lstinline{Exp[A]}. However,
+hope that \lstinline{SubExp[E]} is a supertype of \lstinline{Exp[E]}. However,
 such subtyping relation does not fit well in Scala because inheritance implies
 subtyping in such languages \footnote{It is still possible to encode
   contravariant parameter types in Scala but doing so would require some
-  technique.\bruno{what technique?}}. As \lstinline{SubExp[A]} extends \lstinline{Exp[A]}, the former
-becomes a subtype of the latter.
+  technique.\bruno{what technique?}}. As \lstinline{SubExp[E]} extends
+\lstinline{Exp[E]}, the former becomes a subtype of the latter. This suffers
+from the ``Inheritance is Not Subtyping'' problem.
 
-Such limitation does not exist in \name. For example, we can define the similar interfaces \lstinline{Exp} and \lstinline{SubExp}:
+Such limitation does not exist in \name. For example, we can define the similar
+interfaces for \lstinline{Exp} and \lstinline{SubExp} as type aliases:
 \begin{lstlisting}{language=F2J}
-type Exp    A = { accept: forall A. ExpAlg A -> A };
-type SubExp A = { accept: forall A. SubExpAlg A -> A };
+type Exp    = {accept: forall A. ExpAlg[A] -> A};
+type SubExp = {accept: forall A. SubExpAlg[A] -> A};
 \end{lstlisting}
 Then by the typing judgment it holds that \lstinline{SubExp} is a supertype of
-\lstinline{Exp}. This relation gives desired results. To give a concrete example:
-
-A is called is the \emph{interpretation}. It works for any interpretation you want.
+\lstinline{Exp}. This relation gives desired results. To give a concrete
+example:
 
 First we define two data constructors for simple expressions:
 \begin{lstlisting}{language=F2J}
-let lit (n : Int): Exp A = {
-  accept = /\A. \(f : ExpAlg A). f.lit n
+let lit (n: Int): Exp = {
+  accept = /\E -> \(f: ExpVisitor[E]) -> f.lit n
 };
-
-let add (e1 : Exp) (e2 : Exp): Exp A = {
-  accept = /\A. \(f : ExpAlg A).
-             f.add (e1.accept A f) (e2.accept A f)
+let add (e1: Exp) (e2: Exp): Exp = {
+  accept = /\E -> \(f: ExpVisitor[E]) -> f.add (e1.accept[E] f) (e2.accept[E] f)
 };
 \end{lstlisting}
 
-Suppose later we decide to augment the expressions with subtraction:
+Later we augment the expressions with subtraction:
 \begin{lstlisting}{language=F2J}
-let sub (e1 : SubExp) (e2 : SubExp): SubExp A =
-  { accept = /\A. \(f : SubExpAlg A).
-               f.sub (e1.accept A f) (e2.accept A f) };
+let sub (e1: SubExp) (e2: SubExp): SubExp =
+  { accept = /\E -> \(f : SubExpVisitor[E]).
+               f.sub (e1.accept[E] f) (e2.accept[E] f) };
 \end{lstlisting}
 
-One big benefit of using the visitor pattern is that programmers is able to
-write in the same way that would do in Haskell.
-For example, \lstinline{e2 = sub (lit 2) (lit 3)} defines an expression.
+% One big benefit of using the visitor pattern is that programmers are able to
+% define structures in a more natural way. 
 
-Another important property that does not exist in Scala is that programmer is
-able to pass \lstinline{lit 2}, which is of type \lstinline{Exp A}, to
-\lstinline{sub}, which expects a \lstinline{SubExp A} because of the subtyping
-relation we have. After all, it is known statically that \lstinline{lit 2} can
-be passed into \lstinline{sub} and nothing will go
-wrong.\bruno{Subtyping needs to be much more emphasized! See Modular
-  Visitor Components! }
+As client code, \lstinline$e2 = sub (lit 2) (lit 3)$ defines an expression. The
+programmer is able to pass \lstinline{lit 2}, which is of type \lstinline{Exp},
+to \lstinline{sub}, which expects a \lstinline{SubExp}. The types are compatible
+because because \lstinline$Exp$ is a \emph{subtype} of \lstinline$SubExp$. Code
+reuse is achieved since we can use the constructors from \lstinline$Exp$ as the
+constructor for \lstinline$SubExp$. In Scala, we would have to define two
+literal constructors, one for \lstinline$Exp$ and another for
+\lstinline$SubExp$! \bruno{Subtyping needs to be much more emphasized! See
+  Modular Visitor Components! }
 
 % \subsection{Yanlin stuff}
 % \bruno{This can be dropped.}
@@ -411,48 +428,48 @@ wrong.\bruno{Subtyping needs to be much more emphasized! See Modular
 % (subExt e1 e1).print
 % \end{lstlisting}
 
-\subsection{Mixins}
+% \subsection{Mixins}
 
-\bruno{Still not convinced by this section. Change to the record-based example.}
-Mixins are useful programming technique wildly adopted in dynamic programming
-languages such as JavaScript and Ruby. But obviously it is the programmers'
-responsbility to make sure that the mixin does not try to access methods or
-fields that are not present in the base class.
+% \bruno{Still not convinced by this section. Change to the record-based example.}
+% Mixins are useful programming technique wildly adopted in dynamic programming
+% languages such as JavaScript and Ruby. But obviously it is the programmers'
+% responsbility to make sure that the mixin does not try to access methods or
+% fields that are not present in the base class.
 
-In Haskell, one is also able to write programs in mixin style using records.
-However, this approach has a serious drawback: since there is no subtyping in
-Haskell, it is not possible to refine the mixin by adding more fields to the
-records. This means that the type of the family of the mixins has to be
-determined upfront, which undermines extensibility.
+% In Haskell, one is also able to write programs in mixin style using records.
+% However, this approach has a serious drawback: since there is no subtyping in
+% Haskell, it is not possible to refine the mixin by adding more fields to the
+% records. This means that the type of the family of the mixins has to be
+% determined upfront, which undermines extensibility.
 
-\name is able to overcome both of the problems: it allows composing mixins
-that (1) extends the base behavior, (2) while ensuring type safety.
+% \name is able to overcome both of the problems: it allows composing mixins
+% that (1) extends the base behavior, (2) while ensuring type safety.
 
-The figure defines a mini mixin library. The apostrophe in front of types
-denotes call-by-name arguments similar to the \lstinline{=>} notation in the
-Scala language.
+% The figure defines a mini mixin library. The apostrophe in front of types
+% denotes call-by-name arguments similar to the \lstinline{=>} notation in the
+% Scala language.
 
-\begin{lstlisting}{language=F2J}
-type Mixin S = 'S -> 'S -> S;
-let zero S (super : 'S) (this : 'S) : S = super;
-let rec mixin S (f : Mixin S) : S
-  = let m = mixin S in f (\ (_ : Unit). m f) (\ (_ : Unit). m f);
-let extends S (f : Mixin S) (g : Mixin S) : Mixin S
-  = \ (super : 'S). \ (this  : 'S). f (\ (d : Unit). g super this) this;
-\end{lstlisting}
+% \begin{lstlisting}{language=F2J}
+% type Mixin S = 'S -> 'S -> S;
+% let zero S (super : 'S) (this : 'S) : S = super;
+% let rec mixin S (f : Mixin S) : S
+%   = let m = mixin S in f (\ (_ : Unit). m f) (\ (_ : Unit). m f);
+% let extends S (f : Mixin S) (g : Mixin S) : Mixin S
+%   = \ (super : 'S). \ (this  : 'S). f (\ (d : Unit). g super this) this;
+% \end{lstlisting}
 
-We define a factorial function in mixin style and make a \lstinline{noisy} mixin
-that prints ``Hello'' and delegates to its superclass. Then the two functions
-are composed using the \lstinline{mixin} and \lstinline{extends} combinators.
-The result is the \lstinline{noisyFact} function that prints ``Hello'' every
-time it is called and computes factorial.
-\begin{lstlisting}{language=F2J}
-let fact (super : 'Int -> Int) (this : 'Int -> Int) : Int -> Int
-  = \ (n : Int). if n == 0 then 1 else n * this (n - 1)
-let noisy (super : 'Int -> Int) (this : 'Int -> Int) : Int -> Int
-  = \ (n : Int). { println("Hello"); super n }
-let noisyFact = mixin (Int -> Int) (extends (Int -> Int) foolish fact)
-noisy 5
-\end{lstlisting}
+% We define a factorial function in mixin style and make a \lstinline{noisy} mixin
+% that prints ``Hello'' and delegates to its superclass. Then the two functions
+% are composed using the \lstinline{mixin} and \lstinline{extends} combinators.
+% The result is the \lstinline{noisyFact} function that prints ``Hello'' every
+% time it is called and computes factorial.
+% \begin{lstlisting}{language=F2J}
+% let fact (super : 'Int -> Int) (this : 'Int -> Int) : Int -> Int
+%   = \ (n : Int). if n == 0 then 1 else n * this (n - 1)
+% let noisy (super : 'Int -> Int) (this : 'Int -> Int) : Int -> Int
+%   = \ (n : Int). { println("Hello"); super n }
+% let noisyFact = mixin (Int -> Int) (extends (Int -> Int) foolish fact)
+% noisy 5
+% \end{lstlisting}
 
 % \subsection{Composing Mixins and Object Algebras}
