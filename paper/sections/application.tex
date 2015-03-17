@@ -184,65 +184,61 @@ that we can still access the \lstinline{admin} field later.
 % {A => B => A with B}. \footnote{FIXME}
 
 Oliveira~\cite{} noted that composition of object algebras can be cumbersome and
-language support for intersection types would solve that problem. Our type
-system is just a simple extension of System $ F $; yet surprisingly, it is able
-to solve the limitations of using object algebras in languages such as Java and
-Scala. We will illustrate this point with an step-by-step of solving the
-Expression Problem~\cite{wadler1998expression}.
+language support for intersection types would solve that problem. 
+% Our type system is just a simple extension of System $ F $; yet surprisingly, it
+% is able to solve the limitations of using object algebras in languages such as
+% Java and Scala.
+We will illustrate this point with an step-by-step of solving the Expression
+Problem~\cite{wadler1998expression}. Prior knowledge of object algebra is not
+assumed.
 
-\paragraph{Base scenario.}
-In the base scenario, we consider expressions with two variants (literal and
+\paragraph{Initial features.}
+As the base scenario, we consider expressions with two variants (literal and
 addition) and one operation (evaluation). Here is an interface that supports
 evaluation:
 \begin{lstlisting}{language=F2J}
-type IEval = {eval : Int}
+type IEval = {eval: Int};
 \end{lstlisting}
-and an object algebra interface, \lstinline{ExpAlg}, for expression types with
-the two variants. \lstinline{ExpAlg} is abstracted over the the type of the
-interpretation, \lstinline{E}.
+and an object algebra interface, \lstinline$ExpAlg$, for expression types with
+the two variants. It has fixed number of variants, but is abstracted over the
+the type of the interpretation \lstinline$E$.
 \begin{lstlisting}{language=F2J}
-type ExpAlg[E] = {lit : Int -> E, add : E -> E -> E}
+type ExpAlg[E] = {lit: Int -> E, add: E -> E -> E};
 \end{lstlisting}
-To illustrate the point,
-\begin{lstlisting}{language=F2J}
-ExpAlg[IEval]
-\end{lstlisting}
-will be the type of object algebras with evaluation as the interpretation, whereas
-\begin{lstlisting}{language=F2J}
-ExpAlg[IEval & IPrint]
-\end{lstlisting}
-will be the type of object algebras that support both evaluation and pretty
-printing.
+To illustrate the point of this abstraction, \lstinline$ExpAlg[IEval]$ will be
+the type of object algebras with evaluation as the interpretation, whereas
+\lstinline$ExpAlg[IEval & IPrint]$ will be the type of object algebras that
+support both evaluation and pretty printing.
 
 % In \name, record types are structural and hence any value that satisfies this
-% interface is of type \lstinline{IEval} or of a subtype of \lstinline{IEval}.
+% interface is of type \lstinline$IEval$ or of a subtype of \lstinline$IEval$.
 % \footnote{Should be mentioned in S2.}
 
 Having defined the interfaces, we can implement that object algebra interface
-with \lstinline{evalAlg}, which is an object algebra for evluation. Contrary to
+with \lstinline$evalAlg$, which is an object algebra for evluation. Contrary to
 nominal type systems as in most statically typed OO languages, the interface
-being implemented here, \lstinline{ExpAlg[Int]}, is not required. But we put the
+being implemented here, \lstinline$ExpAlg[Int]$, is not required. But we put the
 type ascription nonetheless for clarity and comparison.
 \begin{lstlisting}{language=F2J}
-let evalAlg : ExpAlg[E] = {
-  lit = \(x : Int) -> {eval = x},
-  add = \(x : IEval) (y : IEval) -> {eval = x.eval + y.eval}
-}
+let evalAlg: ExpAlg[E] = {
+  lit = \(x: Int) -> {eval = x},
+  add = \(x: IEval) (y: IEval) -> {eval = x.eval + y.eval}
+};
 \end{lstlisting}
 
 \paragraph{Add a subtraction variant.}
 The first evolution is adding a new variant, say, subtraction. We can do so by
 simply intersecting the original types and merging with the original values.
 \begin{lstlisting}{language=F2J}
-type SubExpAlg[E] = ExpAlg[E] & {sub : E -> E -> E}
-let subEvalAlg = evalAlg ,, {sub = \(x : IEval) (y : IEval) -> { eval = x.eval - y.eval }};
+type SubExpAlg[E] = ExpAlg[E] & {sub: E -> E -> E};
+let subEvalAlg = evalAlg ,, {sub = \(x: IEval) (y: IEval) -> { eval = x.eval - y.eval }};
 \end{lstlisting}
 
 \paragraph{Add a pretty printing operation.}
 As the second evolution, we add pretty printing. Similar to how we have defined
 evaluation, we can describe the pretty printing feature as:
 \begin{lstlisting}{language=F2J}
-type IPrint = {print : String}
+type IPrint = {print : String};
 \end{lstlisting}
 We can implement pretty printing for expressions that support literals,
 addition, and subtraction:
@@ -251,46 +247,47 @@ let printAlg : SubExpAlg[String] = {
   lit = \(x: Int) -> {print = x.toString()},
   add = \(x: IPrint) (y: IPrint) -> {print = x.print ++ " + " ++ y.print},
   sub = \(x: IPrint) (y: IPrint) -> {print = x.print ++ " - " ++ y.print}
-}
+};
 \end{lstlisting}
 
 \paragraph{Usage.}
 Provided with the definitions above, we can then create values using the
 appropriate algebras. For example:
 \begin{lstlisting}{language=F2J}
-let e1[E] (f: SubExpAlg[E]) = f.sub (f.lit 7) (f.lit 2)
+let e1[E] (f: SubExpAlg[E]) = f.sub (f.lit 7) (f.lit 2);
 \end{lstlisting}
 
 The expressions are unusual in the sense that they are functions that take an
-extra argument \lstinline{f}, the object algebras, and use the data constructors
-provided by the object algebra (factory) \lstinline{f} such as \lstinline{lit},
-\lstinline{add} and \lstinline{sub} to create values. Moreover, The algebras
+extra argument \lstinline$f$, the object algebras, and use the data constructors
+provided by the object algebra (factory) \lstinline$f$ such as \lstinline$lit$,
+\lstinline$add$ and \lstinline$sub$ to create values. Moreover, The algebras
 themselves are abstracted over the allowed operations such as evaluation and
 pretty printing by requiring the expression functions to take an extra argument
-\lstinline{E}.
-
-\begin{lstlisting}{language=F2J}
-let merge [A] [B] (f : ExpAlg[A]) (g : ExpAlg[B]) = {
-  lit = \(x : Int) -> f.lit x ,, g.lit x,
-  add = \(x : A & B) (y : A & B) ->
-          f.add x y ,, g.add x y
-}
-\end{lstlisting}
+\lstinline$E$.
 
 If we would like to have an expression that supports both evaluation and pretty
 printing, we will need a mechanism to combine the evaluation and printing
-algebras. Intersection types allows such composition: the \lstinline{merge}
+algebras. Intersection types allows such composition: the \lstinline$merge$
 function, which takes two expression algebras to create a combined algebra. It
 does so by constructing a new expression algebra, a record whose each field is a
 function that delegates the input to the two algebras taken.
 \begin{lstlisting}{language=F2J}
-let newAlg = merge[IEval] [IPrint] subEvalAlg printAlg in
-let o1 = e1 [IEval & IPrint] newAlg in
-o1.print
+let merge [A] [B] (f: ExpAlg[A]) (g: ExpAlg[B]) = {
+  lit = \(x: Int) -> f.lit x ,, g.lit x,
+  add = \(x: A & B) (y: A & B) ->
+          f.add x y ,, g.add x y
+}
 \end{lstlisting}
-% \bruno{Don't start a sentence with \lstinline{o1}.}
-Note that \lstinline{o1} is a single object created that supports both
-evaluation and printing, thus achieving full feature-oriented programming.
+
+\begin{lstlisting}{language=F2J}
+let newAlg = merge[IEval] [IPrint] subEvalAlg printAlg;
+let o = e1 [IEval&IPrint] newAlg;
+o.print ++ " = " ++ o.eval.toString()
+\end{lstlisting}
+% \bruno{Don't start a sentence with \lstinline$o1$.}
+Note that \lstinline$o1$ is a single object created that supports both
+evaluation and printing, thus achieving feature-oriented programming in this
+sense.
 
 \subsection{Visitors}
 
