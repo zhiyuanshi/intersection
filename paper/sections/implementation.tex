@@ -14,7 +14,7 @@ programs built into System $ F $ terms.
 
 \item A \emph{desugaring} phase that translates well-typed source terms into
   \name terms. A number of source-level features such as multi-field records,
-  recursive \texttt{let} definitions, type synonyms are rewritten at this phase.
+  recursive \texttt{let} definitions, type aliases are rewritten at this phase.
   The resulting program is just \name expressions with other minor features.
 
 \item A \emph{compilation} phase that translates well-typed \name terms
@@ -23,9 +23,9 @@ programs built into System $ F $ terms.
 
 Phase 3 is what we have formalized in this paper.
 
-\paragraph{Type synonyms.}
+\paragraph{Type aliases.}
 
-We implement \emph{type synonym} as in Scala and Haskell.
+We implement \emph{type alias} as in Scala and Haskell.
 
 In fact, to make future adaptations easier, we implemented this feature on top
 of the more general System $ F_{\omega} $.
