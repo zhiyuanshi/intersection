@@ -18,13 +18,13 @@ def latexmk_cmd(options = "")
 end
 
 desc "Generate the PDF of the paper"
-task(:paper => [:clean]) { system(latexmk_cmd) }
+task(:paper) { system(latexmk_cmd) }
 
 desc "Watch for changes and re-generate the PDF if necessary"
 task(:watch => :clean) { system(latexmk_cmd("-pvc")) }
 
 desc "Clean"
-task(:clean) { system("latexmk -c") }
+task(:clean => :git_clean) { system("latexmk -c") }
 
-desc "Clean, including PDFs"
-task(:Clean) { system("latexmk -C") }
+desc "Remove only files ignored by Git (not including untracked file)"
+task(:git_clean) { system("git clean -Xf") }
