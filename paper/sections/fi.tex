@@ -1,30 +1,23 @@
 \section{The \name calculus}
 
-% { instruction = ``Buy'' } ,, { instruction = ``Sell'' }
-% def merge[A,B](x: A)(y: B) = x ,, y
-% id { instruction = ``Buy'' } { instruction = ``Sell'' }
-% id : forall A B. A -> B -> A & B
-
-% \footnote{Joshua Dunfield}
-
-Following Dunfield's~\cite{dunfield2014elaborating} work on simply-typed lambda
-calculus with intersection and union types, we formalize the syntax, subtyping,
-and typing of \name. In the next section, we will go through the type-directed
-translation from \name to System F.
-
-% \bruno{Mention Dundfield}
-
-% Note the semantics of this language is not defined formally, instead, by a
-% translation into the target language, System $ F $.
+Following Dunfield's~\cite{dunfield2014elaborating} work on a simply-typed
+lambda calculus with intersection and union types, we present the syntax,
+subtyping, and typing of \name. The semantics of \name, on the other hand, will
+be defined by a type-directed translation from \name to a simple variant of
+System $F$, which will be covered in the next section.
 
 \subsection{Syntax}
 
-Figure~\ref{fig:fi-syntax} shows the syntax of \name. It is System $ F $ at its
-core. To System $ F $, we add two features: intersection types and single-field
-records.
-% ~\bruno{labelled types (single field records are fine too)} 
-We include only single records because single record types as the multi-records
-can be desugared into the merge of multiple single records.
+Figure~\ref{fig:fi-syntax} shows the syntax of \name (with the addition to
+System $F$ highlighted). As a convention in this paper, we will be using
+lowercase letters as meta-variables for sorts in \name, and uppercase letters
+for those in System $F$ (starting to appear in the next section).
+
+% To System $ F $, we add two features: intersection types and single-field
+% records.
+% % ~\bruno{labelled types (single field records are fine too)} 
+% We include only single records because single record types as the multi-records
+% can be desugared into the merge of multiple single records.
 
 \begin{figure}[h]
   \input{rule_in_figures/fi-syntax.tex}
@@ -32,25 +25,24 @@ can be desugared into the merge of multiple single records.
   \label{fig:fi-syntax}
 \end{figure}
 
-\paragraph{Types.} The constructs in the first row of types in
-Figure~\ref{fig:fi-syntax} are standard in System $ F $: type variable
-$ \alpha $, function types $ \tau \to \tau $, and type abstraction
-$ \for \alpha \tau $. The last two are novel. $ \tau_1 \andop \tau_1 $ is
-the intersection of type $ \tau_1 $ and $ \tau_2 $, 
+We use the meta-variable $\tau$ to range over types. Types include System $F$
+constructs variable $ \alpha $; function types $ \tau_1 \to \tau_2 $; and type
+abstraction $ \for \alpha \tau $. $ \tau_1 \andop \tau_2 $ denotes the
+intersection of type $ \tau_1 $ and $ \tau_2 $; and $ \recty l \tau $ the types
+for single-field records. Single-field record types can be viewed as types
+tagged with a label $l$, while the other type forms are untagged types.
 % \bruno{be consistent: in the source language we use \&, and in the
 % formalization we use $\andop$}
-and $ \recty l \tau $ are the types for single-field records.
 
-\paragraph{Expressions.} The first five constructs of expressions are also
-standard: variables $ x $, and two abstraction-elimination pairs: lambda
-expressions $ \lam x \tau e $ abstract expression $ e $ over values of
-type $ \tau $ and are eliminated by application $ \app e e $; Big lambdas
-$ \blam \alpha e $ abstract expression $ e $ over types and are eliminated by
-type application $ \app e \tau $. In the source language, lambdas are written as
-\george{TODO} and big lambdas as \george{TODO}.
-
-The last four constructs are new: $ e_1 \mergeop e_2 $ is the \emph{merge} of two
-expressions $ e_1 $ and $ e_2 $.
+Expressions are ranged over by meta-variables $e$. 
+Standard constructs in System $F$ are 
+variables $ x $; 
+abstraction of expressions over variables of a given type $ \lam x \tau e $ (concretely written \lstinline$\(x:T) -> e$); 
+abstraction of expressions over types $ \blam \alpha e $ (concretely written \lstinline$/\A -> e$); 
+value application $ \app e_1 e_2 $;
+and type application $ \tapp e \tau $ (concretely written \lstinline$e[T]$). 
+The last four constructs are new: $ e_1 \mergeop e_2 $ 
+is the \emph{merge} of two expressions $ e_1 $ and $ e_2 $.
 % \bruno{explain further, after all this is new.}
 It can be used as either $ e_1 $ or $ e_2 $. Particarly, if one regard $ e_1 $
 and $ e_2 $ as objects, their merge will responds to every method that one or
@@ -63,14 +55,18 @@ records
 x = \reccon {l_1} {e_1} \mergeop \reccon {l_1} {e_2} 
 \]
 is of an intersection type, $ x.{l_1} $ still gives $ e_1 $. On the other hand,
-$ x.{l_3} $ does not type check. Functional update $ \recupd e l {e_1} $ a
+$ x.{l_3} $ will be rejected by the type system. Functional update $ \recupd e l {e_1} $ a
 \emph{new} record which is exactly the same as $ e $ except the field labelled
-$ l $ is updated to become $ e1 $.
+$ l $ is updated to become $ e1 $. In order to focus on the most essential
+features, we do not include other forms such as fixpoints here, although they
+have are supported in our implementation and can be included in formalization in
+standard ways.
+
 \bruno{Talking about type-checking before type-checking is discussed!}
 % \bruno{What field $F$? I don't know what this is refering to!}
 
-\paragraph{Context.} Context $ \Gamma $ is also standard. It maps variables to
-their types and keeps bound type variables.
+Typing contexts $ \gamma $ track bound type variables and variables (and their
+type $\tau$). We use $l$ for labels, whose nature is left undefined.
 
 \paragraph{Discussion.} A natural question the reader might ask is that why we
 have excluded union types from the language. The answer is we found that
