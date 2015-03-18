@@ -373,19 +373,24 @@ expect: \lstinline${x: Int, y: Int}$ is a subtype of
 %   are missing!}
 
 \subsection{\hspace{-5pt}Intersection~Types~and~Parametric~Polymorphism}
+\bruno{wondering again whether this should be here or in the next section!}
 
-\bruno{I think we should talk about encoding bounded polymorphism here.}
+The combination of intersection types and parametric polymorphism
+makes System \name quite expressive. In particular this combination
+enables an encoding of a simple form of \emph{bounded universal
+  quantification}~\cite{cardelli1985understanding}. 
+This encoding is illustrated next.
 
-% \subsection{Encoding Bounded Polymorphism}
-% \bruno{IMPORTANT: Always capitalize the relevant words in a title!. This title
-% should be "Encoding Bounded Polymorphism''}
+%In the same way that System \name extends System $ F $ with
+%intersection types, System $ F_{\subtype} $ extends System $ F $ with bounded
+%polymorphism. $ F_{\subtype} $~\cite{pierce2002types} allows giving an
+%upper bound to the type variable in type abstractions. 
 
-As \name extends System $ F $ with intersection types, $ F_{\subtype} $ extends
-System $ F $ with bounded polymorphism. $ F_{\subtype} $~\cite{pierce2002types}
-allows giving an upper bound to the type variable in type abstractions. The idea
-of bounded universal quantification was discussed in the seminal paper by
-Cardelli and Wegner ~\cite{cardelli1985understanding}. They show that bounded
-quantifiers are useful because it is able to solve the ``loss of information''
+\paragraph{Bounded Quantification}
+The idea of bounded universal quantification was discussed in the
+seminal paper by Cardelli and Wegner
+~\cite{cardelli1985understanding}. They show that bounded quantifiers
+are useful because it is able to solve the ``loss of information''
 problem.
 
 In fact, the extension of System $ F $ in the other direction, i.e., with
