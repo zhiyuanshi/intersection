@@ -147,7 +147,7 @@ Scala, and \name.
 %In \name the central addition to the type system of System $F$ are
 %intersection types.
 
-\paragraph{Intersection Types for Overloading} 
+\paragraph{Intersection Types for Overloading.} 
 A typical use-case for intersection types is to do
 \emph{overloading}. The benefit is that programmers can use the same
 operation on different types and delegate the task of choosing a
@@ -206,7 +206,7 @@ construct for elimination).
 
 % \lstinputlisting[linerange=-]{} % APPLY:linerange=MIXIN_LIB
 
-\paragraph{Subtyping} The previous example exploits a natural
+\paragraph{Subtyping.} The previous example exploits a natural
 subtyping relation on intersection types. That is the type
 
 \begin{lstlisting}
@@ -224,7 +224,7 @@ and it enjoys of properties such as \emph{commutativity} and \emph{associativity
 \noindent {\bf commutativity: } \lstinline{A & B <: B & A}  \\
 {\bf associativity:~~~~~~}\lstinline{A & (B & C)  <: (A & B)  & C}  
 
-\paragraph{Covariance and Contravariance}
+\paragraph{Covariance and Contravariance.}
 The subtyping also arises from contravariant parameter types
 and covariant return types for functions. 
 \bruno{I think this will be a good place to talk about the following material:}
@@ -279,12 +279,12 @@ with three fields and with the following type:
 intersections of single-field record types.
 
 \name has three primitive operations related to records: \emph{construction},
-\emph{projection}, and \emph{update}. \emph{Extension}, described in many other
+\emph{selection}, and \emph{update}. \emph{Extension}, described in many other
 record systems, is delegated to the merge operator. Working
 with records is type-safe: the type system prevents accessing or updating a
 field that does not exist.
 
-\paragraph{Construction} The usual notation for constructing records
+\paragraph{Construction.} The usual notation for constructing records
 \begin{lstlisting}
 {open=192, high=195, low=189} 
 \end{lstlisting}
@@ -293,14 +293,14 @@ is a shorthand for merges of single-field records
 {open=192} ,, {high=195} ,, {low=189} 
 \end{lstlisting}
 
-\paragraph{Projection}
+\paragraph{Selection.}
 Fields are extracted using the dot notation. For example,
 \begin{lstlisting}
 {open=192, high=195, low=189}.open
 \end{lstlisting}
 selects the value of the field labelled \lstinline{open} from the record.
 
-\paragraph{Update}
+\paragraph{Update.}
 Functional update allows creating a new record based on an existing one, with
 one or more fields replaced. For example, we
 can get a new quote with incremented \lstinline{high} with:
@@ -314,7 +314,7 @@ one.~\footnote{The subtyping restriction is not required for the \name to be
   coherent and it leaves option open for language designers.}
 \bruno{Are we going to show an example of this?}
 
-\paragraph{Extension}
+\paragraph{Extension.}
 Extension, just as construction, is performed with the merge operator
 ($ \mergeop $). The following, for example, adds the \lstinline{close}
 field to the record:
@@ -322,7 +322,7 @@ field to the record:
 {open=192, high=195, low=189} ,, {close=195}
 \end{lstlisting}
 
-\paragraph{Generalized Records}
+\paragraph{Generalized Records.}
 In addition, a record is just a normal term and can be merged with any other
 term, for example, the following program is valid:
 \begin{lstlisting}
@@ -386,7 +386,7 @@ This encoding is illustrated next.
 %polymorphism. $ F_{\subtype} $~\cite{pierce2002types} allows giving an
 %upper bound to the type variable in type abstractions. 
 
-\paragraph{Bounded Quantification}
+\paragraph{Bounded Quantification.}
 The idea of bounded universal quantification was discussed in the
 seminal paper by Cardelli and Wegner
 ~\cite{cardelli1985understanding}. They show that bounded quantifiers
