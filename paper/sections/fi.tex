@@ -159,19 +159,20 @@ is of the form: $ \judgee \gamma e \tau $. It says that ``in the typing context
 $\gamma$, the expression $e$ is of type $\tau$''. The rules that are the same as
 in System $F$ are rules for variables ($\rulelabelevar$), lambda abstractions
 ($\rulelabelelam$), type abstraction ($\rulelabeleblam$), and type application
-($\rulelabeletapp$). The rule $\rulelabeleapp$ needs special attention. To cater
-to the subtyping relations, we additionally require the type of the argument
+($\rulelabeletapp$). The rule $\rulelabeleapp$ needs special attention as we add
+a subtyping requirement in the premise. We require the type of the argument
 ($\tau_3$) be a subtype of that of the parameter ($\tau_1$). For merges like
 $e_1 \mergeop e_2$, we typechecks $e_1$ and $e_2$ respectively, and give it the
 intersection of the resulting types $\tau_1 \andop \tau_2$. The rule for
-single-field record construction ($\rulelabelereccon$) is standard. For record
-projection ($\rulelabelerecsel$) and update ($\rulelabelerecupd$), we resort to
-the auxiliary ``get'' and ``put'' rules the check that the operations are valid.
-The ``get'' judgment checks if a field $ l $ indeed exists in a type $ \tau $
-and fetches the type of the field if so. The ``put'' judgment is almost similar,
-except that it takes the intended update (both expression and type), and returns
-in addition a new type of the expression. In record updates, we allow refining
-the type of the field in question.
+single-field record construction ($\rulelabelereccon$) is standard. The rules
+for record selection ($\rulelabelerecsel$) and update ($\rulelabelerecupd$) are
+expectedly the most complicated. We resort to the auxiliary ``get'' and ``put''
+rules the check that the operations are valid. The ``get'' judgment checks if a
+field $ l $ indeed exists in a type $ \tau $ and fetches the type of the field
+if so. The idea for ``put'' judgment is similar, except that it takes the
+intended update (both expression and type), and returns in addition a new type
+of the expression. In record updates, we allow refining the type of the field in
+question.
 
 % \bruno{Sort the rules by those, which are exactly the same as System F,
 %   following by those which are different (application) and finally the rules for
