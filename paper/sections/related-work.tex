@@ -116,36 +116,36 @@ extensibility.
 
 \paragraph{Extensible records.}
 
+\george{Record field deletion is also possible.}
+
 % http://elm-lang.org/learn/Records.elm
 
-Understanding records is important for understanding object-oriented languages.
-And we are the first to elaborate records to System $ F $. Encoding records
-using intersection types appear in Reynolds~\cite{reynolds1997design} and
-Castagna et al.~\cite{castagna1995calculus}. Although Dunfield also discusses
-this idea in his paper \cite{dunfield2014elaborating}, he only provides an
-implementation but not formalization. Very similar to our treatment of
-elaborating records is Cardelli's work~\cite{cardelli1992extensible} on
-translating a calculus, named $ F_{\subtype \rho}$, with extensible records to a
-simpler calculus that without records primitives (in which case is
-$ F_{\subtype} $). But he does not consider encoding multi-field records as
-intersections; hence his translation is more heavyweight.
-Crary~\cite{crary1998simple} uses intersection types and existential types to
-address the problem that arises when interpreting method dispatch as
-self-application. But in his paper, intersection types are not used to encode
-multi-field records.
+Encoding records using intersection types appear in
+Reynolds~\cite{reynolds1997design} and Castagna et
+al.~\cite{castagna1995calculus}. Although Dunfield also discusses this idea in
+his paper \cite{dunfield2014elaborating}, he only provides an implementation but
+not formalization. Very similar to our treatment of elaborating records is
+Cardelli's work~\cite{cardelli1992extensible} on translating a calculus, named
+$ F_{\subtype \rho}$, with extensible records to a simpler calculus that without
+records primitives (in which case is $ F_{\subtype} $). But he does not consider
+encoding multi-field records as intersections; hence his translation is more
+heavyweight. Crary~\cite{crary1998simple} uses intersection types and
+existential types to address the problem that arises when interpreting method
+dispatch as self-application. But in his paper, intersection types are not used
+to encode multi-field records.
 
 Wand~\cite{wand1987complete} started the work on extensible records and proposes
 row types~\cite{wand1989type} for records. Cardelli and
 Mitchell~\cite{cardelli1990operations} define three primitive operations on
 records that are different from ours: \emph{selection}, \emph{restriction}, and
-\emph{extension}. Following this approach, Leijen~\cite{leijen2005extensible}
-define record update in terms of restriction and extension, while in our record
-system record update is a primitive operation. Both Leijen's system and ours
-allows records that contain duplicate labels. Arguably Leijen's system is
-stronger. For example, it supports passing record labels as arguments to
-functions. He also shows encoding an intersection type using first-class labels.
-Chlipala's \texttt{Ur}~\cite{chlipala2010ur} explains record as type level
-constructs.
+\emph{extension}. Following this approach,
+Leijen~\cite{leijen2004first,leijen2005extensible} define record update in terms
+of restriction and extension, while in our record system record update is a
+primitive operation. Both Leijen's system and ours allows records that contain
+duplicate labels. Arguably Leijen's system is stronger. For example, it supports
+passing record labels as arguments to functions. He also shows encoding an
+intersection type using first-class labels. Chlipala's
+\texttt{Ur}~\cite{chlipala2010ur} explains record as type level constructs.
 
 % Remy~\cite{remy1993type}
 
