@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 task :default => :paper
 
-def latexmk_cmd(options = "")
+def latexmk_cmd(target, options = "")
   # "Since minted makes calls to the outside world (i.e. Pygments), you need to
   # tell the LaTeX processor about this by passing it the -shell-escape option
   # or it won’t allow such calls."
@@ -14,14 +14,17 @@ def latexmk_cmd(options = "")
   # engine = "lualatex"
 
   # -f     Force latexmk to continue document processing despite errors.
-  "latexmk #{options} -pdf -pdflatex='#{engine} -shell-escape %O %S' main.tex"
+  "latexmk #{options} -pdf -pdflatex='#{engine} -shell-escape %O %S' #{target}.tex"
 end
 
 desc "Generate the PDF of the paper"
-task(:paper) { system(latexmk_cmd) }
+task(:paper) { system(latexmk_cmd("main")) }
+
+desc "Generate the PDF for formalization"
+task(:formalization) { system(latexmk_cmd("formalization")) }
 
 desc "Watch for changes and re-generate the PDF if necessary"
-task(:watch => :clean) { system(latexmk_cmd("-pvc")) }
+task(:watch => :clean) { system(latexmk_cmd("main", "-pvc")) }
 
 desc "Clean"
 task(:clean => :git_clean) { system("latexmk -c") }
