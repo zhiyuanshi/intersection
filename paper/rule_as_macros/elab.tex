@@ -43,8 +43,8 @@
   {\judgee \gamma {\reccon l e} {\recty l \tau} \yields E}
 }
 
-\newcommand{\ruleerecprojelab}{
-\inferrule* [right=$\rulelabelerecproj$]
+\newcommand{\ruleerecselelab}{
+\inferrule* [right=$\rulelabelerecsel$]
   {\judgee \gamma e \tau \yields E \andalso
    \judgeget \tau l {\tau_1} \yields C}
   {\judgee \gamma {e.l} {\tau_1} \yields {\app C E}}
