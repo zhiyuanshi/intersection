@@ -1,4 +1,4 @@
-\section{The \name calculus}
+\section{The \name calculus} \label{sec:fi}
 
 Following Dunfield's~\cite{dunfield2014elaborating} work on a simply-typed
 lambda calculus with intersection and union types, we present the syntax,
@@ -30,7 +30,8 @@ constructs variable $ \alpha $; function types $ \tau_1 \to \tau_2 $; and type
 abstraction $ \for \alpha \tau $. $ \tau_1 \andop \tau_2 $ denotes the
 intersection of type $ \tau_1 $ and $ \tau_2 $; and $ \recty l \tau $ the types
 for single-field records. Single-field record types can be viewed as types
-tagged with a label $l$, while the other type forms are untagged types.
+tagged with a label $l$, while the other type forms are untagged types. We omit
+type constants such as \lstinline$Int$ and \lstinline$String$.
 % \bruno{be consistent: in the source language we use \&, and in the
 % formalization we use $\andop$}
 

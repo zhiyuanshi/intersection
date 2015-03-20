@@ -1,104 +1,111 @@
 \section{Type-directed Translation to System $ F $}
 
 In this section we define the semantics of \name by means of a type-directed
-translation to a variant of System $ F $ extended with tuples. This translation
-removes the labels of records and turns intersections into products, much like
-Dunfield's elaboration. But our translation also deals with parametric
-polymorphism and records.
+translation to a variant of System $F$. This translation removes the labels of
+records and turns intersections into products, much like Dunfield's elaboration.
+But our translation also deals with parametric polymorphism and records
+operations.
 
 \subsection{Informal Discussion}
 
-To help the reader have a high-level understanding of how the translation works,
-in this subsection we present the translation informally. Take the \name
+In this subsection we present the translation informally. Take the source
 expression for example:
 \begin{lstlisting}
-{ eval = 4, print = "4" }.eval
+{year = 1969, month = 12, day = 31}
 \end{lstlisting}
-
-First, multi-field record literals are desugared into merges of single-field
-record literals. Therefore
+It is desugared as 
 \begin{lstlisting}
-{ eval = 4, print = "4" }
+{year = 1969} ,, {month = 12} ,, {day = 31}
+\end{lstlisting}
+and then translated to
+\begin{lstlisting}
+((1969,12),31)
+\end{lstlisting}
+as the translation turns merges into pairs and erases the labels of records.
+Record selection is translated as the application of a coercion to the
+translated expression. For example,
+\begin{lstlisting}
+{year = 1969, month = 12, day = 31}.year
 \end{lstlisting}
 becomes
 \begin{lstlisting}
-{ eval = 4 } ,, { print = "4" }
+(\ (x: ((Int,Int),Int)) -> (\ (x: (Int,Int)) -> x._1) x._1) ((1969,12),31)
 \end{lstlisting}
-Merges of two values are translated into just a pair of them by $ \rulelabelemerge $
-and single-field record literals lose their field labels by $ \rulelabelereccon $.
-Hence \lstinline $ { eval = 4 } ,, { print = "4" } $ becomes \lstinline
-$ (4, "4") $.
+The coercion 
+\begin{lstlisting}
+(\ (x: ((Int,Int),Int)) -> (\ (x: (Int,Int)) -> x._1) x._1) 
+\end{lstlisting}
+extracts the item inside the nested pair.
 
 \bruno{Don't abuse inlining of examples in the text!}
 
-Finally, $ e1 $ and $ e2 $ are both coerced by a selection function
-$ \\(x:(Int,String)). \proj 1 x $.
 \bruno{Show the source program, and the program that it gets
   translated to. Then explain how that translation works.}
 
 \subsection{Target Language}
 
-The target language is System $ F $ extended with pairs. The syntax and typing
-is completely standard. The syntax of System $ F $ is as follows:
+Our target language is System $F$ extended with pairs and pair types. The syntax
+and typing is completely standard. The syntax of the target language is shown in
+Figure~\ref{fig:f-syntax} and the typing rules in the Appendix, while the
+operational semantics can be found in standard texts~\cite{pierce2002types}.
 % \bruno{fill!}
 \begin{figure}[h]
   \input{rule_in_figures/f-syntax.tex}
   \caption{Target syntax.}
   \label{fig:f-syntax}
 \end{figure}
-while its semantics can be found in standard texts~\cite{pierce2002types}.
 
 % \bruno{Why is this lemma placed here?}
 % \bruno{Generaly Speaking this text seems out of place.Move to 5.4, maybe?}
 
-The main translation judgment is $ \Gamma \turns e : \tau \hookrightarrow E $ which
-states that with respect to the environment $ \Gamma $, the \name expression
-$ e $ is of a \name type $ \tau $ and its translation is a System $ F $ expression $ E $.
+The main translation judgment is $ \judgee \gamma e \tau \yields E $ which
+states that with respect to the typing context $ \gamma $, the \name expression
+$e$ is of $\tau$ and its translation is a target expression $ E $.
 
 We also define the type translation function $ \im \cdot $ from \name types
-$ \tau $ to System $ F $ types $ T $.
+$ \tau $ to target types $ T $.
 
 \begin{figure}[h]
 \input{rule_in_figures/type-trans.tex}
 \caption{Type translation.}
 \end{figure}
 
-The first three rules of the translation is standard. For the last two, the
-intersection of two types are translated into a product of them, and the label
-of record types are erased.
-
-The translation consists of four sets of rules, which are explained below:
+The rules given in this section are identical with those in
+Section~\ref{sec:fi}, except for the light blue part. The translation consists
+of four sets of rules, which are explained below:
 
 \subsection{Subtyping (Coercion)}
 
-\george{Talk about $ \eta $-expansion.}
+% \george{Talk about $ \eta $-expansion.}
 
 \begin{figure*}
 \input{rule_in_figures/trans-sub.tex}
 \caption{Coersive subtyping.}
 \end{figure*}
 
-The coercion judgment $ \Gamma \turns \tau_1 \subtype \tau_2 \yields C $
-extends the subtyping judgment with a coercion on the right hand side of
-$ \hookrightarrow $. A coercion $ C $ is an expression in the target language
-and has type $ \tau_1 \to \tau_2 $, as proved by Lemma \ref{type-coerce}. It is
-read ``In the environment $ \Gamma $, $ \tau_1 $ is a subtype of $ \tau_2 $; and
-if any expression $ e $ has a type $ \tau_1 $ that is a subtype of the type of
-$ \tau_2 $, the elaborated $ e $, when applied to the corresponding coercion $ C $,
-has exactly type $ \im \tau_2 $''. For example,
-$\Gamma \turns Int \& Bool <: Bool \yields {fst} $, where $ fst $ is the
-selection of a tuple on the first element. The coercion judgment is only used
-in the $ \rulelabeleapp $ case. As $ \rulelabelsubfun $ supports contravariant parameter
-type and covariant return type, the coercion of the parameter types and that of
-the return types are used to create a coercion for the function type.
-$ \rulelabelsubandleft $, $ \rulelabelsubandright $, and $ \rulelabelsuband $ deal with intersection types.
-The first two are complementary to each other. Take $ \rulelabelsubandleft $ for example,
-if we know $ \tau_1 $ is a subtype of $ \tau_3 $ and $ C $ is a coercion from $ \tau_1 $
-to $ \tau_3 $, then we can conclude that $ \tau_1 \andop \tau_2 $ is also a subtype of
-$ \tau_3 $ and the new coercion is a function that takes a value $ x $ of type
-$ \tau_1 \andop \tau_2 $, project $ x $ on the first item, and apply $ C $ to it.
-$ \rulelabelsuband $ uses both of two coercions and constructs a pair.
-\bruno{Give a couple of concrete examples when explaining the rules.}
+The coercion judgment $ \tau_1 \subtype \tau_2 \yields C $ extends the subtyping
+judgment with a coercion on the right hand side of $ \yields {} $. A coercion
+$ C $ is just an expression in the target language and has type
+$ \tau_1 \to \tau_2 $, as proved by Lemma \ref{type-coerce}. It is read ``In the
+environment $ \gamma $, $ \tau_1 $ is a subtype of $ \tau_2 $; and if any
+expression $ e $ has a type $ \tau_1 $ that is a subtype of the type of
+$ \tau_2 $, the elaborated $ e $, when applied to the corresponding coercion
+$ C $, has exactly type $ \im \tau_2 $''. For example,
+$Int \& Bool <: Bool \yields {fst} $, where $ fst $ is the
+selection of a tuple on the first element. The coercion judgment is only used in
+the $ \rulelabeleapp $ case. As $ \rulelabelsubfun $ supports contravariant
+parameter type and covariant return type, the coercion of the parameter types
+and that of the return types are used to create a coercion for the function
+type. $ \rulelabelsubandleft $, $ \rulelabelsubandright $, and
+$ \rulelabelsuband $ deal with intersection types. The first two are
+complementary to each other. Take $ \rulelabelsubandleft $ for example, if we
+know $ \tau_1 $ is a subtype of $ \tau_3 $ and $ C $ is a coercion from
+$ \tau_1 $ to $ \tau_3 $, then we can conclude that $ \tau_1 \andop \tau_2 $ is
+also a subtype of $ \tau_3 $ and the new coercion is a function that takes a
+value $ x $ of type $ \tau_1 \andop \tau_2 $, project $ x $ on the first item,
+and apply $ C $ to it. $ \rulelabelsuband $ uses both of two coercions and
+constructs a pair. \bruno{Give a couple of concrete examples when explaining the
+  rules.}
 
 \subsection{Typing (Translation)}
 
@@ -218,25 +225,29 @@ then $ \tau_1 \subtype \tau_3 $.
   then $$ \im \Gamma \turns C : \im {\tau_1} \to \im {\tau_2} $$
 \end{lemma}
 
-\begin{lemma}[Get rules produce the type-correct coercion.] \label{type-get}
-  If $$ \Gamma \turnsget \tau ; l = C ; \tau_1 $$
-  then $$ \im \Gamma \turns C : \im \tau \to \im {\tau_1} $$
+\begin{lemma}[\rulelabelsub~rules produce type-correct coercion] 
+  If $ \tau_1 \subtype \tau_2 \yields C $, then $ \judget \epsilon C {\im {\tau_1} \to \im {\tau_2}} $.
+\end{lemma}
+
+\begin{lemma}[\rulelabelget~rules produce type-correct coercion] \label{lemma:get-correct}
+  If $ \judgeget \tau l {\tau_1} \yields C $, then $ \judget \epsilon C {\im \tau \to \im {\tau_1}} $.
 \end{lemma}
 
 \begin{proof}
 By induction on the given derivation.
 \end{proof}
 
-\begin{lemma}[Put rules produce the type-correct coercion.] \label{type-put}
-  If $$ \Gamma \turnsput \tau ; l ; E = C ; \tau_1 $$
-  then $$ \im \Gamma \turns C : \im \tau \to \im \tau $$
+\begin{lemma}[\rulelabelput~rules produce type-correct coercion] 
+  If $ \judgeput \tau l {\tau_1 \yields E} {\tau_2} {\tau_3} \yields C $ and $
+  \judget \Gamma E {\im {\tau_1}} $ for some $ \Gamma $, then
+  $ \judget \Gamma C {\im \tau \to \im {\tau_2}} $.
 \end{lemma}
 
 \begin{proof}
 By induction on the given derivation.
 \end{proof}
 
-\begin{lemma}[Translation preserves well-formedness.] \label{preserve-wf}
+\begin{lemma}[Translation preserves well-formedness.] 
   If   $$ \Gamma \turns \tau $$
   then $$ \im \Gamma \turns \im \tau $$
 \end{lemma}
@@ -245,9 +256,8 @@ By induction on the given derivation.
 By induction on the given derivation.
 \end{proof}
 
-\begin{theorem}[Type preserving translation.] \label{preserve-tr}
-  If   $$ \Gamma \turns e : \tau \yields E $$
-  then $$ \im \Gamma \turns E : \im \tau $$
+\begin{theorem}[Type-preserving translation]
+  If $ \judgee \gamma e \tau \yields E $, then $ \judget {\im \gamma} E {\im \tau} $.
 \end{theorem}
 
 \begin{proof}
@@ -255,5 +265,5 @@ By induction on the given derivation.
 inference rule. The full proof can be found in the appendix.
 \end{proof}
 
-Type-Directed Translation to System $ F $.
-Main results: type-preservation + coherence.
+% Type-Directed Translation to System $ F $.
+% Main results: type-preservation + coherence.
