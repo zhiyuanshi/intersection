@@ -174,28 +174,56 @@ $sub\_trans.v$.
   \label{fig:fi-typing}
 \end{figure*}
 
-The typing of \name is shown in Figure~\ref{fig:fi-typing}. The typing judgment
-is of the form: $ \judgee \gamma e \tau $. It says that ``in the typing context
+The typing of \name is shown in Figure~\ref{fig:fi-typing}. It consists of one
+main typing judgment and two auxiliary judgments. The main typing judgment is of
+the form: $ \judgee \gamma e \tau $. It says that ``in the typing context
 $\gamma$, the expression $e$ is of type $\tau$''. The rules that are the same as
 in System $F$ are rules for variables ($\rulelabelevar$), lambda abstractions
 ($\rulelabelelam$), type abstraction ($\rulelabeleblam$), and type application
 ($\rulelabeletapp$). The rule $\rulelabeleapp$ needs special attention as we add
-a subtyping requirement in the premise: we require the type of the argument
-($\tau_3$) be a subtype of that of the parameter ($\tau_1$). The advantage of
-this approach is that it then becomes easier to derive an algorithm for
-typechecking. For merges like $e_1 \mergeop e_2$, we typechecks $e_1$ and $e_2$
-respectively, and give it the intersection of the resulting types
-$\tau_1 \andop \tau_2$. The rule for single-field record construction
-($\rulelabelereccon$) is standard. The rules for record selection
-($\rulelabelerecsel$) and update ($\rulelabelerecupd$) are expectedly the most
-complicated. We resort to the auxiliary ``get'' and ``put'' rules the check that
-the operations are valid. The ``get'' judgment checks if a field $ l $ indeed
-exists in a type $ \tau $ and fetches the type of the field if so. The idea for
-``put'' judgment is similar, except that it takes the intended update (both
-expression and type), and returns in addition a new type of the expression. In
-record updates, we allow refining the type of the field in question.
+a subtyping requirement in the premise: the type of the argument ($\tau_3$) is a
+subtype of that of the parameter ($\tau_1$). The advantage is that it then
+becomes easier to derive an algorithm for typechecking. For merges
+$e_1 \mergeop e_2$, we typechecks $e_1$ and $e_2$ respectively, and give it the
+intersection of the resulting types $\tau_1 \andop \tau_2$. The rule for
+single-field record construction ($\rulelabelereccon$) is standard. The rules
+for record selection ($\rulelabelerecsel$) and update ($\rulelabelerecupd$) are
+expectedly the most complicated. They turn to the auxiliary ``get'' and ``put''
+rules to statically check operations and to obtain resulting types.
 
-The purpose of get / put rules is to statically check...
+The ``get'' judgment deals with record selection and captures the intuition
+that, for example, if an expression has type
+\begin{lstlisting}
+{id: Long, name: String, score: Float}
+\end{lstlisting}
+then the record selection of \lstinline$score$ on it should give back something
+of type \lstinline$Float$. Formally, $\judgeget {\tau_1} l {\tau_2}$ says that a
+field labelled $l$ is present inside $\tau_1$ and is of type $\tau_2$. The
+judgment is made of three inference rules and is recursively defined.
+$\rulelabelget$ is the base case: if we ask for a field labelled $l$ inside
+$\recty l \tau$, the field is clearly present and is of type $\tau$.
+$\rulelabelgetleft$ and $\rulelabelgetright$ are two symmetric step cases. Take
+$\rulelabelgetleft$ for example, it means that if $l$ is present inside
+$\tau_1$, then it is also present inside $\tau_1 \andop \tau_2$; and the type of
+the desired field $l$ remains $\tau$ in the conclusion.
+
+The ``put'' judgment deals with record update and is similar to the ``get''
+judgment in spirit. Consider the same example:
+\begin{lstlisting}
+{id: Long, name: String, score: Float}
+\end{lstlisting}
+If we want to update the content of the \lstinline$score$ field to something of
+type \lstinline$Double$ the judgment will returns a new type where the type of
+the field in question has been updated
+\begin{lstlisting}
+{id: Long, name: String, score: Double}
+\end{lstlisting}
+along with the original type of the field \lstinline$score$, which is
+\lstinline$Float$. More precisely,
+$\judgeput {\tau_1} l {\tau_2} {\tau_3} {\tau_4}$ says that if we want to update
+an expression of type $\tau_1$ by replacing the content of the field $l$ with a
+term of type $\tau_2$, then the new type of the entire expression after the
+update is $\tau_3$ and the original type of the field $l$ is $\tau_4$.
 
 % \bruno{Sort the rules by those, which are exactly the same as System F,
 %   following by those which are different (application) and finally the rules for
