@@ -66,7 +66,10 @@ standard ways.
 % \bruno{What field $F$? I don't know what this is refering to!}
 
 Typing contexts $ \gamma $ track bound type variables and variables (and their
-type $\tau$). We use $l$ for labels, whose nature is left undefined.
+type $\tau$). We use $l$ for labels, whose nature is left undefined. We use
+$\subst {\tau_1} \alpha {\tau_2}$ for the capture-avoiding substitution of
+$\tau_1$ for $\alpha$ inside $\tau_2$ and $\ftv \cdot$ for sets of free
+variables.
 
 \paragraph{Discussion.} A natural question the reader might ask is that why we
 have excluded union types from the language. The answer is we found that
@@ -77,6 +80,11 @@ constructs. For example, fixpoints can be added in standard ways.
 % appear in our language. Our work differs from Dunfield in that ...
 
 \subsection{Subtyping}
+
+% \bruno{Fix the overflow. For example by using 2 lines in
+%   the conclusion.}
+
+% \bruno{Subtyping figure is doing the translation already?}
 
 \george{Explain the subst syntax.}\bruno{Just say, in 1 sentence: 
 the syntax means substitution, and the substitution function is standard 
@@ -93,40 +101,52 @@ inheritance and subtyping to a nominal language. Point out related work.}
   work. Need to cite! The main difference is the interaction with parametric
   polymorphism.}
 
-In some calculi such as System $ F_{\subtype} $, the subtyping relation is
-orthogoal to other language features: those calculi are indifferent with how the
-subtyping relation is defined. In \name, we take a syntatic approach, that is,
-subtyping is due to solely of intersection and function types.
+In some calculi, the subtyping relation is external to the language: those
+calculi are indifferent to how the subtyping relation is defined. In \name, we
+take a syntatic approach, that is, subtyping is due to the syntax of types.
+However, this approach does not preclude integrating other forms of subtyping
+into our system. One is ``primitive'' subtyping relations such as natural
+numbers being a subtype of integers. The other is nominal subtyping relations
+that are explicitly declared by the programmer.
 
-\begin{figure*}
+\begin{figure*}[h]
   \input{rule_in_figures/fi-sub.tex}
   \caption{Subtyping in \name.}
   \label{fig:fi-subtyping}
 \end{figure*}
 
-% \bruno{Fix the overflow. For example by using 2 lines in
-%   the conclusion.}
-% \bruno{Subtyping figure is doing the translation already?}
+Subtyping rules of \name are shown in Figure~\ref{fig:fi-subtyping}. The rule
+$\rulelabelsubfun$ says that functions are contravariant in their parameter type
+and covariant in their return type. A universal quantifier ($\forall$) is
+covariant in its body. A single-field record type is also covariant, which
+becomes obvious if we regard it as just a labelled type. The three rules dealing
+with intersection types are just what one would expect when interpreting types
+as sets. Under this interpretation, for example, the rule $\rulelabelsuband$
+says that if $\tau_1$ is both the subset of $\tau_2$ and $\tau_3$, then $\tau_1$
+is also the subset of the intersection of $\tau_2$ and $\tau_3$.
 
-Intersection types introduce natural subtyping relations among types. For
-example, $ \Int \andop \Bool $ should be a subtype of $ \Int $, since the
-former can be viewed as either $ \Int $ or $ \Bool $. To summarize, the
-subtyping rules are standard except for three points listed below:
-\begin{enumerate}
-\item $ \tau_1 \andop \tau_2 $ is a subtype of $ \tau_3 $, if \emph{either} $ \tau_1 $ or
-  $ \tau_2 $ are subtypes of $ \tau_3 $,
+% Intersection types introduce natural subtyping relations among types. For
+% example, $ \Int \andop \Bool $ should be a subtype of $ \Int $, since the former
+% can be viewed as either $ \Int $ or $ \Bool $. To summarize, the subtyping rules
+% are standard except for three points listed below:
+% \begin{enumerate}
+% \item $ \tau_1 \andop \tau_2 $ is a subtype of $ \tau_3 $, if \emph{either} $ \tau_1 $ or
+%   $ \tau_2 $ are subtypes of $ \tau_3 $,
 
-\item $ \tau_1 $ is a subtype of $ \tau_2 \andop \tau_3 $, if $ \tau_1 $ is a subtype of
-  both $ \tau_2 $ and $ \tau_3 $.
+% \item $ \tau_1 $ is a subtype of $ \tau_2 \andop \tau_3 $, if $ \tau_1 $ is a subtype of
+%   both $ \tau_2 $ and $ \tau_3 $.
 
-\item $ \recty {l_1} {\tau_1} $ is a subtype of $ \recty {l_2} {\tau_2} $, if
-  $ l_1 $ and $ l_2 $ are identical and $ \tau_1 $ is a subtype of $ \tau_2 $.
-\end{enumerate}
-The first point is captured by two rules $ \rulelabelsubandleft $ and
-$ \rulelabelsubandright $, whereas the second point by $ \rulelabelsuband $. Note that the
-last point means that record types are covariant in the type of the fields.
+% \item $ \recty {l_1} {\tau_1} $ is a subtype of $ \recty {l_2} {\tau_2} $, if
+%   $ l_1 $ and $ l_2 $ are identical and $ \tau_1 $ is a subtype of $ \tau_2 $.
+% \end{enumerate}
+% The first point is captured by two rules $ \rulelabelsubandleft $ and
+% $ \rulelabelsubandright $, whereas the second point by $ \rulelabelsuband $.
+% Note that the last point means that record types are covariant in the type of
+% the fields.
 
-% The subtyping relation is reflexive and transitive.
+It is easy to see that subtyping is reflexive and transitive. For the
+corresponding mechanized proofs in Coq, refer to $sub\_refl.v$ and
+$sub\_trans.v$.
 
 \subsection{Typing}
 
@@ -160,19 +180,22 @@ $\gamma$, the expression $e$ is of type $\tau$''. The rules that are the same as
 in System $F$ are rules for variables ($\rulelabelevar$), lambda abstractions
 ($\rulelabelelam$), type abstraction ($\rulelabeleblam$), and type application
 ($\rulelabeletapp$). The rule $\rulelabeleapp$ needs special attention as we add
-a subtyping requirement in the premise. We require the type of the argument
-($\tau_3$) be a subtype of that of the parameter ($\tau_1$). For merges like
-$e_1 \mergeop e_2$, we typechecks $e_1$ and $e_2$ respectively, and give it the
-intersection of the resulting types $\tau_1 \andop \tau_2$. The rule for
-single-field record construction ($\rulelabelereccon$) is standard. The rules
-for record selection ($\rulelabelerecsel$) and update ($\rulelabelerecupd$) are
-expectedly the most complicated. We resort to the auxiliary ``get'' and ``put''
-rules the check that the operations are valid. The ``get'' judgment checks if a
-field $ l $ indeed exists in a type $ \tau $ and fetches the type of the field
-if so. The idea for ``put'' judgment is similar, except that it takes the
-intended update (both expression and type), and returns in addition a new type
-of the expression. In record updates, we allow refining the type of the field in
-question.
+a subtyping requirement in the premise: we require the type of the argument
+($\tau_3$) be a subtype of that of the parameter ($\tau_1$). The advantage of
+this approach is that it then becomes easier to derive an algorithm for
+typechecking. For merges like $e_1 \mergeop e_2$, we typechecks $e_1$ and $e_2$
+respectively, and give it the intersection of the resulting types
+$\tau_1 \andop \tau_2$. The rule for single-field record construction
+($\rulelabelereccon$) is standard. The rules for record selection
+($\rulelabelerecsel$) and update ($\rulelabelerecupd$) are expectedly the most
+complicated. We resort to the auxiliary ``get'' and ``put'' rules the check that
+the operations are valid. The ``get'' judgment checks if a field $ l $ indeed
+exists in a type $ \tau $ and fetches the type of the field if so. The idea for
+``put'' judgment is similar, except that it takes the intended update (both
+expression and type), and returns in addition a new type of the expression. In
+record updates, we allow refining the type of the field in question.
+
+The purpose of get / put rules is to statically check...
 
 % \bruno{Sort the rules by those, which are exactly the same as System F,
 %   following by those which are different (application) and finally the rules for
