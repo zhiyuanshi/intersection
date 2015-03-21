@@ -25,12 +25,12 @@
 \newcommand{\ruleetop} {
 \inferrule* [right=$\rulelabeletop$]
   { }
-  {\judgee \gamma \emptyrec \emptyrec}
+  {\judgee \gamma \top \top}
 }
 \newcommand{\ruleetopelab} {
 \inferrule* [right=$\rulelabeletop$]
   { }
-  {\judgee \gamma \emptyrec \emptyrec \yields {()}}
+  {\judgee \gamma \top \top \yields {()}}
 }
 
 
@@ -211,12 +211,12 @@
 \newcommand{\ruleres}{
   \inferrule* [right=$\rulelabelrestrict$]
   { }
-  {\judgerestrict {\recty l \tau} l \emptyrec}
+  {\judgerestrict {\recty l \tau} l \top}
 }
 \newcommand{\rulereselab}{
   \inferrule* [right=$\rulelabelrestrict$]
   { }
-  {\judgerestrict {\recty l \tau} l \emptyrec \yields {\lam x {\im {\recty l \tau}} {()}}}
+  {\judgerestrict {\recty l \tau} l \top \yields {\lam x {\im {\recty l \tau}} {()}}}
 }
 
 % res1
