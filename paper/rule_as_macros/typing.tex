@@ -146,7 +146,7 @@
 \inferrule* [right=$\rulelabelerecrestrict$]
   {\judgee \gamma e \tau \yields E \andalso
    \judgerestrict \tau l {\tau_1} \yields C}
-  {\judgee \gamma {e - l} {\tau_1} \yields {\app C E}}
+  {\judgee \gamma {e \restrictop l} {\tau_1} \yields {\app C E}}
 }
 
 % rec-update
@@ -222,7 +222,7 @@
 % Restriction
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\newcommand{\judgerestrict}[3]{#1 - #2 = #3}
+\newcommand{\judgerestrict}[3]{#1 \bm{\restrictop} #2 = #3}
 
 % restrict
 \newcommand{\rulelabelrestrict}{\bm{\textcolor{getputcolor}{restrict}}}

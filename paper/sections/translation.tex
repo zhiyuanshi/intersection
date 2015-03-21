@@ -228,6 +228,50 @@ will be used to coece the main \name expression.
   same as $ \rulelabelselectleft $ and $ \rulelabelselectright $ except that the refined type
   $ \tau_1' $ and $ \tau_2' $ is used.
 
+  \newcommand{\crestrictone}{\lam \_ {\im {\recty \J \Int}} {()}}
+  \newcommand{\crestricttwo}{\lam x {\im {\recty \I \Int \andop \recty \J \Int}} {\pair {\proj 1 x} {\  \app {(\crestrictone)} {\proj 2 x}}}}
+
+  Figure~\ref{fig:derivation} shows how
+  $\reccon \I 0 \mergeop \reccon \J 0 \restrictop \J$ is translated into the
+  target expression: 
+  \[
+  \small
+  \app {(\crestricttwo)} 
+  {\pair 0 0}
+  \]
+  After evaluation, the target expression becomes just $\pair 0 {()}$.
+
+  \begin{figure*}
+    \begin{mathpar}
+      \small
+
+      \inferrule* [right=$\rulelabelrestrictright$]
+      {\judgerestrict {\recty \J \Int} \J \top \yields {\lam \_ {\im {\recty \J \Int}} {()}}}
+      {\judgerestrict {\recty \I \Int \andop \recty \J \Int} \J {\recty \I \Int \andop \top} \yields {\crestricttwo}}
+
+      \inferrule* [right=$\rulelabelerecrestrict$]
+      {      
+        \inferrule* [right=$\rulelabelemerge$]
+        {
+          \inferrule* [right=$\rulelabelereccon$]
+          {\ldots}
+          {\judgee \epsilon {\reccon \I 0} {\recty \I \Int} \yields 0}
+          \\
+          \inferrule* [right=$\rulelabelereccon$]
+          {\ldots}
+          {\judgee \epsilon {\reccon \J 0} {\recty \J \Int} \yields 0}
+        }
+        {\judgee \epsilon {\reccon \I 0 \mergeop \reccon \J 0} {\recty \I \Int \andop \recty \J \Int} \yields {\pair 0 0}}
+        \\
+        \ldots
+      }
+      {\judgee \epsilon {\reccon \I 0 \mergeop \reccon \J 0 \restrictop \J} {\recty \I \Int \andop \top} \yields {\app {(\crestricttwo)} {\pair 0 0}}}
+    \end{mathpar}
+
+    \caption{An example of translating record restriction.}
+    \label{fig:derivation}
+  \end{figure*}
+
 \subsection{Meta-theory}
 
 \begin{lemma}[Subtyping is reflexive.] \label{sub-refl}
