@@ -1,0 +1,291 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Typing
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\newcommand{\judgee}[3]{#1 \; \textcolor{elabcolor}{\turns} \; #2 \; \textcolor{elabcolor}{:} \; #3}
+\colorlet{elabcolor}{Blue}
+\newcommand{\rulelabele}{\bm{\textcolor{elabcolor}{E}}}
+
+% var
+\newcommand{\rulelabelevar}{\rulelabele\text{var}}
+\newcommand{\ruleevar} {
+\inferrule* [right=$\rulelabelevar$]
+  {(x,\tau) \in \gamma}
+  {\judgee \gamma x \tau}
+}
+\newcommand{\ruleevarelab} {
+\inferrule* [right=$\rulelabelevar$]
+  {(x,\tau) \in \gamma}
+  {\judgee \gamma x \tau \yields x}
+}
+
+
+% top
+\newcommand{\rulelabeletop}{\rulelabele\text{top}}
+\newcommand{\ruleetop} {
+\inferrule* [right=$\rulelabeletop$]
+  { }
+  {\judgee \gamma \emptyrec \emptyrec}
+}
+\newcommand{\ruleetopelab} {
+\inferrule* [right=$\rulelabeletop$]
+  { }
+  {\judgee \gamma \emptyrec \emptyrec \yields {()}}
+}
+
+
+% lam
+\newcommand{\rulelabelelam}{\rulelabele\text{lam}}
+\newcommand{\ruleelam} {
+\inferrule* [right=$\rulelabelelam$]
+  {\judgee {\gamma, x \hast \tau} e {\tau_1} \andalso \judgeewf \gamma \tau}
+  {\judgee \gamma {\lam x \tau e} {\tau \to \tau_1}}
+}
+\newcommand{\ruleelamelab} {
+\inferrule* [right=$\rulelabelelam$]
+  {\judgee {\gamma, x \hast \tau} e {\tau_1} \yields E \andalso \judgeewf \gamma \tau}
+  {\judgee \gamma {\lam x \tau e} {\tau \to \tau_1} \yields {\lam x {\im \tau} E}}
+}
+
+% app
+\newcommand{\rulelabeleapp}{\rulelabele\text{app}}
+\newcommand{\ruleeapp}{
+\inferrule* [right=$\rulelabeleapp$]
+  {\judgee \gamma {e_1} {\tau_1 \to \tau_2} \\
+   \judgee \gamma {e_2} {\tau_3} \andalso
+   \tau_3 \subtype \tau_1}
+  {\judgee \gamma {\app {e_1} {e_2}} {\tau_2}}
+}
+\newcommand{\ruleeappelab}{
+\inferrule* [right=$\rulelabeleapp$]
+  {\judgee \gamma {e_1} {\tau_1 \to \tau_2} \yields {E_1} \\
+   \judgee \gamma {e_2} {\tau_3} \yields {E_2} \andalso
+   \tau_3 \subtype \tau_1 \yields C}
+  {\judgee \gamma {\app {e_1} {e_2}} {\tau_2} \yields {\app {E_1} {(\app C E_2)}}}
+}
+
+
+% blam
+\newcommand{\rulelabeleblam}{\rulelabele\text{blam}}
+\newcommand{\ruleeblam}{
+\inferrule* [right=$\rulelabeleblam$]
+  {\judgee {\gamma, \alpha} e \tau}
+  {\judgee \gamma {\blam \alpha e} {\for \alpha \tau}}
+}
+\newcommand{\ruleeblamelab}{
+\inferrule* [right=$\rulelabeleblam$]
+  {\judgee {\gamma, \alpha} e \tau \yields E}
+  {\judgee \gamma {\blam \alpha e} {\for \alpha \tau} \yields {\blam \alpha E}}
+}
+
+% tapp
+\newcommand{\rulelabeletapp}{\rulelabele\text{tapp}}
+\newcommand{\ruleetapp}{
+\inferrule* [right=$\rulelabeletapp$]
+  {\judgee \gamma e {\for \alpha {\tau_1}} \andalso \judgeewf \gamma \tau}
+  {\judgee \gamma {\tapp e \tau} {\subst \tau \alpha \tau_1}}
+}
+\newcommand{\ruleetappelab}{
+\inferrule* [right=$\rulelabeletapp$]
+  {\judgee \gamma e {\for \alpha {\tau_1}} \yields E \andalso \judgeewf \gamma \tau}
+  {\judgee \gamma {\tapp e \tau} {\subst \tau \alpha \tau_1} \yields {\tapp E {\im \tau}}}
+}
+
+% merge
+\newcommand{\rulelabelemerge}{\rulelabele\text{merge}}
+\newcommand{\ruleemerge}{
+\inferrule* [right=$\rulelabelemerge$]
+  {\judgee \gamma {e_1} {\tau_1} \andalso
+   \judgee \gamma {e_2} {\tau_2}}
+  {\judgee \gamma {e_1 \mergeop e_2} {\tau_1 \andop \tau_2}}
+}
+\newcommand{\ruleemergeelab}{
+\inferrule* [right=$\rulelabelemerge$]
+  {\judgee \gamma {e_1} {\tau_1} \yields {E_1} \andalso
+   \judgee \gamma {e_2} {\tau_2} \yields {E_2}}
+  {\judgee \gamma {e_1 \mergeop e_2} {\tau_1 \andop \tau_2} \yields {\pair {E_1} {E_2}}}
+}
+
+% rec-con
+\newcommand{\rulelabelereccon}{\rulelabele\text{rec-construct}}
+\newcommand{\ruleereccon}{
+\inferrule* [right=$\rulelabelereccon$]
+  {\judgee \gamma e \tau}
+  {\judgee \gamma {\reccon l e} {\recty l \tau}}
+}
+\newcommand{\ruleerecconelab}{
+\inferrule* [right=$\rulelabelereccon$]
+  {\judgee \gamma e \tau \yields E}
+  {\judgee \gamma {\reccon l e} {\recty l \tau} \yields E}
+}
+
+% rec-select
+\newcommand{\rulelabelerecselect}{\rulelabele\text{rec-select}}
+\newcommand{\ruleerecselect}{
+\inferrule* [right=$\rulelabelerecselect$]
+  {\judgee \gamma e \tau \andalso
+   \judgeselect \tau l {\tau_1}}
+  {\judgee \gamma {e.l} {\tau_1}}
+}
+\newcommand{\ruleerecselectelab}{
+\inferrule* [right=$\rulelabelerecselect$]
+  {\judgee \gamma e \tau \yields E \andalso
+   \judgeselect \tau l {\tau_1} \yields C}
+  {\judgee \gamma {e.l} {\tau_1} \yields {\app C E}}
+}
+
+% rec-restrict
+\newcommand{\rulelabelerecrestrict}{\rulelabele\text{rec-restrict}}
+\newcommand{\ruleerecrestrict}{
+\inferrule* [right=$\rulelabelerecrestrict$]
+  {\judgee \gamma e \tau \andalso
+   \judgerestrict \tau l {\tau_1}}
+  {\judgee \gamma {e - l} {\tau_1}}
+}
+\newcommand{\ruleerecrestrictelab}{
+\inferrule* [right=$\rulelabelerecrestrict$]
+  {\judgee \gamma e \tau \yields E \andalso
+   \judgerestrict \tau l {\tau_1} \yields C}
+  {\judgee \gamma {e - l} {\tau_1} \yields {\app C E}}
+}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% selection
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\colorlet{getputcolor}{DarkOrchid}
+
+\newcommand{\judgeselect}[3]{#1 \bullet #2 = #3}
+
+% select
+\newcommand{\rulelabelselect}{\bm{\textcolor{getputcolor}{select}}}
+\newcommand{\ruleget}{
+  \inferrule* [right=$\rulelabelselect$]
+  { }
+  {\judgeselect {\recty l \tau} l \tau}
+}
+\newcommand{\rulegetelab}{
+  \inferrule* [right=$\rulelabelselect$]
+  { }
+  {\judgeselect {\recty l \tau} l \tau \yields {\lam x {\im {\recty l \tau}} x}}
+}
+
+% select1
+\newcommand{\rulelabelselectleft}{{\rulelabelselect}_1}
+\newcommand{\rulegetleft}{
+  \inferrule* [right=$\rulelabelselectleft$]
+  {\judgeselect {\tau_1} l \tau}
+  {\judgeselect {\tau_1 \andop \tau_2} l \tau}
+}
+\newcommand{\rulegetleftelab}{
+  \inferrule* [right=$\rulelabelselectleft$]
+  {\judgeselect {\tau_1} l \tau \yields C}
+  {\judgeselect {\tau_1 \andop \tau_2} l \tau \yields {\lam x {\im {\tau_1
+          \andop \tau_2}} {\app C {(\proj 1 x)}}}}
+}
+
+% select2
+\newcommand{\rulelabelselectright}{{\rulelabelselect}_2}
+\newcommand{\rulegetright}{
+  \inferrule* [right=$\rulelabelselectright$]
+  {\judgeselect {\tau_2} l \tau}
+  {\judgeselect {\tau_1 \andop \tau_2} l \tau}
+}
+\newcommand{\rulegetrightelab}{
+  \inferrule* [right=$\rulelabelselectright$]
+  {\judgeselect {\tau_2} l \tau \yields C}
+  {\judgeselect {\tau_1 \andop \tau_2} l \tau \yields {\lam x {\im {\tau_1
+          \andop \tau_2}} {\app C {(\proj 2 x)}}}}
+}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Restriction
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\newcommand{\judgerestrict}[3]{#1 - #2 = #3}
+
+% res
+\newcommand{\rulelabelrestrict}{\bm{\textcolor{getputcolor}{restrict}}}
+\newcommand{\ruleres}{
+  \inferrule* [right=$\rulelabelrestrict$]
+  { }
+  {\judgerestrict {\recty l \tau} l \emptyrec}
+}
+\newcommand{\rulereselab}{
+  \inferrule* [right=$\rulelabelrestrict$]
+  { }
+  {\judgerestrict {\recty l \tau} l \emptyrec \yields {\lam x {\im {\recty l \tau}} {()}}}
+}
+
+% res1
+\newcommand{\rulelabelrestrictleft}{{\rulelabelrestrict}_1}
+\newcommand{\ruleresleft}{
+  \inferrule* [right=$\rulelabelrestrictleft$]
+  {\judgerestrict {\tau_1} l \tau}
+  {\judgerestrict {\tau_1 \andop \tau_2} l {\tau \andop \tau_2}}
+}
+\newcommand{\ruleresleftelab}{
+  \inferrule* [right=$\rulelabelrestrictleft$]
+  {\judgerestrict {\tau_1} l \tau \yields C}
+  {\judgerestrict {\tau_1 \andop \tau_2} l {\tau \andop \tau_2} \yields {\lam x {\im {\tau_1
+          \andop \tau_2}} {\pair {\app C {(\proj 1 x)}} {\proj 2 x}}}}
+}
+
+% res2
+\newcommand{\rulelabelrestrictright}{{\rulelabelrestrict}_2}
+\newcommand{\ruleresright}{
+  \inferrule* [right=$\rulelabelrestrictright$]
+  {\judgerestrict {\tau_2} l \tau}
+  {\judgerestrict {\tau_1 \andop \tau_2} l {\tau_1 \andop \tau}}
+}
+\newcommand{\ruleresrightelab}{
+  \inferrule* [right=$\rulelabelrestrictright$]
+  {\judgerestrict {\tau_2} l \tau \yields C}
+  {\judgerestrict {\tau_1 \andop \tau_2} l {\tau_1 \andop \tau} \yields {\lam x {\im {\tau_1
+          \andop \tau_2}} {\pair {\proj 1 x} {\app C {(\proj 2 x)}}}}}
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% put
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\newcommand{\ruleput}{
+\inferrule* [right=$\rulelabelput$]
+  { }
+  {\judgeput {\recty l \tau} l {\tau_1} {\recty l {\tau_1}} \tau}
+}
+
+\newcommand{\ruleputelab}{
+\inferrule* [right=$\rulelabelput$]
+  { }
+  {\judgeput {\recty l \tau} l {\tau_1 \yields E} {\recty l {\tau_1}} \tau
+  \yields {\lam \_ {\im {\recty l \tau}} E}}
+}
+
+\newcommand{\ruleputleft}{
+\inferrule* [right=$\rulelabelputleft$]
+  {\judgeput {\tau_1} l \tau {\tau_3} {\tau_4}}
+  {\judgeput {\tau_1 \andop \tau_2} l \tau {\tau_3 \andop \tau_2} {\tau_4}}
+}
+
+\newcommand{\ruleputleftelab}{
+\inferrule* [right=$\rulelabelputleft$]
+  {\judgeput {\tau_1} l {\tau \yields E} {\tau_3} {\tau_4} \yields C}
+  {\judgeput {\tau_1 \andop \tau_2} l {\tau \yields E} {\tau_3 \andop \tau_2} {\tau_4}
+  \yields {\lam x {\im {\tau_1 \andop \tau_2}} {\app C {(\proj 1 x)}}}}
+}
+
+\newcommand{\ruleputright}{
+\inferrule* [right=$\rulelabelputright$]
+  {\judgeput {\tau_2} l \tau {\tau_3} {\tau_4}}
+  {\judgeput {\tau_1 \andop \tau_2} l \tau {\tau_1 \andop \tau_3} {\tau_4}}
+}
+
+\newcommand{\ruleputrightelab}{
+\inferrule* [right=$\rulelabelputright$]
+  {\judgeput {\tau_2} l {\tau \yields E} {\tau_3} {\tau_4} \yields C}
+  {\judgeput {\tau_1 \andop \tau_2} l {\tau \yields E} {\tau_1 \andop \tau_3} {\tau_4}
+  \yields {\lam x {\im {\tau_1 \andop \tau_2}} {\app C {(\proj 2 x)}}}}
+}

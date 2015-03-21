@@ -152,35 +152,8 @@ $sub\_trans.v$.
 \subsection{Typing}
 
 \begin{figure*}
-\input{rule_in_figures/fi-typing.tex}
-\begin{mathpar}
-\framebox{$\judgeget {\tau_1} l \tau_2$}
-
-\ruleget
-
-\rulegetleft
-
-\rulegetright
-\end{mathpar}
-\begin{mathpar}
-\framebox{$\judgeres {\tau_1} l \tau_2$}
-
-\ruleres
-
-\ruleresleft
-
-\ruleresright
-\end{mathpar}
-\begin{mathpar}
-\framebox{$\judgeput \tau l \tau {\tau_2} {\tau_3}$}
-
-\ruleput
-
-\ruleputleft
-
-\ruleputright
-\end{mathpar}
-\caption{The type system of \name.}
+  \input{rule_in_figures/fi-typing.tex}
+  \caption{The type system of \name.}
   \label{fig:fi-typing}
 \end{figure*}
 
@@ -197,7 +170,7 @@ becomes easier to derive an algorithm for typechecking. For merges
 $e_1 \mergeop e_2$, we typechecks $e_1$ and $e_2$ respectively, and give it the
 intersection of the resulting types $\tau_1 \andop \tau_2$. The rule for
 single-field record construction ($\rulelabelereccon$) is standard. The rules
-for record selection ($\rulelabelerecsel$) and update ($\rulelabelerecupd$) are
+for record selection ($\rulelabelerecselect$) and update ($\rulelabelerecupd$) are
 expectedly the most complicated. They turn to the auxiliary ``get'' and ``put''
 rules to statically check operations and to obtain resulting types.
 
@@ -207,13 +180,13 @@ that, for example, if an expression has type
 {id: Long, name: String, score: Float}
 \end{lstlisting}
 then the record selection of \lstinline$score$ on it should give back something
-of type \lstinline$Float$. Formally, $\judgeget {\tau_1} l {\tau_2}$ says that a
+of type \lstinline$Float$. Formally, $\judgeselect {\tau_1} l {\tau_2}$ says that a
 field labelled $l$ is present inside $\tau_1$ and is of type $\tau_2$. The
 judgment is made of three inference rules and is recursively defined.
-$\rulelabelget$ is the base case: if we ask for a field labelled $l$ inside
+$\rulelabelselect$ is the base case: if we ask for a field labelled $l$ inside
 $\recty l \tau$, the field is clearly present and is of type $\tau$.
-$\rulelabelgetleft$ and $\rulelabelgetright$ are two symmetric step cases. Take
-$\rulelabelgetleft$ for example, it means that if $l$ is present inside
+$\rulelabelselectleft$ and $\rulelabelselectright$ are two symmetric step cases. Take
+$\rulelabelselectleft$ for example, it means that if $l$ is present inside
 $\tau_1$, then it is also present inside $\tau_1 \andop \tau_2$; and the type of
 the desired field $l$ remains $\tau$ in the conclusion.
 
@@ -245,7 +218,7 @@ update is $\tau_3$ and the original type of the field $l$ is $\tau_4$.
    For the new rules have text for each of them.}
 
 % The last two rules make use of the $ \rulename{fields} $ function just to make
-% sure that the field being accessed ($ \rulelabelerecsel $) or updated
+% sure that the field being accessed ($ \rulelabelerecselect $) or updated
 % ($ \rulelabelerecupd $) actually exists. The function is defined recursively, in
 % Haskell pseudocode, as:
 % \[ \begin{array}{rll}

@@ -89,8 +89,8 @@ previous intermediate result to reach the corresponding left-hand side).
 
 \end{proof}
 
-\begin{lemma}[\rulelabelget~rules produce type-correct coercion] \label{lemma:get-correct}
-  If $ \judgeget \tau l {\tau_1} \yields C $, then $ \judget \epsilon C {\im \tau \to \im {\tau_1}} $.
+\begin{lemma}[\rulelabelselect~rules produce type-correct coercion] \label{lemma:get-correct}
+  If $ \judgeselect \tau l {\tau_1} \yields C $, then $ \judget \epsilon C {\im \tau \to \im {\tau_1}} $.
 \end{lemma}
 
 \begin{proof}
@@ -134,8 +134,8 @@ previous intermediate result to reach the corresponding left-hand side).
 \end{proof}
 
 
-\begin{lemma}[\rulelabelres~rules produce type-correct coercion] \label{lemma:get-correct}
-  If $ \judgeres \tau l {\tau_1} \yields C $, then $ \judget \epsilon C {\im \tau \to \im {\tau_1}} $.
+\begin{lemma}[\rulelabelrestrict~rules produce type-correct coercion] \label{lemma:get-correct}
+  If $ \judgerestrict \tau l {\tau_1} \yields C $, then $ \judget \epsilon C {\im \tau \to \im {\tau_1}} $.
 \end{lemma}
 
 \begin{proof}
@@ -341,11 +341,11 @@ previous intermediate result to reach the corresponding left-hand side).
 
   \item \textbf{Case}
     \begin{flalign*}
-      & \ruleerecselelab &
+      & \ruleerecselectelab &
     \end{flalign*}
 
     \begin{tabular}{rll}
-     & $ \judgeget \tau l {\tau_1} \yields C $ & Premise \\
+     & $ \judgeselect \tau l {\tau_1} \yields C $ & Premise \\
      & $ \judget \epsilon C {\im \tau \to \im {\tau_1}} $ & By Lemma~\ref{lemma:get-correct} \\
      & $ \judget {\im \gamma} C {\im \tau \to \im {\tau_1}} $ &  \\
      & $ \judgee \gamma e \tau \yields E $ & Premise \\
@@ -353,20 +353,20 @@ previous intermediate result to reach the corresponding left-hand side).
      & $ \judget {\im \gamma} {\app C E} {\im {\tau_1}} $ & By $ \rulelabeltapp $
     \end{tabular} \\
 
-  \item \textbf{Case}
-    \begin{flalign*}
-      & \ruleerecupdelab &
-    \end{flalign*}
+  % \item \textbf{Case}
+  %   \begin{flalign*}
+  %     & \ruleerecupdelab &
+  %   \end{flalign*}
 
-    \begin{tabular}{rll}
-      & $ \judgee \gamma {e_1} {\tau_1} \yields {E_1} $ & Premise \\
-      & $ \judget {\im \gamma} {E_1} {\im {\tau_1}} $ & By i.h. \\
-      & $ \judgeput \tau l {\tau_1 \yields {E_1}} {\tau_2} {\tau_3} \yields C $ & Premise \\
-      & $ \judget {\im \gamma} C {\im \tau \to \im {\tau_2}} $ & By Lemma~\ref{lemma:put-correct} \\
-      & $ \judgee \gamma e \tau \yields E $ & Premise \\
-      & $ \judget {\im \gamma} E {\im \tau} $ & By i.h. \\
-      & $ \judget {\im \gamma} {\app C E} {\im {\tau_2}} $ & By $ \rulelabeltapp $
-    \end{tabular} \\
+  %   \begin{tabular}{rll}
+  %     & $ \judgee \gamma {e_1} {\tau_1} \yields {E_1} $ & Premise \\
+  %     & $ \judget {\im \gamma} {E_1} {\im {\tau_1}} $ & By i.h. \\
+  %     & $ \judgeput \tau l {\tau_1 \yields {E_1}} {\tau_2} {\tau_3} \yields C $ & Premise \\
+  %     & $ \judget {\im \gamma} C {\im \tau \to \im {\tau_2}} $ & By Lemma~\ref{lemma:put-correct} \\
+  %     & $ \judgee \gamma e \tau \yields E $ & Premise \\
+  %     & $ \judget {\im \gamma} E {\im \tau} $ & By i.h. \\
+  %     & $ \judget {\im \gamma} {\app C E} {\im {\tau_2}} $ & By $ \rulelabeltapp $
+  %   \end{tabular} \\
 
   \end{itemize}
 \end{proof}
