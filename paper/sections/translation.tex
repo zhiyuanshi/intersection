@@ -213,12 +213,12 @@ will be used to coece the main \name expression.
   The ``put'' judgment deals spefically with record update can be thought as
   producing a field updater. Compared to the ``get'' rules, the ``put'' rules
   take an extra input $ e $, which is the desired expression to replace the
-  field lablled $ l $ in values of type $ \tau $. $ \rulelabelput $ is the base
+  field lablled $ l $ in values of type $ \tau $. $ \rulelabelupdate $ is the base
   case. This rule allows refinement of record fields in the sense that the type
   of $ e $ can be a subtype of the type of the field labelled by $ l $. The
   resulting type is $ \recty l {\tau'} $ and the generated coercion is a
-  constant function that always returns $ E $. $ \rulelabelputleft $ and
-  $ \rulelabelputright $ are complementary to each other: the idea is exactly the
+  constant function that always returns $ E $. $ \rulelabelupdateleft $ and
+  $ \rulelabelupdateright $ are complementary to each other: the idea is exactly the
   same as $ \rulelabelselectleft $ and $ \rulelabelselectright $ except that the refined type
   $ \tau_1' $ and $ \tau_2' $ is used.
 
@@ -242,7 +242,7 @@ then $ \tau_1 \subtype \tau_3 $.
   If $ \tau_1 \subtype \tau_2 \yields C $, then $ \judget \epsilon C {\im {\tau_1} \to \im {\tau_2}} $.
 \end{lemma}
 
-\begin{lemma}[\rulelabelselect~rules produce type-correct coercion] \label{lemma:get-correct}
+\begin{lemma}[\rulelabelselect~rules produce type-correct coercion] \label{lemma:select-correct}
   If $ \judgeselect \tau l {\tau_1} \yields C $, then $ \judget \epsilon C {\im \tau \to \im {\tau_1}} $.
 \end{lemma}
 
@@ -250,8 +250,8 @@ then $ \tau_1 \subtype \tau_3 $.
 By induction on the given derivation.
 \end{proof}
 
-\begin{lemma}[\rulelabelput~rules produce type-correct coercion] 
-  If $ \judgeput \tau l {\tau_1 \yields E} {\tau_2} {\tau_3} \yields C $ and $
+\begin{lemma}[\rulelabelupdate~rules produce type-correct coercion] 
+  If $ \judgeupdate \tau l {\tau_1 \yields E} {\tau_2} {\tau_3} \yields C $ and $
   \judget \Gamma E {\im {\tau_1}} $ for some $ \Gamma $, then
   $ \judget \Gamma C {\im \tau \to \im {\tau_2}} $.
 \end{lemma}

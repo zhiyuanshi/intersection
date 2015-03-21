@@ -149,6 +149,24 @@
   {\judgee \gamma {e - l} {\tau_1} \yields {\app C E}}
 }
 
+% rec-update
+\newcommand{\rulelabelerecupdate}{\rulelabele\text{rec-update}}
+\newcommand{\ruleerecupdate}{
+\inferrule* [right=$\rulelabelerecupdate$]
+  {\judgee \gamma e \tau \andalso
+   \judgee \gamma {e_1} {\tau_1} \\
+   \judgeupdate \tau l {\tau_1} {\tau_2} {\tau_3} \andalso
+   \tau_1 \subtype \tau_3}
+  {\judgee \gamma {\recupdate e l {e_1}} {\tau_2}}
+}
+\newcommand{\ruleerecupdateelab}{
+\inferrule* [right=$\rulelabelerecupdate$]
+  {\judgee \gamma e \tau \yields E \andalso
+   \judgee \gamma {e_1} {\tau_1} \yields {E_1} \\
+   \judgeupdate \tau l {\tau_1 \yields {E_1}} {\tau_2} {\tau_3} \yields C \andalso
+   \tau_1 \subtype \tau_3}
+  {\judgee \gamma {\recupdate e l {e_1}} {\tau_2} \yields {\app C E}}
+}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % selection
@@ -206,86 +224,92 @@
 
 \newcommand{\judgerestrict}[3]{#1 - #2 = #3}
 
-% res
+% restrict
 \newcommand{\rulelabelrestrict}{\bm{\textcolor{getputcolor}{restrict}}}
-\newcommand{\ruleres}{
+\newcommand{\rulerestrict}{
   \inferrule* [right=$\rulelabelrestrict$]
   { }
   {\judgerestrict {\recty l \tau} l \top}
 }
-\newcommand{\rulereselab}{
+\newcommand{\rulerestrictelab}{
   \inferrule* [right=$\rulelabelrestrict$]
   { }
   {\judgerestrict {\recty l \tau} l \top \yields {\lam x {\im {\recty l \tau}} {()}}}
 }
 
-% res1
+% restrict1
 \newcommand{\rulelabelrestrictleft}{{\rulelabelrestrict}_1}
-\newcommand{\ruleresleft}{
+\newcommand{\rulerestrictleft}{
   \inferrule* [right=$\rulelabelrestrictleft$]
   {\judgerestrict {\tau_1} l \tau}
   {\judgerestrict {\tau_1 \andop \tau_2} l {\tau \andop \tau_2}}
 }
-\newcommand{\ruleresleftelab}{
+\newcommand{\rulerestrictleftelab}{
   \inferrule* [right=$\rulelabelrestrictleft$]
   {\judgerestrict {\tau_1} l \tau \yields C}
   {\judgerestrict {\tau_1 \andop \tau_2} l {\tau \andop \tau_2} \yields {\lam x {\im {\tau_1
           \andop \tau_2}} {\pair {\app C {(\proj 1 x)}} {\proj 2 x}}}}
 }
 
-% res2
+% restrict2
 \newcommand{\rulelabelrestrictright}{{\rulelabelrestrict}_2}
-\newcommand{\ruleresright}{
+\newcommand{\rulerestrictright}{
   \inferrule* [right=$\rulelabelrestrictright$]
   {\judgerestrict {\tau_2} l \tau}
   {\judgerestrict {\tau_1 \andop \tau_2} l {\tau_1 \andop \tau}}
 }
-\newcommand{\ruleresrightelab}{
+\newcommand{\rulerestrictrightelab}{
   \inferrule* [right=$\rulelabelrestrictright$]
   {\judgerestrict {\tau_2} l \tau \yields C}
   {\judgerestrict {\tau_1 \andop \tau_2} l {\tau_1 \andop \tau} \yields {\lam x {\im {\tau_1
           \andop \tau_2}} {\pair {\proj 1 x} {\app C {(\proj 2 x)}}}}}
 }
 
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% put
+% Update
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\newcommand{\ruleput}{
-\inferrule* [right=$\rulelabelput$]
+\newcommand{\judgeupdate}[5]{#1 \blacktriangleleft \recty {#2} {#3} = #4 \lfloor #5 \rfloor}
+
+% update
+\newcommand{\rulelabelupdate}{\bm{\textcolor{getputcolor}{update}}}
+\newcommand{\ruleupdate}{
+\inferrule* [right=$\rulelabelupdate$]
   { }
-  {\judgeput {\recty l \tau} l {\tau_1} {\recty l {\tau_1}} \tau}
+  {\judgeupdate {\recty l \tau} l {\tau_1} {\recty l {\tau_1}} \tau}
 }
-
-\newcommand{\ruleputelab}{
-\inferrule* [right=$\rulelabelput$]
+\newcommand{\ruleupdateelab}{
+\inferrule* [right=$\rulelabelupdate$]
   { }
-  {\judgeput {\recty l \tau} l {\tau_1 \yields E} {\recty l {\tau_1}} \tau
+  {\judgeupdate {\recty l \tau} l {\tau_1 \yields E} {\recty l {\tau_1}} \tau
   \yields {\lam \_ {\im {\recty l \tau}} E}}
 }
 
-\newcommand{\ruleputleft}{
-\inferrule* [right=$\rulelabelputleft$]
-  {\judgeput {\tau_1} l \tau {\tau_3} {\tau_4}}
-  {\judgeput {\tau_1 \andop \tau_2} l \tau {\tau_3 \andop \tau_2} {\tau_4}}
+% update1
+\newcommand{\rulelabelupdateleft}{{\rulelabelupdate}_1}
+\newcommand{\ruleupdateleft}{
+\inferrule* [right=$\rulelabelupdateleft$]
+  {\judgeupdate {\tau_1} l \tau {\tau_3} {\tau_4}}
+  {\judgeupdate {\tau_1 \andop \tau_2} l \tau {\tau_3 \andop \tau_2} {\tau_4}}
 }
-
-\newcommand{\ruleputleftelab}{
-\inferrule* [right=$\rulelabelputleft$]
-  {\judgeput {\tau_1} l {\tau \yields E} {\tau_3} {\tau_4} \yields C}
-  {\judgeput {\tau_1 \andop \tau_2} l {\tau \yields E} {\tau_3 \andop \tau_2} {\tau_4}
+\newcommand{\ruleupdateleftelab}{
+\inferrule* [right=$\rulelabelupdateleft$]
+  {\judgeupdate {\tau_1} l {\tau \yields E} {\tau_3} {\tau_4} \yields C}
+  {\judgeupdate {\tau_1 \andop \tau_2} l {\tau \yields E} {\tau_3 \andop \tau_2} {\tau_4}
   \yields {\lam x {\im {\tau_1 \andop \tau_2}} {\app C {(\proj 1 x)}}}}
 }
 
-\newcommand{\ruleputright}{
-\inferrule* [right=$\rulelabelputright$]
-  {\judgeput {\tau_2} l \tau {\tau_3} {\tau_4}}
-  {\judgeput {\tau_1 \andop \tau_2} l \tau {\tau_1 \andop \tau_3} {\tau_4}}
+% update2
+\newcommand{\rulelabelupdateright}{{\rulelabelupdate}_2}
+\newcommand{\ruleupdateright}{
+\inferrule* [right=$\rulelabelupdateright$]
+  {\judgeupdate {\tau_2} l \tau {\tau_3} {\tau_4}}
+  {\judgeupdate {\tau_1 \andop \tau_2} l \tau {\tau_1 \andop \tau_3} {\tau_4}}
 }
-
-\newcommand{\ruleputrightelab}{
-\inferrule* [right=$\rulelabelputright$]
-  {\judgeput {\tau_2} l {\tau \yields E} {\tau_3} {\tau_4} \yields C}
-  {\judgeput {\tau_1 \andop \tau_2} l {\tau \yields E} {\tau_1 \andop \tau_3} {\tau_4}
+\newcommand{\ruleupdaterightelab}{
+\inferrule* [right=$\rulelabelupdateright$]
+  {\judgeupdate {\tau_2} l {\tau \yields E} {\tau_3} {\tau_4} \yields C}
+  {\judgeupdate {\tau_1 \andop \tau_2} l {\tau \yields E} {\tau_1 \andop \tau_3} {\tau_4}
   \yields {\lam x {\im {\tau_1 \andop \tau_2}} {\app C {(\proj 2 x)}}}}
 }

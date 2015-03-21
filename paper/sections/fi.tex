@@ -56,7 +56,7 @@ records
 x = \reccon {l_1} {e_1} \mergeop \reccon {l_1} {e_2} 
 \]
 is of an intersection type, $ x.{l_1} $ still gives $ e_1 $. On the other hand,
-$ x.{l_3} $ will be rejected by the type system. Functional update $ \recupd e l {e_1} $ a
+$ x.{l_3} $ will be rejected by the type system. Functional update $ \recupdate e l {e_1} $ a
 \emph{new} record which is exactly the same as $ e $ except the field labelled
 $ l $ is updated to become $ e1 $. In order to focus on the most essential
 features, we do not include other forms such as fixpoints here, although they
@@ -203,7 +203,7 @@ the field in question has been updated
 \end{lstlisting}
 along with the original type of the field \lstinline$score$, which is
 \lstinline$Float$. More precisely,
-$\judgeput {\tau_1} l {\tau_2} {\tau_3} {\tau_4}$ says that if we want to update
+$\judgeupdate {\tau_1} l {\tau_2} {\tau_3} {\tau_4}$ says that if we want to update
 an expression of type $\tau_1$ by replacing the content of the field $l$ with a
 term of type $\tau_2$, then the new type of the entire expression after the
 update is $\tau_3$ and the original type of the field $l$ is $\tau_4$.

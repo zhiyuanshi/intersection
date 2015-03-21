@@ -26,6 +26,16 @@ previous intermediate result to reach the corresponding left-hand side).
 
   \item \textbf{Case}
     \begin{flalign*}
+      & \rulesubtop &
+    \end{flalign*}
+
+    \begin{tabular}{rll}
+      & $ \judget {\epsilon} {\lam x {\im \tau} ()} {\im \tau \to ()} $ & By $ \rulelabeltvar $ and $ \rulelabeltlam $ \\
+      & $ \judget {\epsilon} {\lam x {\im \tau} ()} {\im \tau \to \im \top} $ & By the definition of $ \im \cdot $ 
+    \end{tabular} \\
+
+  \item \textbf{Case}
+    \begin{flalign*}
       & \rulesubfun &
     \end{flalign*}
 
@@ -89,7 +99,7 @@ previous intermediate result to reach the corresponding left-hand side).
 
 \end{proof}
 
-\begin{lemma}[\rulelabelselect~rules produce type-correct coercion] \label{lemma:get-correct}
+\begin{lemma}[\rulelabelselect~rules produce type-correct coercion] \label{lemma:select-correct}
   If $ \judgeselect \tau l {\tau_1} \yields C $, then $ \judget \epsilon C {\im \tau \to \im {\tau_1}} $.
 \end{lemma}
 
@@ -118,7 +128,7 @@ previous intermediate result to reach the corresponding left-hand side).
       & $ \judget {\epsilon, x \hast \im {\tau_1 \andop \tau_2}} x {\pair {\im {\tau_1}} {\im {\tau_2}}} $ & By the definition of $\im \cdot$ \\
       & $ \judget {\epsilon, x \hast \im {\tau_1 \andop \tau_2}} {\proj 1 x} {\im {\tau_1}} $ & By $\rulelabeltprojleft$ \\
       & $ \judget \epsilon C {\im {\tau_1} \to \im \tau} $ & By i.h. \\
-      & $ \judget {\epsilon, x \hast \im {\tau_1 \andop \tau_2}} C {\im {\tau_1} \to \im \tau} $ & \george{What should this be called?} \\
+      & $ \judget {\epsilon, x \hast \im {\tau_1 \andop \tau_2}} C {\im {\tau_1} \to \im \tau} $ &  \\
       & $ \judget {\epsilon, x \hast \im {\tau_1 \andop \tau_2}} {\app C {(\proj 1 x)}} {\im \tau} $ & By $\rulelabeltapp$ \\
       & $ \judget \epsilon {\lam x {\im {\tau_1 \andop \tau_2}} {\app C {(\proj 1 x)}}} {\im {\tau_1 \andop \tau_2} \to \im \tau} $ & By $ \rulelabeltlam $
     \end{tabular} \\
@@ -134,7 +144,7 @@ previous intermediate result to reach the corresponding left-hand side).
 \end{proof}
 
 
-\begin{lemma}[\rulelabelrestrict~rules produce type-correct coercion] \label{lemma:get-correct}
+\begin{lemma}[\rulelabelrestrict~rules produce type-correct coercion] \label{lemma:restrict-correct}
   If $ \judgerestrict \tau l {\tau_1} \yields C $, then $ \judget \epsilon C {\im \tau \to \im {\tau_1}} $.
 \end{lemma}
 
@@ -145,23 +155,36 @@ previous intermediate result to reach the corresponding left-hand side).
 
   \item \textbf{Case}
     \begin{flalign*}
-      & \rulereselab &
+      & \rulerestrictelab &
     \end{flalign*}
 
     \begin{tabular}{rll}
+      & $ \judget \epsilon {\lam x {\im {\recty l \tau}} {()}} {\im {\recty l \tau} \to ()} $ & \\
+      & $ \judget \epsilon {\lam x {\im {\recty l \tau}} {()}} {\im {\recty l \tau} \to \im \top} $ & By the definition of $\im \cdot$  
     \end{tabular} \\
 
   \item \textbf{Case}
     \begin{flalign*}
-      & \ruleresleftelab &
+      & \rulerestrictleftelab &
     \end{flalign*}
 
     \begin{tabular}{rll}
+      & $\judgerestrict {\tau_1} l \tau \yields C$ & Premise \\
+      & $\judget \epsilon C {\im {\tau_1} \to \im \tau} $ & By i.h. \\
+      & $\judget {\epsilon, x \hast \im {\tau_1 \andop \tau_2}} x {\im {\tau_1 \andop \tau_2}} $ & By $\rulelabeltvar$ \\
+      & $\judget {\epsilon, x \hast \im {\tau_1 \andop \tau_2}} x {\pair {\im {\tau_1}} {\im {\tau_2}}} $ & By the definition of $\im \cdot$ \\
+      & $\judget {\epsilon, x \hast \im {\tau_1 \andop \tau_2}} {\proj 1 x} {\im {\tau_1}} $ & By $\rulelabeltprojleft$ \\
+      & $\judget {\epsilon, x \hast \im {\tau_1 \andop \tau_2}} {\proj 2 x} {\im {\tau_2}} $ & By $\rulelabeltprojright$ \\
+      & $\judget {\epsilon, x \hast \im {\tau_1 \andop \tau_2}} {\app C {(\proj 1 x)}} {\im {\tau}} $ & By $\rulelabeltapp$ \\
+      & $\judget {\epsilon, x \hast \im {\tau_1 \andop \tau_2}} {\pair {\app C {(\proj 1 x)}} {\proj 2 x}} {\pair {\im {\tau}} {\im {\tau_2}}} $ & By $\rulelabeltpair$ \\
+      & $\judget {\epsilon, x \hast \im {\tau_1 \andop \tau_2}} {\pair {\app C {(\proj 1 x)}} {\proj 2 x}} {\im {\tau \andop \tau_2}} $ & By the definition of $\im \cdot$ \\
+      & $\judget \epsilon {\lam x {\im {\tau_1
+          \andop \tau_2}} {\pair {\app C {(\proj 1 x)}} {\proj 2 x}}} {\im {\tau_1 \andop \tau_2} \to \im {\tau \andop \tau_2}} $ & By $\rulelabeltlam$ 
     \end{tabular} \\
 
   \item \textbf{Case}
     \begin{flalign*}
-      & \ruleresrightelab &
+      & \rulerestrictrightelab &
     \end{flalign*}
 
     By symmetry with the above case. \\
@@ -170,8 +193,8 @@ previous intermediate result to reach the corresponding left-hand side).
 \end{proof}
 
 
-\begin{lemma}[\rulelabelput~rules produce type-correct coercion] \label{lemma:put-correct}
-  If $ \judgeput \tau l {\tau_1 \yields E} {\tau_2} {\tau_3} \yields C $ and $
+\begin{lemma}[\rulelabelupdate~rules produce type-correct coercion] \label{lemma:update-correct}
+  If $ \judgeupdate \tau l {\tau_1 \yields E} {\tau_2} {\tau_3} \yields C $ and $
   \judget \Gamma E {\im {\tau_1}} $ for some $ \Gamma $, then
   $ \judget \Gamma C {\im \tau \to \im {\tau_2}} $.
 \end{lemma}
@@ -183,7 +206,7 @@ previous intermediate result to reach the corresponding left-hand side).
 
   \item \textbf{Case}
     \begin{flalign*}
-      & \ruleputelab &
+      & \ruleupdateelab &
     \end{flalign*}
 
     \begin{tabular}{rll}
@@ -192,7 +215,7 @@ previous intermediate result to reach the corresponding left-hand side).
 
   \item \textbf{Case}
     \begin{flalign*}
-      & \ruleputleftelab &
+      & \ruleupdateleftelab &
     \end{flalign*}
 
     \begin{tabular}{rll}
@@ -200,14 +223,14 @@ previous intermediate result to reach the corresponding left-hand side).
       & $ \judget {\Gamma, x \hast \im {\tau_1 \andop \tau_2}} x {\pair {\im {\tau_1}} {\im {\tau_2}}} $ & By the definition of $\im \cdot$ \\
       & $ \judget {\Gamma, x \hast \im {\tau_1 \andop \tau_2}} {\proj 1 x} {\im {\tau_1}} $ & By $\rulelabeltprojleft$ \\
       & $ \judget \Gamma C {\im {\tau_1} \to \im {\tau_3}} $ & By i.h. \\ 
-      & $ \judget {\Gamma, x \hast \im {\tau_1 \andop \tau_2}} C {{\im {\tau_1}} \to \im {\tau_3}} $ & \george{Seems to need to assume $x$ fresh} \\ 
+      & $ \judget {\Gamma, x \hast \im {\tau_1 \andop \tau_2}} C {{\im {\tau_1}} \to \im {\tau_3}} $ & \\ 
       & $ \judget {\Gamma, x \hast \im {\tau_1 \andop \tau_2}} {\app C {(\proj 1 x)}} {\im {\tau_3}} $ & By $\rulelabeltapp$ \\
       & $ \judget \Gamma {\lam x {\im {\tau_1 \andop \tau_2}} {\app C {(\proj 1 x)}}} {\im {\tau_1 \andop \tau_2} \to \im {\tau_3}} $ & By $\rulelabeltlam$
     \end{tabular} \\
 
   \item \textbf{Case}
     \begin{flalign*}
-      & \ruleputrightelab &
+      & \ruleupdaterightelab &
     \end{flalign*}
 
     By symmetry with the above case. \\
@@ -283,7 +306,7 @@ previous intermediate result to reach the corresponding left-hand side).
      & $ \judgee \gamma {e_2} {\tau_3} \yields {E_2} $ & Premise \\
      & $ \judget {\im \gamma} {E_2} {\im {\tau_3}} $ & By i.h. \\
      & $ \tau_3 \subtype \tau_1 \yields C $ & Premise \\
-     & $ \judget \epsilon C {\im {\tau_3} \to \im {\tau_1}} $ & \george{one lemma about coercion} \\
+     & $ \judget \epsilon C {\im {\tau_3} \to \im {\tau_1}} $ & By Lemma~\ref{lemma:sub-correct} \\
      & $ \judget {\im \gamma} {\app {E_1} {(\app C E_2)}} {\im {\tau_2}} $ & By $ \rulelabeltapp $ and the definition of $ \im \cdot $
     \end{tabular} \\
 
@@ -346,27 +369,34 @@ previous intermediate result to reach the corresponding left-hand side).
 
     \begin{tabular}{rll}
      & $ \judgeselect \tau l {\tau_1} \yields C $ & Premise \\
-     & $ \judget \epsilon C {\im \tau \to \im {\tau_1}} $ & By Lemma~\ref{lemma:get-correct} \\
+     & $ \judget \epsilon C {\im \tau \to \im {\tau_1}} $ & By Lemma~\ref{lemma:select-correct} \\
      & $ \judget {\im \gamma} C {\im \tau \to \im {\tau_1}} $ &  \\
      & $ \judgee \gamma e \tau \yields E $ & Premise \\
      & $ \judget {\im \gamma} E {\im \tau} $ & By i.h. \\
      & $ \judget {\im \gamma} {\app C E} {\im {\tau_1}} $ & By $ \rulelabeltapp $
     \end{tabular} \\
 
-  % \item \textbf{Case}
-  %   \begin{flalign*}
-  %     & \ruleerecupdelab &
-  %   \end{flalign*}
+  \item \textbf{Case}
+    \begin{flalign*}
+      & \ruleerecrestrictelab &
+    \end{flalign*}
 
-  %   \begin{tabular}{rll}
-  %     & $ \judgee \gamma {e_1} {\tau_1} \yields {E_1} $ & Premise \\
-  %     & $ \judget {\im \gamma} {E_1} {\im {\tau_1}} $ & By i.h. \\
-  %     & $ \judgeput \tau l {\tau_1 \yields {E_1}} {\tau_2} {\tau_3} \yields C $ & Premise \\
-  %     & $ \judget {\im \gamma} C {\im \tau \to \im {\tau_2}} $ & By Lemma~\ref{lemma:put-correct} \\
-  %     & $ \judgee \gamma e \tau \yields E $ & Premise \\
-  %     & $ \judget {\im \gamma} E {\im \tau} $ & By i.h. \\
-  %     & $ \judget {\im \gamma} {\app C E} {\im {\tau_2}} $ & By $ \rulelabeltapp $
-  %   \end{tabular} \\
+    Similar to the above case except that we apply Lemma~\ref{lemma:restrict-correct}.
+
+  \item \textbf{Case}
+    \begin{flalign*}
+      & \ruleerecupdateelab &
+    \end{flalign*}
+
+    \begin{tabular}{rll}
+      & $ \judgee \gamma {e_1} {\tau_1} \yields {E_1} $ & Premise \\
+      & $ \judget {\im \gamma} {E_1} {\im {\tau_1}} $ & By i.h. \\
+      & $ \judgeupdate \tau l {\tau_1 \yields {E_1}} {\tau_2} {\tau_3} \yields C $ & Premise \\
+      & $ \judget {\im \gamma} C {\im \tau \to \im {\tau_2}} $ & By Lemma~\ref{lemma:update-correct} \\
+      & $ \judgee \gamma e \tau \yields E $ & Premise \\
+      & $ \judget {\im \gamma} E {\im \tau} $ & By i.h. \\
+      & $ \judget {\im \gamma} {\app C E} {\im {\tau_2}} $ & By $ \rulelabeltapp $
+    \end{tabular} \\
 
   \end{itemize}
 \end{proof}

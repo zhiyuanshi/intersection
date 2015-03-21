@@ -6,7 +6,7 @@
   \ruleeblam \and \ruleetapp \and
   \ruleemerge \and
   \ruleereccon \and
-  \ruleerecselect \and \ruleerecrestrict
+  \ruleerecselect \and \ruleerecrestrict \and \ruleerecupdate
 \end{mathpar}
 
 
@@ -20,5 +20,12 @@
 % Restriction
 \begin{mathpar}
   \framebox{$\judgerestrict {\tau_1} l \tau_2 \yields C$} \and
-  \ruleres \and \ruleresleft \and \ruleresright
+  \rulerestrict \and \rulerestrictleft \and \rulerestrictright
+\end{mathpar}
+
+
+% Update
+\begin{mathpar}
+  \framebox{$\judgeupdate \tau l {\tau \yields E} {\tau_2} {\tau_3}$} \and
+  \ruleupdate \and \ruleupdateleft \and \ruleupdateright
 \end{mathpar}
