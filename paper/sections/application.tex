@@ -15,7 +15,8 @@ languages:
 
 \begin{enumerate}
 \item \name supports dynamic composition of intersecting values.
-\item \name supports contravariant parameter types in the subtyping relation.
+\item \name does not couple type inheritance and subtyping. Moreover
+  \name supports contravariant parameter types in the subtyping relation.
 \end{enumerate}
 
 These two features avoid the use of low-level programming techniques,
@@ -78,7 +79,7 @@ Church encoding allows modelling algebraic data types.
 % };
 % \end{lstlisting}
 
-\subsection{Object Algebras}
+\subsection{Object Algebras}\label{subsec:OAs}
 
 % Object algebras provide an alternative to \emph{algebraic data types}
 % (ADT).\bruno{We are targeting an OO crowd. Mentioning algebraic
@@ -127,25 +128,25 @@ Church encoding allows modelling algebraic data types.
 % The value level counterpart are functions of the type \lstinline
 % {A => B => A with B}. \footnote{FIXME}
 
-Oliveira and Cook~\cite{} proposed a design pattern that can solve the
+Oliveira and Cook~\cite{oliveira2012extensibility} proposed a design pattern that can solve the
 Expression Problem in languages like Java. An advantage of the pattern
 over previous solutions is that it is relatively lightweight in terms
-of type system features. In a latter paper, Oliveira et al.~\cite{}
+of type system features. In a latter paper, Oliveira et al.~\cite{oliveira2013feature}
 noted some limitations of the original design pattern and proposed 
 some new techniques that generalized the original pattern, allowing it 
-to express programs in a Feature-Oriented Programming~\cite{} style.
+to express programs in a Feature-Oriented Programming~\cite{Prehofer97} style.
 Key to these techniques was the ability to dynamically compose object
 algebras.
 
-Unfortunatelly, dynamic composition of Object Algebras is
+Unfortunatelly, dynamic composition of object algebras is
 non-trivial. At the type-level it is possible to express the resulting
 type of the composition using intersection types. Thus, it is still
 possible to solve that part problem nicely in a language like Scala (which
 has basic support for intersection types). However, the dynamic
 composition itself cannot be easily encoded in Scala. The fundamental 
 issue is that Scala lacks a \lstinline{merge} operator (see the
-discussion in Section~\ref{}). Although both Oliveira et al.~\cite{} and
-Rendell et al.~\cite{} have shown that such a \lstinline{merge} operator can
+discussion in Section~\ref{subsec:interScala}). Although both Oliveira et al.~\cite{oliveira2013feature} and
+Rendell et al.~\cite{rendel14attributes} have shown that such a \lstinline{merge} operator can
 be encoded in Scala, the encoding fundamentally relies in low-level
 programming techniques such as dynamic proxies, reflection or
 meta-programming. 
@@ -208,7 +209,7 @@ let evalAlg: ExpAlg[IEval] = {
 
 In this example we implement a record, where the two operations 
 \lstinline{lit} and \lstinline{add} return a record with type \lstinline{IEval}.
-The type\lstinline$ExpAlg[IEval]$ is the type of object algebras
+The type \lstinline$ExpAlg[IEval]$ is the type of object algebras
 supporting evaluation. However, the one interesting point
 of object algebras is that other operations can be supported as
 well. 
@@ -298,12 +299,39 @@ Note that \lstinline$o$ is a single object that supports both
 evaluation and printing. 
 
 In contrast to the Scala solutions available in the
-literature~\cite{}, \name is able to express object algebra
+literature, \name is able to express object algebra
 composition very directly by using the merge operator. 
 
-\subsection{Visitors}
+\subsection{Back to Visitors}
 
-The visitor pattern~\cite{gamma1994design} is another design pattern that
+Object Algebras are closely related to the visitor
+pattern~\cite{gamma1994design}.  Indeed, object algebra interfaces are just
+\emph{internal
+  visitors}~\cite{oliveira09modular,oliveira2012extensibility}. 
+What distinguishes object algebras
+from the traditional visitor pattern is the lack of a composite
+interface with an \lstinline{accept} method, which 
+is both a blessing and a curse.  On
+the one hand the trouble with composite interfaces with an
+\lstinline{accept} method is that they make adding new variants to the
+visitor pattern very hard. Although extensible versions of the visitor
+pattern are possible, they usually require complex types using
+advanced features of generics~\cite{togersen:2004,oliveira2012extensibility}. On the other hand, the lack of
+such composite interfaces makes object algebras harder to use than
+visitors. As illustrated in Section~\ref{subsec:OAs}, constructing expressions
+with object algebras can only be done using a function parametrized by
+an object algebra.
+
+The remainder of the section shows that in \name there is no need to
+have a dillema between extensibility using simple types and
+usability: \emph{in \name it is possible to have extensible visitors with
+simple types}! The key to achieve this is to have type inheritance
+decoupled from subtyping, and allowing contravariant parameter type 
+refinement. 
+
+\subsubsection{The Problem with Extensible Visitors}
+\begin{comment}
+is another design pattern that
 facilitates extensibility. The gist of this pattern is to decouple an object
 hierarchy from the behaviors of each object. In other words, objects no longer
 contain operations but instead ``accept'' visitors to perform operations on
@@ -311,14 +339,26 @@ them. The visitor pattern tackles at the very problem that makes programming in
 traditional OO styles hard to add a new operation, since operations are defined
 inside object classes that represent data structures. As a result, using the
 visitor pattern allows adding new operations to existing structures without
-modifying code of structures, a style enjoyed by functional programming. To see
-this in action, we define the type of expressions as:
+modifying code of structures, a style enjoyed by functional
+programming. 
+\end{comment}
+We illustrate the problem with extensible visitors using Scala.
+The composite type for expressions is defined in Scala as:
 \begin{lstlisting}{language=scala}
 trait Exp {
-  def accept(v: ExpVisitor[A]): A
+  def accept(v: ExpAlg[A]): A
 }
 \end{lstlisting}
-It has only one method \lstinline$accept$. The actual shape of the expressions
+The trait \lstinline{Exp} has only one method 
+\lstinline$accept$, which takes an internal visitor (or object
+algebra) as an argument. 
+Here the type \lstinline{ExpAlg[A]} is the Scala analogous of the
+corresponding type defined in Section~\ref{} in \name. In terms 
+of the visitor pattern, \lstinline{ExpAlg} defines the visit methods 
+for all variants. 
+
+\begin{comment}
+The actual shape of the expressions
 (i.e., variants) is determined by the type of the visitor, which we define in
 another trait:
 \begin{lstlisting}{language=scala}
@@ -327,75 +367,112 @@ trait ExpVisitor[E] {
   def add(e1: E, e2: E): E
 }
 \end{lstlisting}
+\end{comment}
 
-One serious problem that prevents using the visitor pattern modularly in
-languages such as Scala arises when later when we want to add more cases to the
-expression type. For example, \lstinline$SubExp$ and \lstinline$SubExpVisitor$
-together represent the type of expressions supporting subtraction, in addition
-to literal and addition.
+\paragraph{Adding a new Variant}
+The difficulties arize when a new variant, such as subtraction is
+added. To do so an extended visitor interface analogous to
+\lstinline$SubExpAlg$ is needed. Moreover a corresponding composite 
+interface \lstinline$SubExp$ is needed as well:
+%For example, \lstinline$SubExp$ and \lstinline$SubExpAlg$
+%together represent the type of expressions supporting subtraction, in addition
+%to literal and addition.
 \begin{lstlisting}{language=scala}
 trait SubExp extends Exp {
-  override def accept[E](v: SubExpVisitor[E]): E
-}
-trait SubExpVisitor[E] extends ExpVisitor[E] {
-  def sub(e1: E, e2: E): E
+  override def accept[E](v: SubExpAlg[E]): E
 }
 \end{lstlisting}
-We extend the original visitor and add the new case.
-
+%We extend the original visitor and add the new case.
 The body of \lstinline{Exp} and \lstinline{SubExp} are almost the same: they
-both contain an \lstinline{accept} method that takes an algebra \lstinline{f}
-and returns a value of the type \lstinline{E}. The only difference is at
-\lstinline{f} --- \lstinline{SubExpAlg[E]} is a subtype of
-\lstinline{ExpAlg[A]}. Since \lstinline{f} appear in parameter position of
-\lstinline{accept} and function parameters are contravariant, naturally we would
-hope that \lstinline{SubExp[E]} is a supertype of \lstinline{Exp[E]}. However,
+both contain an \lstinline{accept} method that takes an object algebra 
+and returns a value of the type \lstinline{E}. The only difference in
+\lstinline{SubExp} the object algebra
+\lstinline{v} is of type \lstinline{SubExpAlg[E]}, which is a subtype of
+\lstinline{ExpAlg[E]}. 
+
+\paragraph{Inheritance is not Subtyping}
+Since \lstinline{v} appears in parameter position of
+\lstinline{accept} and function parameters are naturally contravariant,
+\lstinline{SubExp[E]} should be a \emph{supertype} (and not a subtype)
+of \lstinline{Exp[E]}.  However, in Scala every extension induces a
+subtype. In other words type inheritance and subtyping always go along
+together.  To ensure type-soundness Scala (and other common OO
+languages) forbid any kind of type-refinement on method parameter
+types.  In other words method parameter types are invariant.
+The consequence of this is that Scala is not capable of expressing
+that \lstinline{SubExp[E]} is an extension and a supertype of
+\lstinline{Exp}. Such kind of extension is an example where
+``\emph{inheritance is not subtyping}``~\cite{cook1989inheritance}.
+
+\begin{comment}
+However,
 such subtyping relation does not fit well in Scala because inheritance implies
 subtyping in such languages \footnote{It is still possible to encode
   contravariant parameter types in Scala but doing so would require some
   technique.\bruno{what technique?}}. As \lstinline{SubExp[E]} extends
 \lstinline{Exp[E]}, the former becomes a subtype of the latter. This suffers
 from the ``Inheritance is Not Subtyping'' problem.
+\end{comment}
 
+\subsection{Extensible Visitors in \name}
 Such limitation does not exist in \name. For example, we can define the similar
-interfaces for \lstinline{Exp} and \lstinline{SubExp} as type aliases:
+interfaces for \lstinline{Exp} and \lstinline{SubExp}:
 \begin{lstlisting}{language=F2J}
-type Exp    = {accept: forall A. ExpAlg[A] -> A};
-type SubExp = {accept: forall A. SubExpAlg[A] -> A};
+type Exp    = {
+   accept: forall A. ExpAlg[A] -> A
+};
+type SubExp = {
+   accept: forall A. SubExpAlg[A] -> A
+};
 \end{lstlisting}
-Then by the typing judgment it holds that \lstinline{SubExp} is a supertype of
-\lstinline{Exp}. This relation gives desired results. To give a concrete
-example:
-
-First we define two data constructors for simple expressions:
+\name support contravariant parameter type refinement, which means that
+\lstinline{SubExp} is a supertype of \lstinline{Exp}. Using these
+types we first define two data constructors for simple expressions:
 \begin{lstlisting}{language=F2J}
 let lit (n: Int): Exp = {
-  accept = /\E -> \(f: ExpVisitor[E]) -> f.lit n
+  accept = /\E -> \(f: ExpAlg[E]) -> f.lit n
 };
 let add (e1: Exp) (e2: Exp): Exp = {
-  accept = /\E -> \(f: ExpVisitor[E]) -> f.add (e1.accept[E] f) (e2.accept[E] f)
+  accept = /\E -> \(f: ExpAlg[E]) -> 
+      f.add (e1.accept[E] f) (e2.accept[E] f)
 };
 \end{lstlisting}
 
-Later we augment the expressions with subtraction:
+\noindent Both \lstinline{lit} and \lstinline{add} build values of type
+\lstinline{Exp} and use object algebras of type \lstinline{ExpAlg[E]}. 
+However, subtraction requires a value of type \lstinline{SubExp} to be created:
 \begin{lstlisting}{language=F2J}
-let sub (e1: SubExp) (e2: SubExp): SubExp =
-  { accept = /\E -> \(f : SubExpVisitor[E]).
-               f.sub (e1.accept[E] f) (e2.accept[E] f) };
+let sub (e1: SubExp) (e2: SubExp): SubExp ={ 
+   accept = /\E -> \(f : SubExpAlg[E]) ->
+        f.sub (e1.accept[E] f) (e2.accept[E] f) 
+};
 \end{lstlisting}
 
 % One big benefit of using the visitor pattern is that programmers are able to
 % define structures in a more natural way. 
 
-As client code, \lstinline$e2 = sub (lit 2) (lit 3)$ defines an expression. The
-programmer is able to pass \lstinline{lit 2}, which is of type \lstinline{Exp},
+\paragraph{Usage} With visitors constructing expressions is quite simple:
+
+\begin{lstlisting}{language=F2J}
+e2 = sub (lit 7) (lit 2)
+\end{lstlisting}
+
+\noindent The programmer is able to pass \lstinline{lit 2}, which is of type \lstinline{Exp},
 to \lstinline{sub}, which expects a \lstinline{SubExp}. The types are compatible
 because because \lstinline$Exp$ is a \emph{subtype} of \lstinline$SubExp$. Code
 reuse is achieved since we can use the constructors from \lstinline$Exp$ as the
 constructor for \lstinline$SubExp$. In Scala, we would have to define two
 literal constructors, one for \lstinline$Exp$ and another for
-\lstinline$SubExp$! \bruno{Subtyping needs to be much more emphasized! See
-  Modular Visitor Components! }
+\lstinline$SubExp$! 
+
+Compared to object algebras, the addition of the composite structure
+allows values to be created much more intuitively, without any
+drawbacks! All the code developed with object algebras works right
+away with visitors. 
+
+Finally note that in terms of typing, this solution does not require
+any advanced use of generics. This is in sharp constrast with previous 
+proposals for extensible visitors in the literature.
 
 % \subsection{Yanlin stuff}
 % \bruno{This can be dropped.}
