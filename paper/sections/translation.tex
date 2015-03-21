@@ -3,14 +3,14 @@
 In this section we define the semantics of the call-by-value \name by means of a
 type-directed translation to a variant of System $F$. This translation turns
 merges into usual pairs, much like Dunfield's elaboration. In addition it
-removes labels of record and properly rewrite record selection and update
-operations into coercions. In the end we obtain target expressions which can be
-typed by System $F$ rules.
+removes labels of record and properly rewrite record operations into function
+applications. In the end we obtain target expressions which can be typed by
+System $F$ rules.
 
 \subsection{Informal Discussion}
 
 In this subsection we present the translation informally. Generally speaking,
-there are three ideas. The first idea is turning merges into pairs. Therefore,
+there are three ideas. The first idea is turning merges into pairs. For example,
 \begin{lstlisting}
 1,,"one"
 \end{lstlisting}
@@ -18,7 +18,15 @@ becomes
 \begin{lstlisting}
 (1,"one")
 \end{lstlisting}
-The second idea is erasing record labels:
+Now, suppose we want to apply a function that takes only integers to the merge
+\lstinline$1,,"one"$. A coercion, which is just a function in the target
+language, will be inserted before the target argument
+\begin{lstlisting}
+\(x:(Int,String) -> x._1) (1,"one")
+\end{lstlisting}
+before the whole term is ever fed into that function.
+(\lstinline{x._1}, following the Scala syntax, means extracting the first item
+from \lstinline$x$.) The second idea is erasing record labels:
 \begin{lstlisting}
 {name = "Barbara"}
 \end{lstlisting}
@@ -26,32 +34,29 @@ becomes just
 \begin{lstlisting}
 "Barbara"
 \end{lstlisting}
-To see an small application, consider the following program:
+To see how the two ideas are used together, consider the following program:
 \begin{lstlisting}
-{distance = {inLightYears = 3, inParsecs = 1}}
+{distance = {inKilometers = 8, inMiles = 5}}
 \end{lstlisting}
 Since multi-field records are just merges, it is desugared as
 \begin{lstlisting}
-{distance = {inLightYears = 3} ,, {inParsecs = 1}}
+{distance = {inKilometers = 8} ,, {inMiles = 5}}
 \end{lstlisting}
 and then translated to
 \begin{lstlisting}
-(3,1)
+(8,5)
 \end{lstlisting}
-by the two ideas above. Record selection is translated as the application of a
-coercion to the translated expression. For example,
+The third idea is translating record operations into the application of a
+coercion to the translated expression in the target language. For example,
 \begin{lstlisting}
-{distance = {value = 4.3, unit="light-year"}}.distance
+{distance = {inKilometers = 8, inMiles = 1}}.distance.inMiles
 \end{lstlisting}
 becomes
 \begin{lstlisting}
-(\ (x: ((Int,Int),Int)) -> (\ (x: (Int,Int)) -> x._1) x._1) ((1969,12),31)
+(\(x: (Int,Int)) -> x._2) (8,5)
 \end{lstlisting}
-The coercion 
-\begin{lstlisting}
-(\ (x: ((Int,Int),Int)) -> (\ (x: (Int,Int)) -> x._1) x._1) 
-\end{lstlisting}
-extracts the item inside the nested pair.
+Of course erasing record labels will result in loss of information. Hence the
+three ideas are applied simultaneously during the translation.
 
 \bruno{Don't abuse inlining of examples in the text!}
 
@@ -74,25 +79,26 @@ operational semantics can be found in standard texts~\cite{pierce2002types}.
 % \bruno{Why is this lemma placed here?}
 % \bruno{Generaly Speaking this text seems out of place.Move to 5.4, maybe?}
 
-The main translation judgment is $ \judgee \gamma e \tau \yields E $ which
-states that with respect to the typing context $ \gamma $, the \name expression
-$e$ is of $\tau$ and its translation is a target expression $ E $.
+% The main translation judgment is $ \judgee \gamma e \tau \yields E $ which
+% states that with respect to the typing context $ \gamma $, the \name expression
+% $e$ is of $\tau$ and its translation is a target expression $ E $.
 
-We also define the type translation function $ \im \cdot $ from \name types
-$ \tau $ to target types $ T $.
+\subsection{Type Translation}
+
+The type translation function, $\im \cdot$, from \name types to target types is
+shown in Figure~\ref{fig:type-translation}
 
 \begin{figure}[h]
 \input{rule_in_figures/type-translation.tex}
 \caption{Type translation.}
+\label{fig:type-translation}
 \end{figure}
 
-The rules given in this section are identical with those in
-Section~\ref{sec:fi}, except for the light blue part. The translation consists
-of four sets of rules, which are explained below:
+% The rules given in this section are identical with those in
+% Section~\ref{sec:fi}, except for the light blue part. The translation consists
+% of four sets of rules, which are explained below:
 
 \subsection{Subtyping (Coercion)}
-
-% \george{Talk about $ \eta $-expansion.}
 
 \begin{figure*}
 \input{rule_in_figures/elab-sub.tex}
@@ -208,7 +214,7 @@ will be used to coece the main \name expression.
   \[ "Isaac" \]
 
 
-\paragraph{``update'' rules.}\bruno{Missing example (and derivation)}
+\paragraph{``Update'' rules.}\bruno{Missing example (and derivation)}
 
   The ``update'' judgment deals spefically with record update can be thought as
   producing a field updater. Compared to the ``select'' rules, the ``update'' rules
