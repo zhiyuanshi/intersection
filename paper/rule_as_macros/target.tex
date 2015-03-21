@@ -4,6 +4,12 @@
   {\judget \Gamma x T}
 }
 
+\newcommand{\ruletunit} {
+\inferrule* [right=$\rulelabeltunit$]
+  { }
+  {\judget \Gamma {()} {()}}
+}
+
 \newcommand{\ruletlam} {
 \inferrule* [right=$\rulelabeltlam$]
   {\judget {\Gamma, x \hast T} E {T_1} \andalso \judgetwf \Gamma T}
