@@ -1,6 +1,6 @@
 \section{Proofs}
 
-\paragraph{Notation.} We present our proofs in two-column style: on the left are
+\paragraph{Notation.} We sketch our proofs in two-column style: on the left are
 the intermediate results and on the right are the justification (for the
 previous intermediate result to reach the corresponding left-hand side).
 
@@ -381,7 +381,14 @@ previous intermediate result to reach the corresponding left-hand side).
       & \ruleerecrestrictelab &
     \end{flalign*}
 
-    Similar to the above case except that we apply Lemma~\ref{lemma:restrict-correct}.
+    \begin{tabular}{rll}
+     & $ \judgerestrict \tau l {\tau_1} \yields C $ & Premise \\
+     & $ \judget \epsilon C {\im \tau \to \im {\tau_1}} $ & By Lemma~\ref{lemma:restrict-correct} \\
+     & $ \judget {\im \gamma} C {\im \tau \to \im {\tau_1}} $ &  \\
+     & $ \judgee \gamma e \tau \yields E $ & Premise \\
+     & $ \judget {\im \gamma} E {\im \tau} $ & By i.h. \\
+     & $ \judget {\im \gamma} {\app C E} {\im {\tau_1}} $ & By $ \rulelabeltapp $
+    \end{tabular} \\
 
   \item \textbf{Case}
     \begin{flalign*}
