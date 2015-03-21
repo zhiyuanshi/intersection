@@ -4,6 +4,12 @@
   {\alpha \subtype \alpha \yields {\lam x {\im \alpha} x}}
 }
 
+\newcommand{\rulesubtop}{
+\inferrule* [right=$\rulelabelsubtop$]
+  { }
+  {\tau \subtype \emptyrec \yields {\lam x {\im \tau} {()}}}
+}
+
 \newcommand{\rulesubfun}{
 \inferrule* [right=$\rulelabelsubfun$]
   {\tau_3 \subtype \tau_1 \yields {C_1} \andalso \tau_2 \subtype \tau_4 \yields {C_2}}

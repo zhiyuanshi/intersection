@@ -5,6 +5,10 @@
   { }
   {\alpha \subtype \alpha}
 
+\inferrule* [right=$\rulelabelsubtop$]
+  { }
+  {\tau \subtype \emptyrec}
+
 \inferrule* [right=$\rulelabelsubfun$]
   {\tau_3 \subtype \tau_1 \andalso \tau_2 \subtype \tau_4}
   {\tau_1 \to \tau_2 \subtype \tau_3 \to \tau_4}

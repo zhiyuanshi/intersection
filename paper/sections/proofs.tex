@@ -134,6 +134,42 @@ previous intermediate result to reach the corresponding left-hand side).
 \end{proof}
 
 
+\begin{lemma}[\rulelabelres~rules produce type-correct coercion] \label{lemma:get-correct}
+  If $ \judgeres \tau l {\tau_1} \yields C $, then $ \judget \epsilon C {\im \tau \to \im {\tau_1}} $.
+\end{lemma}
+
+\begin{proof}
+  By structural induction of the derivation.
+
+  \begin{itemize}
+
+  \item \textbf{Case}
+    \begin{flalign*}
+      & \rulereselab &
+    \end{flalign*}
+
+    \begin{tabular}{rll}
+    \end{tabular} \\
+
+  \item \textbf{Case}
+    \begin{flalign*}
+      & \ruleresleftelab &
+    \end{flalign*}
+
+    \begin{tabular}{rll}
+    \end{tabular} \\
+
+  \item \textbf{Case}
+    \begin{flalign*}
+      & \ruleresrightelab &
+    \end{flalign*}
+
+    By symmetry with the above case. \\
+
+\end{itemize}
+\end{proof}
+
+
 \begin{lemma}[\rulelabelput~rules produce type-correct coercion] \label{lemma:put-correct}
   If $ \judgeput \tau l {\tau_1 \yields E} {\tau_2} {\tau_3} \yields C $ and $
   \judget \Gamma E {\im {\tau_1}} $ for some $ \Gamma $, then

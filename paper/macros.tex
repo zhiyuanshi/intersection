@@ -21,12 +21,13 @@
 % Types
 \newcommand{\for}[2]{\forall #1. \binderspacing #2}
 \newcommand{\recty}[2]{\{ #1 \hast #2 \}}
+\newcommand{\emptyrec}{\{\}}
 \newcommand{\andop}{\with}
 \newcommand{\pair}[2]{(#1, #2)}
 
 % Expressions
 \newcommand{\lam}[3]{\lambda (#1 \hast #2).\binderspacing #3}
-\newcommand{\blam}[2]{\lambda #1.\binderspacing #2}
+\newcommand{\blam}[2]{\Lambda #1.\binderspacing #2}
 \newcommand{\app}[2]{#1 \appspacing #2}
 \newcommand{\tapp}[2]{#1 \appspacing #2}
 \newcommand{\mergeop}{,,}
@@ -51,6 +52,7 @@
 % Subtyping labels
 \newcommand{\rulelabelsub}{\bm{\textcolor{subcolor}{sub}}}
 \newcommand{\rulelabelsubvar}{\rulelabelsub\text{var}}
+\newcommand{\rulelabelsubtop}{\rulelabelsub\text{top}}
 \newcommand{\rulelabelsubfun}{\rulelabelsub\text{fun}}
 \newcommand{\rulelabelsubforall}{\rulelabelsub\text{forall}}
 \newcommand{\rulelabelsuband}{\rulelabelsub\text{and}}
@@ -63,6 +65,7 @@
 \newcommand{\judgee}[3]{#1 \; \textcolor{elabcolor}{\turns} \; #2 \; \textcolor{elabcolor}{:} \; #3}
 \newcommand{\rulelabele}{\bm{\textcolor{elabcolor}{E}}}
 \newcommand{\rulelabelevar}{\rulelabele\text{var}}
+\newcommand{\rulelabeletop}{\rulelabele\text{top}}
 \newcommand{\rulelabelelam}{\rulelabele\text{lam}}
 \newcommand{\rulelabeleapp}{\rulelabele\text{app}}
 \newcommand{\rulelabeleblam}{\rulelabele\text{blam}}
@@ -70,6 +73,7 @@
 \newcommand{\rulelabelemerge}{\rulelabele\text{merge}}
 \newcommand{\rulelabelereccon}{\rulelabele\text{rec-con}}
 \newcommand{\rulelabelerecsel}{\rulelabele\text{rec-sel}}
+\newcommand{\rulelabelerecres}{\rulelabele\text{rec-res}}
 \newcommand{\rulelabelerecupd}{\rulelabele\text{rec-upd}}
 
 % Target typing judgment and labels
@@ -98,6 +102,13 @@
 \newcommand{\rulelabelput}{\bm{\textcolor{getputcolor}{put}}}
 \newcommand{\rulelabelputleft}{{\rulelabelput}_1}
 \newcommand{\rulelabelputright}{{\rulelabelput}_2}
+
+% Restriction judgment and labels
+\newcommand{\judgeres}[3]{#1 \bm{-} #2 = #3}
+
+\newcommand{\rulelabelres}{\bm{\textcolor{getputcolor}{res}}}
+\newcommand{\rulelabelresleft}{{\rulelabelres}_1}
+\newcommand{\rulelabelresright}{{\rulelabelres}_2}
 
 
 % Presentation

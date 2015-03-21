@@ -2,10 +2,10 @@
 \begin{array}{l}
   \begin{array}{llrl}
     \text{Types} 
-    & \tau & \Coloneqq & \alpha \mid \tau_1 \to \tau_2 \mid \for \alpha \tau \mid
+    & \tau & \Coloneqq & \alpha \mid \emptyrec \mid \tau_1 \to \tau_2 \mid \for \alpha \tau \mid
                          \tau_1 \andop \tau_2 \mid \recty l \tau \\
     \text{Expressions} 
-    & e & \Coloneqq & x \mid \blam \alpha e \mid \tapp e \tau \mid \lam x \tau e \mid \app e_1 e_2 \\
+    & e & \Coloneqq & x \mid \emptyrec \mid \lam x \tau e \mid \app e e \mid \blam \alpha e \mid \tapp e \tau \\
     &   & \mid      & \highlight {e \mergeop e} \mid \highlight {\reccon l e} \mid
                       \highlight {e.l} \\
     & & \mid & \recupd e l e \\
