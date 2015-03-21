@@ -1,6 +1,6 @@
 % Typing 
 \begin{mathpar}
-  \framebox{$ \judgee \gamma e \tau \yields E $} \and
+  \framebox{$ \judgee \gamma e \tau $} \and
   \ruleevar \and \ruleetop \and
   \ruleelam  \and \ruleeapp \and
   \ruleeblam \and \ruleetapp \and
@@ -12,20 +12,20 @@
 
 % Selection
 \begin{mathpar}
-  \framebox{$\judgeselect {\tau_1} l \tau_2 \yields C$} \and
+  \framebox{$\judgeselect {\tau_1} l \tau_2 $} \and
   \ruleget \and \rulegetleft \and \rulegetright
 \end{mathpar}
 
 
 % Restriction
 \begin{mathpar}
-  \framebox{$\judgerestrict {\tau_1} l \tau_2 \yields C$} \and
+  \framebox{$\judgerestrict {\tau_1} l \tau_2 $} \and
   \rulerestrict \and \rulerestrictleft \and \rulerestrictright
 \end{mathpar}
 
 
 % Update
 \begin{mathpar}
-  \framebox{$\judgeupdate \tau l {\tau \yields E} {\tau_2} {\tau_3}$} \and
+  \framebox{$\judgeupdate \tau l \tau {\tau_2} {\tau_3}$} \and
   \ruleupdate \and \ruleupdateleft \and \ruleupdateright
 \end{mathpar}
