@@ -26,18 +26,20 @@ for those in System $F$ (starting to appear in the next section).
 \end{figure}
 
 We use the meta-variable $\tau$ to range over types. Types include System $F$
-constructs variable $ \alpha $; function types $ \tau_1 \to \tau_2 $; and type
-abstraction $ \for \alpha \tau $. $ \tau_1 \andop \tau_2 $ denotes the
-intersection of type $ \tau_1 $ and $ \tau_2 $; and $ \recty l \tau $ the types
-for single-field records. Single-field record types can be viewed as types
-tagged with a label $l$, while the other type forms are untagged types. We omit
-type constants such as \lstinline$Int$ and \lstinline$String$.
+constructs variable $ \alpha $; the top type $\top$ (supertype of all types);
+function types $ \tau_1 \to \tau_2 $; and type abstraction $ \for \alpha \tau $.
+$ \tau_1 \andop \tau_2 $ denotes the intersection of type $ \tau_1 $ and
+$ \tau_2 $; and $ \recty l \tau $ the types for single-field records.
+Single-field record types can be viewed as types tagged with a label $l$, while
+the other type forms are untagged types. We omit type constants such as
+\lstinline$Int$ and \lstinline$String$.
 % \bruno{be consistent: in the source language we use \&, and in the
 % formalization we use $\andop$}
 
 Expressions are ranged over by meta-variables $e$. 
 Standard constructs in System $F$ are 
 variables $ x $; 
+the canonical term that inhabits the top type, also written as $\top$;
 abstraction of expressions over variables of a given type $ \lam x \tau e $ (concretely written \lstinline$\(x:T) -> e$); 
 abstraction of expressions over types $ \blam \alpha e $ (concretely written \lstinline$/\A -> e$); 
 value application $ \app e_1 e_2 $;
@@ -116,15 +118,16 @@ that are explicitly declared by the programmer.
   \label{fig:fi-subtyping}
 \end{figure*}
 
-Subtyping rules of \name are shown in Figure~\ref{fig:fi-subtyping}. The rule
-$\rulelabelsubfun$ says that functions are contravariant in their parameter type
-and covariant in their return type. A universal quantifier ($\forall$) is
-covariant in its body. A single-field record type is also covariant, which
-becomes obvious if we regard it as just a labelled type. The three rules dealing
-with intersection types are just what one would expect when interpreting types
-as sets. Under this interpretation, for example, the rule $\rulelabelsuband$
-says that if $\tau_1$ is both the subset of $\tau_2$ and $\tau_3$, then $\tau_1$
-is also the subset of the intersection of $\tau_2$ and $\tau_3$.
+Subtyping rules of \name are shown in Figure~\ref{fig:fi-subtyping}. They them
+are not very surprising. The rule $\rulelabelsubfun$ says that functions are
+contravariant in their parameter type and covariant in their return type. A
+universal quantifier ($\forall$) is covariant in its body. A single-field record
+type is also covariant, which becomes obvious if we regard it as just a labelled
+type. The three rules dealing with intersection types are just what one would
+expect when interpreting types as sets. Under this interpretation, for example,
+the rule $\rulelabelsuband$ says that if $\tau_1$ is both the subset of $\tau_2$
+and $\tau_3$, then $\tau_1$ is also the subset of the intersection of $\tau_2$
+and $\tau_3$.
 
 % Intersection types introduce natural subtyping relations among types. For
 % example, $ \Int \andop \Bool $ should be a subtype of $ \Int $, since the former
@@ -146,8 +149,8 @@ is also the subset of the intersection of $\tau_2$ and $\tau_3$.
 % the fields.
 
 It is easy to see that subtyping is reflexive and transitive. For the
-corresponding mechanized proofs in Coq, refer to $sub\_refl.v$ and
-$sub\_trans.v$.
+corresponding mechanized proofs in Coq, refer to \textit{sub\_refl.v} and
+\textit{sub\_trans.v}.
 
 \subsection{Typing}
 
@@ -171,10 +174,10 @@ $e_1 \mergeop e_2$, we typechecks $e_1$ and $e_2$ respectively, and give it the
 intersection of the resulting types $\tau_1 \andop \tau_2$. The rule for
 single-field record construction ($\rulelabelereccon$) is standard. The rules
 for record selection ($\rulelabelerecselect$) and update ($\rulelabelerecupd$) are
-expectedly the most complicated. They turn to the auxiliary ``get'' and ``put''
+expectedly the most complicated. They turn to the auxiliary ``select'' and ``update''
 rules to statically check operations and to obtain resulting types.
 
-The ``get'' judgment deals with record selection and captures the intuition
+The ``select'' judgment deals with record selection and captures the intuition
 that, for example, if an expression has type
 \begin{lstlisting}
 {id: Long, name: String, score: Float}
@@ -190,7 +193,7 @@ $\rulelabelselectleft$ for example, it means that if $l$ is present inside
 $\tau_1$, then it is also present inside $\tau_1 \andop \tau_2$; and the type of
 the desired field $l$ remains $\tau$ in the conclusion.
 
-The ``put'' judgment deals with record update and is similar to the ``get''
+The ``update'' judgment deals with record update and is similar to the ``select''
 judgment in spirit. Consider the same example:
 \begin{lstlisting}
 {id: Long, name: String, score: Float}
