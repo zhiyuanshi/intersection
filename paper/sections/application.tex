@@ -1,18 +1,27 @@
-\section{Application} \label{sec:application}
+\section{Applications to Extensibility} \label{sec:application}
 
 % Structural subtyping facilitates reuse~\cite{malayeri2008integrating}.
 % \bruno{orphan sentence!}
 
-This section shows that the System $ F $ plus intersection types are enough for
-encoding extensible designs, and even beat the designs in languages with a much
-more sophisticated type system (such as Scala). That is because \name has two
-main advantages over existing languages:
+\bruno{Make sure that the important code in the paper is reused from a script
+  and not inlined directly in the text.}
+
+This section shows that, although \name is a minimal language, its
+features are enough for encoding extensible designs that been
+presented in mainstream languages. Moreover \name addresses
+limitations of those languages, making those designs significantly
+simpler. There are two main advantages of \name over existing
+languages:
 
 \begin{enumerate}
-\item It supports dynamic composition of intersecting values.
-\item It supports contravariant parameter types in the subtyping relation.
+\item \name supports dynamic composition of intersecting values.
+\item \name supports contravariant parameter types in the subtyping relation.
 \end{enumerate}
 
+These two features avoid the use of low-level programming techniques,
+and make the designs less reliant on advanced features of generics. 
+
+\begin{comment}
 Various solutions have been proposed to deal with the extensibility problems and
 many rely on heavyweight language features such as abstract methods and classes
 in Java. These two features can be used to improve existing designs of modular
@@ -23,17 +32,14 @@ programs.
   along those lines? That will be a good intro for object algebras and
 visitors!}
 
-\begin{comment}
+
 \url{http://repository.cmu.edu/cgi/viewcontent.cgi?article=3018&context=compsci}
 Church encoding allows modelling algebraic data types. 
 \end{comment}
 
 % Introduce the expression problem
 
-The Expression Problem~\cite{wadler1998expression} refers to the difficulty of
-adding a new operations and a new data variant without changing or duplicating
-existing code. We will be solving the Expression Problem to demonstrate the
-capability of our language.
+
 
 % There has been recently a lightweight solution to the expression problem that
 % takes advantage of covariant return types in Java. We show that \name is able
@@ -121,110 +127,179 @@ capability of our language.
 % The value level counterpart are functions of the type \lstinline
 % {A => B => A with B}. \footnote{FIXME}
 
-Oliveira~\cite{} noted that composition of object algebras can be cumbersome and
-language support for intersection types would solve that problem. 
+Oliveira and Cook~\cite{} proposed a design pattern that can solve the
+Expression Problem in languages like Java. An advantage of the pattern
+over previous solutions is that it is relatively lightweight in terms
+of type system features. In a latter paper, Oliveira et al.~\cite{}
+noted some limitations of the original design pattern and proposed 
+some new techniques that generalized the original pattern, allowing it 
+to express programs in a Feature-Oriented Programming~\cite{} style.
+Key to these techniques was the ability to dynamically compose object
+algebras.
+
+Unfortunatelly, dynamic composition of Object Algebras is
+non-trivial. At the type-level it is possible to express the resulting
+type of the composition using intersection types. Thus, it is still
+possible to solve that part problem nicely in a language like Scala (which
+has basic support for intersection types). However, the dynamic
+composition itself cannot be easily encoded in Scala. The fundamental 
+issue is that Scala lacks a \lstinline{merge} operator (see the
+discussion in Section~\ref{}). Although both Oliveira et al.~\cite{} and
+Rendell et al.~\cite{} have shown that such a \lstinline{merge} operator can
+be encoded in Scala, the encoding fundamentally relies in low-level
+programming techniques such as dynamic proxies, reflection or
+meta-programming. 
+
+Because \name supports a \lstinline{merge} operator natively, dynamic
+object algebra composition becomes easy to encode. The remainder of
+this section shows how object algebras and object algebras composition
+can be encoded in \name. We will illustrate this point with an
+step-by-step of solving the Expression Problem. 
+%%Prior knowledge of object algebras is not assumed.
+ 
+% can be cumbersome and
+% language support for intersection types would solve that problem. 
 % Our type system is just a simple extension of System $ F $; yet surprisingly, it
 % is able to solve the limitations of using object algebras in languages such as
 % Java and Scala.
-We will illustrate this point with an step-by-step of solving the Expression
-Problem. Prior knowledge of object algebra is not assumed.
 
-\paragraph{Initial features.}
-As the base scenario, we consider expressions with two variants (literal and
+\paragraph{A Simple System of Arithmetic Expressions} 
+In the Expression Problem, the idea is to start with a very simple
+system modeling arithmetic expressions and evaluation.
+The initial system considers expressions with two variants (literals and
 addition) and one operation (evaluation). Here is an interface that supports
 evaluation:
 \begin{lstlisting}{language=F2J}
 type IEval = {eval: Int};
 \end{lstlisting}
-and an object algebra interface, \lstinline$ExpAlg$, for expression types with
-the two variants. It has fixed number of variants, but is abstracted over the
-the type of the interpretation \lstinline$E$.
-\begin{lstlisting}{language=F2J}
-type ExpAlg[E] = {lit: Int -> E, add: E -> E -> E};
-\end{lstlisting}
-To illustrate the point of this abstraction, \lstinline$ExpAlg[IEval]$ will be
-the type of object algebras with evaluation as the interpretation, whereas
-\lstinline$ExpAlg[IEval & IPrint]$ will be the type of object algebras that
-support both evaluation and pretty printing.
 
+\noindent In \name the interfaces of objects (or object types) are expressed as
+a record type. A \lstinline{type} declaration allow us to create a
+simple alias for a type.  In this case \lstinline{IEval} is an alias
+for \{\lstinline{eval: Int}\}.
+
+With object algebras, the idea is to create an object algebra
+interface, \lstinline$ExpAlg$, for expression types with the two
+variants. This interface has a fixed number of variants, but abstracts over the
+the type of the interpretation \lstinline$E$.
+
+\begin{lstlisting}{language=F2J}
+type ExpAlg[E] = {
+   lit: Int -> E, 
+   add: E -> E -> E
+};
+\end{lstlisting}
+% whereas
+%\lstinline$ExpAlg[IEval & IPrint]$ will be the type of object algebras that
+%support both evaluation and pretty printing.
 % In \name, record types are structural and hence any value that satisfies this
 % interface is of type \lstinline$IEval$ or of a subtype of \lstinline$IEval$.
 % \footnote{Should be mentioned in S2.}
-
 Having defined the interfaces, we can implement that object algebra interface
-with \lstinline$evalAlg$, which is an object algebra for evluation. Contrary to
-nominal type systems as in most statically typed OO languages, the interface
-being implemented here, \lstinline$ExpAlg[Int]$, is not required. But we put the
-type ascription nonetheless for clarity and comparison.
+with \lstinline$evalAlg$, which is an object algebra for evaluation. 
 \begin{lstlisting}{language=F2J}
-let evalAlg: ExpAlg[E] = {
+let evalAlg: ExpAlg[IEval] = {
   lit = \(x: Int) -> {eval = x},
-  add = \(x: IEval) (y: IEval) -> {eval = x.eval + y.eval}
+  add = \(x: IEval) (y: IEval) -> {
+     eval = x.eval + y.eval
+  }
 };
 \end{lstlisting}
 
-\paragraph{Add a subtraction variant.}
-The first evolution is adding a new variant, say, subtraction. We can do so by
-simply intersecting the original types and merging with the original values.
+In this example we implement a record, where the two operations 
+\lstinline{lit} and \lstinline{add} return a record with type \lstinline{IEval}.
+The type\lstinline$ExpAlg[IEval]$ is the type of object algebras
+supporting evaluation. However, the one interesting point
+of object algebras is that other operations can be supported as
+well. 
+
+\paragraph{Add a subtraction variant} The point of the Expression
+Problem support the addition of new features to the existing
+program, without modifying existing code. 
+The first feature is adding a new variant, such as subtraction. We can do so by
+simply intersecting the original types and merging with the original values:
 \begin{lstlisting}{language=F2J}
-type SubExpAlg[E] = ExpAlg[E] & {sub: E -> E -> E};
-let subEvalAlg = evalAlg ,, {sub = \(x: IEval) (y: IEval) -> { eval = x.eval - y.eval }};
+type SubExpAlg[E] = 
+   ExpAlg[E] & {sub: E -> E -> E};
+let subEvalAlg = evalAlg ,, {
+   sub = \(x: IEval) (y: IEval) -> { 
+      eval = x.eval - y.eval 
+   }
+};
 \end{lstlisting}
 
-\paragraph{Add a pretty printing operation.}
-As the second evolution, we add pretty printing. Similar to how we have defined
-evaluation, we can describe the pretty printing feature as:
+\noindent Note that here intersection types are used to model \emph{type
+  inheritance} and the merge operator models a basic form of
+\emph{dynamic implementation inheritance}. 
+
+\paragraph{Add a pretty printing operation}
+A second extension adding a new operation, such as pretty printing. 
+Similar to evaluation, the interface of the pretty printing feature
+is modeled as:
 \begin{lstlisting}{language=F2J}
 type IPrint = {print : String};
 \end{lstlisting}
-We can implement pretty printing for expressions that support literals,
-addition, and subtraction:
+The implementation of pretty printing for expressions that support literals,
+addition, and subtraction is:
 \begin{lstlisting}{language=F2J}
-let printAlg : SubExpAlg[String] = {
+let printAlg : SubExpAlg[IPrint] = {
   lit = \(x: Int) -> {print = x.toString()},
-  add = \(x: IPrint) (y: IPrint) -> {print = x.print ++ " + " ++ y.print},
-  sub = \(x: IPrint) (y: IPrint) -> {print = x.print ++ " - " ++ y.print}
+  add = \(x: IPrint) (y: IPrint) -> {
+     print = x.print ++ " + " ++ y.print
+  },
+  sub = \(x: IPrint) (y: IPrint) -> {
+     print = x.print ++ " - " ++ y.print
+  }
 };
 \end{lstlisting}
 
-\paragraph{Usage.}
-Provided with the definitions above, we can then create values using the
-appropriate algebras. For example:
+\paragraph{Usage}
+With the definitions above, values are created using the
+appropriate algebras. For example, the expression \lstinline{7 - 2} 
+is encoded as follows:
 \begin{lstlisting}{language=F2J}
-let e1[E] (f: SubExpAlg[E]) = f.sub (f.lit 7) (f.lit 2);
+let e1[E] (f: SubExpAlg[E]) = 
+   f.sub (f.lit 7) (f.lit 2);
 \end{lstlisting}
 
-The expressions are unusual in the sense that they are functions that take an
-extra argument \lstinline$f$, the object algebras, and use the data constructors
-provided by the object algebra (factory) \lstinline$f$ such as \lstinline$lit$,
-\lstinline$add$ and \lstinline$sub$ to create values. Moreover, The algebras
-themselves are abstracted over the allowed operations such as evaluation and
-pretty printing by requiring the expression functions to take an extra argument
-\lstinline$E$.
+\noindent The expressions are unusual in the sense that they are
+functions that take an extra argument \lstinline$f$. The extra
+argument is an object algebra that uses the functions in the record
+(\lstinline$lit$, \lstinline$add$ and \lstinline$sub$) as factory
+methods for creating values. Moreover, the algebras themselves are
+abstracted over the allowed operations such as evaluation and pretty
+printing by requiring the expression functions to take an extra
+argument \lstinline$E$.
 
-If we would like to have an expression that supports both evaluation and pretty
-printing, we will need a mechanism to combine the evaluation and printing
-algebras. Intersection types allows such composition: the \lstinline$merge$
-function, which takes two expression algebras to create a combined algebra. It
-does so by constructing a new expression algebra, a record whose each field is a
-function that delegates the input to the two algebras taken.
+\paragraph{Dynamic Object Algebra Composition}
+To obtain an expression that supports both evaluation and pretty
+printing, a mechanism to combine the evaluation and printing
+algebras is needed. \name allows such composition: the \lstinline$combine$
+function, which takes two object algebras to create a combined algebra. It
+does so by constructing a new object algebra where each field is a
+function that delegates the input to the two algebra parameters.
 \begin{lstlisting}{language=F2J}
-let merge [A] [B] (f: ExpAlg[A]) (g: ExpAlg[B]) = {
-  lit = \(x: Int) -> f.lit x ,, g.lit x,
-  add = \(x: A & B) (y: A & B) ->
+let combine[A,B](f: ExpAlg[A])(g: ExpAlg[B]) : 
+  ExpAlg[A&B] = {
+    lit = \(x: Int) -> f.lit x ,, g.lit x,
+    add = \(x: A & B) (y: A & B) ->
           f.add x y ,, g.add x y
-}
+  }
 \end{lstlisting}
 
 \begin{lstlisting}{language=F2J}
-let newAlg = merge[IEval] [IPrint] subEvalAlg printAlg;
-let o = e1 [IEval&IPrint] newAlg;
+let newAlg = 
+   combine[IEval,IPrint] subEvalAlg printAlg;
+let o = e1[IEval&IPrint] newAlg;
 o.print ++ " = " ++ o.eval.toString()
 \end{lstlisting}
-% \bruno{Don't start a sentence with \lstinline$o1$.}
-Note that \lstinline$o1$ is a single object created that supports both
-evaluation and printing, thus achieving feature-oriented programming in this
-sense.
+
+Note that \lstinline$o$ is a single object that supports both
+evaluation and printing. 
+
+In contrast to the Scala solutions available in the
+literature~\cite{}, \name is able to express object algebra
+composition very directly by using the merge operator. 
 
 \subsection{Visitors}
 
