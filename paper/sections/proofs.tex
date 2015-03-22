@@ -2,7 +2,7 @@
 
 \paragraph{Notation.} We sketch our proofs in two-column style: on the left are
 the intermediate results and on the right are the justification (for the
-previous intermediate result to reach the corresponding left-hand side).
+previous intermediate result to reach the corresponding left-hand side). 
 
 \subsection{Elaboration}
 
@@ -128,7 +128,7 @@ previous intermediate result to reach the corresponding left-hand side).
       & $ \judget {\epsilon, x \hast \im {\tau_1 \andop \tau_2}} x {\pair {\im {\tau_1}} {\im {\tau_2}}} $ & By the definition of $\im \cdot$ \\
       & $ \judget {\epsilon, x \hast \im {\tau_1 \andop \tau_2}} {\proj 1 x} {\im {\tau_1}} $ & By $\rulelabeltprojleft$ \\
       & $ \judget \epsilon C {\im {\tau_1} \to \im \tau} $ & By i.h. \\
-      & $ \judget {\epsilon, x \hast \im {\tau_1 \andop \tau_2}} C {\im {\tau_1} \to \im \tau} $ &  \\
+      & $ \judget {\epsilon, x \hast \im {\tau_1 \andop \tau_2}} C {\im {\tau_1} \to \im \tau} $ & By weakening \\
       & $ \judget {\epsilon, x \hast \im {\tau_1 \andop \tau_2}} {\app C {(\proj 1 x)}} {\im \tau} $ & By $\rulelabeltapp$ \\
       & $ \judget \epsilon {\lam x {\im {\tau_1 \andop \tau_2}} {\app C {(\proj 1 x)}}} {\im {\tau_1 \andop \tau_2} \to \im \tau} $ & By $ \rulelabeltlam $
     \end{tabular} \\
@@ -159,7 +159,7 @@ previous intermediate result to reach the corresponding left-hand side).
     \end{flalign*}
 
     \begin{tabular}{rll}
-      & $ \judget \epsilon {\lam x {\im {\recty l \tau}} {()}} {\im {\recty l \tau} \to ()} $ & \\
+      & $ \judget \epsilon {\lam x {\im {\recty l \tau}} {()}} {\im {\recty l \tau} \to ()} $ & By $\rulelabeltunit$ and $\rulelabeltlam$ \\
       & $ \judget \epsilon {\lam x {\im {\recty l \tau}} {()}} {\im {\recty l \tau} \to \im \top} $ & By the definition of $\im \cdot$  
     \end{tabular} \\
 
@@ -223,7 +223,7 @@ previous intermediate result to reach the corresponding left-hand side).
       & $ \judget {\Gamma, x \hast \im {\tau_1 \andop \tau_2}} x {\pair {\im {\tau_1}} {\im {\tau_2}}} $ & By the definition of $\im \cdot$ \\
       & $ \judget {\Gamma, x \hast \im {\tau_1 \andop \tau_2}} {\proj 1 x} {\im {\tau_1}} $ & By $\rulelabeltprojleft$ \\
       & $ \judget \Gamma C {\im {\tau_1} \to \im {\tau_3}} $ & By i.h. \\ 
-      & $ \judget {\Gamma, x \hast \im {\tau_1 \andop \tau_2}} C {{\im {\tau_1}} \to \im {\tau_3}} $ & \\ 
+      & $ \judget {\Gamma, x \hast \im {\tau_1 \andop \tau_2}} C {{\im {\tau_1}} \to \im {\tau_3}} $ & By weakening \\ 
       & $ \judget {\Gamma, x \hast \im {\tau_1 \andop \tau_2}} {\app C {(\proj 1 x)}} {\im {\tau_3}} $ & By $\rulelabeltapp$ \\
       & $ \judget \Gamma {\lam x {\im {\tau_1 \andop \tau_2}} {\app C {(\proj 1 x)}}} {\im {\tau_1 \andop \tau_2} \to \im {\tau_3}} $ & By $\rulelabeltlam$
     \end{tabular} \\
@@ -278,7 +278,7 @@ previous intermediate result to reach the corresponding left-hand side).
 
     \begin{tabular}{rll}
      & $ (x,\tau) \in \gamma $ & Premise \\
-     & $ (x,\im \tau) \in \im \gamma $ & \\
+     & $ (x,\im \tau) \in \im \gamma $ & By the definition of $ \im \cdot $ \\
      & $ \judget {\im \gamma} x {\im \tau} $ & By $ \rulelabeltvar $
     \end{tabular} \\
 
@@ -300,7 +300,7 @@ previous intermediate result to reach the corresponding left-hand side).
     \begin{tabular}{rll}
       & $ \judgee {\gamma, x \hast \tau} e {\tau_1} \yields E $ & Premise \\
       & $ \judget {\im {\gamma, x \hast \tau}} E {\im {\tau_1}} $ & By i.h. \\
-      & $ \judget {\im \gamma, x \hast \im \tau} E {\im {\tau_1}} $ & \\
+      & $ \judget {\im \gamma, x \hast \im \tau} E {\im {\tau_1}} $ & By the definition of $ \im \cdot $ \\
       & $ \judget {\im \gamma} {\lam x {\im \tau} E} {\im \tau \to \im {\tau_1}} $ & By $ \rulelabeltlam $ \\
       & $ \judget {\im \gamma} {\lam x {\im \tau} E} {\im {\tau \to \tau_1}} $ & By the definition of $ \im \cdot $ 
     \end{tabular} \\
@@ -328,7 +328,7 @@ previous intermediate result to reach the corresponding left-hand side).
     \begin{tabular}{rll}
       & $ \judgee {\gamma, \alpha} e \tau \yields E $ & Premise \\
       & $ \judget {\im {\gamma, \alpha}} E {\im \tau} $ & By i.h. \\
-      & $ \judget {\im \gamma, \alpha} E {\im \tau} $ &  \\
+      & $ \judget {\im \gamma, \alpha} E {\im \tau} $ & By the definition of $ \im \cdot $ \\
       & $ \judget {\im \gamma} {\blam \alpha E} {\for \alpha {\im \tau}} $ & By $ \rulelabeltblam $ \\
       & $ \judget {\im \gamma} {\blam \alpha E} {\im {\for \alpha \tau}} $ & By the definition of $ \im \cdot $
     \end{tabular} \\
@@ -345,7 +345,7 @@ previous intermediate result to reach the corresponding left-hand side).
      & $ \judgeewf \gamma \tau $ & Premise \\
      & $ \judgetwf {\im \gamma} {\im \tau} $ & By Lemma~\ref{lemma:preserve-wf} \\
      & $ \judget \gamma {\tapp E {\im \tau}} {\subst {\im \tau} \alpha {\im {\tau_1}}} $ & By $ \rulelabelttapp $ \\
-     & $ \judget \gamma {\tapp E {\im \tau}} {\im {\subst \tau \alpha {\tau_1}}} $ &  
+     & $ \judget \gamma {\tapp E {\im \tau}} {\im {\subst \tau \alpha {\tau_1}}} $ & By substitution lemma
     \end{tabular} \\
 
   \item \textbf{Case}
@@ -380,7 +380,7 @@ previous intermediate result to reach the corresponding left-hand side).
     \begin{tabular}{rll}
      & $ \judgeselect \tau l {\tau_1} \yields C $ & Premise \\
      & $ \judget \epsilon C {\im \tau \to \im {\tau_1}} $ & By Lemma~\ref{lemma:select-correct} \\
-     & $ \judget {\im \gamma} C {\im \tau \to \im {\tau_1}} $ &  \\
+     & $ \judget {\im \gamma} C {\im \tau \to \im {\tau_1}} $ & By weakening \\
      & $ \judgee \gamma e \tau \yields E $ & Premise \\
      & $ \judget {\im \gamma} E {\im \tau} $ & By i.h. \\
      & $ \judget {\im \gamma} {\app C E} {\im {\tau_1}} $ & By $ \rulelabeltapp $
@@ -394,26 +394,26 @@ previous intermediate result to reach the corresponding left-hand side).
     \begin{tabular}{rll}
      & $ \judgerestrict \tau l {\tau_1} \yields C $ & Premise \\
      & $ \judget \epsilon C {\im \tau \to \im {\tau_1}} $ & By Lemma~\ref{lemma:restrict-correct} \\
-     & $ \judget {\im \gamma} C {\im \tau \to \im {\tau_1}} $ &  \\
+     & $ \judget {\im \gamma} C {\im \tau \to \im {\tau_1}} $ & By weakening \\
      & $ \judgee \gamma e \tau \yields E $ & Premise \\
      & $ \judget {\im \gamma} E {\im \tau} $ & By i.h. \\
      & $ \judget {\im \gamma} {\app C E} {\im {\tau_1}} $ & By $ \rulelabeltapp $
     \end{tabular} \\
 
-  \item \textbf{Case}
-    \begin{flalign*}
-      & \ruleerecupdateelab &
-    \end{flalign*}
+  % \item \textbf{Case}
+  %   \begin{flalign*}
+  %     & \ruleerecupdateelab &
+  %   \end{flalign*}
 
-    \begin{tabular}{rll}
-      & $ \judgee \gamma {e_1} {\tau_1} \yields {E_1} $ & Premise \\
-      & $ \judget {\im \gamma} {E_1} {\im {\tau_1}} $ & By i.h. \\
-      & $ \judgeupdate \tau l {\tau_1 \yields {E_1}} {\tau_2} {\tau_3} \yields C $ & Premise \\
-      & $ \judget {\im \gamma} C {\im \tau \to \im {\tau_2}} $ & By Lemma~\ref{lemma:update-correct} \\
-      & $ \judgee \gamma e \tau \yields E $ & Premise \\
-      & $ \judget {\im \gamma} E {\im \tau} $ & By i.h. \\
-      & $ \judget {\im \gamma} {\app C E} {\im {\tau_2}} $ & By $ \rulelabeltapp $
-    \end{tabular} \\
+  %   \begin{tabular}{rll}
+  %     & $ \judgee \gamma {e_1} {\tau_1} \yields {E_1} $ & Premise \\
+  %     & $ \judget {\im \gamma} {E_1} {\im {\tau_1}} $ & By i.h. \\
+  %     & $ \judgeupdate \tau l {\tau_1 \yields {E_1}} {\tau_2} {\tau_3} \yields C $ & Premise \\
+  %     & $ \judget {\im \gamma} C {\im \tau \to \im {\tau_2}} $ & By Lemma~\ref{lemma:update-correct} \\
+  %     & $ \judgee \gamma e \tau \yields E $ & Premise \\
+  %     & $ \judget {\im \gamma} E {\im \tau} $ & By i.h. \\
+  %     & $ \judget {\im \gamma} {\app C E} {\im {\tau_2}} $ & By $ \rulelabeltapp $
+  %   \end{tabular} \\
 
   \end{itemize}
 \end{proof}
