@@ -4,7 +4,7 @@
 
 Following Dunfield's~\cite{dunfield2014elaborating} work on a simply-typed
 lambda calculus with intersection and union types, we present the syntax,
-subtyping, and typing of \name. The semantics of \name, on the other hand, will
+subtyping, and typing of \name. The semantics of \name will
 be defined by a type-directed translation from \name to a simple variant of
 System $F$ in the next section.
 
@@ -25,10 +25,12 @@ for those in the target language (starting to appear in the next section).
   \input{rule_in_figures/fi-syntax.tex}
   \caption{Syntax of \name.}
   \label{fig:fi-syntax}
-\end{figure}
+\end{figure}\bruno{I am not sure if the highlighting will be
+  visible. Use gray?}\bruno{there is no \lstinline{with} anymore.
+Make sure the syntax is consistent with what is presented in the type rules!}
 
-Meta-variables $\tau$ are ranged over types. Types include System $F$ constructs
-variable $ \alpha $; the top type $\top$ (supertype of all types); function
+Meta-variables $\tau$ range over types. Types include System $F$ constructs:
+type variables $ \alpha $; the top type $\top$ (supertype of all types); function
 types $ \tau_1 \to \tau_2 $; and type abstraction $ \for \alpha \tau $.
 $ \tau_1 \andop \tau_2 $ denotes the intersection of type $ \tau_1 $ and
 $ \tau_2 $; and $ \recty l \tau $ the types for single-field records.
@@ -38,8 +40,8 @@ the other type forms are untagged types. We omit type constants such as
 % \bruno{be consistent: in the source language we use \&, and in the
 % formalization we use $\andop$}
 
-Expressions are ranged over by meta-variables $e$. Standard constructs in System
-$F$ are variables $ x $; the canonical term that inhabits the top type, also
+Expressions also inlcude standard constructs in System
+$F$: variables $ x $; the canonical term that inhabits the top type, also
 written as $\top$; abstraction of expressions over variables of a given type
 $\lam x \tau e$ (concretely written \lstinline$\(x:T) -> e$); 
 abstraction of expressions over types $\blam \alpha e$ (concretely written \lstinline$/\A -> e$); 
@@ -48,11 +50,11 @@ and application of expressions to types $\tapp e \tau$ (concretely written \lsti
 The last four constructs are new:
 $e_1 \mergeop e_2$ is the \emph{merge} of two expressions $e_1$ and $e_2$.
 % \bruno{explain further, after all this is new.}
-It can be used as either $ e_1 $ or $ e_2 $. Particarly, if one regard $e_1$
-and $e_2$ as objects, their merge will responds to every method that one or
+It can be used as either $ e_1 $ or $ e_2 $. In particular, if one regards $e_1$
+and $e_2$ as objects, their merge will respond to every method that one or
 both of them have. Merge of expressions correspond to intersection types
-$ \tau_1 \andop \tau_2 $. $ \reccon l e $ constructs a single-field record.
-$ e.l $ accesses the field labelled $ l $ in $ e $. 
+$ \tau_1 \andop \tau_2 $. The expression $ \reccon l e $ constructs a
+single-field record, whereas $ e.l $ accesses the field labelled $ l $ in $ e $. 
 \begin{comment}
 Note that $ e $ does not
 need to be a record type in this case. For example, although the merge of two
@@ -65,11 +67,8 @@ $ x.{l_3} $ will be rejected by the type system.
 \end{comment}
 Restriction $e \restrictop l$ removes the field $l$ inside $e$. In order to
 focus on the most essential features, we do not include other forms such as
-fixpoints here, although they have are supported in our implementation and can
+fixpoints here, although they are supported in our implementation and can
 be included in formalization in standard ways.
-
-\bruno{Talking about type-checking before type-checking is discussed!}
-% \bruno{What field $F$? I don't know what this is refering to!}
 
 Typing contexts $ \gamma $ track bound type variables and variables (and their
 type $\tau$). We use $l$ for labels, whose nature is left undefined. We use
@@ -77,6 +76,7 @@ $\subst {\tau_1} \alpha {\tau_2}$ for the capture-avoiding substitution of
 $\tau_1$ for $\alpha$ inside $\tau_2$ and $\ftv \cdot$ for sets of free
 variables.
 
+\begin{comment}
 \paragraph{Discussion.} A natural question the reader might ask is that why we
 have excluded union types from the language. The answer is we found that
 intersection types alone are enough support extensible designs. To focus on the
@@ -84,29 +84,11 @@ key features that make this language interesting, we also omit other common
 constructs. For example, fixpoints can be added in standard ways.
 % Dunfield has described a language that includes a ``top'' type but it does not
 % appear in our language. Our work differs from Dunfield in that ...
+\end{comment}
 
 \subsection{Subtyping}
 
-% \bruno{Fix the overflow. For example by using 2 lines in
-%   the conclusion.}
-
-% \bruno{Subtyping figure is doing the translation already?}
-
-\george{Explain the subst syntax.}\bruno{Just say, in 1 sentence: 
-the syntax means substitution, and the substitution function is standard 
-and thus ommitted.}
-
-\george{However, have we forbidden the interplay of subtyping relations
-  explicitly declared by programmers as seen in class-based OO languages?}
-\bruno{Discuss somewhere (perhaps in related work) that although 
-our system is structural, we could apply the idea of separating 
-inheritance and subtyping to a nominal language. Point out related work.}
-
-\bruno{Intersection types require a simple form of subtyping. The subtyping
-  relation is reflexive and transitive. Our subtyping relation follows previous
-  work. Need to cite! The main difference is the interaction with parametric
-  polymorphism.}
-
+\begin{comment}
 In some calculi, the subtyping relation is external to the language: those
 calculi are indifferent to how the subtyping relation is defined. In \name, we
 take a syntatic approach, that is, subtyping is due to the syntax of types.
@@ -114,6 +96,7 @@ However, this approach does not preclude integrating other forms of subtyping
 into our system. One is ``primitive'' subtyping relations such as natural
 numbers being a subtype of integers. The other is nominal subtyping relations
 that are explicitly declared by the programmer.
+\end{comment}
 
 \begin{figure*}
   \small
@@ -122,7 +105,7 @@ that are explicitly declared by the programmer.
   \label{fig:fi-subtyping}
 \end{figure*}
 
-Subtyping rules of \name are shown in Figure~\ref{fig:fi-subtyping}. They them
+The syntax-directed subtyping rules of \name are shown in Figure~\ref{fig:fi-subtyping}. They them
 are not very surprising. The rule $\rulelabelsubfun$ says that functions are
 contravariant in their parameter type and covariant in their return type. A
 universal quantifier ($\forall$) is covariant in its body. A single-field record
@@ -153,8 +136,9 @@ and $\tau_3$.
 % the fields.
 
 It is easy to see that subtyping is reflexive and transitive. For the
-corresponding mechanized proofs in Coq, refer to \textit{sub\_refl.v} and
-\textit{sub\_trans.v}.
+corresponding mechanized proofs in Coq, we refer to the online 
+repository which includes our implementation and formalization.
+\bruno{State the reflexivity and transitivity Lemmas here then!}
 
 \subsection{Typing}
 
@@ -165,7 +149,7 @@ corresponding mechanized proofs in Coq, refer to \textit{sub\_refl.v} and
   \label{fig:fi-typing}
 \end{figure*}
 
-The typing of \name is shown in Figure~\ref{fig:fi-typing}. It consists of one
+The syntax-directed typing rules of \name are shown in Figure~\ref{fig:fi-typing}. They consists of one
 main typing judgment and two auxiliary judgments. The main typing judgment is of
 the form: $ \judgee \gamma e \tau $. It says that ``in the typing context
 $\gamma$, the expression $e$ is of type $\tau$''. The rules that are the same as
@@ -173,9 +157,11 @@ in System $F$ are rules for variables ($\rulelabelevar$), lambda abstractions
 ($\rulelabelelam$), type abstraction ($\rulelabeleblam$), and type application
 ($\rulelabeletapp$). The rule $\rulelabeleapp$ needs special attention as we add
 a subtyping requirement in the premise: the type of the argument ($\tau_3$) is a
-subtype of that of the parameter ($\tau_1$). The advantage is that it then
-becomes easier to derive an algorithm for typechecking. For merges
-$e_1 \mergeop e_2$, we typechecks $e_1$ and $e_2$ respectively, and give it the
+subtype of that of the parameter ($\tau_1$). 
+%The advantage is that it then
+%becomes easier to derive an algorithm for typechecking. 
+For merges
+$e_1 \mergeop e_2$, we typecheck $e_1$ and $e_2$ respectively, and give it the
 intersection of the resulting types $\tau_1 \andop \tau_2$. The rule for
 single-field record construction ($\rulelabelereccon$) is standard. The rules
 for record selection ($\rulelabelerecselect$) and restriction
@@ -183,6 +169,7 @@ for record selection ($\rulelabelerecselect$) and restriction
 auxiliary ``select'' and ``restrict'' rules to statically check operations and
 to obtain resulting types.
 
+\paragraph{Typing Record Selection}
 The ``select'' judgment deals with record selection. For example,
 \[
 \judgeselect {\recty {\texttt{id}} \Int \andop \recty {\texttt{name}} \String}
@@ -190,7 +177,7 @@ The ``select'' judgment deals with record selection. For example,
 \]
 That means the $\texttt{name}$ field inside
 $\recty {\texttt{id}} \Int \andop \recty {\texttt{name}} \String$ is of type
-$\texttt{name}$. Formally, $\judgeselect {\tau_1} l {\tau_2}$ says that a field
+$\texttt{String}$. Formally, $\judgeselect {\tau_1} l {\tau_2}$ says that a field
 labelled $l$ is present inside $\tau_1$ and is of type $\tau_2$. The judgment is
 made of three inference rules and is recursively defined. $\rulelabelselect$ is
 the base case: if we ask for a field labelled $l$ inside $\recty l \tau$, the
@@ -200,6 +187,7 @@ $\rulelabelselectleft$ for example, it means that if $l$ is present inside
 $\tau_1$, then it is also present inside $\tau_1 \andop \tau_2$; and the type of
 the desired field $l$ remains $\tau$ in the conclusion.
 
+\paragraph{Typing Record Restriction}
 The ``restrict'' judgment $\judgerestrict {\tau_1} l {\tau_2}$ deals with record
 restriction and is very similar to the ``select'' judgment. The only difference
 is that instead of giving the type of field being selected, the judment holds
@@ -209,32 +197,7 @@ the type after the restriction. For example,
 {\texttt{name}} {\recty {\texttt{id}} \Int \andop \top}
 \]
 
-% The ``restrict'' judgment deals with record restriction and is similar to the
-% ``select'' judgment in spirit. Consider the same example:
-% \begin{lstlisting}
-% {id: Long, name: String, score: Float}
-% \end{lstlisting}
-% If we want to remove the \lstinline$score$ field to something of
-% type \lstinline$Double$ the judgment will returns a new type where the type of
-% the field in question has been updated
-% \begin{lstlisting}
-% {id: Long, name: String, score: Double}
-% \end{lstlisting}
-% along with the original type of the field \lstinline$score$, which is
-% \lstinline$Float$. More precisely,
-% $\judgeupdate {\tau_1} l {\tau_2} {\tau_3} {\tau_4}$ says that if we want to update
-% an expression of type $\tau_1$ by replacing the content of the field $l$ with a
-% term of type $\tau_2$, then the new type of the entire expression after the
-% update is $\tau_3$ and the original type of the field $l$ is $\tau_4$.
-
-% \bruno{Sort the rules by those, which are exactly the same as System F,
-%   following by those which are different (application) and finally the rules for
-%   the new constructs.}
-
-\bruno{A lot more explanation needed here! You want to
-   explain: 1) the rules which are different, and why they are
-   different; 2) the new rules and the intuition for the new rules.
-   For the new rules have text for each of them.}
+\bruno{We should probably say that {id:Int} \& T is equivalent to {id:Int}}
 
 % The last two rules make use of the $ \rulename{fields} $ function just to make
 % sure that the field being accessed ($ \rulelabelerecselect $) or updated
