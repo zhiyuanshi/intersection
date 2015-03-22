@@ -1,17 +1,19 @@
 \section{The \name calculus} \label{sec:fi}
 
+\george{Discuss duplicate labels}
+
 Following Dunfield's~\cite{dunfield2014elaborating} work on a simply-typed
 lambda calculus with intersection and union types, we present the syntax,
 subtyping, and typing of \name. The semantics of \name, on the other hand, will
 be defined by a type-directed translation from \name to a simple variant of
-System $F$, which will be covered in the next section.
+System $F$ in the next section.
 
 \subsection{Syntax}
 
 Figure~\ref{fig:fi-syntax} shows the syntax of \name (with the addition to
 System $F$ highlighted). As a convention in this paper, we will be using
 lowercase letters as meta-variables for sorts in \name, and uppercase letters
-for those in System $F$ (starting to appear in the next section).
+for those in the target language (starting to appear in the next section).
 
 % To System $ F $, we add two features: intersection types and single-field
 % records.
@@ -25,9 +27,9 @@ for those in System $F$ (starting to appear in the next section).
   \label{fig:fi-syntax}
 \end{figure}
 
-We use the meta-variable $\tau$ to range over types. Types include System $F$
-constructs variable $ \alpha $; the top type $\top$ (supertype of all types);
-function types $ \tau_1 \to \tau_2 $; and type abstraction $ \for \alpha \tau $.
+Meta-variables $\tau$ are ranged over types. Types include System $F$ constructs
+variable $ \alpha $; the top type $\top$ (supertype of all types); function
+types $ \tau_1 \to \tau_2 $; and type abstraction $ \for \alpha \tau $.
 $ \tau_1 \andop \tau_2 $ denotes the intersection of type $ \tau_1 $ and
 $ \tau_2 $; and $ \recty l \tau $ the types for single-field records.
 Single-field record types can be viewed as types tagged with a label $l$, while
@@ -36,34 +38,35 @@ the other type forms are untagged types. We omit type constants such as
 % \bruno{be consistent: in the source language we use \&, and in the
 % formalization we use $\andop$}
 
-Expressions are ranged over by meta-variables $e$. 
-Standard constructs in System $F$ are 
-variables $ x $; 
-the canonical term that inhabits the top type, also written as $\top$;
-abstraction of expressions over variables of a given type $ \lam x \tau e $ (concretely written \lstinline$\(x:T) -> e$); 
-abstraction of expressions over types $ \blam \alpha e $ (concretely written \lstinline$/\A -> e$); 
-value application $ \app e_1 e_2 $;
-and type application $ \tapp e \tau $ (concretely written \lstinline$e[T]$). 
-The last four constructs are new: $ e_1 \mergeop e_2 $ 
-is the \emph{merge} of two expressions $ e_1 $ and $ e_2 $.
+Expressions are ranged over by meta-variables $e$. Standard constructs in System
+$F$ are variables $ x $; the canonical term that inhabits the top type, also
+written as $\top$; abstraction of expressions over variables of a given type
+$\lam x \tau e$ (concretely written \lstinline$\(x:T) -> e$); 
+abstraction of expressions over types $\blam \alpha e$ (concretely written \lstinline$/\A -> e$); 
+application of expressions to expressions $\app {e_1} {e_2}$; 
+and application of expressions to types $\tapp e \tau$ (concretely written \lstinline$e[T]$). 
+The last four constructs are new:
+$e_1 \mergeop e_2$ is the \emph{merge} of two expressions $e_1$ and $e_2$.
 % \bruno{explain further, after all this is new.}
-It can be used as either $ e_1 $ or $ e_2 $. Particarly, if one regard $ e_1 $
-and $ e_2 $ as objects, their merge will responds to every method that one or
+It can be used as either $ e_1 $ or $ e_2 $. Particarly, if one regard $e_1$
+and $e_2$ as objects, their merge will responds to every method that one or
 both of them have. Merge of expressions correspond to intersection types
 $ \tau_1 \andop \tau_2 $. $ \reccon l e $ constructs a single-field record.
-$ e.l $ accesses the field labelled $ l $ in $ e $. Note that $ e $ does not
+$ e.l $ accesses the field labelled $ l $ in $ e $. 
+\begin{comment}
+Note that $ e $ does not
 need to be a record type in this case. For example, although the merge of two
 records
 \[
 x = \reccon {l_1} {e_1} \mergeop \reccon {l_1} {e_2} 
 \]
 is of an intersection type, $ x.{l_1} $ still gives $ e_1 $. On the other hand,
-$ x.{l_3} $ will be rejected by the type system. Functional update $ \recupdate e l {e_1} $ a
-\emph{new} record which is exactly the same as $ e $ except the field labelled
-$ l $ is updated to become $ e1 $. In order to focus on the most essential
-features, we do not include other forms such as fixpoints here, although they
-have are supported in our implementation and can be included in formalization in
-standard ways.
+$ x.{l_3} $ will be rejected by the type system. 
+\end{comment}
+Restriction $e \restrictop l$ removes the field $l$ inside $e$. In order to
+focus on the most essential features, we do not include other forms such as
+fixpoints here, although they have are supported in our implementation and can
+be included in formalization in standard ways.
 
 \bruno{Talking about type-checking before type-checking is discussed!}
 % \bruno{What field $F$? I don't know what this is refering to!}
@@ -112,7 +115,8 @@ into our system. One is ``primitive'' subtyping relations such as natural
 numbers being a subtype of integers. The other is nominal subtyping relations
 that are explicitly declared by the programmer.
 
-\begin{figure*}[h]
+\begin{figure*}
+  \small
   \input{rule_in_figures/fi-sub.tex}
   \caption{Subtyping in \name.}
   \label{fig:fi-subtyping}
@@ -155,6 +159,7 @@ corresponding mechanized proofs in Coq, refer to \textit{sub\_refl.v} and
 \subsection{Typing}
 
 \begin{figure*}
+  \small
   \input{rule_in_figures/fi-typing.tex}
   \caption{The type system of \name.}
   \label{fig:fi-typing}
@@ -173,43 +178,54 @@ becomes easier to derive an algorithm for typechecking. For merges
 $e_1 \mergeop e_2$, we typechecks $e_1$ and $e_2$ respectively, and give it the
 intersection of the resulting types $\tau_1 \andop \tau_2$. The rule for
 single-field record construction ($\rulelabelereccon$) is standard. The rules
-for record selection ($\rulelabelerecselect$) and update ($\rulelabelerecupd$) are
-expectedly the most complicated. They turn to the auxiliary ``select'' and ``update''
-rules to statically check operations and to obtain resulting types.
+for record selection ($\rulelabelerecselect$) and restriction
+($\rulelabelerecrestrict$) are expectedly the most complicated. They turn to the
+auxiliary ``select'' and ``restrict'' rules to statically check operations and
+to obtain resulting types.
 
-The ``select'' judgment deals with record selection and captures the intuition
-that, for example, if an expression has type
-\begin{lstlisting}
-{id: Long, name: String, score: Float}
-\end{lstlisting}
-then the record selection of \lstinline$score$ on it should give back something
-of type \lstinline$Float$. Formally, $\judgeselect {\tau_1} l {\tau_2}$ says that a
-field labelled $l$ is present inside $\tau_1$ and is of type $\tau_2$. The
-judgment is made of three inference rules and is recursively defined.
-$\rulelabelselect$ is the base case: if we ask for a field labelled $l$ inside
-$\recty l \tau$, the field is clearly present and is of type $\tau$.
-$\rulelabelselectleft$ and $\rulelabelselectright$ are two symmetric step cases. Take
+The ``select'' judgment deals with record selection. For example,
+\[
+\judgeselect {\recty {\texttt{id}} \Int \andop \recty {\texttt{name}} \String}
+{\texttt{name}} {\String}
+\]
+That means the $\texttt{name}$ field inside
+$\recty {\texttt{id}} \Int \andop \recty {\texttt{name}} \String$ is of type
+$\texttt{name}$. Formally, $\judgeselect {\tau_1} l {\tau_2}$ says that a field
+labelled $l$ is present inside $\tau_1$ and is of type $\tau_2$. The judgment is
+made of three inference rules and is recursively defined. $\rulelabelselect$ is
+the base case: if we ask for a field labelled $l$ inside $\recty l \tau$, the
+field is clearly present and is of type $\tau$. $\rulelabelselectleft$ and
+$\rulelabelselectright$ are two symmetric step cases. Take
 $\rulelabelselectleft$ for example, it means that if $l$ is present inside
 $\tau_1$, then it is also present inside $\tau_1 \andop \tau_2$; and the type of
 the desired field $l$ remains $\tau$ in the conclusion.
 
-The ``update'' judgment deals with record update and is similar to the ``select''
-judgment in spirit. Consider the same example:
-\begin{lstlisting}
-{id: Long, name: String, score: Float}
-\end{lstlisting}
-If we want to update the content of the \lstinline$score$ field to something of
-type \lstinline$Double$ the judgment will returns a new type where the type of
-the field in question has been updated
-\begin{lstlisting}
-{id: Long, name: String, score: Double}
-\end{lstlisting}
-along with the original type of the field \lstinline$score$, which is
-\lstinline$Float$. More precisely,
-$\judgeupdate {\tau_1} l {\tau_2} {\tau_3} {\tau_4}$ says that if we want to update
-an expression of type $\tau_1$ by replacing the content of the field $l$ with a
-term of type $\tau_2$, then the new type of the entire expression after the
-update is $\tau_3$ and the original type of the field $l$ is $\tau_4$.
+The ``restrict'' judgment $\judgerestrict {\tau_1} l {\tau_2}$ deals with record
+restriction and is very similar to the ``select'' judgment. The only difference
+is that instead of giving the type of field being selected, the judment holds
+the type after the restriction. For example,
+\[
+\judgerestrict {\recty {\texttt{id}} \Int \andop \recty {\texttt{name}} \String}
+{\texttt{name}} {\recty {\texttt{id}} \Int \andop \top}
+\]
+
+% The ``restrict'' judgment deals with record restriction and is similar to the
+% ``select'' judgment in spirit. Consider the same example:
+% \begin{lstlisting}
+% {id: Long, name: String, score: Float}
+% \end{lstlisting}
+% If we want to remove the \lstinline$score$ field to something of
+% type \lstinline$Double$ the judgment will returns a new type where the type of
+% the field in question has been updated
+% \begin{lstlisting}
+% {id: Long, name: String, score: Double}
+% \end{lstlisting}
+% along with the original type of the field \lstinline$score$, which is
+% \lstinline$Float$. More precisely,
+% $\judgeupdate {\tau_1} l {\tau_2} {\tau_3} {\tau_4}$ says that if we want to update
+% an expression of type $\tau_1$ by replacing the content of the field $l$ with a
+% term of type $\tau_2$, then the new type of the entire expression after the
+% update is $\tau_3$ and the original type of the field $l$ is $\tau_4$.
 
 % \bruno{Sort the rules by those, which are exactly the same as System F,
 %   following by those which are different (application) and finally the rules for

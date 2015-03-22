@@ -101,8 +101,9 @@ shown in Figure~\ref{fig:type-translation}
 \subsection{Subtyping (Coercion)}
 
 \begin{figure*}
-\input{rule_in_figures/elab-sub.tex}
-\caption{Coersive subtyping.}
+  \small
+  \input{rule_in_figures/elab-sub.tex}
+  \caption{Coersive subtyping.}
 \end{figure*}
 
 The coercion judgment $ \tau_1 \subtype \tau_2 \yields C $ extends the subtyping
@@ -136,8 +137,9 @@ In this subsection we now present formally the translation rules that convert
 those in the previous section with the light-blue part for the translation.
 
 \begin{figure*}
-\input{rule_in_figures/elab-typing.tex}
-\caption{Elaboration typing from \name to System $ F $.}
+  \small
+  \input{rule_in_figures/elab-typing.tex}
+  \caption{Elaboration typing from \name to System $ F $.}
 \end{figure*}
 
 % \bruno{Badly structured. Don't mention Coercion here, as it was already
@@ -241,7 +243,8 @@ will be used to coece the main \name expression.
   \]
   After evaluation, the target expression becomes just $\pair 0 {()}$.
 
-  \begin{figure*}
+  \begin{figure*}[h]
+    \small
     \begin{mathpar}
       \small
 
