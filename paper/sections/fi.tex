@@ -1,6 +1,7 @@
 \section{The \name calculus} \label{sec:fi}
 
-\george{Discuss duplicate labels}
+\george{Discuss duplicate labels?}
+\george{Fix highlighting or just remove it}
 
 Following Dunfield's~\cite{dunfield2014elaborating} work on a simply-typed
 lambda calculus with intersection and union types, we present the syntax,
@@ -135,10 +136,20 @@ and $\tau_3$.
 % Note that the last point means that record types are covariant in the type of
 % the fields.
 
-It is easy to see that subtyping is reflexive and transitive. For the
-corresponding mechanized proofs in Coq, we refer to the online 
-repository which includes our implementation and formalization.
-\bruno{State the reflexivity and transitivity Lemmas here then!}
+It is easy to see that subtyping is reflexive and transitive.
+
+\begin{lemma}[Subtyping is reflexive.] \label{sub-refl}
+Given a type $ \tau $, $ \tau \subtype \tau $.
+\end{lemma}
+
+\begin{lemma}[Subtyping is transitive.] \label{sub-trans}
+If $ \tau_1 \subtype \tau_2 $ and $ \tau_2 \subtype \tau_3 $,
+then $ \tau_1 \subtype \tau_3 $.
+\end{lemma}
+
+For the corresponding mechanized proofs in Coq, we refer to the online
+repository which includes our implementation and formalization. \bruno{State the
+  reflexivity and transitivity Lemmas here then!}
 
 \subsection{Typing}
 
@@ -164,7 +175,7 @@ subtype of that of the parameter ($\tau_1$).
 For merges
 $e_1 \mergeop e_2$, we typecheck $e_1$ and $e_2$ respectively, and give it the
 intersection of the resulting types $\tau_1 \andop \tau_2$. The rule for
-single-field record construction ($\rulelabelereccon$) is standard. The rules
+single-field record construction ($\rulelabelerecconstruct$) is standard. The rules
 for record selection ($\rulelabelerecselect$) and restriction
 ($\rulelabelerecrestrict$) are expectedly the most complicated. They turn to the
 auxiliary ``select'' and ``restrict'' rules to statically check operations and

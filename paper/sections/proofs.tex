@@ -6,11 +6,11 @@ previous intermediate result to reach the corresponding left-hand side).
 
 \subsection{Elaboration}
 
-\bruno{fix numbering of lemmas}\\
+\bruno{fix numbering of lemmas}
 \bruno{reflexitivity and transitivity missing. You can do a proof
   sketch instead of a full proof. Just say in 1 or 2 sentences what is
-the main idea. You can mention that we have a full proof in Coq.}\\
-\bruno{target type system is missing 3 cases: Tunit; Tproj1; TProj2}\\
+the main idea. You can mention that we have a full proof in Coq.}
+\bruno{target type system is missing 3 cases: Tunit; Tproj1; TProj2}
 
 \begin{lemma}[\rulelabelsub~rules produce type-correct coercion] \label{lemma:sub-correct}
   If $ \tau_1 \subtype \tau_2 \yields C $, then $ \judget \epsilon C {\im {\tau_1} \to \im {\tau_2}} $.
@@ -369,7 +369,7 @@ the main idea. You can mention that we have a full proof in Coq.}\\
 
   \item \textbf{Case}
     \begin{flalign*}
-      & \ruleerecconelab &
+      & \ruleerecconstructelab &
     \end{flalign*}
 
     \begin{tabular}{rll}
@@ -423,4 +423,3 @@ the main idea. You can mention that we have a full proof in Coq.}\\
 
   \end{itemize}
 \end{proof}
-

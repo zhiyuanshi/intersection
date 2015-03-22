@@ -107,14 +107,14 @@
 }
 
 % rec-con
-\newcommand{\rulelabelereccon}{\rulelabele\text{rec-construct}}
-\newcommand{\ruleereccon}{
-\inferrule* [right=$\rulelabelereccon$]
+\newcommand{\rulelabelerecconstruct}{\rulelabele\text{rec-construct}}
+\newcommand{\ruleerecconstruct}{
+\inferrule* [right=$\rulelabelerecconstruct$]
   {\judgee \gamma e \tau}
   {\judgee \gamma {\reccon l e} {\recty l \tau}}
 }
-\newcommand{\ruleerecconelab}{
-\inferrule* [right=$\rulelabelereccon$]
+\newcommand{\ruleerecconstructelab}{
+\inferrule* [right=$\rulelabelerecconstruct$]
   {\judgee \gamma e \tau \yields E}
   {\judgee \gamma {\reccon l e} {\recty l \tau} \yields E}
 }
