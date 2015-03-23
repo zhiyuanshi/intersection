@@ -1,54 +1,35 @@
 \section{Implementation}
 
-We implemented all the functionalities of the \name as a contribution to the
-open source community. Besides, we built a language on top of \name to
+We implemented the functionalities of the \name as a contribution to the open
+source community. Besides, we built a source language on top of \name to
 facilitate programming. We adopted a three-phase design to compile source
-programs built into System $ F $ terms.
-
+programs built into System $F$ terms.
 \begin{enumerate}
-\item A \emph{type checking} phase that checks the usage of \name and other
-  source features against an abstract syntax tree that follows strictly with the
-  source syntax. We intentionally made type checking happen first, so as to make
-  the error messages relevant for programmers, although such an approach has
-  obviously complicated the implementation.
+\item A \emph{type checking} phase that checks the usage of \name features and
+  other source language features against an abstract syntax tree that follows
+  strictly with the source syntax.
+  % We intentionally made type checking happen first, so as to make
+  % the error messages relevant for programmers, although such an approach has
+  % obviously complicated the implementation.
 
 \item A \emph{desugaring} phase that translates well-typed source terms into
-  \name terms. A number of source-level features such as multi-field records,
+  \name terms. A number of source-level features including multi-field records,
   recursive \texttt{let} definitions, type aliases are rewritten at this phase.
   The resulting program is just \name expressions with other minor features.
 
-\item A \emph{compilation} phase that translates well-typed \name terms
-  into System $ F $ ones.
+\item A \emph{compilation} phase that translates well-typed \name terms into
+  System $F$ ones.
 \end{enumerate}
-
 Phase 3 is what we have formalized in this paper.
 
-\paragraph{Type aliases.}
+\paragraph{Type aliases.} We implemented \emph{type alias} as in Scala and
+Haskell (called ``type synonyms''). In fact, to make future adaptations easier,
+our source language is an extension of the more general System $F_{\omega}$.
 
-We implement \emph{type alias} as in Scala and Haskell.
-
-In fact, to make future adaptations easier, we implemented this feature on top
-of the more general System $ F_{\omega} $.
-
-
-\begin{lstlisting}
-type T[A, B] = t; e
-\end{lstlisting}
-
-\subsection{Optimization.}
-
-\george{Discuss our partial evaluator!}
-
-The reader might argue that translating merges as pairs can be inefficient in
-practice. That is indeed the case. For example, the ternary merge
-\begin{lstlisting}
-1,,2,,3 
-\end{lstlisting}
-is elaborated into a nested tuple
-\begin{lstlisting}
-((1,2),3)
-\end{lstlisting}
-as the merge operator associates to the left.
-
-Another issue is that every time a coercion is generated, an application will be
-incurred at run-time.
+\paragraph{Optimization.} Our translation inserts identity functions whenever
+subtyping or record operation occurs. But that is just for the sake of the
+simplicity of formalization. In our current implementation, we introduced a
+\emph{partial evaluator} to eliminate the identity functions as another phase
+after the translation. In another version of our implementation, partial
+evaluation is weaved into the process of translation and unnecessary identity
+functions are removed simultaneously during the translation.
