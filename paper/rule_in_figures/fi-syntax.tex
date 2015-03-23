@@ -2,13 +2,12 @@
 \begin{array}{l}
   \begin{array}{llrl}
     \text{Types} 
-    & \tau & \Coloneqq & \alpha \mid \top \mid \tau_1 \to \tau_2 \mid \for \alpha \tau \\
-    &      &           & \mid \tau_1 \andop \tau_2 \mid \recty l \tau \\
+    & \tau & \Coloneqq & \alpha \mid \highlight{\top} \mid \tau_1 \to \tau_2 \mid \for \alpha \tau \\
+    &      &           & \mid \highlight{\tau_1 \andop \tau_2} \mid \highlight{\recty l \tau} \\
     \text{Expressions} 
-    & e & \Coloneqq & x \mid \top \mid \lam x \tau e \mid \app e e \mid \blam \alpha e \mid \tapp e \tau \\
+    & e & \Coloneqq & x \mid \highlight{\top} \mid \lam x \tau e \mid \app e e \mid \blam \alpha e \mid \tapp e \tau \\
     &   & \mid      & \highlight {e \mergeop e} \mid \highlight {\reccon l e} \mid
-                      \highlight {e.l} \\
-    & & \mid & \recupdate e l e \\
+                      \highlight {e.l} \mid \highlight{e \restrictop l} \\
     \text{Contexts} 
     & \gamma & \Coloneqq & \epsilon \mid \gamma, \alpha \mid \gamma, x \hast \tau \\
     \text{Labels} & l

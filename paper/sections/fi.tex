@@ -31,24 +31,24 @@ for those in the target language (starting to appear in the next section).
 Make sure the syntax is consistent with what is presented in the type rules!}
 
 Meta-variables $\tau$ range over types. Types include System $F$ constructs:
-type variables $ \alpha $; the top type $\top$ (supertype of all types); function
-types $ \tau_1 \to \tau_2 $; and type abstraction $ \for \alpha \tau $.
-$ \tau_1 \andop \tau_2 $ denotes the intersection of type $ \tau_1 $ and
-$ \tau_2 $; and $ \recty l \tau $ the types for single-field records.
-Single-field record types can be viewed as types tagged with a label $l$, while
-the other type forms are untagged types. We omit type constants such as
-\lstinline$Int$ and \lstinline$String$.
+type variables $\alpha$; function types $\tau_1 \to \tau_2$; and type
+abstraction $ \for \alpha \tau $. The top type $\top$ is the supertype of all
+types. It is in fact the $0$-ary intersection. $\tau_1 \andop \tau_2$ denotes
+the intersection of type $\tau_1$ and $\tau_2$; and $\recty l \tau$ the types
+for single-field records. Single-field record types can be viewed as types
+tagged with a label $l$, while the other type forms are untagged types. We omit
+type constants such as \lstinline$Int$ and \lstinline$String$.
 % \bruno{be consistent: in the source language we use \&, and in the
 % formalization we use $\andop$}
 
-Expressions also inlcude standard constructs in System
-$F$: variables $ x $; the canonical term that inhabits the top type, also
-written as $\top$; abstraction of expressions over variables of a given type
+Expressions include standard constructs in System
+$F$: variables $ x $; abstraction of expressions over variables of a given type
 $\lam x \tau e$ (concretely written \lstinline$\(x:T) -> e$); 
 abstraction of expressions over types $\blam \alpha e$ (concretely written \lstinline$/\A -> e$); 
 application of expressions to expressions $\app {e_1} {e_2}$; 
 and application of expressions to types $\tapp e \tau$ (concretely written \lstinline$e[T]$). 
-The last four constructs are new:
+The last four constructs are new.
+The canonical term that inhabits the top type is also written as $\top$.
 $e_1 \mergeop e_2$ is the \emph{merge} of two expressions $e_1$ and $e_2$.
 % \bruno{explain further, after all this is new.}
 It can be used as either $ e_1 $ or $ e_2 $. In particular, if one regards $e_1$
@@ -138,11 +138,11 @@ and $\tau_3$.
 
 It is easy to see that subtyping is reflexive and transitive.
 
-\begin{lemma}[Subtyping is reflexive.] \label{sub-refl}
+\begin{lemma}[Subtyping is reflexive] \label{sub-refl}
 Given a type $ \tau $, $ \tau \subtype \tau $.
 \end{lemma}
 
-\begin{lemma}[Subtyping is transitive.] \label{sub-trans}
+\begin{lemma}[Subtyping is transitive] \label{sub-trans}
 If $ \tau_1 \subtype \tau_2 $ and $ \tau_2 \subtype \tau_3 $,
 then $ \tau_1 \subtype \tau_3 $.
 \end{lemma}
@@ -205,9 +205,12 @@ restriction and is very similar to the ``select'' judgment. The only difference
 is that instead of giving the type of field being selected, the judment holds
 the type after the restriction. For example,
 \[
-\judgerestrict {\recty {\texttt{id}} \Int \andop \recty {\texttt{name}} \String}
-{\texttt{name}} {\recty {\texttt{id}} \Int \andop \top}
+\judgerestrict {\recty {\code{id}} \Int \andop \recty {\code{name}} \String}
+{\code{name}} {\recty {\code{id}} \Int \andop \top}
 \]
+Note that $\recty {\code{id}} \Int \andop \top$, interpreted set-theoretically,
+is equivalent to $\recty {\code{id}} \Int$. Indeed, our system is able to judge
+they are subtype of each other.
 
 \bruno{We should probably say that {id:Int} \& T is equivalent to {id:Int}}
 

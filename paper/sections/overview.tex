@@ -219,18 +219,20 @@ subtyping relation on intersection types. That is the type
 (Int -> String) & (Bool -> String) 
 \end{lstlisting}
 
-\noindent is a \emph{subtype} of both \lstinline{Int -> String} 
-and \lstinline{Bool -> String}. This is why \lstinline{show} 
-can take \lstinline{100} as its argument.
-Generally speaking an intersection type \lstinline{A & B} is
-a subtype of both \lstinline{A} and \lstinline{B}. 
-Moreove, subtyping of intersection types in \name is purely structural
-and it enjoys of properties such as \emph{commutativity} and \emph{associativity}: \\
+\noindent is a \emph{subtype} of both \lstinline{Int -> String} and
+\lstinline{Bool -> String}. This is why \lstinline{show} can take
+\lstinline{100} as its argument. Generally speaking an intersection type
+\lstinline{A & B} is a subtype of both \lstinline{A} and \lstinline{B}.
+Moreover, subtyping of intersection types in \name is purely structural
+and it enjoys of properties such as \emph{idempotence} and \emph{commutativity}: \\
 
-\noindent {\bf commutativity: } \lstinline{A & B <: B & A}  \\
-{\bf associativity:~~~~~~}\lstinline{A & (B & C)  <: (A & B)  & C}  
+% \noindent {\bf commutativity: } $A \andop B = B \andop A$  \\
+% {\bf associativity:~~~~~~}$A \andop (B \andop C) = (A \andop B) \andop C$
 
-\george{I think this is not shown.}
+\begin{tabular}{ll}
+  \textbf{Idempotent}  & $A \andop A = A$ \\
+  \textbf{Commutative} & $A \andop B = B \andop A$ 
+\end{tabular}
 
 \paragraph{Covariance and contravariance.}
 The subtyping also arises from contravariant parameter types

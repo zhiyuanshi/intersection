@@ -17,19 +17,19 @@ programs built into System $F$ terms.
   recursive \texttt{let} definitions, type aliases are rewritten at this phase.
   The resulting program is just \name expressions with other minor features.
 
-\item A \emph{compilation} phase that translates well-typed \name terms into
+\item A \emph{translation} phase that translates well-typed \name terms into
   System $F$ ones.
 \end{enumerate}
 Phase 3 is what we have formalized in this paper.
 
-\paragraph{Type aliases.} We implemented \emph{type alias} as in Scala and
+\paragraph{Other features.} We implemented \emph{type alias} as in Scala and
 Haskell (called ``type synonyms''). In fact, to make future adaptations easier,
 our source language is an extension of the more general System $F_{\omega}$.
 
 \paragraph{Identity functions.} Our translation inserts identity functions
 whenever subtyping or record operation occurs. But that is just for the sake of
 the simplicity of formalization. In our current implementation, we introduced a
-\emph{partial evaluator} to eliminate the identity functions as another phase
-after the translation. In another version of our implementation, partial
-evaluation is weaved into the process of translation and unnecessary identity
-functions are removed simultaneously during the translation.
+partial evaluator to eliminate the identity functions as another phase after the
+translation phase. In another version of our implementation, partial evaluation
+is weaved into the process of translation and unnecessary identity functions are
+removed simultaneously during the translation.
