@@ -286,7 +286,8 @@ top value in the target language. For the case
 \[
 \reccon {\code{name}} {\code{"Alan"}} \andop \reccon {\code{age}} {24} \restrictop \code{name}
 \]
-the coercion will keep the $name$ field and replace the $age$ field with a unit.
+the coercion will keep the $\code{name}$ field and replace the $\code{age}$
+field with a unit.
 
 \begin{lemma}[\rulelabelrestrict~rules produce type-correct coercion] \label{lemma:restrict-correct}
   If $ \judgerestrict \tau l {\tau_1} \yields C $, then $ \judget \epsilon C {\im \tau \to \im {\tau_1}} $.
