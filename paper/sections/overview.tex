@@ -153,7 +153,7 @@ Scala, and \name.
 %In \name the central addition to the type system of System $F$ are
 %intersection types.
 
-\paragraph{Intersection Types for Overloading.} 
+\paragraph{Intersection types for overloading.} 
 A typical use-case for intersection types is to do
 \emph{overloading}. The benefit is that programmers can use the same
 operation on different types and delegate the task of choosing a
@@ -232,7 +232,7 @@ and it enjoys of properties such as \emph{commutativity} and \emph{associativity
 
 \george{I think this is not shown.}
 
-\paragraph{Covariance and Contravariance.}
+\paragraph{Covariance and contravariance.}
 The subtyping also arises from contravariant parameter types
 and covariant return types for functions. 
 \bruno{I think this will be a good place to talk about the following material:}
@@ -330,7 +330,7 @@ field to the record:
 {open=192, high=195, low=189} ,, {close=195}
 \end{lstlisting}
 
-\paragraph{Generalized Records.}
+\paragraph{Generalized records.}
 In addition, a record is just a normal term and can be merged with any other
 term, for example, the following program is valid:
 \begin{lstlisting}
@@ -393,7 +393,7 @@ enables an encoding of a simple form of \emph{bounded universal
 %polymorphism. $ F_{\subtype} $~\cite{pierce2002types} allows giving an
 %upper bound to the type variable in type abstractions. 
 
-\paragraph{Bounded Quantification and Loss of Information}
+\paragraph{Bounded quantification and loss of information.}
 The idea of bounded universal quantification was discussed in the
 seminal paper by Cardelli and Wegner
 ~\cite{cardelli1985understanding}. They show that bounded quantifiers
@@ -439,7 +439,7 @@ of \{\lstinline{name: String}\}. With such a type the function
 \lstinline{id} avoids losing information about the argument type.
 
 
-\paragraph{Encoding Bounded Polymorphism in \name}
+\paragraph{Encoding bounded polymorphism in \name.}
 \name does not have bounded polymorphism. However the same effect can
 be achieved with a combination of intersection types and parametric polymorphism:
 \begin{lstlisting}{language=F2J}

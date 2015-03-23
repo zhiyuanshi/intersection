@@ -26,9 +26,9 @@ Phase 3 is what we have formalized in this paper.
 Haskell (called ``type synonyms''). In fact, to make future adaptations easier,
 our source language is an extension of the more general System $F_{\omega}$.
 
-\paragraph{Optimization.} Our translation inserts identity functions whenever
-subtyping or record operation occurs. But that is just for the sake of the
-simplicity of formalization. In our current implementation, we introduced a
+\paragraph{Identity functions.} Our translation inserts identity functions
+whenever subtyping or record operation occurs. But that is just for the sake of
+the simplicity of formalization. In our current implementation, we introduced a
 \emph{partial evaluator} to eliminate the identity functions as another phase
 after the translation. In another version of our implementation, partial
 evaluation is weaved into the process of translation and unnecessary identity

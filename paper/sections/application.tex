@@ -164,7 +164,7 @@ step-by-step of solving the Expression Problem.
 % is able to solve the limitations of using object algebras in languages such as
 % Java and Scala.
 
-\paragraph{A Simple System of Arithmetic Expressions} 
+\paragraph{A simple system of arithmetic expressions.} 
 In the Expression Problem, the idea is to start with a very simple
 system modeling arithmetic expressions and evaluation.
 The initial system considers expressions with two variants (literals and
@@ -214,7 +214,7 @@ supporting evaluation. However, the one interesting point
 of object algebras is that other operations can be supported as
 well. 
 
-\paragraph{Add a subtraction variant} The point of the Expression
+\paragraph{Add a subtraction variant.} The point of the Expression
 Problem support the addition of new features to the existing
 program, without modifying existing code. 
 The first feature is adding a new variant, such as subtraction. We can do so by
@@ -233,7 +233,7 @@ let subEvalAlg = evalAlg ,, {
   inheritance} and the merge operator models a basic form of
 \emph{dynamic implementation inheritance}. 
 
-\paragraph{Add a pretty printing operation}
+\paragraph{Add a pretty printing operation.}
 A second extension adding a new operation, such as pretty printing. 
 Similar to evaluation, the interface of the pretty printing feature
 is modeled as:
@@ -254,7 +254,7 @@ let printAlg : SubExpAlg[IPrint] = {
 };
 \end{lstlisting}
 
-\paragraph{Usage}
+\paragraph{Usage.}
 With the definitions above, values are created using the
 appropriate algebras. For example, the expression \lstinline{7 - 2} 
 is encoded as follows:
@@ -272,7 +272,7 @@ abstracted over the allowed operations such as evaluation and pretty
 printing by requiring the expression functions to take an extra
 argument \lstinline$E$.
 
-\paragraph{Dynamic Object Algebra Composition}
+\paragraph{Dynamic object algebra composition.}
 To obtain an expression that supports both evaluation and pretty
 printing, a mechanism to combine the evaluation and printing
 algebras is needed. \name allows such composition: the \lstinline$combine$
@@ -369,7 +369,7 @@ trait ExpVisitor[E] {
 \end{lstlisting}
 \end{comment}
 
-\paragraph{Adding a new Variant}
+\paragraph{Adding a new variant.}
 The difficulties arize when a new variant, such as subtraction is
 added. To do so an extended visitor interface analogous to
 \lstinline$SubExpAlg$ is needed. Moreover a corresponding composite 
@@ -390,7 +390,7 @@ and returns a value of the type \lstinline{E}. The only difference in
 \lstinline{v} is of type \lstinline{SubExpAlg[E]}, which is a subtype of
 \lstinline{ExpAlg[E]}. 
 
-\paragraph{Inheritance is not Subtyping}
+\paragraph{Inheritance is not subtyping.}
 Since \lstinline{v} appears in parameter position of
 \lstinline{accept} and function parameters are naturally contravariant,
 \lstinline{SubExp[E]} should be a \emph{supertype} (and not a subtype)
