@@ -11,8 +11,8 @@ number of other features, including multi-field records, mutually recursive
 \code{let} bindings, type aliases, algebraic data types, pattern matching, and
 first-class modules that are encoded with \code{letrec} and records.
 
-Relevant to this paper are three phases in the compiler that collectively turn
-source programs to System $F$.
+Relevant to this paper are the three following phases in the compiler that
+collectively turn source programs into System $F$:
 
 \begin{enumerate}
 \item A \emph{typechecking} phase that checks the usage of \name features and
@@ -31,10 +31,10 @@ source programs to System $F$.
 Phase 3 is what we have formalized in this paper.
 
 \paragraph{Removing identity functions.} Our translation inserts identity
-functions whenever subtyping or record operation occurs, which incurs run-time
-overhead. But in practice this is not an issue. In the current implementation,
-we introduced a partial evaluator with three simple rewriting rules to eliminate
-the redundant identity functions as another compiler phase after the
-translation. In another version of our implementation, partial evaluation is
-weaved into the process of translation so that the unwanted identity functions
-are removed simultaneously during the translation.
+functions whenever subtyping or record operation occurs, which could mean
+notable run-time overhead. But in practice this is not an issue. In the current
+implementation, we introduced a partial evaluator with three simple rewriting
+rules to eliminate the redundant identity functions as another compiler phase
+after the translation. In another version of our implementation, partial
+evaluation is weaved into the process of translation so that the unwanted
+identity functions are not introduced during the translation.
