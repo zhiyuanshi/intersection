@@ -46,10 +46,17 @@ the main idea. You can mention that we have a full proof in Coq.}
     \end{flalign*}
 
     \begin{tabular}{rll}
-      & $ \tau_3 \subtype \tau_1 \yields {C_1} $ & Premise \\
       & $ \judget \epsilon {C_1} {\im {\tau_3} \to \im {\tau_1}} $ & By i.h. \\
-      & $ \judget \epsilon {C_2} {\im {\tau_2} \to \im {\tau_4}} $ & Similar to the above \\
-      \george{TODO} &
+      & $ \judget \epsilon {C_2} {\im {\tau_2} \to \im {\tau_4}} $ & By i.h. \\
+      & $ \judget {\epsilon, x \hast {\im {\tau_3}}} x {\im {\tau_3}} $ & By $\rulelabeltvar$ \\
+      & $ \tau_3 \subtype \tau_1 \yields {C_1} $ & Premise \\
+      & $ \judget {\epsilon, x \hast {\im {\tau_3}}} {\app {C_1} x} {\im {\tau_1}} $ & By $\rulelabeltapp$ \\
+      & $ \judget {\epsilon, f \hast {\im {\tau_1 \to \tau_2}}} f {\im {\tau_1 \to \tau_2}} $ & By $\rulelabeltvar$ \\
+      & $ \judget {\epsilon, f \hast {\im {\tau_1 \to \tau_2}}} f {\im {\tau_1} \to \im {\tau_2}} $ & By the definition of $ \im \cdot $ \\
+      & $ \judget {\epsilon, f \hast {\im {\tau_1 \to \tau_2}}, x \hast {\im {\tau_3}}} {\app f {(\app {C_1} x})} {\im {\tau_2}} $ & By $\rulelabeltapp$ \\
+      & $ \judget {\epsilon, f \hast {\im {\tau_1 \to \tau_2}}, x \hast {\im {\tau_3}}} {\app {C_2} {(\app f {(\app {C_1} x})})} {\im {\tau_4}} $ & By $\rulelabeltapp$ \\
+      & $ \judget \epsilon {\lam f {\im {\tau_1 \to \tau_2}} {\lam x {\im {\tau_3}} {\app {C_2} {(\app f {(\app {C_1} x)})}}}} {\im {\tau_1 \to \tau_2} \to \im {\tau_3} \to \im {\tau_4}} $ & By applying $\rulelabeltlam$ twice \\
+      & $ \judget \epsilon {\lam f {\im {\tau_1 \to \tau_2}} {\lam x {\im {\tau_3}} {\app {C_2} {(\app f {(\app {C_1} x)})}}}} {\im {\tau_1 \to \tau_2} \to \im {\tau_3 \to \tau_4}} $ & By the definition of $\im \cdot$ 
     \end{tabular} \\
 
   \item \textbf{Case}
@@ -58,7 +65,14 @@ the main idea. You can mention that we have a full proof in Coq.}
     \end{flalign*}
 
     \begin{tabular}{rll}
-      & \george{TODO} &
+      & $ \judget \epsilon C {\im {\tau_1} \to {\im {\subst {\alpha_1} {\alpha_2} \tau_2}}} $ & By i.h. \\
+      & $ \judget {\epsilon, f \hast {\im {\for {\alpha_1} {\tau_1}}}} f {\im {\for {\alpha_1} {\tau_1}}} $ & By $\rulelabeltvar$ \\
+      & $ \judget {\epsilon, f \hast {\im {\for {\alpha_1} {\tau_1}}}} f {\for {\alpha_1} {\im {\tau_1}}} $ & By the definition of $ \im \cdot $ \\
+      & $ \judget {\epsilon, f \hast {\im {\for {\alpha_1} {\tau_1}}}, \alpha} {\tapp f \alpha} {\subst \alpha {\alpha_1} {\im {\tau_1}}} $ & By $\rulelabeltvar$ and $\rulelabelttapp$ \\
+      & $ \judget {\epsilon, f \hast {\im {\for {\alpha_1} {\tau_1}}}, \alpha} {\app C {(\tapp f \alpha)}} {\subst \alpha {\alpha_1} {\im {\subst {\alpha_1} {\alpha_2} {\tau_2}}}} $ & By $\rulelabeltapp$ \\
+      & $ \judget {\epsilon, f \hast {\im {\for {\alpha_1} {\tau_1}}}} {\blam \alpha {\app C {(\tapp f \alpha)}}} {\for {\alpha_2} {\im {\tau_2}}} $ & By $\rulelabeltblam$ and substitution \george{What?} \\
+      & $ \judget \epsilon {\lam f {\im {\for {\alpha_1} {\tau_1}}} {\blam \alpha {\app C {(\tapp f \alpha)}}}} {\im {\for {\alpha_1} {\tau_1}} \to \for {\alpha_2} {\im {\tau_2}}} $ & By $\rulelabeltlam$ \\
+      & $ \judget \epsilon {\lam f {\im {\for {\alpha_1} {\tau_1}}} {\blam \alpha {\app C {(\tapp f \alpha)}}}} {\im {\for {\alpha_1} {\tau_1}} \to \im {\for {\alpha_2} {\tau_2}}} $ & By the definition of $\im \cdot$ 
     \end{tabular} \\
 
   \item \textbf{Case}
@@ -67,7 +81,12 @@ the main idea. You can mention that we have a full proof in Coq.}
     \end{flalign*}
 
     \begin{tabular}{rll}
-      & \george{TODO} &
+      & $\judget {\epsilon, x \hast \im {\tau_1}} x {\im {\tau_1}}$ & By $\rulelabeltvar$ \\
+      & $\judget \epsilon {C_1} {\im {\tau_1} \to \im {\tau_2}}$ & By i.h. \\
+      & $\judget {\epsilon, x \hast \im {\tau_1}} {\app {C_1} x} {\im {\tau_2}}$ & By $\rulelabeltapp$ and weakening \\
+      & $\judget {\epsilon, x \hast \im {\tau_1}} {\app {C_2} x} {\im {\tau_3}}$ & Similar \\
+      & $\judget {\epsilon, x \hast \im {\tau_1}} {\pair {\app {C_1} x} {\app {C_2} x}} {\pair {\im {\tau_2}} {\im {\tau_3}}}$ & By $\rulelabeltpair$ \\
+      & $\judget {\epsilon, x \hast \im {\tau_1}} {\pair {\app {C_1} x} {\app {C_2} x}} {\im {\tau_2 \andop \tau_3}}$ & By the definition of $\im \cdot$ \\
     \end{tabular} \\
 
   \item \textbf{Case}
@@ -76,7 +95,13 @@ the main idea. You can mention that we have a full proof in Coq.}
     \end{flalign*}
 
     \begin{tabular}{rll}
-      & \george{TODO} &
+      & $ \judget {\epsilon, x \hast \im {\tau_1 \andop \tau_2}} x {\im {\tau_1 \andop \tau_2}} $ & By $\rulelabeltvar$ \\
+      & $ \judget {\epsilon, x \hast \im {\tau_1 \andop \tau_2}} x {\pair {\im {\tau_1}} {\im {\tau_2}}} $ & By the definition of $\im \cdot$ \\
+      & $ \judget {\epsilon, x \hast \im {\tau_1 \andop \tau_2}} {\proj 1 x} {\im {\tau_1}} $ & By $\rulelabeltprojleft$ \\
+      & $ \judget \epsilon C {\im {\tau_1} \to \im {\tau_3}} $ & By i.h. \\
+      & $ \judget {\epsilon, x \hast \im {\tau_1 \andop \tau_2}} C {\im {\tau_1} \to \im {\tau_3}} $ & By weakening \\
+      & $ \judget {\epsilon, x \hast \im {\tau_1 \andop \tau_2}} {\app C {(\proj 1 x)}} {\im {\tau_3}} $ & By $\rulelabeltapp$ \\
+      & $ \judget \epsilon {\lam x {\im {\tau_1 \andop \tau_2}} {\app C {(\proj 1 x)}}} {\im {\tau_1 \andop \tau_2} \to \im {\tau_3}} $ & By $\rulelabeltlam$ 
     \end{tabular} \\
 
   \item \textbf{Case}
@@ -93,10 +118,10 @@ the main idea. You can mention that we have a full proof in Coq.}
 
     \begin{tabular}{rll}
       & $ \tau_1 \subtype \tau_2 \yields C $ & Premise \\
-      (a) & $ \judget \epsilon C {\im {\tau_1} \to \im {\tau_2}} $ & By i.h. \\
+      & $ \judget \epsilon C {\im {\tau_1} \to \im {\tau_2}} $ & By i.h. \\
       & $ \judget {\epsilon, x \hast \im {\recty l {\tau_1}}} x {\im {\recty l {\tau_1}}} $ & By $ \rulelabeltvar $ \\
       & $ \judget {\epsilon, x \hast \im {\recty l {\tau_1}}} x {\im {\tau_1}} $ & By the definition of $ \im \cdot $ \\
-      & $ \judget {\epsilon, x \hast \im {\recty l {\tau_1}}} {\app C x} {\im {\tau_2}} $ & By $ \rulelabeltapp $ and (a) \\
+      & $ \judget {\epsilon, x \hast \im {\recty l {\tau_1}}} {\app C x} {\im {\tau_2}} $ & By $ \rulelabeltapp $ \\
       & $ \judget {\epsilon, x \hast \im {\recty l {\tau_1}}} {\app C x} {\im {\recty l {\tau_2}}} $ & By the definition of $ \im \cdot $ \\
       & $ \judget \epsilon {\lam x {\im {\recty l {\tau_1}}} {\app C x}} {\im {\recty l {\tau_1}} \to \im {\recty l {\tau_2}}} $ & By $ \rulelabeltlam $ 
     \end{tabular} \\
