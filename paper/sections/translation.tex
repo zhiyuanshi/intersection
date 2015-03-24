@@ -13,7 +13,7 @@ within System $F$.
 This subsection presents the translation informally by explaining the major
 ideas. 
 
-\paragraph{Turning merges into pairs}
+\paragraph{Turning merges into pairs.}
 The first idea is turning merges into pairs. For example,
 \[
 1 \mergeop \code{"one"}
@@ -33,7 +33,7 @@ The coercion in this case is $(\lam x {\pair \Int \String} {\proj 2 x})$.
 \noindent The coercion extracts the second item from the pair since the function expects a $\String$
 but the translated argument is of type $\pair \Int \String$. 
 
-\paragraph{Erasing labels}
+\paragraph{Erasing labels.}
 The second idea is erasing record labels. For example,
 \begin{lstlisting}
 {name = "Barbara"}
@@ -49,7 +49,7 @@ Since multi-field records are just merges, the record is desugared as
 \end{lstlisting}
 and then translated to \lstinline{(8,5)}.
 
-\paragraph{Record operations as functions}
+\paragraph{Record operations as functions.}
 The third idea is translating record operations into normal functions. For
 example, the source program
 \begin{lstlisting}

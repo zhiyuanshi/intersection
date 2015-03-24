@@ -299,10 +299,10 @@ with three fields and with the following type:
 intersections of single-field record types.
 
 \name has three primitive operations related to records: \emph{construction},
-\emph{selection}, and \emph{update}. \emph{Extension},\george{FIXME} described in many other
-record systems, is delegated to the merge operator. Working
-with records is type-safe: the type system prevents accessing or updating a
-field that does not exist.
+\emph{selection}, and \emph{restriction}. \emph{Extension}, described in many
+other record systems, is delegated to the merge operator. Working with records
+is type-safe: the type system prevents accessing or updating a field that does
+not exist.
 
 \paragraph{Construction.} The usual notation for constructing records
 \begin{lstlisting}
@@ -320,19 +320,28 @@ Fields are extracted using the dot notation. For example,
 \end{lstlisting}
 selects the value of the field labelled \lstinline{open} from the record.
 
-\paragraph{Update.}\george{FIXME}
-Functional update allows creating a new record based on an existing one, with
-one or more fields replaced. For example, we
-can get a new quote with incremented \lstinline{high} with:
+\paragraph{Restriction.}
+Restriction $e \restrictop l$ removes a field $l$ from an expression $e$. If $e$
+contains multiple fields labelled $l$, only the last field will be removed.
+Restriction was chosen to be a primitive because we may define other common
+record operations in terms of restriction. For example, we can define record
+\emph{update} as a restriction followed by a merge. The following example
+creates a new quote with the \lstinline{high} field updated:
 \begin{lstlisting}
-{open=192, high=195, low=189} with {high=196}
+{open=192, high=195, low=189} \ high ,, {high=196} 
+\end{lstlisting}
+Similarly, \emph{renaming} of a field can be simulated by:
+\begin{lstlisting}
+{open=192, high=195, low=189} \ high ,, {dayHigh=196} 
 \end{lstlisting}
 
+\begin{comment}
 Refinement of fields is also possible, in the sense
 that the type of a new value can be a subtype of that of the old
 one.~\footnote{The subtyping restriction is not required for the \name to be
   coherent and it leaves option open for language designers.}
 \bruno{Are we going to show an example of this?}
+\end{comment}
 
 \paragraph{Extension.}
 Extension, just as construction, is performed with the merge operator
