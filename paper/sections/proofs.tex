@@ -1,16 +1,36 @@
 \section{Proofs}
 
-\paragraph{Notation.} We sketch our proofs in two-column style: on the left are
-the intermediate results and on the right are the justification (for the
-previous intermediate result to reach the corresponding left-hand side). 
+\paragraph{Notation.} We sketch most of our proofs in two-column style: on the
+left are the intermediate results and on the right are the justification (for
+the previous intermediate result to reach the corresponding left-hand side).
 
-\subsection{Elaboration}
+\subsection{Subtyping}
+
+\begin{theorem}[Subtyping is reflexive]
+  If $\tau$ is a well-formed type, then $\tau \subtype \tau$.
+\end{theorem}
+
+\begin{proof}
+  \george{TODO}
+\end{proof}
+
+\begin{theorem}[Subtyping is transitive]
+  If $\tau_1$, $\tau_2$, $\tau_3$ are well-formed types, and
+  $\tau_1 \subtype \tau_2$ and $\tau_2 \subtype \tau_3$, then
+  $\tau_1 \subtype \tau_3$.
+\end{theorem}
+
+\begin{proof}
+  \george{TODO}
+\end{proof}
 
 \bruno{fix numbering of lemmas}
 \bruno{reflexitivity and transitivity missing. You can do a proof
   sketch instead of a full proof. Just say in 1 or 2 sentences what is
 the main idea. You can mention that we have a full proof in Coq.}
 \bruno{target type system is missing 3 cases: Tunit; Tproj1; TProj2}
+
+\subsection{Elaboration}
 
 \begin{lemma}[\rulelabelsub~rules produce type-correct coercion] \label{lemma:sub-correct}
   If $ \tau_1 \subtype \tau_2 \yields C $, then $ \judget \epsilon C {\im {\tau_1} \to \im {\tau_2}} $.
@@ -70,7 +90,7 @@ the main idea. You can mention that we have a full proof in Coq.}
       & $ \judget {\epsilon, f \hast {\im {\for {\alpha_1} {\tau_1}}}} f {\for {\alpha_1} {\im {\tau_1}}} $ & By the definition of $ \im \cdot $ \\
       & $ \judget {\epsilon, f \hast {\im {\for {\alpha_1} {\tau_1}}}, \alpha} {\tapp f \alpha} {\subst \alpha {\alpha_1} {\im {\tau_1}}} $ & By $\rulelabeltvar$ and $\rulelabelttapp$ \\
       & $ \judget {\epsilon, f \hast {\im {\for {\alpha_1} {\tau_1}}}, \alpha} {\app C {(\tapp f \alpha)}} {\subst \alpha {\alpha_1} {\im {\subst {\alpha_1} {\alpha_2} {\tau_2}}}} $ & By $\rulelabeltapp$ \\
-      & $ \judget {\epsilon, f \hast {\im {\for {\alpha_1} {\tau_1}}}} {\blam \alpha {\app C {(\tapp f \alpha)}}} {\for {\alpha_2} {\im {\tau_2}}} $ & By $\rulelabeltblam$ and substitution \george{What?} \\
+      & $ \judget {\epsilon, f \hast {\im {\for {\alpha_1} {\tau_1}}}} {\blam \alpha {\app C {(\tapp f \alpha)}}} {\for {\alpha_2} {\im {\tau_2}}} $ & By $\rulelabeltblam$ and substitution \george{Substitution is problematic} \\
       & $ \judget \epsilon {\lam f {\im {\for {\alpha_1} {\tau_1}}} {\blam \alpha {\app C {(\tapp f \alpha)}}}} {\im {\for {\alpha_1} {\tau_1}} \to \for {\alpha_2} {\im {\tau_2}}} $ & By $\rulelabeltlam$ \\
       & $ \judget \epsilon {\lam f {\im {\for {\alpha_1} {\tau_1}}} {\blam \alpha {\app C {(\tapp f \alpha)}}}} {\im {\for {\alpha_1} {\tau_1}} \to \im {\for {\alpha_2} {\tau_2}}} $ & By the definition of $\im \cdot$ 
     \end{tabular} \\
@@ -87,6 +107,7 @@ the main idea. You can mention that we have a full proof in Coq.}
       & $\judget {\epsilon, x \hast \im {\tau_1}} {\app {C_2} x} {\im {\tau_3}}$ & Similar \\
       & $\judget {\epsilon, x \hast \im {\tau_1}} {\pair {\app {C_1} x} {\app {C_2} x}} {\pair {\im {\tau_2}} {\im {\tau_3}}}$ & By $\rulelabeltpair$ \\
       & $\judget {\epsilon, x \hast \im {\tau_1}} {\pair {\app {C_1} x} {\app {C_2} x}} {\im {\tau_2 \andop \tau_3}}$ & By the definition of $\im \cdot$ \\
+      & $\judget \epsilon {\lam x {\im {\tau_1}} {\pair {\app {C_1} x} {\app {C_2} x}}} {\im {\tau_1} \to {\im {\tau_2 \andop \tau_3}}}$ & By $\rulelabeltlam$
     \end{tabular} \\
 
   \item \textbf{Case}
@@ -223,7 +244,7 @@ the main idea. You can mention that we have a full proof in Coq.}
 \end{itemize}
 \end{proof}
 
-
+\begin{comment}
 \begin{lemma}[\rulelabelupdate~rules produce type-correct coercion] \label{lemma:update-correct}
   If $ \judgeupdate \tau l {\tau_1 \yields E} {\tau_2} {\tau_3} \yields C $ and $
   \judget \Gamma E {\im {\tau_1}} $ for some $ \Gamma $, then
@@ -268,6 +289,7 @@ the main idea. You can mention that we have a full proof in Coq.}
 
   \end{itemize}
 \end{proof}
+\end{comment}
 
 \begin{lemma}[Preservation of well-formedness under type translation] \label{lemma:preserve-wf}
   If $ \judgeewf \gamma \tau $, then $ \judgetwf {\im \gamma} {\im \tau} $.
