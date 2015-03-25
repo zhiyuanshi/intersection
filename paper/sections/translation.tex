@@ -7,7 +7,9 @@ approach~\cite{dunfield2014elaborating}. But in addition, our translation
 removes labels of records and rewrites record operations as function
 applications. In the end the translated expressions can be typed and interpreted
 within System $F$. We add the blue-color part to our rules presented in the
-previous section. Besides that, they stay the same.
+previous section. Besides that, they stay the same. We also tacitly assume the
+variables introduced in the blue part are generated from a unique name supply and
+are always fresh.
 
 \subsection{Informal Discussion}
 
@@ -67,8 +69,7 @@ extracts the desired item $5$.
 
 Our target language is System $F$ extended with pair and unit types. The syntax
 and typing is completely standard. The syntax of the target language is shown in
-Figure~\ref{fig:f-syntax} and the typing rules in the Appendix~\george{cross
-  ref}.
+Figure~\ref{fig:f-syntax} and the typing rules in the appendix.
 % \bruno{fill!}
 \begin{figure}[h]
   \input{rule_in_figures/f-syntax.tex}
@@ -337,3 +338,7 @@ Since we define the dynamic semantics of \name in terms of the composition of th
   If $e$ is a well-typed \name expression, then $e$ evaluates to some System $F$
   value.
 \end{theorem}
+
+\begin{proof}
+  It follows directly from the discussion above.
+\end{proof}
