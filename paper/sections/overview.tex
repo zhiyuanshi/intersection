@@ -21,7 +21,7 @@ part of our implementation.
  
 %will do so by introducing a simple source language, which will be used in
 %Section~\ref{sec:application}. \george{From the practice of similar papers, I
-% think a figure listing the source syntax is neccessary.}
+% think a figure listing the source syntax is necessary.}
 
 \subsection{Intersection Types in Existing Languages}\label{subsec:interScala}
 
@@ -267,9 +267,9 @@ where any field in the increment may replace an existing field $l$, which is
 type-inheritance in Cook's sense~\cite{cook1989inheritance}. 
 ``Inheritance is not subtyping'' means that structually, 
 $G$ can be: 
-(1) a subtype of $F$, 
-(2) a supertype of $F$, or 
-(3) $G$ and $F$ can have no relation at all! 
+1) a subtype of $F$, 
+2) a supertype of $F$, or 
+3) $G$ and $F$ can have no relation at all! 
 If none of $l_1, \ldots, l_n$ is present in $F$, $G$ can be safely regarded as a subtype of $F$, since $G$ always contains the fields required by the signature $F$.
 If all of $l_1, \ldots, l_n$ are present in $F$
 and each of their types is a supertype of the corresponding type, $G$ becomes instead a supertype of $F$.
@@ -344,7 +344,7 @@ selects the value of the field labelled \lstinline{open} from the record.
 Restriction $e \restrictop l$ removes a field $l$ from an expression $e$. If $e$
 contains multiple fields labelled $l$, only the last field will be removed.
 Restriction was chosen to be a primitive because other common
-record operations can be defined in terms of restriction. For example, we can define record
+record operations can be defined in terms of restriction. For example, we can encode record
 \emph{update} as a restriction followed by a merge. The following example
 shows updating the \lstinline{high} field of a quote:
 \begin{lstlisting}
