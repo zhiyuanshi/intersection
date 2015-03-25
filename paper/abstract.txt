@@ -1,0 +1,18 @@
+Over the years there have been various proposals for design patterns to improve
+extensibility of programs. Examples include Object Algebras, Modular Visitors or
+Torgersen’s design patterns using generics. Although those design patterns give
+practical benefits in terms of extensibility, they also expose limitations in
+existing mainstream OOP languages. Some pressing limitations are: 1) lack of
+good mechanisms for object-level composition; 2) conflation of (type)
+inheritance with subtyping; 3) heavy reliance on generics. This paper presents
+System F&: an extension of System F with intersection types and a merge
+operator. The goal of System F& is to study the minimal language constructs
+needed to support various extensible designs, while at the same time addressing
+the limitations of existing OOP languages. To address the lack of good
+object-level composition mechanisms, System F& uses the merge operator to do
+dynamic composition of values/objects. Moreover, in System F& type inheritance
+is independent of subtyping, and an extension can be a supertype of a base
+object type. Finally, System F& replaces many uses of generics by intersection
+types or conventional subtyping. System F& is formalized and implemented.
+Moreover the paper shows how various extensible designs can be encoded in System
+F&.
