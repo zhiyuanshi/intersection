@@ -1,15 +1,15 @@
 \section{The \name calculus} \label{sec:fi}
 
 This section presents the syntax, subtyping, and typing of \name.  The
-semantics of \name will be defined by a type-directed translation from
-\name to a simple variant of System $F$ in the next section.
+semantics of \name will be defined by a type-directed translation 
+to a simple variant of System $F$ in the next section.
 
 \subsection{Syntax}
 
 Figure~\ref{fig:fi-syntax} shows the syntax of \name (with the addition to
 System $F$ highlighted). As a convention in this paper, we will be using
 lowercase letters as meta-variables for sorts in \name, and uppercase letters
-for those in the target language (starting to appear in the next section).
+for those in the target language.
 
 % To System $ F $, we add two features: intersection types and single-field
 % records.
@@ -30,9 +30,9 @@ for those in the target language (starting to appear in the next section).
 Meta-variables $\tau$ range over types. Types include System $F$ constructs:
 type variables $\alpha$; function types $\tau_1 \to \tau_2$; and type
 abstraction $ \for \alpha \tau $. The top type $\top$ is the supertype of all
-types. It is in fact the $0$-ary intersection. $\tau_1 \andop \tau_2$ denotes
-the intersection of type $\tau_1$ and $\tau_2$; and $\recty l \tau$ the types
-for single-field records. Single-field record types can be viewed as types
+types. $\tau_1 \andop \tau_2$ denotes
+the intersection of types $\tau_1$ and $\tau_2$; and $\recty l \tau$ the types
+for single-field records. Interestingly, single-field record types can be viewed as types
 tagged with a label $l$, while the other type forms are untagged types. We omit
 type constants such as \lstinline$Int$ and \lstinline$String$.
 % \bruno{be consistent: in the source language we use \&, and in the
@@ -44,7 +44,7 @@ $\lam x \tau e$ (concretely written \lstinline$\(x:T) -> e$);
 abstraction of expressions over types $\blam \alpha e$ (concretely written \lstinline$/\A -> e$); 
 application of expressions to expressions $\app {e_1} {e_2}$; 
 and application of expressions to types $\tapp e \tau$ (concretely written \lstinline$e[T]$). 
-The last four constructs are new.
+The last four constructs are novel.
 The canonical term that inhabits the top type is also written as $\top$.
 $e_1 \mergeop e_2$ is the \emph{merge} of two expressions $e_1$ and $e_2$.
 % \bruno{explain further, after all this is new.}
@@ -63,7 +63,7 @@ x = \reccon {l_1} {e_1} \mergeop \reccon {l_1} {e_2}
 is of an intersection type, $ x.{l_1} $ still gives $ e_1 $. On the other hand,
 $ x.{l_3} $ will be rejected by the type system. 
 \end{comment}
-Restriction $e \restrictop l$ removes the field $l$ inside $e$. In order to
+Restriction $e \restrictop l$ clears the field $l$ inside $e$. In order to
 focus on the most essential features, we do not include other forms such as
 fixpoints here, although they are supported in our implementation and can
 be included in formalization in standard ways.
@@ -103,15 +103,16 @@ that are explicitly declared by the programmer.
   \label{fig:fi-subtyping}
 \end{figure*}
 
-The syntax-directed subtyping rules of \name are shown in Figure~\ref{fig:fi-subtyping}. They
-are not very surprising. The rule $\rulelabelsubfun$ says that functions are
-contravariant in their parameter type and covariant in their return type. A
+The subtyping rules of \name, shown in Figure~\ref{fig:fi-subtyping}, are syntax-directed
+(different from the approach by Davies and Pfenning~\cite{davies2000intersection},
+and Frisch et. al~\cite{frisch2008semantic}). The rule $\rulelabelsubfun$ says that a function is
+contravariant in its parameter type and covariant in its return type. A
 universal quantifier ($\forall$) is covariant in its body. A single-field record
-type is also covariant, which becomes obvious if we regard it as just a labelled
+type is also covariant, which becomes obvious if we regard it as a labelled
 type. The three rules dealing with intersection types are just what one would
 expect when interpreting types as sets. Under this interpretation, for example,
 the rule $\rulelabelsuband$ says that if $\tau_1$ is both the subset of $\tau_2$
-and $\tau_3$, then $\tau_1$ is also the subset of the intersection of $\tau_2$
+and the subset of $\tau_3$, then $\tau_1$ is also the subset of the intersection of $\tau_2$
 and $\tau_3$.
 
 % Intersection types introduce natural subtyping relations among types. For
@@ -156,20 +157,20 @@ materials submitted with the paper.
   \label{fig:fi-typing}
 \end{figure*}
 
-The syntax-directed typing rules of \name are shown in Figure~\ref{fig:fi-typing}. They consists of one
+The syntax-directed typing rules of \name are shown in Figure~\ref{fig:fi-typing}. They consist of one
 main typing judgment and two auxiliary judgments. The main typing judgment is of
-the form: $ \judgee \gamma e \tau $. It says that ``in the typing context
+the form: $ \judgee \gamma e \tau $. It reads: ``in the typing context
 $\gamma$, the expression $e$ is of type $\tau$''. The rules that are the same as
 in System $F$ are rules for variables ($\rulelabelevar$), lambda abstractions
-($\rulelabelelam$), type abstraction ($\rulelabeleblam$), and type application
+($\rulelabelelam$), type abstractions ($\rulelabeleblam$), and type applications
 ($\rulelabeletapp$). The rule $\rulelabeleapp$ needs special attention as we add
 a subtyping requirement in the premise: the type of the argument ($\tau_3$) is a
 subtype of that of the parameter ($\tau_1$). 
 %The advantage is that it then
 %becomes easier to derive an algorithm for typechecking. 
 For merges
-$e_1 \mergeop e_2$, we typecheck $e_1$ and $e_2$ respectively, and give it the
-intersection of the resulting types $\tau_1 \andop \tau_2$. The rule for
+$e_1 \mergeop e_2$, we typecheck $e_1$ and $e_2$, and give it the
+intersection of the resulting types. The rule for
 single-field record construction ($\rulelabelerecconstruct$) is standard. The rules
 for record selection ($\rulelabelerecselect$) and restriction
 ($\rulelabelerecrestrict$) are expectedly the most complicated. They turn to the
@@ -184,7 +185,7 @@ The ``select'' judgment deals with record selection. For example,
 \]
 That means that the $\texttt{name}$ field inside
 $\recty {\texttt{id}} \Int \andop \recty {\texttt{name}} \String$ is of type
-$\texttt{String}$. Formally, $\judgeselect {\tau_1} l {\tau_2}$ says that a field
+$\texttt{String}$. Generally, $\judgeselect {\tau_1} l {\tau_2}$ says that a field
 labelled $l$ is present inside $\tau_1$ and is of type $\tau_2$. The judgment is
 made of three inference rules and is inductively defined. $\rulelabelselect$ is
 the base case: if we ask for a field labelled $l$ inside $\recty l \tau$, the
@@ -197,7 +198,7 @@ the desired field $l$ remains $\tau$ in the conclusion.
 \paragraph{Typing record restriction.}
 The ``restrict'' judgment $\judgerestrict {\tau_1} l {\tau_2}$ deals with record
 restriction and is very similar to the ``select'' judgment. The only difference
-is that instead of giving the type of field being selected, the judment holds
+is on the right-hand side of the equal sign: instead of giving the type of field being selected, the judment holds
 the type after the restriction. For example,
 \[
 \judgerestrict {\recty {\code{id}} \Int \andop \recty {\code{name}} \String}
