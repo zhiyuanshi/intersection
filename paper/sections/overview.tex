@@ -224,7 +224,9 @@ subtyping relation on intersection types. That is the type
 \lstinline{100} as its argument. Generally speaking an intersection type
 \lstinline{A & B} is a subtype of both \lstinline{A} and \lstinline{B}.
 Moreover, subtyping of intersection types in \name is purely structural
-and it enjoys of properties such as \emph{idempotence} and \emph{commutativity} (equality is defined as bidirectional subtyping relation): \\
+and it enjoys of properties such as \emph{idempotence},
+\emph{commutativity} and \emph{associativity}
+(equality is defined as bidirectional subtyping relation): \\
 
 % \noindent {\bf commutativity: } $A \andop B = B \andop A$  \\
 % {\bf associativity:~~~~~~}$A \andop (B \andop C) = (A \andop B) \andop C$
@@ -391,7 +393,7 @@ Subtyping of record types supports both width and depth, as one might
 expect: \lstinline${x: Int, y: Int}$ is a subtype of
 \lstinline${x: Int}$; and if \lstinline$T1$ is a subtype of
 \lstinline$T2$, then \lstinline${l: T1}$ is also a subtype of
-\lstinline${l: T2} $.
+\lstinline${l: T2}$.
 
 % \bruno{I would call this a labelled type. Record types can be viewed as
 % intersections of labelled types.}
@@ -420,7 +422,6 @@ expect: \lstinline${x: Int, y: Int}$ is a subtype of
 %   are missing!}
 
 \subsection{\hspace{-5pt}Intersection~Types~and~Parametric~Polymorphism}
-\bruno{wondering again whether this should be here or in the next section!}
 
 The combination of intersection types and parametric polymorphism
 makes System \name quite expressive. In particular this combination
