@@ -17,7 +17,7 @@ This section provides the reader with the necessary intuition for
 The features of \name are also contrasted with features of mainstream
 languages such as Java or Scala. Note that this section uses some 
 common syntactic sugar in programming languages, which is 
-part of our implementation of System \name.
+part of our implementation.
  
 %will do so by introducing a simple source language, which will be used in
 %Section~\ref{sec:application}. \george{From the practice of similar papers, I
@@ -276,7 +276,7 @@ and each of their types is a supertype of the corresponding type, $G$ becomes in
 Conceivably, mixing the two cases above will lead to the third possibility.
 However, most OO languages conflate the two ideas, leading to cases
 where the type system gets in the way of expressing semantically correct programs. 
-This problem is exactly what has made using visitor pattern in OO languages hard to extend.
+This problem is exactly what has made using the visitor pattern in many OO languages hard to extend.
 
 % \george{I think points regarding the designs of type system should prob. be addressed
 %   somewhere else. The purpose of this section is just introducing the source
@@ -321,7 +321,7 @@ intersections of single-field record types.
 \name has three primitive operations related to records: \emph{construction},
 \emph{selection}, and \emph{restriction}. \emph{Extension}, described in many
 other record systems, is delegated to the merge operator. Working with records
-is type-safe: the type system prevents accessing or updating a field that does
+is type-safe: the type system prevents accessing or removing a field that does
 not exist.
 
 \paragraph{Construction.} The usual notation for constructing records
@@ -343,10 +343,10 @@ selects the value of the field labelled \lstinline{open} from the record.
 \paragraph{Restriction.}
 Restriction $e \restrictop l$ removes a field $l$ from an expression $e$. If $e$
 contains multiple fields labelled $l$, only the last field will be removed.
-Restriction was chosen to be a primitive because we may define other common
-record operations in terms of restriction. For example, we can define record
+Restriction was chosen to be a primitive because other common
+record operations can be defined in terms of restriction. For example, we can define record
 \emph{update} as a restriction followed by a merge. The following example
-creates a new quote with the \lstinline{high} field updated:
+shows updating the \lstinline{high} field of a quote:
 \begin{lstlisting}
 {open=192, high=195, low=189} \ high ,, {high=196} 
 \end{lstlisting}
@@ -365,7 +365,7 @@ one.~\footnote{The subtyping restriction is not required for the \name to be
 
 \paragraph{Extension.}
 Extension, just as construction, is performed with the merge operator
-($ \mergeop $). The following, for example, adds the \lstinline{close}
+($ \mergeop $). The following, for example, adds a \lstinline{close}
 field to the record:
 \begin{lstlisting}
 {open=192, high=195, low=189} ,, {close=195}
@@ -380,12 +380,8 @@ let mixed : Int & {x : Int} = 1 ,, {x = 2};
 and it is still possible to use record operations on
 \lstinline{mixed}. That is because a record type of the form $ \recty
 l \tau $ can be thought as a normal type $ \tau $ tagged by the label
-$ l $. For instance:
-\begin{lstlisting}
-mixed.x
-\end{lstlisting}
-
-\noindent extracts the value of the field \lstinline{x} from \lstinline{mixed}.
+$ l $. For instance, \lstinline$mixed.x$ extracts the value of the field 
+\lstinline{x} from \lstinline{mixed}.
 
 \subsubsection{Record Subtyping}
 

@@ -6,12 +6,12 @@ primitive; however the former is formalized with the same underlying idea of
 elaborating records. Based on the type system of \name, we built an ML-like
 source language compiler that offers interoperability with Java (such as object
 creation and method calls). The source language is loosely based on the more
-general System $F_{\omega}$ (compared to our target, System $F$) and supports a
+general System $F_{\omega}$ and supports a
 number of other features, including multi-field records, mutually recursive
 \code{let} bindings, type aliases, algebraic data types, pattern matching, and
 first-class modules that are encoded with \code{letrec} and records.
 
-Relevant to this paper are the three following phases in the compiler that
+Relevant to this paper are the three phases in the compiler, which 
 collectively turn source programs into System $F$:
 
 \begin{enumerate}

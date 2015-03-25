@@ -336,13 +336,11 @@ $\pair 0 {()}$.
 inference rule. The full proof can be found in the appendix.
 \end{proof}
 
-Since we define the dynamic semantics of \name in terms of the composition of the type-directed translation and the dynamic semantics of System $F$, we have:
-
 \begin{theorem}[Type safety]
   If $e$ is a well-typed \name expression, then $e$ evaluates to some System $F$
   value.
 \end{theorem}
-
 \begin{proof}
-  It follows directly from the discussion above.
+  Since we define the dynamic semantics of \name in terms of the composition of
+  the type-directed translation and the dynamic semantics of System $F$, type safety follows immediately.
 \end{proof}

@@ -138,13 +138,10 @@ use delegation for doing dynamic composition in a system
 with virtual classes. This in contrast with most other approaches 
 that use class-based composition, but closer to the dynamic
 composition that we use in \name.
-
 \begin{comment}
 In contrast to type systems for virtual classes 
 and similar mechanisms, the goal of our work is to study the type
 systems and basic language mechanism to better support such design patterns. 
-
-
  some researchers have designed new type
 system features such as virtual classes~\cite{ernst2006virtual}, polymorphic
 variants~\cite{garrigue1998programming}, while others have shown employing
@@ -155,7 +152,6 @@ designs, while the second approach still sacrifices the readability for
 extensibility.
 \bruno{fill me in with more details and more references!}
 \end{comment}
-
 % Intersection types have been shown to be useful in designing languages that
 % support modularity.~\cite{nystrom2006j}
 
@@ -179,15 +175,15 @@ existential types to address the problem that arises when interpreting method
 dispatch as self-application. But in his paper, intersection types are not used
 to encode multi-field records.
 
-Wand~\cite{wand1987complete} started the work on extensible records and proposes
+Wand~\cite{wand1987complete} started the work on extensible records and proposed
 row types~\cite{wand1989type} for records. Cardelli and
 Mitchell~\cite{cardelli1990operations} defined three primitive operations on
 records that are similar to ours: \emph{selection}, \emph{restriction}, and
 \emph{extension}. The merge operator in \name plays the same role as extension.
 Following Cardelli and Mitchell's approach,
-Leijen~\cite{leijen2004first,leijen2005extensible} define record update in terms
-of restriction and extension. Both Leijen's system and ours allows records that contain
-duplicate labels. Arguably Leijen's system is stronger. For example, it supports
+of restriction and extension. Both Leijen's systems~\cite{leijen2004first,leijen2005extensible} 
+and ours allows records that contain
+duplicate labels. Leijen's system is more sophisticated. For example, it supports
 passing record labels as arguments to functions. He also shows encoding an
 intersection types using first-class labels. 
 
