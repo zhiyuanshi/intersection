@@ -1,39 +1,51 @@
 let (++) (s: String) (t: String) = s.concat(t);
 
-type ExpVisitor[E] = {lit: Int -> E, add: E -> E -> E};
-type Exp = {accept: forall E. ExpVisitor[E] -> E};
+type ExpAlg[E] = {lit: Int -> E, add: E -> E -> E};
+type SubExpAlg[E] = ExpAlg[E] & {sub: E -> E -> E};
 
-let evalVisitor: ExpVisitor[Int] = {
+-- BEGIN_V_EXP_SUBEXP
+type Exp = {
+  accept: forall E. ExpAlg[E] -> E
+};
+type SubExp = {
+  accept: forall E. SubExpAlg[E] -> E
+};
+-- END_V_EXP_SUBEXP
+
+
+let evalAlg: ExpAlg[Int] = {
   lit = \(x: Int) -> x,
   add = \(x: Int) (y: Int) -> x + y
 };
 
 -- Define "constructors"
+-- BEGIN_V_LITADD
 let lit (n: Int): Exp = {
-  accept = /\E -> \(f: ExpVisitor[E]) -> f.lit n
+  accept = /\E -> \(f: ExpAlg[E]) -> f.lit n
 };
 let add (e1: Exp) (e2: Exp): Exp = {
-  accept = /\E -> \(f: ExpVisitor[E]) -> f.add (e1.accept[E] f) (e2.accept[E] f)
+  accept = /\E -> \(f: ExpAlg[E]) ->
+    f.add (e1.accept[E] f) (e2.accept[E] f)
 };
+-- END_V_LITADD
 
-type SubExpVisitor[E] = ExpVisitor[E] & {sub: E -> E -> E};
-type SubExp = {accept: forall E. SubExpVisitor[E] -> E};
 
 -- Check SubExp :> Exp
 
+-- BEGIN_V_SUB
 let sub (e1: SubExp) (e2: SubExp): SubExp = {
-  accept = /\E -> \(f: SubExpVisitor[E]) -> f.sub (e1.accept[E] f) (e2.accept[E] f)
+  accept = /\E -> \(f: SubExpAlg[E]) ->
+    f.sub (e1.accept[E] f) (e2.accept[E] f)
 };
+-- END_V_SUB
 
-let printVisitor: SubExpVisitor[String] = {
+let printAlg: SubExpAlg[String] = {
   lit = \(x: Int) -> x.toString(),
   add = \(x: String) (y: String) -> x ++ " + " ++ y,
   sub = \(x: String) (y: String) -> x ++ " - " ++ y
 };
 
-let e1 = add (lit 2) (lit 3);
-let e2 = sub (lit 2) (lit 3);
-
--- Client code
--- e1.accept[Int] evalVisitor
-e2.accept[String] printVisitor 
+-- BEGIN_V_USAGE
+let e1 = sub (lit 7) (lit 2);
+e1.accept[String] printAlg
+-- END_V_USAGE

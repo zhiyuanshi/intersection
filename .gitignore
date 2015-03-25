@@ -30,3 +30,7 @@
 
 
 paper/*.pdf
+
+# Ruby script
+*.tex-old
+footempfile.txt

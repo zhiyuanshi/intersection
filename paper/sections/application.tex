@@ -170,9 +170,12 @@ system modeling arithmetic expressions and evaluation.
 The initial system considers expressions with two variants (literals and
 addition) and one operation (evaluation). Here is an interface that supports
 evaluation:
-\begin{lstlisting}{language=F2J}
-type IEval = {eval: Int};
-\end{lstlisting}
+\begin{comment}
+  \begin{lstlisting}{language=F2J}
+    type IEval = {eval: Int};
+  \end{lstlisting}
+\end{comment}
+\lstinputlisting[linerange=4-4]{../src/ObjectAlgebra.sf} % APPLY:linerange=OA_IEVAL
 
 \noindent In \name the interfaces of objects (or object types) are expressed as
 a record type. A \lstinline{type} declaration allow us to create a
@@ -184,12 +187,17 @@ interface, \lstinline$ExpAlg$, for expression types with the two
 variants. This interface has a fixed number of variants, but abstracts over the
 the type of the interpretation \lstinline$E$.
 
-\begin{lstlisting}{language=F2J}
-type ExpAlg[E] = {
-   lit: Int -> E, 
-   add: E -> E -> E
-};
-\end{lstlisting}
+\begin{comment}
+  \begin{lstlisting}{language=F2J}
+    type ExpAlg[E] = {
+      lit: Int -> E, 
+      add: E -> E -> E
+    };
+  \end{lstlisting}
+\end{comment}
+
+\lstinputlisting[linerange=8-11]{../src/ObjectAlgebra.sf} % APPLY:linerange=OA_EXPALG
+
 % whereas
 %\lstinline$ExpAlg[IEval & IPrint]$ will be the type of object algebras that
 %support both evaluation and pretty printing.
@@ -198,15 +206,18 @@ type ExpAlg[E] = {
 % \footnote{Should be mentioned in S2.}
 Having defined the interfaces, we can implement that object algebra interface
 with \lstinline$evalAlg$, which is an object algebra for evaluation. 
-\begin{lstlisting}{language=F2J}
-let evalAlg: ExpAlg[IEval] = {
-  lit = \(x: Int) -> {eval = x},
-  add = \(x: IEval) (y: IEval) -> {
-     eval = x.eval + y.eval
-  }
-};
-\end{lstlisting}
+\begin{comment}
+  \begin{lstlisting}{language=F2J}
+    let evalAlg: ExpAlg[IEval] = {
+      lit = \(x: Int) -> {eval = x},
+      add = \(x: IEval) (y: IEval) -> {
+        eval = x.eval + y.eval
+      }
+    };
+  \end{lstlisting}
+\end{comment}
 
+\lstinputlisting[linerange=15-20]{../src/ObjectAlgebra.sf} % APPLY:linerange=OA_EVALALG
 In this example we implement a record, where the two operations 
 \lstinline{lit} and \lstinline{add} return a record with type \lstinline{IEval}.
 The type \lstinline$ExpAlg[IEval]$ is the type of object algebras
@@ -219,15 +230,20 @@ Problem support the addition of new features to the existing
 program, without modifying existing code. 
 The first feature is adding a new variant, such as subtraction. We can do so by
 simply intersecting the original types and merging with the original values:
-\begin{lstlisting}{language=F2J}
-type SubExpAlg[E] = 
-   ExpAlg[E] & {sub: E -> E -> E};
-let subEvalAlg = evalAlg ,, {
-   sub = \(x: IEval) (y: IEval) -> { 
-      eval = x.eval - y.eval 
-   }
-};
-\end{lstlisting}
+
+\begin{comment}
+  \begin{lstlisting}{language=F2J}
+    type SubExpAlg[E] = 
+    ExpAlg[E] & {sub: E -> E -> E};
+    let subEvalAlg = evalAlg ,, {
+      sub = \(x: IEval) (y: IEval) -> { 
+        eval = x.eval - y.eval 
+      }
+    };
+  \end{lstlisting}
+\end{comment}
+
+\lstinputlisting[linerange=24-31]{../src/ObjectAlgebra.sf} % APPLY:linerange=OA_SUBEXPALG
 
 \noindent Note that here intersection types are used to model \emph{type
   inheritance} and the merge operator models a basic form of
@@ -237,31 +253,40 @@ let subEvalAlg = evalAlg ,, {
 A second extension adding a new operation, such as pretty printing. 
 Similar to evaluation, the interface of the pretty printing feature
 is modeled as:
-\begin{lstlisting}{language=F2J}
-type IPrint = {print : String};
-\end{lstlisting}
+\begin{comment}
+  \begin{lstlisting}{language=F2J}
+    type IPrint = {print : String};
+  \end{lstlisting}
+\end{comment}
+\lstinputlisting[linerange=35-35]{../src/ObjectAlgebra.sf} % APPLY:linerange=OA_IPRINT
 The implementation of pretty printing for expressions that support literals,
 addition, and subtraction is:
-\begin{lstlisting}{language=F2J}
-let printAlg : SubExpAlg[IPrint] = {
-  lit = \(x: Int) -> {print = x.toString()},
-  add = \(x: IPrint) (y: IPrint) -> {
-     print = x.print ++ " + " ++ y.print
-  },
-  sub = \(x: IPrint) (y: IPrint) -> {
-     print = x.print ++ " - " ++ y.print
-  }
-};
-\end{lstlisting}
+\begin{comment}
+  \begin{lstlisting}{language=F2J}
+    let printAlg : SubExpAlg[IPrint] = {
+      lit = \(x: Int) -> {print = x.toString()},
+      add = \(x: IPrint) (y: IPrint) -> {
+        print = x.print ++ " + " ++ y.print
+      },
+      sub = \(x: IPrint) (y: IPrint) -> {
+        print = x.print ++ " - " ++ y.print
+      }
+    };
+  \end{lstlisting}
+\end{comment}
+\lstinputlisting[linerange=39-47]{../src/ObjectAlgebra.sf} % APPLY:linerange=OA_PRINTALG
 
 \paragraph{Usage.}
 With the definitions above, values are created using the
-appropriate algebras. For example, the expression \lstinline{7 - 2} 
+appropriate algebras. For example, the expression \lstinline{7 + 2} 
 is encoded as follows:
-\begin{lstlisting}{language=F2J}
-let e1[E] (f: SubExpAlg[E]) = 
-   f.sub (f.lit 7) (f.lit 2);
-\end{lstlisting}
+\begin{comment}
+  \begin{lstlisting}{language=F2J}
+    let e1[E] (f: SubExpAlg[E]) = 
+    f.add (f.lit 7) (f.lit 2);
+  \end{lstlisting}
+\end{comment}
+\lstinputlisting[linerange=51-52]{../src/ObjectAlgebra.sf} % APPLY:linerange=OA_E1
 
 \noindent The expressions are unusual in the sense that they are
 functions that take an extra argument \lstinline$f$. The extra
@@ -279,24 +304,34 @@ algebras is needed. \name allows such composition: the \lstinline$combine$
 function, which takes two object algebras to create a combined algebra. It
 does so by constructing a new object algebra where each field is a
 function that delegates the input to the two algebra parameters.
-\begin{lstlisting}{language=F2J}
-let combine[A,B](f: ExpAlg[A])(g: ExpAlg[B]) : 
-  ExpAlg[A&B] = {
-    lit = \(x: Int) -> f.lit x ,, g.lit x,
-    add = \(x: A & B) (y: A & B) ->
-          f.add x y ,, g.add x y
-  }
-\end{lstlisting}
+\begin{comment}
+  \begin{lstlisting}{language=F2J}
+    let combine[A,B](f: ExpAlg[A])(g: ExpAlg[B]) : 
+    ExpAlg[A&B] = {
+      lit = \(x: Int) -> f.lit x ,, g.lit x,
+      add = \(x: A & B) (y: A & B) ->
+      f.add x y ,, g.add x y
+    }
+  \end{lstlisting}
+\end{comment}
+\lstinputlisting[linerange=58-63]{../src/ObjectAlgebra.sf} % APPLY:linerange=OA_COMBINE
 
-\begin{lstlisting}{language=F2J}
-let newAlg = 
-   combine[IEval,IPrint] subEvalAlg printAlg;
-let o = e1[IEval&IPrint] newAlg;
-o.print ++ " = " ++ o.eval.toString()
-\end{lstlisting}
+\begin{comment}
+  \begin{lstlisting}{language=F2J}
+    let newAlg = 
+    combine[IEval,IPrint] subEvalAlg printAlg;
+    let o = e1[IEval&IPrint] newAlg;
+    o.print ++ " = " ++ o.eval.toString()
+  \end{lstlisting}
+\end{comment}
+
+\lstinputlisting[linerange=67-69]{../src/ObjectAlgebra.sf} % APPLY:linerange=OA_USAGE
 
 Note that \lstinline$o$ is a single object that supports both
-evaluation and printing. 
+evaluation and printing, as the output of the program is
+\begin{lstlisting}
+> 7 + 2 = 9
+\end{lstlisting}
 
 In contrast to the Scala solutions available in the
 literature, \name is able to express object algebra
@@ -346,13 +381,13 @@ We illustrate the problem with extensible visitors using Scala.
 The composite type for expressions is defined in Scala as:
 \begin{lstlisting}{language=scala}
 trait Exp {
-  def accept(v: ExpAlg[A]): A
+  def accept[E](v: ExpAlg[E]): E
 }
 \end{lstlisting}
 The trait \lstinline{Exp} has only one method 
 \lstinline$accept$, which takes an internal visitor (or object
 algebra) as an argument. 
-Here the type \lstinline{ExpAlg[A]} is the Scala analogous of the
+Here the type \lstinline{ExpAlg[E]} is the Scala analogous of the
 corresponding type defined in Section~\ref{} in \name. In terms 
 of the visitor pattern, \lstinline{ExpAlg} defines the visit methods 
 for all variants. 
@@ -379,7 +414,7 @@ interface \lstinline$SubExp$ is needed as well:
 %to literal and addition.
 \begin{lstlisting}{language=scala}
 trait SubExp extends Exp {
-  override def accept[E](v: SubExpAlg[E]): E
+  def accept[E](v: SubExpAlg[E]): E
 }
 \end{lstlisting}
 %We extend the original visitor and add the new case.
@@ -417,53 +452,64 @@ from the ``Inheritance is Not Subtyping'' problem.
 \subsection{Extensible Visitors in \name}
 Such limitation does not exist in \name. For example, we can define the similar
 interfaces for \lstinline{Exp} and \lstinline{SubExp}:
-\begin{lstlisting}{language=F2J}
-type Exp    = {
-   accept: forall A. ExpAlg[A] -> A
-};
-type SubExp = {
-   accept: forall A. SubExpAlg[A] -> A
-};
-\end{lstlisting}
+\begin{comment}
+  \begin{lstlisting}{language=F2J}
+    type Exp    = {
+      accept: forall A. ExpAlg[A] -> A
+    };
+    type SubExp = {
+      accept: forall A. SubExpAlg[A] -> A
+    };
+  \end{lstlisting}
+\end{comment}
+\lstinputlisting[linerange=7-12]{../src/Visitor.sf} % APPLY:linerange=V_EXP_SUBEXP
 \name support contravariant parameter type refinement, which means that
 \lstinline{SubExp} is a supertype of \lstinline{Exp}. Using these
 types we first define two data constructors for simple expressions:
-\begin{lstlisting}{language=F2J}
-let lit (n: Int): Exp = {
-  accept = /\E -> \(f: ExpAlg[E]) -> f.lit n
-};
-let add (e1: Exp) (e2: Exp): Exp = {
-  accept = /\E -> \(f: ExpAlg[E]) -> 
+\begin{comment}
+  \begin{lstlisting}{language=F2J}
+    let lit (n: Int): Exp = {
+      accept = /\E -> \(f: ExpAlg[E]) -> f.lit n
+    };
+    let add (e1: Exp) (e2: Exp): Exp = {
+      accept = /\E -> \(f: ExpAlg[E]) -> 
       f.add (e1.accept[E] f) (e2.accept[E] f)
-};
-\end{lstlisting}
+    };
+  \end{lstlisting}
+\end{comment}
+\lstinputlisting[linerange=23-29]{../src/Visitor.sf} % APPLY:linerange=V_LITADD
 
 \noindent Both \lstinline{lit} and \lstinline{add} build values of type
 \lstinline{Exp} and use object algebras of type \lstinline{ExpAlg[E]}. 
 However, subtraction requires a value of type \lstinline{SubExp} to be created:
-\begin{lstlisting}{language=F2J}
-let sub (e1: SubExp) (e2: SubExp): SubExp ={ 
-   accept = /\E -> \(f : SubExpAlg[E]) ->
-        f.sub (e1.accept[E] f) (e2.accept[E] f) 
-};
-\end{lstlisting}
+\begin{comment}
+  \begin{lstlisting}{language=F2J}
+    let sub (e1: SubExp) (e2: SubExp): SubExp ={ 
+      accept = /\E -> \(f : SubExpAlg[E]) ->
+      f.sub (e1.accept[E] f) (e2.accept[E] f) 
+    };
+  \end{lstlisting}
+\end{comment}
+\lstinputlisting[linerange=36-39]{../src/Visitor.sf} % APPLY:linerange=V_SUB
 
 % One big benefit of using the visitor pattern is that programmers are able to
 % define structures in a more natural way. 
 
 \paragraph{Usage.} With visitors constructing expressions is quite simple:
 
-\begin{lstlisting}{language=F2J}
-e2 = sub (lit 7) (lit 2)
-\end{lstlisting}
-
-\noindent The programmer is able to pass \lstinline{lit 2}, which is of type \lstinline{Exp},
+\begin{comment}
+  \begin{lstlisting}{language=F2J}
+    e2 = sub (lit 7) (lit 2)
+  \end{lstlisting}
+\end{comment}
+\lstinputlisting[linerange=49-50]{../src/Visitor.sf} % APPLY:linerange=V_USAGE
+The output is \lstinline$7 - 2$. Note that the programmer is able to pass \lstinline{lit 2}, which is of type \lstinline{Exp},
 to \lstinline{sub}, which expects a \lstinline{SubExp}. The types are compatible
 because because \lstinline$Exp$ is a \emph{subtype} of \lstinline$SubExp$. Code
 reuse is achieved since we can use the constructors from \lstinline$Exp$ as the
 constructor for \lstinline$SubExp$. In Scala, we would have to define two
 literal constructors, one for \lstinline$Exp$ and another for
-\lstinline$SubExp$! 
+\lstinline$SubExp$. 
 
 Compared to object algebras, the addition of the composite structure
 allows values to be created much more intuitively, without any

@@ -1,29 +1,70 @@
 let (++) (s: String) (t: String) = s.concat(t);
 
+-- BEGIN_OA_IEVAL
 type IEval = {eval : Int};
-type ExpAlg[E] = {lit : Int -> E, add : E -> E -> E};
+-- END_OA_IEVAL
+
+-- BEGIN_OA_EXPALG
+type ExpAlg[E] = {
+  lit: Int -> E,
+  add: E -> E -> E
+};
+-- END_OA_EXPALG
+
+-- BEGIN_OA_EVALALG
 let evalAlg: ExpAlg[IEval] = {
   lit = \(x: Int) -> {eval = x},
-  add = \(x: IEval) (y: IEval) -> {eval = x.eval + y.eval}
+  add = \(x: IEval) (y: IEval) -> {
+    eval = x.eval + y.eval
+  }
 };
+-- END_OA_EVALALG
 
-type SubExpAlg[E] = ExpAlg[E] & {sub: E -> E -> E};
-let subEvalAlg = evalAlg ,, {sub = \(x: IEval) (y: IEval) -> {eval = x.eval - y.eval}};
+-- BEGIN_OA_SUBEXPALG
+type SubExpAlg[E] = ExpAlg[E] & {
+  sub: E -> E -> E
+};
+let subEvalAlg = evalAlg ,, {
+  sub = \(x: IEval) (y: IEval) -> {
+    eval = x.eval - y.eval
+  }
+};
+-- END_OA_SUBEXPALG
 
+-- BEGIN_OA_IPRINT
 type IPrint = {print: String};
-let printAlg = {
-  lit = \(x: Int) -> {print = x.toString()},
-  add = \(x: IPrint) (y: IPrint) -> {print = x.print ++ " + " ++ y.print},
-  sub = \(x: IPrint) (y: IPrint) -> {print = x.print ++ " - " ++ y.print}
-};
+-- END_OA_IPRINT
 
-let e1 [E] (f: ExpAlg [E])    = f.add (f.lit 6) (f.lit 6);
-let e2 [E] (f: SubExpAlg [E]) = f.sub (e1 [E] f) (f.lit 2);
-let merge [A, B] (f: ExpAlg[A]) (g: ExpAlg[B]): ExpAlg[A&B] = {
-  lit = \(x: Int) -> f.lit x ,, g.lit x,
-  add = \(x: A & B) (y: A & B) -> f.add x y ,, g.add x y
+-- BEGIN_OA_PRINTALG
+let printAlg: SubExpAlg[IPrint] = {
+  lit = \(x: Int) -> {print = x.toString()},
+  add = \(x: IPrint) (y: IPrint) -> {
+    print = x.print ++ " + " ++ y.print
+  },
+  sub = \(x: IPrint) (y: IPrint) -> {
+    print = x.print ++ " - " ++ y.print
+  }
 };
-let newAlg = merge [IEval, IPrint] subEvalAlg printAlg;
--- (e1 [IEval&IPrint] newAlg).print
-let o = e1 [IEval&IPrint] newAlg;
+-- END_OA_PRINTALG
+
+-- BEGIN_OA_E1
+let e1[E] (f: ExpAlg[E]) =
+  f.add (f.lit 7) (f.lit 2);
+-- END_OA_E1
+
+let e2 [E] (f: SubExpAlg [E]) = f.sub (e1 [E] f) (f.lit 2);
+
+-- BEGIN_OA_COMBINE
+let combine[A,B] (f: ExpAlg[A]) (g: ExpAlg[B]) : 
+  ExpAlg[A&B] = {
+    lit = \(x: Int) -> f.lit x ,, g.lit x,
+    add = \(x: A & B) (y: A & B) ->
+          f.add x y ,, g.add x y
+};
+-- END_OA_COMBINE
+
+-- BEGIN_OA_USAGE
+let newAlg = combine[IEval, IPrint] subEvalAlg printAlg;
+let o = e1[IEval&IPrint] newAlg;
 o.print ++ " = " ++ o.eval.toString()
+-- END_OA_USAGE
