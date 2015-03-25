@@ -25,6 +25,10 @@ To watch for changes of source files and re-generate the PDF if necessary:
 
     rake watch
 
+To see what else you can do (in case you live in the year 3000):
+
+    rake -T
+
 ## Note for viewing the PDF
 
 The default PDF viewer on Ubuntu, evince, renders PDF poorly. Google Chrome does
