@@ -1,13 +1,8 @@
 \section{The \name calculus} \label{sec:fi}
 
-\george{Discuss duplicate labels?}
-\george{Fix highlighting or just remove it}
-
-Following Dunfield's~\cite{dunfield2014elaborating} work on a simply-typed
-lambda calculus with intersection and union types, we present the syntax,
-subtyping, and typing of \name. The semantics of \name will
-be defined by a type-directed translation from \name to a simple variant of
-System $F$ in the next section.
+This section presents the syntax, subtyping, and typing of \name.  The
+semantics of \name will be defined by a type-directed translation from
+\name to a simple variant of System $F$ in the next section.
 
 \subsection{Syntax}
 
@@ -150,8 +145,7 @@ then $ \tau_1 \subtype \tau_3 $.
 \end{lemma}
 
 For the corresponding mechanized proofs in Coq, we refer to the supplementary
-materials submitted with the paper. \bruno{State the reflexivity and
-  transitivity Lemmas here then!}
+materials submitted with the paper. 
 
 \subsection{Typing}
 
@@ -161,7 +155,6 @@ materials submitted with the paper. \bruno{State the reflexivity and
   \caption{The type system of \name.}
   \label{fig:fi-typing}
 \end{figure*}
-\bruno{Please make the rule forms appear slightly above the rules.}
 
 The syntax-directed typing rules of \name are shown in Figure~\ref{fig:fi-typing}. They consists of one
 main typing judgment and two auxiliary judgments. The main typing judgment is of
@@ -189,11 +182,11 @@ The ``select'' judgment deals with record selection. For example,
 \judgeselect {\recty {\texttt{id}} \Int \andop \recty {\texttt{name}} \String}
 {\texttt{name}} {\String}
 \]
-That means the $\texttt{name}$ field inside
+That means that the $\texttt{name}$ field inside
 $\recty {\texttt{id}} \Int \andop \recty {\texttt{name}} \String$ is of type
 $\texttt{String}$. Formally, $\judgeselect {\tau_1} l {\tau_2}$ says that a field
 labelled $l$ is present inside $\tau_1$ and is of type $\tau_2$. The judgment is
-made of three inference rules and is recursively defined. $\rulelabelselect$ is
+made of three inference rules and is inductively defined. $\rulelabelselect$ is
 the base case: if we ask for a field labelled $l$ inside $\recty l \tau$, the
 field is clearly present and is of type $\tau$. $\rulelabelselectleft$ and
 $\rulelabelselectright$ are two symmetric step cases. Take
@@ -214,7 +207,6 @@ Note that $\recty {\code{id}} \Int \andop \top$, interpreted set-theoretically,
 is equivalent to $\recty {\code{id}} \Int$. Indeed, our system is able to judge
 they are subtype of each other.
 
-\bruno{We should probably say that {id:Int} \& T is equivalent to {id:Int}}
 
 % The last two rules make use of the $ \rulename{fields} $ function just to make
 % sure that the field being accessed ($ \rulelabelerecselect $) or updated
