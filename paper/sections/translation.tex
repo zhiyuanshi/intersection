@@ -118,7 +118,7 @@ Figure~\ref{fig:elab-subtyping} shows subtyping with coercions. The judgment
 extends the subtyping judgment in Figure~\ref{fig:fi-subtyping} with a coercion
 on the right hand side of $ \yields {} $. A coercion $ C $ is just an expression
 in the target language and is ensured to have type
-$ \im {\tau_1} \to \im {\tau_2} $ (Lemma~\ref{type-coerce})\bruno{ref
+$ \im {\tau_1} \to \im {\tau_2} $ (Lemma~\ref{lemma:sub})\bruno{ref
   now showing}. For example,
 \[
 \Int \andop \Bool \subtype \Bool \yields {\lam x {\im {\Int \andop \Bool}} {\proj 2 x}}
@@ -146,9 +146,10 @@ of $\tau_3$ and the new coercion is a function that takes a value $ x $ of type
 $\tau_1\andop \tau_2$, project $x$ on the first item, and apply $ C $ to it.
 \end{comment}
 
-\begin{lemma}[\rulelabelsub~rules produce type-correct coercion]
+\begin{restatable}[\rulelabelsub~rules produce type-correct coercion]{lemma}{lemmasub}
+  \label{lemma:sub}
   If $ \tau_1 \subtype \tau_2 \yields C $, then $ \judget \epsilon C {\im {\tau_1} \to \im {\tau_2}} $.
-\end{lemma}
+\end{restatable}
 
 \begin{proof}
   By a straighforward induction on the derivation.
@@ -215,9 +216,10 @@ $\tau_1 \andop \tau_2$ according to the selector for $\tau_1$ or $\tau_2$. The
 same idea appears in the twin $\rulelabelsubandleft$ and
 $\rulelabelsubandright$.
 
-\begin{lemma}[\rulelabelselect~rules produce type-correct coercion] \label{lemma:select-correct}
+\begin{restatable}[\rulelabelselect~rules produce type-correct coercion]{lemma}{lemmaselect}
+  \label{lemma:select}
   If $ \judgeselect \tau l {\tau_1} \yields C $, then $ \judget \epsilon C {\im \tau \to \im {\tau_1}} $.
-\end{lemma}
+\end{restatable}
 
 \begin{proof}
   By structural induction of the derivation.
@@ -268,10 +270,11 @@ top value in the target language. For the case
 the coercion will keep the $\code{name}$ field and replace the $\code{age}$
 field with a unit.
 
-\begin{lemma}[\rulelabelrestrict~rules produce type-correct coercion] \label{lemma:restrict-correct}
-  If $ \judgerestrict \tau l {\tau_1} \yields C $, then $ \judget \epsilon C {\im \tau \to \im {\tau_1}} $.
-\end{lemma}
-
+\begin{restatable}[\rulelabelrestrict~rules produce type-correct coercion]{lemma}{lemmarestrict}
+  \label{lemma:restrict}
+  If $ \judgerestrict \tau l {\tau_1} \yields C $,
+  then $ \judget \epsilon C {\im \tau \to \im {\tau_1}} $.
+\end{restatable}
 \begin{proof}
   By structural induction of the derivation.
 \end{proof}
@@ -323,10 +326,11 @@ $\pair 0 {()}$.
   \end{figure*}
 \end{comment}
 
-\begin{theorem}[Translation preserves well-typing]
-  If $ \judgee \gamma e \tau \yields E $, then $ \judget {\im \gamma} E {\im \tau} $.
-\end{theorem}
-
+\begin{restatable}[Translation preserves well-typing]{theorem}{theorempreservation}
+  \label{theorem:preservation}
+  If $ \judgee \gamma e \tau \yields E $,
+  then $ \judget {\im \gamma} E {\im \tau} $.
+\end{restatable}
 \begin{proof}
 (Sketch) By structural induction on the expression and the corresponding
 inference rule. The full proof can be found in the appendix.

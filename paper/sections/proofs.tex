@@ -32,10 +32,7 @@ the main idea. You can mention that we have a full proof in Coq.}
 
 \subsection{Elaboration}
 
-\begin{lemma}[\rulelabelsub~rules produce type-correct coercion] \label{lemma:sub-correct}
-  If $ \tau_1 \subtype \tau_2 \yields C $, then $ \judget \epsilon C {\im {\tau_1} \to \im {\tau_2}} $.
-\end{lemma}
-
+\lemmasub*
 \begin{proof}
   By structural induction of the derivation.
 
@@ -151,10 +148,7 @@ the main idea. You can mention that we have a full proof in Coq.}
 
 \end{proof}
 
-\begin{lemma}[\rulelabelselect~rules produce type-correct coercion] \label{lemma:select-correct}
-  If $ \judgeselect \tau l {\tau_1} \yields C $, then $ \judget \epsilon C {\im \tau \to \im {\tau_1}} $.
-\end{lemma}
-
+\lemmaselect*
 \begin{proof}
   By structural induction of the derivation.
 
@@ -196,10 +190,7 @@ the main idea. You can mention that we have a full proof in Coq.}
 \end{proof}
 
 
-\begin{lemma}[\rulelabelrestrict~rules produce type-correct coercion] \label{lemma:restrict-correct}
-  If $ \judgerestrict \tau l {\tau_1} \yields C $, then $ \judget \epsilon C {\im \tau \to \im {\tau_1}} $.
-\end{lemma}
-
+\lemmarestrict*
 \begin{proof}
   By structural induction of the derivation.
 
@@ -315,10 +306,7 @@ the main idea. You can mention that we have a full proof in Coq.}
   \end{itemize}
 \end{proof}
 
-\begin{theorem}[Translation preserves well-typing]
-  If $ \judgee \gamma e \tau \yields E $, then $ \judget {\im \gamma} E {\im \tau} $.
-\end{theorem}
-
+\theorempreservation*
 \begin{proof}
   By structural induction of the derivation.
 
@@ -369,7 +357,7 @@ the main idea. You can mention that we have a full proof in Coq.}
      & $ \judgee \gamma {e_2} {\tau_3} \yields {E_2} $ & Premise \\
      & $ \judget {\im \gamma} {E_2} {\im {\tau_3}} $ & By i.h. \\
      & $ \tau_3 \subtype \tau_1 \yields C $ & Premise \\
-     & $ \judget \epsilon C {\im {\tau_3} \to \im {\tau_1}} $ & By Lemma~\ref{lemma:sub-correct} \\
+     & $ \judget \epsilon C {\im {\tau_3} \to \im {\tau_1}} $ & By Lemma~\ref{lemma:sub} \\
      & $ \judget {\im \gamma} {\app {E_1} {(\app C E_2)}} {\im {\tau_2}} $ & By $ \rulelabeltapp $ and the definition of $ \im \cdot $
     \end{tabular} \\
 
@@ -432,7 +420,7 @@ the main idea. You can mention that we have a full proof in Coq.}
 
     \begin{tabular}{rll}
      & $ \judgeselect \tau l {\tau_1} \yields C $ & Premise \\
-     & $ \judget \epsilon C {\im \tau \to \im {\tau_1}} $ & By Lemma~\ref{lemma:select-correct} \\
+     & $ \judget \epsilon C {\im \tau \to \im {\tau_1}} $ & By Lemma~\ref{lemma:select} \\
      & $ \judget {\im \gamma} C {\im \tau \to \im {\tau_1}} $ & By weakening \\
      & $ \judgee \gamma e \tau \yields E $ & Premise \\
      & $ \judget {\im \gamma} E {\im \tau} $ & By i.h. \\
@@ -446,7 +434,7 @@ the main idea. You can mention that we have a full proof in Coq.}
 
     \begin{tabular}{rll}
      & $ \judgerestrict \tau l {\tau_1} \yields C $ & Premise \\
-     & $ \judget \epsilon C {\im \tau \to \im {\tau_1}} $ & By Lemma~\ref{lemma:restrict-correct} \\
+     & $ \judget \epsilon C {\im \tau \to \im {\tau_1}} $ & By Lemma~\ref{lemma:restrict} \\
      & $ \judget {\im \gamma} C {\im \tau \to \im {\tau_1}} $ & By weakening \\
      & $ \judgee \gamma e \tau \yields E $ & Premise \\
      & $ \judget {\im \gamma} E {\im \tau} $ & By i.h. \\
