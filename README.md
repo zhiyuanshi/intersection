@@ -25,6 +25,10 @@ To watch for changes of source files and re-generate the PDF if necessary:
 
     rake watch
 
+To make the PDF for supplementary materials:
+
+    rake supp
+
 To see what else you can do (in case you live in the year 3000):
 
     rake -T

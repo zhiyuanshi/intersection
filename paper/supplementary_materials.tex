@@ -30,20 +30,22 @@ with the paper ``System $F_\&$: A Simple Core Language for Extensibility'':
 
 The implementation of the compiler (in Haskell) is publicly available at:
 \url{https://github.com/hkuplg/fcore.git}. To build and install the compiler,
-simply follow the instructions at \texttt{README} at the project root. Besides,
-what may be of special interest to the reader of this paper is the component
+simply follow the instructions at \texttt{README.md} at the project root. Besides,
+what may be of special interest to the reader of this paper is the module
 \texttt{Simplify}, which translates $ F_\&$ to a variant of System $F$. It is
-located (relative to the project root) at \texttt{lib/simplify}. The definition
-of the abstract syntax tree of System $F_\&$ is at \texttt{lib/SystemFI.hs}.
+located (relative to the project root) at \texttt{lib/simplify}.
+Also, the definition of the abstract syntax tree of System $F_\&$
+is at \texttt{lib/SystemFI.hs}.
 
 \section*{Code examples}
 
-Two code examples that are used in the paper can be found at:
+Two code examples that are used in the paper (Section 3) can be found at:
 \url{https://github.com/zhiyuanshi/intersection/tree/master/src}. One is named
 \texttt{ObjectAlgebra.sf}, the other \texttt{Visitor.sf}. To run the examples,
 you need a working installation of the compiler described in the previous
 section. Here is how you would try out the examples at command line
-(\texttt{f2j} is the name of the compiler):
+(\texttt{f2j} is the name of the compiler; passing the \texttt{-r} flag
+additionally runs the program):
 \begin{lstlisting}
 $ f2j ObjectAlgebra.sf -r
 ObjectAlgebra using [Naive]
