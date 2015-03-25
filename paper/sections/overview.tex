@@ -229,11 +229,11 @@ and it enjoys of properties such as \emph{idempotence} and \emph{commutativity} 
 % \noindent {\bf commutativity: } $A \andop B = B \andop A$  \\
 % {\bf associativity:~~~~~~}$A \andop (B \andop C) = (A \andop B) \andop C$
 
-\begin{tabular}{ll}
-  \textbf{Idempotent}  & $A \andop A = A$ \\
-  \textbf{Commutative} & $A \andop B = B \andop A$ 
+\begin{tabular}{llrcl}
+  \textbf{Idempotent}  & $A \andop A$            & $=$ & $A$ \\
+  \textbf{Commutative} & $A \andop B$            & $=$ & $B \andop A$ \\
+  \textbf{Associative} & $(A \andop B) \andop C$ & $=$ & $(A \andop B) \andop C$ 
 \end{tabular}
-\george{Assoc? not sure!}
 
 \paragraph{Covariance and contravariance.}
 The subtyping also arises from contravariant parameter types
