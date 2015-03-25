@@ -169,7 +169,7 @@ Encoding records using intersection types appear in
 Reynolds~\cite{reynolds1997design} and Castagna et
 al.~\cite{castagna1995calculus}. Although Dunfield also discusses this idea in
 his paper \cite{dunfield2014elaborating}, he only provides an implementation but
-not formalization. Very similar to our treatment of elaborating records is
+not a formalization. Very similar to our treatment of elaborating records is
 Cardelli's work~\cite{cardelli1992extensible} on translating a calculus, named
 $ F_{\subtype \rho}$, with extensible records to a simpler calculus that without
 records primitives (in which case is $ F_{\subtype} $). But he does not consider
@@ -189,8 +189,7 @@ Leijen~\cite{leijen2004first,leijen2005extensible} define record update in terms
 of restriction and extension. Both Leijen's system and ours allows records that contain
 duplicate labels. Arguably Leijen's system is stronger. For example, it supports
 passing record labels as arguments to functions. He also shows encoding an
-intersection types using first-class labels. \bruno{check carefully
-  this text!}
+intersection types using first-class labels. 
 
 \begin{comment}
 Chlipala's
