@@ -259,24 +259,42 @@ nominal system that untangles inheritance and subtyping. For example, users may
 declare supertype of an existing class type while at the same time inheriting
 the implementation, and vice versa.
 
-Consider defining $G$ by adding fields to an existing type $F$
+Consider defining a type $G$ by adding fields to an existing type $F$
+in Cook's notation~\cite{cook1989inheritance}:
 \[
 G = F + \{ l_1:\tau_1, \ldots, l_n:\tau_n \}
 \]
-where any field in the increment may replace an existing field $l$, which is
-type-inheritance in Cook's sense~\cite{cook1989inheritance}. 
-``Inheritance is not subtyping'' means that structually, 
-$G$ can be: 
-1) a subtype of $F$, 
-2) a supertype of $F$, or 
-3) $G$ and $F$ can have no relation at all! 
-If none of $l_1, \ldots, l_n$ is present in $F$, $G$ can be safely regarded as a subtype of $F$, since $G$ always contains the fields required by the signature $F$.
-If all of $l_1, \ldots, l_n$ are present in $F$
-and each of their types is a supertype of the corresponding type, $G$ becomes instead a supertype of $F$.
-Conceivably, mixing the two cases above will lead to the third possibility.
-However, most OO languages conflate the two ideas, leading to cases
-where the type system gets in the way of expressing semantically correct programs. 
-This problem is exactly what has made using the visitor pattern in many OO languages hard to extend.
+where the plus sign means a field in the increment will override an existing
+field in $F$. ``Inheritance is not subtyping'' means that structually, $G$ can
+be: 1) a subtype of $F$, 2) a supertype of $F$, or 3) $G$ and $F$ can have no
+relation at all! If none of $l_1, \ldots, l_n$ is present in $F$, $G$ can be
+safely regarded as a subtype of $F$, since $G$ always contains the fields
+required by the signature $F$; if all of $l_1, \ldots, l_n$ are present in $F$
+and each of their types is a supertype of the corresponding type, $G$ becomes
+instead a supertype of $F$; Conceivably, the third possibility will make $F$ and
+$G$ have no relation. However, most OO languages conflate the two ideas, leading
+to cases where the type system gets in the way of expressing semantically
+correct programs. This problem is exactly what has made using the visitor
+pattern in many OO languages hard to extend.
+
+Now let's look at concrete example. An initial program consists of the two
+types:
+\begin{lstlisting}
+type A = {x1: Int};
+type F = {f: A -> Int};
+\end{lstlisting}
+Later one wishes to add a field to form a new type \lstinline$B$ and refine the
+parameter type of \lstinline$f$ by using \lstinline$B$ instead:
+\begin{lstlisting}
+type B = {x1: Int, x2: Int}; -- B <: A
+type G = {f: B -> Int};      -- G :> F
+\end{lstlisting}
+Clearly, \lstinline$B$ should be a subtype of \lstinline$A$. But it is also
+desirable to have the property that \lstinline$G$ is a \emph{supertype} of
+\lstinline$F$, since the refinement happens at a parameter position. In OO
+languages such as Java and Scala, the idiom of making \lstinline$G$ type-inherit
+$F$ is through \lstinline$G extends F$. Unfortunately, $G$ has become a subtype
+of $F$.
 
 % \george{I think points regarding the designs of type system should prob. be addressed
 %   somewhere else. The purpose of this section is just introducing the source
@@ -375,7 +393,7 @@ field to the record:
 In addition, a record is just a normal term and can be merged with any other
 term, for example, the following program is valid:
 \begin{lstlisting}
-let mixed : Int & {x : Int} = 1 ,, {x = 2};
+let mixed: Int & {x: Int} = 1 ,, {x=2};
 \end{lstlisting}
 and it is still possible to use record operations on
 \lstinline{mixed}. That is because a record type of the form $ \recty
@@ -385,7 +403,7 @@ $ l $. For instance, \lstinline$mixed.x$ extracts the value of the field
 
 \subsubsection{Record Subtyping}
 
-Subtyping of record types supports both width and depth, as one might
+Subtyping of record types is both in width and in depth, as one might
 expect: \lstinline${x: Int, y: Int}$ is a subtype of
 \lstinline${x: Int}$; and if \lstinline$T1$ is a subtype of
 \lstinline$T2$, then \lstinline${l: T1}$ is also a subtype of
@@ -441,7 +459,7 @@ definitions:
 let user = {name = "George", admin = true};
 let id(user: {name: String}) = user;
 \end{lstlisting}
-Under a structural type system, passing  \lstinline{user}
+Under a structural type system, passing \lstinline{user}
 to \lstinline{id} is allowed. 
 In other words, the type of \lstinline{user} 
 is of a subtype of the expected parameter type of \lstinline{id}. 
