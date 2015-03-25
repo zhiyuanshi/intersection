@@ -237,9 +237,6 @@ and it enjoys of properties such as \emph{idempotence},
   \textbf{Associative} & $(A \andop B) \andop C$ & $=$ & $A \andop (B \andop C)$ 
 \end{tabular}
 
-\paragraph{Covariance and contravariance.}
-The subtyping also arises from contravariant parameter types
-and covariant return types for functions. 
 % \bruno{I think this will be a good place to talk about the following material:}
 % \bruno{Talk about Inheritance is not Subtyping. 
 % Describe type inheritance and subtyping, show that they don't necessarelly 
@@ -251,33 +248,25 @@ and covariant return types for functions.
 % See Klaus Ostermann's paper \& ``Inheritance is not Subtyping''.
 % }
 
-Our system enjoys modular extensibility that structural subtyping offers.
-Although in nominal systems there is the well-known tension between inheritance
-and subtyping, it is worth noting that extending this benefit to nominal
-subtyping is possible. Ostermann~\cite{ostermann2008nominal} proposed a flexible
-nominal system that untangles inheritance and subtyping. For example, users may
-declare supertype of an existing class type while at the same time inheriting
-the implementation, and vice versa.
-
-Consider defining a type $G$ by adding fields to an existing type $F$
-in Cook's notation~\cite{cook1989inheritance}:
+\paragraph{Type-Inheritance} In \name type-inheritance is decoupled
+from subtyping. Type-inheritance, as formally defined by Cook et
+al.~\cite{cook1989inheritance}, is:
 \[
 G = F + \{ l_1:\tau_1, \ldots, l_n:\tau_n \}
 \]
-where the plus sign means a field in the increment will override an existing
-field in $F$. ``Inheritance is not subtyping'' means that structually, $G$ can
+Here $G$ is a new type defined by adding fields to an existing type $F$.
+The plus operator roughly correponds to $\&$ in \name. The
+argument that ``Inheritance is not subtyping'' means that structually, $G$ can
 be: 1) a subtype of $F$, 2) a supertype of $F$, or 3) $G$ and $F$ can have no
 relation at all! If none of $l_1, \ldots, l_n$ is present in $F$, $G$ can be
 safely regarded as a subtype of $F$, since $G$ always contains the fields
 required by the signature $F$; if all of $l_1, \ldots, l_n$ are present in $F$
 and each of their types is a supertype of the corresponding type, $G$ becomes
 instead a supertype of $F$; Conceivably, the third possibility will make $F$ and
-$G$ have no relation. However, most OO languages conflate the two ideas, leading
+$G$ have no relation. However, most OO languages conflate the
+subtyping and type-inheritance allowing only 1). This leads
 to cases where the type system gets in the way of expressing semantically
-correct programs. This problem is exactly what has made using the visitor
-pattern in many OO languages hard to extend.
-
-Now let's look at a concrete example. An initial program consists of the two
+correct programs. For example, consider a program that consists of the two
 types:
 \begin{lstlisting}
 type A = {x1: Int};
@@ -293,8 +282,17 @@ Clearly, \lstinline$B$ should be a subtype of \lstinline$A$. But it is also
 desirable to have the property that \lstinline$G$ is a \emph{supertype} of
 \lstinline$F$, since the refinement happens at a parameter position. In OO
 languages such as Java and Scala, the idiom of making \lstinline$G$ type-inherit
-$F$ is through \lstinline$G extends F$. Unfortunately, $G$ has become a subtype
-of $F$.
+$F$ is through \lstinline$G extends F$, which only works when $G$ is a
+subtype of $F$. 
+%Unfortunately, $G$ has become a subtype
+%of $F$.
+
+Although in nominal systems there is the well-known tension between inheritance
+and subtyping, it is worth noting that extending this benefit to nominal
+subtyping is possible. Ostermann~\cite{ostermann2008nominal} proposed a flexible
+nominal system that untangles inheritance and subtyping. For example, users may
+declare supertype of an existing class type while at the same time inheriting
+the implementation, and vice versa.
 
 % \george{I think points regarding the designs of type system should prob. be addressed
 %   somewhere else. The purpose of this section is just introducing the source
