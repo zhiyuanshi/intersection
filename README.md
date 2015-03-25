@@ -1,7 +1,5 @@
 # intersection
 
-[Paper (PDF)](https://github.com/zhiyuanshi/intersection/blob/master/paper/main.pdf?raw=true)
-
 ## Dependencies
 
 We use the true Times New Roman font and hence require XeLaTeX.
