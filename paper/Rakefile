@@ -18,7 +18,10 @@ def latexmk_cmd(target, options = "")
 end
 
 desc "Generate the PDF of the paper"
-task(:paper) { system(latexmk_cmd("main")) }
+task(:paper => :embed_code) { system(latexmk_cmd("main")) }
+ 
+desc "Embed code from external files into LaTeX source"
+task(:embed_code) { system("ruby scripts/compute_positions.rb") }
 
 desc "Generate the PDF for formalization"
 task(:formalization) { system(latexmk_cmd("formalization")) }
