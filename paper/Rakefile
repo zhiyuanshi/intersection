@@ -19,6 +19,9 @@ end
 
 desc "Generate the PDF of the paper"
 task(:paper => :embed_code) { system(latexmk_cmd("main")) }
+
+desc "Generate the PDF for supplementary materials"
+task(:supp) { system(latexmk_cmd("supplementary_materials"))}
  
 desc "Embed code from external files into LaTeX source"
 task(:embed_code) { system("ruby scripts/compute_positions.rb") }
