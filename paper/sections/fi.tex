@@ -69,7 +69,7 @@ fixpoints here, although they are supported in our implementation and can
 be included in formalization in standard ways.
 
 Typing contexts $ \gamma $ track bound type variables and variables (and their
-type $\tau$). We use $l$ for labels, whose nature is left undefined. We use
+type $\tau$). We use $l$ for labels and use
 $\subst {\tau_1} \alpha {\tau_2}$ for the capture-avoiding substitution of
 $\tau_1$ for $\alpha$ inside $\tau_2$ and $\ftv \cdot$ for sets of free
 variables.
@@ -164,7 +164,7 @@ $\gamma$, the expression $e$ is of type $\tau$''. The rules that are the same as
 in System $F$ are rules for variables ($\rulelabelevar$), lambda abstractions
 ($\rulelabelelam$), type abstractions ($\rulelabeleblam$), and type applications
 ($\rulelabeletapp$). The rule $\rulelabeleapp$ needs special attention as we add
-a subtyping requirement in the premise: the type of the argument ($\tau_3$) is a
+a subtyping requirement: the type of the argument ($\tau_3$) is a
 subtype of that of the parameter ($\tau_1$). 
 %The advantage is that it then
 %becomes easier to derive an algorithm for typechecking. 
@@ -205,7 +205,7 @@ the type after the restriction. For example,
 {\code{name}} {\recty {\code{id}} \Int \andop \top}
 \]
 Note that $\recty {\code{id}} \Int \andop \top$, interpreted set-theoretically,
-is equivalent to $\recty {\code{id}} \Int$. Indeed, our system is able to judge
+is equivalent to $\recty {\code{id}} \Int$ and our system is able to judge
 that they are subtypes of each other.
 
 

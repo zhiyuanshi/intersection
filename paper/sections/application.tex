@@ -378,7 +378,7 @@ modifying code of structures, a style enjoyed by functional
 programming. 
 \end{comment}
 We illustrate the problem with extensible visitors using Scala.
-The composite type for expressions is defined in Scala as:
+The type for expressions is defined in Scala as:
 \begin{lstlisting}{language=scala}
 trait Exp {
   def accept[E](v: ExpAlg[E]): E
@@ -503,7 +503,7 @@ However, subtraction requires a value of type \lstinline{SubExp} to be created:
   \end{lstlisting}
 \end{comment}
 \lstinputlisting[linerange=49-50]{../src/Visitor.sf} % APPLY:linerange=V_USAGE
-The output is \lstinline$7 - 2$. Note that the programmer is able to pass \lstinline{lit 2}, which is of type \lstinline{Exp},
+The result is \lstinline$"7 - 2"$. Note that the programmer is able to pass \lstinline{lit 2}, which is of type \lstinline{Exp},
 to \lstinline{sub}, which expects a \lstinline{SubExp}. The types are compatible
 because because \lstinline$Exp$ is a \emph{subtype} of \lstinline$SubExp$. Code
 reuse is achieved since we can use the constructors from \lstinline$Exp$ as the

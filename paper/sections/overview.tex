@@ -248,7 +248,7 @@ and it enjoys of properties such as \emph{idempotence},
 % See Klaus Ostermann's paper \& ``Inheritance is not Subtyping''.
 % }
 
-\paragraph{Type-Inheritance} In \name type-inheritance is decoupled
+\paragraph{Type-inheritance} In \name type-inheritance is decoupled
 from subtyping. Type-inheritance, as formally defined by Cook et
 al.~\cite{cook1989inheritance}, is:
 \[
@@ -263,8 +263,8 @@ required by the signature $F$; if all of $l_1, \ldots, l_n$ are present in $F$
 and each of their types is a supertype of the corresponding type, $G$ becomes
 instead a supertype of $F$; Conceivably, the third possibility will make $F$ and
 $G$ have no relation. However, most OO languages conflate the
-subtyping and type-inheritance allowing only 1). This leads
-to cases where the type system gets in the way of expressing semantically
+subtyping and type-inheritance, allowing only 1). This leads
+to cases where the type system prevents expressing semantically
 correct programs. For example, consider a program that consists of the two
 types:
 \begin{lstlisting}
@@ -310,8 +310,8 @@ Therefore in \name, there are only single-field record constructs.
 %are orthogonal addition to the existing type system and a more general notion of
 %records. 
 
-Conventionally, record operations work only on record types. But \name
-generalizes them, allowing operations to occur on \emph{any} type. The
+Conventionally, record operations work only on record types. But in \name
+such operations can occur on \emph{any} type. The
 reason is that multi-field records in \name do not have a proper
 record types. Instead, their types are intersections.
 

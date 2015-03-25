@@ -12,17 +12,17 @@
 % \cite{barbanera1995intersection}
 
 \paragraph{Intersection types with polymorphism.}
-Our type system combines intersection types and parametric polymorphism.  Closest
+Our type system combines intersection types and parametric polymorphism. Closest
 to us is Pierce's work~\cite{pierce1991programming1} on a prototype
 compiler for a language with both intersection types, union types, and
 parametric polymorphism. Similarly to \name in his system universal
 quantifiers do not support bounded quantification. However Pierce did not try to prove any
 meta-theoretical results and his calculus does not have a merge
 operator.  Pierce has also studied a system where both intersection
-types and bounded polymorphism are present in his Ph.D
+types and bounded polymorphism are present in his Ph.D.
 dissertation~\cite{pierce1991programming2} and a 1997
 report~\cite{pierce1997intersection}. Going in the direction of higher
-kinds, Compagnoni and Pierce~\cite{compagnoni1996higher} add
+kinds, Compagnoni and Pierce~\cite{compagnoni1996higher} added
 intersection types to System $ F_{\omega} $ and use the new calculus,
 $ F^{\omega}_{\wedge} $, to model multiple inheritance. In their
 system, types include the construct of intersection of types of the
@@ -182,9 +182,9 @@ records that are similar to ours: \emph{selection}, \emph{restriction}, and
 \emph{extension}. The merge operator in \name plays the same role as extension.
 Following Cardelli and Mitchell's approach,
 of restriction and extension. Both Leijen's systems~\cite{leijen2004first,leijen2005extensible} 
-and ours allows records that contain
+and ours allow records that contain
 duplicate labels. Leijen's system is more sophisticated. For example, it supports
-passing record labels as arguments to functions. He also shows an encoding of
+passing record labels as arguments to functions. He also showed an encoding of
 intersection types using first-class labels. 
 
 \begin{comment}

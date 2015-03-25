@@ -33,7 +33,7 @@ It will be translated to
 \]
 The coercion in this case is $(\lam x {\pair \Int \String} {\proj 2 x})$.
 
-\noindent The coercion extracts the second item from the pair since the function expects a $\String$
+\noindent It extracts the second item from the pair since the function expects a $\String$
 but the translated argument is of type $\pair \Int \String$. 
 
 \paragraph{Erasing labels.}
@@ -58,7 +58,7 @@ example, the source program
 \begin{lstlisting}
 {distance = {inKilometers = 8, inMiles = 5}}.distance.inMiles
 \end{lstlisting}
-becomes
+becomes an \name expression
 \[
 \app {(\lam x {\pair \Int \Int} {\proj 2 x})} {\pair 8 5}
 \]
@@ -152,7 +152,7 @@ $\tau_1\andop \tau_2$, project $x$ on the first item, and apply $ C $ to it.
 \end{restatable}
 
 \begin{proof}
-  By a straighforward induction on the derivation.
+  By a straighforward induction on the derivation\footnote{The proofs of major lemmata and theorems can be found in the appendix.}.
 \end{proof}
 
 \subsection{Main Translation}
@@ -189,7 +189,7 @@ by the ``select'' and ``restrict'' rules will be used to coerce the main \name
 expression.
 \end{comment}
 
-$\rulelabelerecselect$ typechecks $e$ and use the ``select'' rule to return the
+$\rulelabelerecselect$ typechecks $e$ and uses the ``select'' rule to return the
 type of the field $\tau_1$ and the coercion $C$. The type of the whole expression
 is $\tau_1$ and its translation of $\app C E$. $\rulelabelerecrestrict$ is
 exactly the same as $\rulelabelerecselect$ except that it uses the auxiliary
@@ -333,12 +333,12 @@ $\pair 0 {()}$.
 \end{restatable}
 \begin{proof}
 (Sketch) By structural induction on the expression and the corresponding
-inference rule. The full proof can be found in the appendix.
+inference rule.
 \end{proof}
 
 \begin{theorem}[Type safety]
   If $e$ is a well-typed \name expression, then $e$ evaluates to some System $F$
-  value.
+  value $v$.
 \end{theorem}
 \begin{proof}
   Since we define the dynamic semantics of \name in terms of the composition of
