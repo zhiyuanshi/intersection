@@ -226,7 +226,7 @@ of object algebras is that other operations can be supported as
 well. 
 
 \paragraph{Add a subtraction variant.} The point of the Expression
-Problem support the addition of new features to the existing
+Problem is to support the addition of new features to the existing
 program, without modifying existing code. 
 The first feature is adding a new variant, such as subtraction. We can do so by
 simply intersecting the original types and merging with the original values:
@@ -250,7 +250,7 @@ simply intersecting the original types and merging with the original values:
 \emph{dynamic implementation inheritance}. 
 
 \paragraph{Add a pretty printing operation.}
-A second extension adding a new operation, such as pretty printing. 
+A second extension is adding a new operation, such as pretty printing. 
 Similar to evaluation, the interface of the pretty printing feature
 is modeled as:
 \begin{comment}
@@ -387,8 +387,8 @@ trait Exp {
 The trait \lstinline{Exp} has only one method 
 \lstinline$accept$, which takes an internal visitor (or object
 algebra) as an argument. 
-Here the type \lstinline{ExpAlg[E]} is the Scala analogous of the
-corresponding type defined in Section~\ref{} in \name. In terms 
+Here the type \lstinline{ExpAlg[A]} is the Scala analogous of the
+corresponding type defined in Section~\ref{subsec:OAs} in \name. In terms 
 of the visitor pattern, \lstinline{ExpAlg} defines the visit methods 
 for all variants. 
 
