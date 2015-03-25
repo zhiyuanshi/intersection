@@ -6,11 +6,11 @@
 %\bruno{Mention that we use some syntactic sugar, which is part 
 %of our implementation.}
 
-\bruno{Syntax in the examples is not being used consistently! 
-That is why it is better to import code from a file. You have to
-carefully go over every example and see whether the examples 
-are actually valid syntax in our language. I fixed some of these, 
-but there may be some more.}
+% \bruno{Syntax in the examples is not being used consistently! 
+% That is why it is better to import code from a file. You have to
+% carefully go over every example and see whether the examples 
+% are actually valid syntax in our language. I fixed some of these, 
+% but there may be some more.}
 
 This section provides the reader with the necessary intuition for
 \name by informally introducing the main features of the language.
@@ -240,16 +240,16 @@ and it enjoys of properties such as \emph{idempotence},
 \paragraph{Covariance and contravariance.}
 The subtyping also arises from contravariant parameter types
 and covariant return types for functions. 
-\bruno{I think this will be a good place to talk about the following material:}
-\bruno{Talk about Inheritance is not Subtyping. 
-Describe type inheritance and subtyping, show that they don't necessarelly 
-go along together in our language. You may need to write some Java code, to 
-illustrate differences. \emph{We support contravariant argument types!}
-}
-\bruno{Related to the previous point, don't forget to mention that 
-there are nominal languages, that also separate inheritance from subtyping!
-See Klaus Ostermann's paper \& ``Inheritance is not Subtyping''.
-}
+% \bruno{I think this will be a good place to talk about the following material:}
+% \bruno{Talk about Inheritance is not Subtyping. 
+% Describe type inheritance and subtyping, show that they don't necessarelly 
+% go along together in our language. You may need to write some Java code, to 
+% illustrate differences. \emph{We support contravariant argument types!}
+% }
+% \bruno{Related to the previous point, don't forget to mention that 
+% there are nominal languages, that also separate inheritance from subtyping!
+% See Klaus Ostermann's paper \& ``Inheritance is not Subtyping''.
+% }
 
 Our system enjoys modular extensibility that structural subtyping offers.
 Although in nominal systems there is the well-known tension between inheritance
@@ -278,9 +278,9 @@ However, most OO languages conflate the two ideas, leading to cases
 where the type system gets in the way of expressing semantically correct programs. 
 This problem is exactly what has made using visitor pattern in OO languages hard to extend.
 
-\george{I think points regarding the designs of type system should prob. be addressed
-  somewhere else. The purpose of this section is just introducing the source
-  language and preparing the reader for the next section.}
+% \george{I think points regarding the designs of type system should prob. be addressed
+%   somewhere else. The purpose of this section is just introducing the source
+%   language and preparing the reader for the next section.}
 
 % Subtyping in \name is syntactical and structural.
 
