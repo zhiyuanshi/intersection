@@ -18,20 +18,20 @@ compiler for a language with both intersection types, union types, and
 parametric polymorphism. Similarly to \name in his system universal
 quantifiers do not support bounded quantification. However Pierce did not try to prove any
 meta-theoretical results and his calculus does not have a merge
-operator.  Pierce has also studied a system where both intersection
+operator.  Pierce also studied a system where both intersection
 types and bounded polymorphism are present in his Ph.D.
 dissertation~\cite{pierce1991programming2} and a 1997
 report~\cite{pierce1997intersection}. Going in the direction of higher
 kinds, Compagnoni and Pierce~\cite{compagnoni1996higher} added
-intersection types to System $ F_{\omega} $ and use the new calculus,
+intersection types to System $ F_{\omega} $ and used the new calculus,
 $ F^{\omega}_{\wedge} $, to model multiple inheritance. In their
 system, types include the construct of intersection of types of the
 same kind $ K $. Davies and Pfenning
-\cite{davies2000intersection} study the interactions between
+\cite{davies2000intersection} studied the interactions between
 intersection types and effects in call-by-value languages. And they
 proposed a ``value restriction'' for intersection types, similar to
 value restriction on parametric polymorphism. Although they proposed a system with 
-parametric polymorphism, their subtyping rule is significantly different from ours, 
+parametric polymorphism, their subtyping rules are significantly different from ours, 
 since they consider parametric polymorphism 
 as the ``infinit analog'' of intersection polymorphism.
 There have been attempts to provide a foundational calculus
@@ -44,7 +44,7 @@ this calculus also supports intersection types and parametric
 polymorphism. However, the type-soundness of a minimal Scala-like 
 calculus with intersection types and parametric polymorphism is not
 yet proven. Recently, some form of intersection
-types have been adopted in object-oriented languages such as Scala,
+types has been adopted in object-oriented languages such as Scala,
 Ceylon, and Grace. Generally speaking,
 the most significant difference to \name is that in all previous systems
 there is no explicit introduction construct like our merge operator. As shown in
@@ -71,7 +71,7 @@ let merge [A, B] (f: ExpAlg A) (g: ExpAlg B) = {
 \paragraph{Other type systems with intersection types.}
 Intersection types date back to as early as Coppo et
 al.~\cite{coppo1981functional}. As emphasized throughout the paper our 
-work is inspired by Dunfield~\cite{dunfield2014elaborating}. He describes a similar approach to ours:
+work is inspired by Dunfield~\cite{dunfield2014elaborating}. He described a similar approach to ours:
 compiling a system with intersection types into ordinary $ \lambda $-calculus
 terms. The major difference is that his system does not include parametric
 polymorphism, while ours does not include unions. Besides, our rules are
@@ -111,7 +111,7 @@ is the more conservative approach of adopting intersection types. It increases
 only the expressiveness of types but not terms. But without a term-level
 construct like ``merge'', it is not possible to encode various language
 features. As an alternative to syntatic subtyping described in this paper,
-Frisch et al.~\cite{frisch2008semantic} study semantic subtyping.
+Frisch et al.~\cite{frisch2008semantic} studied semantic subtyping.
 
 \paragraph{Languages for extensibility.}
 To improve support for extensibility various researchers have proposed
@@ -161,16 +161,16 @@ extensibility.
 
 % http://elm-lang.org/learn/Records.elm
 
-Encoding records using intersection types appear in
+Encoding records using intersection types appeared in
 Reynolds~\cite{reynolds1997design} and Castagna et
-al.~\cite{castagna1995calculus}. Although Dunfield also discusses this idea in
-his paper \cite{dunfield2014elaborating}, he only provides an implementation but
+al.~\cite{castagna1995calculus}. Although Dunfield also discussed this idea in
+his paper \cite{dunfield2014elaborating}, he only provided an implementation but
 not a formalization. Very similar to our treatment of elaborating records is
 Cardelli's work~\cite{cardelli1992extensible} on translating a calculus, named
 $ F_{\subtype \rho}$, with extensible records to a simpler calculus that without
-records primitives (in which case is $ F_{\subtype} $). But he does not consider
+records primitives (in which case is $ F_{\subtype} $). But he did not consider
 encoding multi-field records as intersections; hence his translation is more
-heavyweight. Crary~\cite{crary1998simple} uses intersection types and
+heavyweight. Crary~\cite{crary1998simple} used intersection types and
 existential types to address the problem that arises when interpreting method
 dispatch as self-application. But in his paper, intersection types are not used
 to encode multi-field records.
