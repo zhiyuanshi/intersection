@@ -1,0 +1,55 @@
+\colorlet{orthogcolor}{BrickRed}
+
+\newcommand{\orthog}{\perp}
+
+\newcommand{\rulelabelorthog}{\bm{\textcolor{orthogcolor}{orthog}}}
+\newcommand{\rulelabelorthogvar}{\rulelabelorthog\text{var}}
+\newcommand{\rulelabelorthogtop}{\rulelabelorthog\text{top}}
+\newcommand{\rulelabelorthogfun}{\rulelabelorthog\text{fun}}
+\newcommand{\rulelabelorthogforall}{\rulelabelorthog\text{forall}}
+\newcommand{\rulelabelorthogandleft}{\rulelabelorthog{\text{and}_1}}
+\newcommand{\rulelabelorthogandright}{\rulelabelorthog{\text{and}_2}}
+\newcommand{\rulelabelorthogreclab}{\rulelabelorthog\text{reclab}}
+\newcommand{\rulelabelorthogrec}{\rulelabelorthog\text{rec}}
+
+\newcommand{\ruleorthogvar}{
+\inferrule* [right=$\rulelabelorthogvar$]
+  {\alpha_1 \neq \alpha_2}
+  {\alpha_1 \orthog \alpha_2}
+}
+
+\newcommand{\ruleorthogfun}{
+\inferrule* [right=$\rulelabelorthogfun$]
+  {\tau_3 \orthog \tau_1 \andalso \tau_2 \orthog \tau_4}
+  {\tau_1 \to \tau_2 \orthog \tau_3 \to \tau_4}
+}
+
+\newcommand{\ruleorthogforall}{
+\inferrule* [right=$\rulelabelorthogforall$]
+  {\tau_1 \orthog \subst {\alpha_1} {\alpha_2} \tau_2}
+  {\for {\alpha_1} \tau_1 \orthog \for {\alpha_2} \tau_2}
+}
+
+\newcommand{\ruleorthogandleft}{
+\inferrule* [right=$\rulelabelorthogandleft$]
+  {\tau_1 \orthog \tau_3 \andalso \tau_2 \orthog \tau_3}
+  {\tau_1 \andop \tau_2 \orthog \tau_3}
+}
+
+\newcommand{\ruleorthogandright}{
+\inferrule* [right=$\rulelabelorthogandright$]
+  {\tau_1 \orthog \tau_2 \andalso \tau_1 \orthog \tau_3}
+  {\tau_1 \orthog \tau_2 \andop \tau_3}
+}
+
+\newcommand{\ruleorthogreclab}{
+\inferrule* [right=$\rulelabelorthogreclab$]
+  {l_1 \neq l_2}
+  {\recty {l_1} {\tau_1} \orthog \recty {l_2} {\tau_2}}
+}
+
+\newcommand{\ruleorthogrec}{
+\inferrule* [right=$\rulelabelorthogrec$]
+  {\tau_1 \orthog \tau_2}
+  {\recty l {\tau_1} \orthog \recty l {\tau_2}}
+}
