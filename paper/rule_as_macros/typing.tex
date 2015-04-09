@@ -95,15 +95,14 @@
 \newcommand{\rulelabelemerge}{\rulelabele\text{merge}}
 \newcommand{\ruleemerge}{
 \inferrule* [right=$\rulelabelemerge$]
-  {\judgee \gamma {e_1} {\tau_1} \\
-   \judgee \gamma {e_2} {\tau_2} \\
-   \tau_1 \orthog \tau_2}
+  {\judgee \gamma {e_1} {\tau_1} \\ \judgee \gamma {e_2} {\tau_2} \\ \tau_1 \orthog \tau_2}
   {\judgee \gamma {e_1 \mergeop e_2} {\tau_1 \andop \tau_2}}
 }
 \newcommand{\ruleemergeelab}{
 \inferrule* [right=$\rulelabelemerge$]
-  {\judgee \gamma {e_1} {\tau_1} \yields {E_1} \andalso
-   \judgee \gamma {e_2} {\tau_2} \yields {E_2}}
+  {\judgee \gamma {e_1} {\tau_1} \yields {E_1} \\
+   \judgee \gamma {e_2} {\tau_2} \yields {E_2} \\
+   \tau_1 \orthog \tau_2}
   {\judgee \gamma {e_1 \mergeop e_2} {\tau_1 \andop \tau_2} \yields {\pair {E_1} {E_2}}}
 }
 
