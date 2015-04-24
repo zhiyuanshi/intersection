@@ -3,22 +3,22 @@
 % \bruno{mention (and cite) that there are a number of OO languages supporting
 % intersection types }
 %\george{Change the examples later to something very simple.}
-%\bruno{Mention that we use some syntactic sugar, which is part 
+%\bruno{Mention that we use some syntactic sugar, which is part
 %of our implementation.}
 
-% \bruno{Syntax in the examples is not being used consistently! 
+% \bruno{Syntax in the examples is not being used consistently!
 % That is why it is better to import code from a file. You have to
-% carefully go over every example and see whether the examples 
-% are actually valid syntax in our language. I fixed some of these, 
+% carefully go over every example and see whether the examples
+% are actually valid syntax in our language. I fixed some of these,
 % but there may be some more.}
 
 This section provides the reader with the necessary intuition for
 \name by informally introducing the main features of the language.
 The features of \name are also contrasted with features of mainstream
-languages such as Java or Scala. Note that this section uses some 
-common syntactic sugar in programming languages, which is 
+languages such as Java or Scala. Note that this section uses some
+common syntactic sugar in programming languages, which is
 part of our implementation.
- 
+
 %will do so by introducing a simple source language, which will be used in
 %Section~\ref{sec:application}. \george{From the practice of similar papers, I
 % think a figure listing the source syntax is necessary.}
@@ -37,7 +37,7 @@ interface AwithB extends A, B {}
 both \lstinline{A} and \lstinline{B}. Arguably such type can be considered as a nominal
 intersection type. Scala takes one step further by eliminating the
 need of a nominal type. For example, given two concrete traits, it is possible to
-use \emph{mixin composition} to create an object that implements both 
+use \emph{mixin composition} to create an object that implements both
 traits. Such an object has a (structural) intersection type:
 
 \begin{lstlisting}
@@ -62,10 +62,10 @@ def merge[A,B] (x: A) (y: B) : A with B = x with y
 
 \noindent is rejected by the Scala compiler. The problem is that the
 \lstinline{with} construct for Scala expressions can only be used to
-mixin traits or classes, and not arbitrary objects. Note that in the 
+mixin traits or classes, and not arbitrary objects. Note that in the
 definition \lstinline{newAB} both \lstinline{A} and \lstinline{B} are
-\emph{traits}, whereas in the definition of \lstinline{merge} the variables 
-\lstinline{x} and \lstinline{y} denote \emph{objects}. 
+\emph{traits}, whereas in the definition of \lstinline{merge} the variables
+\lstinline{x} and \lstinline{y} denote \emph{objects}.
 
 \begin{comment}
 A common limitation in those languages, though, is that there is no introduction
@@ -88,18 +88,18 @@ is clearly a hack and it would be better to provide proper language
 support for such a feature.
 
 \begin{comment}
-This is in 
+This is in
 contrast, there are term-level introduction construct for function types (with
 lambdas) and universal quantification (with big lambdas) in most core
 calculi.
 \end{comment}
 
-% The key constructs are the ``merge'' operator, denoted by $ \mergeop $
+% The key constructs are the ``merge'' operator, denoted by $ \mergeOp $
 % at the term level and the corresponding type intersection operator, denoted by
-% $ \andop $ at the type level.
+% $ \andOp $ at the type level.
 % \bruno{We take a particular approach to intersection types, namely that of
 % Dundfield. Some other approaches are different. The \emph{key feature} in
-% Dunfield's approach is the $\mergeop$ operator, which allows for run-time
+% Dunfield's approach is the $\mergeOp$ operator, which allows for run-time
 % value/object composition.}
 
 % The addition of intersection types to System $ F $ has a number of consequences,
@@ -111,10 +111,10 @@ calculi.
 \subsection{Intersection Types in \name}
 
 % What is an intersection type? One classic view is from set-theoretic
-% interpretation of types: $ A \andop B $ stands for the intersection of
+% interpretation of types: $ A \andOp B $ stands for the intersection of
 % the set of values of $ A $ and $ B $. A more practical view, adopted in this
 % paper, regards types as a kind of interface: a value of type
-% $ A \andop B $ satisfies both of the interfaces of $ A $ and $ B $. For
+% $ A \andOp B $ satisfies both of the interfaces of $ A $ and $ B $. For
 % example, \lstinline{eval : Int} is the interface that supports evaluation to
 % integers, while \lstinline{eval : Int & print : String } supports both
 % evaluation and pretty printing. Those interfaces are akin to interfaces in
@@ -123,7 +123,7 @@ calculi.
 
 To address the limitations of intersection types in languages like
 Scala, \name allows intersecting any two terms at run time using a
-\emph{merge} operator (denoted by $ \mergeop $)~\cite{dunfield2014elaborating}.  With the merge 
+\emph{merge} operator (denoted by $ \mergeOp $)~\cite{dunfield2014elaborating}.  With the merge
 operator it is trivial to implement the \lstinline{merge} function in \name:
 
 \begin{lstlisting}
@@ -131,9 +131,9 @@ let merge[A,B] (x : A) (y : B) : A & B = x ,, y;
 \end{lstlisting}
 
 \noindent In contrast to Scala's expression-level \lstinline{with}
-construct, the operator \lstinline{,,} allows two arbitrary values \lstinline{x} 
+construct, the operator \lstinline{,,} allows two arbitrary values \lstinline{x}
 and \lstinline{y} to be merged. The resulting type is an
-intersection of the types of  \lstinline{x} 
+intersection of the types of  \lstinline{x}
 and \lstinline{y} (\lstinline{A & B} in this case).
 
 \begin{comment}
@@ -146,14 +146,14 @@ Scala, and \name.
   Basic intersection types         & \checkmark & \checkmark & \checkmark \\ \hline
   Anonymous intersection types     &            & \checkmark & \checkmark \\ \hline
   Intersection of type parameters  &            & \checkmark & \checkmark \\ \hline
-  Term-level intersection          &            &            & \checkmark 
+  Term-level intersection          &            &            & \checkmark
 \end{tabular} \\
 \end{comment}
 
 %In \name the central addition to the type system of System $F$ are
 %intersection types.
 
-\paragraph{Intersection types for overloading.} 
+\paragraph{Intersection types for overloading.}
 A typical use-case for intersection types is to do
 \emph{overloading}. The benefit is that programmers can use the same
 operation on different types and delegate the task of choosing a
@@ -168,7 +168,7 @@ show : (Int -> String) & (Bool -> String)
 \end{lstlisting}
 Assuming that the following two functions are available:
 \begin{lstlisting}
-showInt : Int  -> String 
+showInt : Int  -> String
 showBool : Bool -> String
 \end{lstlisting}
 
@@ -216,7 +216,7 @@ construct for elimination).
 subtyping relation on intersection types. That is the type
 
 \begin{lstlisting}
-(Int -> String) & (Bool -> String) 
+(Int -> String) & (Bool -> String)
 \end{lstlisting}
 
 \noindent is a \emph{subtype} of both \lstinline{Int -> String} and
@@ -228,22 +228,22 @@ and it enjoys of properties such as \emph{idempotence},
 \emph{commutativity} and \emph{associativity}
 (equality is defined as bidirectional subtyping relation): \\
 
-% \noindent {\bf commutativity: } $A \andop B = B \andop A$  \\
-% {\bf associativity:~~~~~~}$A \andop (B \andop C) = (A \andop B) \andop C$
+% \noindent {\bf commutativity: } $A \andOp B = B \andOp A$  \\
+% {\bf associativity:~~~~~~}$A \andOp (B \andOp C) = (A \andOp B) \andOp C$
 
 \begin{tabular}{llrcl}
-  \textbf{Idempotent}  & $A \andop A$            & $=$ & $A$ \\
-  \textbf{Commutative} & $A \andop B$            & $=$ & $B \andop A$ \\
-  \textbf{Associative} & $(A \andop B) \andop C$ & $=$ & $A \andop (B \andop C)$ 
+  \textbf{Idempotent}  & $A \andOp A$            & $=$ & $A$ \\
+  \textbf{Commutative} & $A \andOp B$            & $=$ & $B \andOp A$ \\
+  \textbf{Associative} & $(A \andOp B) \andOp C$ & $=$ & $A \andOp (B \andOp C)$
 \end{tabular}
 
 % \bruno{I think this will be a good place to talk about the following material:}
-% \bruno{Talk about Inheritance is not Subtyping. 
-% Describe type inheritance and subtyping, show that they don't necessarelly 
-% go along together in our language. You may need to write some Java code, to 
+% \bruno{Talk about Inheritance is not Subtyping.
+% Describe type inheritance and subtyping, show that they don't necessarelly
+% go along together in our language. You may need to write some Java code, to
 % illustrate differences. \emph{We support contravariant argument types!}
 % }
-% \bruno{Related to the previous point, don't forget to mention that 
+% \bruno{Related to the previous point, don't forget to mention that
 % there are nominal languages, that also separate inheritance from subtyping!
 % See Klaus Ostermann's paper \& ``Inheritance is not Subtyping''.
 % }
@@ -282,7 +282,7 @@ desirable to have the property that \lstinline$G$ is a \emph{supertype} of
 \lstinline$F$, since the refinement happens at a parameter position. In OO
 languages such as Java and Scala, the idiom of making \lstinline$G$ type-inherit
 $F$ is through \lstinline$G extends F$, which only works when $G$ is a
-subtype of $F$. 
+subtype of $F$.
 %Unfortunately, $G$ has become a subtype
 %of $F$.
 
@@ -305,10 +305,10 @@ Following Reynolds~\cite{reynolds1997design} and Castagna et
 al.~\cite{castagna1995calculus}, \name leverages intersection types to type
 extensible records. The idea is that a multi-field record can be encoded as
 merges of single-field records, and multi-field record types as intersections.
-Therefore in \name, there are only single-field record constructs. 
+Therefore in \name, there are only single-field record constructs.
 %The result
 %are orthogonal addition to the existing type system and a more general notion of
-%records. 
+%records.
 
 Conventionally, record operations work only on record types. But in \name
 such operations can occur on \emph{any} type. The
@@ -321,13 +321,13 @@ To illustrate the various operations on records, we consider a record
 with three fields and with the following type:
 
 \begin{lstlisting}
-{open : Int, high : Int, low : Int} 
+{open : Int, high : Int, low : Int}
 \end{lstlisting}
 
 \noindent Note that this type is just syntactic sugar for:
 
 \begin{lstlisting}
-{open : Int} & {high : Int} & {low : Int} 
+{open : Int} & {high : Int} & {low : Int}
 \end{lstlisting}
 
 \noindent That is a multi-field record type is desugared as
@@ -341,11 +341,11 @@ not exist.
 
 \paragraph{Construction.} The usual notation for constructing records
 \begin{lstlisting}
-{open=192, high=195, low=189} 
+{open=192, high=195, low=189}
 \end{lstlisting}
 is a shorthand for merges of single-field records
 \begin{lstlisting}
-{open=192} ,, {high=195} ,, {low=189} 
+{open=192} ,, {high=195} ,, {low=189}
 \end{lstlisting}
 
 \paragraph{Selection.}
@@ -356,18 +356,18 @@ Fields are extracted using the dot notation. For example,
 selects the value of the field labelled \lstinline{open} from the record.
 
 \paragraph{Restriction.}
-Restriction $e \restrictop l$ removes a field $l$ from an expression $e$. If $e$
+Restriction $e \restrictOp l$ removes a field $l$ from an expression $e$. If $e$
 contains multiple fields labelled $l$, only the last field will be removed.
 Restriction was chosen to be a primitive because other common
 record operations can be defined in terms of restriction. For example, we can encode record
 \emph{update} as a restriction followed by a merge. The following example
 shows updating the \lstinline{high} field of a quote:
 \begin{lstlisting}
-{open=192, high=195, low=189} \ high ,, {high=196} 
+{open=192, high=195, low=189} \ high ,, {high=196}
 \end{lstlisting}
 Similarly, \emph{renaming} of a field can be simulated by:
 \begin{lstlisting}
-{open=192, high=195, low=189} \ high ,, {dayHigh=196} 
+{open=192, high=195, low=189} \ high ,, {dayHigh=196}
 \end{lstlisting}
 
 \begin{comment}
@@ -380,7 +380,7 @@ one.~\footnote{The subtyping restriction is not required for the \name to be
 
 \paragraph{Extension.}
 Extension, just as construction, is performed with the merge operator
-($ \mergeop $). The following, for example, adds a \lstinline{close}
+($ \mergeOp $). The following, for example, adds a \lstinline{close}
 field to the record:
 \begin{lstlisting}
 {open=192, high=195, low=189} ,, {close=195}
@@ -393,9 +393,9 @@ term, for example, the following program is valid:
 let mixed: Int & {x: Int} = 1 ,, {x=2};
 \end{lstlisting}
 and it is still possible to use record operations on
-\lstinline{mixed}. That is because a record type of the form $ \recty
+\lstinline{mixed}. That is because a record type of the form $ \recordType
 l \tau $ can be thought as a normal type $ \tau $ tagged by the label
-$ l $. For instance, \lstinline$mixed.x$ extracts the value of the field 
+$ l $. For instance, \lstinline$mixed.x$ extracts the value of the field
 \lstinline{x} from \lstinline{mixed}.
 
 \subsubsection{Record Subtyping}
@@ -437,12 +437,12 @@ expect: \lstinline${x: Int, y: Int}$ is a subtype of
 The combination of intersection types and parametric polymorphism
 makes System \name quite expressive. In particular this combination
 enables an encoding of a simple form of \emph{bounded universal
-  quantification}~\cite{cardelli1985understanding}. 
+  quantification}~\cite{cardelli1985understanding}.
 
 %In the same way that System \name extends System $ F $ with
 %intersection types, System $ F_{\subtype} $ extends System $ F $ with bounded
 %polymorphism. $ F_{\subtype} $~\cite{pierce2002types} allows giving an
-%upper bound to the type variable in type abstractions. 
+%upper bound to the type variable in type abstractions.
 
 \paragraph{Bounded quantification and loss of information.}
 The idea of bounded universal quantification was discussed in the
@@ -457,9 +457,9 @@ let user = {name = "George", admin = true};
 let id(user: {name: String}) = user;
 \end{lstlisting}
 Under a structural type system, passing \lstinline{user}
-to \lstinline{id} is allowed. 
-In other words, the type of \lstinline{user} 
-is of a subtype of the expected parameter type of \lstinline{id}. 
+to \lstinline{id} is allowed.
+In other words, the type of \lstinline{user}
+is of a subtype of the expected parameter type of \lstinline{id}.
 However there is a problem: what if programmers
 want to access the \texttt{admin} field later. For example:
 \begin{lstlisting}{language=scala}
@@ -499,7 +499,7 @@ let id[A] (user: A & {name: String}) = user;
 \end{lstlisting}
 By requiring the type of the argument to be an intersection type of a type
 parameter and the upper bound and passing the type information, we make sure
-that we can still access the \lstinline{admin} field later. 
+that we can still access the \lstinline{admin} field later.
 
 Therefore, this technique allows \name to encode a simple form
 of bounded quantification. This is good because it means that \name

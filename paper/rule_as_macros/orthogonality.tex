@@ -2,54 +2,54 @@
 
 \newcommand{\orthog}{\perp}
 
-\newcommand{\rulelabelorthog}{\bm{\textcolor{orthogcolor}{orthog}}}
-\newcommand{\rulelabelorthogvar}{\rulelabelorthog\text{var}}
-\newcommand{\rulelabelorthogtop}{\rulelabelorthog\text{top}}
-\newcommand{\rulelabelorthogfun}{\rulelabelorthog\text{fun}}
-\newcommand{\rulelabelorthogforall}{\rulelabelorthog\text{forall}}
-\newcommand{\rulelabelorthogandleft}{\rulelabelorthog{\text{and}_1}}
-\newcommand{\rulelabelorthogandright}{\rulelabelorthog{\text{and}_2}}
-\newcommand{\rulelabelorthogreclab}{\rulelabelorthog\text{reclab}}
-\newcommand{\rulelabelorthogrec}{\rulelabelorthog\text{rec}}
+\newcommand{\ruleLabelOrthog}{\bm{\textcolor{orthogcolor}{orthog}}}
+\newcommand{\ruleLabelOrthogVar}{\ruleLabelOrthog\text{var}}
+\newcommand{\ruleLabelOrthogTop}{\ruleLabelOrthog\text{top}}
+\newcommand{\ruleLabelOrthogFun}{\ruleLabelOrthog\text{fun}}
+\newcommand{\ruleLabelOrthogForall}{\ruleLabelOrthog\text{forall}}
+\newcommand{\ruleLabelOrthogAndLeft}{\ruleLabelOrthog{\text{and}_1}}
+\newcommand{\ruleLabelOrthogAndRight}{\ruleLabelOrthog{\text{and}_2}}
+\newcommand{\ruleLabelOrthogRecLab}{\ruleLabelOrthog\text{reclab}}
+\newcommand{\ruleLabelOrthogRec}{\ruleLabelOrthog\text{rec}}
 
-\newcommand{\ruleorthogvar}{
-\inferrule* [right=$\rulelabelorthogvar$]
+\newcommand{\ruleOrthogVar}{
+\inferrule* [right=$\ruleLabelOrthogVar$]
   {\alpha_1 \neq \alpha_2}
   {\alpha_1 \orthog \alpha_2}
 }
 
-\newcommand{\ruleorthogfun}{
-\inferrule* [right=$\rulelabelorthogfun$]
+\newcommand{\ruleOrthogFun}{
+\inferrule* [right=$\ruleLabelOrthogFun$]
   {\tau_1 \orthog \tau_3 \andalso \tau_2 \orthog \tau_4}
   {\tau_1 \to \tau_2 \orthog \tau_3 \to \tau_4}
 }
 
-\newcommand{\ruleorthogforall}{
-\inferrule* [right=$\rulelabelorthogforall$]
+\newcommand{\ruleOrthogForall}{
+\inferrule* [right=$\ruleLabelOrthogForall$]
   {\tau_1 \orthog \subst {\alpha_1} {\alpha_2} \tau_2}
   {\for {\alpha_1} \tau_1 \orthog \for {\alpha_2} \tau_2}
 }
 
-\newcommand{\ruleorthogandleft}{
-\inferrule* [right=$\rulelabelorthogandleft$]
+\newcommand{\ruleOrthogAndLeft}{
+\inferrule* [right=$\ruleLabelOrthogAndLeft$]
   {\tau_1 \orthog \tau_3 \andalso \tau_2 \orthog \tau_3}
-  {\tau_1 \andop \tau_2 \orthog \tau_3}
+  {\tau_1 \andOp \tau_2 \orthog \tau_3}
 }
 
-\newcommand{\ruleorthogandright}{
-\inferrule* [right=$\rulelabelorthogandright$]
+\newcommand{\ruleOrthogAndRight}{
+\inferrule* [right=$\ruleLabelOrthogAndRight$]
   {\tau_1 \orthog \tau_2 \andalso \tau_1 \orthog \tau_3}
-  {\tau_1 \orthog \tau_2 \andop \tau_3}
+  {\tau_1 \orthog \tau_2 \andOp \tau_3}
 }
 
-\newcommand{\ruleorthogreclab}{
-\inferrule* [right=$\rulelabelorthogreclab$]
+\newcommand{\ruleOrthogRecLab}{
+\inferrule* [right=$\ruleLabelOrthogRecLab$]
   {l_1 \neq l_2}
-  {\recty {l_1} {\tau_1} \orthog \recty {l_2} {\tau_2}}
+  {\recordType {l_1} {\tau_1} \orthog \recordType {l_2} {\tau_2}}
 }
 
-\newcommand{\ruleorthogrec}{
-\inferrule* [right=$\rulelabelorthogrec$]
+\newcommand{\ruleOrthogRec}{
+\inferrule* [right=$\ruleLabelOrthogRec$]
   {\tau_1 \orthog \tau_2}
-  {\recty l {\tau_1} \orthog \recty l {\tau_2}}
+  {\recordType l {\tau_1} \orthog \recordType l {\tau_2}}
 }

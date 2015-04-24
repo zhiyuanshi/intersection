@@ -1,8 +1,10 @@
+.DS_Store
+
 # Emacs
 .#*
 
 
-# LaTeX 
+# LaTeX
 *.aux
 *.bbl
 *.blg
@@ -24,7 +26,7 @@
 *.java
 
 
-# IntelliJ IDEA 
+# IntelliJ IDEA
 *.iml
 .idea
 

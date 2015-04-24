@@ -15,25 +15,25 @@
 \newcommand{\ftv}[1]{\textit{ftv}({#1})}
 
 % Spacing
-\newcommand{\binderspacing}{\,}
-\newcommand{\appspacing}{\;}
+\newcommand{\binderSpacing}{\,}
+\newcommand{\appSpacing}{\;}
 
 % Types
-\newcommand{\for}[2]{\forall #1. \binderspacing #2}
-\newcommand{\recty}[2]{\{ #1 \hast #2 \}}
+\newcommand{\for}[2]{\forall #1. \binderSpacing #2}
+\newcommand{\recordType}[2]{\{ #1 \hast #2 \}}
 % \newcommand{\top}{\{\}}
-\newcommand{\andop}{\with}
+\newcommand{\andOp}{\with}
 \newcommand{\pair}[2]{(#1, #2)}
 
 % Expressions
-\newcommand{\lam}[3]{\lambda (#1 \hast #2).\binderspacing #3}
-\newcommand{\blam}[2]{\Lambda #1.\binderspacing #2}
-\newcommand{\app}[2]{#1 \appspacing #2}
-\newcommand{\tapp}[2]{#1 \appspacing #2}
-\newcommand{\mergeop}{,,}
-\newcommand{\reccon}[2]{\{ #1 = #2 \}}
-\newcommand{\restrictop}{\setminus}
-\newcommand{\recupdate}[3]{#1 \; \mathbf{with} \; \{#2 = #3\}}
+\newcommand{\lam}[3]{\lambda (#1 \hast #2).\binderSpacing #3}
+\newcommand{\blam}[2]{\Lambda #1.\binderSpacing #2}
+\newcommand{\app}[2]{#1 \appSpacing #2}
+\newcommand{\tapp}[2]{#1 \appSpacing #2}
+\newcommand{\mergeOp}{,,}
+\newcommand{\recordCon}[2]{\{ #1 = #2 \}}
+\newcommand{\restrictOp}{\setminus}
+\newcommand{\recordUpdate}[3]{#1 \; \mathbf{with} \; \{#2 = #3\}}
 \newcommand{\proj}[2]{{\code{proj}}_{#1} #2}
 
 
@@ -49,23 +49,23 @@
 % Rules
 
 % Couleurs
-\colorlet{subcolor}{OliveGreen}
-\colorlet{targetcolor}{BrickRed}
+\colorlet{subColor}{OliveGreen}
+\colorlet{targetColor}{BrickRed}
 
 % Subtyping labels
-\newcommand{\rulelabelsub}{\bm{\textcolor{subcolor}{sub}}}
-\newcommand{\rulelabelsubvar}{\rulelabelsub\text{var}}
-\newcommand{\rulelabelsubtop}{\rulelabelsub\text{top}}
-\newcommand{\rulelabelsubfun}{\rulelabelsub\text{fun}}
-\newcommand{\rulelabelsubforall}{\rulelabelsub\text{forall}}
-\newcommand{\rulelabelsuband}{\rulelabelsub\text{and}}
-\newcommand{\rulelabelsubandleft}{\rulelabelsub{\text{and}_1}}
-\newcommand{\rulelabelsubandright}{\rulelabelsub{\text{and}_2}}
-\newcommand{\rulelabelsubrec}{\rulelabelsub\text{rec}}
+\newcommand{\ruleLabelSub}{\bm{\textcolor{subColor}{sub}}}
+\newcommand{\ruleLabelSubVar}{\ruleLabelSub\text{var}}
+\newcommand{\ruleLabelSubTop}{\ruleLabelSub\text{top}}
+\newcommand{\ruleLabelSubFun}{\ruleLabelSub\text{fun}}
+\newcommand{\ruleLabelSubForall}{\ruleLabelSub\text{forall}}
+\newcommand{\ruleLabelSubAnd}{\ruleLabelSub\text{and}}
+\newcommand{\ruleLabelSubAndLeft}{\ruleLabelSub{\text{and}_1}}
+\newcommand{\ruleLabelSubAndRight}{\ruleLabelSub{\text{and}_2}}
+\newcommand{\ruleLabelSubRec}{\ruleLabelSub\text{rec}}
 
 % Source/elaboration and labels
-\newcommand{\judgeewf}[2]{#1 \; \textcolor{elabcolor}{\turns} \; #2}
-\newcommand{\rulelabelerecupd}{\rulelabele\text{rec-upd}}
+\newcommand{\judgeSourceWF}[2]{#1 \; \textcolor{sourceColor}{\turns} \; #2}
+\newcommand{\ruleLabelSourceRecUpd}{\ruleLabelSource\text{rec-upd}}
 
 
 % Presentation
@@ -74,8 +74,8 @@
 
 
 % To be retired
-\newcommand{\turnsget}{\vdash_{\textrm{get}}}
-\newcommand{\turnsput}{\vdash_{\textrm{put}}}
-\newcommand{\turnsrec}{\vdash_{\textrm{rec}}}
+\newcommand{\turnsGet}{\turns_{\textrm{get}}}
+\newcommand{\turnsPut}{\turns_{\textrm{put}}}
+\newcommand{\turnsrec}{\turns_{\textrm{rec}}}
 \newcommand{\rulename}[1]{(\textrm{#1})}
 

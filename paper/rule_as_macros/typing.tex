@@ -2,219 +2,219 @@
 % Typing
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\newcommand{\judgee}[3]{#1 \; \textcolor{elabcolor}{\turns} \; #2 \; \textcolor{elabcolor}{:} \; #3}
-\colorlet{elabcolor}{Blue}
-\newcommand{\rulelabele}{\bm{\textcolor{elabcolor}{E}}}
+\newcommand{\judgeSource}[3]{#1 \; \textcolor{sourceColor}{\turns} \; #2 \; \textcolor{sourceColor}{:} \; #3}
+\colorlet{sourceColor}{Blue}
+\newcommand{\ruleLabelSource}{\bm{\textcolor{sourceColor}{E}}}
 
 % var
-\newcommand{\rulelabelevar}{\rulelabele\text{var}}
-\newcommand{\ruleevar} {
-\inferrule* [right=$\rulelabelevar$]
+\newcommand{\ruleLabelSourceVar}{\ruleLabelSource\text{var}}
+\newcommand{\ruleSourceVar} {
+\inferrule* [right=$\ruleLabelSourceVar$]
   {(x,\tau) \in \gamma}
-  {\judgee \gamma x \tau}
+  {\judgeSource \gamma x \tau}
 }
-\newcommand{\ruleevarelab} {
-\inferrule* [right=$\rulelabelevar$]
+\newcommand{\ruleSourceVarElab} {
+\inferrule* [right=$\ruleLabelSourceVar$]
   {(x,\tau) \in \gamma}
-  {\judgee \gamma x \tau \yields x}
+  {\judgeSource \gamma x \tau \yields x}
 }
 
 
 % top
-\newcommand{\rulelabeletop}{\rulelabele\text{top}}
-\newcommand{\ruleetop} {
-\inferrule* [right=$\rulelabeletop$]
+\newcommand{\ruleLabelSourceTop}{\ruleLabelSource\text{top}}
+\newcommand{\ruleSourceTop} {
+\inferrule* [right=$\ruleLabelSourceTop$]
   { }
-  {\judgee \gamma \top \top}
+  {\judgeSource \gamma \top \top}
 }
-\newcommand{\ruleetopelab} {
-\inferrule* [right=$\rulelabeletop$]
+\newcommand{\ruleSourceTopElab} {
+\inferrule* [right=$\ruleLabelSourceTop$]
   { }
-  {\judgee \gamma \top \top \yields {()}}
+  {\judgeSource \gamma \top \top \yields {()}}
 }
 
 
 % lam
-\newcommand{\rulelabelelam}{\rulelabele\text{lam}}
-\newcommand{\ruleelam} {
-\inferrule* [right=$\rulelabelelam$]
-  {\judgee {\gamma, x \hast \tau} e {\tau_1} \andalso \judgeewf \gamma \tau}
-  {\judgee \gamma {\lam x \tau e} {\tau \to \tau_1}}
+\newcommand{\ruleLabelSourceLam}{\ruleLabelSource\text{lam}}
+\newcommand{\ruleSourceLam} {
+\inferrule* [right=$\ruleLabelSourceLam$]
+  {\judgeSource {\gamma, x \hast \tau} e {\tau_1} \andalso \judgeSourceWF \gamma \tau}
+  {\judgeSource \gamma {\lam x \tau e} {\tau \to \tau_1}}
 }
-\newcommand{\ruleelamelab} {
-\inferrule* [right=$\rulelabelelam$]
-  {\judgee {\gamma, x \hast \tau} e {\tau_1} \yields E \andalso \judgeewf \gamma \tau}
-  {\judgee \gamma {\lam x \tau e} {\tau \to \tau_1} \yields {\lam x {\im \tau} E}}
+\newcommand{\ruleSourceLamElab} {
+\inferrule* [right=$\ruleLabelSourceLam$]
+  {\judgeSource {\gamma, x \hast \tau} e {\tau_1} \yields E \andalso \judgeSourceWF \gamma \tau}
+  {\judgeSource \gamma {\lam x \tau e} {\tau \to \tau_1} \yields {\lam x {\im \tau} E}}
 }
 
 % app
-\newcommand{\rulelabeleapp}{\rulelabele\text{app}}
-\newcommand{\ruleeapp}{
-\inferrule* [right=$\rulelabeleapp$]
-  {\judgee \gamma {e_1} {\tau_1 \to \tau_2} \\
-   \judgee \gamma {e_2} {\tau_3} \andalso
+\newcommand{\ruleLabelSourceApp}{\ruleLabelSource\text{app}}
+\newcommand{\ruleSourceApp}{
+\inferrule* [right=$\ruleLabelSourceApp$]
+  {\judgeSource \gamma {e_1} {\tau_1 \to \tau_2} \\
+   \judgeSource \gamma {e_2} {\tau_3} \andalso
    \tau_3 \subtype \tau_1}
-  {\judgee \gamma {\app {e_1} {e_2}} {\tau_2}}
+  {\judgeSource \gamma {\app {e_1} {e_2}} {\tau_2}}
 }
-\newcommand{\ruleeappelab}{
-\inferrule* [right=$\rulelabeleapp$]
-  {\judgee \gamma {e_1} {\tau_1 \to \tau_2} \yields {E_1} \\
-   \judgee \gamma {e_2} {\tau_3} \yields {E_2} \andalso
+\newcommand{\ruleSourceAppElab}{
+\inferrule* [right=$\ruleLabelSourceApp$]
+  {\judgeSource \gamma {e_1} {\tau_1 \to \tau_2} \yields {E_1} \\
+   \judgeSource \gamma {e_2} {\tau_3} \yields {E_2} \andalso
    \tau_3 \subtype \tau_1 \yields C}
-  {\judgee \gamma {\app {e_1} {e_2}} {\tau_2} \yields {\app {E_1} {(\app C E_2)}}}
+  {\judgeSource \gamma {\app {e_1} {e_2}} {\tau_2} \yields {\app {E_1} {(\app C E_2)}}}
 }
 
 
 % blam
-\newcommand{\rulelabeleblam}{\rulelabele\text{blam}}
-\newcommand{\ruleeblam}{
-\inferrule* [right=$\rulelabeleblam$]
-  {\judgee {\gamma, \alpha} e \tau}
-  {\judgee \gamma {\blam \alpha e} {\for \alpha \tau}}
+\newcommand{\ruleLabelSourceBLam}{\ruleLabelSource\text{blam}}
+\newcommand{\ruleSourceBLam}{
+\inferrule* [right=$\ruleLabelSourceBLam$]
+  {\judgeSource {\gamma, \alpha} e \tau}
+  {\judgeSource \gamma {\blam \alpha e} {\for \alpha \tau}}
 }
-\newcommand{\ruleeblamelab}{
-\inferrule* [right=$\rulelabeleblam$]
-  {\judgee {\gamma, \alpha} e \tau \yields E}
-  {\judgee \gamma {\blam \alpha e} {\for \alpha \tau} \yields {\blam \alpha E}}
+\newcommand{\ruleSourceBLamElab}{
+\inferrule* [right=$\ruleLabelSourceBLam$]
+  {\judgeSource {\gamma, \alpha} e \tau \yields E}
+  {\judgeSource \gamma {\blam \alpha e} {\for \alpha \tau} \yields {\blam \alpha E}}
 }
 
 % tapp
-\newcommand{\rulelabeletapp}{\rulelabele\text{tapp}}
-\newcommand{\ruleetapp}{
-\inferrule* [right=$\rulelabeletapp$]
-  {\judgee \gamma e {\for \alpha {\tau_1}} \andalso \judgeewf \gamma \tau}
-  {\judgee \gamma {\tapp e \tau} {\subst \tau \alpha \tau_1}}
+\newcommand{\ruleLabelSourceTApp}{\ruleLabelSource\text{tapp}}
+\newcommand{\ruleSourceTApp}{
+\inferrule* [right=$\ruleLabelSourceTApp$]
+  {\judgeSource \gamma e {\for \alpha {\tau_1}} \andalso \judgeSourceWF \gamma \tau}
+  {\judgeSource \gamma {\tapp e \tau} {\subst \tau \alpha \tau_1}}
 }
-\newcommand{\ruleetappelab}{
-\inferrule* [right=$\rulelabeletapp$]
-  {\judgee \gamma e {\for \alpha {\tau_1}} \yields E \andalso \judgeewf \gamma \tau}
-  {\judgee \gamma {\tapp e \tau} {\subst \tau \alpha \tau_1} \yields {\tapp E {\im \tau}}}
+\newcommand{\ruleSourceTAppElab}{
+\inferrule* [right=$\ruleLabelSourceTApp$]
+  {\judgeSource \gamma e {\for \alpha {\tau_1}} \yields E \andalso \judgeSourceWF \gamma \tau}
+  {\judgeSource \gamma {\tapp e \tau} {\subst \tau \alpha \tau_1} \yields {\tapp E {\im \tau}}}
 }
 
 % merge
-\newcommand{\rulelabelemerge}{\rulelabele\text{merge}}
-\newcommand{\ruleemerge}{
-\inferrule* [right=$\rulelabelemerge$]
-  {\judgee \gamma {e_1} {\tau_1} \\ \judgee \gamma {e_2} {\tau_2} \\ \tau_1 \orthog \tau_2}
-  {\judgee \gamma {e_1 \mergeop e_2} {\tau_1 \andop \tau_2}}
+\newcommand{\ruleLabelSourceMerge}{\ruleLabelSource\text{merge}}
+\newcommand{\ruleSourceMerge}{
+\inferrule* [right=$\ruleLabelSourceMerge$]
+  {\judgeSource \gamma {e_1} {\tau_1} \\ \judgeSource \gamma {e_2} {\tau_2} \\ \tau_1 \orthog \tau_2}
+  {\judgeSource \gamma {e_1 \mergeOp e_2} {\tau_1 \andOp \tau_2}}
 }
-\newcommand{\ruleemergeelab}{
-\inferrule* [right=$\rulelabelemerge$]
-  {\judgee \gamma {e_1} {\tau_1} \yields {E_1} \\
-   \judgee \gamma {e_2} {\tau_2} \yields {E_2} \\
+\newcommand{\ruleSourceMergeElab}{
+\inferrule* [right=$\ruleLabelSourceMerge$]
+  {\judgeSource \gamma {e_1} {\tau_1} \yields {E_1} \\
+   \judgeSource \gamma {e_2} {\tau_2} \yields {E_2} \\
    \tau_1 \orthog \tau_2}
-  {\judgee \gamma {e_1 \mergeop e_2} {\tau_1 \andop \tau_2} \yields {\pair {E_1} {E_2}}}
+  {\judgeSource \gamma {e_1 \mergeOp e_2} {\tau_1 \andOp \tau_2} \yields {\pair {E_1} {E_2}}}
 }
 
 % rec-con
-\newcommand{\rulelabelerecconstruct}{\rulelabele\text{rec-construct}}
-\newcommand{\ruleerecconstruct}{
-\inferrule* [right=$\rulelabelerecconstruct$]
-  {\judgee \gamma e \tau}
-  {\judgee \gamma {\reccon l e} {\recty l \tau}}
+\newcommand{\ruleLabelSourceRecConstruct}{\ruleLabelSource\text{rec-construct}}
+\newcommand{\ruleSourcerecordConstruct}{
+\inferrule* [right=$\ruleLabelSourceRecConstruct$]
+  {\judgeSource \gamma e \tau}
+  {\judgeSource \gamma {\recordCon l e} {\recordType l \tau}}
 }
-\newcommand{\ruleerecconstructelab}{
-\inferrule* [right=$\rulelabelerecconstruct$]
-  {\judgee \gamma e \tau \yields E}
-  {\judgee \gamma {\reccon l e} {\recty l \tau} \yields E}
+\newcommand{\ruleSourcerecordConstructElab}{
+\inferrule* [right=$\ruleLabelSourceRecConstruct$]
+  {\judgeSource \gamma e \tau \yields E}
+  {\judgeSource \gamma {\recordCon l e} {\recordType l \tau} \yields E}
 }
 
 % rec-select
-\newcommand{\rulelabelerecselect}{\rulelabele\text{rec-select}}
-\newcommand{\ruleerecselect}{
-\inferrule* [right=$\rulelabelerecselect$]
-  {\judgee \gamma e \tau \andalso
-   \judgeselect \tau l {\tau_1}}
-  {\judgee \gamma {e.l} {\tau_1}}
+\newcommand{\ruleLabelSourceRecSelect}{\ruleLabelSource\text{rec-select}}
+\newcommand{\ruleSourceRecSelect}{
+\inferrule* [right=$\ruleLabelSourceRecSelect$]
+  {\judgeSource \gamma e \tau \andalso
+   \judgeSelect \tau l {\tau_1}}
+  {\judgeSource \gamma {e.l} {\tau_1}}
 }
-\newcommand{\ruleerecselectelab}{
-\inferrule* [right=$\rulelabelerecselect$]
-  {\judgee \gamma e \tau \yields E \andalso
-   \judgeselect \tau l {\tau_1} \yields C}
-  {\judgee \gamma {e.l} {\tau_1} \yields {\app C E}}
+\newcommand{\ruleSourceRecSelectElab}{
+\inferrule* [right=$\ruleLabelSourceRecSelect$]
+  {\judgeSource \gamma e \tau \yields E \andalso
+   \judgeSelect \tau l {\tau_1} \yields C}
+  {\judgeSource \gamma {e.l} {\tau_1} \yields {\app C E}}
 }
 
 % rec-restrict
-\newcommand{\rulelabelerecrestrict}{\rulelabele\text{rec-restrict}}
-\newcommand{\ruleerecrestrict}{
-\inferrule* [right=$\rulelabelerecrestrict$]
-  {\judgee \gamma e \tau \andalso
-   \judgerestrict \tau l {\tau_1}}
-  {\judgee \gamma {e \restrictop l} {\tau_1}}
+\newcommand{\ruleLabelSourceRecRestrict}{\ruleLabelSource\text{rec-restrict}}
+\newcommand{\ruleSourceRecRestrict}{
+\inferrule* [right=$\ruleLabelSourceRecRestrict$]
+  {\judgeSource \gamma e \tau \andalso
+   \judgeRestrict \tau l {\tau_1}}
+  {\judgeSource \gamma {e \restrictOp l} {\tau_1}}
 }
-\newcommand{\ruleerecrestrictelab}{
-\inferrule* [right=$\rulelabelerecrestrict$]
-  {\judgee \gamma e \tau \yields E \andalso
-   \judgerestrict \tau l {\tau_1} \yields C}
-  {\judgee \gamma {e \restrictop l} {\tau_1} \yields {\app C E}}
+\newcommand{\ruleSourceRecRestrictElab}{
+\inferrule* [right=$\ruleLabelSourceRecRestrict$]
+  {\judgeSource \gamma e \tau \yields E \andalso
+   \judgeRestrict \tau l {\tau_1} \yields C}
+  {\judgeSource \gamma {e \restrictOp l} {\tau_1} \yields {\app C E}}
 }
 
 % rec-update
-\newcommand{\rulelabelerecupdate}{\rulelabele\text{rec-update}}
-\newcommand{\ruleerecupdate}{
-\inferrule* [right=$\rulelabelerecupdate$]
-  {\judgee \gamma e \tau \andalso
-   \judgee \gamma {e_1} {\tau_1} \\
-   \judgeupdate \tau l {\tau_1} {\tau_2} {\tau_3} \andalso
+\newcommand{\ruleLabelSourceRecUpdate}{\ruleLabelSource\text{rec-update}}
+\newcommand{\ruleSourcerecordUpdate}{
+\inferrule* [right=$\ruleLabelSourceRecUpdate$]
+  {\judgeSource \gamma e \tau \andalso
+   \judgeSource \gamma {e_1} {\tau_1} \\
+   \judgeUpdate \tau l {\tau_1} {\tau_2} {\tau_3} \andalso
    \tau_1 \subtype \tau_3}
-  {\judgee \gamma {\recupdate e l {e_1}} {\tau_2}}
+  {\judgeSource \gamma {\recordUpdate e l {e_1}} {\tau_2}}
 }
-\newcommand{\ruleerecupdateelab}{
-\inferrule* [right=$\rulelabelerecupdate$]
-  {\judgee \gamma e \tau \yields E \andalso
-   \judgee \gamma {e_1} {\tau_1} \yields {E_1} \\
-   \judgeupdate \tau l {\tau_1 \yields {E_1}} {\tau_2} {\tau_3} \yields C \andalso
+\newcommand{\ruleSourcerecordUpdateelab}{
+\inferrule* [right=$\ruleLabelSourceRecUpdate$]
+  {\judgeSource \gamma e \tau \yields E \andalso
+   \judgeSource \gamma {e_1} {\tau_1} \yields {E_1} \\
+   \judgeUpdate \tau l {\tau_1 \yields {E_1}} {\tau_2} {\tau_3} \yields C \andalso
    \tau_1 \subtype \tau_3}
-  {\judgee \gamma {\recupdate e l {e_1}} {\tau_2} \yields {\app C E}}
+  {\judgeSource \gamma {\recordUpdate e l {e_1}} {\tau_2} \yields {\app C E}}
 }
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % selection
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\colorlet{getputcolor}{DarkOrchid}
+\colorlet{getPutColor}{DarkOrchid}
 
-\newcommand{\judgeselect}[3]{#1 \bullet #2 = #3}
+\newcommand{\judgeSelect}[3]{#1 \bullet #2 = #3}
 
 % select
-\newcommand{\rulelabelselect}{\bm{\textcolor{getputcolor}{select}}}
-\newcommand{\ruleget}{
-  \inferrule* [right=$\rulelabelselect$]
+\newcommand{\ruleLabelSelect}{\bm{\textcolor{getPutColor}{select}}}
+\newcommand{\ruleGet}{
+  \inferrule* [right=$\ruleLabelSelect$]
   { }
-  {\judgeselect {\recty l \tau} l \tau}
+  {\judgeSelect {\recordType l \tau} l \tau}
 }
-\newcommand{\rulegetelab}{
-  \inferrule* [right=$\rulelabelselect$]
+\newcommand{\ruleGetElab}{
+  \inferrule* [right=$\ruleLabelSelect$]
   { }
-  {\judgeselect {\recty l \tau} l \tau \yields {\lam x {\im {\recty l \tau}} x}}
+  {\judgeSelect {\recordType l \tau} l \tau \yields {\lam x {\im {\recordType l \tau}} x}}
 }
 
 % select1
-\newcommand{\rulelabelselectleft}{{\rulelabelselect}_1}
-\newcommand{\rulegetleft}{
-  \inferrule* [right=$\rulelabelselectleft$]
-  {\judgeselect {\tau_1} l \tau}
-  {\judgeselect {\tau_1 \andop \tau_2} l \tau}
+\newcommand{\ruleLabelSelectLeft}{{\ruleLabelSelect}_1}
+\newcommand{\ruleGetLeft}{
+  \inferrule* [right=$\ruleLabelSelectLeft$]
+  {\judgeSelect {\tau_1} l \tau}
+  {\judgeSelect {\tau_1 \andOp \tau_2} l \tau}
 }
-\newcommand{\rulegetleftelab}{
-  \inferrule* [right=$\rulelabelselectleft$]
-  {\judgeselect {\tau_1} l \tau \yields C}
-  {\judgeselect {\tau_1 \andop \tau_2} l \tau \yields {\lam x {\im {\tau_1
-          \andop \tau_2}} {\app C {(\proj 1 x)}}}}
+\newcommand{\ruleGetLeftElab}{
+  \inferrule* [right=$\ruleLabelSelectLeft$]
+  {\judgeSelect {\tau_1} l \tau \yields C}
+  {\judgeSelect {\tau_1 \andOp \tau_2} l \tau \yields {\lam x {\im {\tau_1
+          \andOp \tau_2}} {\app C {(\proj 1 x)}}}}
 }
 
 % select2
-\newcommand{\rulelabelselectright}{{\rulelabelselect}_2}
-\newcommand{\rulegetright}{
-  \inferrule* [right=$\rulelabelselectright$]
-  {\judgeselect {\tau_2} l \tau}
-  {\judgeselect {\tau_1 \andop \tau_2} l \tau}
+\newcommand{\ruleLabelSelectRight}{{\ruleLabelSelect}_2}
+\newcommand{\ruleGetRight}{
+  \inferrule* [right=$\ruleLabelSelectRight$]
+  {\judgeSelect {\tau_2} l \tau}
+  {\judgeSelect {\tau_1 \andOp \tau_2} l \tau}
 }
-\newcommand{\rulegetrightelab}{
-  \inferrule* [right=$\rulelabelselectright$]
-  {\judgeselect {\tau_2} l \tau \yields C}
-  {\judgeselect {\tau_1 \andop \tau_2} l \tau \yields {\lam x {\im {\tau_1
-          \andop \tau_2}} {\app C {(\proj 2 x)}}}}
+\newcommand{\ruleGetRightElab}{
+  \inferrule* [right=$\ruleLabelSelectRight$]
+  {\judgeSelect {\tau_2} l \tau \yields C}
+  {\judgeSelect {\tau_1 \andOp \tau_2} l \tau \yields {\lam x {\im {\tau_1
+          \andOp \tau_2}} {\app C {(\proj 2 x)}}}}
 }
 
 
@@ -222,47 +222,47 @@
 % Restriction
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\newcommand{\judgerestrict}[3]{#1 \bm{\restrictop} #2 = #3}
+\newcommand{\judgeRestrict}[3]{#1 \bm{\restrictOp} #2 = #3}
 
 % restrict
-\newcommand{\rulelabelrestrict}{\bm{\textcolor{getputcolor}{restrict}}}
-\newcommand{\rulerestrict}{
-  \inferrule* [right=$\rulelabelrestrict$]
+\newcommand{\ruleLabelRestrict}{\bm{\textcolor{getPutColor}{restrict}}}
+\newcommand{\ruleRestrict}{
+  \inferrule* [right=$\ruleLabelRestrict$]
   { }
-  {\judgerestrict {\recty l \tau} l \top}
+  {\judgeRestrict {\recordType l \tau} l \top}
 }
-\newcommand{\rulerestrictelab}{
-  \inferrule* [right=$\rulelabelrestrict$]
+\newcommand{\ruleRestrictElab}{
+  \inferrule* [right=$\ruleLabelRestrict$]
   { }
-  {\judgerestrict {\recty l \tau} l \top \yields {\lam x {\im {\recty l \tau}} {()}}}
+  {\judgeRestrict {\recordType l \tau} l \top \yields {\lam x {\im {\recordType l \tau}} {()}}}
 }
 
 % restrict1
-\newcommand{\rulelabelrestrictleft}{{\rulelabelrestrict}_1}
-\newcommand{\rulerestrictleft}{
-  \inferrule* [right=$\rulelabelrestrictleft$]
-  {\judgerestrict {\tau_1} l \tau}
-  {\judgerestrict {\tau_1 \andop \tau_2} l {\tau \andop \tau_2}}
+\newcommand{\ruleLabelRestrictleft}{{\ruleLabelRestrict}_1}
+\newcommand{\ruleRestrictLeft}{
+  \inferrule* [right=$\ruleLabelRestrictleft$]
+  {\judgeRestrict {\tau_1} l \tau}
+  {\judgeRestrict {\tau_1 \andOp \tau_2} l {\tau \andOp \tau_2}}
 }
-\newcommand{\rulerestrictleftelab}{
-  \inferrule* [right=$\rulelabelrestrictleft$]
-  {\judgerestrict {\tau_1} l \tau \yields C}
-  {\judgerestrict {\tau_1 \andop \tau_2} l {\tau \andop \tau_2} \yields {\lam x {\im {\tau_1
-          \andop \tau_2}} {\pair {\app C {(\proj 1 x)}} {\proj 2 x}}}}
+\newcommand{\ruleRestrictLeftElab}{
+  \inferrule* [right=$\ruleLabelRestrictleft$]
+  {\judgeRestrict {\tau_1} l \tau \yields C}
+  {\judgeRestrict {\tau_1 \andOp \tau_2} l {\tau \andOp \tau_2} \yields {\lam x {\im {\tau_1
+          \andOp \tau_2}} {\pair {\app C {(\proj 1 x)}} {\proj 2 x}}}}
 }
 
 % restrict2
-\newcommand{\rulelabelrestrictright}{{\rulelabelrestrict}_2}
-\newcommand{\rulerestrictright}{
-  \inferrule* [right=$\rulelabelrestrictright$]
-  {\judgerestrict {\tau_2} l \tau}
-  {\judgerestrict {\tau_1 \andop \tau_2} l {\tau_1 \andop \tau}}
+\newcommand{\ruleLabelRestrictRight}{{\ruleLabelRestrict}_2}
+\newcommand{\ruleRestrictRight}{
+  \inferrule* [right=$\ruleLabelRestrictRight$]
+  {\judgeRestrict {\tau_2} l \tau}
+  {\judgeRestrict {\tau_1 \andOp \tau_2} l {\tau_1 \andOp \tau}}
 }
-\newcommand{\rulerestrictrightelab}{
-  \inferrule* [right=$\rulelabelrestrictright$]
-  {\judgerestrict {\tau_2} l \tau \yields C}
-  {\judgerestrict {\tau_1 \andop \tau_2} l {\tau_1 \andop \tau} \yields {\lam x {\im {\tau_1
-          \andop \tau_2}} {\pair {\proj 1 x} {\app C {(\proj 2 x)}}}}}
+\newcommand{\ruleRestrictRightElab}{
+  \inferrule* [right=$\ruleLabelRestrictRight$]
+  {\judgeRestrict {\tau_2} l \tau \yields C}
+  {\judgeRestrict {\tau_1 \andOp \tau_2} l {\tau_1 \andOp \tau} \yields {\lam x {\im {\tau_1
+          \andOp \tau_2}} {\pair {\proj 1 x} {\app C {(\proj 2 x)}}}}}
 }
 
 
@@ -270,46 +270,46 @@
 % Update
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\newcommand{\judgeupdate}[5]{#1 \blacktriangleleft \recty {#2} {#3} = #4 \lfloor #5 \rfloor}
+\newcommand{\judgeUpdate}[5]{#1 \blacktriangleleft \recordType {#2} {#3} = #4 \lfloor #5 \rfloor}
 
 % update
-\newcommand{\rulelabelupdate}{\bm{\textcolor{getputcolor}{update}}}
+\newcommand{\ruleLabelUpdate}{\bm{\textcolor{getPutColor}{update}}}
 \newcommand{\ruleupdate}{
-\inferrule* [right=$\rulelabelupdate$]
+\inferrule* [right=$\ruleLabelUpdate$]
   { }
-  {\judgeupdate {\recty l \tau} l {\tau_1} {\recty l {\tau_1}} \tau}
+  {\judgeUpdate {\recordType l \tau} l {\tau_1} {\recordType l {\tau_1}} \tau}
 }
-\newcommand{\ruleupdateelab}{
-\inferrule* [right=$\rulelabelupdate$]
+\newcommand{\ruleUpdateElab}{
+\inferrule* [right=$\ruleLabelUpdate$]
   { }
-  {\judgeupdate {\recty l \tau} l {\tau_1 \yields E} {\recty l {\tau_1}} \tau
-  \yields {\lam \_ {\im {\recty l \tau}} E}}
+  {\judgeUpdate {\recordType l \tau} l {\tau_1 \yields E} {\recordType l {\tau_1}} \tau
+  \yields {\lam \_ {\im {\recordType l \tau}} E}}
 }
 
 % update1
-\newcommand{\rulelabelupdateleft}{{\rulelabelupdate}_1}
-\newcommand{\ruleupdateleft}{
-\inferrule* [right=$\rulelabelupdateleft$]
-  {\judgeupdate {\tau_1} l \tau {\tau_3} {\tau_4}}
-  {\judgeupdate {\tau_1 \andop \tau_2} l \tau {\tau_3 \andop \tau_2} {\tau_4}}
+\newcommand{\ruleLabelUpdateLeft}{{\ruleLabelUpdate}_1}
+\newcommand{\ruleUpdateLeft}{
+\inferrule* [right=$\ruleLabelUpdateLeft$]
+  {\judgeUpdate {\tau_1} l \tau {\tau_3} {\tau_4}}
+  {\judgeUpdate {\tau_1 \andOp \tau_2} l \tau {\tau_3 \andOp \tau_2} {\tau_4}}
 }
-\newcommand{\ruleupdateleftelab}{
-\inferrule* [right=$\rulelabelupdateleft$]
-  {\judgeupdate {\tau_1} l {\tau \yields E} {\tau_3} {\tau_4} \yields C}
-  {\judgeupdate {\tau_1 \andop \tau_2} l {\tau \yields E} {\tau_3 \andop \tau_2} {\tau_4}
-  \yields {\lam x {\im {\tau_1 \andop \tau_2}} {\app C {(\proj 1 x)}}}}
+\newcommand{\ruleUpdateLeftElab}{
+\inferrule* [right=$\ruleLabelUpdateLeft$]
+  {\judgeUpdate {\tau_1} l {\tau \yields E} {\tau_3} {\tau_4} \yields C}
+  {\judgeUpdate {\tau_1 \andOp \tau_2} l {\tau \yields E} {\tau_3 \andOp \tau_2} {\tau_4}
+  \yields {\lam x {\im {\tau_1 \andOp \tau_2}} {\app C {(\proj 1 x)}}}}
 }
 
 % update2
-\newcommand{\rulelabelupdateright}{{\rulelabelupdate}_2}
-\newcommand{\ruleupdateright}{
-\inferrule* [right=$\rulelabelupdateright$]
-  {\judgeupdate {\tau_2} l \tau {\tau_3} {\tau_4}}
-  {\judgeupdate {\tau_1 \andop \tau_2} l \tau {\tau_1 \andop \tau_3} {\tau_4}}
+\newcommand{\ruleLabelUpdateRight}{{\ruleLabelUpdate}_2}
+\newcommand{\ruleUpdateRight}{
+\inferrule* [right=$\ruleLabelUpdateRight$]
+  {\judgeUpdate {\tau_2} l \tau {\tau_3} {\tau_4}}
+  {\judgeUpdate {\tau_1 \andOp \tau_2} l \tau {\tau_1 \andOp \tau_3} {\tau_4}}
 }
-\newcommand{\ruleupdaterightelab}{
-\inferrule* [right=$\rulelabelupdateright$]
-  {\judgeupdate {\tau_2} l {\tau \yields E} {\tau_3} {\tau_4} \yields C}
-  {\judgeupdate {\tau_1 \andop \tau_2} l {\tau \yields E} {\tau_1 \andop \tau_3} {\tau_4}
-  \yields {\lam x {\im {\tau_1 \andop \tau_2}} {\app C {(\proj 2 x)}}}}
+\newcommand{\ruleUpdateRightElab}{
+\inferrule* [right=$\ruleLabelUpdateRight$]
+  {\judgeUpdate {\tau_2} l {\tau \yields E} {\tau_3} {\tau_4} \yields C}
+  {\judgeUpdate {\tau_1 \andOp \tau_2} l {\tau \yields E} {\tau_1 \andOp \tau_3} {\tau_4}
+  \yields {\lam x {\im {\tau_1 \andOp \tau_2}} {\app C {(\proj 2 x)}}}}
 }

@@ -40,108 +40,108 @@ the previous intermediate result to reach the corresponding left-hand side).
 
   \item \textbf{Case}
     \begin{flalign*}
-      & \rulesubvar &
+      & \ruleSubVar &
     \end{flalign*}
 
     \begin{tabular}{rll}
-      & $ \judget {\epsilon} {\lam x {\im \alpha} x} {\alpha \to \alpha} $ & By $ \rulelabeltvar $ and $ \rulelabeltlam $
+      & $ \judgeTarget {\epsilon} {\lam x {\im \alpha} x} {\alpha \to \alpha} $ & By $ \ruleLabelTargetvar $ and $ \ruleLabelTargetlam $
     \end{tabular} \\
 
   \item \textbf{Case}
     \begin{flalign*}
-      & \rulesubtop &
+      & \ruleSubTop &
     \end{flalign*}
 
     \begin{tabular}{rll}
-      & $ \judget {\epsilon} {\lam x {\im \tau} ()} {\im \tau \to ()} $ & By $ \rulelabeltvar $ and $ \rulelabeltlam $ \\
-      & $ \judget {\epsilon} {\lam x {\im \tau} ()} {\im \tau \to \im \top} $ & By the definition of $ \im \cdot $ 
+      & $ \judgeTarget {\epsilon} {\lam x {\im \tau} ()} {\im \tau \to ()} $ & By $ \ruleLabelTargetvar $ and $ \ruleLabelTargetlam $ \\
+      & $ \judgeTarget {\epsilon} {\lam x {\im \tau} ()} {\im \tau \to \im \top} $ & By the definition of $ \im \cdot $
     \end{tabular} \\
 
   \item \textbf{Case}
     \begin{flalign*}
-      & \rulesubfun &
+      & \ruleSubFun &
     \end{flalign*}
 
     \begin{tabular}{rll}
-      & $ \judget \epsilon {C_1} {\im {\tau_3} \to \im {\tau_1}} $ & By i.h. \\
-      & $ \judget \epsilon {C_2} {\im {\tau_2} \to \im {\tau_4}} $ & By i.h. \\
-      & $ \judget {\epsilon, x \hast {\im {\tau_3}}} x {\im {\tau_3}} $ & By $\rulelabeltvar$ \\
+      & $ \judgeTarget \epsilon {C_1} {\im {\tau_3} \to \im {\tau_1}} $ & By i.h. \\
+      & $ \judgeTarget \epsilon {C_2} {\im {\tau_2} \to \im {\tau_4}} $ & By i.h. \\
+      & $ \judgeTarget {\epsilon, x \hast {\im {\tau_3}}} x {\im {\tau_3}} $ & By $\ruleLabelTargetvar$ \\
       & $ \tau_3 \subtype \tau_1 \yields {C_1} $ & Premise \\
-      & $ \judget {\epsilon, x \hast {\im {\tau_3}}} {\app {C_1} x} {\im {\tau_1}} $ & By $\rulelabeltapp$ \\
-      & $ \judget {\epsilon, f \hast {\im {\tau_1 \to \tau_2}}} f {\im {\tau_1 \to \tau_2}} $ & By $\rulelabeltvar$ \\
-      & $ \judget {\epsilon, f \hast {\im {\tau_1 \to \tau_2}}} f {\im {\tau_1} \to \im {\tau_2}} $ & By the definition of $ \im \cdot $ \\
-      & $ \judget {\epsilon, f \hast {\im {\tau_1 \to \tau_2}}, x \hast {\im {\tau_3}}} {\app f {(\app {C_1} x})} {\im {\tau_2}} $ & By $\rulelabeltapp$ \\
-      & $ \judget {\epsilon, f \hast {\im {\tau_1 \to \tau_2}}, x \hast {\im {\tau_3}}} {\app {C_2} {(\app f {(\app {C_1} x})})} {\im {\tau_4}} $ & By $\rulelabeltapp$ \\
-      & $ \judget \epsilon {\lam f {\im {\tau_1 \to \tau_2}} {\lam x {\im {\tau_3}} {\app {C_2} {(\app f {(\app {C_1} x)})}}}} {\im {\tau_1 \to \tau_2} \to \im {\tau_3} \to \im {\tau_4}} $ & By applying $\rulelabeltlam$ twice \\
-      & $ \judget \epsilon {\lam f {\im {\tau_1 \to \tau_2}} {\lam x {\im {\tau_3}} {\app {C_2} {(\app f {(\app {C_1} x)})}}}} {\im {\tau_1 \to \tau_2} \to \im {\tau_3 \to \tau_4}} $ & By the definition of $\im \cdot$ 
+      & $ \judgeTarget {\epsilon, x \hast {\im {\tau_3}}} {\app {C_1} x} {\im {\tau_1}} $ & By $\ruleLabelTargetApp$ \\
+      & $ \judgeTarget {\epsilon, f \hast {\im {\tau_1 \to \tau_2}}} f {\im {\tau_1 \to \tau_2}} $ & By $\ruleLabelTargetvar$ \\
+      & $ \judgeTarget {\epsilon, f \hast {\im {\tau_1 \to \tau_2}}} f {\im {\tau_1} \to \im {\tau_2}} $ & By the definition of $ \im \cdot $ \\
+      & $ \judgeTarget {\epsilon, f \hast {\im {\tau_1 \to \tau_2}}, x \hast {\im {\tau_3}}} {\app f {(\app {C_1} x})} {\im {\tau_2}} $ & By $\ruleLabelTargetApp$ \\
+      & $ \judgeTarget {\epsilon, f \hast {\im {\tau_1 \to \tau_2}}, x \hast {\im {\tau_3}}} {\app {C_2} {(\app f {(\app {C_1} x})})} {\im {\tau_4}} $ & By $\ruleLabelTargetApp$ \\
+      & $ \judgeTarget \epsilon {\lam f {\im {\tau_1 \to \tau_2}} {\lam x {\im {\tau_3}} {\app {C_2} {(\app f {(\app {C_1} x)})}}}} {\im {\tau_1 \to \tau_2} \to \im {\tau_3} \to \im {\tau_4}} $ & By applying $\ruleLabelTargetlam$ twice \\
+      & $ \judgeTarget \epsilon {\lam f {\im {\tau_1 \to \tau_2}} {\lam x {\im {\tau_3}} {\app {C_2} {(\app f {(\app {C_1} x)})}}}} {\im {\tau_1 \to \tau_2} \to \im {\tau_3 \to \tau_4}} $ & By the definition of $\im \cdot$
     \end{tabular} \\
 
   \item \textbf{Case}
     \begin{flalign*}
-      & \rulesubforall &
+      & \ruleSubForall &
     \end{flalign*}
 
     \begin{tabular}{rll}
-      & $ \judget \epsilon C {\im {\tau_1} \to {\im {\subst {\alpha_1} {\alpha_2} \tau_2}}} $ & By i.h. \\
-      & $ \judget {\epsilon, f \hast {\im {\for {\alpha_1} {\tau_1}}}} f {\im {\for {\alpha_1} {\tau_1}}} $ & By $\rulelabeltvar$ \\
-      & $ \judget {\epsilon, f \hast {\im {\for {\alpha_1} {\tau_1}}}} f {\for {\alpha_1} {\im {\tau_1}}} $ & By the definition of $ \im \cdot $ \\
-      & $ \judget {\epsilon, f \hast {\im {\for {\alpha_1} {\tau_1}}}, \alpha} {\tapp f \alpha} {\subst \alpha {\alpha_1} {\im {\tau_1}}} $ & By $\rulelabeltvar$ and $\rulelabelttapp$ \\
-      & $ \judget {\epsilon, f \hast {\im {\for {\alpha_1} {\tau_1}}}, \alpha} {\app C {(\tapp f \alpha)}} {\subst \alpha {\alpha_1} {\im {\subst {\alpha_1} {\alpha_2} {\tau_2}}}} $ & By $\rulelabeltapp$ \\
-      & $ \judget {\epsilon, f \hast {\im {\for {\alpha_1} {\tau_1}}}} {\blam \alpha {\app C {(\tapp f \alpha)}}} {\for {\alpha_2} {\im {\tau_2}}} $ & By $\rulelabeltblam$ and substitution \george{Substitution is problematic} \\
-      & $ \judget \epsilon {\lam f {\im {\for {\alpha_1} {\tau_1}}} {\blam \alpha {\app C {(\tapp f \alpha)}}}} {\im {\for {\alpha_1} {\tau_1}} \to \for {\alpha_2} {\im {\tau_2}}} $ & By $\rulelabeltlam$ \\
-      & $ \judget \epsilon {\lam f {\im {\for {\alpha_1} {\tau_1}}} {\blam \alpha {\app C {(\tapp f \alpha)}}}} {\im {\for {\alpha_1} {\tau_1}} \to \im {\for {\alpha_2} {\tau_2}}} $ & By the definition of $\im \cdot$ 
+      & $ \judgeTarget \epsilon C {\im {\tau_1} \to {\im {\subst {\alpha_1} {\alpha_2} \tau_2}}} $ & By i.h. \\
+      & $ \judgeTarget {\epsilon, f \hast {\im {\for {\alpha_1} {\tau_1}}}} f {\im {\for {\alpha_1} {\tau_1}}} $ & By $\ruleLabelTargetvar$ \\
+      & $ \judgeTarget {\epsilon, f \hast {\im {\for {\alpha_1} {\tau_1}}}} f {\for {\alpha_1} {\im {\tau_1}}} $ & By the definition of $ \im \cdot $ \\
+      & $ \judgeTarget {\epsilon, f \hast {\im {\for {\alpha_1} {\tau_1}}}, \alpha} {\tapp f \alpha} {\subst \alpha {\alpha_1} {\im {\tau_1}}} $ & By $\ruleLabelTargetvar$ and $\ruleLabelTargetTApp$ \\
+      & $ \judgeTarget {\epsilon, f \hast {\im {\for {\alpha_1} {\tau_1}}}, \alpha} {\app C {(\tapp f \alpha)}} {\subst \alpha {\alpha_1} {\im {\subst {\alpha_1} {\alpha_2} {\tau_2}}}} $ & By $\ruleLabelTargetApp$ \\
+      & $ \judgeTarget {\epsilon, f \hast {\im {\for {\alpha_1} {\tau_1}}}} {\blam \alpha {\app C {(\tapp f \alpha)}}} {\for {\alpha_2} {\im {\tau_2}}} $ & By $\ruleLabelTargetBLam$ and substitution \george{Substitution is problematic} \\
+      & $ \judgeTarget \epsilon {\lam f {\im {\for {\alpha_1} {\tau_1}}} {\blam \alpha {\app C {(\tapp f \alpha)}}}} {\im {\for {\alpha_1} {\tau_1}} \to \for {\alpha_2} {\im {\tau_2}}} $ & By $\ruleLabelTargetlam$ \\
+      & $ \judgeTarget \epsilon {\lam f {\im {\for {\alpha_1} {\tau_1}}} {\blam \alpha {\app C {(\tapp f \alpha)}}}} {\im {\for {\alpha_1} {\tau_1}} \to \im {\for {\alpha_2} {\tau_2}}} $ & By the definition of $\im \cdot$
     \end{tabular} \\
 
   \item \textbf{Case}
     \begin{flalign*}
-      & \rulesuband &
+      & \ruleSubAnd &
     \end{flalign*}
 
     \begin{tabular}{rll}
-      & $\judget {\epsilon, x \hast \im {\tau_1}} x {\im {\tau_1}}$ & By $\rulelabeltvar$ \\
-      & $\judget \epsilon {C_1} {\im {\tau_1} \to \im {\tau_2}}$ & By i.h. \\
-      & $\judget {\epsilon, x \hast \im {\tau_1}} {\app {C_1} x} {\im {\tau_2}}$ & By $\rulelabeltapp$ and weakening \\
-      & $\judget {\epsilon, x \hast \im {\tau_1}} {\app {C_2} x} {\im {\tau_3}}$ & Similar \\
-      & $\judget {\epsilon, x \hast \im {\tau_1}} {\pair {\app {C_1} x} {\app {C_2} x}} {\pair {\im {\tau_2}} {\im {\tau_3}}}$ & By $\rulelabeltpair$ \\
-      & $\judget {\epsilon, x \hast \im {\tau_1}} {\pair {\app {C_1} x} {\app {C_2} x}} {\im {\tau_2 \andop \tau_3}}$ & By the definition of $\im \cdot$ \\
-      & $\judget \epsilon {\lam x {\im {\tau_1}} {\pair {\app {C_1} x} {\app {C_2} x}}} {\im {\tau_1} \to {\im {\tau_2 \andop \tau_3}}}$ & By $\rulelabeltlam$
+      & $\judgeTarget {\epsilon, x \hast \im {\tau_1}} x {\im {\tau_1}}$ & By $\ruleLabelTargetvar$ \\
+      & $\judgeTarget \epsilon {C_1} {\im {\tau_1} \to \im {\tau_2}}$ & By i.h. \\
+      & $\judgeTarget {\epsilon, x \hast \im {\tau_1}} {\app {C_1} x} {\im {\tau_2}}$ & By $\ruleLabelTargetApp$ and weakening \\
+      & $\judgeTarget {\epsilon, x \hast \im {\tau_1}} {\app {C_2} x} {\im {\tau_3}}$ & Similar \\
+      & $\judgeTarget {\epsilon, x \hast \im {\tau_1}} {\pair {\app {C_1} x} {\app {C_2} x}} {\pair {\im {\tau_2}} {\im {\tau_3}}}$ & By $\ruleLabelTargetPair$ \\
+      & $\judgeTarget {\epsilon, x \hast \im {\tau_1}} {\pair {\app {C_1} x} {\app {C_2} x}} {\im {\tau_2 \andOp \tau_3}}$ & By the definition of $\im \cdot$ \\
+      & $\judgeTarget \epsilon {\lam x {\im {\tau_1}} {\pair {\app {C_1} x} {\app {C_2} x}}} {\im {\tau_1} \to {\im {\tau_2 \andOp \tau_3}}}$ & By $\ruleLabelTargetlam$
     \end{tabular} \\
 
   \item \textbf{Case}
     \begin{flalign*}
-      & \rulesubandleft &
+      & \ruleSubAndleft &
     \end{flalign*}
 
     \begin{tabular}{rll}
-      & $ \judget {\epsilon, x \hast \im {\tau_1 \andop \tau_2}} x {\im {\tau_1 \andop \tau_2}} $ & By $\rulelabeltvar$ \\
-      & $ \judget {\epsilon, x \hast \im {\tau_1 \andop \tau_2}} x {\pair {\im {\tau_1}} {\im {\tau_2}}} $ & By the definition of $\im \cdot$ \\
-      & $ \judget {\epsilon, x \hast \im {\tau_1 \andop \tau_2}} {\proj 1 x} {\im {\tau_1}} $ & By $\rulelabeltprojleft$ \\
-      & $ \judget \epsilon C {\im {\tau_1} \to \im {\tau_3}} $ & By i.h. \\
-      & $ \judget {\epsilon, x \hast \im {\tau_1 \andop \tau_2}} C {\im {\tau_1} \to \im {\tau_3}} $ & By weakening \\
-      & $ \judget {\epsilon, x \hast \im {\tau_1 \andop \tau_2}} {\app C {(\proj 1 x)}} {\im {\tau_3}} $ & By $\rulelabeltapp$ \\
-      & $ \judget \epsilon {\lam x {\im {\tau_1 \andop \tau_2}} {\app C {(\proj 1 x)}}} {\im {\tau_1 \andop \tau_2} \to \im {\tau_3}} $ & By $\rulelabeltlam$ 
+      & $ \judgeTarget {\epsilon, x \hast \im {\tau_1 \andOp \tau_2}} x {\im {\tau_1 \andOp \tau_2}} $ & By $\ruleLabelTargetvar$ \\
+      & $ \judgeTarget {\epsilon, x \hast \im {\tau_1 \andOp \tau_2}} x {\pair {\im {\tau_1}} {\im {\tau_2}}} $ & By the definition of $\im \cdot$ \\
+      & $ \judgeTarget {\epsilon, x \hast \im {\tau_1 \andOp \tau_2}} {\proj 1 x} {\im {\tau_1}} $ & By $\ruleLabelTargetProjLeft$ \\
+      & $ \judgeTarget \epsilon C {\im {\tau_1} \to \im {\tau_3}} $ & By i.h. \\
+      & $ \judgeTarget {\epsilon, x \hast \im {\tau_1 \andOp \tau_2}} C {\im {\tau_1} \to \im {\tau_3}} $ & By weakening \\
+      & $ \judgeTarget {\epsilon, x \hast \im {\tau_1 \andOp \tau_2}} {\app C {(\proj 1 x)}} {\im {\tau_3}} $ & By $\ruleLabelTargetApp$ \\
+      & $ \judgeTarget \epsilon {\lam x {\im {\tau_1 \andOp \tau_2}} {\app C {(\proj 1 x)}}} {\im {\tau_1 \andOp \tau_2} \to \im {\tau_3}} $ & By $\ruleLabelTargetlam$
     \end{tabular} \\
 
   \item \textbf{Case}
     \begin{flalign*}
-      & \rulesubandright &
+      & \ruleSubAndright &
     \end{flalign*}
 
     By symmetry with the above case. \\
 
   \item \textbf{Case}
     \begin{flalign*}
-      & \rulesubrec &
+      & \ruleSubRec &
     \end{flalign*}
 
     \begin{tabular}{rll}
       & $ \tau_1 \subtype \tau_2 \yields C $ & Premise \\
-      & $ \judget \epsilon C {\im {\tau_1} \to \im {\tau_2}} $ & By i.h. \\
-      & $ \judget {\epsilon, x \hast \im {\recty l {\tau_1}}} x {\im {\recty l {\tau_1}}} $ & By $ \rulelabeltvar $ \\
-      & $ \judget {\epsilon, x \hast \im {\recty l {\tau_1}}} x {\im {\tau_1}} $ & By the definition of $ \im \cdot $ \\
-      & $ \judget {\epsilon, x \hast \im {\recty l {\tau_1}}} {\app C x} {\im {\tau_2}} $ & By $ \rulelabeltapp $ \\
-      & $ \judget {\epsilon, x \hast \im {\recty l {\tau_1}}} {\app C x} {\im {\recty l {\tau_2}}} $ & By the definition of $ \im \cdot $ \\
-      & $ \judget \epsilon {\lam x {\im {\recty l {\tau_1}}} {\app C x}} {\im {\recty l {\tau_1}} \to \im {\recty l {\tau_2}}} $ & By $ \rulelabeltlam $ 
+      & $ \judgeTarget \epsilon C {\im {\tau_1} \to \im {\tau_2}} $ & By i.h. \\
+      & $ \judgeTarget {\epsilon, x \hast \im {\recordType l {\tau_1}}} x {\im {\recordType l {\tau_1}}} $ & By $ \ruleLabelTargetvar $ \\
+      & $ \judgeTarget {\epsilon, x \hast \im {\recordType l {\tau_1}}} x {\im {\tau_1}} $ & By the definition of $ \im \cdot $ \\
+      & $ \judgeTarget {\epsilon, x \hast \im {\recordType l {\tau_1}}} {\app C x} {\im {\tau_2}} $ & By $ \ruleLabelTargetApp $ \\
+      & $ \judgeTarget {\epsilon, x \hast \im {\recordType l {\tau_1}}} {\app C x} {\im {\recordType l {\tau_2}}} $ & By the definition of $ \im \cdot $ \\
+      & $ \judgeTarget \epsilon {\lam x {\im {\recordType l {\tau_1}}} {\app C x}} {\im {\recordType l {\tau_1}} \to \im {\recordType l {\tau_2}}} $ & By $ \ruleLabelTargetlam $
     \end{tabular} \\
 
   \end{itemize}
@@ -156,32 +156,32 @@ the previous intermediate result to reach the corresponding left-hand side).
 
   \item \textbf{Case}
     \begin{flalign*}
-      & \rulegetelab &
+      & \ruleGetElab &
     \end{flalign*}
 
     \begin{tabular}{rll}
-      & $ \judget \epsilon {\lam x {\im {\recty l \tau}} x} {\im {\recty l \tau} \to \im {\recty l \tau}} $ & By $ \rulelabeltlam $ and $\rulelabeltvar$ \\
-      & $ \judget \epsilon {\lam x {\im {\recty l \tau}} x} {\im {\recty l \tau} \to \im \tau} $ & By the definition of $ \im \cdot $
+      & $ \judgeTarget \epsilon {\lam x {\im {\recordType l \tau}} x} {\im {\recordType l \tau} \to \im {\recordType l \tau}} $ & By $ \ruleLabelTargetlam $ and $\ruleLabelTargetvar$ \\
+      & $ \judgeTarget \epsilon {\lam x {\im {\recordType l \tau}} x} {\im {\recordType l \tau} \to \im \tau} $ & By the definition of $ \im \cdot $
     \end{tabular} \\
 
   \item \textbf{Case}
     \begin{flalign*}
-      & \rulegetleftelab &
+      & \ruleGetLeftElab &
     \end{flalign*}
 
     \begin{tabular}{rll}
-      & $ \judget {\epsilon, x \hast \im {\tau_1 \andop \tau_2}} x {\im {\tau_1 \andop \tau_2}} $ & By $ \rulelabeltvar $ \\
-      & $ \judget {\epsilon, x \hast \im {\tau_1 \andop \tau_2}} x {\pair {\im {\tau_1}} {\im {\tau_2}}} $ & By the definition of $\im \cdot$ \\
-      & $ \judget {\epsilon, x \hast \im {\tau_1 \andop \tau_2}} {\proj 1 x} {\im {\tau_1}} $ & By $\rulelabeltprojleft$ \\
-      & $ \judget \epsilon C {\im {\tau_1} \to \im \tau} $ & By i.h. \\
-      & $ \judget {\epsilon, x \hast \im {\tau_1 \andop \tau_2}} C {\im {\tau_1} \to \im \tau} $ & By weakening \\
-      & $ \judget {\epsilon, x \hast \im {\tau_1 \andop \tau_2}} {\app C {(\proj 1 x)}} {\im \tau} $ & By $\rulelabeltapp$ \\
-      & $ \judget \epsilon {\lam x {\im {\tau_1 \andop \tau_2}} {\app C {(\proj 1 x)}}} {\im {\tau_1 \andop \tau_2} \to \im \tau} $ & By $ \rulelabeltlam $
+      & $ \judgeTarget {\epsilon, x \hast \im {\tau_1 \andOp \tau_2}} x {\im {\tau_1 \andOp \tau_2}} $ & By $ \ruleLabelTargetvar $ \\
+      & $ \judgeTarget {\epsilon, x \hast \im {\tau_1 \andOp \tau_2}} x {\pair {\im {\tau_1}} {\im {\tau_2}}} $ & By the definition of $\im \cdot$ \\
+      & $ \judgeTarget {\epsilon, x \hast \im {\tau_1 \andOp \tau_2}} {\proj 1 x} {\im {\tau_1}} $ & By $\ruleLabelTargetProjLeft$ \\
+      & $ \judgeTarget \epsilon C {\im {\tau_1} \to \im \tau} $ & By i.h. \\
+      & $ \judgeTarget {\epsilon, x \hast \im {\tau_1 \andOp \tau_2}} C {\im {\tau_1} \to \im \tau} $ & By weakening \\
+      & $ \judgeTarget {\epsilon, x \hast \im {\tau_1 \andOp \tau_2}} {\app C {(\proj 1 x)}} {\im \tau} $ & By $\ruleLabelTargetApp$ \\
+      & $ \judgeTarget \epsilon {\lam x {\im {\tau_1 \andOp \tau_2}} {\app C {(\proj 1 x)}}} {\im {\tau_1 \andOp \tau_2} \to \im \tau} $ & By $ \ruleLabelTargetlam $
     \end{tabular} \\
 
   \item \textbf{Case}
     \begin{flalign*}
-      & \rulegetrightelab &
+      & \ruleGetRightElab &
     \end{flalign*}
 
     By symmetry with the above case. \\
@@ -198,36 +198,36 @@ the previous intermediate result to reach the corresponding left-hand side).
 
   \item \textbf{Case}
     \begin{flalign*}
-      & \rulerestrictelab &
+      & \ruleRestrictElab &
     \end{flalign*}
 
     \begin{tabular}{rll}
-      & $ \judget \epsilon {\lam x {\im {\recty l \tau}} {()}} {\im {\recty l \tau} \to ()} $ & By $\rulelabeltunit$ and $\rulelabeltlam$ \\
-      & $ \judget \epsilon {\lam x {\im {\recty l \tau}} {()}} {\im {\recty l \tau} \to \im \top} $ & By the definition of $\im \cdot$  
+      & $ \judgeTarget \epsilon {\lam x {\im {\recordType l \tau}} {()}} {\im {\recordType l \tau} \to ()} $ & By $\ruleLabelTargetUnit$ and $\ruleLabelTargetlam$ \\
+      & $ \judgeTarget \epsilon {\lam x {\im {\recordType l \tau}} {()}} {\im {\recordType l \tau} \to \im \top} $ & By the definition of $\im \cdot$
     \end{tabular} \\
 
   \item \textbf{Case}
     \begin{flalign*}
-      & \rulerestrictleftelab &
+      & \ruleRestrictLeftElab &
     \end{flalign*}
 
     \begin{tabular}{rll}
-      & $\judgerestrict {\tau_1} l \tau \yields C$ & Premise \\
-      & $\judget \epsilon C {\im {\tau_1} \to \im \tau} $ & By i.h. \\
-      & $\judget {\epsilon, x \hast \im {\tau_1 \andop \tau_2}} x {\im {\tau_1 \andop \tau_2}} $ & By $\rulelabeltvar$ \\
-      & $\judget {\epsilon, x \hast \im {\tau_1 \andop \tau_2}} x {\pair {\im {\tau_1}} {\im {\tau_2}}} $ & By the definition of $\im \cdot$ \\
-      & $\judget {\epsilon, x \hast \im {\tau_1 \andop \tau_2}} {\proj 1 x} {\im {\tau_1}} $ & By $\rulelabeltprojleft$ \\
-      & $\judget {\epsilon, x \hast \im {\tau_1 \andop \tau_2}} {\proj 2 x} {\im {\tau_2}} $ & By $\rulelabeltprojright$ \\
-      & $\judget {\epsilon, x \hast \im {\tau_1 \andop \tau_2}} {\app C {(\proj 1 x)}} {\im {\tau}} $ & By $\rulelabeltapp$ \\
-      & $\judget {\epsilon, x \hast \im {\tau_1 \andop \tau_2}} {\pair {\app C {(\proj 1 x)}} {\proj 2 x}} {\pair {\im {\tau}} {\im {\tau_2}}} $ & By $\rulelabeltpair$ \\
-      & $\judget {\epsilon, x \hast \im {\tau_1 \andop \tau_2}} {\pair {\app C {(\proj 1 x)}} {\proj 2 x}} {\im {\tau \andop \tau_2}} $ & By the definition of $\im \cdot$ \\
-      & $\judget \epsilon {\lam x {\im {\tau_1
-          \andop \tau_2}} {\pair {\app C {(\proj 1 x)}} {\proj 2 x}}} {\im {\tau_1 \andop \tau_2} \to \im {\tau \andop \tau_2}} $ & By $\rulelabeltlam$ 
+      & $\judgeRestrict {\tau_1} l \tau \yields C$ & Premise \\
+      & $\judgeTarget \epsilon C {\im {\tau_1} \to \im \tau} $ & By i.h. \\
+      & $\judgeTarget {\epsilon, x \hast \im {\tau_1 \andOp \tau_2}} x {\im {\tau_1 \andOp \tau_2}} $ & By $\ruleLabelTargetvar$ \\
+      & $\judgeTarget {\epsilon, x \hast \im {\tau_1 \andOp \tau_2}} x {\pair {\im {\tau_1}} {\im {\tau_2}}} $ & By the definition of $\im \cdot$ \\
+      & $\judgeTarget {\epsilon, x \hast \im {\tau_1 \andOp \tau_2}} {\proj 1 x} {\im {\tau_1}} $ & By $\ruleLabelTargetProjLeft$ \\
+      & $\judgeTarget {\epsilon, x \hast \im {\tau_1 \andOp \tau_2}} {\proj 2 x} {\im {\tau_2}} $ & By $\ruleLabelTargetProjRight$ \\
+      & $\judgeTarget {\epsilon, x \hast \im {\tau_1 \andOp \tau_2}} {\app C {(\proj 1 x)}} {\im {\tau}} $ & By $\ruleLabelTargetApp$ \\
+      & $\judgeTarget {\epsilon, x \hast \im {\tau_1 \andOp \tau_2}} {\pair {\app C {(\proj 1 x)}} {\proj 2 x}} {\pair {\im {\tau}} {\im {\tau_2}}} $ & By $\ruleLabelTargetPair$ \\
+      & $\judgeTarget {\epsilon, x \hast \im {\tau_1 \andOp \tau_2}} {\pair {\app C {(\proj 1 x)}} {\proj 2 x}} {\im {\tau \andOp \tau_2}} $ & By the definition of $\im \cdot$ \\
+      & $\judgeTarget \epsilon {\lam x {\im {\tau_1
+          \andOp \tau_2}} {\pair {\app C {(\proj 1 x)}} {\proj 2 x}}} {\im {\tau_1 \andOp \tau_2} \to \im {\tau \andOp \tau_2}} $ & By $\ruleLabelTargetlam$
     \end{tabular} \\
 
   \item \textbf{Case}
     \begin{flalign*}
-      & \rulerestrictrightelab &
+      & \ruleRestrictRightElab &
     \end{flalign*}
 
     By symmetry with the above case. \\
@@ -236,10 +236,10 @@ the previous intermediate result to reach the corresponding left-hand side).
 \end{proof}
 
 \begin{comment}
-\begin{lemma}[\rulelabelupdate~rules produce type-correct coercion] \label{lemma:update-correct}
-  If $ \judgeupdate \tau l {\tau_1 \yields E} {\tau_2} {\tau_3} \yields C $ and $
-  \judget \Gamma E {\im {\tau_1}} $ for some $ \Gamma $, then
-  $ \judget \Gamma C {\im \tau \to \im {\tau_2}} $.
+\begin{lemma}[\ruleLabelUpdate~rules produce type-correct coercion] \label{lemma:update-correct}
+  If $ \judgeUpdate \tau l {\tau_1 \yields E} {\tau_2} {\tau_3} \yields C $ and $
+  \judgeTarget \Gamma E {\im {\tau_1}} $ for some $ \Gamma $, then
+  $ \judgeTarget \Gamma C {\im \tau \to \im {\tau_2}} $.
 \end{lemma}
 
 \begin{proof}
@@ -249,31 +249,31 @@ the previous intermediate result to reach the corresponding left-hand side).
 
   \item \textbf{Case}
     \begin{flalign*}
-      & \ruleupdateelab &
+      & \ruleUpdateElab &
     \end{flalign*}
 
     \begin{tabular}{rll}
-      & $ \judget \Gamma {\lam \_ {\im {\recty l \tau}} E} {\im {\recty l \tau}} \to \im {\tau_1} $ & By $ \rulelabeltlam $, $ \rulelabeltvar $, and the hypothesis
+      & $ \judgeTarget \Gamma {\lam \_ {\im {\recordType l \tau}} E} {\im {\recordType l \tau}} \to \im {\tau_1} $ & By $ \ruleLabelTargetlam $, $ \ruleLabelTargetvar $, and the hypothesis
     \end{tabular} \\
 
   \item \textbf{Case}
     \begin{flalign*}
-      & \ruleupdateleftelab &
+      & \ruleUpdateLeftElab &
     \end{flalign*}
 
     \begin{tabular}{rll}
-      & $ \judget {\Gamma, x \hast \im {\tau_1 \andop \tau_2}} x {\im {\tau_1 \andop \tau_2}} $ & By $\rulelabeltvar$ \\
-      & $ \judget {\Gamma, x \hast \im {\tau_1 \andop \tau_2}} x {\pair {\im {\tau_1}} {\im {\tau_2}}} $ & By the definition of $\im \cdot$ \\
-      & $ \judget {\Gamma, x \hast \im {\tau_1 \andop \tau_2}} {\proj 1 x} {\im {\tau_1}} $ & By $\rulelabeltprojleft$ \\
-      & $ \judget \Gamma C {\im {\tau_1} \to \im {\tau_3}} $ & By i.h. \\ 
-      & $ \judget {\Gamma, x \hast \im {\tau_1 \andop \tau_2}} C {{\im {\tau_1}} \to \im {\tau_3}} $ & By weakening \\ 
-      & $ \judget {\Gamma, x \hast \im {\tau_1 \andop \tau_2}} {\app C {(\proj 1 x)}} {\im {\tau_3}} $ & By $\rulelabeltapp$ \\
-      & $ \judget \Gamma {\lam x {\im {\tau_1 \andop \tau_2}} {\app C {(\proj 1 x)}}} {\im {\tau_1 \andop \tau_2} \to \im {\tau_3}} $ & By $\rulelabeltlam$
+      & $ \judgeTarget {\Gamma, x \hast \im {\tau_1 \andOp \tau_2}} x {\im {\tau_1 \andOp \tau_2}} $ & By $\ruleLabelTargetvar$ \\
+      & $ \judgeTarget {\Gamma, x \hast \im {\tau_1 \andOp \tau_2}} x {\pair {\im {\tau_1}} {\im {\tau_2}}} $ & By the definition of $\im \cdot$ \\
+      & $ \judgeTarget {\Gamma, x \hast \im {\tau_1 \andOp \tau_2}} {\proj 1 x} {\im {\tau_1}} $ & By $\ruleLabelTargetProjLeft$ \\
+      & $ \judgeTarget \Gamma C {\im {\tau_1} \to \im {\tau_3}} $ & By i.h. \\
+      & $ \judgeTarget {\Gamma, x \hast \im {\tau_1 \andOp \tau_2}} C {{\im {\tau_1}} \to \im {\tau_3}} $ & By weakening \\
+      & $ \judgeTarget {\Gamma, x \hast \im {\tau_1 \andOp \tau_2}} {\app C {(\proj 1 x)}} {\im {\tau_3}} $ & By $\ruleLabelTargetApp$ \\
+      & $ \judgeTarget \Gamma {\lam x {\im {\tau_1 \andOp \tau_2}} {\app C {(\proj 1 x)}}} {\im {\tau_1 \andOp \tau_2} \to \im {\tau_3}} $ & By $\ruleLabelTargetlam$
     \end{tabular} \\
 
   \item \textbf{Case}
     \begin{flalign*}
-      & \ruleupdaterightelab &
+      & \ruleUpdateRightElab &
     \end{flalign*}
 
     By symmetry with the above case. \\
@@ -283,24 +283,24 @@ the previous intermediate result to reach the corresponding left-hand side).
 \end{comment}
 
 \begin{lemma}[Preservation of well-formedness under type translation] \label{lemma:preserve-wf}
-  If $ \judgeewf \gamma \tau $, then $ \judgetwf {\im \gamma} {\im \tau} $.
+  If $ \judgeSourceWF \gamma \tau $, then $ \judgeTargetWF {\im \gamma} {\im \tau} $.
 \end{lemma}
 
 \begin{proof}
-  By structural induction of the derivation. The only case to consider is $ \rulelabelewf $.
+  By structural induction of the derivation. The only case to consider is $ \ruleLabelSourceWF $.
 
   \begin{itemize}
 
   \item \textbf{Case}
 
     \begin{flalign*}
-      & \ruleewf &
+      & \ruleSourceWF &
     \end{flalign*}
 
     \begin{tabular}{rll}
       & $ \ftv \tau \in \gamma $ & Premise \\
       & $ \ftv {\im \tau} \in \im \gamma $ & By the definition of $ \im \cdot $ \\
-      & $ \judgetwf {\im \gamma} {\im \tau} $ & By $ \rulelabeltwf $
+      & $ \judgeTargetWF {\im \gamma} {\im \tau} $ & By $ \ruleLabelTargetWF $
     \end{tabular} \\
 
   \end{itemize}
@@ -314,146 +314,146 @@ the previous intermediate result to reach the corresponding left-hand side).
 
   \item \textbf{Case}
     \begin{flalign*}
-      & \ruleevarelab &
+      & \ruleSourceVarElab &
     \end{flalign*}
 
     \begin{tabular}{rll}
      & $ (x,\tau) \in \gamma $ & Premise \\
      & $ (x,\im \tau) \in \im \gamma $ & By the definition of $ \im \cdot $ \\
-     & $ \judget {\im \gamma} x {\im \tau} $ & By $ \rulelabeltvar $
+     & $ \judgeTarget {\im \gamma} x {\im \tau} $ & By $ \ruleLabelTargetvar $
     \end{tabular} \\
 
   \item \textbf{Case}
     \begin{flalign*}
-      & \ruleetopelab &
+      & \ruleSourceTopElab &
     \end{flalign*}
 
     \begin{tabular}{rll}
-      & $\judget {\im \gamma} {()} {()} $ & By $\rulelabeltunit$ \\
-      & $\judget {\im \gamma} {()} {\im \top}$ & By the definition of $ \im \cdot$ 
+      & $\judgeTarget {\im \gamma} {()} {()} $ & By $\ruleLabelTargetUnit$ \\
+      & $\judgeTarget {\im \gamma} {()} {\im \top}$ & By the definition of $ \im \cdot$
     \end{tabular} \\
 
   \item \textbf{Case}
     \begin{flalign*}
-      & \ruleelamelab &
+      & \ruleSourceLamElab &
     \end{flalign*}
 
     \begin{tabular}{rll}
-      & $ \judgee {\gamma, x \hast \tau} e {\tau_1} \yields E $ & Premise \\
-      & $ \judget {\im {\gamma, x \hast \tau}} E {\im {\tau_1}} $ & By i.h. \\
-      & $ \judget {\im \gamma, x \hast \im \tau} E {\im {\tau_1}} $ & By the definition of $ \im \cdot $ \\
-      & $ \judget {\im \gamma} {\lam x {\im \tau} E} {\im \tau \to \im {\tau_1}} $ & By $ \rulelabeltlam $ \\
-      & $ \judget {\im \gamma} {\lam x {\im \tau} E} {\im {\tau \to \tau_1}} $ & By the definition of $ \im \cdot $ 
+      & $ \judgeSource {\gamma, x \hast \tau} e {\tau_1} \yields E $ & Premise \\
+      & $ \judgeTarget {\im {\gamma, x \hast \tau}} E {\im {\tau_1}} $ & By i.h. \\
+      & $ \judgeTarget {\im \gamma, x \hast \im \tau} E {\im {\tau_1}} $ & By the definition of $ \im \cdot $ \\
+      & $ \judgeTarget {\im \gamma} {\lam x {\im \tau} E} {\im \tau \to \im {\tau_1}} $ & By $ \ruleLabelTargetlam $ \\
+      & $ \judgeTarget {\im \gamma} {\lam x {\im \tau} E} {\im {\tau \to \tau_1}} $ & By the definition of $ \im \cdot $
     \end{tabular} \\
 
   \item \textbf{Case}
     \begin{flalign*}
-      & \ruleeappelab &
+      & \ruleSourceAppElab &
     \end{flalign*}
 
     \begin{tabular}{rll}
-     & $ \judgee \gamma {e_1} {\tau_1 \to \tau_2} \yields {E_1} $  & Premise \\
-     & $ \judget {\im \gamma} {E_1} {\im {\tau_1 \to \tau_2}} $ & By i.h. \\
-     & $ \judgee \gamma {e_2} {\tau_3} \yields {E_2} $ & Premise \\
-     & $ \judget {\im \gamma} {E_2} {\im {\tau_3}} $ & By i.h. \\
+     & $ \judgeSource \gamma {e_1} {\tau_1 \to \tau_2} \yields {E_1} $  & Premise \\
+     & $ \judgeTarget {\im \gamma} {E_1} {\im {\tau_1 \to \tau_2}} $ & By i.h. \\
+     & $ \judgeSource \gamma {e_2} {\tau_3} \yields {E_2} $ & Premise \\
+     & $ \judgeTarget {\im \gamma} {E_2} {\im {\tau_3}} $ & By i.h. \\
      & $ \tau_3 \subtype \tau_1 \yields C $ & Premise \\
-     & $ \judget \epsilon C {\im {\tau_3} \to \im {\tau_1}} $ & By Lemma~\ref{lemma:sub} \\
-     & $ \judget {\im \gamma} {\app {E_1} {(\app C E_2)}} {\im {\tau_2}} $ & By $ \rulelabeltapp $ and the definition of $ \im \cdot $
+     & $ \judgeTarget \epsilon C {\im {\tau_3} \to \im {\tau_1}} $ & By Lemma~\ref{lemma:sub} \\
+     & $ \judgeTarget {\im \gamma} {\app {E_1} {(\app C E_2)}} {\im {\tau_2}} $ & By $ \ruleLabelTargetApp $ and the definition of $ \im \cdot $
     \end{tabular} \\
 
   \item \textbf{Case}
     \begin{flalign*}
-      & \ruleeblamelab &
+      & \ruleSourceBLamElab &
     \end{flalign*}
 
     \begin{tabular}{rll}
-      & $ \judgee {\gamma, \alpha} e \tau \yields E $ & Premise \\
-      & $ \judget {\im {\gamma, \alpha}} E {\im \tau} $ & By i.h. \\
-      & $ \judget {\im \gamma, \alpha} E {\im \tau} $ & By the definition of $ \im \cdot $ \\
-      & $ \judget {\im \gamma} {\blam \alpha E} {\for \alpha {\im \tau}} $ & By $ \rulelabeltblam $ \\
-      & $ \judget {\im \gamma} {\blam \alpha E} {\im {\for \alpha \tau}} $ & By the definition of $ \im \cdot $
+      & $ \judgeSource {\gamma, \alpha} e \tau \yields E $ & Premise \\
+      & $ \judgeTarget {\im {\gamma, \alpha}} E {\im \tau} $ & By i.h. \\
+      & $ \judgeTarget {\im \gamma, \alpha} E {\im \tau} $ & By the definition of $ \im \cdot $ \\
+      & $ \judgeTarget {\im \gamma} {\blam \alpha E} {\for \alpha {\im \tau}} $ & By $ \ruleLabelTargetBLam $ \\
+      & $ \judgeTarget {\im \gamma} {\blam \alpha E} {\im {\for \alpha \tau}} $ & By the definition of $ \im \cdot $
     \end{tabular} \\
 
   \item \textbf{Case}
     \begin{flalign*}
-      & \ruleetappelab &
+      & \ruleSourceTAppElab &
     \end{flalign*}
 
     \begin{tabular}{rll}
-     & $ \judgee \gamma e {\for \alpha \tau_1} \yields E $ & Premise \\
-     & $ \judget {\im \gamma} E {\im {\for \alpha \tau_1}} $ & By i.h. \\
-     & $ \judget {\im \gamma} E {\for \alpha \im {\tau_1}} $ & By the definition of $ \im \cdot $ \\
-     & $ \judgeewf \gamma \tau $ & Premise \\
-     & $ \judgetwf {\im \gamma} {\im \tau} $ & By Lemma~\ref{lemma:preserve-wf} \\
-     & $ \judget \gamma {\tapp E {\im \tau}} {\subst {\im \tau} \alpha {\im {\tau_1}}} $ & By $ \rulelabelttapp $ \\
-     & $ \judget \gamma {\tapp E {\im \tau}} {\im {\subst \tau \alpha {\tau_1}}} $ & By substitution lemma
+     & $ \judgeSource \gamma e {\for \alpha \tau_1} \yields E $ & Premise \\
+     & $ \judgeTarget {\im \gamma} E {\im {\for \alpha \tau_1}} $ & By i.h. \\
+     & $ \judgeTarget {\im \gamma} E {\for \alpha \im {\tau_1}} $ & By the definition of $ \im \cdot $ \\
+     & $ \judgeSourceWF \gamma \tau $ & Premise \\
+     & $ \judgeTargetWF {\im \gamma} {\im \tau} $ & By Lemma~\ref{lemma:preserve-wf} \\
+     & $ \judgeTarget \gamma {\tapp E {\im \tau}} {\subst {\im \tau} \alpha {\im {\tau_1}}} $ & By $ \ruleLabelTargetTApp $ \\
+     & $ \judgeTarget \gamma {\tapp E {\im \tau}} {\im {\subst \tau \alpha {\tau_1}}} $ & By substitution lemma
     \end{tabular} \\
 
   \item \textbf{Case}
     \begin{flalign*}
-      & \ruleemergeelab &
+      & \ruleSourceMergeElab &
     \end{flalign*}
 
     \begin{tabular}{rll}
-      & $ \judgee \gamma {e_1} {\tau_1} \yields {E_1} $ & Premise \\
-      & $ \judget {\im \gamma} {E_1} {\im {\tau_1}} $ & By i.h. \\
-      & $ \judget {\im \gamma} {E_2} {\im {\tau_2}} $ & Similar to the above \\
-      & $ \judget {\im \gamma} {\pair {E_1} {E_2}} {\pair {\im {\tau_1}} {\im {\tau_2}}} $ & By $ \rulelabeltpair $ \\
-      & $ \judget {\im \gamma} {\pair {E_1} {E_2}} {\im {\tau_1 \andop \tau_2}} $ & By the definition of $ \im \cdot $ 
+      & $ \judgeSource \gamma {e_1} {\tau_1} \yields {E_1} $ & Premise \\
+      & $ \judgeTarget {\im \gamma} {E_1} {\im {\tau_1}} $ & By i.h. \\
+      & $ \judgeTarget {\im \gamma} {E_2} {\im {\tau_2}} $ & Similar to the above \\
+      & $ \judgeTarget {\im \gamma} {\pair {E_1} {E_2}} {\pair {\im {\tau_1}} {\im {\tau_2}}} $ & By $ \ruleLabelTargetPair $ \\
+      & $ \judgeTarget {\im \gamma} {\pair {E_1} {E_2}} {\im {\tau_1 \andOp \tau_2}} $ & By the definition of $ \im \cdot $
     \end{tabular} \\
 
   \item \textbf{Case}
     \begin{flalign*}
-      & \ruleerecconstructelab &
+      & \ruleSourcerecordConstructElab &
     \end{flalign*}
 
     \begin{tabular}{rll}
-      & $ \judgee \gamma e \tau \yields E $ & Premise \\
-      & $ \judget {\im \gamma} E {\im \tau} $ & By i.h. \\
-      & $ \judget {\im \gamma} E {\im {\recty l \tau}} $ & By the definition of $ \im \cdot $ 
+      & $ \judgeSource \gamma e \tau \yields E $ & Premise \\
+      & $ \judgeTarget {\im \gamma} E {\im \tau} $ & By i.h. \\
+      & $ \judgeTarget {\im \gamma} E {\im {\recordType l \tau}} $ & By the definition of $ \im \cdot $
     \end{tabular} \\
 
   \item \textbf{Case}
     \begin{flalign*}
-      & \ruleerecselectelab &
+      & \ruleSourceRecSelectElab &
     \end{flalign*}
 
     \begin{tabular}{rll}
-     & $ \judgeselect \tau l {\tau_1} \yields C $ & Premise \\
-     & $ \judget \epsilon C {\im \tau \to \im {\tau_1}} $ & By Lemma~\ref{lemma:select} \\
-     & $ \judget {\im \gamma} C {\im \tau \to \im {\tau_1}} $ & By weakening \\
-     & $ \judgee \gamma e \tau \yields E $ & Premise \\
-     & $ \judget {\im \gamma} E {\im \tau} $ & By i.h. \\
-     & $ \judget {\im \gamma} {\app C E} {\im {\tau_1}} $ & By $ \rulelabeltapp $
+     & $ \judgeSelect \tau l {\tau_1} \yields C $ & Premise \\
+     & $ \judgeTarget \epsilon C {\im \tau \to \im {\tau_1}} $ & By Lemma~\ref{lemma:select} \\
+     & $ \judgeTarget {\im \gamma} C {\im \tau \to \im {\tau_1}} $ & By weakening \\
+     & $ \judgeSource \gamma e \tau \yields E $ & Premise \\
+     & $ \judgeTarget {\im \gamma} E {\im \tau} $ & By i.h. \\
+     & $ \judgeTarget {\im \gamma} {\app C E} {\im {\tau_1}} $ & By $ \ruleLabelTargetApp $
     \end{tabular} \\
 
   \item \textbf{Case}
     \begin{flalign*}
-      & \ruleerecrestrictelab &
+      & \ruleSourceRecRestrictElab &
     \end{flalign*}
 
     \begin{tabular}{rll}
-     & $ \judgerestrict \tau l {\tau_1} \yields C $ & Premise \\
-     & $ \judget \epsilon C {\im \tau \to \im {\tau_1}} $ & By Lemma~\ref{lemma:restrict} \\
-     & $ \judget {\im \gamma} C {\im \tau \to \im {\tau_1}} $ & By weakening \\
-     & $ \judgee \gamma e \tau \yields E $ & Premise \\
-     & $ \judget {\im \gamma} E {\im \tau} $ & By i.h. \\
-     & $ \judget {\im \gamma} {\app C E} {\im {\tau_1}} $ & By $ \rulelabeltapp $
+     & $ \judgeRestrict \tau l {\tau_1} \yields C $ & Premise \\
+     & $ \judgeTarget \epsilon C {\im \tau \to \im {\tau_1}} $ & By Lemma~\ref{lemma:restrict} \\
+     & $ \judgeTarget {\im \gamma} C {\im \tau \to \im {\tau_1}} $ & By weakening \\
+     & $ \judgeSource \gamma e \tau \yields E $ & Premise \\
+     & $ \judgeTarget {\im \gamma} E {\im \tau} $ & By i.h. \\
+     & $ \judgeTarget {\im \gamma} {\app C E} {\im {\tau_1}} $ & By $ \ruleLabelTargetApp $
     \end{tabular} \\
 
   % \item \textbf{Case}
   %   \begin{flalign*}
-  %     & \ruleerecupdateelab &
+  %     & \ruleSourcerecordUpdateelab &
   %   \end{flalign*}
 
   %   \begin{tabular}{rll}
-  %     & $ \judgee \gamma {e_1} {\tau_1} \yields {E_1} $ & Premise \\
-  %     & $ \judget {\im \gamma} {E_1} {\im {\tau_1}} $ & By i.h. \\
-  %     & $ \judgeupdate \tau l {\tau_1 \yields {E_1}} {\tau_2} {\tau_3} \yields C $ & Premise \\
-  %     & $ \judget {\im \gamma} C {\im \tau \to \im {\tau_2}} $ & By Lemma~\ref{lemma:update-correct} \\
-  %     & $ \judgee \gamma e \tau \yields E $ & Premise \\
-  %     & $ \judget {\im \gamma} E {\im \tau} $ & By i.h. \\
-  %     & $ \judget {\im \gamma} {\app C E} {\im {\tau_2}} $ & By $ \rulelabeltapp $
+  %     & $ \judgeSource \gamma {e_1} {\tau_1} \yields {E_1} $ & Premise \\
+  %     & $ \judgeTarget {\im \gamma} {E_1} {\im {\tau_1}} $ & By i.h. \\
+  %     & $ \judgeUpdate \tau l {\tau_1 \yields {E_1}} {\tau_2} {\tau_3} \yields C $ & Premise \\
+  %     & $ \judgeTarget {\im \gamma} C {\im \tau \to \im {\tau_2}} $ & By Lemma~\ref{lemma:update-correct} \\
+  %     & $ \judgeSource \gamma e \tau \yields E $ & Premise \\
+  %     & $ \judgeTarget {\im \gamma} E {\im \tau} $ & By i.h. \\
+  %     & $ \judgeTarget {\im \gamma} {\app C E} {\im {\tau_2}} $ & By $ \ruleLabelTargetApp $
   %   \end{tabular} \\
 
   \end{itemize}

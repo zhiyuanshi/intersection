@@ -30,18 +30,18 @@ same kind $ K $. Davies and Pfenning
 \cite{davies2000intersection} studied the interactions between
 intersection types and effects in call-by-value languages. And they
 proposed a ``value restriction'' for intersection types, similar to
-value restriction on parametric polymorphism. Although they proposed a system with 
-parametric polymorphism, their subtyping rules are significantly different from ours, 
-since they consider parametric polymorphism 
+value restriction on parametric polymorphism. Although they proposed a system with
+parametric polymorphism, their subtyping rules are significantly different from ours,
+since they consider parametric polymorphism
 as the ``infinit analog'' of intersection polymorphism.
 There have been attempts to provide a foundational calculus
 for Scala that incorporates intersection
-types~\cite{amin2014foundations,amin2012dependent}. 
-Although the minimal Scala-like calculus does not natively support 
+types~\cite{amin2014foundations,amin2012dependent}.
+Although the minimal Scala-like calculus does not natively support
 parametric polymorphism, it is possible to encode parametric
-polymorphism with abstract type members. Thus it can be argued that 
+polymorphism with abstract type members. Thus it can be argued that
 this calculus also supports intersection types and parametric
-polymorphism. However, the type-soundness of a minimal Scala-like 
+polymorphism. However, the type-soundness of a minimal Scala-like
 calculus with intersection types and parametric polymorphism is not
 yet proven. Recently, some form of intersection
 types has been adopted in object-oriented languages such as Scala,
@@ -70,7 +70,7 @@ let merge [A, B] (f: ExpAlg A) (g: ExpAlg B) = {
 
 \paragraph{Other type systems with intersection types.}
 Intersection types date back to as early as Coppo et
-al.~\cite{coppo1981functional}. As emphasized throughout the paper our 
+al.~\cite{coppo1981functional}. As emphasized throughout the paper our
 work is inspired by Dunfield~\cite{dunfield2014elaborating}. He described a similar approach to ours:
 compiling a system with intersection types into ordinary $ \lambda $-calculus
 terms. The major difference is that his system does not include parametric
@@ -80,20 +80,20 @@ algorithmic and we formalize a record system.
 % our elaboration typing is simpler: we require subtyping in the case of
 % applications, thus avoiding the subsumption rule. Besides, our treatment
 % combines the merge rules ($ k $ ranges over $ \{1, 2\} $)
-% \inferrule 
+% \inferrule
 % {\Gamma \turns e_k : \tau}
-% {\Gamma \turns e_1 \mergeop e_2 : \tau}
+% {\Gamma \turns e_1 \mergeOp e_2 : \tau}
 % and the standard intersection-introduction rule
-% \inferrule 
+% \inferrule
 % {\Gamma \turns e : \tau_1 \andalso \Gamma \turns e : \tau_2}
-% {\Gamma \turns e : \tau_1 \andop \tau_2}
+% {\Gamma \turns e : \tau_1 \andOp \tau_2}
 % into one rule:
 % \inferrule [Merge]
 % {\Gamma \turns e_1 : \tau_1 \andalso \Gamma \turns e_2 : \tau_2}
-% {\Gamma \turns e_1 \mergeop e_2 : \tau_1 \andop \tau_2}
+% {\Gamma \turns e_1 \mergeOp e_2 : \tau_1 \andOp \tau_2}
 Reynolds invented Forsythe~\cite{reynolds1997design} in the 1980s. Our merge
 operator is analogous to his $ p_1, p_2 $. As Dunfield
-has noted, in Forsythe merges can be only used unambiguously. 
+has noted, in Forsythe merges can be only used unambiguously.
 For instance, it is not allowed in Forsythe to merge two functions.
 
 %Castagna, and Dunfield describe
@@ -130,18 +130,18 @@ container class can hold nested inner \emph{virtual} classes (forming
 the family of classes). In a subclass of the container class, the
 inner classes can themselfves be \emph{overriden}, which is why they
 are called virtual. There are many language mechanisms that provide
-variants of virtual classes or similar mechanisms~\cite{McDirmid01Jiazzi,Aracic06CaesarJ,Smaragdakis98mixin,nystrom2006j}. The work by 
+variants of virtual classes or similar mechanisms~\cite{McDirmid01Jiazzi,Aracic06CaesarJ,Smaragdakis98mixin,nystrom2006j}. The work by
 Nystrom on \emph{nested intersection}~\cite{nystrom2006j} uses a
 form of intersection types to support the composition of
 families of classes. Ostermann's \emph{delegation layers}~\cite{Ostermann02dynamically}
-use delegation for doing dynamic composition in a system 
-with virtual classes. This in contrast with most other approaches 
+use delegation for doing dynamic composition in a system
+with virtual classes. This in contrast with most other approaches
 that use class-based composition, but closer to the dynamic
 composition that we use in \name.
 \begin{comment}
-In contrast to type systems for virtual classes 
+In contrast to type systems for virtual classes
 and similar mechanisms, the goal of our work is to study the type
-systems and basic language mechanism to better support such design patterns. 
+systems and basic language mechanism to better support such design patterns.
  some researchers have designed new type
 system features such as virtual classes~\cite{ernst2006virtual}, polymorphic
 variants~\cite{garrigue1998programming}, while others have shown employing
@@ -181,11 +181,11 @@ Mitchell~\cite{cardelli1990operations} defined three primitive operations on
 records that are similar to ours: \emph{selection}, \emph{restriction}, and
 \emph{extension}. The merge operator in \name plays the same role as extension.
 Following Cardelli and Mitchell's approach,
-of restriction and extension. Both Leijen's systems~\cite{leijen2004first,leijen2005extensible} 
+of restriction and extension. Both Leijen's systems~\cite{leijen2004first,leijen2005extensible}
 and ours allow records that contain
 duplicate labels. Leijen's system is more sophisticated. For example, it supports
 passing record labels as arguments to functions. He also showed an encoding of
-intersection types using first-class labels. 
+intersection types using first-class labels.
 
 \begin{comment}
 Chlipala's
@@ -201,16 +201,16 @@ records but not intersection of ordinary types like \texttt{Int} and
 $ \turnsrec \tau $ states that $ \tau $ is a record type, or the intersection of
 record types, and so forth.
 
-\inferrule [RecBase] {} {\turnsrec \recty l \tau}
+\inferrule [RecBase] {} {\turnsrec \recordType l \tau}
 
 \inferrule [RecStep]
 {\turnsrec \tau_1 \andalso \turnsrec \tau_2}
-{\turnsrec \tau_1 \andop \tau_2}
+{\turnsrec \tau_1 \andOp \tau_2}
 
 \inferrule [Merge']
 {\Gamma \turns e_1 : \tau_1 \yields {E_1} \andalso \turnsrec \tau_1 \\
  \Gamma \turns e_2 : \tau_2 \yields {E_2} \andalso \turnsrec \tau_2}
-{\Gamma \turns e_1 \mergeop e_2 : \tau_1 \andop \tau_2 \yields {\pair {E_1} {E_2}}}
+{\Gamma \turns e_1 \mergeOp e_2 : \tau_1 \andOp \tau_2 \yields {\pair {E_1} {E_2}}}
 
 Of course our approach has its limitation as duplicated labels in a record are
 allowed. This has been discussed in a larger issue by

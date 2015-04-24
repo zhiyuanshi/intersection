@@ -1,61 +1,61 @@
 \colorlet{wfcolor}{BrickRed}
 
-\newcommand{\rulelabelewf}{\bm{\textcolor{wfcolor}{wf}}}
+\newcommand{\ruleLabelSourceWF}{\bm{\textcolor{wfcolor}{wf}}}
 
-\newcommand{\rulelabelewfvar}{\rulelabelewf\text{var}}
-\newcommand{\rulelabelewftop}{\rulelabelewf\text{top}}
-\newcommand{\rulelabelewffun}{\rulelabelewf\text{fun}}
-\newcommand{\rulelabelewfforall}{\rulelabelewf\text{forall}}
-\newcommand{\rulelabelewfand}{\rulelabelewf{\text{and}}}
-\newcommand{\rulelabelewfrec}{\rulelabelewf\text{rec}}
+\newcommand{\ruleLabelSourceWFVar}{\ruleLabelSourceWF\text{var}}
+\newcommand{\ruleLabelSourceWFTop}{\ruleLabelSourceWF\text{top}}
+\newcommand{\ruleLabelSourceWFFun}{\ruleLabelSourceWF\text{fun}}
+\newcommand{\ruleLabelSourceWFForall}{\ruleLabelSourceWF\text{forall}}
+\newcommand{\ruleLabelSourceWFAnd}{\ruleLabelSourceWF{\text{and}}}
+\newcommand{\ruleLabelSourceWFRec}{\ruleLabelSourceWF\text{rec}}
 
-\newcommand{\ruleewf}{
-\inferrule* [right=$\rulelabelewf$]
+\newcommand{\ruleSourceWF}{
+\inferrule* [right=$\ruleLabelSourceWF$]
   {\ftv \tau \in \gamma}
-  {\judgeewf \gamma \tau}
+  {\judgeSourceWF \gamma \tau}
 }
 
-\newcommand{\rulelabeltwf}{\rulelabelt\text{wf}}
-\newcommand{\ruletwf}{
-\inferrule* [right=$\rulelabeltwf$]
+\newcommand{\ruleLabelTargetWF}{\ruleLabelTarget\text{wf}}
+\newcommand{\ruleTargetWF}{
+\inferrule* [right=$\ruleLabelTargetWF$]
   {\ftv T \in \Gamma}
-  {\judgetwf \Gamma T}
+  {\judgeTargetWF \Gamma T}
 }
 
 % Expanded form of well-formedness
 
-\newcommand{\ruleewfvar}{
-\inferrule* [right=$\rulelabelewfvar$]
+\newcommand{\ruleSourceWFVar}{
+\inferrule* [right=$\ruleLabelSourceWFVar$]
   {\alpha \in \gamma}
-  {\judgeewf \gamma \alpha}
+  {\judgeSourceWF \gamma \alpha}
 }
 
-\newcommand{\ruleewftop}{
-\inferrule* [right=$\rulelabelewftop$]
+\newcommand{\ruleSourceWFTop}{
+\inferrule* [right=$\ruleLabelSourceWFTop$]
   { }
-  {\judgeewf \gamma \top}
+  {\judgeSourceWF \gamma \top}
 }
 
-\newcommand{\ruleewffun}{
-\inferrule* [right=$\rulelabelewffun$]
-  {\judgeewf \gamma {\tau_1} \\ \judgeewf \Gamma {\tau_2}}
-  {\judgeewf \gamma {\tau_1 \to \tau_2}}
+\newcommand{\ruleSourceWFFun}{
+\inferrule* [right=$\ruleLabelSourceWFFun$]
+  {\judgeSourceWF \gamma {\tau_1} \\ \judgeSourceWF \Gamma {\tau_2}}
+  {\judgeSourceWF \gamma {\tau_1 \to \tau_2}}
 }
 
-\newcommand{\ruleewfforall}{
-\inferrule* [right=$\rulelabelewfforall$]
-  {\judgeewf {\gamma, \alpha} \tau}
-  {\judgeewf \gamma {\for \alpha \tau}}
+\newcommand{\ruleSourceWFForall}{
+\inferrule* [right=$\ruleLabelSourceWFForall$]
+  {\judgeSourceWF {\gamma, \alpha} \tau}
+  {\judgeSourceWF \gamma {\for \alpha \tau}}
 }
 
-\newcommand{\ruleewfand}{
-\inferrule* [right=$\rulelabelewfand$]
-  {\judgeewf \gamma {\tau_1} \\ \judgeewf \Gamma {\tau_2} \\ \tau_1 \orthog \tau_2}
-  {\judgeewf \gamma {\tau_1 \andop \tau_2}}
+\newcommand{\ruleSourceWFAnd}{
+\inferrule* [right=$\ruleLabelSourceWFAnd$]
+  {\judgeSourceWF \gamma {\tau_1} \\ \judgeSourceWF \Gamma {\tau_2} \\ \tau_1 \orthog \tau_2}
+  {\judgeSourceWF \gamma {\tau_1 \andOp \tau_2}}
 }
 
-\newcommand{\ruleewfrec}{
-\inferrule* [right=$\rulelabelewfrec$]
-  {\judgeewf \gamma \tau}
-  {\judgeewf \gamma {\recty l \tau}}
+\newcommand{\ruleSourceWFRec}{
+\inferrule* [right=$\ruleLabelSourceWFRec$]
+  {\judgeSourceWF \gamma \tau}
+  {\judgeSourceWF \gamma {\recordType l \tau}}
 }
