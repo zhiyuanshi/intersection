@@ -1,8 +1,10 @@
 .DS_Store
 
-# Emacs
+## Emacs
 .#*
 
+## Latexian
+paper/*LatexianTemp*
 
 # LaTeX
 *.aux

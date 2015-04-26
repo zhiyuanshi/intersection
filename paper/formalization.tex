@@ -1,6 +1,7 @@
 \documentclass[nocopyrightspace,preprint,times,10pt]{sigplanconf}
 
 \input{preamble.tex}
+\input{macros/f_and.tex}
 
 \begin{document}
 
@@ -12,6 +13,83 @@
 \begin{figure*}
   \input{rule_in_figures/wellformedness.tex}
   \caption{Well-formedness of types.}
+\end{figure*}
+
+\begin{figure*}
+\begin{mathpar}
+\begin{array}{l}
+  \begin{array}{llrl}
+    \text{Values} & v & \Coloneqq & \top \mid \lam x \tau e \mid \blam \alpha e \mid v_1 \mergeOp v_2 \mid \recordCon l e
+  \end{array}
+\end{array}
+\end{mathpar}
+
+  \caption{Values.}
+\end{figure*}
+
+\begin{figure*}
+
+  \begin{mathpar}
+    \begin{array}{lcl}
+      \fields {v_1 \mergeOp v_2} &=& \fields {v_1} \concatOp \fields {v_2} \\
+      \fields {\recordCon l e}   &=& [(l, e)] \\
+      \fields v                  &=& []
+    \end{array}
+  \end{mathpar}
+  \caption{\code{fields}.}
+\end{figure*}
+
+\begin{figure*}
+  \begin{mathpar}
+    \begin{array}{lcl}
+      \remove {\recordCon l e} l &=& \top \\
+      \remove {\recordCon l e \mergeOp v_2} l &=& v_2 \\
+      \remove {\recordCon l e \mergeOp v_2} {l'} &=& \recordCon l e \mergeOp \remove {v_2} {l'} \quad \quad (l \neq l') \\
+      \remove {v_1 \mergeOp \recordCon l e} l &=& v_1 \\
+      \remove {v_1 \mergeOp \recordCon l e} {l'} &=& \remove {v_1} {l'} \mergeOp \recordCon l e \quad \quad (l \neq l') \\
+
+      \remove v l                  &=& v
+    \end{array}
+
+  \end{mathpar}
+
+  \caption{\code{remove}.}
+\end{figure*}
+
+\begin{figure*}
+  \begin{mathpar}
+    \inferrule* [right=Dyn::Val]
+      { }
+      {v \Downarrow v}
+
+    \inferrule* [right=Dyn::App]
+      {e_1 \Downarrow \lam x \tau e \\
+       e_2 \Downarrow v_2 \\
+       \subst {v_2} x e \Downarrow v}
+      {\app {e_1} {e_2} \Downarrow v}
+
+    \inferrule* [right=Dyn::TApp]
+      {e_1 \Downarrow \for \alpha e \\
+       \subst \tau \alpha e \Downarrow v}
+      {\tapp {e_1} \tau \Downarrow v}
+
+    \inferrule* [right=Dyn::Merge]
+      {e_1 \Downarrow v_1 \\ e_2 \Downarrow v_2}
+      {e_1 \mergeOp e_2 \Downarrow v_1 \mergeOp v_2}
+
+    \inferrule* [right=Dyn::RecSelect]
+      {e \Downarrow v \\
+       (l, e_1) \; \code{`uniqueElem`} \; \fields v \\
+       e_1 \Downarrow v_1}
+      {e.l \Downarrow v_1}
+
+    \inferrule* [right=Dyn::RecRestrict]
+      {e \Downarrow v \\
+       (l, e_1) \; \code{`uniqueElem`} \; \fields v}
+      {e \restrictOp l \Downarrow v \; \code{`remove`} \; l}
+  \end{mathpar}
+
+  \caption{Dynamic semantics.}
 \end{figure*}
 
 \begin{figure*}

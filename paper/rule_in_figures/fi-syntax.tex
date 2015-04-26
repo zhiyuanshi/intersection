@@ -2,12 +2,12 @@
 \begin{array}{l}
   \begin{array}{llrl}
     \text{Types}
-    & \tau & \Coloneqq & \alpha \mid \highlight{\top} \mid \tau_1 \to \tau_2 \mid \for \alpha \tau \\
-    &      & \mid      & \highlight{\tau_1 \andOp \tau_2} \mid \highlight{\recordType l \tau} \\
+    & \tau & \Coloneqq & \alpha \mid \highlight{$\top$} \mid \tau_1 \to \tau_2 \mid \for \alpha \tau \\
+    &      & \mid      & \highlight{$\tau_1 \andOp \tau_2$} \mid \highlight{$\recordType l \tau$} \\
     \text{Expressions}
-    & e & \Coloneqq & x \mid \highlight{\top} \mid \lam x \tau e \mid \app {e_1} {e_2} \mid \blam \alpha e \mid \tapp e \tau \\
-    &   & \mid      & \highlight {e_1 \mergeOp e_2} \mid \highlight {\recordCon l e} \mid
-                      \highlight {e.l} \mid \highlight{e \restrictOp l} \\
+    & e & \Coloneqq & x \mid \highlight{$\top$} \mid \lam x \tau e \mid \app {e_1} {e_2} \mid \blam \alpha e \mid \tapp e \tau \\
+    &   & \mid      & \highlight {$e_1 \mergeOp e_2$} \mid \highlight {$\recordCon l e$} \mid
+                      \highlight {$e.l$} \mid \highlight{$e \restrictOp l$} \\
     \text{Contexts}
     & \gamma & \Coloneqq & \epsilon \mid \gamma, \alpha \mid \gamma, x \hast \tau \\
     \text{Labels} & l
