@@ -1,0 +1,61 @@
+\colorlet{wfcolor}{BrickRed}
+
+\newcommand{\ruleLabelSourceWF}{\bm{\textcolor{wfcolor}{wf}}}
+
+\newcommand{\ruleLabelSourceWFVar}{\ruleLabelSourceWF\text{var}}
+\newcommand{\ruleLabelSourceWFTop}{\ruleLabelSourceWF\text{top}}
+\newcommand{\ruleLabelSourceWFFun}{\ruleLabelSourceWF\text{fun}}
+\newcommand{\ruleLabelSourceWFForall}{\ruleLabelSourceWF\text{forall}}
+\newcommand{\ruleLabelSourceWFAnd}{\ruleLabelSourceWF{\text{and}}}
+\newcommand{\ruleLabelSourceWFRec}{\ruleLabelSourceWF\text{rec}}
+
+\newcommand{\ruleSourceWF}{
+\inferrule* [right=$\ruleLabelSourceWF$]
+  {\ftv \tau \in \gamma}
+  {\judgeSourceWF \gamma \tau}
+}
+
+\newcommand{\ruleLabelTargetWF}{\ruleLabelTarget\text{wf}}
+\newcommand{\ruleTargetWF}{
+\inferrule* [right=$\ruleLabelTargetWF$]
+  {\ftv T \in \Gamma}
+  {\judgeTargetWF \Gamma T}
+}
+
+% Expanded form of well-formedness
+
+\newcommand{\ruleSourceWFVar}{
+\inferrule* [right=$\ruleLabelSourceWFVar$]
+  {\alpha \in \gamma}
+  {\judgeSourceWF \gamma \alpha}
+}
+
+\newcommand{\ruleSourceWFTop}{
+\inferrule* [right=$\ruleLabelSourceWFTop$]
+  { }
+  {\judgeSourceWF \gamma \top}
+}
+
+\newcommand{\ruleSourceWFFun}{
+\inferrule* [right=$\ruleLabelSourceWFFun$]
+  {\judgeSourceWF \gamma {\tau_1} \\ \judgeSourceWF \Gamma {\tau_2}}
+  {\judgeSourceWF \gamma {\tau_1 \to \tau_2}}
+}
+
+\newcommand{\ruleSourceWFForall}{
+\inferrule* [right=$\ruleLabelSourceWFForall$]
+  {\judgeSourceWF {\gamma, \alpha} \tau}
+  {\judgeSourceWF \gamma {\for \alpha \tau}}
+}
+
+\newcommand{\ruleSourceWFAnd}{
+\inferrule* [right=$\ruleLabelSourceWFAnd$]
+  {\judgeSourceWF \gamma {\tau_1} \\ \judgeSourceWF \Gamma {\tau_2} \\ \tau_1 \orthog \tau_2}
+  {\judgeSourceWF \gamma {\tau_1 \andOp \tau_2}}
+}
+
+\newcommand{\ruleSourceWFRec}{
+\inferrule* [right=$\ruleLabelSourceWFRec$]
+  {\judgeSourceWF \gamma \tau}
+  {\judgeSourceWF \gamma {\recordType l \tau}}
+}
