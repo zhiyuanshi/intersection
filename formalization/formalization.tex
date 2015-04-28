@@ -60,15 +60,15 @@
   \begin{mathpar}
     \inferrule* [right=Cast::Base]
       { }
-      {\cast \tau {\withType v \tau} \hookrightarrow \withType v \tau}
+      {\cast \tau {\withType v \tau} \hookrightarrow v}
 
     \inferrule* [right=Cast::Left]
-      {\cast \tau {\withType {v_1} {\tau_1}} \hookrightarrow \withType v \tau}
-      {\cast \tau {\withType {v_1 \mergeOp v_2} {\tau_1 \andOp \tau_2}} \hookrightarrow \withType v \tau}
+      {\cast \tau {\withType {v_1} {\tau_1}} \hookrightarrow v}
+      {\cast \tau {\withType {v_1 \mergeOp v_2} {\tau_1 \andOp \tau_2}} \hookrightarrow v}
 
     \inferrule* [right=Cast::Right]
-      {\cast \tau {\withType {v_2} {\tau_2}} \hookrightarrow \withType v \tau}
-      {\cast \tau {\withType {v_1 \mergeOp v_2} {\tau_1 \andOp \tau_2}} \hookrightarrow \withType v \tau}
+      {\cast \tau {\withType {v_2} {\tau_2}} \hookrightarrow v}
+      {\cast \tau {\withType {v_1 \mergeOp v_2} {\tau_1 \andOp \tau_2}} \hookrightarrow v}
   \end{mathpar}
 
   \caption{Casts.}
