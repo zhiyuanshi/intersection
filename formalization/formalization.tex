@@ -58,15 +58,15 @@
 
 \begin{figure*}
   \begin{mathpar}
-    \inferrule* [right=Cast::Base]
+    \inferrule* [right=Cast/Base]
       {\tau_1 \subtype \tau}
       {\cast \tau {\withType v {\tau_1}} \hookrightarrow v}
 
-    \inferrule* [right=Cast::Left]
+    \inferrule* [right=Cast/Left]
       {\cast \tau {\withType {v_1} {\tau_1}} \hookrightarrow v}
       {\cast \tau {\withType {v_1 \mergeOp v_2} {\tau_1 \andOp \tau_2}} \hookrightarrow v}
 
-    \inferrule* [right=Cast::Right]
+    \inferrule* [right=Cast/Right]
       {\cast \tau {\withType {v_2} {\tau_2}} \hookrightarrow v}
       {\cast \tau {\withType {v_1 \mergeOp v_2} {\tau_1 \andOp \tau_2}} \hookrightarrow v}
   \end{mathpar}
@@ -76,33 +76,33 @@
 
 \begin{figure*}
   \begin{mathpar}
-    \inferrule* [right=Dyn::Val]
+    \inferrule* [right=Dyn/Val]
       { }
       {v \Downarrow v}
 
-    \inferrule* [right=Dyn::App]
+    \inferrule* [right=Dyn/App]
       {e_1 \Downarrow \lam x \tau e \\
        e_2 \Downarrow v_2 \\
        \cast \tau {\withType {v_2} {\tau_2}} \hookrightarrow v_3 \\
        \subst {v_3} x e \Downarrow v}
       {\app {e_1} {\withType {e_2} {\tau_2}} \Downarrow v}
 
-    \inferrule* [right=Dyn::TApp]
+    \inferrule* [right=Dyn/TApp]
       {e_1 \Downarrow \for \alpha e \\
        \subst \tau \alpha e \Downarrow v}
       {\tapp {e_1} \tau \Downarrow v}
 
-    \inferrule* [right=Dyn::Merge]
+    \inferrule* [right=Dyn/Merge]
       {e_1 \Downarrow v_1 \\ e_2 \Downarrow v_2}
       {e_1 \mergeOp e_2 \Downarrow v_1 \mergeOp v_2}
 
-    % \inferrule* [right=Dyn::RecSelect]
+    % \inferrule* [right=Dyn/RecSelect]
     %   {e \Downarrow v \\
     %    (l, e_1) \; \code{`uniqueElem`} \; \fields v \\
     %    e_1 \Downarrow v_1}
     %   {e.l \Downarrow v_1}
 
-    % \inferrule* [right=Dyn::RecRestrict]
+    % \inferrule* [right=Dyn/RecRestrict]
     %   {e \Downarrow v \\
     %    (l, e_1) \; \code{`uniqueElem`} \; \fields v}
     %   {e \restrictOp l \Downarrow v \; \code{`remove`} \; l}
