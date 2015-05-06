@@ -59,8 +59,8 @@
 \begin{figure*}
   \begin{mathpar}
     \inferrule* [right=Cast::Base]
-      { }
-      {\cast \tau {\withType v \tau} \hookrightarrow v}
+      {\tau_1 \subtype \tau}
+      {\cast \tau {\withType v {\tau_1}} \hookrightarrow v}
 
     \inferrule* [right=Cast::Left]
       {\cast \tau {\withType {v_1} {\tau_1}} \hookrightarrow v}
@@ -127,3 +127,7 @@
 \end{figure*}
 
 \end{document}
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: t
+%%% End:
