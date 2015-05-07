@@ -39,3 +39,20 @@ However, we were a bit slopy forgot to clean up some experiments after
 the transitivity proof. Please ignore the code after line 207, which
 is where all the 25 admits are. The proofs for type-soundness are not
 mechanized, they are manual and fully presented in the appendix.
+
+* Technical novelty
+
+The main goal of our work was to find a minimal core calculus that
+could support existing extensible designs in the literature. Even if
+that calculus already existed, we would still write an OOPSLA paper
+illustrating why that calculus would have applications to solve the
+extensibility problems and how it could be a foundation towards a
+better OO language. So, there is more to our paper than just the
+formalisation of F& (we invite the reviewer to read our list of
+contributions in the introduction again).
+
+Having said that the formalisation of F& does have some interesting as
+there are some design choices to be made when adding polymorphism. In
+particular, we chose not to have bounded quantifiers in the language,
+where most previous work explored systems combining intersection types
+with bounded polymorphism. See also the first item on related work.
