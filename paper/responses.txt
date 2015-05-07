@@ -1,236 +1,31 @@
-===========================================================================
-                          OOPSLA '15 Review #133A
----------------------------------------------------------------------------
-      Paper #133: System F&: A Simple Core Language for Extensibility
----------------------------------------------------------------------------
-
-
-                      Overall merit: 4. Accept
-                 Reviewer expertise: 4. Expert
-
-                         ===== Paper summary =====
-
-The authors shows how the Wadler expression problem can be nicely solved in a language intersection types and a corresponding operationto merge values.  In particular, it allows an extension to generate a *supertype*, as well as generating subtypes.  They formalize an extension to System F called F&, give a type system and a coercion semantics to System F which is proved type safe. F& gives some of the power of bounded quantification without its problems.
-
-                      ===== Comments for author =====
-
-Evaluation:
-
-+ The paper is interesting and well-written.
-
-+ The motivation is interesting.
-
-+ I find novel the idea to use merge ",," to give the semantics of
-  multi-field record types which greatly simplifies the formalism,
-  and makes it much more elegant.
-
-+ The translation to System F that drops labels is surprisingly
-  simple and may suggest ways to implement records in functional
-  languages.
-
-+ The authors provide mechanism of formalisms.
-
-- The type system and semantics are nondeterministic which leads to
-  strange behavior.  The semantics are not complete w.r.t. Sets.
-  See below.
-
-
-My biggest complaint with the paper is that the type system is
-nondeterministic.  This isn't fully acknowledged, despite the fact
-that it leads to strange behavior:
-
-@ ({x=1},,{x=2}).x can evaluate to either 1 or 2
-
-@ ({x=1},,{x="hi"}).x can have type Integer
-  and it can have type String, but it does *not* have type
-  Integer & String.  (This is my example of incompleteness.)
-
-The authors should probably check Castagna's 2014/5 POPL papers which give a type system that is complete w.r.t. Set semantics that includes intersections, union and negation.
-
-Castagna also has an unpublished manuscript (claiming to be an update of his covariance/contravariance paper) on this topic.
-
-
-Detailed comments:
-
-[need to check if Castagna's 2014/5 POPL paper (part 1 and 2) is related work.]
-
-Is ",," really the best operator?  I would think an operator that
-suggested higher precedence such as \oplus or even an expression level
-& would be better.  I imagine "f(x, y ,, z, a)" is not going
-to be very clear.
-
-bad comma at start of column half-way down left-column of page 3.
-
-Figure 3 defines E-... rules.  The convention is that E-... rules are
-for evaluation not types.  Why use E- and not T-?
-
-Typing record selection: Hmm.  You don't mention that "select" is
-nondeterministic.  Why not?  The "correct" rule probably would use
-either an intersection type, or maybe even a ``union'' type (if the
-choice is external).  Similarly with restrict, but I have less
-experience with this operation.
-
-Figure 5: Typo, fourth line should be
-       | t_1 -> t_2 | = |t_1| -> |t_2|
-The last line should be
-       | g, x:t | = |g|, x:|t|
-
-page 10: left column: Finally a recognition that the rules
-are nondeterministic.  "usually applies the rules sequentially"
-does not increase my confidence very much.
-
-Figure 7: Ok, now I see, the nondeterministic choice is remembered in
-the translation so we keep type safety through the nondeterminism.
-
-Page 12: proof of Theorem 2 depends on normalization in System
-F which I expect (but I don't know) is preserved even when pairs are
-added to System F.  (You have an unusual way to state type safety that
-requires evaluating to a value, which requires termination.)
-
-You claim your rules are algorithmic even though they are
-nondeterministic.  This seems wrong to me.
-
-page 13: typo "themselfves"
-
-===========================================================================
-                          OOPSLA '15 Review #133B
----------------------------------------------------------------------------
-      Paper #133: System F&: A Simple Core Language for Extensibility
----------------------------------------------------------------------------
-
-
-                      Overall merit: 3. Weak accept
-                 Reviewer expertise: 3. Knowledgeable
-
-                         ===== Paper summary =====
-
-This paper presents System F&, a variant of System with intersection types, records, and a merge operator. System F& is presented as an expressive core calculus for extensible programming, showing how it can naturally support several typical extensibility challenges like the expression problem and modular visitors. The paper also shows how System F& supports a simpler version of Object Algebras, by exploiting the object-level merge operator. After several illustrative examples, the paper presents the formalization of System F&. The formal development consists of defining the static semantics of F& and providing its dynamic semantics through a type-directed elaboration to System F (extended with pairs and unit). The core idea is that intersections are like "implicit pairs", which are explicitly introduced with the merge operator, and implicitly eliminated by the type-driven translation. The translation therefore turns merges into pairs (like prior work by Dunfield), but additionally erases record labels, relying on functions instead for member access. The soundness of the calculus is proven. Finally, the paper mentions an implementation of F& (plus additional syntactic goodies) on top of the JVM, although the implementation is not used for any form of practical evaluation. The paper ends with an extensive (and informative) review of related work in the area.
-
-                      ===== Comments for author =====
-
-System F& is a very elegant calculus, whose formal description and practical applications are both very clear and convincing.
-
-The work is very close to Dunfield [19], differing mostly in that it supports parametric polymorphism (although there is apparently not much challenge coming from this part), and in that it includes a record system. The record system is interesting. First, the authors realized that intersections make it possible to encode multi-field records simply, so the core calculus has only single-field records. Second, the calculus includes a restriction operator to remove a field from a record.
-
-An interesting contribution is to show how this system can be used to address many of the extensibility challenges of the literature. In particular the authors show that that Object Algebras find a "simple home" in this calculus. A side contribution of the paper is also to identify that modular visitors are a nice example where "inheritance is not subtyping" matters.
-
-One question regarding restriction: it is chosen to inhabit the core because it makes it possible to encode record update and renaming. However, it is never used in the extensibility examples. Do the authors foresee interesting uses of this operator, extensibility-wise?
-This point is quite crucial since this feature is part of what distinguishes this work from [19]. I would like the authors to address this in their response.
-
-Commutativity of intersections is stated as a fundamental property on p3.  Nevertheless, the semantics of intersections with respect to both field selection and removal seem to violate this property. For removal, "only the last field will be removed" (p4), which breaks commutativity.
-
-For field selection, the ambiguity (and non-determinism) is maintained in several places, including the formal semantics, with a small note that says that the implementation chooses an order. At the type level, there is no constraint that the two components of an intersection agree on the type of a shared label, which makes the non-determinism a bit hard to apprehend it seems.  The paper should be more explicit about this non-determinism, and how it is handled in practice (it seems that it is handled by the implementation making an order; then why not make the calculus deterministic?). This is clearly something that should be discussed in details.
-
-- "To ensure type-soundness Scala (and other common OO languages) forbids any kind of type-refinement on method parameter types." -> what is the soundness issue with supporting contravariant arguments?
-
-- related work: could be more explicit about the differences between Fω∧ and F&
-
-- I looked at the Coq proofs, and there are 25 uses of admit. Can the authors comment on this??
-
-details:
-- "Dundfield" -> "Dunfield"
-- "annonymous", "dillema", "themselfves" -> apply a spell checker
-- "enjoys of properties"
-- p4 "mixed.x extracts the value of the field x from mixed" -> add that "mixed + 3" is perfectly legal.
-- "included in formalization"
-- p7 "The types are compatible because because..."
-- p7/8 "the subset" -> "a subset" (3 occurrences)
-- "We add the blue-color part" -> the choice of color is unfortunate since there is already a blue-color style in use (the E typing rules)
-- figure 3: uses "e - l" for restriction while the syntax (fig 1) is "e\l".
-- "To see how the this and the previous"
-- figure 5: |τ1| → |τ2| = |τ1| → |τ2| should be |τ1 → τ2| = |τ1| → |τ2|
-- "that without"
-- "Following Cardelli and Mitchell's approach, of restriction and extension." -> not a sentence
-
-===========================================================================
-                          OOPSLA '15 Review #133C
----------------------------------------------------------------------------
-      Paper #133: System F&: A Simple Core Language for Extensibility
----------------------------------------------------------------------------
-
-
-                      Overall merit: 2. Weak reject
-                 Reviewer expertise: 3. Knowledgeable
-
-                         ===== Paper summary =====
-
-The paper presents System F&, an extension to System F that models
-object extension through a merge operator on records along with
-intersection types.  The language is presented informally by example,
-along with examples that illustrate how to encode object extensibility
-in the calculus.  The language is then formalized and proven sound.
-
-                      ===== Comments for author =====
-
-There have been various approaches to object extensibility in the
-literature, as the authors describe.  Having a core calculus to ground
-this and future work in strong foundations as well as to allow for
-precise comparisons would be very useful.  The calculus described here
-is pleasingly simple, well described, and the work appears to be
-technically solid.
-
-However, I have two concerns that limit my enthusiasm for the work in
-the current form:
-
-* Despite statements to the contrary in the informal examples and
-  later in the paper, System F& as I understand it is highly
-  nondeterministic.  In particular, a record can have many labels of
-  the same name, and selecting a label selects one with the right name
-  nondeterministically.  Similarly, removing a label only
-  nondeterministically removes one with the given name.  This
-  semantics is nontraditional, so it's unclear to me how well this
-  semantics maps to standard extensibility tasks and how it models
-  existing approaches to extensibility.
-
-  More generally, I found it difficult to evaluate what was achieved
-  regarding extensibility.  Section 3 gives a bunch of examples, but I
-  don't have a clear sense of what kinds of extensibility idioms from
-  the literature can be done, which can't, etc.
-
-* From a technical point of view, the main idea comes from Dunfield
-  [19], who encodes merge as a pairing operation and has intersection
-  types (as well as unions) in his calculus.  The addition of records
-  and System-F-style polymorphism here does not seem to add much of
-  interest in terms of technical challenges.  Or at least, those
-  challenges are not made clear.  So it's hard for me to evaluate the
-  technical novelty.
-
-Specific comments:
-
-Sec 1:  "Dundfield" should be "Dunfield"
-
-2.2: "the idiom of making G type-inherit F is through..."  I get the
-point, but why do I need inheritance here?  It doesn't look like G is
-actually going to inherit any code from F.
-
-2.2:  In addition to [36] the type system for Cecil is nominal and separates inheritance from subtyping.  E.g. see Litvinov, OOPSLA 98.
-
-2.3: "If e contains multiple fields labelled l, only the last field
-will be removed."  This is the first mention of having multiple fields
-of the same name, which is unusual -- it needs more discussion.
-Worse, the sentence is untrue!  Your formal semantics allows any field
-of the right name to be nondeterministically removed.
-
-2.3:  "a record type...can be thought of as a normal type \tau tagged
-by the label l"  I don't understand the point of this sentence.
-
-3.1: In the combine function, I wondered why f and g weren't directly
-merged, rather than individually merging each of their components
-within a new function.  Would the former style work?  What are the
-differences?  And how does the current version actually work?  Showing
-what happens at run time would be useful to make it more concrete.
-
-3.3: I missed the point of the sub example.
-
-Fig 3:  Here is where I see the nondeterministic semantics of select
-and restrict for the first time.
-
-5.4: "one usually applies the rules sequentially ... essentially
-defining a deterministic order of lookup" So your implementation does
-not follow the semantics of the core calculus.  Unclear what the
-implication of that is.
-
-7: "Besides, our rules are algorithmic" As far as I can tell, this is
-not true!  Your rules are highly nondeterministic.  E.g. if a record
-has many labels of the same name, you have to "guess" which one to
-select and then hope that is consistent with later usage of the field.
+A concern raised by all reviewers is nondeterminism.
+
+The rules presented are nondeterministic mainly for simplicity, since it is
+unnatural to describe the order of applying rules in a deductive system. But it
+is easy to get a deterministic result by imposing an order in the
+implementation. We will illustrate this idea by using examples given by Reviewer
+1. As noted,
+
+({x=1},,{x=2}).x
+
+can evaluate to either 1 or 2 because ({x=1},,{x=2}) is of an intersection type,
+for which both rules, (select1) and (select2), are applicable (copied below).
+
+t . l = t
+--------------- (select1)
+t1 & t2 . l = t
+
+t . l = t
+--------------- (select2)
+t1 & t2 . l = t
+
+However, in our implementation, whenever this case happens, the right component
+of & and ,, will take precedence. In other words, the (select2) rule is tried
+first. Only after it fails, the (select1) rule is tried. Therefore,
+({x=1},,{x=2}).x can only evaluate to 2. And likewise, ({x=1},,{x="hi"}).x will
+evaluate to "hi" and will be of type String.
+
+More generally, three pairs of rules in our system that cause nondeterminism can
+be implemented with the same fashion. That means that (sub-and2) is also favored
+to (sub-and1), and (restrict2) to (restrict1). This approach is also covered in
+Section 5.4 of our paper.
