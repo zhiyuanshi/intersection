@@ -29,3 +29,13 @@ More generally, three pairs of rules in our system that cause nondeterminism can
 be implemented with the same fashion. That means that (sub-and2) is also favored
 to (sub-and1), and (restrict2) to (restrict1). This approach is also covered in
 Section 5.4 of our paper.
+
+* Coq proofs
+
+The Coq script proves reflexivity and transitivity of subtyping
+without using any admit.
+
+However, we were a bit slopy forgot to clean up some experiments after
+the transitivity proof. Please ignore the code after line 207, which
+is where all the 25 admits are. The proofs for type-soundness are not
+mechanized, they are manual and fully presented in the appendix.
