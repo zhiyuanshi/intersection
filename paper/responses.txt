@@ -1,73 +1,58 @@
 * Nondeterminism
 
-The major concern, raised by all reviewers, is nondeterminism. We argue that
-from our experience of using the compiler this is not a problem in practice.
+We agree with the reviewers that the semantics presented in the paper
+is nondeterministic. Our explanation is not very accurate and we will 
+correct it to clearly explain what we mean. 
 
-The rules presented are nondeterministic mainly for simplicity, since it is
-otherwise unnatural to describe the order of applying rules in a deductive
-system. But it is easy to get a deterministic result by imposing an order in the
-implementation. Take the program given by Reviewer A for example. As noted,
+The rules presented are nondeterministic mainly for simplicity, since
+it is otherwise unnatural to describe the order of applying rules in a
+deductive system. But it is easy to get a deterministic result by
+imposing an order in the implementation. Take the program given by
+Reviewer A for example. As noted,
 
 ({x=1},,{x=2}).x
 
-can evaluate to either 1 or 2 because ({x=1},,{x=2}) is of an intersection type,
-for which both rules, (select1) and (select2), are applicable (copied below).
+can evaluate to either 1 or 2 because ({x=1},,{x=2}) is of an
+intersection type, for which both rules, (select1) and (select2), are
+applicable.
 
-t . l = t
---------------- (select1)
-t1 & t2 . l = t
-
-t . l = t
---------------- (select2)
-t1 & t2 . l = t
-
-However, as discussed in Section 5.4 of our paper, in our implementation,
-whenever this case happens, the right component of & and ,, will take
-precedence. In other words, the (select2) rule is tried first. Only if (select2)
-fails, the (select1) rule is tried. To be more concrete, below is the
-corresponding code in our implementation for readers familiar with Haskell (feel
-free to skip if you cannot read Haskell).
-
-Note that:
-(1) `getter` implements the "select" rules as a *function* and is hence deterministic.
-(2) If (select2) fails, that is exactly when `getter i j t2 l` gives `Nothing`,
-(select1) is considered by evaluating `getter i j t2 l`.
-
-getter i j this@(FI.And t1 t2) l =
-  case getter i j t2 l of
-    Just (t, c) -> return (t, lam (transType i this) (App c . Proj 2 . var))
-    Nothing     ->
-      case getter i j t1 l of
-        Just (t, c) -> return (t, lam (transType i this) (App c . Proj 1 . var))
-        Nothing     -> Nothing
-
+However, as discussed in Section 5.4 of our paper, in our
+implementation, whenever this case happens, the right component of &
+and ,, will take precedence. In other words, the (select2) rule is
+tried first. Only if (select2) fails, the (select1) rule is tried.
 Therefore, ({x=1},,{x=2}).x can only evaluate to 2. And likewise,
 ({x=1},,{x="hi"}).x will evaluate to "hi" and will be of type String.
 
-More generally, three pairs of rules in our system that cause nondeterminism can
-all be implemented in the same fashion. That means that (sub-and2) is also
-favored to (sub-and1), and (restrict2) to (restrict1). After this treatment, the
-resulting language is deterministic.
+More generally, three pairs of rules in our system that cause
+nondeterminism can all be implemented in the same fashion. That means
+that (sub-and2) is also favored to (sub-and1), and (restrict2) to
+(restrict1). After this treatment, the resulting language is
+deterministic and we can easily get an algorithm.
+
+We will explain this in the revised version of the paper, as well as 
+give a detailed informal explanation of the semantics in Section 2.
 
 * Usage of restriction
 
-Restriction is useful to support standard OOP idioms for code reuse, like method
-overriding. For example, based on a print printer (printAlg) shown in Section
-3.1, we can override the Add case such that "(+ 2 3)" is printed instead of "2 +
-3":
+Restriction is useful to support standard OOP idioms for code reuse,
+like method/field overriding. For example, based on a print printer
+(printAlg) shown in Section 3.1, we can override the Add case such
+that "(+ 2 3)" is printed instead of "2 + 3":
 
-let sexpPrintAlg = printAlg \ add ,, {
-  add = \(x: IPrint) (y: IPrint) -> { print = "(+ " ++ x.print ++ y.print ++ ")" }
+let sexpPrintAlg = printAlg \add ,, { -- replace add with a new version
+  add = \(x: IPrint) (y: IPrint) -> 
+    {print = "(+ " ++ x.print ++ " " ++ y.print ++ ")"}
 };
 ...
 
 * Commutativity of intersections
 
-We note in the corresponding paragraph that the underlying equality is defined
-as bidirectional subtyping relation. For example, the sentence "A&B = B&A"
-should be understood as "A&B <: B&A and A&B :> A&B". In fact, it is not
-difficult to show all the three properties, including commutativity, using the
-subtyping relation (Figure 2).
+We note in the corresponding paragraph that the underlying equality is
+defined as bidirectional subtyping relation. For example, the sentence
+"A&B = B&A" should be understood as "A&B <: B&A and A&B :> A&B". In
+fact, it is not difficult to show all the three properties, including
+commutativity, using the subtyping relation (Figure 2). Note that we are
+*not* claiming that ",," has similar properties!
 
 * Coq proofs
 
@@ -90,8 +75,9 @@ better OO language. So, there is more to our paper than just the
 formalisation of F& (we invite the reviewer to read our list of
 contributions in the introduction again).
 
-Having said that the formalisation of F& does have some interesting as
-there are some design choices to be made when adding polymorphism. In
-particular, we chose not to have bounded quantifiers in the language,
-where most previous work explored systems combining intersection types
-with bounded polymorphism. See also the first item on related work.
+Having said that the formalisation of F& does have some interesting
+aspects as there are some design choices to be made when adding
+polymorphism. In particular, we chose not to have bounded quantifiers
+in the language, where most previous work explored systems combining
+intersection types with bounded polymorphism. See also the first item
+on related work.
