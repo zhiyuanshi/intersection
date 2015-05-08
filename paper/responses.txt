@@ -1,3 +1,5 @@
+* Nondeterminism
+
 A concern raised by all reviewers is nondeterminism.
 
 The rules presented are nondeterministic mainly for simplicity, since it is
@@ -29,6 +31,18 @@ More generally, three pairs of rules in our system that cause nondeterminism can
 be implemented with the same fashion. That means that (sub-and2) is also favored
 to (sub-and1), and (restrict2) to (restrict1). This approach is also covered in
 Section 5.4 of our paper.
+
+* Usage of restriction
+
+Restriction is useful to support standard OOP idioms for code reuse, like method
+overriding. For example, based on a print printer (printAlg) shown in Section
+3.1, we can override the Add case such that "(+ 2 3)" is printed instead of "2 +
+3":
+
+let sexpPrintAlg = printAlg \ add ,, {
+  add = \(x: IPrint) (y: IPrint) -> { print = "(+ " ++ x.print ++ y.print ++ ")" }
+};
+...
 
 * Coq proofs
 
