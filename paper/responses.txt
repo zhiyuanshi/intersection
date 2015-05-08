@@ -1,12 +1,12 @@
 * Nondeterminism
 
-A concern raised by all reviewers is nondeterminism.
+The major concern, raised by all reviewers, is nondeterminism. We argue that
+from our experience of using the compiler this is not a problem in practice.
 
 The rules presented are nondeterministic mainly for simplicity, since it is
-unnatural to describe the order of applying rules in a deductive system. But it
-is easy to get a deterministic result by imposing an order in the
-implementation. We will illustrate this idea by using examples given by Reviewer
-1. As noted,
+otherwise unnatural to describe the order of applying rules in a deductive
+system. But it is easy to get a deterministic result by imposing an order in the
+implementation. Take the program given by Reviewer A for example. As noted,
 
 ({x=1},,{x=2}).x
 
@@ -21,16 +21,33 @@ t . l = t
 --------------- (select2)
 t1 & t2 . l = t
 
-However, in our implementation, whenever this case happens, the right component
-of & and ,, will take precedence. In other words, the (select2) rule is tried
-first. Only after it fails, the (select1) rule is tried. Therefore,
-({x=1},,{x=2}).x can only evaluate to 2. And likewise, ({x=1},,{x="hi"}).x will
-evaluate to "hi" and will be of type String.
+However, as discussed in Section 5.4 of our paper, in our implementation,
+whenever this case happens, the right component of & and ,, will take
+precedence. In other words, the (select2) rule is tried first. Only if (select2)
+fails, the (select1) rule is tried. To be more concrete, below is the
+corresponding code in our implementation for readers familiar with Haskell (feel
+free to skip if you cannot read Haskell).
+
+Note that:
+(1) `getter` implements the "select" rules as a *function* and is hence deterministic.
+(2) If (select2) fails, that is exactly when `getter i j t2 l` gives `Nothing`,
+(select1) is considered by evaluating `getter i j t2 l`.
+
+getter i j this@(FI.And t1 t2) l =
+  case getter i j t2 l of
+    Just (t, c) -> return (t, lam (transType i this) (App c . Proj 2 . var))
+    Nothing     ->
+      case getter i j t1 l of
+        Just (t, c) -> return (t, lam (transType i this) (App c . Proj 1 . var))
+        Nothing     -> Nothing
+
+Therefore, ({x=1},,{x=2}).x can only evaluate to 2. And likewise,
+({x=1},,{x="hi"}).x will evaluate to "hi" and will be of type String.
 
 More generally, three pairs of rules in our system that cause nondeterminism can
-be implemented with the same fashion. That means that (sub-and2) is also favored
-to (sub-and1), and (restrict2) to (restrict1). This approach is also covered in
-Section 5.4 of our paper.
+all be implemented in the same fashion. That means that (sub-and2) is also
+favored to (sub-and1), and (restrict2) to (restrict1). After this treatment, the
+resulting language is deterministic.
 
 * Usage of restriction
 
@@ -57,7 +74,7 @@ subtyping relation (Figure 2).
 The Coq script proves reflexivity and transitivity of subtyping
 without using any admit.
 
-However, we were a bit slopy forgot to clean up some experiments after
+However, we were a bit sloppy--forgot to clean up some experiments after
 the transitivity proof. Please ignore the code after line 207, which
 is where all the 25 admits are. The proofs for type-soundness are not
 mechanized, they are manual and fully presented in the appendix.
