@@ -44,6 +44,14 @@ let sexpPrintAlg = printAlg \ add ,, {
 };
 ...
 
+* Commutativity of intersections
+
+We note in the corresponding paragraph that the underlying equality is defined
+as bidirectional subtyping relation. For example, the sentence "A&B = B&A"
+should be understood as "A&B <: B&A and A&B :> A&B". In fact, it is not
+difficult to show all the three properties, including commutativity, using the
+subtyping relation (Figure 2).
+
 * Coq proofs
 
 The Coq script proves reflexivity and transitivity of subtyping
