@@ -58,15 +58,15 @@
 
 \begin{figure*}
   \begin{mathpar}
-    \inferrule* [right=Cast/Base]
+    \inferrule* [right=Cast/UpCast]
       {\tau_1 \subtype \tau}
       {\cast \tau {\withType v {\tau_1}} \hookrightarrow v}
 
-    \inferrule* [right=Cast/Left]
+    \inferrule* [right=Cast/TakeLeft]
       {\cast \tau {\withType {v_1} {\tau_1}} \hookrightarrow v}
       {\cast \tau {\withType {v_1 \mergeOp v_2} {\tau_1 \andOp \tau_2}} \hookrightarrow v}
 
-    \inferrule* [right=Cast/Right]
+    \inferrule* [right=Cast/TakeRight]
       {\cast \tau {\withType {v_2} {\tau_2}} \hookrightarrow v}
       {\cast \tau {\withType {v_1 \mergeOp v_2} {\tau_1 \andOp \tau_2}} \hookrightarrow v}
   \end{mathpar}
@@ -122,7 +122,34 @@
 \end{figure*}
 
 \begin{figure*}
-  \input{rule_in_figures/elab-typing.tex}
+  % Typing
+  \begin{mathpar}
+    \framebox{$ \judgeSource \gamma e \tau \yields E $} \and
+    \ruleSourceVarElab \and \ruleSourceTopElab \and
+    \ruleSourceLamElab  \and \ruleSourceAppElab \and
+    \ruleSourceBLamElab \and \ruleSourceTAppElab \and
+    \ruleSourceMergeElab \and
+    \ruleSourcerecordConstructElab \and
+    \ruleSourceRecSelectElab \and \ruleSourceRecRestrictElab
+  \end{mathpar}
+
+  % Selection
+  \begin{mathpar}
+    \framebox{$\judgeSelect {\tau_1} l \tau_2 \yields C$} \and
+    \ruleGetElab \and \ruleGetLeftElab \and \ruleGetRightElab
+  \end{mathpar}
+
+  % Restriction
+  \begin{mathpar}
+    \framebox{$\judgeRestrict {\tau_1} l \tau_2 \yields C$} \and
+    \ruleRestrictElab \and \ruleRestrictLeftElab \and \ruleRestrictRightElab
+  \end{mathpar}
+
+  % Update
+  % \begin{mathpar}
+  %   \framebox{$\judgeUpdate \tau l {\tau \yields E} {\tau_2} {\tau_3} \yields C$} \and
+  %   \ruleUpdateElab \and \ruleUpdateLeftElab \and \ruleUpdateRightElab
+  % \end{mathpar}
   \caption{Elaboration typing.}
 \end{figure*}
 
