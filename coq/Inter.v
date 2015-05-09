@@ -11,18 +11,17 @@ Inductive PTyp A :=
   | PInt : PTyp A
   | Forall : (A -> PTyp A) -> PTyp A
   | Fun : PTyp A -> PTyp A -> PTyp A
-  | And : PTyp A -> PTyp A -> PTyp A
-  | Rcd : string -> PTyp A -> PTyp A.
+  | And : PTyp A -> PTyp A -> PTyp A.
 
 (*
 
 ----------
-|t1 <: t2| 
+|t1 <: t2|
 ----------
 
 a <: a                             Sub-Var
 
-           t1 <: t2 
+           t1 <: t2
 ------------------------------     Sub-Forall
 forall a . t1 <: forall a . t2
 
@@ -56,10 +55,9 @@ Inductive sub : nat -> PTyp nat -> PTyp nat -> Prop :=
   | SFun : forall i o1 o2 o3 o4, sub i o3 o1 -> sub i o2 o4 -> sub i (Fun nat o1 o2) (Fun nat o3 o4)
   | SAnd1 : forall i t t1 t2, sub i t t1 -> sub i t t2 -> sub i t (And nat t1 t2)
   | SAnd2 : forall i t t1 t2, sub i t1 t -> sub i (And nat t1 t2) t
-  | SAnd3 : forall i t t1 t2, sub i t2 t -> sub i (And nat t1 t2) t
-  | SRcd  : forall i s t1 t2, sub i t1 t2 -> sub i (Rcd nat s t1) (Rcd nat s t2).
+  | SAnd3 : forall i t t1 t2, sub i t2 t -> sub i (And nat t1 t2) t.
 
-Hint Resolve SVar SInt SForall SFun SAnd1 SAnd2 SAnd3 SRcd.
+Hint Resolve SVar SInt SForall SFun SAnd1 SAnd2 SAnd3.
 
 Lemma reflex : forall t1 i, sub i t1 t1.
 Proof.
@@ -115,11 +113,6 @@ apply SAnd3.
 exact H5.
 apply SAnd3.
 exact H6.
-(* Case Rcd *)
-inversion H.
-split.
-apply H4.
-apply H5.
 Defined.
 
 Definition transitivity_sub S Q T := forall i, sub i S Q -> sub i Q T -> sub i S T.
@@ -175,8 +168,6 @@ apply IHT1; auto.
 apply IHT2; auto.
 apply IHQ1; auto.
 apply IHQ2; auto.
-(* Case Rcd *)
-unfold transitivity_sub; intros.
 Defined.
 
 Lemma p1 : forall (A B C : Prop), (A \/ B -> C) -> ((A -> C) /\ (B -> C)).
