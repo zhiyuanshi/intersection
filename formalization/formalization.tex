@@ -1,4 +1,9 @@
-\documentclass[nocopyrightspace,preprint,times,10pt]{sigplanconf}
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: t
+%%% End:
+
+\documentclass[nocopyrightspace,preprint]{sigplanconf}
 
 \input{preamble.tex}
 \input{macros/f_and.tex}
@@ -6,23 +11,55 @@
 \begin{document}
 
 \begin{figure*}
-  \input{rule_in_figures/orthogonality.tex}
+  \begin{mathpar}
+    \framebox{$ \tau \orthog \tau $}
+
+    \ruleOrthogVar
+
+    \ruleOrthogFun
+
+    \ruleOrthogForall
+
+    \ruleOrthogAndLeft
+
+    \ruleOrthogAndRight
+
+    \ruleOrthogRecLab
+
+    \ruleOrthogRec
+  \end{mathpar}
+
   \caption{Orthogonality between types.}
 \end{figure*}
 
 \begin{figure*}
-  \input{rule_in_figures/wellformedness.tex}
+  \begin{mathpar}
+    \framebox{$ \judgeSourceWF \gamma \tau $}
+
+    \ruleSourceWFVar
+
+    \ruleSourceWFTop
+
+    \ruleSourceWFFun
+
+    \ruleSourceWFForall
+
+    \ruleSourceWFAnd
+
+    \ruleSourceWFRec
+  \end{mathpar}
+
   \caption{Well-formedness of types.}
 \end{figure*}
 
 \begin{figure*}
-\begin{mathpar}
-\begin{array}{l}
-  \begin{array}{llrl}
-    \text{Values} & v & \Coloneqq & \top \mid \lam x \tau e \mid \blam \alpha e \mid v_1 \mergeOp v_2 \mid \recordCon l e
-  \end{array}
-\end{array}
-\end{mathpar}
+  \begin{mathpar}
+    \begin{array}{l}
+      \begin{array}{llrl}
+        \text{Values} & v & \Coloneqq & \top \mid \lam x \tau e \mid \blam \alpha e \mid v_1 \mergeOp v_2 \mid \recordCon l e
+      \end{array}
+    \end{array}
+  \end{mathpar}
 
   \caption{Values.}
 \end{figure*}
@@ -31,44 +68,44 @@
 
 %   \begin{mathpar}
 %     \begin{array}{lcl}
-%       \fields {v_1 \mergeOp v_2} &=& \fields {v_1} \concatOp \fields {v_2} \\
-%       \fields {\recordCon l e}   &=& [(l, e)] \\
-%       \fields v                  &=& []
-%     \end{array}
-%   \end{mathpar}
-%   \caption{\code{fields}.}
-% \end{figure*}
+        %         \fields {v_1 \mergeOp v_2} &=& \fields {v_1} \concatOp \fields {v_2} \\
+        %         \fields {\recordCon l e}   &=& [(l, e)] \\
+        %         \fields v                  &=& []
+                                                 %       \end{array}
+                                                 %                                                  \end{mathpar}
+                                                 %                                                  \caption{\code{fields}.}
+                                                 %                                                  \end{figure*}
 
-% \begin{figure*}
-%   \begin{mathpar}
-%     \begin{array}{lcl}
-%       \remove {\recordCon l e} l &=& \top \\
-%       \remove {\recordCon l e \mergeOp v_2} l &=& v_2 \\
-%       \remove {\recordCon l e \mergeOp v_2} {l'} &=& \recordCon l e \mergeOp \remove {v_2} {l'} \quad \quad (l \neq l') \\
-%       \remove {v_1 \mergeOp \recordCon l e} l &=& v_1 \\
-%       \remove {v_1 \mergeOp \recordCon l e} {l'} &=& \remove {v_1} {l'} \mergeOp \recordCon l e \quad \quad (l \neq l') \\
+                                                 %                                                  \begin{figure*}
+                                                 %                                                  \begin{mathpar}
+                                                 %                                                  \begin{array}{lcl}
+                                                 %                                                  \remove {\recordCon l e} l &=& \top \\
+        %         \remove {\recordCon l e \mergeOp v_2} l &=& v_2 \\
+        %         \remove {\recordCon l e \mergeOp v_2} {l'} &=& \recordCon l e \mergeOp \remove {v_2} {l'} \quad \quad (l \neq l') \\
+        %         \remove {v_1 \mergeOp \recordCon l e} l &=& v_1 \\
+        %         \remove {v_1 \mergeOp \recordCon l e} {l'} &=& \remove {v_1} {l'} \mergeOp \recordCon l e \quad \quad (l \neq l') \\
 
-%       \remove v l                  &=& v
-%     \end{array}
+        %         \remove v l                  &=& v
+                                                   %       \end{array}
 
-%   \end{mathpar}
+                                                   %                                                    \end{mathpar}
 
-%   \caption{\code{remove}.}
-% \end{figure*}
+                                                   %                                                    \caption{\code{remove}.}
+                                                   %                                                    \end{figure*}
 
 \begin{figure*}
   \begin{mathpar}
     \inferrule* [right=Cast/UpCast]
-      {\tau_1 \subtype \tau}
-      {\cast \tau {\withType v {\tau_1}} \hookrightarrow v}
+    {\tau_1 \subtype \tau}
+    {\cast \tau {\withType v {\tau_1}} \hookrightarrow v}
 
     \inferrule* [right=Cast/TakeLeft]
-      {\cast \tau {\withType {v_1} {\tau_1}} \hookrightarrow v}
-      {\cast \tau {\withType {v_1 \mergeOp v_2} {\tau_1 \andOp \tau_2}} \hookrightarrow v}
+    {\cast \tau {\withType {v_1} {\tau_1}} \hookrightarrow v}
+    {\cast \tau {\withType {v_1 \mergeOp v_2} {\tau_1 \andOp \tau_2}} \hookrightarrow v}
 
     \inferrule* [right=Cast/TakeRight]
-      {\cast \tau {\withType {v_2} {\tau_2}} \hookrightarrow v}
-      {\cast \tau {\withType {v_1 \mergeOp v_2} {\tau_1 \andOp \tau_2}} \hookrightarrow v}
+    {\cast \tau {\withType {v_2} {\tau_2}} \hookrightarrow v}
+    {\cast \tau {\withType {v_1 \mergeOp v_2} {\tau_1 \andOp \tau_2}} \hookrightarrow v}
   \end{mathpar}
 
   \caption{Casts.}
@@ -77,35 +114,35 @@
 \begin{figure*}
   \begin{mathpar}
     \inferrule* [right=Dyn/Val]
-      { }
-      {v \Downarrow v}
+    { }
+    {v \Downarrow v}
 
     \inferrule* [right=Dyn/App]
-      {e_1 \Downarrow \lam x \tau e \\
-       e_2 \Downarrow v_2 \\
-       \cast \tau {\withType {v_2} {\tau_2}} \hookrightarrow v_3 \\
-       \subst {v_3} x e \Downarrow v}
-      {\app {e_1} {\withType {e_2} {\tau_2}} \Downarrow v}
+    {e_1 \Downarrow \lam x \tau e \\
+      e_2 \Downarrow v_2 \\
+      \cast \tau {\withType {v_2} {\tau_2}} \hookrightarrow v_3 \\
+      \subst {v_3} x e \Downarrow v}
+    {\app {e_1} {\withType {e_2} {\tau_2}} \Downarrow v}
 
     \inferrule* [right=Dyn/TApp]
-      {e_1 \Downarrow \for \alpha e \\
-       \subst \tau \alpha e \Downarrow v}
-      {\tapp {e_1} \tau \Downarrow v}
+    {e_1 \Downarrow \for \alpha e \\
+      \subst \tau \alpha e \Downarrow v}
+    {\tapp {e_1} \tau \Downarrow v}
 
     \inferrule* [right=Dyn/Merge]
-      {e_1 \Downarrow v_1 \\ e_2 \Downarrow v_2}
-      {e_1 \mergeOp e_2 \Downarrow v_1 \mergeOp v_2}
+    {e_1 \Downarrow v_1 \\ e_2 \Downarrow v_2}
+    {e_1 \mergeOp e_2 \Downarrow v_1 \mergeOp v_2}
 
     % \inferrule* [right=Dyn/RecSelect]
-    %   {e \Downarrow v \\
-    %    (l, e_1) \; \code{`uniqueElem`} \; \fields v \\
-    %    e_1 \Downarrow v_1}
-    %   {e.l \Downarrow v_1}
+    % {e \Downarrow v \\
+    % (l, e_1) \; \code{`uniqueElem`} \; \fields v \\
+    % e_1 \Downarrow v_1}
+    % {e.l \Downarrow v_1}
 
     % \inferrule* [right=Dyn/RecRestrict]
-    %   {e \Downarrow v \\
-    %    (l, e_1) \; \code{`uniqueElem`} \; \fields v}
-    %   {e \restrictOp l \Downarrow v \; \code{`remove`} \; l}
+    % {e \Downarrow v \\
+    % (l, e_1) \; \code{`uniqueElem`} \; \fields v}
+    % {e \restrictOp l \Downarrow v \; \code{`remove`} \; l}
   \end{mathpar}
 
   \caption{Dynamic semantics.}
@@ -124,37 +161,52 @@
 \begin{figure*}
   % Typing
   \begin{mathpar}
-    \framebox{$ \judgeSource \gamma e \tau \yields E $} \and
-    \ruleSourceVarElab \and \ruleSourceTopElab \and
-    \ruleSourceLamElab  \and \ruleSourceAppElab \and
-    \ruleSourceBLamElab \and \ruleSourceTAppElab \and
-    \ruleSourceMergeElab \and
-    \ruleSourcerecordConstructElab \and
-    \ruleSourceRecSelectElab \and \ruleSourceRecRestrictElab
+    \framebox{$ \judgeSource \gamma e \tau \yields E $}
+
+    \ruleSourceVarElab
+
+    \ruleSourceTopElab
+
+    \ruleSourceLamElab
+
+    \ruleSourceAppElab
+
+    \ruleSourceBLamElab
+
+    \ruleSourceTAppElab
+
+    \ruleSourceMergeElab
+
+    \ruleSourcerecordConstructElab
+
+    \ruleSourceRecSelectElab
+
+    \ruleSourceRecRestrictElab
   \end{mathpar}
 
   % Selection
   \begin{mathpar}
-    \framebox{$\judgeSelect {\tau_1} l \tau_2 \yields C$} \and
-    \ruleGetElab \and \ruleGetLeftElab \and \ruleGetRightElab
+    \framebox{$\judgeSelect {\tau_1} l \tau_2 \yields C$}
+
+    \ruleGetElab
+
+    \ruleGetLeftElab
+
+    \ruleGetRightElab
   \end{mathpar}
 
   % Restriction
   \begin{mathpar}
-    \framebox{$\judgeRestrict {\tau_1} l \tau_2 \yields C$} \and
-    \ruleRestrictElab \and \ruleRestrictLeftElab \and \ruleRestrictRightElab
+    \framebox{$\judgeRestrict {\tau_1} l \tau_2 \yields C$}
+
+    \ruleRestrictElab
+
+    \ruleRestrictLeftElab
+
+    \ruleRestrictRightElab
   \end{mathpar}
 
-  % Update
-  % \begin{mathpar}
-  %   \framebox{$\judgeUpdate \tau l {\tau \yields E} {\tau_2} {\tau_3} \yields C$} \and
-  %   \ruleUpdateElab \and \ruleUpdateLeftElab \and \ruleUpdateRightElab
-  % \end{mathpar}
   \caption{Elaboration typing.}
 \end{figure*}
 
 \end{document}
-%%% Local Variables:
-%%% mode: latex
-%%% TeX-master: t
-%%% End:

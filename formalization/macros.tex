@@ -15,7 +15,7 @@
 
 % Types
 % \newcommand{\top}{\{\}}
-\newcommand{\andOp}{\with}
+\newcommand{\andOp}{\&}
 
 % Expressions
 \newcommand{\lam}[3]{\lambda (#1 \hast #2).\binderSpacing #3}
@@ -31,35 +31,34 @@
 \newcommand{\J}{\code{j}}
 
 
-% Rules
+% % Rules
 
-% Couleurs
-\colorlet{subColor}{OliveGreen}
-\colorlet{targetColor}{BrickRed}
+% % Couleurs
+% \colorlet{subColor}{OliveGreen}
+% \colorlet{targetColor}{BrickRed}
 
-% Subtyping labels
-\newcommand{\ruleLabelSub}{\bm{\textcolor{subColor}{sub}}}
-\newcommand{\ruleLabelSubVar}{\ruleLabelSub\text{var}}
-\newcommand{\ruleLabelSubTop}{\ruleLabelSub\text{top}}
-\newcommand{\ruleLabelSubFun}{\ruleLabelSub\text{fun}}
-\newcommand{\ruleLabelSubForall}{\ruleLabelSub\text{forall}}
-\newcommand{\ruleLabelSubAnd}{\ruleLabelSub\text{and}}
-\newcommand{\ruleLabelSubAndLeft}{\ruleLabelSub{\text{and}_1}}
-\newcommand{\ruleLabelSubAndRight}{\ruleLabelSub{\text{and}_2}}
-\newcommand{\ruleLabelSubRec}{\ruleLabelSub\text{rec}}
+% % Subtyping labels
+% \newcommand{\ruleLabelSub}{\bm{\textcolor{subColor}{sub}}}
+% \newcommand{\ruleLabelSubVar}{\ruleLabelSub\text{var}}
+% \newcommand{\ruleLabelSubTop}{\ruleLabelSub\text{top}}
+% \newcommand{\ruleLabelSubFun}{\ruleLabelSub\text{fun}}
+% \newcommand{\ruleLabelSubForall}{\ruleLabelSub\text{forall}}
+% \newcommand{\ruleLabelSubAnd}{\ruleLabelSub\text{and}}
+% \newcommand{\ruleLabelSubAndLeft}{\ruleLabelSub{\text{and}_1}}
+% \newcommand{\ruleLabelSubAndRight}{\ruleLabelSub{\text{and}_2}}
+% \newcommand{\ruleLabelSubRec}{\ruleLabelSub\text{rec}}
 
-% Source/elaboration and labels
-\newcommand{\judgeSourceWF}[2]{#1 \; \textcolor{sourceColor}{\turns} \; #2}
-\newcommand{\ruleLabelSourceRecUpd}{\ruleLabelSource\text{rec-upd}}
-
-
-% Presentation
-\definecolor{lightyellow}{HTML}{FFFFE0}
+% % Source/elaboration and labels
+% \newcommand{\judgeSourceWF}[2]{#1 \; \textcolor{sourceColor}{\turns} \; #2}
+% \newcommand{\ruleLabelSourceRecUpd}{\ruleLabelSource\text{rec-upd}}
 
 
-% To be retired
-\newcommand{\turnsGet}{\turns_{\textrm{get}}}
-\newcommand{\turnsPut}{\turns_{\textrm{put}}}
-\newcommand{\turnsrec}{\turns_{\textrm{rec}}}
-\newcommand{\rulename}[1]{(\textrm{#1})}
+% % Presentation
+% \definecolor{lightyellow}{HTML}{FFFFE0}
 
+
+% % To be retired
+% \newcommand{\turnsGet}{\turns_{\textrm{get}}}
+% \newcommand{\turnsPut}{\turns_{\textrm{put}}}
+% \newcommand{\turnsrec}{\turns_{\textrm{rec}}}
+% \newcommand{\rulename}[1]{(\textrm{#1})}
