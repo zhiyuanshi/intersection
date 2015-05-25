@@ -3,8 +3,6 @@
 ## Emacs
 .#*
 
-## Latexian
-paper/*LatexianTemp*
 
 # LaTeX
 *.aux
@@ -32,8 +30,6 @@ paper/*LatexianTemp*
 *.iml
 .idea
 
-
-paper/*.pdf
 
 # Ruby script
 *.tex-old
