@@ -57,9 +57,8 @@
 \newcommand{\ruleMerge}{
 \inferrule* [right=$\rulelabelMerge$]
   {\hastype \Gamma {e_1} A \yields {E_1} \\
-   \hastype \Gamma {e_2} B \yields {E_2} \\
-   \isdisjoint \Gamma A B}
-  {\hastype \Gamma {e_1 \mergeOp e_2} {A \intersect B} \yields {\pair {E_1} {E_2}}}
+   \hastype \Gamma {e_2} B \yields {E_2}}
+  {\hastype \Gamma {e_1 \mergeOp e_2} {\constraints {A \disjoint B} {A \intersect B}} \yields {\pair {E_1} {E_2}}}
 }
 
 % DisjointAssume
@@ -67,16 +66,16 @@
 \newcommand{\ruleDisjointAssume}{
 \inferrule* [right=$\rulelabeldisjointassume$]
   {\hastype {\Gamma, A_1 \disjoint A_2} e B \yields E}
-  {\hastype \Gamma {\assume {(A_1 \disjoint A_1)} e} B \yields E}
+  {\hastype \Gamma {\assume {(A_1 \disjoint A_1)} e} {\constraints {A_1 \disjoint A_2} B} \yields E}
 }
 
 % DisjointCheck
 \newcommand{\rulelabeldisjointcheck}{\rulelabel\text{DisjointCheck}}
 \newcommand{\ruleDisjointCheck}{
 \inferrule* [right=$\rulelabeldisjointcheck$]
-  {\hastype \Gamma e {\constraint {A_1 \disjoint A_2} B} \yields E \\
+  {\hastype \Gamma e {\constraints {A_1 \disjoint A_2} B} \yields E \\
   \isdisjoint \Gamma {A_1} {A_2}}
-  {\hastype \Gamma {\app e {\_}} B \yields E}
+  {\hastype \Gamma {e} B \yields E}
 }
 
 % rec-con

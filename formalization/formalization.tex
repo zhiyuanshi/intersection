@@ -22,17 +22,19 @@
 
 \title{\name}
 
+Coherence for well-typed terms.
+
 \begin{figure}
   \[
   \begin{array}{l}
     \begin{array}{llrll}
       \text{Types}
-      & A, B, C & \Coloneqq & \alpha     & \text{Type variable} \\
+      & A, B, C, D & \Coloneqq & \alpha     & \text{Type variable} \\
       &         & \mid & \top            & \text{Top type} \\
       &         & \mid & A \to B         & \text{Function type} \\
       &         & \mid & \for \alpha A   & \text{Universal quantification} \\
       &         & \mid & A \intersect B  & \text{Intersection type} \\
-      &         & \mid & \constraint {A \disjoint B} C & \text{Disjoint constraint} \\
+      &         & \mid & \constraints {A \disjoint B} C & \text{Disjoint constraint} \\
       % &         & \mid & \recordType l A & \text{Record type} \\
 
       \\
@@ -44,18 +46,18 @@
       &   & \mid & \blam \alpha e    & \text{Big lambda} \\
       &   & \mid & \tapp e A         & \text{Type application} \\
       &   & \mid &  e_1 \mergeOp e_2 & \text{Merge} \\
-      &   & \mid & \assume {(A \disjoint B)} e & \text{Disjointness assumption} \\
-      &   & \mid & \app e {\_}       & \text{Disjointness check} \\
+      % &   & \mid & \assume {(A \disjoint B)} e & \\
+      % &   & \mid & \app e {\_}       & \text{Disjointness check} \\
       % &   & \mid & \recordCon l e    & \text{Record} \\
       % &   & \mid & e.l               & \text{Record selection} \\
       % &   & \mid & e \restrictOp l   & \text{Record restriction} \\
 
       \\
       \text{Contexts}
-      & \Gamma & \Coloneqq & \epsilon               & \\
-      &        & \mid & \Gamma, \alpha              & \\
-      &        & \mid & \Gamma, x \hast A           & \\
-      &        & \mid & \Gamma, \alpha_1 \disjoint \alpha_2 & \\
+      & \Gamma & \Coloneqq & \epsilon         & \\
+      &        & \mid & \Gamma, \alpha        & \\
+      &        & \mid & \Gamma, x \hast A     & \\
+      &        & \mid & \Gamma, A \disjoint B & \\
 
       % \\
       % \text{Labels} & l
@@ -175,13 +177,21 @@
 %   \caption{Type translation.}
 % \end{figure*}
 
-% \begin{figure*}
-%   \input{rule_in_figures/-sub.tex}
-%   \caption{oration subtyping.}
-% \end{figure*}
+\begin{figure}
+  \begin{mathpar}
+  \framebox{$ A \subtype B \yields F $} \\
+  \subVar \\
+  \subTop \\
+  \subFun \\
+  \subForall \\
+  \subAnd \\
+  \subAndleft \\
+  \subAndright \\
+  \end{mathpar}
+  \caption{Subtyping.}
+\end{figure}
 
 \begin{figure}
-  % Typing
   \begin{mathpar}
     \framebox{$ \hastype \Gamma e A \yields E $} \\
     \ruleVar \and
@@ -191,7 +201,7 @@
     \ruleBLam \and
     \ruleTApp \and
     \ruleMerge \and
-    \ruleDisjointAssume \and
+    % \ruleDisjointAssume \and
     \ruleDisjointCheck
     % \rulerecordConstruct \and
     % \ruleRecSelect \and \ruleRecRestrict
@@ -212,17 +222,23 @@
   \caption{Typing.}
 \end{figure}
 
-\begin{definition}{(Disjointness)}
-Two sets $S$ and $T$ are \emph{disjoint} if there does not exist an element $x$, such that $x \in S$ and $x \in T$.
-\end{definition}
+\begin{mathpar}
+  \inferrule
+  {}
+  {\hastype \epsilon {1 \mergeOp 2} {\constraints {\integer \disjoint \integer} \integer \intersect \integer}}
+\end{mathpar}
 
-\begin{definition}{(Disjointness)}
-Two types $A$ and $B$ are \emph{disjoint} if there does not exist an expression $e$, which is not a merge, such that $\hastype \epsilon e A'$, $\hastype \epsilon e B'$, $A' \subtype A$, and $B' \subtype B$.
-\end{definition}
-
-\begin{definition}{(Disjointness)}
-Two types $A$ and $B$ are \emph{disjoint} if their least common supertype is $\top$.
-\end{definition}
+% \begin{definition}{(Disjointness)}
+% Two sets $S$ and $T$ are \emph{disjoint} if there does not exist an element $x$, such that $x \in S$ and $x \in T$.
+% \end{definition}
+%
+% \begin{definition}{(Disjointness)}
+% Two types $A$ and $B$ are \emph{disjoint} if there does not exist an expression $e$, which is not a merge, such that $\hastype \epsilon e A'$, $\hastype \epsilon e B'$, $A' \subtype A$, and $B' \subtype B$.
+% \end{definition}
+%
+% \begin{definition}{(Disjointness)}
+% Two types $A$ and $B$ are \emph{disjoint} if their least common supertype is $\top$.
+% \end{definition}
 
 % \begin{figure}
 %   % Typing
