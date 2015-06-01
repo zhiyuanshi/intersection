@@ -32,7 +32,7 @@
 \newcommand{\ruleSubAnd}{
 \inferrule* [right=$\ruleLabelSubAnd$]
   {\tau_1 \subtype \tau_2 \yields {C_1} \andalso \tau_1 \subtype \tau_3 \yields {C_2}}
-  {\tau_1 \subtype \tau_2 \andOp \tau_3
+  {\tau_1 \subtype \tau_2 \intersect \tau_3
     \yields
       {\lam x {\im {\tau_1}}
         {\pair {\app {C_1} x} {\app {C_2} x}}}}
@@ -41,18 +41,18 @@
 \newcommand{\ruleSubAndleft}{
 \inferrule* [right=$\ruleLabelSubAndLeft$]
   {\tau_1 \subtype \tau_3 \yields C}
-  {\tau_1 \andOp \tau_2 \subtype \tau_3
+  {\tau_1 \intersect \tau_2 \subtype \tau_3
     \yields
-      {\lam x {\im {\tau_1 \andOp \tau_2}}
+      {\lam x {\im {\tau_1 \intersect \tau_2}}
         {\app C {(\proj 1 x)}}}}
 }
 
 \newcommand{\ruleSubAndright}{
 \inferrule* [right=$\ruleLabelSubAndRight$]
   {\tau_2 \subtype \tau_3 \yields C}
-  {\tau_1 \andOp \tau_2 \subtype \tau_3
+  {\tau_1 \intersect \tau_2 \subtype \tau_3
     \yields
-      {\lam x {\im {\tau_1 \andOp \tau_2}}
+      {\lam x {\im {\tau_1 \intersect \tau_2}}
         {\app C {(\proj 2 x)}}}}
 }
 

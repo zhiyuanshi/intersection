@@ -1,36 +1,9 @@
-%-----------------------------------------------------------------------------
-%
-%               Template for sigplanconf LaTeX Class
-%
-% Name:         sigplanconf-template.tex
-%
-% Purpose:      A template for sigplanconf.cls, which is a LaTeX 2e class
-%               file for SIGPLAN conference proceedings.
-%
-% Guide:        Refer to "Author's Guide to the ACM SIGPLAN Class,"
-%               sigplanconf-guide.pdf
-%
-% Author:       Paul C. Anagnostopoulos
-%               Windfall Software
-%               978 371-2316
-%               paul@windfall.com
-%
-% Created:      15 February 2005
-%
-%-----------------------------------------------------------------------------
+\documentclass[preprint]{sigplanconf}
 
+\input{packages.tex}
 
-\documentclass{sigplanconf}
-
-% The following \documentclass options may be useful:
-
-% preprint      Remove this option only once the paper is in final form.
-% 10pt          To set in 10-point type instead of 9-point.
-% 11pt          To set in 11-point type instead of 9-point.
-% authoryear    To obtain author/year citation style instead of numeric.
-
-\usepackage{amsmath}
-
+% Define macros immediately before the \begin{document} command
+\input{macros.tex}
 
 \begin{document}
 
@@ -38,257 +11,213 @@
 \setlength{\pdfpageheight}{\paperheight}
 \setlength{\pdfpagewidth}{\paperwidth}
 
-\conferenceinfo{CONF 'yy}{Month d--d, 20yy, City, ST, Country} 
-\copyrightyear{20yy} 
-\copyrightdata{978-1-nnnn-nnnn-n/yy/mm} 
-\doi{nnnnnnn.nnnnnnn}
-
-% Uncomment one of the following two, if you are not going for the 
-% traditional copyright transfer agreement.
-
-%\exclusivelicense                % ACM gets exclusive license to publish, 
-                                  % you retain copyright
-
-%\permissiontopublish             % ACM gets nonexclusive license to publish
-                                  % (paid open-access papers, 
-                                  % short abstracts)
-
-\titlebanner{banner above paper title}        % These are ignored unless
-\preprintfooter{short description of paper}   % 'preprint' option specified.
-
-\title{Title Text}
-\subtitle{Subtitle Text, if any}
-
+\title{Intersection Type with Determinism}
 \authorinfo{Name1}
            {Affiliation1}
            {Email1}
 \authorinfo{Name2\and Name3}
            {Affiliation2/3}
            {Email2/3}
-
 \maketitle
-
-\begin{abstract}
-This is the text of the abstract.
-\end{abstract}
-
-\category{CR-number}{subcategory}{third-level}
-
-% general terms are not compulsory anymore, 
-% you may leave them out
-\terms
-term1, term2
-
-\keywords
-keyword1, keyword2
 
 \section{Introduction}
 
-The text of the paper begins here.
-
-Lots of text.
-
-More text.
-
-Lots of text.
-
-More text.
-
-
-Lots of text.
-
-More text.
-
-Lots of text.
-
-More text.
-
-
-Lots of text.
-
-More text.
-
-Lots of text.
-
-More text.
-
-Lots of text.
-
-More text.
-
-Lots of text.
-
-More text.
-
-Lots of text.
-
-More text.
-
-Lots of text.
-
-More text.
-
-Lots of text.
-
-More text.
-
-Lots of text.
-
-More text.
-
-Lots of text.
-
-More text.
-
-Lots of text.
-
-More text.
-
-
-Lots of text.
-
-More text.
-
-Lots of text.
-
-More text.
-
-
-Lots of text.
-
-More text.
-
-Lots of text.
-
-More text.
-
-Lots of text.
-
-More text.
-
-Lots of text.
-
-More text.
-
-Lots of text.
-
-More text.
-
-Lots of text.
-
-More text.
-
-Lots of text.
-
-More text.
-
-Lots of text.
-
-More text.
-
-
-Lots of text.
-
-More text.
-
-Lots of text.
-
-More text.
-
-
-
-
-Lots of text.
-
-More text.
-
-Lots of text.
-
-More text.
-
-Lots of text.
-
-
-Lots of text.
-
-More text.
-
-Lots of text.
-
-More text.
-
-Lots of text.
-
-More text.
-
-Lots of text.
-
-More text.
-
-Lots of text.
-
-More text.
-
-Lots of text.
-
-More text.
-
-Lots of text.
-
-More text.
-
-Lots of text.
-
-More text.
-
-Lots of text.
-
-More text.
-
-Lots of text.
-
-More text.
-
-Lots of text.
-
-More text.
-
-Lots of text.
-
-More text.
-
-Lots of text.
-
-\appendix
-\section{Appendix Title}
-
-This is the text of the appendix, if you need one.
-
-\acks
-
-Acknowledgments, if needed.
-
-% We recommend abbrvnat bibliography style.
-
-\bibliographystyle{abbrvnat}
-
-% The bibliography should be embedded for final submission.
-
-\begin{thebibliography}{}
-\softraggedright
-
-\bibitem[Smith et~al.(2009)Smith, Jones]{smith02}
-P. Q. Smith, and X. Y. Jones. ...reference text...
-
-\end{thebibliography}
-
+The benefit of a merge, compared to a pair, is that you don't need to explicitly extract an item out. For example, \lstinline@fst (1,'c')@
+
+\begin{definition}{Determinism}
+If $e : \tau_1 \hookrightarrow E_1$ and $e : \tau_2 \hookrightarrow E_2$,
+then $\tau_1 = \tau_2$ and $E_1 = E_2$.
+\end{definition}
+
+\emph{Coherence} is a property about the relation between syntax and semantics. We say a semantics is \emph{coherent} if the syntax of a term uniquely determines its semantics.
+
+\begin{definition}{Coherence}
+If $e_1 : \tau_1 \hookrightarrow E_1$ and $e_2 : \tau_2 \hookrightarrow E_2$,
+$E_1 \Downarrow v_1$ and $E_2 \Downarrow v_2$,
+then $v_1 = v_2$.
+\end{definition}
+
+\section{Theory}
+
+Types include three constructs: type variables, function types, and family intersections:
+\begin{mathpar}
+A,B,C \Coloneqq \alpha \mid A \to B \mid \cap_{\alpha \in S} A
+\end{mathpar}
+
+A \emph{family intersection}, denoted by $\cap_{\alpha \in S} A$, is the intersection of the family of types $A$ indexed by $\alpha$ (So $\alpha$ may be free in $A$).
+
+Let $\universe$ be the universe of all types.
+
+Then the parametric polymorphism is defined as:
+\begin{displaymath}
+\for \alpha A \coloneqq \cap_{\alpha \in \universe} A
+\end{displaymath}
+
+Binary intersection is a special case of family intersection:
+\begin{displaymath}
+A \cap B \coloneqq \cap_{\alpha \in \{A,B\}} \alpha
+\end{displaymath}
+
+\begin{mathpar}
+\inferrule
+  {(1,,'c') : \integer \intersect \character}
+  {(1,,'c'),,(2,,\true)}
+\end{mathpar}
+
+\begin{definition}{Disjointness}
+Two types $A$ and $B$ are \emph{disjoint} (written as ``$\disjoint A B$'') if there does not exist a type $C$ such that $C \subtype A$ and $C \subtype B$ and $C \subtype A \intersect B$.
+\end{definition}
+
+\begin{mathpar}
+\inferrule* [right=$\text{Formation}$]
+  {\istype A \\ \istype B}
+  {\istype {A \intersect B}}
+
+\inferrule* [right=$\text{Intro}$]
+  {e : A \\ e : B}
+  {e : A \intersect B}
+
+\inferrule* [right=$\text{Elim}_1$]
+  {e : A \intersect B}
+  {e : A}
+
+\inferrule* [right=$\text{Elim}_2$]
+  {e : A \intersect B}
+  {e : B}
+
+\inferrule* [right=$\text{Merge}_1$]
+  {e_1 : A \\ e_2 : B}
+  {e_1 \mergeOp e_2 : A}
+
+\inferrule* [right=$\text{Merge}_2$]
+  {e_1 : A \\ e_2 : B}
+  {e_1 \mergeOp e_2 : B}
+\end{mathpar}
+
+A well-formed type is such that given any query type, it is always clear which subpart the query is referring to.
+
+\subsection{Equational reasoning}
+
+We can define a \lstinline@fst@ function that extracts the first item of a merged value:
+\begin{lstlisting}
+let fst A B (x : A & B) = (\(y : A). y) x in ...
+\end{lstlisting}
+Then we have the following equational reasoning:
+\begin{lstlisting}
+fst Int Int (2,,3)
+(\(y : Int). y) (2,,3)
+\end{lstlisting}
+
+\subsection{Discussion}
+
+In our type-directed translation, some inference rules return conclusions having
+\emph{the same constructor}. This phenomenon makes the translation
+nondeterministic. As an example,
+
+\begin{lstlisting}
+({x=1},,{x=2}).x
+\end{lstlisting}
+
+can evaluate to either \lstinline@1@ or \lstinline@2@ (according their
+translation in the target language). In this case, the constructor is the
+intersection operator, for which both rules, (select1) and (select2), are
+applicable.
+
+One remedy, which you may have realised, is to enforce the order of applying
+rules. Whenever the case as shown above happens, the right component of
+\lstinline@&@ and \lstinline@,,@ will take precedence. In other words, the
+(select2) rule is tried first. Only if (select2) fails, the (select1) rule is
+tried. Therefore, \lstinline@({x=1},,{x=2}).x@ can only evaluate to 2. Likewise,
+\lstinline@({x=1},,{x="hi"}).x@ will evaluate to \lstinline@"hi"@ and will be of
+type \lstinline@String@. Generally, three pairs of rules in our system that
+cause nondeterminism can all be implemented in the same fashion (sub-and2 is
+favored over sub-and1), and (restrict2 is favored over restrict1).
+
+This approach seem works fine until you think about how it interact with
+parametric polymorphism.
+
+\begin{lstlisting}
+(/\A. \(x:A&Int). x) Int (1,,2) + 1
+\end{lstlisting}
+
+If we would like to have a deterministic elaboration result, another idea is to
+tweak the rules a little bit so that given a term, it is no longer possible that
+both of the twin rules described above can be used. For example, if
+$\tau_1 \intersect \tau_2 \subtype
+\tau_3$, we would like to be certain that either $\tau_1 \subtype
+\tau_3$ holds or $\tau_2 \subtype \tau_3$ holds, but not both.
+
+Formally, we can state this theorem as:
+
+\begin{theorem}
+  If $\tau_1$, $\tau_2$, $\tau_3$, and $\tau_1 \intersect \tau_2$ are well-formed
+  types, and $\tau_1 \intersect \tau_2 \subtype \tau_3$, then $\tau_1 \intersect \tau_3$
+  \emph{exclusive} or $\tau_2 \intersect \tau_3$.
+\end{theorem}
+
+Note that $A$ \emph{exclusive} or $B$ is true if and only if their truth value
+differ. Next, we are going to investigate the minimal requirement (necessary and
+sufficient conditions) such that the theorem holds.
+
+If $\tau_1$ and $\tau_2$ in this setting are the same, for example,
+$\code{Int} \intersect \code{Int} \subtype \code{Int}$, obviously the theorem will
+not hold since both the left $\code{Int}$ and the right $\code{Int}$ are a
+subtype of $\code{Int}$.
+
+If our types include primitive subtyping such as
+$\code{Nat} \subtype_\text{prim} \code{Int}$ (a natural number is also an
+integer), which can be promoted to the normal subtyping with this rule:
+\begin{mathpar}
+  \inferrule
+  {\tau_1 \subtype_\text{prim} \tau_2}
+  {\tau_1 \subtype \tau_2}
+\end{mathpar}
+the theorem will also not hold because
+$\code{Int} \intersect \code{Nat} \subtype \code{Int}$ and yet
+$\code{Int} \subtype \code{Int}$ and $\code{Nat} \subtype \code{Int}$.
+
+We can try to rule out such possibilities by making the requirement of
+well-formedness stronger. This suggests that the two types on the sides of
+$\intersect$ should not ``overlap''. In other words, they should be ``disjoint''. It
+is easy to determine if two base types are disjoint. For example, $\code{Int}$
+and $\code{Int}$ are not disjoint. Neither do $\code{Int}$ and $\code{Nat}$.
+Also, types built with different constructors are disjoint. For example,
+$\code{Int}$ and $\code{Int} \to \code{Int}$. For function types, disjointness
+is harder to visualise. But bear in the mind that disjointness can defined by
+the very requirement that the theorem holds.
+
+We shall give two semantics and show the two are the same.
+
+\begin{itemize}
+\item an type-directed semantics
+\item a direct operational semantics
+\end{itemize}
+
+say the example above:
+
+without the cast, you could either get:
+1,,'c'
+or
+1
+depending on what rules you use
+
+but I think with your change, you can only get the first
+
+(which is what we want)
+
+let me see how we can get `1` before the change
+
+\begin{mathpar}
+
+\end{mathpar}
+
+% (Int & Char) (1 : Int) ~> 1
+% ----------------------------------------------
+% (Int & Char) ((1 ,, 'c') : Int & Char) ~> 1
+
+With the change, we need $\code{Int} \subtype \code{Int} \intersect \code{Char}$ to
+hold in order to get the premise, which does not. So it can be shown that
+$(\code{Int} \intersect \code{Char}) ((1 \mergeOp 'c') : \code{Int} \intersect
+\code{Char}) \hookrightarrow 1$ is not derivable.
 
 \end{document}
-
-%                       Revision History
-%                       -------- -------
-%  Date         Person  Ver.    Change
-%  ----         ------  ----    ------
-
-%  2013.06.29   TU      0.1--4  comments on permission/copyright notices
-

@@ -1,31 +1,90 @@
-\documentclass[nocopyrightspace,preprint,times,10pt]{sigplanconf}
+\documentclass[preprint]{sigplanconf}
 
-\input{preamble.tex}
-\input{macros/f_and.tex}
+\input{packages.tex}
+\input{macros.tex}
+
+\input{rule_as_macros/orthogonality.tex}
+\input{rule_as_macros/sub.tex}
+\input{rule_as_macros/typing.tex}
+% \input{rule_as_macros/target.tex}
+\input{rule_as_macros/wellformedness.tex}
+
+\newcommand{\name}{{\bf $F_{\&}$}\xspace}
+
+\newcommand{\target}{{\bf f}\xspace}
+\newcommand{\Target}{{\bf f}\xspace}
 
 \begin{document}
 
-\begin{figure*}
-  \input{rule_in_figures/orthogonality.tex}
-  \caption{Orthogonality between types.}
-\end{figure*}
+\special{papersize=8.5in,11in}
+\setlength{\pdfpageheight}{\paperheight}
+\setlength{\pdfpagewidth}{\paperwidth}
 
-\begin{figure*}
-  \input{rule_in_figures/wellformedness.tex}
-  \caption{Well-formedness of types.}
-\end{figure*}
+\title{\name}
 
-\begin{figure*}
-\begin{mathpar}
-\begin{array}{l}
-  \begin{array}{llrl}
-    \text{Values} & v & \Coloneqq & \top \mid \lam x \tau e \mid \blam \alpha e \mid v_1 \mergeOp v_2 \mid \recordCon l e
+\begin{figure}
+  \[
+  \begin{array}{l}
+    \begin{array}{llrll}
+      \text{Types}
+      & A, B, C & \Coloneqq & \alpha     & \text{Type variable} \\
+      &         & \mid & \top            & \text{Top type} \\
+      &         & \mid & A \to B         & \text{Function type} \\
+      &         & \mid & \for \alpha A   & \text{Universal quantification} \\
+      &         & \mid & A \intersect B  & \text{Intersection type} \\
+      &         & \mid & \constraint {A \disjoint B} C & \text{Disjoint constraint} \\
+      % &         & \mid & \recordType l A & \text{Record type} \\
+
+      \\
+      \text{Expressions}
+      & e & \Coloneqq & x            & \text{Variable} \\
+      &   & \mid & \top              & \text{Top} \\
+      &   & \mid & \lam x A e        & \text{Lambda} \\
+      &   & \mid & \app {e_1} {e_2}  & \text{Application} \\
+      &   & \mid & \blam \alpha e    & \text{Big lambda} \\
+      &   & \mid & \tapp e A         & \text{Type application} \\
+      &   & \mid &  e_1 \mergeOp e_2 & \text{Merge} \\
+      &   & \mid & \assume {(A \disjoint B)} e & \text{Disjointness assumption} \\
+      &   & \mid & \app e {\_}       & \text{Disjointness check} \\
+      % &   & \mid & \recordCon l e    & \text{Record} \\
+      % &   & \mid & e.l               & \text{Record selection} \\
+      % &   & \mid & e \restrictOp l   & \text{Record restriction} \\
+
+      \\
+      \text{Contexts}
+      & \Gamma & \Coloneqq & \epsilon               & \\
+      &        & \mid & \Gamma, \alpha              & \\
+      &        & \mid & \Gamma, x \hast A           & \\
+      &        & \mid & \Gamma, \alpha_1 \disjoint \alpha_2 & \\
+
+      % \\
+      % \text{Labels} & l
+    \end{array}
   \end{array}
-\end{array}
-\end{mathpar}
+  \]
+  \caption{Syntax.}
+\end{figure}
 
-  \caption{Values.}
-\end{figure*}
+% \begin{figure*}
+%   \caption{Disjointness between types.}
+% \end{figure*}
+
+% \begin{figure*}
+%   \input{rule_in_figures/wellformedness.tex}
+%   \caption{Well-formedness of types.}
+% \end{figure*}
+
+% \begin{figure*}
+% \begin{mathpar}
+% \begin{array}{l}
+%   \begin{array}{llrl}
+%     \text{Values} & v & \Coloneqq & \top \mid \lam x \tau e \mid \blam \alpha e \mid v_1 \mergeOp v_2 \mid \recordCon l e
+%   \end{array}
+% \end{array}
+% \end{mathpar}
+%
+%   \caption{Values.}
+% \end{figure*}
 
 % \begin{figure*}
 
@@ -56,105 +115,145 @@
 %   \caption{\code{remove}.}
 % \end{figure*}
 
-\begin{figure*}
-  \begin{mathpar}
-    \inferrule* [right=Cast/UpCast]
-      {\tau_1 \subtype \tau}
-      {\cast \tau {\withType v {\tau_1}} \hookrightarrow v}
+% \begin{figure*}
+%   \begin{mathpar}
+%     \inferrule* [right=Cast/UpCast]
+%       {\tau_1 \subtype \tau}
+%       {\cast \tau {\withType v {\tau_1}} \hookrightarrow v}
+%
+%     \inferrule* [right=Cast/TakeLeft]
+%       {\cast \tau {\withType {v_1} {\tau_1}} \hookrightarrow v}
+%       {\cast \tau {\withType {v_1 \mergeOp v_2} {\tau_1 \intersect \tau_2}} \hookrightarrow v}
+%
+%     \inferrule* [right=Cast/TakeRight]
+%       {\cast \tau {\withType {v_2} {\tau_2}} \hookrightarrow v}
+%       {\cast \tau {\withType {v_1 \mergeOp v_2} {\tau_1 \intersect \tau_2}} \hookrightarrow v}
+%   \end{mathpar}
+%
+%   \caption{Casts.}
+% \end{figure*}
 
-    \inferrule* [right=Cast/TakeLeft]
-      {\cast \tau {\withType {v_1} {\tau_1}} \hookrightarrow v}
-      {\cast \tau {\withType {v_1 \mergeOp v_2} {\tau_1 \andOp \tau_2}} \hookrightarrow v}
+% \begin{figure*}
+%   \begin{mathpar}
+%     \inferrule* [right=Dyn/Val]
+%       { }
+%       {v \Downarrow v}
+%
+%     \inferrule* [right=Dyn/App]
+%       {e_1 \Downarrow \lam x \tau e \\
+%        e_2 \Downarrow v_2 \\
+%        \cast \tau {\withType {v_2} {\tau_2}} \hookrightarrow v_3 \\
+%        \subst {v_3} x e \Downarrow v}
+%       {\app {e_1} {\withType {e_2} {\tau_2}} \Downarrow v}
+%
+%     \inferrule* [right=Dyn/TApp]
+%       {e_1 \Downarrow \for \alpha e \\
+%        \subst \tau \alpha e \Downarrow v}
+%       {\tapp {e_1} \tau \Downarrow v}
+%
+%     \inferrule* [right=Dyn/Merge]
+%       {e_1 \Downarrow v_1 \\ e_2 \Downarrow v_2}
+%       {e_1 \mergeOp e_2 \Downarrow v_1 \mergeOp v_2}
+%
+%     % \inferrule* [right=Dyn/RecSelect]
+%     %   {e \Downarrow v \\
+%     %    (l, e_1) \; \code{`uniqueElem`} \; \fields v \\
+%     %    e_1 \Downarrow v_1}
+%     %   {e.l \Downarrow v_1}
+%
+%     % \inferrule* [right=Dyn/RecRestrict]
+%     %   {e \Downarrow v \\
+%     %    (l, e_1) \; \code{`uniqueElem`} \; \fields v}
+%     %   {e \restrictOp l \Downarrow v \; \code{`remove`} \; l}
+%   \end{mathpar}
+%
+%   \caption{Dynamic semantics.}
+% \end{figure*}
+%
+% \begin{figure*}
+%   \input{rule_in_figures/type-translation.tex}
+%   \caption{Type translation.}
+% \end{figure*}
 
-    \inferrule* [right=Cast/TakeRight]
-      {\cast \tau {\withType {v_2} {\tau_2}} \hookrightarrow v}
-      {\cast \tau {\withType {v_1 \mergeOp v_2} {\tau_1 \andOp \tau_2}} \hookrightarrow v}
-  \end{mathpar}
+% \begin{figure*}
+%   \input{rule_in_figures/-sub.tex}
+%   \caption{oration subtyping.}
+% \end{figure*}
 
-  \caption{Casts.}
-\end{figure*}
-
-\begin{figure*}
-  \begin{mathpar}
-    \inferrule* [right=Dyn/Val]
-      { }
-      {v \Downarrow v}
-
-    \inferrule* [right=Dyn/App]
-      {e_1 \Downarrow \lam x \tau e \\
-       e_2 \Downarrow v_2 \\
-       \cast \tau {\withType {v_2} {\tau_2}} \hookrightarrow v_3 \\
-       \subst {v_3} x e \Downarrow v}
-      {\app {e_1} {\withType {e_2} {\tau_2}} \Downarrow v}
-
-    \inferrule* [right=Dyn/TApp]
-      {e_1 \Downarrow \for \alpha e \\
-       \subst \tau \alpha e \Downarrow v}
-      {\tapp {e_1} \tau \Downarrow v}
-
-    \inferrule* [right=Dyn/Merge]
-      {e_1 \Downarrow v_1 \\ e_2 \Downarrow v_2}
-      {e_1 \mergeOp e_2 \Downarrow v_1 \mergeOp v_2}
-
-    % \inferrule* [right=Dyn/RecSelect]
-    %   {e \Downarrow v \\
-    %    (l, e_1) \; \code{`uniqueElem`} \; \fields v \\
-    %    e_1 \Downarrow v_1}
-    %   {e.l \Downarrow v_1}
-
-    % \inferrule* [right=Dyn/RecRestrict]
-    %   {e \Downarrow v \\
-    %    (l, e_1) \; \code{`uniqueElem`} \; \fields v}
-    %   {e \restrictOp l \Downarrow v \; \code{`remove`} \; l}
-  \end{mathpar}
-
-  \caption{Dynamic semantics.}
-\end{figure*}
-
-\begin{figure*}
-  \input{rule_in_figures/type-translation.tex}
-  \caption{Type translation.}
-\end{figure*}
-
-\begin{figure*}
-  \input{rule_in_figures/elab-sub.tex}
-  \caption{Elaboration subtyping.}
-\end{figure*}
-
-\begin{figure*}
+\begin{figure}
   % Typing
   \begin{mathpar}
-    \framebox{$ \judgeSource \gamma e \tau \yields E $} \and
-    \ruleSourceVarElab \and \ruleSourceTopElab \and
-    \ruleSourceLamElab  \and \ruleSourceAppElab \and
-    \ruleSourceBLamElab \and \ruleSourceTAppElab \and
-    \ruleSourceMergeElab \and
-    \ruleSourcerecordConstructElab \and
-    \ruleSourceRecSelectElab \and \ruleSourceRecRestrictElab
+    \framebox{$ \hastype \Gamma e A \yields E $} \\
+    \ruleVar \and
+    \ruleTop \and
+    \ruleLam \and
+    \ruleApp \and
+    \ruleBLam \and
+    \ruleTApp \and
+    \ruleMerge \and
+    \ruleDisjointAssume \and
+    \ruleDisjointCheck
+    % \rulerecordConstruct \and
+    % \ruleRecSelect \and \ruleRecRestrict
   \end{mathpar}
 
-  % Selection
-  \begin{mathpar}
-    \framebox{$\judgeSelect {\tau_1} l \tau_2 \yields C$} \and
-    \ruleGetElab \and \ruleGetLeftElab \and \ruleGetRightElab
-  \end{mathpar}
-
-  % Restriction
-  \begin{mathpar}
-    \framebox{$\judgeRestrict {\tau_1} l \tau_2 \yields C$} \and
-    \ruleRestrictElab \and \ruleRestrictLeftElab \and \ruleRestrictRightElab
-  \end{mathpar}
-
-  % Update
+  % % Selection
   % \begin{mathpar}
-  %   \framebox{$\judgeUpdate \tau l {\tau \yields E} {\tau_2} {\tau_3} \yields C$} \and
-  %   \ruleUpdateElab \and \ruleUpdateLeftElab \and \ruleUpdateRightElab
+  %   \framebox{$\judgeSelect {\tau_1} l \tau_2 \yields C$} \and
+  %   \ruleGet \and \ruleGetLeft \and \ruleGetRight
   % \end{mathpar}
-  \caption{Elaboration typing.}
-\end{figure*}
+  %
+  % % Restriction
+  % \begin{mathpar}
+  %   \framebox{$\judgeRestrict {\tau_1} l \tau_2 \yields C$} \and
+  %   \ruleRestrict \and \ruleRestrictLeft \and \ruleRestrictRight
+  % \end{mathpar}
+
+  \caption{Typing.}
+\end{figure}
+
+\begin{definition}{(Disjointness)}
+Two sets $S$ and $T$ are \emph{disjoint} if there does not exist an element $x$, such that $x \in S$ and $x \in T$.
+\end{definition}
+
+\begin{definition}{(Disjointness)}
+Two types $A$ and $B$ are \emph{disjoint} if there does not exist an expression $e$, which is not a merge, such that $\hastype \epsilon e A'$, $\hastype \epsilon e B'$, $A' \subtype A$, and $B' \subtype B$.
+\end{definition}
+
+\begin{definition}{(Disjointness)}
+Two types $A$ and $B$ are \emph{disjoint} if their least common supertype is $\top$.
+\end{definition}
+
+% \begin{figure}
+%   % Typing
+%   \begin{mathpar}
+%     \framebox{$ \hastype \Gamma e A \yields E $} \\
+%     \ruleVar \and
+%     \ruleTop \and
+%     \ruleLam \and
+%     \ruleApp \and
+%     \ruleBLam \and
+%     \ruleTApp \and
+%     \ruleMerge \and
+%     \ruleDisjointAssume \and
+%     \ruleDisjointCheck
+%     % \rulerecordConstruct \and
+%     % \ruleRecSelect \and \ruleRecRestrict
+%   \end{mathpar}
+%
+%   % % Selection
+%   % \begin{mathpar}
+%   %   \framebox{$\judgeSelect {\tau_1} l \tau_2 \yields C$} \and
+%   %   \ruleGet \and \ruleGetLeft \and \ruleGetRight
+%   % \end{mathpar}
+%   %
+%   % % Restriction
+%   % \begin{mathpar}
+%   %   \framebox{$\judgeRestrict {\tau_1} l \tau_2 \yields C$} \and
+%   %   \ruleRestrict \and \ruleRestrictLeft \and \ruleRestrictRight
+%   % \end{mathpar}
+%
+%   \caption{Disjointness.}
+% \end{figure}
 
 \end{document}
-%%% Local Variables:
-%%% mode: latex
-%%% TeX-master: t
-%%% End:

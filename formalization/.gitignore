@@ -1,2 +1,4 @@
-*.prv/
+*.fdb_latexmk
+*.prv
+*.synctex.gz
 _region_.tex

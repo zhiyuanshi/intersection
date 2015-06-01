@@ -1,4 +1,6 @@
 \colorlet{wfcolor}{BrickRed}
+\newcommand{\judgeSourceWF}[2]{#1 \; \turns \; #2}
+
 
 \newcommand{\ruleLabelSourceWF}{\bm{\textcolor{wfcolor}{wf}}}
 
@@ -11,8 +13,8 @@
 
 \newcommand{\ruleSourceWF}{
 \inferrule* [right=$\ruleLabelSourceWF$]
-  {\ftv \tau \in \gamma}
-  {\judgeSourceWF \gamma \tau}
+  {\ftv \A \in \gamma}
+  {\judgeSourceWF \gamma \A}
 }
 
 \newcommand{\ruleLabelTargetWF}{\ruleLabelTarget\text{wf}}
@@ -38,24 +40,24 @@
 
 \newcommand{\ruleSourceWFFun}{
 \inferrule* [right=$\ruleLabelSourceWFFun$]
-  {\judgeSourceWF \gamma {\tau_1} \\ \judgeSourceWF \Gamma {\tau_2}}
-  {\judgeSourceWF \gamma {\tau_1 \to \tau_2}}
+  {\judgeSourceWF \gamma {\A_1} \\ \judgeSourceWF \Gamma {\A_2}}
+  {\judgeSourceWF \gamma {\A_1 \to \A_2}}
 }
 
 \newcommand{\ruleSourceWFForall}{
 \inferrule* [right=$\ruleLabelSourceWFForall$]
-  {\judgeSourceWF {\gamma, \alpha} \tau}
-  {\judgeSourceWF \gamma {\for \alpha \tau}}
+  {\judgeSourceWF {\gamma, \alpha} \A}
+  {\judgeSourceWF \gamma {\for \alpha \A}}
 }
 
 \newcommand{\ruleSourceWFAnd}{
 \inferrule* [right=$\ruleLabelSourceWFAnd$]
-  {\judgeSourceWF \gamma {\tau_1} \\ \judgeSourceWF \Gamma {\tau_2} \\ \tau_1 \orthog \tau_2}
-  {\judgeSourceWF \gamma {\tau_1 \andOp \tau_2}}
+  {\judgeSourceWF \gamma {\A_1} \\ \judgeSourceWF \Gamma {\A_2}}
+  {\judgeSourceWF \gamma {\A_1 \intersect \A_2}}
 }
 
 \newcommand{\ruleSourceWFRec}{
 \inferrule* [right=$\ruleLabelSourceWFRec$]
-  {\judgeSourceWF \gamma \tau}
-  {\judgeSourceWF \gamma {\recordType l \tau}}
+  {\judgeSourceWF \gamma \A}
+  {\judgeSourceWF \gamma {\recordType l \A}}
 }

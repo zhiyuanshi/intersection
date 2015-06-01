@@ -1,0 +1,68 @@
+% For pdflatex, replaced by fontspec:
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+
+
+%% For general writing
+\usepackage{fixltx2e}
+\usepackage[usenames,dvipsnames,svgnames,table]{xcolor}
+\usepackage{url}
+\usepackage{fancyvrb}
+\usepackage{mdwlist}  % Miscellaneous list-related commands
+\usepackage{xspace}   % Smart spacing
+\usepackage{ucs}
+
+% https://www.nesono.com/?q=book/export/html/347
+% Package for inserting TODO statements in nice colorful boxes - so that you
+% won’t forget to ﬁx/remove them. To add a todo statement, use something like
+% \todo{Find better wording here}.
+\usepackage{todonotes}
+
+
+%% Math ＆ theoretical computer science
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsthm}
+\usepackage{bm}         % Bold symbols in maths mode
+\usepackage{dsfont}
+\usepackage{stmaryrd}
+\usepackage{mathtools}  % For "::=" ( \Coloneqq )
+% http://tex.stackexchange.com/questions/114151/how-do-i-reference-in-appendix-a-theorem-given-in-the-body
+\usepackage{thmtools, thm-restate}
+
+\theoremstyle{definition}
+\newtheorem{definition}{Definition}
+
+\theoremstyle{plain}
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}{Lemma}
+
+
+%% Code listings
+\usepackage{listings}
+
+\lstdefinestyle{f2j}{
+    basicstyle=\ttfamily\small,
+    keywordstyle=\sffamily\bfseries,
+    tabsize=2,
+    keepspaces=true,
+    showstringspaces=false,
+    escapeinside={(*}{*)},
+    morekeywords={let,in}
+}
+
+\lstset{style=f2j}
+
+
+%% Font
+\usepackage[euler-digits,euler-hat-accent]{eulervm}
+
+%% Typesetting inference rules
+% \usepackage{styles/bcprules}    % by Benjamin C. Pierce
+% \usepackage{styles/cmll}
+\usepackage{styles/mathpartir}  % by Didier Rémy (http://gallium.inria.fr/~remy/latex/mathpartir.html
+
+
+% Copied from the FCore paper:
+\usepackage[colorlinks=true,allcolors=black,breaklinks,draft=false]{hyperref}   % hyperlinks, including DOIs and URLs in bibliography
+% known bug: http://tex.stackexchange.com/questions/1522/pdfendlink-ended-up-in-different-nesting-level-than-pdfstartlink
