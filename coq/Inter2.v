@@ -6,23 +6,68 @@ data PTyp a = Var a | Forall (a -> PSigma a) | Fun (PSigma a) (PSigma a) | PInt
 data PSigma a = And (PSigma a) (PSigma a) | Typ (PTyp a)
 *)
 
-(*
 Inductive S := Base | Inter.
 
-Inductive PTyp A : S -> Type :=
-  | Var : A -> PTyp A Base 
-  | PInt : PTyp A Base
-  | Fun : PTyp A Inter -> PTyp A Inter -> PTyp A Base
-  | And : PTyp A Inter -> PTyp A Inter -> PTyp A Inter
-  | Lift : PTyp A Base -> PTyp A Inter.
-*)
+Inductive PTyp : S -> Type :=
+  | PInt : PTyp Base
+  | Fun : PTyp Inter -> PTyp Inter -> PTyp Base
+  | And : PTyp Inter -> PTyp Inter -> PTyp Inter
+  | Lift : PTyp Base -> PTyp Inter.
 
+Check PTyp_ind.
+
+Definition PTyp_ind2 : forall (s : S) (p : PTyp s)  (P : forall s : S, PTyp s -> Prop),
+       P Base PInt ->
+       (forall p : PTyp Inter,
+        P Inter p -> forall p0 : PTyp Inter, P Inter p0 -> P Base (Fun p p0)) ->
+       (forall p : PTyp Inter,
+        P Inter p -> forall p0 : PTyp Inter, P Inter p0 -> P Inter (And p p0)) ->
+       (forall p : PTyp Base, P Base p -> P Inter (Lift p)) ->
+       P s p.
+Proof.
+intros.
+apply PTyp_ind. auto. auto. auto. auto.
+Defined.
+
+Definition T (P : PTyp Inter -> Prop) : forall s, PTyp s -> Prop.
+intros.
+destruct s.
+exact True.
+exact (P H).
+Defined.
+
+Check (PTyp_ind2 Inter _ (T _)).
+
+Definition PTyp_ind3 (p : PTyp Inter) (P : PTyp Inter -> Prop) := PTyp_ind2 Inter p (T P).
+
+Check PTyp_ind3.
+
+Definition PTyp_ind4 : 
+       forall (p : PTyp Inter) (P : PTyp Inter -> Prop),
+       (forall p0 : PTyp Inter,
+        P p0 ->
+        forall p1 : PTyp Inter, P p1 -> P (And p0 p1)) ->
+       (forall p0 : PTyp Base, P (Lift p0)) ->
+       P p.
+Proof.
+intros.
+apply (PTyp_ind3 p). 
+unfold T. auto.
+intros. unfold T. auto.
+auto.
+unfold T.
+intros.
+apply H0.
+Defined.
+
+(*
 Inductive PTyp A :=
   | Var : A -> PTyp A
   | PInt : PTyp A
   | Forall : (A -> PTyp A) -> PTyp A
   | Fun : PTyp A -> PTyp A -> PTyp A
   | And : PTyp A -> PTyp A -> PTyp A.
+*)
 
 (*
 
@@ -59,20 +104,330 @@ Require Import Setoid.
 
 (* Subtyping relation *)
 
-Inductive sub : nat -> PTyp nat -> PTyp nat -> Prop :=
-  | SInt : forall i, sub i (PInt nat) (PInt nat)
-  | SVar : forall i x, sub i (Var nat x) (Var nat x)
-  | SForall : forall i f g, sub (i+1) (f i) (g i) -> sub i (Forall nat f) (Forall nat g)
-  | SFun : forall i o1 o2 o3 o4, sub i o3 o1 -> sub i o2 o4 -> sub i (Fun nat o1 o2) (Fun nat o3 o4)
-  | SAnd1 : forall i t t1 t2, sub i t t1 -> sub i t t2 -> sub i t (And nat t1 t2)
-  | SAnd2 : forall i t t1 t2, sub i t1 t -> sub i (And nat t1 t2) t
-  | SAnd3 : forall i t t1 t2, sub i t2 t -> sub i (And nat t1 t2) t.
+Inductive sub : forall (s : S), PTyp s -> PTyp s -> Prop :=
+  | SInt : sub Base (PInt) (PInt)
+  | SFun : forall o1 o2 o3 o4, sub Inter o3 o1 -> sub Inter o2 o4 -> sub Base (Fun  o1 o2) (Fun  o3 o4)
+  | SAnd1 : forall t t1 t2, sub Inter t t1 -> sub Inter t t2 -> sub Inter t (And  t1 t2)
+  | SAnd2 : forall t t1 t2, sub Inter t1 t -> sub Inter (And  t1 t2) t
+  | SAnd3 : forall t t1 t2, sub Inter t2 t -> sub Inter (And  t1 t2) t
+  | SLift : forall t1 t2, sub Base t1 t2 -> sub Inter (Lift  t1) (Lift  t2).
 
-Hint Resolve SVar SInt SForall SFun SAnd1 SAnd2 SAnd3.
+(*
+Definition prog s t1 t2 (s1 : sub s t1 t2) : Prop.
+destruct t1.
+exact True.
+exact True.
+exact ((*(exists u1 u2, s1 = SAnd1 (And t1_1 t1_2) _ _ u1 u2) \/*) (exists u, s1 = SAnd2 _ _ _ u) \/ (exists u, s1 = SAnd3 _ _ _ u)).
+exact True.
+Defined.
 
-Lemma reflex : forall t1 i, sub i t1 t1.
+Lemma invAnd : forall s t x (u : sub s t x), prog s t x u.
+Proof.
+intros.
+unfold prog.
+destruct t.
+auto.auto.
+inversion u.
+
+assert (t = And t1 t2).
+admit.
+rewrite H.
+*)
+(* Orthogonality: Implementation *)
+
+
+Inductive Ortho : forall s, PTyp s -> PTyp s -> Prop :=
+  | OAnd1 : forall t1 t2 t3, Ortho Inter t1 t3 -> Ortho Inter t2 t3 -> Ortho Inter (And t1 t2) t3
+  | OAnd2 : forall t1 t2 t3, Ortho Inter t1 t2 -> Ortho Inter t1 t3 -> Ortho Inter t1 (And t2 t3)
+  | OLift : forall t1 t2, not (sub Base t1 t2) -> not (sub Base t2 t1) -> Ortho Inter (Lift t1) (Lift t2).
+
+(* Orthogonality: Specification *)
+
+
+Hint Resolve SInt SFun SAnd1 SAnd2 SAnd3 SLift.
+
+Lemma reflex : forall s (t1 : PTyp s) , sub s t1 t1.
 Proof.
 induction t1; intros; auto.
+Defined.
+
+Definition OrthoS (s:S) (A B : PTyp s) := not (exists C, sub s A C /\ sub s B C).
+
+
+Definition prog s (t2 : PTyp s) : Prop.
+intros.
+destruct s.
+exact True.
+exact ((exists t3, t2 = Lift t3) \/ (exists t3 t4, t2 = And t3 t4)).
+Defined.
+
+Print prog.
+
+Lemma inv : 
+  forall s (t2 : PTyp s), prog s t2.
+intros; unfold prog.
+destruct t2.
+auto.
+auto.
+right.
+exists t2_1.
+exists t2_2.
+reflexivity.
+left.
+exists t2.
+reflexivity.
+Defined.
+
+Lemma invInter (t2 : PTyp Inter) : (exists t3 : PTyp Base, t2 = Lift t3) \/ (exists t3 t4 : PTyp Inter, t2 = And t3 t4).
+unfold prog.
+apply (inv Inter).
+Defined.
+
+Lemma ortho_completness : forall s (t1 t2 : PTyp s), (s = Inter) -> OrthoS s t1 t2 -> Ortho s t1 t2.
+Proof.
+induction t1; intros; unfold OrthoS in H.
+(* Dummy cases *)
+discriminate H.
+discriminate H.
+(* Case (t11 & t12) _|_ t2 *) 
+apply OAnd1.
+apply IHt1_1.
+exact H.
+unfold OrthoS in H0.
+unfold OrthoS.
+unfold not.
+intro.
+apply H0.
+clear H0.
+destruct H1. destruct H0.
+exists x.
+split.
+apply SAnd2. exact H0.
+exact H1.
+apply IHt1_2.
+exact H.
+unfold OrthoS; unfold not; intro.
+apply H0. clear H0.
+destruct H1.
+destruct H0.
+exists x.
+split.
+apply SAnd3.
+exact H0.
+exact H1.
+clear H.
+clear IHt1.
+(* Make a separate Lemma ? *)
+generalize H0. clear H0.
+apply (PTyp_ind4 t2).
+intros.
+apply OAnd2.
+apply H.
+unfold OrthoS. unfold not. intro.
+apply H1.
+destruct H2. destruct H2.
+exists x.
+split.
+exact H2.
+apply SAnd2.
+exact H3.
+apply H0.
+unfold OrthoS. unfold not. intro.
+apply H1.
+destruct H2. destruct H2.
+exists x.
+split.
+exact H2.
+apply SAnd3.
+exact H3.
+(* Last case *)
+intros.
+apply OLift.
+unfold not. intros.
+apply H0.
+exists (Lift p0).
+split.
+apply SLift.
+apply H.
+(*case 2*)
+apply SLift.
+apply reflex.
+(*case 3*)
+unfold not. intros.
+apply H0.
+exists (Lift t1).
+split.
+apply reflex.
+apply SLift.
+exact H.
+Defined.
+
+Definition SubEither s t1 t2 := sub s t1 t2 \/ sub s t2 t1.
+
+
+Lemma prop_sub : forall s t1 t2, (s = Base) -> (exists t3, sub s t1 t3 /\ sub s t2 t3) -> sub s t1 t2 \/ sub s t2 t1.
+Proof.
+intros.
+destruct H0.
+destruct H0.
+induction H0; intros. 
+inversion H1.
+assert (PInt = t2). admit.
+rewrite H2. left. apply reflex.
+inversion H1.
+exact H1.
+destruct H0. destruct H0. inversion H0.
+admit. admit.
+discriminate H.
+discriminate H.
+Defined.
+
+
+(*
+Lemma ortho_aux : forall s (t1 t2 : PTyp s), (s = Inter) -> Ortho s t1 t2 -> not (sub s t1 t2) /\ not (sub s t2 t1).
+Proof.
+induction t1; intros. discriminate H. discriminate H.
+induction H0; split; unfold not; intros.
+*)
+
+Lemma ortho_soundness : forall s (t1 t2 : PTyp s), (s = Inter) -> Ortho s t1 t2 -> OrthoS s t1 t2.
+intros.
+induction H0. admit. admit.
+unfold OrthoS. unfold not. intros.
+destruct H2. destruct H2.
+apply H0.
+
+
+
+Lemma ortho_soundness : forall s (t1 t2 : PTyp s), (s = Inter) -> OrthoS s t1 t2 -> Ortho s t1 t2.
+Proof.
+induction t1; intros; unfold OrthoS in H.
+(* Dummy cases *)
+discriminate H.
+discriminate H.
+(* Case (t11 & t12) _|_ t2 *) 
+apply OAnd1.
+apply IHt1_1.
+exact H.
+unfold OrthoS in H0.
+unfold OrthoS.
+unfold not.
+intro.
+apply H0.
+clear H0.
+destruct H1. destruct H0.
+exists x.
+split.
+apply SAnd2. exact H0.
+exact H1.
+apply IHt1_2.
+exact H.
+unfold OrthoS; unfold not; intro.
+apply H0. clear H0.
+destruct H1.
+destruct H0.
+exists x.
+split.
+apply SAnd3.
+exact H0.
+exact H1.
+clear H.
+clear IHt1.
+(* Make a separate Lemma ? *)
+unfold OrthoS in H0. unfold not in H0.
+assert ((exists t3 : PTyp Base, t2 = Lift t3) \/ (exists t3 t4 : PTyp Inter, t2 = And t3 t4)).
+apply invInter.
+destruct H. destruct H.
+rewrite H.
+apply OLift.
+unfold not; intros.
+apply H0.
+exists (Lift x).
+rewrite H.
+split.
+apply SLift.
+apply H1.
+apply reflex.
+(*case 2*)
+unfold not; intros.
+apply H0.
+exists (Lift t1).
+rewrite H.
+split.
+apply reflex.
+apply SLift.
+exact H1.
+(* Part 2 *)
+destruct H. destruct H.
+rewrite H.
+apply OAnd2.
+rewrite H in H0.
+admit.
+admit.
+Defined.
+
+
+Lemma ortho_soundness : forall s (t1 t2 : PTyp s), (s = Inter) -> OrthoS s t1 t2 -> Ortho s t1 t2.
+Proof.
+induction t1; intros; unfold OrthoS in H.
+(* Dummy cases *)
+discriminate H.
+discriminate H.
+(* Case (t11 & t12) _|_ t2 *) 
+apply OAnd1.
+apply IHt1_1.
+exact H.
+unfold OrthoS in H0.
+unfold OrthoS.
+unfold not.
+intro.
+apply H0.
+clear H0.
+destruct H1. destruct H0.
+exists x.
+split.
+apply SAnd2. exact H0.
+exact H1.
+apply IHt1_2.
+exact H.
+unfold OrthoS; unfold not; intro.
+apply H0. clear H0.
+destruct H1.
+destruct H0.
+exists x.
+split.
+apply SAnd3.
+exact H0.
+exact H1.
+clear H.
+clear IHt1.
+(* Make a separate Lemma ? *)
+unfold OrthoS in H0. unfold not in H0.
+(*
+assert ((exists t3 : PTyp Base, t2 = Lift t3) \/ (exists t3 t4 : PTyp Inter, t2 = And t3 t4)).
+apply invInter.*)
+assert (exists t3, t2 = Lift t3).
+admit. (* How to do this? *)
+destruct H.
+rewrite H.
+apply OLift.
+unfold not; intros.
+apply H0.
+exists (Lift x).
+rewrite H.
+split.
+apply SLift.
+apply H1.
+apply reflex.
+(*case 2*)
+unfold not; intros.
+apply H0.
+exists (Lift t1).
+rewrite H.
+split.
+apply reflex.
+apply SLift.
+exact H1.
 Defined.
 
 Lemma invAndS1 : forall t t1 t2 i, sub i t (And nat t1 t2) -> sub i t t1 /\ sub i t t2.
