@@ -6,6 +6,17 @@ data PTyp a = Var a | Forall (a -> PSigma a) | Fun (PSigma a) (PSigma a) | PInt
 data PSigma a = And (PSigma a) (PSigma a) | Typ (PTyp a)
 *)
 
+(*
+Inductive S := Base | Inter.
+
+Inductive PTyp A : S -> Type :=
+  | Var : A -> PTyp A Base 
+  | PInt : PTyp A Base
+  | Fun : PTyp A Inter -> PTyp A Inter -> PTyp A Base
+  | And : PTyp A Inter -> PTyp A Inter -> PTyp A Inter
+  | Lift : PTyp A Base -> PTyp A Inter.
+*)
+
 Inductive PTyp A :=
   | Var : A -> PTyp A
   | PInt : PTyp A
@@ -169,6 +180,10 @@ apply IHT2; auto.
 apply IHQ1; auto.
 apply IHQ2; auto.
 Defined.
+
+Definition Ortho A B := forall n, not (exists C, sub n A C /\ sub n B C).
+
+
 
 Lemma p1 : forall (A B C : Prop), (A \/ B -> C) -> ((A -> C) /\ (B -> C)).
 Proof.
