@@ -1,5 +1,4 @@
 \colorlet{wfcolor}{BrickRed}
-\newcommand{\judgeSourceWF}[2]{#1 \; \turns \; #2}
 
 
 \newcommand{\ruleLabelSourceWF}{\bm{\textcolor{wfcolor}{wf}}}
@@ -14,7 +13,7 @@
 \newcommand{\ruleSourceWF}{
 \inferrule* [right=$\ruleLabelSourceWF$]
   {\ftv \A \in \gamma}
-  {\judgeSourceWF \gamma \A}
+  {\istype \gamma \A}
 }
 
 \newcommand{\ruleLabelTargetWF}{\ruleLabelTarget\text{wf}}
@@ -29,35 +28,35 @@
 \newcommand{\ruleSourceWFVar}{
 \inferrule* [right=$\ruleLabelSourceWFVar$]
   {\alpha \in \gamma}
-  {\judgeSourceWF \gamma \alpha}
+  {\istype \gamma \alpha}
 }
 
 \newcommand{\ruleSourceWFTop}{
 \inferrule* [right=$\ruleLabelSourceWFTop$]
   { }
-  {\judgeSourceWF \gamma \top}
+  {\istype \gamma \top}
 }
 
 \newcommand{\ruleSourceWFFun}{
 \inferrule* [right=$\ruleLabelSourceWFFun$]
-  {\judgeSourceWF \gamma {\A_1} \\ \judgeSourceWF \Gamma {\A_2}}
-  {\judgeSourceWF \gamma {\A_1 \to \A_2}}
+  {\istype \gamma {\A_1} \\ \istype \Gamma {\A_2}}
+  {\istype \gamma {\A_1 \to \A_2}}
 }
 
 \newcommand{\ruleSourceWFForall}{
 \inferrule* [right=$\ruleLabelSourceWFForall$]
-  {\judgeSourceWF {\gamma, \alpha} \A}
-  {\judgeSourceWF \gamma {\for \alpha \A}}
+  {\istype {\gamma, \alpha} \A}
+  {\istype \gamma {\for \alpha \A}}
 }
 
 \newcommand{\ruleSourceWFAnd}{
 \inferrule* [right=$\ruleLabelSourceWFAnd$]
-  {\judgeSourceWF \gamma {\A_1} \\ \judgeSourceWF \Gamma {\A_2}}
-  {\judgeSourceWF \gamma {\A_1 \intersect \A_2}}
+  {\istype \gamma {\A_1} \\ \istype \Gamma {\A_2}}
+  {\istype \gamma {\A_1 \intersect \A_2}}
 }
 
 \newcommand{\ruleSourceWFRec}{
 \inferrule* [right=$\ruleLabelSourceWFRec$]
-  {\judgeSourceWF \gamma \A}
-  {\judgeSourceWF \gamma {\recordType l \A}}
+  {\istype \gamma \A}
+  {\istype \gamma {\recordType l \A}}
 }

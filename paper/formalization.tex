@@ -22,7 +22,7 @@
 
 \title{\name}
 
-Coherence for well-typed terms.
+% Coherence for well-typed terms.
 
 \begin{figure}
   \[
@@ -46,8 +46,8 @@ Coherence for well-typed terms.
       &   & \mid & \blam \alpha e    & \text{Big lambda} \\
       &   & \mid & \tapp e A         & \text{Type application} \\
       &   & \mid &  e_1 \mergeOp e_2 & \text{Merge} \\
-      % &   & \mid & \assume {(A \disjoint B)} e & \\
-      % &   & \mid & \app e {\_}       & \text{Disjointness check} \\
+      &   & \mid & \assume {(A \disjoint B)} e & \text{Constraint intro} \\
+      &   & \mid & \app e {\_}                 & \text{Constraint elim} \\
       % &   & \mid & \recordCon l e    & \text{Record} \\
       % &   & \mid & e.l               & \text{Record selection} \\
       % &   & \mid & e \restrictOp l   & \text{Record restriction} \\
@@ -187,9 +187,26 @@ Coherence for well-typed terms.
   \subAnd \\
   \subAndleft \\
   \subAndright \\
+  \subConstraint
   \end{mathpar}
   \caption{Subtyping.}
 \end{figure}
+
+% \begin{figure}
+%   \begin{mathpar}
+%     \framebox{$\isdisjoint \Gamma A B$} \\
+%
+%     \inferrule* [right=DisjointRefl]
+%       {\isdisjoint \Gamma A B}
+%       {\isdisjoint \Gamma B A}
+%
+%     \inferrule* [right=DisjointSub]
+%       {\isdisjoint \Gamma A B \\ A' \subtype A \\ B' \subtype B}
+%       {\isdisjoint \Gamma {A'} {B'}}
+%
+%   \end{mathpar}
+%   \caption{Disjointness.}
+% \end{figure}
 
 \begin{figure}
   \begin{mathpar}
@@ -201,8 +218,8 @@ Coherence for well-typed terms.
     \ruleBLam \and
     \ruleTApp \and
     \ruleMerge \and
-    % \ruleDisjointAssume \and
-    \ruleDisjointCheck
+    \ruleConstraintIntro \and
+    \ruleConstraintElim
     % \rulerecordConstruct \and
     % \ruleRecSelect \and \ruleRecRestrict
   \end{mathpar}
@@ -228,17 +245,17 @@ Coherence for well-typed terms.
   {\hastype \epsilon {1 \mergeOp 2} {\constraints {\integer \disjoint \integer} \integer \intersect \integer}}
 \end{mathpar}
 
-% \begin{definition}{(Disjointness)}
-% Two sets $S$ and $T$ are \emph{disjoint} if there does not exist an element $x$, such that $x \in S$ and $x \in T$.
-% \end{definition}
-%
-% \begin{definition}{(Disjointness)}
-% Two types $A$ and $B$ are \emph{disjoint} if there does not exist an expression $e$, which is not a merge, such that $\hastype \epsilon e A'$, $\hastype \epsilon e B'$, $A' \subtype A$, and $B' \subtype B$.
-% \end{definition}
-%
-% \begin{definition}{(Disjointness)}
-% Two types $A$ and $B$ are \emph{disjoint} if their least common supertype is $\top$.
-% \end{definition}
+\begin{definition}{(Disjointness)}
+Two sets $S$ and $T$ are \emph{disjoint} if there does not exist an element $x$, such that $x \in S$ and $x \in T$.
+\end{definition}
+
+\begin{definition}{(Disjointness)}
+Two types $A$ and $B$ are \emph{disjoint} if there does not exist an expression $e$, which is not a merge, such that $\hastype \epsilon e A'$, $\hastype \epsilon e B'$, $A' \subtype A$, and $B' \subtype B$.
+\end{definition}
+
+\begin{definition}{(Disjointness)}
+Two types $A$ and $B$ are \emph{disjoint} if their least common supertype is $\top$.
+\end{definition}
 
 % \begin{figure}
 %   % Typing

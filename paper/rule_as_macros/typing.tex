@@ -1,4 +1,4 @@
-\newcommand{\rulelabel}{\text{Ty/}}
+\newcommand{\rulelabel}{\text{Ty}}
 \newcommand{\rulelabelSelect}{\text{Sel}}
 \newcommand{\rulelabelRestrict}{\text{Res}}
 
@@ -22,7 +22,7 @@
 \newcommand{\rulelabelLam}{\rulelabel\text{Lam}}
 \newcommand{\ruleLam} {
 \inferrule* [right=$\rulelabelLam$]
-  {\hastype {\Gamma, x \hast A} e B \yields E \\ \judgeSourceWF \Gamma A}
+  {\istype \Gamma A \\ \hastype {\Gamma, x \hast A} e B \yields E}
   {\hastype \Gamma {\lam x A e} {A \to B} \yields {\lam x {\im A} E}}
 }
 
@@ -48,7 +48,7 @@
 \newcommand{\rulelabelTApp}{\rulelabel\text{TApp}}
 \newcommand{\ruleTApp}{
 \inferrule* [right=$\rulelabelTApp$]
-  {\hastype \Gamma e {\for \alpha B} \yields E \\ \judgeSourceWF \Gamma A}
+  {\hastype \Gamma e {\for \alpha B} \yields E \\ \istype \Gamma A}
   {\hastype \Gamma {\tapp e A} {\subst A \alpha B} \yields {\tapp E {\im A}}}
 }
 
@@ -57,25 +57,27 @@
 \newcommand{\ruleMerge}{
 \inferrule* [right=$\rulelabelMerge$]
   {\hastype \Gamma {e_1} A \yields {E_1} \\
-   \hastype \Gamma {e_2} B \yields {E_2}}
-  {\hastype \Gamma {e_1 \mergeOp e_2} {\constraints {A \disjoint B} {A \intersect B}} \yields {\pair {E_1} {E_2}}}
+   \hastype \Gamma {e_2} B \yields {E_2} \\
+   \isdisjoint \Gamma A B}
+  {\hastype \Gamma {e_1 \mergeOp e_2} {A \intersect B} \yields {\pair {E_1} {E_2}}}
 }
 
-% DisjointAssume
-\newcommand{\rulelabeldisjointassume}{\rulelabel\text{DisjointAssume}}
-\newcommand{\ruleDisjointAssume}{
-\inferrule* [right=$\rulelabeldisjointassume$]
-  {\hastype {\Gamma, A_1 \disjoint A_2} e B \yields E}
-  {\hastype \Gamma {\assume {(A_1 \disjoint A_1)} e} {\constraints {A_1 \disjoint A_2} B} \yields E}
+% ConstraintIntro
+\newcommand{\rulelabelConstraintIntro}{\rulelabel\text{ConstraintIntro}}
+\newcommand{\ruleConstraintIntro}{
+  \inferrule* [right=$\rulelabelConstraintIntro$]
+    {\istype \Gamma {A_1} \\ \istype \Gamma {A_2} \\
+     \hastype {\Gamma, A_1 \disjoint A_2} e B \yields E}
+    {\hastype \Gamma {\assume {(A_1 \disjoint A_1)} e} {\constraints {A_1   \disjoint A_2} B} \yields E}
 }
 
-% DisjointCheck
-\newcommand{\rulelabeldisjointcheck}{\rulelabel\text{DisjointCheck}}
-\newcommand{\ruleDisjointCheck}{
-\inferrule* [right=$\rulelabeldisjointcheck$]
+% ConstraintElim
+\newcommand{\rulelabelConstraintElim}{\rulelabel\text{ConstraintElim}}
+\newcommand{\ruleConstraintElim}{
+\inferrule* [right=$\rulelabelConstraintElim$]
   {\hastype \Gamma e {\constraints {A_1 \disjoint A_2} B} \yields E \\
   \isdisjoint \Gamma {A_1} {A_2}}
-  {\hastype \Gamma {e} B \yields E}
+  {\hastype \Gamma {\app e {\_}} B \yields E}
 }
 
 % rec-con

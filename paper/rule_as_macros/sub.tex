@@ -6,6 +6,7 @@
 \newcommand{\ruleLabelSubAnd}{\ruleLabelSub\text{And}}
 \newcommand{\ruleLabelSubAndLeft}{\ruleLabelSub{\text{And}_1}}
 \newcommand{\ruleLabelSubAndRight}{\ruleLabelSub{\text{And}_2}}
+\newcommand{\ruleLabelSubConstraint}{\ruleLabelSub{\text{Constraint}}}
 \newcommand{\ruleLabelSubRec}{\ruleLabelSub\text{Rec}}
 
 \newcommand{\subVar}{
@@ -65,6 +66,13 @@
       {\lam x {\im {\tau_1 \intersect \tau_2}}
         {\app C {(\proj 2 x)}}}}
 }
+
+\newcommand{\subConstraint}{
+\inferrule* [right=$\ruleLabelSubConstraint$]
+  {A_2 \subtype A_1 \\ B_2 \subtype B_1 \\ C_1 \subtype C_2}
+  {\constraints {A_1 \disjoint B_1} {C_1} \subtype \constraints {A_2 \disjoint B_2} {C_2}}
+}
+
 
 \newcommand{\subRec}{
 \inferrule* [right=$\ruleLabelSubRec$]
