@@ -193,21 +193,21 @@
   \caption{Subtyping.}
 \end{figure}
 
-% \begin{figure}
-%   \begin{mathpar}
-%     \framebox{$\isdisjoint \Gamma A B$} \\
-%
-%     \inferrule* [right=DisjointRefl]
-%       {\isdisjoint \Gamma A B}
-%       {\isdisjoint \Gamma B A}
-%
-%     \inferrule* [right=DisjointSub]
-%       {\isdisjoint \Gamma A B \\ A' \subtype A \\ B' \subtype B}
-%       {\isdisjoint \Gamma {A'} {B'}}
-%
-%   \end{mathpar}
-%   \caption{Disjointness.}
-% \end{figure}
+\begin{figure}
+  \begin{mathpar}
+    \framebox{$\isdisjoint \Gamma A B$} \\
+
+    \inferrule* [right=DisjointRefl]
+      {\isdisjoint \Gamma A B}
+      {\isdisjoint \Gamma B A}
+
+    \inferrule* [right=DisjointSub]
+      {\isdisjoint \Gamma A B \\ A' \subtype A \\ B' \subtype B}
+      {\isdisjoint \Gamma {A'} {B'}}
+
+  \end{mathpar}
+  \caption{Disjointness.}
+\end{figure}
 
 \begin{figure}
   \begin{mathpar}
