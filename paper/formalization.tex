@@ -31,7 +31,7 @@
       \text{Atomic Types}
 %      & T & \Coloneqq & \alpha     & \text{Type variable} \\
       &  T       & \Coloneqq & A \to B         & \text{Function type}\\
-      &         & \mid & \top            & \text{Top type} \\
+      &         & \mid & \bot            & \text{Bottom type} \\
       &         & \mid & \for {\alpha * B} A   & \text{Universal quantification} \\
 %      &         & \mid & A \intersect B  & \text{Intersection type} \\
 %      &         & \mid & \constraints {A \disjoint B} C & \text{Disjoint constraint} \\
@@ -46,7 +46,7 @@
       \\
       \text{Expressions}
       & e & \Coloneqq & x            & \text{Variable} \\
-      &   & \mid & \top              & \text{Top} \\
+%      &   & \mid & \top              & \text{Top} \\
       &   & \mid & \lam x A e        & \text{Lambda} \\
       &   & \mid & \app {e_1} {e_2}  & \text{Application} \\
       &   & \mid & \blam {\alpha * A}  e    & \text{Big lambda} \\
@@ -67,7 +67,7 @@
 %      &        & \mid & \Gamma, A \disjoint B & \\
 
       % \\
-      % \text{Labels} & l
+      \text{Sugar} & \blam {\alpha} e & \Coloneqq & \blam {\alpha * \bot} e
     \end{array}
   \end{array}
   \]
@@ -188,14 +188,14 @@
   \begin{mathpar}
   \framebox{$ A \subtype B \yields F $} \\
   \subVar \\
-  \subTop \\
+%  \subTop \\
   \subFun \\
   \subForall \\
   \subAnd \\
   \subAndleft \\
   \subAndright \\
 %  \subConstraint
-  \end{mathpar}
+  \end{mathpar}\footnote{miss a rule for $\bot$}
   \caption{Subtyping.}
 \end{figure}
 
@@ -231,7 +231,7 @@
   \begin{mathpar}
     \framebox{$ \hastype \Gamma e A \yields E $} \\
     \ruleVar \and
-    \ruleTop \and
+%    \ruleTop \and
     \ruleLam \and
     \ruleApp \and
     \ruleBLam \and
