@@ -70,8 +70,8 @@ Two types $A$ and $B$ are \emph{disjoint} (written as ``$\disjoint A B$'') if th
 
 \begin{mathpar}
 \inferrule* [right=$\text{Formation}$]
-  {\istype A \\ \istype B}
-  {\istype {A \intersect B}}
+  {\istype \Gamma A \\ \istype B}
+  {\istype \Gamma {A \intersect B}}
 
 \inferrule* [right=$\text{Intro}$]
   {e : A \\ e : B}
