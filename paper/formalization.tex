@@ -30,11 +30,11 @@
     \begin{array}{llrll}
       \text{Atomic Types}
 %      & T & \Coloneqq & \alpha     & \text{Type variable} \\
-%      &         & \mid & \top            & \text{Top type} \\
-      &  T       & \Coloneqq & A \to B         & \text{Function type} \\
-      &         & \mid & \for \alpha A   & \text{Universal quantification} \\
+      &  T       & \Coloneqq & A \to B         & \text{Function type}\\
+      &         & \mid & \top            & \text{Top type} \\
+      &         & \mid & \for {\alpha * B} A   & \text{Universal quantification} \\
 %      &         & \mid & A \intersect B  & \text{Intersection type} \\
-      &         & \mid & \constraints {A \disjoint B} C & \text{Disjoint constraint} \\
+%      &         & \mid & \constraints {A \disjoint B} C & \text{Disjoint constraint} \\
       % &         & \mid & \recordType l A & \text{Record type} \\
      \\
      \text{Types}
@@ -46,15 +46,15 @@
       \\
       \text{Expressions}
       & e & \Coloneqq & x            & \text{Variable} \\
-%      &   & \mid & \top              & \text{Top} \\
+      &   & \mid & \top              & \text{Top} \\
       &   & \mid & \lam x A e        & \text{Lambda} \\
       &   & \mid & \app {e_1} {e_2}  & \text{Application} \\
-      &   & \mid & \blam \alpha e    & \text{Big lambda} \\
+      &   & \mid & \blam {\alpha * A}  e    & \text{Big lambda} \\
       &   & \mid & \tapp e A         & \text{Type application} \\
       &   & \mid &  e_1 \mergeOp e_2 & \text{Merge} \\
       % &   & \mid & {\_}                 & \text{Disjointness evidence}
-      &   & \mid & \assume {(A \disjoint B)} e & \text{Constraint intro} \\
-      &   & \mid & \app e {\_}                 & \text{Constraint elim} \\
+%      &   & \mid & \assume {(A \disjoint B)} e & \text{Constraint intro} \\
+%      &   & \mid & \app e {\_}                 & \text{Constraint elim} \\
       % &   & \mid & \recordCon l e    & \text{Record} \\
       % &   & \mid & e.l               & \text{Record selection} \\
       % &   & \mid & e \restrictOp l   & \text{Record restriction} \\
@@ -62,9 +62,9 @@
       \\
       \text{Contexts}
       & \Gamma & \Coloneqq & \epsilon         & \\
-      &        & \mid & \Gamma, \alpha        & \\
+      &        & \mid & \Gamma, \alpha * A       & \\
       &        & \mid & \Gamma, x \hast A     & \\
-      &        & \mid & \Gamma, A \disjoint B & \\
+%      &        & \mid & \Gamma, A \disjoint B & \\
 
       % \\
       % \text{Labels} & l
@@ -188,13 +188,13 @@
   \begin{mathpar}
   \framebox{$ A \subtype B \yields F $} \\
   \subVar \\
-%  \subTop \\
+  \subTop \\
   \subFun \\
   \subForall \\
   \subAnd \\
   \subAndleft \\
   \subAndright \\
-  \subConstraint
+%  \subConstraint
   \end{mathpar}
   \caption{Subtyping.}
 \end{figure}
@@ -204,12 +204,12 @@
     \framebox{$ \isdisjoint \Gamma A B$} \\
 
     \inferrule* [right=DisjointRefl]
-      {A * B \in \Gamma}
-      {\isdisjoint \Gamma A B}
+      {\alpha * B \in \Gamma}
+      {\isdisjoint \Gamma \alpha B}
 
 \inferrule* [right=DisjointSym]
-      {B * A \in \Gamma}
-      {\isdisjoint \Gamma A B}
+      {\alpha * A \in \Gamma}
+      {\isdisjoint \Gamma A \alpha}
 
     \inferrule* [right=DisjointSub1]
       {\isdisjoint \Gamma A C \\ \isdisjoint \Gamma B C}
@@ -231,14 +231,14 @@
   \begin{mathpar}
     \framebox{$ \hastype \Gamma e A \yields E $} \\
     \ruleVar \and
-%    \ruleTop \and
+    \ruleTop \and
     \ruleLam \and
     \ruleApp \and
     \ruleBLam \and
     \ruleTApp \and
     \ruleMerge \and
-    \ruleConstraintIntro \and
-    \ruleConstraintElim
+%    \ruleConstraintIntro \and
+%    \ruleConstraintElim
     % \rulerecordConstruct \and
     % \ruleRecSelect \and \ruleRecRestrict
   \end{mathpar}
