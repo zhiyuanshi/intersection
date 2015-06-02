@@ -34,10 +34,10 @@
 \newcommand{\subForall}{
 \inferrule* [right=$\ruleLabelSubForall$]
   {\tau_1 \subtype \subst {\alpha_1} {\alpha_2} \tau_2 \yields C}
-  {\for {\alpha_1} \tau_1 \subtype \for {\alpha_2} \tau_2
+  {\for {\alpha_1 * \tau_3} \tau_1 \subtype \for {\alpha_2 * \tau_3} \tau_2
     \yields
-      {\lam f {\im {\for {\alpha_1} \tau_1}}
-        {\blam \alpha {\app C {(\app f \alpha)}}}}}
+      {\lam f {\im {\for {\alpha_1 * \tau_3} \tau_1}}
+        {\blam (\alpha) {\app C {(\app f \alpha)}}}}}
 }
 
 \newcommand{\subAnd}{
