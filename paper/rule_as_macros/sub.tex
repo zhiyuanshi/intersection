@@ -69,10 +69,16 @@
 
 \newcommand{\subConstraint}{
 \inferrule* [right=$\ruleLabelSubConstraint$]
-  {A_2 \subtype A_1 \\ B_2 \subtype B_1 \\ C_1 \subtype C_2}
-  {\constraints {A_1 \disjoint B_1} {C_1} \subtype \constraints {A_2 \disjoint B_2} {C_2}}
+  {A_2 \subtype A_1 \\ B_2 \subtype B_1 \\ C_1 \subtype C_2 \yields E}
+  {\constraints {A_1 \disjoint B_1} {C_1} \subtype \constraints {A_2
+  \disjoint B_2} {C_2} \yields E}
 }
 
+%\newcommand{\subConstraint1}{
+%\inferrule* [right=$\ruleLabelSubConstraint$]
+%  {A_2 \subtype A_1 \\ B_2 \subtype B_1 \\ C_1 \subtype C_2}
+%  {A \disjoint B \subtype A \disjoint B} }
+%}
 
 \newcommand{\subRec}{
 \inferrule* [right=$\ruleLabelSubRec$]

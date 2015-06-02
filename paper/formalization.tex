@@ -46,6 +46,7 @@
       &   & \mid & \blam \alpha e    & \text{Big lambda} \\
       &   & \mid & \tapp e A         & \text{Type application} \\
       &   & \mid &  e_1 \mergeOp e_2 & \text{Merge} \\
+      % &   & \mid & {\_}                 & \text{Disjointness evidence}
       &   & \mid & \assume {(A \disjoint B)} e & \text{Constraint intro} \\
       &   & \mid & \app e {\_}                 & \text{Constraint elim} \\
       % &   & \mid & \recordCon l e    & \text{Record} \\
@@ -254,6 +255,8 @@ Two types $A$ and $B$ are \emph{disjoint} if there does not exist an expression 
 \end{definition}
 
 \begin{definition}{(Disjointness)}
+$A \bot B = \not \exists C. A <: C \wedge B <: C$ \\
+
 Two types $A$ and $B$ are \emph{disjoint} if their least common supertype is $\top$.
 \end{definition}
 
