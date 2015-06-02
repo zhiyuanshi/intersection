@@ -28,19 +28,25 @@
   \[
   \begin{array}{l}
     \begin{array}{llrll}
-      \text{Types}
-      & A, B, C, D & \Coloneqq & \alpha     & \text{Type variable} \\
-      &         & \mid & \top            & \text{Top type} \\
-      &         & \mid & A \to B         & \text{Function type} \\
+      \text{Atomic Types}
+%      & T & \Coloneqq & \alpha     & \text{Type variable} \\
+%      &         & \mid & \top            & \text{Top type} \\
+      &  T       & \Coloneqq & A \to B         & \text{Function type} \\
       &         & \mid & \for \alpha A   & \text{Universal quantification} \\
-      &         & \mid & A \intersect B  & \text{Intersection type} \\
+%      &         & \mid & A \intersect B  & \text{Intersection type} \\
       &         & \mid & \constraints {A \disjoint B} C & \text{Disjoint constraint} \\
       % &         & \mid & \recordType l A & \text{Record type} \\
+     \\
+     \text{Types}
+     & A, B, C, D & \Coloneqq & \alpha     & \text{Type variable} \\
+     &  & \mid & A \intersect B  & \text{Intersection type} \\
+%     &         & \mid & A \intersect B  & \text{Intersection type} \\
+     &         & \mid & T  & \text{Atomic type} \\
 
       \\
       \text{Expressions}
       & e & \Coloneqq & x            & \text{Variable} \\
-      &   & \mid & \top              & \text{Top} \\
+%      &   & \mid & \top              & \text{Top} \\
       &   & \mid & \lam x A e        & \text{Lambda} \\
       &   & \mid & \app {e_1} {e_2}  & \text{Application} \\
       &   & \mid & \blam \alpha e    & \text{Big lambda} \\
@@ -182,7 +188,7 @@
   \begin{mathpar}
   \framebox{$ A \subtype B \yields F $} \\
   \subVar \\
-  \subTop \\
+%  \subTop \\
   \subFun \\
   \subForall \\
   \subAnd \\
@@ -195,15 +201,27 @@
 
 \begin{figure}
   \begin{mathpar}
-    \framebox{$\isdisjoint \Gamma A B$} \\
+    \framebox{$ \isdisjoint \Gamma A B$} \\
 
     \inferrule* [right=DisjointRefl]
+      {A * B \in \Gamma}
       {\isdisjoint \Gamma A B}
-      {\isdisjoint \Gamma B A}
 
-    \inferrule* [right=DisjointSub]
-      {\isdisjoint \Gamma A B \\ A' \subtype A \\ B' \subtype B}
-      {\isdisjoint \Gamma {A'} {B'}}
+\inferrule* [right=DisjointSym]
+      {B * A \in \Gamma}
+      {\isdisjoint \Gamma A B}
+
+    \inferrule* [right=DisjointSub1]
+      {\isdisjoint \Gamma A C \\ \isdisjoint \Gamma B C}
+      {\isdisjoint \Gamma {A \& B} {C}}
+
+ \inferrule* [right=DisjointSub2]
+      {\isdisjoint \Gamma A B \\ \isdisjoint \Gamma A C}
+      {\isdisjoint \Gamma {A} {B \& C}}
+
+\inferrule* [right=DisjointAtomic]
+      {T_1 \not<: T_2 \\ T_2 \not<: T_1}
+      {\isdisjoint \Gamma {T_1} {T_2}}
 
   \end{mathpar}
   \caption{Disjointness.}
@@ -213,7 +231,7 @@
   \begin{mathpar}
     \framebox{$ \hastype \Gamma e A \yields E $} \\
     \ruleVar \and
-    \ruleTop \and
+%    \ruleTop \and
     \ruleLam \and
     \ruleApp \and
     \ruleBLam \and
