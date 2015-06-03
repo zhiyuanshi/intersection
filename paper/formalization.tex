@@ -304,6 +304,11 @@ check.
 This example should type-check because B is guaranteed to be disjoint with A. Therefore 
 instantiation should produce a well-formed type. 
 
+\item $(\lambda (z:Int) . z) ((1,,'c'),,(2,False))$: This example should not type-check, 
+since it leads to an ambigous of integers (can either be 1 or 2). The definition of disjointness 
+is crutial to prevent this example from type-checking. When type-checking the large merge, 
+the disjointness predicate will detect that more than one integer exists in the merge.
+
 \end{enumerate}
 
 \begin{mathpar}
