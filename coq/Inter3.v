@@ -40,6 +40,22 @@ Inductive Ortho : PTyp -> PTyp -> Prop :=
 
 Definition OrthoS (A B : PTyp) := not (exists C, sub A C /\ sub B C).
 
+(* Well-formed types *)
+
+Inductive WFTyp : PTyp -> Prop := 
+  | WFInt : WFTyp PInt
+  | WFFun : forall t1 t2, WFTyp t1 -> WFTyp t2 -> WFTyp (Fun t1 t2)
+  | WFAnd : forall t1 t2, WFTyp t1 -> WFTyp t2 -> Ortho t1 t2 -> WFTyp (And t1 t2).
+
+(*
+Lemma atomic_sub : forall t1, WFTyp t1 -> Atomic t1 -> forall t2, WFTyp t2 -> sub t1 t2 -> Atomic t2. 
+Proof. 
+intro. intro. intro.
+induction H; intros.
+inversion H1. exact AInt.
+rewrite 
+*)
+
 (* Reflexivity *)
 
 Hint Resolve SInt SFun SAnd1 SAnd2 SAnd3.
@@ -110,7 +126,14 @@ exact H.
 exact H0.
 Defined.
 
-Lemma ortho_soundness : forall s (t1 t2 : PTyp s), (s = Inter) -> Ortho s t1 t2 -> OrthoS s t1 t2.
+(* use only well-formed types ? *)
+Lemma ortho_soundness : forall (t1 t2 : PTyp), Ortho t1 t2 -> OrthoS t1 t2.
+induction t1; intros; unfold OrthoS; unfold not; intros.
+induction t2. inversion H. apply H1. apply reflex.
+destruct H0. destruct H0.
+inversion H0. rewrite <- H3 in H1. inversion H1.
+rewrite <- H5 in H0. rewrite <- H5 in H1.
+
 induction t1; intros. discriminate H. discriminate H. admit.
 clear IHt1. generalize H0. clear H0. intros. unfold OrthoS. unfold not. intros.
 
