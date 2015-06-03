@@ -28,20 +28,20 @@
   \[
   \begin{array}{l}
     \begin{array}{llrll}
-      \text{Atomic Types}
-%      & T & \Coloneqq & \alpha     & \text{Type variable} \\
-      &  T       & \Coloneqq & A \to B         & \text{Function type}\\
+      \text{Types}
+      & T & \Coloneqq & \alpha     & \text{Type variable} \\
+      &        & \mid & A \to B         & \text{Function type}\\
       &         & \mid & \bot            & \text{Bottom type} \\
       &         & \mid & \for {\alpha * B} A   & \text{Universal quantification} \\
-%      &         & \mid & A \intersect B  & \text{Intersection type} \\
+      &         & \mid & A \intersect B  & \text{Intersection type} \\
 %      &         & \mid & \constraints {A \disjoint B} C & \text{Disjoint constraint} \\
       % &         & \mid & \recordType l A & \text{Record type} \\
-     \\
-     \text{Types}
-     & A, B, C, D & \Coloneqq & \alpha     & \text{Type variable} \\
-     &  & \mid & A \intersect B  & \text{Intersection type} \\
+%     \\
+%     \text{Types}
+%     & A, B, C, D & \Coloneqq & \alpha     & \text{Type variable} \\
+%     &  & \mid & A \intersect B  & \text{Intersection type} \\
 %     &         & \mid & A \intersect B  & \text{Intersection type} \\
-     &         & \mid & T  & \text{Atomic type} \\
+%     &         & \mid & T  & \text{Atomic type} \\
 
       \\
       \text{Expressions}
@@ -199,6 +199,27 @@
   \caption{Subtyping.}
 \end{figure}
 
+
+\begin{figure}
+  \begin{mathpar}
+    \framebox{$ A~atomic$} \\
+
+    \inferrule* 
+      {}
+      {\bot~atomic}
+
+\inferrule* 
+      {}
+      {A \to B~atomic}
+
+    \inferrule*
+      {}
+      {\for {\alpha * B} A~atomic}
+
+  \end{mathpar}
+  \caption{Atomic types.}
+\end{figure}
+
 \begin{figure}
   \begin{mathpar}
     \framebox{$ \isdisjoint \Gamma A B$} \\
@@ -220,8 +241,8 @@
       {\isdisjoint \Gamma {A} {B \& C}}
 
 \inferrule* [right=DisjointAtomic]
-      {T_1 \not<: T_2 \\ T_2 \not<: T_1}
-      {\isdisjoint \Gamma {T_1} {T_2}}
+      {A \not<: B \\ B \not<: A \\ A~atomic \\ B~atomic}
+      {\isdisjoint \Gamma {A} {B}}
 
   \end{mathpar}
   \caption{Disjointness.}
