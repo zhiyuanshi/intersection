@@ -314,6 +314,44 @@
 
 \end{enumerate}
 
+\subsection{Achieving Coherence}
+
+The crutial challenge lies in the generation of coercions, which can lead 
+to different results due to multiple possible choices in the rules that 
+can be used. In particular the rules SubAnd1 and SubAnd2 overlap and 
+can result in coercions that are not equivalent. A simple example is:
+
+$(\lambda (x:Int) . x) (1,,2)$
+
+The result of this program can be either 1 or 2 depending on whether 
+we chose SubAnd1 or SubAnd2. 
+
+Therefore the challenge of coherence lies in ensuring that, for any given 
+types A and B, the result of $A <: B$ always leads to the same (or semantically 
+equivalent) coercions. 
+
+It is clear that, in general, the following does not hold:
+
+$if~A <: B \leadsto C1~and~A <: B \leadsto C2~then~C1 = C2$
+
+We can see this with the example above. There are two possible coercions:\\
+
+\noindent $(Int\&Int) <: Int \leadsto \lambda (x,y). x$\\
+$(Int\&Int) <: Int \leadsto \lambda (x,y). y$\\
+
+However $\lambda (x,y). x$ and $\lambda (x,y). y$ are not semantically equivalent.
+
+One simple observation is that the use of the subtyping relation on the 
+example uses an ill-formed type ($Int\&Int$). Since the type system can prevent 
+such bad uses of ill-formed types, it could be that if we only allow well-formed 
+types then the uses of the subtyping relation do produce equivalent coercions. 
+Therefore the we postulate the following conjecture:
+
+$if~A <: B \leadsto C1~and~A <: B \leadsto C2~and~A, B~well~formed~then~C1 = C2$
+
+If the following conjecture does hold then it should be easy to prove that 
+the translation is coherent.
+
 \begin{mathpar}
   \inferrule
   {}
