@@ -229,6 +229,34 @@
 
 \begin{figure}
   \begin{mathpar}
+    \framebox{$ \Gamma \turns A~type$} \\
+
+    \inferrule* [right=WFBot]
+      {}
+      {\Gamma \turns \bot~type}
+
+\inferrule* [right=WFFun]
+      {\Gamma \turns A~type \\ \Gamma \turns B~type}
+      {\Gamma \turns A \to B~type}
+
+    \inferrule* [right=WFForall]
+      {\Gamma, \alpha * B \turns A~type}
+      {\Gamma \turns \for {\alpha * B} A~type}
+
+ \inferrule* [right=WFVar]
+      {\alpha * A \in \Gamma}
+      {\Gamma \turns \alpha~type}
+
+\inferrule* [right=WFInter]
+      {\Gamma \turns A~type \\ \Gamma \turns B~type \\ \isdisjoint \Gamma A B}
+      {\Gamma \turns A \intersect B type}
+
+  \end{mathpar}
+  \caption{Well-formed types.}
+\end{figure}
+
+\begin{figure}
+  \begin{mathpar}
     \framebox{$ \hastype \Gamma e A \yields E $} \\
     \ruleVar \and
 %    \ruleTop \and
@@ -257,6 +285,34 @@
 
   \caption{Typing.}
 \end{figure}
+
+\subsection{``Testsuite'' of examples}
+
+\begin{enumerate}
+
+\item $\lambda (x : Int * Int). (\lambda (z : Int) . z)~x$: This
+  example should not type-check because it leads to an ambigous choice
+  in the body of the lambda. In the current system the well-formedness
+  checks forbid such example.
+
+\item $\Lambda A.\Lambda B.\lambda (x:A).\lambda (y:B). (\lambda (z:A)
+  . z) (x,,y)$: This example should not type-check because it is not
+  guaranteed that the instantiation of A and B produces a well-formed
+  type. The TyMerge rule forbids it with the disjointness check.
+
+\item $\Lambda A.\Lambda B * A.\lambda (x:A).\lambda (y:B). (\lambda
+  (z:A) . z) (x,,y)$: This example should type-check because B is
+  guaranteed to be disjoint with A. Therefore instantiation should
+  produce a well-formed type.
+
+\item $(\lambda (z:Int) . z) ((1,,'c'),,(2,False))$: This example
+  should not type-check, since it leads to an ambigous lookup of
+  integers (can either be 1 or 2). The definition of disjointness is
+  crutial to prevent this example from type-checking. When
+  type-checking the large merge, the disjointness predicate will
+  detect that more than one integer exists in the merge.
+
+\end{enumerate}
 
 \begin{mathpar}
   \inferrule

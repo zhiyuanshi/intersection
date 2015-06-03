@@ -264,39 +264,42 @@ Defined.
 
 Definition SubEither s t1 t2 := sub s t1 t2 \/ sub s t2 t1.
 
-
-Lemma prop_sub : forall s t1 t2, (s = Base) -> (exists t3, sub s t1 t3 /\ sub s t2 t3) -> sub s t1 t2 \/ sub s t2 t1.
-Proof.
+Lemma ortho_aux : forall s (t1 t2 : PTyp s), (s = Base) -> not (sub s t1 t2 /\ sub s t2 t1) -> OrthoS s t1 t2.
 intros.
+unfold not in H0.
+unfold OrthoS. unfold not.
+intros.
+apply H0. clear H0.
+induction t1; split; try (discriminate H); intros.
+destruct H1.
 destruct H0.
-destruct H0.
-induction H0; intros. 
+inversion H0.
+assert (PInt = x). admit. rewrite <- H3 in H0. rewrite <- H3 in H1. clear H2.
 inversion H1.
-assert (PInt = t2). admit.
-rewrite H2. left. apply reflex.
+assert (PInt = t2). admit. rewrite <- H4 in H1. rewrite <- H4. apply reflex.
+admit. (* Similar to previous one *)
+clear IHt1_1. clear IHt1_2.
+destruct H1. destruct H0.
+inversion H0.
+assert (Fun o3 o4 = x). admit. rewrite <- H7 in H0. rewrite <- H7 in H1. clear H4. clear H7.
 inversion H1.
-exact H1.
-destruct H0. destruct H0. inversion H0.
-admit. admit.
-discriminate H.
-discriminate H.
-Defined.
-
-
-(*
-Lemma ortho_aux : forall s (t1 t2 : PTyp s), (s = Inter) -> Ortho s t1 t2 -> not (sub s t1 t2) /\ not (sub s t2 t1).
-Proof.
-induction t1; intros. discriminate H. discriminate H.
-induction H0; split; unfold not; intros.
-*)
+assert (Fun o0 o5 = t2). admit. rewrite <- H7 in H0. rewrite <- H7 in H1. clear H4. clear H7.
 
 Lemma ortho_soundness : forall s (t1 t2 : PTyp s), (s = Inter) -> Ortho s t1 t2 -> OrthoS s t1 t2.
-intros.
-induction H0. admit. admit.
-unfold OrthoS. unfold not. intros.
-destruct H2. destruct H2.
-apply H0.
+induction t1; intros. discriminate H. discriminate H. admit.
+clear IHt1. generalize H0. clear H0. intros. unfold OrthoS. unfold not. intros.
 
+ apply (PTyp_ind4 t2); intros. 
+unfold OrthoS. unfold not. intros.
+destruct H3. destruct H3.
+unfold OrthoS in H0. unfold not in H1.
+unfold OrthoS in H1. unfold not in H1.
+admit.
+unfold OrthoS. unfold not. intros.
+destruct H1.
+destruct H1.
+inversion H0.
+inversion H1.
 
 
 Lemma ortho_soundness : forall s (t1 t2 : PTyp s), (s = Inter) -> OrthoS s t1 t2 -> Ortho s t1 t2.

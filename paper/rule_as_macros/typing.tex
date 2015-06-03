@@ -40,7 +40,7 @@
 \newcommand{\rulelabelBLam}{\rulelabel\text{BLam}}
 \newcommand{\ruleBLam}{
 \inferrule* [right=$\rulelabelBLam$]
-  {\hastype {\Gamma, \alpha * B} e A \yields E}
+  {\hastype {\Gamma, \alpha * B} e A \yields E \\ \istype \Gamma B}
   {\hastype \Gamma {\blam {\alpha * B} e} {\for {\alpha * B} A} \yields {\blam \alpha E}}
 }
 
