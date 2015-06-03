@@ -23,9 +23,6 @@ task(:paper) { system(latexmk_cmd("paper")) }
 desc "Generate the PDF for formalization"
 task(:formalization) { system(latexmk_cmd("formalization")) }
 
-desc "Generate the PDF for formalization2"
-task(:formalization2) { system(latexmk_cmd("formalization2")) }
-
 desc "Clean"
 task(:clean) { system("latexmk -c") }
 
