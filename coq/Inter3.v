@@ -47,14 +47,6 @@ Inductive WFTyp : PTyp -> Prop :=
   | WFFun : forall t1 t2, WFTyp t1 -> WFTyp t2 -> WFTyp (Fun t1 t2)
   | WFAnd : forall t1 t2, WFTyp t1 -> WFTyp t2 -> Ortho t1 t2 -> WFTyp (And t1 t2).
 
-(*
-Lemma atomic_sub : forall t1, WFTyp t1 -> Atomic t1 -> forall t2, WFTyp t2 -> sub t1 t2 -> Atomic t2. 
-Proof. 
-intro. intro. intro.
-induction H; intros.
-inversion H1. exact AInt.
-rewrite 
-*)
 
 (* Reflexivity *)
 
@@ -64,6 +56,32 @@ Lemma reflex : forall (t1 : PTyp), sub t1 t1.
 Proof.
 induction t1; intros; auto.
 Defined.
+
+
+Lemma invWFSInt : forall t2, WFTyp t2 -> sub PInt t2 -> t2 = PInt. 
+Proof. 
+intro. intro. intro.
+induction H; intros. reflexivity.
+inversion H0.
+inversion H0.
+assert (t1 = PInt). apply  IHWFTyp1. auto. rewrite H8 in H2.
+assert (t2 = PInt). apply  IHWFTyp2. auto. rewrite H9 in H2.
+inversion H2. destruct H10. apply reflex.
+Defined.
+
+Lemma invWFSFun : forall t1 t2 t3, WFTyp t3 -> sub (Fun t1 t2) t3 -> exists t4 t5, sub t4 t1 /\ sub t2 t5 /\ t3 = Fun t4 t5. 
+Proof.
+intros.
+induction H.
+inversion H0.
+exists t0. exists t3. split. inversion H0. auto. 
+split. inversion H0. auto. reflexivity.
+inversion H0.
+assert (exists t4 t5 : PTyp, sub t4 t1 /\ sub t2 t5 /\ t0 = Fun t4 t5). apply IHWFTyp1. auto. 
+destruct H8. destruct H8. destruct H8. destruct H9. rewrite H10 in H2.
+assert (exists t4 t5 : PTyp, sub t4 t1 /\ sub t2 t5 /\ t3 = Fun t4 t5). apply IHWFTyp2. auto. 
+destruct H11. destruct H11. destruct H11. destruct H12. rewrite H13 in H2.
+admit.
 
 (* Orthogonality algorithm is complete *)
 
