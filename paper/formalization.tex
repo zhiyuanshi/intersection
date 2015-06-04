@@ -67,7 +67,8 @@
 %      &        & \mid & \Gamma, A \disjoint B & \\
 
       % \\
-      \text{Sugar} & \blam {\alpha} e & \Coloneqq & \blam {\alpha * \bot} e
+      \text{Sugar} & \blam {\alpha} e & \equiv & \blam {\alpha * \bot} e & \\
+                   & e : A &  \equiv & (\lambda z : A . z) e &
     \end{array}
   \end{array}
   \]
@@ -332,6 +333,12 @@
   crutial to prevent this example from type-checking. When
   type-checking the large merge, the disjointness predicate will
   detect that more than one integer exists in the merge.
+
+\item $(\lambda (f: Int \to Int \& Bool) . \lambda (g : Int \to Char \& Bool) . ((f,,g) : Int \to Bool)$: 
+  This example
+  should not type-check, since it leads to an ambigous lookup of
+  functions. It shows that in order to check disjointness 
+  of functions we must also check disjointness of the subcomponents. 
 
 \end{enumerate}
 

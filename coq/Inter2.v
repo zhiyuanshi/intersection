@@ -60,45 +60,6 @@ intros.
 apply H0.
 Defined.
 
-(*
-Inductive PTyp A :=
-  | Var : A -> PTyp A
-  | PInt : PTyp A
-  | Forall : (A -> PTyp A) -> PTyp A
-  | Fun : PTyp A -> PTyp A -> PTyp A
-  | And : PTyp A -> PTyp A -> PTyp A.
-*)
-
-(*
-
-----------
-|t1 <: t2|
-----------
-
-a <: a                             Sub-Var
-
-           t1 <: t2
-------------------------------     Sub-Forall
-forall a . t1 <: forall a . t2
-
-t3 <: t1     t2 <: t4
----------------------              Sub-Arrow
-t1 -> t2 <: t3 -> t4
-
-t <: t1   t <: t2
------------------                  Sub-&1
-t <: t1 & t2
-
-t1 <: t
-------------                       Sub-&2
-t1 & t2 <: t
-
-t2 <: t
-------------                       Sub-&3
-t1 & t2 <: t
-
-*)
-
 Require Import Arith.
 Require Import Setoid.
 
@@ -112,34 +73,19 @@ Inductive sub : forall (s : S), PTyp s -> PTyp s -> Prop :=
   | SAnd3 : forall t t1 t2, sub Inter t2 t -> sub Inter (And  t1 t2) t
   | SLift : forall t1 t2, sub Base t1 t2 -> sub Inter (Lift  t1) (Lift  t2).
 
-(*
-Definition prog s t1 t2 (s1 : sub s t1 t2) : Prop.
-destruct t1.
-exact True.
-exact True.
-exact ((*(exists u1 u2, s1 = SAnd1 (And t1_1 t1_2) _ _ u1 u2) \/*) (exists u, s1 = SAnd2 _ _ _ u) \/ (exists u, s1 = SAnd3 _ _ _ u)).
-exact True.
-Defined.
-
-Lemma invAnd : forall s t x (u : sub s t x), prog s t x u.
-Proof.
-intros.
-unfold prog.
-destruct t.
-auto.auto.
-inversion u.
-
-assert (t = And t1 t2).
-admit.
-rewrite H.
-*)
 (* Orthogonality: Implementation *)
-
 
 Inductive Ortho : forall s, PTyp s -> PTyp s -> Prop :=
   | OAnd1 : forall t1 t2 t3, Ortho Inter t1 t3 -> Ortho Inter t2 t3 -> Ortho Inter (And t1 t2) t3
   | OAnd2 : forall t1 t2 t3, Ortho Inter t1 t2 -> Ortho Inter t1 t3 -> Ortho Inter t1 (And t2 t3)
   | OLift : forall t1 t2, not (sub Base t1 t2) -> not (sub Base t2 t1) -> Ortho Inter (Lift t1) (Lift t2).
+
+(* Well-formed types *)
+
+Inductive WFType : forall s, PTyp s -> Prop :=
+  | WFPInt : WFType Base PInt
+  | WFFun  : forall t1 t2, WFType Inter t1 -> WFType Inter t2 -> WFType Base (Fun t1 t2)
+  | WFAnd  : forall t1 t2, Ortho Inter t1 t2 -> WFType Inter t1 -> WFType Inter t2 -> WFType Inter (And t1 t2).
 
 (* Orthogonality: Specification *)
 
@@ -152,36 +98,6 @@ induction t1; intros; auto.
 Defined.
 
 Definition OrthoS (s:S) (A B : PTyp s) := not (exists C, sub s A C /\ sub s B C).
-
-
-Definition prog s (t2 : PTyp s) : Prop.
-intros.
-destruct s.
-exact True.
-exact ((exists t3, t2 = Lift t3) \/ (exists t3 t4, t2 = And t3 t4)).
-Defined.
-
-Print prog.
-
-Lemma inv : 
-  forall s (t2 : PTyp s), prog s t2.
-intros; unfold prog.
-destruct t2.
-auto.
-auto.
-right.
-exists t2_1.
-exists t2_2.
-reflexivity.
-left.
-exists t2.
-reflexivity.
-Defined.
-
-Lemma invInter (t2 : PTyp Inter) : (exists t3 : PTyp Base, t2 = Lift t3) \/ (exists t3 t4 : PTyp Inter, t2 = And t3 t4).
-unfold prog.
-apply (inv Inter).
-Defined.
 
 Lemma ortho_completness : forall s (t1 t2 : PTyp s), (s = Inter) -> OrthoS s t1 t2 -> Ortho s t1 t2.
 Proof.
@@ -569,6 +485,35 @@ exact H2.
 exact H0.
 Defined.
 
+
+Definition prog s (t2 : PTyp s) : Prop.
+intros.
+destruct s.
+exact True.
+exact ((exists t3, t2 = Lift t3) \/ (exists t3 t4, t2 = And t3 t4)).
+Defined.
+
+Print prog.
+
+Lemma inv : 
+  forall s (t2 : PTyp s), prog s t2.
+intros; unfold prog.
+destruct t2.
+auto.
+auto.
+right.
+exists t2_1.
+exists t2_2.
+reflexivity.
+left.
+exists t2.
+reflexivity.
+Defined.
+
+Lemma invInter (t2 : PTyp Inter) : (exists t3 : PTyp Base, t2 = Lift t3) \/ (exists t3 t4 : PTyp Inter, t2 = And t3 t4).
+unfold prog.
+apply (inv Inter).
+Defined.
 
 
 Definition substitutability :
