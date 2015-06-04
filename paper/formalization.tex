@@ -1,5 +1,7 @@
 \documentclass[preprint]{sigplanconf}
 
+\usepackage{comment}
+
 \input{packages.tex}
 \input{macros.tex}
 
@@ -201,6 +203,7 @@
 \end{figure}
 
 
+\begin{comment}
 \begin{figure}
   \begin{mathpar}
     \framebox{$ A~atomic$} \\
@@ -220,6 +223,7 @@
   \end{mathpar}
   \caption{Atomic types.}
 \end{figure}
+\end{comment}
 
 \begin{figure}
   \begin{mathpar}
@@ -241,9 +245,35 @@
       {\isdisjoint \Gamma A B \\ \isdisjoint \Gamma A C}
       {\isdisjoint \Gamma {A} {B \& C}}
 
+\inferrule* [right=DisjointFun]
+      {\isdisjoint \Gamma B D}
+      {\isdisjoint \Gamma {A \to B} {C \to D}}\\
+
+\inferrule* [right=DisjointForall]
+      {\isdisjoint \Gamma A C}
+      {\isdisjoint \Gamma {\for {\alpha * B} A} {\for {\alpha * B} C}}\\
+
 \inferrule* [right=DisjointAtomic]
-      {A \not<: B \\ B \not<: A \\ A~atomic \\ B~atomic}
-      {\isdisjoint \Gamma {A} {B}}
+      {A \not\sim B}
+      {\isdisjoint \Gamma {A} {B}}\\
+
+\framebox{$ A \not\sim B$} \\
+
+\inferrule* [right=NotSimBot1]
+      {}
+      {\bot \not\sim A \to B}
+
+\inferrule* [right=NotSimBot2]
+      {}
+      {\bot \not\sim \for {\alpha * B} A}
+
+\inferrule* [right=NotSimFunForall]
+      {}
+      {A \to B \not\sim \for {\alpha * B} A}
+
+\inferrule* [right=NotSimFunForall]
+      {B \not\sim A}
+      {A \not\sim B}
 
   \end{mathpar}
   \caption{Disjointness.}
@@ -340,6 +370,9 @@
   functions. It shows that in order to check disjointness 
   of functions we must also check disjointness of the subcomponents. 
 
+\item $(\lambda (f: Int \to Int) . \lambda (g : Bool \to Int) . ((f,,g) : Bool \& Int \to Int)$: 
+  This example shows that whenever the return types overlap, so does the function type: 
+  we can always find a common subtype for the argument types.
 \end{enumerate}
 
 \subsection{Achieving Coherence}
