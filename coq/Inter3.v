@@ -13,9 +13,11 @@ Inductive PTyp : Type :=
 
 (* Atomic types *)
 
+(*
 Inductive Atomic : PTyp -> Prop :=
   | AInt : Atomic PInt
   | AFun : forall t1 t2, Atomic (Fun t1 t2).
+*)
 
 Require Import Arith.
 Require Import Setoid.
@@ -34,7 +36,11 @@ Inductive sub : PTyp -> PTyp -> Prop :=
 Inductive Ortho : PTyp -> PTyp -> Prop :=
   | OAnd1 : forall t1 t2 t3, Ortho t1 t3 -> Ortho t2 t3 -> Ortho (And t1 t2) t3
   | OAnd2 : forall t1 t2 t3, Ortho t1 t2 -> Ortho t1 t3 -> Ortho t1 (And t2 t3)
-  | OLift : forall t1 t2, not (sub t1 t2) -> not (sub t2 t1) -> Atomic t1 -> Atomic t2 -> Ortho t1 t2.
+  | OFun  : forall t1 t2 t3 t4, Ortho t2 t4 -> Ortho (Fun t1 t2) (Fun t3 t4)
+  | OIntFun : forall t1 t2, Ortho PInt (Fun t1 t2)
+  | OFunInt : forall t1 t2, Ortho (Fun t1 t2) PInt.
+
+(*  | OLift : forall t1 t2, not (sub t1 t2) -> not (sub t2 t1) -> Atomic t1 -> Atomic t2 -> Ortho t1 t2. *)
 
 (* Orthogonality: Specification *)
 
@@ -66,9 +72,10 @@ inversion H0.
 inversion H0.
 assert (t1 = PInt). apply  IHWFTyp1. auto. rewrite H8 in H2.
 assert (t2 = PInt). apply  IHWFTyp2. auto. rewrite H9 in H2.
-inversion H2. destruct H10. apply reflex.
+inversion H2. 
 Defined.
 
+(*
 Lemma invWFSFun : forall t1 t2 t3, WFTyp t3 -> sub (Fun t1 t2) t3 -> exists t4 t5, sub t4 t1 /\ sub t2 t5 /\ t3 = Fun t4 t5. 
 Proof.
 intros.
@@ -81,7 +88,9 @@ assert (exists t4 t5 : PTyp, sub t4 t1 /\ sub t2 t5 /\ t0 = Fun t4 t5). apply IH
 destruct H8. destruct H8. destruct H8. destruct H9. rewrite H10 in H2.
 assert (exists t4 t5 : PTyp, sub t4 t1 /\ sub t2 t5 /\ t3 = Fun t4 t5). apply IHWFTyp2. auto. 
 destruct H11. destruct H11. destruct H11. destruct H12. rewrite H13 in H2.
-admit.
+exists x. exists x0. split. exact H8. split. exact H9.
+inversion H2.
+admit.*)
 
 (* Orthogonality algorithm is complete *)
 
@@ -91,8 +100,7 @@ induction t1; intros; unfold OrthoS in H.
 (* Case PInt *)
 induction t2.
 destruct H. exists PInt. split; apply reflex.
-apply OLift; unfold not; unfold not in H; intros. apply H. inversion H0. inversion H0.
-exact AInt. apply AFun.
+apply OIntFun.
 apply OAnd2. apply IHt2_1. unfold not. unfold not in H. intros; apply H.
 destruct H0. destruct H0. 
 exists x. split. exact H0. apply SAnd2. exact H1.
@@ -102,15 +110,21 @@ split. auto. apply SAnd3.
 auto.
 (* Case Fun t1 t2 *)
 induction t2.
-apply OLift. unfold not. unfold not in H. intros. apply H.
-inversion H0.
-unfold not. unfold not in H. intros. apply H. inversion H0.
-apply AFun. apply AInt.
-apply OLift.
-unfold not. unfold not in H. intros. apply H. exists (Fun t2_1 t2_2).
-split. auto. apply reflex.
-unfold not. unfold not in H. intros. apply H. exists (Fun t1_1 t1_2).
-split. auto. apply reflex. auto. apply AFun. apply AFun.
+apply OFunInt. 
+apply OFun.
+apply IHt1_2. unfold OrthoS. unfold not. intros.
+unfold not in H. apply H.
+destruct H0. destruct H0.
+exists (Fun (And t1_1 t2_1) x).
+split.
+apply SFun.
+apply SAnd2.
+apply reflex.
+auto.
+apply SFun.
+apply SAnd3. apply reflex.
+auto.
+(* Case t11 -> t12 _|_ t21 & t22 *)
 apply OAnd2.
 apply IHt2_1.
 unfold not. unfold not in H. intros. apply H.
