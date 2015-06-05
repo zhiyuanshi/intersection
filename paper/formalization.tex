@@ -465,6 +465,53 @@ $A \bot B = \not \exists C. A <: C \wedge B <: C$
 %   \caption{Disjointness.}
 % \end{figure}
 
+\section{Polymorphism with disjoint constraint}
+
+With a subtyping relation in a type system, bounded polymorphism extends the universal quantifier by confining the polymorphic type to be a subtype of a given type. In our type system, the forall binder also extends the parametric polymorphism, but in a different vein: the polymorphic type can only be disjoint with a given type.
+
+\begin{itemize}
+  \item \textbf{Bounded polymorphism}---the instantiation can only be the descendant of a given type
+  \item \textbf{Polymorphism with disjoint constraint}---the instantiation cannot share a common ancestor with a given type
+\end{itemize}
+
+The intuition can be found in figure \ldots.
+
+% http://tex.stackexchange.com/questions/158876/drawing-subgroup-lattices-in-tikz
+\begin{figure}
+
+% center everything in the figure
+\centering
+% horizontal node distance
+\newcommand{\mydistance}{.6cm}
+\begin{tikzpicture}[node distance=2cm]
+\title{Untergruppenverband der $A_4$}
+\node(A4)                           {$A_4$};
+\node(V4)       [below right=2cm and 2cm of A4] {$V_4$};
+\node(C31)      [below left=2cm and 0cm of A4]  {$C_3$};
+\node(C32)      [left=\mydistance of C31]       {$C_3$};
+\node(C33)      [left=\mydistance of C32]       {$C_3$};
+\node(C34)      [left=\mydistance of C33]       {$C_3$};
+\node(C22)      [below=2cm of V4]       {$C_2$};
+\node(C21)      [left=\mydistance of C22]       {$C_2$};
+\node(C23)      [right=\mydistance of C22]      {$C_2$};
+\node(1)            [below=6cm of A4]     {$\left\{1\right\}$};
+\draw(A4)       -- (V4);
+\foreach \x\y in {1,2,3,4} {
+    \draw (A4) -- (C3\x) node [midway, fill=white] {3};
+    \draw (C3\x) -- (1);
+
+}
+\foreach \x\y in {1/2,2/3,3/4} {
+    \draw(V4) -- (C2\x) node [midway, fill=white] {2};
+\draw (C3\x) -- (C3\y);
+\draw (C2\x) -- (1);
+}
+\draw(C21)      -- (C22);
+\draw(C22)      -- (C23);
+\end{tikzpicture}
+\caption{Untergruppenverband}
+\end{figure}
+
 \section{Proof}
 
 \subsection{Sketch of the proof}
