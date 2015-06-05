@@ -287,7 +287,7 @@
       { }
       {\istype \Gamma \bot}
 
-\inferrule* [right=WFFun]
+    \inferrule* [right=WFFun]
       {\istype \Gamma A \\ \istype \Gamma B}
       {\istype \Gamma {A \to B}}
 
@@ -295,11 +295,11 @@
       {\istype \Gamma B \\ \istype {\Gamma, \alpha * B} A}
       {\istype \Gamma {\for {\alpha * B} A}}
 
- \inferrule* [right=WFVar]
+    \inferrule* [right=WFVar]
       {\alpha * A \in \Gamma}
       {\istype \Gamma \alpha}
 
-\inferrule* [right=WFInter]
+    \inferrule* [right=WFInter]
       {\istype \Gamma A \\ \istype \Gamma B \\ \isdisjoint \Gamma A B}
       {\istype \Gamma {A \intersect B}}
 
@@ -537,12 +537,16 @@ For the second claim, let's suppose the contrary. Then it is impossible that $A 
 The coercion of a subtyping relation $A \subtype B$ is uniquely determined.
 
 \begin{lemma}[Unique coercion] \label{unique-coercion}
-If $A \subtype B \yields {C_1}$ and $A \subtype B \yields {C_2}$, then $C_1 \equiv C_2$
+If $A \subtype B \yields {C_1}$ and $A \subtype B \yields {C_2}$, where $A$ and $B$ are well-formed types, then $C_1 \equiv C_2$
 \end{lemma}
 
 \begin{proof}
 By \ref{unique-subtype-contributor}.
 \end{proof}
+
+\begin{lemma} \label{wf-typing}
+If $\hastype \Gamma e \tau \yields E$, then $\tau$ is a well-formed type.
+\end{lemma}
 
 Given a source expression $e$, elaboration always produces the same target expression $E$.
 
