@@ -101,7 +101,8 @@ induction t1; intros; unfold OrthoS in H.
 induction t2.
 destruct H. exists PInt. split; apply reflex.
 apply OIntFun.
-apply OAnd2. apply IHt2_1. unfold not. unfold not in H. intros; apply H.
+apply OAnd2. 
+apply IHt2_1. unfold not. unfold not in H. intros; apply H.
 destruct H0. destruct H0. 
 exists x. split. exact H0. apply SAnd2. exact H1.
 apply IHt2_2. unfold not. unfold not in H. intros. apply H.
@@ -170,30 +171,109 @@ apply H.
 exists t1. split. apply reflex. auto.
 Defined.
 
+
+Lemma invAndS1 : forall t t1 t2, sub t (And t1 t2) -> sub t t1 /\ sub t t2.
+Proof.
+induction t; intros.
+(* Case Int *)
+inversion H.
+split; auto.
+(* Case Fun *)
+inversion H.
+split; auto.
+(* Case And *)
+inversion H.
+split; auto.
+assert (sub t1 t0 /\ sub t1 t3).
+apply IHt1.
+auto.
+destruct H4.
+split.
+apply SAnd2.
+auto.
+apply SAnd2.
+auto.
+assert (sub t2 t0 /\ sub t2 t3).
+apply IHt2.
+auto.
+destruct H4.
+split.
+apply SAnd3.
+auto.
+apply SAnd3.
+auto.
+Defined.
+
+Lemma uniquesub : forall A B C, 
+  WFTyp A -> WFTyp B -> WFTyp C -> OrthoS A B -> sub (And A B) C -> (sub A C /\ not (sub B C)) \/ (not (sub A C) /\ sub B C).
+Proof.
+intros. unfold OrthoS in H2.
+induction H1.
+inversion H3. left. split. auto. unfold not. intros.
+unfold OrthoS in H2. apply H2. exists PInt. split; auto.
+right. split. unfold not. intros.
+unfold OrthoS in H2. apply H2. exists PInt. split; auto. auto.
+inversion H3. left. split. auto. unfold not. intros.
+unfold OrthoS in H2. apply H2. exists (Fun t1 t2). split; auto.
+right. split. unfold not. intros.
+unfold OrthoS in H2. apply H2. exists (Fun t1 t2). split; auto. auto.
+(* Interesting case *)
+assert (sub (And A B) t1 /\ sub (And A B) t2). apply invAndS1. auto.
+destruct H4.
+assert (sub A t1 /\ ~ sub B t1 \/ ~ sub A t1 /\ sub B t1). apply IHWFTyp1. auto. auto.
+assert (sub A t2 /\ ~ sub B t2 \/ ~ sub A t2 /\ sub B t2). apply IHWFTyp2. auto. auto.
+clear IHWFTyp1. clear IHWFTyp2.
+
+destruct H6; destruct H7; destruct H6; destruct H7.
+left. split.
+apply SAnd1. auto. auto. unfold not. intros. 
+admit.
+left. split.
+apply SAnd1. auto.
+
 (* use only well-formed types ? *)
-Lemma ortho_soundness : forall (t1 t2 : PTyp), Ortho t1 t2 -> OrthoS t1 t2.
+Lemma ortho_soundness : forall (t1 t2 : PTyp), WFTyp t1 -> WFTyp t2 -> Ortho t1 t2 -> OrthoS t1 t2.
+(*
+induction t1. induction t2; intros. inversion H. unfold OrthoS. unfold not. intros.
+inversion H.*)
 intros.
-induction H. admit. admit. 
+induction H1.
+unfold OrthoS. unfold not. unfold OrthoS in IHOrtho1. unfold not in IHOrtho1. intros.
+destruct H1. destruct H1. inversion H.
+induction x.
+inversion H1.
+apply IHOrtho1. auto. auto. exists PInt; split; auto.
+unfold OrthoS in IHOrtho2. unfold not in IHOrtho2.
+apply IHOrtho2. auto. auto. exists PInt; split; auto.
+inversion H1.
+apply IHOrtho1. auto. auto.
+exists (Fun x1 x2); split; auto.
+apply IHOrtho2. auto. auto.
+exists (Fun x1 x2); split; auto.
+inversion H1. inversion H2. apply IHx1. auto. auto. 
+inversion H2. apply IHx1. auto. auto.
+admit.
+admit.
 (* Case FunFun *)
 unfold OrthoS. unfold not. intros.
-unfold OrthoS in IHOrtho. apply IHOrtho.
-destruct H0. destruct H0. generalize H0. generalize H1. clear H0. clear H1.
-induction x; intros. inversion H0. exists x2.
-split. inversion H0. auto. inversion H1. auto.
+unfold OrthoS in IHOrtho. apply IHOrtho. inversion H. auto. inversion H0. auto.
+destruct H2. destruct H2. generalize H2. generalize H3. clear H2. clear H3.
+induction x; intros. inversion H3. exists x2.
+split. inversion H2. auto. inversion H3. auto.
 apply IHx1.
-inversion H1. auto.
-inversion H0. auto.
+inversion H3. auto.
+inversion H2. auto.
 (* Case IntFun *)
 unfold OrthoS. unfold not. intros.
-destruct H. destruct H. induction x. inversion H0. inversion H.
+destruct H1. destruct H1. induction x. inversion H2. inversion H1.
 apply IHx1.
-inversion H. auto.
-inversion H0. auto. 
+inversion H1. auto.
+inversion H2. auto. 
 (* Case FunInt *)
 unfold OrthoS. unfold not. intros.
-destruct H. destruct H. induction x. inversion H. inversion H0.
-apply IHx1. inversion H. auto.
-inversion H0. auto.
+destruct H1. destruct H1. induction x. inversion H1. inversion H2.
+apply IHx1. inversion H1. auto.
+inversion H2. auto.
 Defined.
 
 Lemma ortho_soundness : forall s (t1 t2 : PTyp s), (s = Inter) -> OrthoS s t1 t2 -> Ortho s t1 t2.
@@ -262,6 +342,7 @@ rewrite H in H0.
 admit.
 admit.
 Defined.
+
 
 
 Lemma ortho_soundness : forall s (t1 t2 : PTyp s), (s = Inter) -> OrthoS s t1 t2 -> Ortho s t1 t2.
