@@ -281,27 +281,27 @@
 
 \begin{figure}
   \begin{mathpar}
-    \framebox{$ \Gamma \turns A~type$} \\
+    \framebox{$\istype \Gamma \tau$} \\
 
     \inferrule* [right=WFBot]
-      {}
-      {\Gamma \turns \bot~type}
+      { }
+      {\istype \Gamma \bot}
 
 \inferrule* [right=WFFun]
-      {\Gamma \turns A~type \\ \Gamma \turns B~type}
-      {\Gamma \turns A \to B~type}
+      {\istype \Gamma A \\ \istype \Gamma B}
+      {\istype \Gamma {A \to B}}
 
     \inferrule* [right=WFForall]
-      {\Gamma, \alpha * B \turns A~type}
-      {\Gamma \turns \for {\alpha * B} A~type}
+      {\istype \Gamma B \\ \istype {\Gamma, \alpha * B} A}
+      {\istype \Gamma {\for {\alpha * B} A}}
 
  \inferrule* [right=WFVar]
       {\alpha * A \in \Gamma}
-      {\Gamma \turns \alpha~type}
+      {\istype \Gamma \alpha}
 
 \inferrule* [right=WFInter]
-      {\Gamma \turns A~type \\ \Gamma \turns B~type \\ \isdisjoint \Gamma A B}
-      {\Gamma \turns A \intersect B type}
+      {\istype \Gamma A \\ \istype \Gamma B \\ \isdisjoint \Gamma A B}
+      {\istype \Gamma {A \intersect B}}
 
   \end{mathpar}
   \caption{Well-formed types.}
