@@ -208,11 +208,11 @@
   \begin{mathpar}
     \framebox{$ A~atomic$} \\
 
-    \inferrule* 
+    \inferrule*
       {}
       {\bot~atomic}
 
-\inferrule* 
+\inferrule*
       {}
       {A \to B~atomic}
 
@@ -364,32 +364,32 @@
   type-checking the large merge, the disjointness predicate will
   detect that more than one integer exists in the merge.
 
-\item $(\lambda (f: Int \to Int \& Bool) . \lambda (g : Int \to Char \& Bool) . ((f,,g) : Int \to Bool)$: 
+\item $(\lambda (f: Int \to Int \& Bool) . \lambda (g : Int \to Char \& Bool) . ((f,,g) : Int \to Bool)$:
   This example
   should not type-check, since it leads to an ambigous lookup of
-  functions. It shows that in order to check disjointness 
-  of functions we must also check disjointness of the subcomponents. 
+  functions. It shows that in order to check disjointness
+  of functions we must also check disjointness of the subcomponents.
 
-\item $(\lambda (f: Int \to Int) . \lambda (g : Bool \to Int) . ((f,,g) : Bool \& Int \to Int)$: 
-  This example shows that whenever the return types overlap, so does the function type: 
+\item $(\lambda (f: Int \to Int) . \lambda (g : Bool \to Int) . ((f,,g) : Bool \& Int \to Int)$:
+  This example shows that whenever the return types overlap, so does the function type:
   we can always find a common subtype for the argument types.
 \end{enumerate}
 
 \subsection{Achieving Coherence}
 
-The crutial challenge lies in the generation of coercions, which can lead 
-to different results due to multiple possible choices in the rules that 
-can be used. In particular the rules SubAnd1 and SubAnd2 overlap and 
+The crutial challenge lies in the generation of coercions, which can lead
+to different results due to multiple possible choices in the rules that
+can be used. In particular the rules SubAnd1 and SubAnd2 overlap and
 can result in coercions that are not equivalent. A simple example is:
 
 $(\lambda (x:Int) . x) (1,,2)$
 
-The result of this program can be either 1 or 2 depending on whether 
-we chose SubAnd1 or SubAnd2. 
+The result of this program can be either 1 or 2 depending on whether
+we chose SubAnd1 or SubAnd2.
 
-Therefore the challenge of coherence lies in ensuring that, for any given 
-types A and B, the result of $A <: B$ always leads to the same (or semantically 
-equivalent) coercions. 
+Therefore the challenge of coherence lies in ensuring that, for any given
+types A and B, the result of $A <: B$ always leads to the same (or semantically
+equivalent) coercions.
 
 It is clear that, in general, the following does not hold:
 
@@ -402,15 +402,15 @@ $(Int\&Int) <: Int \leadsto \lambda (x,y). y$\\
 
 However $\lambda (x,y). x$ and $\lambda (x,y). y$ are not semantically equivalent.
 
-One simple observation is that the use of the subtyping relation on the 
-example uses an ill-formed type ($Int\&Int$). Since the type system can prevent 
-such bad uses of ill-formed types, it could be that if we only allow well-formed 
-types then the uses of the subtyping relation do produce equivalent coercions. 
+One simple observation is that the use of the subtyping relation on the
+example uses an ill-formed type ($Int\&Int$). Since the type system can prevent
+such bad uses of ill-formed types, it could be that if we only allow well-formed
+types then the uses of the subtyping relation do produce equivalent coercions.
 Therefore the we postulate the following conjecture:
 
 $if~A <: B \leadsto C1~and~A <: B \leadsto C2~and~A, B~well~formed~then~C1 = C2$
 
-If the following conjecture does hold then it should be easy to prove that 
+If the following conjecture does hold then it should be easy to prove that
 the translation is coherent.
 
 \begin{mathpar}
@@ -419,18 +419,18 @@ the translation is coherent.
   {\hastype \epsilon {1 \mergeOp 2} {\constraints {\integer \disjoint \integer} \integer \intersect \integer}}
 \end{mathpar}
 
-\begin{definition}{(Disjointness)}
-Two sets $S$ and $T$ are \emph{disjoint} if there does not exist an element $x$, such that $x \in S$ and $x \in T$.
-\end{definition}
+% \begin{definition}{(Disjointness)}
+% Two sets $S$ and $T$ are \emph{disjoint} if there does not exist an element $x$, such that $x \in S$ and $x \in T$.
+% \end{definition}
 
-\begin{definition}{(Disjointness)}
-Two types $A$ and $B$ are \emph{disjoint} if there does not exist an expression $e$, which is not a merge, such that $\hastype \epsilon e A'$, $\hastype \epsilon e B'$, $A' \subtype A$, and $B' \subtype B$.
-\end{definition}
+% \begin{definition}{(Disjointness)}
+% Two types $A$ and $B$ are \emph{disjoint} if there does not exist an expression $e$, which is not a merge, such that $\hastype \epsilon e A'$, $\hastype \epsilon e B'$, $A' \subtype A$, and $B' \subtype B$.
+% \end{definition}
 
-\begin{definition}{(Disjointness)}
-$A \bot B = \not \exists C. A <: C \wedge B <: C$ \\
+We say two types are \emph{disjoint} if they do not share a common supertype.
 
-Two types $A$ and $B$ are \emph{disjoint} if their least common supertype is $\top$.
+\begin{definition}[Disjointness]
+$A \bot B = \not \exists C. A <: C \wedge B <: C$
 \end{definition}
 
 % \begin{figure}
@@ -464,5 +464,43 @@ Two types $A$ and $B$ are \emph{disjoint} if their least common supertype is $\t
 %
 %   \caption{Disjointness.}
 % \end{figure}
+
+\section{Proof}
+
+\subsection{Sketch of the proof}
+
+\begin{lemma}[Unique subtype contributor] \label{unique-subtype-contributor}
+If $A \intersect B \subtype C$, where $A \intersect B$ and $C$ are well-formed types, then one and only one of the following is possible:
+\begin{enumerate}
+\item $A \subtype C$
+\item $B \subtype C$
+\end{enumerate}
+\end{lemma}
+
+If $A \intersect B \subtype C$, then either $A$ or $B$ contributes to that subtyping relation, but not both. The implication of this lemma is that during the derivation, it is not possible that two rules are applicable.
+
+\begin{proof}
+Idea: First we will show that the $A \subtype C$ and $B \subtype C$ cannot hold simultaneously. Then we will show that at least one of them holds.
+
+For the first claim, since $A \intersect B$ is well-formed, $A \disjoint B$. Then by the definition of disjointness, there does not exist a type $C$ such that $A \subtype C$ and $B \subtype C$. It follows that $A \subtype C$ and $B \subtype C$ cannot hold simultaneously.
+
+For the second claim, let's suppose the contrary. Then it is impossible that $A \intersect B \subtype C$.
+\end{proof}
+
+The coercion of a subtyping relation $A \subtype B$ is uniquely determined.
+
+\begin{lemma}[Unique coercion] \label{unique-coercion}
+If $A \subtype B \yields {C_1}$ and $A \subtype B \yields {C_2}$, then $C_1 \equiv C_2$
+\end{lemma}
+
+\begin{proof}
+By \ref{unique-subtype-contributor}.
+\end{proof}
+
+Given a source expression $e$, elaboration always produces the same target expression $E$.
+
+\begin{theorem}[Unique elaboration] \label{unique-elaboration}
+If $\hastype \Gamma e {\tau_1} \yields {E_1}$ and $\hastype \Gamma e {\tau_2} \yields {E_2}$, then $E_1 \equiv E_2$
+\end{theorem}
 
 \end{document}
