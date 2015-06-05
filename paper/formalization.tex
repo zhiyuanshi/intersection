@@ -281,27 +281,27 @@
 
 \begin{figure}
   \begin{mathpar}
-    \framebox{$ \Gamma \turns A~type$} \\
+    \framebox{$\istype \Gamma \tau$} \\
 
     \inferrule* [right=WFBot]
-      {}
-      {\Gamma \turns \bot~type}
+      { }
+      {\istype \Gamma \bot}
 
-\inferrule* [right=WFFun]
-      {\Gamma \turns A~type \\ \Gamma \turns B~type}
-      {\Gamma \turns A \to B~type}
+    \inferrule* [right=WFFun]
+      {\istype \Gamma A \\ \istype \Gamma B}
+      {\istype \Gamma {A \to B}}
 
     \inferrule* [right=WFForall]
-      {\Gamma, \alpha * B \turns A~type}
-      {\Gamma \turns \for {\alpha * B} A~type}
+      {\istype \Gamma B \\ \istype {\Gamma, \alpha * B} A}
+      {\istype \Gamma {\for {\alpha * B} A}}
 
- \inferrule* [right=WFVar]
+    \inferrule* [right=WFVar]
       {\alpha * A \in \Gamma}
-      {\Gamma \turns \alpha~type}
+      {\istype \Gamma \alpha}
 
-\inferrule* [right=WFInter]
-      {\Gamma \turns A~type \\ \Gamma \turns B~type \\ \isdisjoint \Gamma A B}
-      {\Gamma \turns A \intersect B type}
+    \inferrule* [right=WFInter]
+      {\istype \Gamma A \\ \istype \Gamma B \\ \isdisjoint \Gamma A B}
+      {\istype \Gamma {A \intersect B}}
 
   \end{mathpar}
   \caption{Well-formed types.}
@@ -375,7 +375,7 @@
   we can always find a common subtype for the argument types.
 \end{enumerate}
 
-\subsection{Achieving Coherence}
+\subsection{Achieving coherence}
 
 The crutial challenge lies in the generation of coercions, which can lead
 to different results due to multiple possible choices in the rules that
@@ -512,6 +512,31 @@ The intuition can be found in figure \ldots.
 \caption{Untergruppenverband}
 \end{figure}
 
+\section{Intuition for the disjoint rules}
+
+The problem with the definition of disjointness is that it is a search problem. In this section, we are going to convert it that into an algorithm.
+
+Let $\universe_0$ be the universe of $\tau$ types. Let $\universe$ be the quotient set of $\universe_0$ by $\approx$, where $\approx$ is defined by \ldots.
+
+Let $\commonsuper$ be the ``common supertype'' function, and $\commonsub$ be the ``common subtype'' function. For example, assume $\integer$ and $\character$ share no common supertype. Then the fact can be expressed by $\commonsuper(\integer,\character)=\emptyset$. Formally,
+\begin{align*}
+  \commonsuper &: \universe \times \universe \to \powerset {\universe} \\
+  \commonsub   &: \universe \times \universe \to \powerset {\universe}
+\end{align*}
+which, given two types, computes the set of their common supertypes. ($\powerset S$ denotes the power set of $S$, that is, the set of all subsets of $S$.)
+
+\begin{align*}
+  \commonsuper(\alpha,\alpha) &= \{ \alpha \} \\
+  \commonsuper(\bot,\bot) &= \{ \bot \} \\
+  \commonsuper(\tau_1 \to \tau_2, \tau_3 \to \tau_4) &= \commonsub(\tau_1,\tau_3) \to \commonsuper(\tau_2,\tau_4) \\
+  \commonsuper({\tau_1 \intersect \tau_2, \tau_3}) &= \commonsuper(\tau_1, \tau_3) \cup \commonsuper(\tau_1,\tau_3) \\
+  \commonsuper({\tau_1, \tau_2 \intersect \tau_3}) &= \commonsuper(\tau_1, \tau_2) \cup \commonsuper(\tau_1,\tau_3)
+\end{align*}
+
+Notation. We use $\commonsub(\tau_1,\tau_3) \to \commonsuper(\tau_2,\tau_4)$ as a shorthand for $\{ s \to t ~|~ s \in \commonsub(\tau_1 \to \tau_2), t \in \commonsuper(\tau_2,\tau_4) \}$.
+
+Note that there always exists a common subtype of any two given types (case disjoint / case nondisjoint).
+
 \section{Proof}
 
 \subsection{Sketch of the proof}
@@ -537,17 +562,31 @@ For the second claim, let's suppose the contrary. Then it is impossible that $A 
 The coercion of a subtyping relation $A \subtype B$ is uniquely determined.
 
 \begin{lemma}[Unique coercion] \label{unique-coercion}
-If $A \subtype B \yields {C_1}$ and $A \subtype B \yields {C_2}$, then $C_1 \equiv C_2$
+If $A \subtype B \yields {C_1}$ and $A \subtype B \yields {C_2}$, where $A$ and $B$ are well-formed types, then $C_1 \equiv C_2$
 \end{lemma}
 
 \begin{proof}
 By \ref{unique-subtype-contributor}.
 \end{proof}
 
+\begin{lemma} \label{wf-typing}
+If $\hastype \Gamma e \tau \yields E$, then $\tau$ is a well-formed type.
+\end{lemma}
+
 Given a source expression $e$, elaboration always produces the same target expression $E$.
 
 \begin{theorem}[Unique elaboration] \label{unique-elaboration}
 If $\hastype \Gamma e {\tau_1} \yields {E_1}$ and $\hastype \Gamma e {\tau_2} \yields {E_2}$, then $E_1 \equiv E_2$
 \end{theorem}
+
+\section{Application of the theory}
+
+\subsection{Systems without subtyping}
+
+\subsection{Systems with a top type}
+
+In type systems with a top type (such as \lstinline@Object@ in some OO languages), the definition of disjointness can be modified to:
+
+We say two types are \emph{disjoint} if their only common supertype is the top type.
 
 \end{document}
