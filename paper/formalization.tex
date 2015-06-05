@@ -529,8 +529,8 @@ which, given two types, computes the set of their common supertypes. ($\powerset
   \commonsuper(\alpha,\alpha) &= \{ \alpha \} \\
   \commonsuper(\bot,\bot) &= \{ \bot \} \\
   \commonsuper(\tau_1 \to \tau_2, \tau_3 \to \tau_4) &= \commonsub(\tau_1,\tau_3) \to \commonsuper(\tau_2,\tau_4) \\
-  \commonsuper({\tau_1 \intersect \tau_2, \tau_3}) &= \commonsuper(\tau_1, \tau_3) \cup \commonsuper(\tau_1,\tau_3) \\
-  \commonsuper({\tau_1, \tau_2 \intersect \tau_3}) &= \commonsuper(\tau_1, \tau_2) \cup \commonsuper(\tau_1,\tau_3)
+  % \commonsuper({\tau_1 \intersect \tau_2, \tau_3}) &= \commonsuper(\tau_1, \tau_3) \cup \commonsuper(\tau_1,\tau_3) \\
+  % \commonsuper({\tau_1, \tau_2 \intersect \tau_3}) &= \commonsuper(\tau_1, \tau_2) \cup \commonsuper(\tau_1,\tau_3)
 \end{align*}
 
 Notation. We use $\commonsub(\tau_1,\tau_3) \to \commonsuper(\tau_2,\tau_4)$ as a shorthand for $\{ s \to t ~|~ s \in \commonsub(\tau_1 \to \tau_2), t \in \commonsuper(\tau_2,\tau_4) \}$.
@@ -542,7 +542,7 @@ Note that there always exists a common subtype of any two given types (case disj
 \subsection{Sketch of the proof}
 
 \begin{lemma}[Unique subtype contributor] \label{unique-subtype-contributor}
-If $A \intersect B \subtype C$, where $A \intersect B$ and $C$ are well-formed types, then one and only one of the following is possible:
+If $A \intersect B \subtype C$, where $A \intersect B$ and $C$ are well-formed types, then it is not possible that the following holds at the same time:
 \begin{enumerate}
 \item $A \subtype C$
 \item $B \subtype C$
@@ -552,11 +552,7 @@ If $A \intersect B \subtype C$, where $A \intersect B$ and $C$ are well-formed t
 If $A \intersect B \subtype C$, then either $A$ or $B$ contributes to that subtyping relation, but not both. The implication of this lemma is that during the derivation, it is not possible that two rules are applicable.
 
 \begin{proof}
-Idea: First we will show that the $A \subtype C$ and $B \subtype C$ cannot hold simultaneously. Then we will show that at least one of them holds.
-
-For the first claim, since $A \intersect B$ is well-formed, $A \disjoint B$. Then by the definition of disjointness, there does not exist a type $C$ such that $A \subtype C$ and $B \subtype C$. It follows that $A \subtype C$ and $B \subtype C$ cannot hold simultaneously.
-
-For the second claim, let's suppose the contrary. Then it is impossible that $A \intersect B \subtype C$.
+Since $A \intersect B$ is well-formed, $A \disjoint B$. Then by the definition of disjointness, there does not exist a type $C$ such that $A \subtype C$ and $B \subtype C$. It follows that $A \subtype C$ and $B \subtype C$ cannot hold simultaneously.
 \end{proof}
 
 The coercion of a subtyping relation $A \subtype B$ is uniquely determined.
