@@ -205,9 +205,19 @@ auto.
 Defined.
 
 Lemma uniquesub : forall A B C, 
-  WFTyp A -> WFTyp B -> WFTyp C -> OrthoS A B -> sub (And A B) C -> (sub A C /\ not (sub B C)) \/ (not (sub A C) /\ sub B C).
+  OrthoS A B -> sub (And A B) C -> not (sub A C /\ sub B C).
 Proof.
-intros. unfold OrthoS in H2.
+intros. unfold OrthoS in H. unfold not. intros. apply H. exists C. auto.
+Defined.
+
+Lemma uniquesub2 : forall A B C, 
+  Ortho A B -> sub (And A B) C -> not (sub A C /\ sub B C).
+Proof.
+admit.
+Defined.
+(*
+induction H2.
+ 
 induction H1.
 inversion H3. left. split. auto. unfold not. intros.
 unfold OrthoS in H2. apply H2. exists PInt. split; auto.
@@ -230,6 +240,7 @@ apply SAnd1. auto. auto. unfold not. intros.
 admit.
 left. split.
 apply SAnd1. auto.
+*)
 
 (* use only well-formed types ? *)
 Lemma ortho_soundness : forall (t1 t2 : PTyp), WFTyp t1 -> WFTyp t2 -> Ortho t1 t2 -> OrthoS t1 t2.
@@ -238,8 +249,9 @@ induction t1. induction t2; intros. inversion H. unfold OrthoS. unfold not. intr
 inversion H.*)
 intros.
 induction H1.
-unfold OrthoS. unfold not. unfold OrthoS in IHOrtho1. unfold not in IHOrtho1. intros.
-destruct H1. destruct H1. inversion H.
+inversion H.
+unfold OrthoS. unfold not.  intros.
+destruct H6. destruct H6. assert (not (sub t1 x /\ sub t2 x)). apply uniquesub2; auto.
 induction x.
 inversion H1.
 apply IHOrtho1. auto. auto. exists PInt; split; auto.
