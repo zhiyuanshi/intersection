@@ -210,6 +210,15 @@ Proof.
 intros. unfold OrthoS in H. unfold not. intros. apply H. exists C. auto.
 Defined.
 
+(*
+Lemma uniquesub2 : forall A B C, 
+  OrthoS A B -> sub (And A B) C -> (sub A C /\ not (sub B C)) \/ (not (sub A C) /\ sub B C) \/ (not (sub A C) /\ not (sub B C)).
+Proof.
+intros.
+assert (not (sub A C /\ sub B C)). apply uniquesub. auto. auto.
+Defined.
+*)
+
 Lemma uniquesub2 : forall A B C, 
   Ortho A B -> sub (And A B) C -> not (sub A C /\ sub B C).
 Proof.
@@ -242,6 +251,25 @@ left. split.
 apply SAnd1. auto.
 *)
 
+Lemma ortho_sym : forall A B, OrthoS A B -> OrthoS B A.
+Proof.
+unfold OrthoS. unfold not.
+intros. apply H.
+destruct H0. destruct H0.
+exists x.
+split; auto.
+Defined.
+
+Lemma ortho_and : forall A B C, OrthoS A C -> OrthoS B C -> OrthoS (And A B) C.
+Proof.
+intros. unfold OrthoS.
+unfold not. intros.
+destruct H1. destruct H1.
+unfold OrthoS in H. unfold OrthoS in H0. unfold not in H. unfold not in H0.
+induction x.
+
+Defined.
+
 (* use only well-formed types ? *)
 Lemma ortho_soundness : forall (t1 t2 : PTyp), WFTyp t1 -> WFTyp t2 -> Ortho t1 t2 -> OrthoS t1 t2.
 (*
@@ -249,6 +277,16 @@ induction t1. induction t2; intros. inversion H. unfold OrthoS. unfold not. intr
 inversion H.*)
 intros.
 induction H1.
+inversion H.
+assert (OrthoS t1 t3). apply IHOrtho1; auto.
+assert (OrthoS t2 t3). apply IHOrtho2; auto.
+apply ortho_and; auto.
+inversion H0.
+assert (OrthoS t2 t1). apply ortho_sym. apply IHOrtho1; auto.
+assert (OrthoS t3 t1). apply ortho_sym. apply IHOrtho2; auto.
+apply ortho_sym.
+apply ortho_and; auto.
+(*
 inversion H.
 unfold OrthoS. unfold not.  intros.
 destruct H6. destruct H6. assert (not (sub t1 x /\ sub t2 x)). apply uniquesub2; auto.
@@ -263,9 +301,7 @@ exists (Fun x1 x2); split; auto.
 apply IHOrtho2. auto. auto.
 exists (Fun x1 x2); split; auto.
 inversion H1. inversion H2. apply IHx1. auto. auto. 
-inversion H2. apply IHx1. auto. auto.
-admit.
-admit.
+inversion H2. apply IHx1. auto. auto.*)
 (* Case FunFun *)
 unfold OrthoS. unfold not. intros.
 unfold OrthoS in IHOrtho. apply IHOrtho. inversion H. auto. inversion H0. auto.

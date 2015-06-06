@@ -18,6 +18,45 @@
 
 \begin{document}
 
+\section{Introduction}
+
+Dundfield's work showed how many language features can be encoded in terms 
+of intersection types with a merge operator. However two important
+questions were left open by Dundfield:
+
+\begin{enumerate}
+
+\item How to allow coherent programs only? 
+
+\item If a restriction that allows coherent programs is in place, can
+  all coherent programs conform to the restriction? 
+
+\end{enumerate}
+
+In other words question 1) asks whether we can find sufficient
+conditions to guarantee coherency; whereas question 2) asks 
+whether those conditions are also necessary. In terms of technical 
+lemmas that would correspond to: 
+
+\begin{enumerate}
+
+\item Coherency theorem: $\Gamma \turns e : A \leadsto E_1 \wedge
+  \Gamma \turns e : A \leadsto E_2~\to~E_1 = E_2$.
+
+\item Completness of Coherency: ($\Gamma \turns_{old} e : A \leadsto E_1 \wedge
+  \Gamma \turns_{old} e : A \leadsto E_2~\to~E_1 = E_2) \to \Gamma
+  \turns e : A$.
+
+\end{enumerate}
+
+For these theorems we assume two type systems. On liberal type system
+that ensures type-safety, but not coherence ($\Gamma \turns_{old} e :
+A$); and another one that is both type-safe and coherent  ($\Gamma \turns e :
+A$). What needs to be shown for completness is that if a coherent
+program type-checks in the liberal type system, then it also
+type-checks in the restricted system.
+
+
 \special{papersize=8.5in,11in}
 \setlength{\pdfpageheight}{\paperheight}
 \setlength{\pdfpagewidth}{\paperwidth}
