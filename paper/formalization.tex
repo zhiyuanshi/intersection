@@ -20,23 +20,23 @@
 
 \section{Introduction}
 
-Dundfield's work showed how many language features can be encoded in terms 
+Dundfield's work showed how many language features can be encoded in terms
 of intersection types with a merge operator. However two important
 questions were left open by Dundfield:
 
 \begin{enumerate}
 
-\item How to allow coherent programs only? 
+\item How to allow coherent programs only?
 
 \item If a restriction that allows coherent programs is in place, can
-  all coherent programs conform to the restriction? 
+  all coherent programs conform to the restriction?
 
 \end{enumerate}
 
 In other words question 1) asks whether we can find sufficient
-conditions to guarantee coherency; whereas question 2) asks 
-whether those conditions are also necessary. In terms of technical 
-lemmas that would correspond to: 
+conditions to guarantee coherency; whereas question 2) asks
+whether those conditions are also necessary. In terms of technical
+lemmas that would correspond to:
 
 \begin{enumerate}
 
@@ -592,8 +592,10 @@ If $A \intersect B \subtype C$, where $A \intersect B$ and $C$ are well-formed t
 
 If $A \intersect B \subtype C$, then either $A$ or $B$ contributes to that subtyping relation, but not both. The implication of this lemma is that during the derivation, it is not possible that two rules are applicable.
 
+\newcommand{\wfinterlabel}{\textsc{WFInter}}
+
 \begin{proof}
-Since $A \intersect B$ is well-formed, $A \disjoint B$. Then by the definition of disjointness, there does not exist a type $C$ such that $A \subtype C$ and $B \subtype C$. It follows that $A \subtype C$ and $B \subtype C$ cannot hold simultaneously.
+Since $A \intersect B$ is well-formed, $A \disjoint B$ by the formation rule of intersection types \wfinterlabel. Then by the definition of disjointness, there does not exist a type $C$ such that $A \subtype C$ and $B \subtype C$. It follows that $A \subtype C$ and $B \subtype C$ cannot hold simultaneously.
 \end{proof}
 
 The coercion of a subtyping relation $A \subtype B$ is uniquely determined.
@@ -603,7 +605,18 @@ If $A \subtype B \yields {C_1}$ and $A \subtype B \yields {C_2}$, where $A$ and 
 \end{lemma}
 
 \begin{proof}
-By \ref{unique-subtype-contributor}.
+The set of rules for generating coercions is syntax-directed except for the three rules that involve intersection types in the conclusion. Therefore it suffices to show that if well-formed types $A$ and $B$ satisfy $A \subtype B$, where $A$ or $B$ is an intersection type, then at most one of the three rules applies. In the following, we do a case analysis on the shape of $A$ and $B$:
+
+\begin{itemize}
+  \item \textbf{Case} $A \neq A_1 \intersect A_2$ and $B = B_1 \intersect B_2$: Clearly only \textsc{SubAnd} can apply.
+  \item \textbf{Case} $A = A_1 \intersect A_2$ and $B \neq B_1 \intersect B_2$: Only two rules can apply, \textsc{SubAnd1} and \textsc{SubAnd2}. Further, by the unique subtype contributor lemma, it is not possible that $A_1 \subtype B$ and that $A_2 \subtype B$. Thus we are certain that at most one rule of \textsc{SubAnd1} and \textsc{SubAnd2} will apply.
+  \item \textbf{Case} $A = A_1 \intersect A_2$ and $B = B_1 \intersect B_2$\footnote{An example of this case is:
+    \[ (\integer \intersect \bool) \intersect \character \subtype \bool \intersect \character \]}: Suppose the contrary, that is, more than one of the three rules apply. Since it is not possible that both \textsc{SubAnd1} and \textsc{SubAnd2} apply by the unique subtype contributor lemma, only one of \textsc{SubAnd1} and \textsc{SubAnd2} apply. Therefore \textsc{SubAnd} has to hold. Without the loss of generality, assume \textsc{SubAnd1} apply. Then we have:
+  \[ A_1 \subtype B_1 \intersect B_2 \]
+  \[ A_1 \intersect A_2 \subtype B_1 \]
+  \[ A_1 \intersect A_2 \subtype B_2 \]
+\end{itemize}
+
 \end{proof}
 
 \begin{lemma} \label{wf-typing}
