@@ -472,6 +472,8 @@ We say two types are \emph{disjoint} if they do not share a common supertype.
 $A \bot B = \not \exists C. A <: C \wedge B <: C$
 \end{definition}
 
+We require the types of two terms in a merge $e_1 \mergeOp e_2$ to be disjoint. Why do we require this? That is because if both terms can be assigned some type $C$, both of them can be chosen as the meaning of the merge, which leads to multiple meaning of a term, known as incoherence.
+
 % \begin{figure}
 %   % Typing
 %   \begin{mathpar}
@@ -572,7 +574,7 @@ which, given two types, computes the set of their common supertypes. ($\powerset
   % \commonsuper({\tau_1, \tau_2 \intersect \tau_3}) &= \commonsuper(\tau_1, \tau_2) \cup \commonsuper(\tau_1,\tau_3)
 \end{align*}
 
-Notation. We use $\commonsub(\tau_1,\tau_3) \to \commonsuper(\tau_2,\tau_4)$ as a shorthand for $\{ s \to t ~|~ s \in \commonsub(\tau_1 \to \tau_2), t \in \commonsuper(\tau_2,\tau_4) \}$.
+Notation. We use $\commonsub(\tau_1,\tau_3) \to \commonsuper(\tau_2,\tau_4)$ as a shorthand for $\{ s \to t ~|~ s \in \commonsub(\tau_1 \to \tau_2), t \in \commonsuper(\tau_2,\tau_4) \}$. Therefore, the problem of determining if $\commonsub(\tau_1,\tau_3) \to \commonsuper(\tau_2,\tau_4)$ is empty reduces to the problem of determining if $\commonsuper(\tau_2,\tau_4)$ is empty.
 
 Note that there always exists a common subtype of any two given types (case disjoint / case nondisjoint).
 
@@ -581,7 +583,7 @@ Note that there always exists a common subtype of any two given types (case disj
 \subsection{Sketch of the proof}
 
 \begin{lemma}[Unique subtype contributor] \label{unique-subtype-contributor}
-If $A \intersect B \subtype C$, where $A \intersect B$ and $C$ are well-formed types, then it is not possible that the following holds at the same time:
+If $A \intersect B \subtype C$, where $A \intersect B$ and $C$ are well-formed types, then it is not possible that the following hold at the same time:
 \begin{enumerate}
 \item $A \subtype C$
 \item $B \subtype C$
