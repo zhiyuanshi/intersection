@@ -97,7 +97,7 @@ Definition OrthoS (A B : PTyp) := not (exists C, Sub A C /\ Sub B C).
 Inductive WFTyp : PTyp -> Prop := 
   | WFInt : WFTyp PInt
   | WFFun : forall t1 t2, WFTyp t1 -> WFTyp t2 -> WFTyp (Fun t1 t2)
-  | WFAnd : forall t1 t2, WFTyp t1 -> WFTyp t2 -> Ortho t1 t2 -> WFTyp (And t1 t2).
+  | WFAnd : forall t1 t2, WFTyp t1 -> WFTyp t2 -> OrthoS t1 t2 -> WFTyp (And t1 t2).
 
 (* Reflexivity *)
 Hint Resolve sint sfun sand1 sand2 sand3.
@@ -288,6 +288,26 @@ destruct H. destruct H. induction x. inversion H. inversion H1. inversion H0. in
 apply IHx1. inversion H. inversion H1. unfold Sub. exists c1. auto.
 inversion H0. inversion H1. unfold Sub. exists c1. auto.
 Defined.
+
+(* coercive subtyping is coeherent *)
+
+Lemma sub_coherent : forall A B, WFTyp A -> WFTyp B -> forall C1 C2, sub A B C1 -> sub A B C2 -> C1 = C2.
+Proof.
+intro. intro. intro.
+induction H. intro.
+(* Case PInt *)
+induction H; intros. inversion H. inversion H0. reflexivity.
+inversion H1.
+inversion H2. inversion H3.
+assert (c1 = c0). apply IHWFTyp1; auto.
+assert (c2 = c3). apply IHWFTyp2; auto.
+rewrite H16. rewrite H17. reflexivity.
+(* Case Fun *)
+admit.
+(* Case And *)
+admit.
+Defined.
+
 
 (* Old theorems *)
 
