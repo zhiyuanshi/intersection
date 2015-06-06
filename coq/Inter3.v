@@ -210,46 +210,7 @@ Proof.
 intros. unfold OrthoS in H. unfold not. intros. apply H. exists C. auto.
 Defined.
 
-(*
-Lemma uniquesub2 : forall A B C, 
-  OrthoS A B -> sub (And A B) C -> (sub A C /\ not (sub B C)) \/ (not (sub A C) /\ sub B C) \/ (not (sub A C) /\ not (sub B C)).
-Proof.
-intros.
-assert (not (sub A C /\ sub B C)). apply uniquesub. auto. auto.
-Defined.
-*)
-
-Lemma uniquesub2 : forall A B C, 
-  Ortho A B -> sub (And A B) C -> not (sub A C /\ sub B C).
-Proof.
-admit.
-Defined.
-(*
-induction H2.
- 
-induction H1.
-inversion H3. left. split. auto. unfold not. intros.
-unfold OrthoS in H2. apply H2. exists PInt. split; auto.
-right. split. unfold not. intros.
-unfold OrthoS in H2. apply H2. exists PInt. split; auto. auto.
-inversion H3. left. split. auto. unfold not. intros.
-unfold OrthoS in H2. apply H2. exists (Fun t1 t2). split; auto.
-right. split. unfold not. intros.
-unfold OrthoS in H2. apply H2. exists (Fun t1 t2). split; auto. auto.
-(* Interesting case *)
-assert (sub (And A B) t1 /\ sub (And A B) t2). apply invAndS1. auto.
-destruct H4.
-assert (sub A t1 /\ ~ sub B t1 \/ ~ sub A t1 /\ sub B t1). apply IHWFTyp1. auto. auto.
-assert (sub A t2 /\ ~ sub B t2 \/ ~ sub A t2 /\ sub B t2). apply IHWFTyp2. auto. auto.
-clear IHWFTyp1. clear IHWFTyp2.
-
-destruct H6; destruct H7; destruct H6; destruct H7.
-left. split.
-apply SAnd1. auto. auto. unfold not. intros. 
-admit.
-left. split.
-apply SAnd1. auto.
-*)
+(* Lemmas needed to prove soundness of the orthogonality algorithm *)
 
 Lemma ortho_sym : forall A B, OrthoS A B -> OrthoS B A.
 Proof.
@@ -265,196 +226,51 @@ Proof.
 intros. unfold OrthoS.
 unfold not. intros.
 destruct H1. destruct H1.
-unfold OrthoS in H. unfold OrthoS in H0. unfold not in H. unfold not in H0.
-induction x.
-
+induction x. 
+inversion H1. unfold OrthoS in H. apply H. exists (PInt). split; auto.
+unfold OrthoS in H0. apply H0. exists (PInt). split; auto.
+inversion H1. unfold OrthoS in H. apply H. exists (Fun x1 x2). split; auto.
+unfold OrthoS in H0. apply H0. exists (Fun x1 x2). split; auto.
+assert (sub C x1 /\ sub C x2). apply invAndS1. auto. destruct H3.
+inversion H1. apply IHx1; auto.
+unfold OrthoS in H. apply H. exists (And x1 x2). split; auto.
+unfold OrthoS in H0. apply H0. exists (And x1 x2). split; auto.
 Defined.
 
-(* use only well-formed types ? *)
-Lemma ortho_soundness : forall (t1 t2 : PTyp), WFTyp t1 -> WFTyp t2 -> Ortho t1 t2 -> OrthoS t1 t2.
-(*
-induction t1. induction t2; intros. inversion H. unfold OrthoS. unfold not. intros.
-inversion H.*)
+Lemma ortho_soundness : forall (t1 t2 : PTyp), Ortho t1 t2 -> OrthoS t1 t2.
 intros.
-induction H1.
-inversion H.
+induction H.
+(* Hard case *)
 assert (OrthoS t1 t3). apply IHOrtho1; auto.
 assert (OrthoS t2 t3). apply IHOrtho2; auto.
 apply ortho_and; auto.
-inversion H0.
 assert (OrthoS t2 t1). apply ortho_sym. apply IHOrtho1; auto.
 assert (OrthoS t3 t1). apply ortho_sym. apply IHOrtho2; auto.
 apply ortho_sym.
 apply ortho_and; auto.
-(*
-inversion H.
-unfold OrthoS. unfold not.  intros.
-destruct H6. destruct H6. assert (not (sub t1 x /\ sub t2 x)). apply uniquesub2; auto.
-induction x.
-inversion H1.
-apply IHOrtho1. auto. auto. exists PInt; split; auto.
-unfold OrthoS in IHOrtho2. unfold not in IHOrtho2.
-apply IHOrtho2. auto. auto. exists PInt; split; auto.
-inversion H1.
-apply IHOrtho1. auto. auto.
-exists (Fun x1 x2); split; auto.
-apply IHOrtho2. auto. auto.
-exists (Fun x1 x2); split; auto.
-inversion H1. inversion H2. apply IHx1. auto. auto. 
-inversion H2. apply IHx1. auto. auto.*)
 (* Case FunFun *)
 unfold OrthoS. unfold not. intros.
-unfold OrthoS in IHOrtho. apply IHOrtho. inversion H. auto. inversion H0. auto.
-destruct H2. destruct H2. generalize H2. generalize H3. clear H2. clear H3.
-induction x; intros. inversion H3. exists x2.
-split. inversion H2. auto. inversion H3. auto.
-apply IHx1.
-inversion H3. auto.
-inversion H2. auto.
-(* Case IntFun *)
-unfold OrthoS. unfold not. intros.
-destruct H1. destruct H1. induction x. inversion H2. inversion H1.
+unfold OrthoS in IHOrtho. apply IHOrtho.
+destruct H0. destruct H0. generalize H0. generalize H1. clear H0. clear H1.
+induction x; intros. inversion H1. exists x2.
+split. inversion H0. auto. inversion H1. auto.
 apply IHx1.
 inversion H1. auto.
-inversion H2. auto. 
+inversion H0. auto.
+(* Case IntFun *)
+unfold OrthoS. unfold not. intros.
+destruct H. destruct H. induction x. inversion H0. inversion H.
+apply IHx1.
+inversion H. auto.
+inversion H0. auto. 
 (* Case FunInt *)
 unfold OrthoS. unfold not. intros.
-destruct H1. destruct H1. induction x. inversion H1. inversion H2.
-apply IHx1. inversion H1. auto.
-inversion H2. auto.
+destruct H. destruct H. induction x. inversion H. inversion H0.
+apply IHx1. inversion H. auto.
+inversion H0. auto.
 Defined.
 
-Lemma ortho_soundness : forall s (t1 t2 : PTyp s), (s = Inter) -> OrthoS s t1 t2 -> Ortho s t1 t2.
-Proof.
-induction t1; intros; unfold OrthoS in H.
-(* Dummy cases *)
-discriminate H.
-discriminate H.
-(* Case (t11 & t12) _|_ t2 *) 
-apply OAnd1.
-apply IHt1_1.
-exact H.
-unfold OrthoS in H0.
-unfold OrthoS.
-unfold not.
-intro.
-apply H0.
-clear H0.
-destruct H1. destruct H0.
-exists x.
-split.
-apply SAnd2. exact H0.
-exact H1.
-apply IHt1_2.
-exact H.
-unfold OrthoS; unfold not; intro.
-apply H0. clear H0.
-destruct H1.
-destruct H0.
-exists x.
-split.
-apply SAnd3.
-exact H0.
-exact H1.
-clear H.
-clear IHt1.
-(* Make a separate Lemma ? *)
-unfold OrthoS in H0. unfold not in H0.
-assert ((exists t3 : PTyp Base, t2 = Lift t3) \/ (exists t3 t4 : PTyp Inter, t2 = And t3 t4)).
-apply invInter.
-destruct H. destruct H.
-rewrite H.
-apply OLift.
-unfold not; intros.
-apply H0.
-exists (Lift x).
-rewrite H.
-split.
-apply SLift.
-apply H1.
-apply reflex.
-(*case 2*)
-unfold not; intros.
-apply H0.
-exists (Lift t1).
-rewrite H.
-split.
-apply reflex.
-apply SLift.
-exact H1.
-(* Part 2 *)
-destruct H. destruct H.
-rewrite H.
-apply OAnd2.
-rewrite H in H0.
-admit.
-admit.
-Defined.
-
-
-
-Lemma ortho_soundness : forall s (t1 t2 : PTyp s), (s = Inter) -> OrthoS s t1 t2 -> Ortho s t1 t2.
-Proof.
-induction t1; intros; unfold OrthoS in H.
-(* Dummy cases *)
-discriminate H.
-discriminate H.
-(* Case (t11 & t12) _|_ t2 *) 
-apply OAnd1.
-apply IHt1_1.
-exact H.
-unfold OrthoS in H0.
-unfold OrthoS.
-unfold not.
-intro.
-apply H0.
-clear H0.
-destruct H1. destruct H0.
-exists x.
-split.
-apply SAnd2. exact H0.
-exact H1.
-apply IHt1_2.
-exact H.
-unfold OrthoS; unfold not; intro.
-apply H0. clear H0.
-destruct H1.
-destruct H0.
-exists x.
-split.
-apply SAnd3.
-exact H0.
-exact H1.
-clear H.
-clear IHt1.
-(* Make a separate Lemma ? *)
-unfold OrthoS in H0. unfold not in H0.
-(*
-assert ((exists t3 : PTyp Base, t2 = Lift t3) \/ (exists t3 t4 : PTyp Inter, t2 = And t3 t4)).
-apply invInter.*)
-assert (exists t3, t2 = Lift t3).
-admit. (* How to do this? *)
-destruct H.
-rewrite H.
-apply OLift.
-unfold not; intros.
-apply H0.
-exists (Lift x).
-rewrite H.
-split.
-apply SLift.
-apply H1.
-apply reflex.
-(*case 2*)
-unfold not; intros.
-apply H0.
-exists (Lift t1).
-rewrite H.
-split.
-apply reflex.
-apply SLift.
-exact H1.
-Defined.
+(* Old theorems *)
 
 Lemma invAndS1 : forall t t1 t2 i, sub i t (And nat t1 t2) -> sub i t t1 /\ sub i t t2.
 Proof.
