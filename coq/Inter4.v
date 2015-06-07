@@ -9,11 +9,46 @@ Inductive STyp :=
 
 Inductive SExp (A : Type) :=
   | STVar   : A -> SExp A
+  | STLit   : nat -> SExp A
   | STLam   : STyp -> (A -> SExp A) -> SExp A
   | STApp   : SExp A -> SExp A -> SExp A
   | STPair  : SExp A -> SExp A -> SExp A
   | STProj1 : SExp A -> SExp A
   | STProj2 : SExp A -> SExp A.
+
+Fixpoint join A (e : SExp (SExp A)) : SExp A :=
+  match e with
+    | STVar x => x
+    | STLit n => STLit _ n
+    | STLam t f => STLam _ t (fun x => join _ (f (STVar _ x)))
+    | STApp e1 e2 => STApp _ (join _ e1) (join _ e2)
+    | STPair e1 e2 => STPair _ (join _ e1) (join _ e2)
+    | STProj1 e => STProj1 _ (join _ e)
+    | STProj2 e => STProj2 _ (join _ e)
+  end.
+
+(* STLC: Evaluation (incomplete rules, but sufficient?) *)
+
+Inductive Ev : forall a, SExp (SExp a) -> SExp a -> Prop :=
+  | Beta : forall a t f e, Ev a (STApp _ (STLam _ t f) e) (join _ (f (join _ e))).
+
+Definition Ev2 A (e : SExp (SExp A)) : option (SExp A) :=
+  match e with
+    | STApp (STLam t f) e => Some (join _ (f (join _ e))) (* beta *)
+    | e => Some (join _ e) (* wrong! *)
+  end.
+
+Definition e1 A (p : SExp A) : SExp A := 
+  STApp _ (STLam _ (STTuple STInt STInt) (fun pair => STPair _ (STProj1 _ (STVar _ pair)) (STProj2 _ (STVar _ pair)))) p.
+
+Definition e2 A (p : SExp A) : SExp A := 
+  STPair _ (STProj1 _ (STProj1 _ p)) (STProj2 _ (STProj1 _ p)).
+
+Lemma equalExp : forall A (p : SExp (SExp A)), Ev2 _ (e1 _ p) = Ev2 _ (e2 _ p).
+Proof.
+unfold e1. unfold e2. simpl. intros. 
+admit.
+Defined.
 
 Definition Exp := forall A, SExp A.
 
@@ -35,6 +70,10 @@ Require Import Arith.
 Require Import Setoid.
 
 (* Subtyping relation *)
+
+Inductive Atomic : PTyp -> Prop :=
+  | AInt : Atomic PInt
+  | AFun : forall t1 t2, Atomic (Fun t1 t2).
 
 Inductive sub : PTyp -> PTyp -> Exp -> Prop :=
   | SInt : sub PInt PInt (fun A => STLam _ STInt (fun x => STVar _ x))
@@ -104,6 +143,10 @@ Hint Resolve sint sfun sand1 sand2 sand3.
 
 Lemma reflex : forall (t1 : PTyp), Sub t1 t1.
 Proof.
+(*induction t1; auto. 
+auto. apply sand1. inversion IHt1_1. induction H. apply sand2. auto. apply AInt. 
+apply sand2. auto. apply AFun.
+apply sand1. admit. admit. apply sand2; auto. apply sand2; auto.  *)
 induction t1; intros; auto.
 Defined.
 
@@ -291,21 +334,51 @@ Defined.
 
 (* coercive subtyping is coeherent *)
 
-Lemma sub_coherent : forall A B, WFTyp A -> WFTyp B -> forall C1 C2, sub A B C1 -> sub A B C2 -> C1 = C2.
+
+Lemma sub_coherent : forall A, WFTyp A -> forall B, WFTyp B -> forall C1, sub A B C1 -> forall C2, sub A B C2 -> C1 = C2.
 Proof.
-intro. intro. intro.
-induction H. intro.
-(* Case PInt *)
-induction H; intros. inversion H. inversion H0. reflexivity.
-inversion H1.
-inversion H2. inversion H3.
-assert (c1 = c0). apply IHWFTyp1; auto.
-assert (c2 = c3). apply IHWFTyp2; auto.
-rewrite H16. rewrite H17. reflexivity.
-(* Case Fun *)
+intro. intro. intro. intro. intro. intro.
+(* Case: Int <: Int *)
+induction H1; intros.
+inversion H1. 
+reflexivity.
+(* Case: Fun t1 t2 <: Fun t3 t4 *)
+inversion H1; inversion H; inversion H0.
+assert (c2 = c3). apply IHsub2; auto.
+assert (c1 = c0). apply IHsub1; auto.
+rewrite H17. rewrite H18.
+reflexivity.
+(* Case: t <: And t1 t2 *) 
+inversion H1; inversion H0.
+assert (c1 = c0). apply IHsub1; auto.
+assert (c2 = c3). apply IHsub2; auto.
+rewrite H13. rewrite H14.
+reflexivity.
+(* different coercion case*)
+rewrite <- H3 in H. inversion H.
+rewrite <- H3 in H1_. rewrite <- H3 in H1_0. rewrite <- H3 in H1.
 admit.
-(* Case And *)
+(* different coercion case*)
 admit.
+(* Case: And t1 t2 <: t (first) *)
+inversion H2; inversion H.
+(* different coercion *)
+admit.
+(* same coercion *)
+assert (c = c0). apply IHsub; auto. rewrite H13.
+reflexivity.
+(* contradiction: not orthogonal! *)
+destruct H12. exists t. unfold Sub.
+split. exists c; auto. exists c0. auto.
+(* Case: And t1 t2 <: t (second) *)
+inversion H2; inversion H.
+admit.
+(* contradiction: not orthogonal! *)
+destruct H12. exists t. unfold Sub.
+split. exists c0; auto. exists c. auto.
+(* same coercion; no contradiction *)
+assert (c = c0). apply IHsub; auto. rewrite H13.
+reflexivity.
 Defined.
 
 
