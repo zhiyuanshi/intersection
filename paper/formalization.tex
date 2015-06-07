@@ -582,6 +582,14 @@ Note that there always exists a common subtype of any two given types (case disj
 
 \subsection{Sketch of the proof}
 
+\begin{lemma}
+If $A \subtype B$ where both $A$ and $B$ are well-formed, then $A$ and $B$ cannot be disjoint.
+\end{lemma}
+
+\begin{proof}
+$A \subtype B$ implies $B$ is a common supertype of $A$ and $B$. As a result, $A$ and $B$ are not disjoint by definition.
+\end{proof}
+
 \begin{lemma}[Unique subtype contributor] \label{unique-subtype-contributor}
 If $A \intersect B \subtype C$, where $A \intersect B$ and $C$ are well-formed types, then it is not possible that the following hold at the same time:
 \begin{enumerate}
