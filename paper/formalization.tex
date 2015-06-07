@@ -629,7 +629,7 @@ The set of rules for generating coercions is syntax-directed except for the thre
 
 \end{proof}
 
-\begin{lemma} \label{wf-typing}
+\begin{lemma}{Well-formed typing} \label{wf-typing}
 If $\hastype \Gamma e \tau \yields E$, then $\tau$ is a well-formed type.
 \end{lemma}
 
@@ -638,6 +638,10 @@ Given a source expression $e$, elaboration always produces the same target expre
 \begin{theorem}[Unique elaboration] \label{unique-elaboration}
 If $\hastype \Gamma e {\tau_1} \yields {E_1}$ and $\hastype \Gamma e {\tau_2} \yields {E_2}$, then $E_1 \equiv E_2$
 \end{theorem}
+
+\begin{proof}
+The typing rules are syntax-directed. It suffices to show that $C$ in \textsc{TyApp} is unique. Note that $A_3$ and $A_1$ are well-formed due to Lemma~\ref{wf-typing}. Therefore $C$ is unique.
+\end{proof}
 
 \section{Application of the theory}
 
