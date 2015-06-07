@@ -619,10 +619,12 @@ The set of rules for generating coercions is syntax-directed except for the thre
   \item \textbf{Case} $A \neq A_1 \intersect A_2$ and $B = B_1 \intersect B_2$: Clearly only \textsc{SubAnd} can apply.
   \item \textbf{Case} $A = A_1 \intersect A_2$ and $B \neq B_1 \intersect B_2$: Only two rules can apply, \textsc{SubAnd1} and \textsc{SubAnd2}. Further, by the unique subtype contributor lemma, it is not possible that $A_1 \subtype B$ and that $A_2 \subtype B$. Thus we are certain that at most one rule of \textsc{SubAnd1} and \textsc{SubAnd2} will apply.
   \item \textbf{Case} $A = A_1 \intersect A_2$ and $B = B_1 \intersect B_2$\footnote{An example of this case is:
-    \[ (\integer \intersect \bool) \intersect \character \subtype \bool \intersect \character \]}: Suppose the contrary, that is, more than one of the three rules apply. Since it is not possible that both \textsc{SubAnd1} and \textsc{SubAnd2} apply by the unique subtype contributor lemma, only one of \textsc{SubAnd1} and \textsc{SubAnd2} apply. Therefore \textsc{SubAnd} has to hold. Without the loss of generality, assume \textsc{SubAnd1} apply. Then we have:
-  \[ A_1 \subtype B_1 \intersect B_2 \]
-  \[ A_1 \intersect A_2 \subtype B_1 \]
-  \[ A_1 \intersect A_2 \subtype B_2 \]
+    \[ (\integer \intersect \bool) \intersect \character \subtype \bool \intersect \character \]}: Since $B$ is not atomic, only $\ruleLabelSubAnd$ apply.
+
+  %   Suppose the contrary, that is, more than one of the three rules apply. Since it is not possible that both \textsc{SubAnd1} and \textsc{SubAnd2} apply by the unique subtype contributor lemma, only one of \textsc{SubAnd1} and \textsc{SubAnd2} apply. Therefore \textsc{SubAnd} has to hold. Without the loss of generality, assume \textsc{SubAnd1} apply. Then we have:
+  % \[ A_1 \subtype B_1 \intersect B_2 \]
+  % \[ A_1 \intersect A_2 \subtype B_1 \]
+  % \[ A_1 \intersect A_2 \subtype B_2 \]
 \end{itemize}
 
 \end{proof}
