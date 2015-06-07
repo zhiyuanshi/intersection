@@ -51,7 +51,7 @@
 
 \newcommand{\subAndleft}{
 \inferrule* [right=$\ruleLabelSubAndLeft$]
-  {\tau_1 \subtype \tau_3 \yields C}
+  {\tau_1 \subtype \tau_3 \yields C \\ \isatomic {\tau_3}}
   {\tau_1 \intersect \tau_2 \subtype \tau_3
     \yields
       {\lam x {\im {\tau_1 \intersect \tau_2}}
@@ -60,7 +60,7 @@
 
 \newcommand{\subAndright}{
 \inferrule* [right=$\ruleLabelSubAndRight$]
-  {\tau_2 \subtype \tau_3 \yields C}
+  {\tau_2 \subtype \tau_3 \yields C \\ \isatomic {\tau_3}}
   {\tau_1 \intersect \tau_2 \subtype \tau_3
     \yields
       {\lam x {\im {\tau_1 \intersect \tau_2}}

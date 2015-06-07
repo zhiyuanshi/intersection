@@ -245,19 +245,19 @@ type-checks in the restricted system.
 \begin{comment}
 \begin{figure}
   \begin{mathpar}
-    \framebox{$ A~atomic$} \\
+    \framebox{$ \isatomic A$} \\
 
     \inferrule*
       {}
-      {\bot~atomic}
+      {\isatomic \bot}
 
 \inferrule*
       {}
-      {A \to B~atomic}
+      {\isatomic {A \to B}
 
     \inferrule*
       {}
-      {\for {\alpha * B} A~atomic}
+      {\isatomic {\for {\alpha * B} A}
 
   \end{mathpar}
   \caption{Atomic types.}
