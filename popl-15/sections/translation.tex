@@ -1,0 +1,346 @@
+\section{Type-directed Translation to System $ F $}
+
+In this section we define the dynamic semantics of the call-by-value \name by
+means of a type-directed translation to a variant of System $F$. This
+translation turns merges into usual pairs, similar to Dunfield's elaboration
+approach~\cite{dunfield2014elaborating}. But in addition, our translation
+removes labels of records and rewrites record operations as function
+applications. In the end the translated expressions can be typed and interpreted
+within System $F$. We add the blue-color part to our rules presented in the
+previous section. Besides that, they stay the same. We also tacitly assume the
+variables introduced in the blue part are generated from a unique name supply and
+are always fresh.
+
+\subsection{Informal Discussion}
+
+This subsection presents the translation informally by explaining the major
+ideas.
+
+\paragraph{Turning merges into pairs.}
+The first idea is turning merges into pairs. For example,
+\[
+1 \mergeOp \code{"one"}
+\]
+becomes \pair 1 {\code{"one"}}.
+In usage, the pair will be coerced according to type information. For example,
+consider the function application:
+\[
+\app {(\lam x \String x)} {(1 \mergeOp \code{"one"})}
+\]
+It will be translated to
+\[
+\app {(\lam x \String x)} {(\app {(\lam x {\pair \Int \String} {\proj 2 x})} {\pair 1 {\code{"one"}}})}
+\]
+The coercion in this case is $(\lam x {\pair \Int \String} {\proj 2 x})$.
+
+\noindent It extracts the second item from the pair since the function expects a $\String$
+but the translated argument is of type $\pair \Int \String$.
+
+\paragraph{Erasing labels.}
+The second idea is erasing record labels. For example,
+\begin{lstlisting}
+{name = "Barbara"}
+\end{lstlisting}
+becomes just \lstinline{"Barbara"}.
+To see how the this and the previous idea are used together, consider the following program:
+\begin{lstlisting}
+{distance = {inKilometers = 8, inMiles = 5}}
+\end{lstlisting}
+Since multi-field records are just merges, the record is desugared as
+\begin{lstlisting}
+{distance = {inKilometers = 8} ,, {inMiles = 5}}
+\end{lstlisting}
+and then translated to \lstinline{(8,5)}.
+
+\paragraph{Record operations as functions.}
+The third idea is translating record operations into normal functions. For
+example, the source program
+\begin{lstlisting}
+{distance = {inKilometers = 8, inMiles = 5}}.distance.inMiles
+\end{lstlisting}
+becomes an \name expression
+\[
+\app {(\lam x {\pair \Int \Int} {\proj 2 x})} {\pair 8 5}
+\]
+where $\lam x {\pair \Int \Int} {\proj 2 x}$
+extracts the desired item $5$.
+
+\subsection{Target Language}
+
+Our target language is System $F$ extended with pair and unit types. The syntax
+and typing is completely standard. The syntax of the target language is shown in
+Figure~\ref{fig:f-syntax} and the typing rules in the appendix.
+% \bruno{fill!}
+\begin{figure}[h]
+  \input{rule_in_figures/f-syntax.tex}
+  \caption{Target language syntax.}
+  \label{fig:f-syntax}
+\end{figure}
+
+% \bruno{Why is this lemma placed here?}
+% \bruno{Generaly Speaking this text seems out of place.Move to 5.4, maybe?}
+
+% The main translation judgment is $ \judgeSource \gamma e \tau \yields E $ which
+% states that with respect to the typing context $ \gamma $, the \name expression
+% $e$ is of $\tau$ and its translation is a target expression $ E $.
+
+\subsection{Type Translation}
+
+\begin{figure}[h]
+\input{rule_in_figures/type-translation.tex}
+\input{rule_in_figures/context-translation.tex}
+\caption{Type and context translation.}
+\label{fig:type-and-context-translation}
+\end{figure}
+
+Figure~\ref{fig:type-and-context-translation} defines the type translation
+function $\im \cdot$ from \name types $\tau$ to target language types $T$. The
+notation $\im \cdot$ is also overloaded for context translation from \name
+contexts $\gamma$ to target language contexts $\Gamma$.
+
+% The rules given in this section are identical with those in
+% Section~\ref{sec:fi}, except for the light blue part. The translation consists
+% of four sets of rules, which are explained below:
+
+\subsection{Coercive Subtyping}
+
+\begin{figure*}
+  \small
+  \input{rule_in_figures/elab-sub.tex}
+  \caption{Coercive subtyping.}
+  \label{fig:elab-subtyping}
+\end{figure*}
+
+Figure~\ref{fig:elab-subtyping} shows subtyping with coercions. The judgment
+\[
+\tau_1 \subtype \tau_2 \yields C
+\]
+extends the subtyping judgment in Figure~\ref{fig:fi-subtyping} with a coercion
+on the right hand side of $ \yields {} $. A coercion $ C $ is just an expression
+in the target language and is ensured to have type
+$ \im {\tau_1} \to \im {\tau_2} $ (Lemma~\ref{lemma:sub})\bruno{ref
+  now showing}. For example,
+\[
+\Int \andOp \Bool \subtype \Bool \yields {\lam x {\im {\Int \andOp \Bool}} {\proj 2 x}}
+\]
+
+\noindent generates a coercion function from $\Int \andOp \Bool$ to $\Bool$.
+
+In rules $\ruleLabelSubVar$, $\ruleLabelSubTop$, $\ruleLabelSubForall$,
+coercions are just identity functions. In $\ruleLabelSubFun$, we elaborate the
+subtyping of parameter and return types by $\eta$-expanding $f$ to
+$\lam x {\im {\tau_3}} {\app f x}$, applying $C_1$ to the argument and $C_2$ to
+the result. Rules $\ruleLabelSubAndLeft$, $\ruleLabelSubAndRight$, and
+$\ruleLabelSubAnd$ elaborate with intersection types. $\ruleLabelSubAnd$ uses
+both coercions to form a pair. Rules $\ruleLabelSubAndLeft$ and
+$\ruleLabelSubAndRight$ reuse the coercion from the premises and create new ones
+that cater to the changes of the argument type in the conclusions. Note that the
+two rules are syntatically the same and hence a program can be elaborated
+differently, depending on which rule is used. But in the implementation one
+usually applies the rules sequentially with pattern matching, essentially
+defining a deterministic order of lookup.
+\begin{comment}
+if we know $\tau_1$ is a subtype of $\tau_3$ and $C$ is a coercion from $\tau_1$
+to $\tau_3$, then we can conclude that $\tau_1 \andOp \tau_2$ is also a subtype
+of $\tau_3$ and the new coercion is a function that takes a value $ x $ of type
+$\tau_1\andOp \tau_2$, project $x$ on the first item, and apply $ C $ to it.
+\end{comment}
+
+\begin{restatable}[\ruleLabelSub~rules produce type-correct coercion]{lemma}{lemmasub}
+  \label{lemma:sub}
+  If $ \tau_1 \subtype \tau_2 \yields C $, then $ \judgeTarget \epsilon C {\im {\tau_1} \to \im {\tau_2}} $.
+\end{restatable}
+
+\begin{proof}
+  By a straighforward induction on the derivation\footnote{The proofs of major lemmata and theorems can be found in the appendix.}.
+\end{proof}
+
+\subsection{Main Translation}
+
+\begin{comment}
+In this subsection we now present formally the translation rules that convert
+\name expressions into System $ F $ ones. This set of rules essentially extends
+those in the previous section with the light-blue part for the translation.
+\end{comment}
+
+\begin{figure*}
+  \small
+  \input{rule_in_figures/elab-typing.tex}
+  \caption{Elaboration typing from \name to System $ F $.}
+\end{figure*}
+
+% \bruno{Badly structured. Don't mention Coercion here, as it was already
+% explained in the previous section.}
+% \bruno{Don't use itemize and items. Use paragraphs instead!}
+
+\paragraph{Main translation judgment.} The main translation judgment
+$\judgeSource \gamma e \tau \yields E$ extends the typing judgment with an elaborated
+expression on the right hand side of $\yields {}$. The translation ensures
+that $E$ has type $\im \tau$. In \name, one may pass more information to a
+function than what is required; but not in System $F$. To account for this
+difference, in $\ruleLabelSourceApp$, the coercion $C$ from the subtyping relation is
+applied to the argument. $\ruleLabelSourceMerge$ straighforwardly translates merges
+into pairs. As record labels are erased, $\ruleLabelSourceRecConstruct$ yields the
+same target expression $E$ from the premise.
+
+\begin{comment}
+In $\ruleLabelSourceRecSelect$ and $\ruleLabelSourceRecRestrict$ the coercions generated
+by the ``select'' and ``restrict'' rules will be used to coerce the main \name
+expression.
+\end{comment}
+
+$\ruleLabelSourceRecSelect$ typechecks $e$ and uses the ``select'' rule to return the
+type of the field $\tau_1$ and the coercion $C$. The type of the whole expression
+is $\tau_1$ and its translation of $\app C E$. $\ruleLabelSourceRecRestrict$ is
+exactly the same as $\ruleLabelSourceRecSelect$ except that it uses the auxiliary
+``restrict'' rule.
+
+\paragraph{``Select'' judgment.} The ``select'' judgment additionally generates a
+coercion on the right-hand side of $\yields {}$, which can be thought as a field
+selector in the target language. For example, in translating the \name
+expression
+\[
+\recordCon {\code{id}} {12}.\code{id}
+\]
+the judgment
+\[
+\judgeSelect {\recordType {\code{id}} \Int} {\code{id}} {\Int} \yields {\lam x {\im {\recordType {\code{id}} \Int}} x}
+\]
+gives a ``selector'' $\lam x {\im {\recordType {\code{id}} \Int}} x$ that can be
+applied to the translation of $\recordCon {\code{id}} {12}$. The generation of
+selectors is defined recursively. $\ruleLabelSelect$ is the base case: since the
+type of the field labelled $ l $ in a $\recordType l \tau$ is just $ \tau $, the
+coercion is an identity function. $\ruleLabelSelectLeft$
+and $\ruleLabelSelectRight$ builds selectors for intersection types
+$\tau_1 \andOp \tau_2$ according to the selector for $\tau_1$ or $\tau_2$. The
+same idea appears in the twin $\ruleLabelSubAndLeft$ and
+$\ruleLabelSubAndRight$.
+
+\begin{restatable}[\ruleLabelSelect~rules produce type-correct coercion]{lemma}{lemmaselect}
+  \label{lemma:select}
+  If $ \judgeSelect \tau l {\tau_1} \yields C $, then $ \judgeTarget \epsilon C {\im \tau \to \im {\tau_1}} $.
+\end{restatable}
+
+\begin{proof}
+  By structural induction of the derivation.
+\end{proof}
+
+% Consider the source program:
+% \begin{lstlisting}
+%   ({ name = "Isaac", age = 10 }).name
+% \end{lstlisting}
+
+%   Multi-field records are desugared into merge of single-field records:
+%   \begin{lstlisting}
+%     ({ name = "Isaac"} ,, { age = 10 }).name
+%   \end{lstlisting}
+
+%   By $ \ruleLabelSelect $,
+%   \[ \turnsGet (\recordType {name} {String}; {name}) : String \]
+
+%   we have the coercion
+%   \[ \lam x {\im {\recordType {name} {String}}} x \]
+
+%   which is just $ \lam x {String} x $ according to type translation.
+
+%   By $ \ruleLabelSelectLeft $,
+%   \[ \turnsGet (\recordType {name} {String} \andOp \recordType {age} {Int}; {name}) : String \]
+
+%   % we have the coercion
+%   % \[ \abs {\rel x {\im {\recordType {name} {String} \andOp \recordType
+%   %         {age} {Int}}}} \app {(\abs {\rel x {\im {\recordType {name} {String}}}} x)} {(\fst ~ x)} \]
+%   % which is just $ \abs {\rel x {(String, Int)}} {\app {(\abs {\rel x {String}} x)} {(\fst ~ x)}} $ by type translation.
+
+%   By typing rules, the translation of the program is
+%   \[ ("Isaac", 10) \]. If we apply the coercion to it, we get
+%   \[ "Isaac" \]
+
+\paragraph{``Restrict'' judgment.}
+The ``restrict'' judgment deals with record restriction.
+The rules are analogous to the ``select'' rules.
+Compared with the coercions generated by the ``select'' rules, the coercions
+generated here keep all but the restricted field in an expresison. In the base
+case ($\ruleLabelRestrict$), removing a field labelled $l$ from a single-field
+record with the same label should result in the top value. Therefore, the
+coercion is a constant function that returns unit, which is just the image of
+top value in the target language. For the case
+\[
+\recordCon {\code{name}} {\code{"Alan"}} \andOp \recordCon {\code{age}} {24} \restrictOp \code{name}
+\]
+the coercion will keep the $\code{name}$ field and replace the $\code{age}$
+field with a unit.
+
+\begin{restatable}[\ruleLabelRestrict~rules produce type-correct coercion]{lemma}{lemmarestrict}
+  \label{lemma:restrict}
+  If $ \judgeRestrict \tau l {\tau_1} \yields C $,
+  then $ \judgeTarget \epsilon C {\im \tau \to \im {\tau_1}} $.
+\end{restatable}
+\begin{proof}
+  By structural induction of the derivation.
+\end{proof}
+
+\newcommand{\crestrictone}{\lam \_ {\im {\recordType \J \Int}} {()}}
+\newcommand{\crestricttwo}{\lam x {\im {\recordType \I \Int \andOp \recordType \J \Int}} {\pair {\proj 1 x} {\  \app {(\crestrictone)} {\proj 2 x}}}}
+
+\begin{comment}
+To illustrate the idea of translation in more detail, we show a step-by-step
+derivation in Figure~\ref{fig:derivation} of translating the \name program
+program:
+\[
+\small
+\recordCon \I 0 \mergeOp \recordCon \J 0 \restrictOp \J
+\]
+into the target language. After evaluation, the target expression becomes just
+$\pair 0 {()}$.
+
+  \begin{figure*}[h]
+    \small
+    \begin{mathpar}
+      \small
+
+      \inferrule* [right=$\ruleLabelRestrictRight$]
+      {\judgeRestrict {\recordType \J \Int} \J \top \yields {\lam \_ {\im {\recordType \J \Int}} {()}}}
+      {\judgeRestrict {\recordType \I \Int \andOp \recordType \J \Int} \J {\recordType \I \Int \andOp \top} \yields {\crestricttwo}}
+
+      \inferrule* [right=$\ruleLabelSourceRecRestrict$]
+      {
+        \inferrule* [right=$\ruleLabelSourceMerge$]
+        {
+          \inferrule* [right=$\ruleLabelSourceRecConstruct$]
+          {\ldots}
+          {\judgeSource \epsilon {\recordCon \I 0} {\recordType \I \Int} \yields 0}
+          \\
+          \inferrule* [right=$\ruleLabelSourceRecConstruct$]
+          {\ldots}
+          {\judgeSource \epsilon {\recordCon \J 0} {\recordType \J \Int} \yields 0}
+        }
+        {\judgeSource \epsilon {\recordCon \I 0 \mergeOp \recordCon \J 0} {\recordType \I \Int \andOp \recordType \J \Int} \yields {\pair 0 0}}
+        \\
+        \ldots
+      }
+      {\judgeSource \epsilon {\recordCon \I 0 \mergeOp \recordCon \J 0 \restrictOp \J} {\recordType \I \Int \andOp \top} \yields {\app {(\crestricttwo)} {\pair 0 0}}}
+    \end{mathpar}
+
+    \caption{An example of translating record restriction.}
+    \label{fig:derivation}
+  \end{figure*}
+\end{comment}
+
+\begin{restatable}[Translation preserves well-typing]{theorem}{theorempreservation}
+  \label{theorem:preservation}
+  If $ \judgeSource \gamma e \tau \yields E $,
+  then $ \judgeTarget {\im \gamma} E {\im \tau} $.
+\end{restatable}
+\begin{proof}
+(Sketch) By structural induction on the expression and the corresponding
+inference rule.
+\end{proof}
+
+\begin{theorem}[Type safety]
+  If $e$ is a well-typed \name expression, then $e$ evaluates to some System $F$
+  value $v$.
+\end{theorem}
+\begin{proof}
+  Since we define the dynamic semantics of \name in terms of the composition of
+  the type-directed translation and the dynamic semantics of System $F$, type safety follows immediately.
+\end{proof}
