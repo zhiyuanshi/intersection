@@ -629,9 +629,23 @@ The set of rules for generating coercions is syntax-directed except for the thre
 
 \end{proof}
 
+\begin{lemma}{Substitution lemma} \label{substitution-lemma}
+If $\istype \Gamma {\for {\alpha * C} B}$, where $A$, $B$, and $C$ are all well-formed types, then $\istype \Gamma {\subst A \alpha B}$.
+\end{lemma}
+
+\begin{proof}
+\todo{TODO}
+\end{proof}
+
 \begin{lemma}{Well-formed typing} \label{wf-typing}
 If $\hastype \Gamma e \tau \yields E$, then $\tau$ is a well-formed type.
 \end{lemma}
+
+\begin{proof}
+Proof by induction on the derivation.
+
+The special case to consider is $\rulelabelTApp$. $\subst A \alpha B$ is also well-formed by Lemma~\ref{substitution-lemma}.
+\end{proof}
 
 Given a source expression $e$, elaboration always produces the same target expression $E$.
 
