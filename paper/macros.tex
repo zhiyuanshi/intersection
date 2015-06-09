@@ -23,7 +23,7 @@
 \newcommand{\commonsuper}{\Uparrow}
 \newcommand{\commonsub}{\Downarrow}
 \newcommand{\disjoint}{*}
-\newcommand{\subst}[2]{\lbrack #1 / #2 \rbrack}
+\newcommand{\subst}[2]{\lbrack #1 / #2 \rbrack~}
 
 \definecolor{lightblue}{rgb}{0.85, 0.95, 1.0}
 \newcommand{\yields}[1]{\colorbox{lightblue}{$\; \hookrightarrow #1$}}
@@ -49,13 +49,20 @@
 \newcommand{\recordType}[2]{\{ #1 : #2 \}}
 \newcommand{\recordCon}[2]{\{ #1 = #2 \}}
 
-\newcommand{\true}{\code{True}}
 \newcommand{\integer}{\code{Int}}
 \newcommand{\bool}{\code{Bool}}
 \newcommand{\character}{\code{Char}}
 
+\newcommand{\true}{\code{True}}
+\newcommand{\tyint}{\code{Int}}
+\newcommand{\tybool}{\code{Bool}}
+\newcommand{\tychar}{\code{Char}}
+\newcommand{\tystring}{\code{String}}
+
 % Judgments
-\newcommand{\istype}[2]{#1 \turns #2 \ \text{type}}
+\newcommand{\istype}[2]{#1 \turns #2}
 \newcommand{\isatomic}[1]{#1 \ \text{atomic}}
 \newcommand{\hastype}[3]{#1 \turns #2 \ \hast \ #3}
 \newcommand{\isdisjoint}[3]{#1 \turns #2 \bot #3}
+
+\newcommand{\rulelabel}[1]{(\textsc{#1})}
