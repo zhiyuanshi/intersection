@@ -100,12 +100,17 @@ exact SInt.
 Defined.
 
 Definition sfun : forall o1 o2 o3 o4, Sub o3 o1 -> Sub o2 o4 -> Sub (Fun o1 o2) (Fun  o3 o4).
-unfold Sub; intros.
-admit.
+unfold Sub; intros. destruct H. destruct H0.
+exists (fun A => STLam _ (ptyp2styp (Fun o1 o2)) (fun f => 
+       STLam _ (ptyp2styp o3) (fun x1 => STApp _ (x0 A) (STApp _ (STVar _ f) (STApp _ (x A) (STVar _ x1)))))).
+apply SFun. auto. auto.
 Defined.
 
 Definition sand1 : forall t t1 t2, Sub t t1 -> Sub t t2 -> Sub t (And t1 t2).
-admit.
+unfold Sub. intros. destruct H. destruct H0.
+exists (fun A => STLam _ (ptyp2styp t1) (fun x1 => 
+       STPair _ (STApp _ (x A) (STVar _ x1)) (STApp _ (x0 A) (STVar _ x1)))).
+apply SAnd1. auto. auto.
 Defined.
 
 Definition sand2_atomic : forall t t1 t2, Sub t1 t -> Atomic t -> Sub (And  t1 t2) t.
@@ -141,7 +146,14 @@ inversion H1.
 Defined.
 
 Definition sand3_atomic : forall t t1 t2, Sub t2 t -> Atomic t -> Sub (And  t1 t2) t.
-admit.
+unfold Sub. intros. destruct t. destruct H.
+exists (fun A => STLam _ (ptyp2styp (And t1 t2)) (fun x1 => 
+       (STApp _ (x A) (STProj2 _ (STVar _ x1))))).
+apply SAnd3. auto. auto. destruct H.
+exists (fun A => STLam _ (ptyp2styp (And t1 t2)) (fun x1 => 
+       (STApp _ (x A) (STProj2 _ (STVar _ x1))))).
+apply SAnd3. auto. auto.
+inversion H0.
 Defined.
 
 Definition sand3 : forall t t1 t2, Sub t2 t -> Sub (And  t1 t2) t.
@@ -192,10 +204,6 @@ Hint Resolve sint sfun sand1 sand2 sand3.
 
 Lemma reflex : forall (t1 : PTyp), Sub t1 t1.
 Proof.
-(*induction t1; auto. 
-auto. apply sand1. inversion IHt1_1. induction H. apply sand2. auto. apply AInt. 
-apply sand2. auto. apply AFun.
-apply sand1. admit. admit. apply sand2; auto. apply sand2; auto.  *)
 induction t1; intros; auto.
 Defined.
 
