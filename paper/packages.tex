@@ -27,10 +27,10 @@
 \usepackage{amsmath}
 \usepackage{amssymb}
 \usepackage{amsthm}
-\usepackage{bm}         % Bold symbols in maths mode
+\usepackage{bm}        % Bold symbols in maths mode
 \usepackage{dsfont}
 \usepackage{stmaryrd}
-\usepackage{mathtools}  % For "::=" ( \Coloneqq )
+\usepackage{mathtools} % For "::=" ( \Coloneqq )
 % http://tex.stackexchange.com/questions/114151/how-do-i-reference-in-appendix-a-theorem-given-in-the-body
 \usepackage{thmtools, thm-restate}
 
@@ -41,6 +41,8 @@
 \newtheorem{theorem}{Theorem}
 \newtheorem{lemma}{Lemma}
 
+\usepackage{cleveref}  % Never do "Theorem~\ref{thm1}" agin!
+\crefname{lemma}{Lemma}{Lemmas}
 
 %% Code listings
 \usepackage{listings}

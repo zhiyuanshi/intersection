@@ -5,11 +5,11 @@
 \input{packages.tex}
 \input{macros.tex}
 
-\input{rule_as_macros/orthogonality.tex}
-\input{rule_as_macros/sub.tex}
-\input{rule_as_macros/typing.tex}
+\input{rules/wf.tex}
+\input{rules/orthogonality.tex}
+\input{rules/sub.tex}
+\input{rules/ty.tex}
 % \input{rule_as_macros/target.tex}
-\input{rule_as_macros/wellformedness.tex}
 
 \newcommand{\name}{{\bf $F_{\&}$}\xspace}
 
@@ -322,26 +322,15 @@ type-checks in the restricted system.
   \begin{mathpar}
     \framebox{$\istype \Gamma \tau$} \\
 
-    \inferrule* [right=WFBot]
-      { }
-      {\istype \Gamma \bot}
+    \wfvar
 
-    \inferrule* [right=WFFun]
-      {\istype \Gamma A \\ \istype \Gamma B}
-      {\istype \Gamma {A \to B}}
+    \wfbot
 
-    \inferrule* [right=WFForall]
-      {\istype \Gamma B \\ \istype {\Gamma, \alpha * B} A}
-      {\istype \Gamma {\for {\alpha * B} A}}
+    \wffun
 
-    \inferrule* [right=WFVar]
-      {\alpha * A \in \Gamma}
-      {\istype \Gamma \alpha}
+    \wfforall
 
-    \inferrule* [right=WFInter]
-      {\istype \Gamma A \\ \istype \Gamma B \\ \isdisjoint \Gamma A B}
-      {\istype \Gamma {A \intersect B}}
-
+    \wfinter
   \end{mathpar}
   \caption{Well-formed types.}
 \end{figure}
@@ -349,13 +338,18 @@ type-checks in the restricted system.
 \begin{figure}
   \begin{mathpar}
     \framebox{$ \hastype \Gamma e A \yields E $} \\
-    \ruleVar \and
+    \tyvar
+
 %    \ruleTop \and
-    \ruleLam \and
-    \ruleApp \and
-    \ruleBLam \and
-    \ruleTApp \and
-    \ruleMerge \and
+    \tylam
+
+    \tyapp
+
+    \tyblam
+
+    \tytapp
+
+    \tymerge
 %    \ruleConstraintIntro \and
 %    \ruleConstraintElim
     % \rulerecordConstruct \and
@@ -478,13 +472,13 @@ We require the types of two terms in a merge $e_1 \mergeOp e_2$ to be disjoint. 
 %   % Typing
 %   \begin{mathpar}
 %     \framebox{$ \hastype \Gamma e A \yields E $} \\
-%     \ruleVar \and
+%     \tyvar \and
 %     \ruleTop \and
-%     \ruleLam \and
-%     \ruleApp \and
-%     \ruleBLam \and
-%     \ruleTApp \and
-%     \ruleMerge \and
+%     \tylam \and
+%     \tyapp \and
+%     \tyblam \and
+%     \tytapp \and
+%     \tymerge \and
 %     \ruleDisjointAssume \and
 %     \ruleDisjointCheck
 %     % \rulerecordConstruct \and
@@ -629,12 +623,61 @@ The set of rules for generating coercions is syntax-directed except for the thre
 
 \end{proof}
 
+A naive substitution can violate the disjoint constraint in the context. For example (assuming the existence of some base type $\tyint$),
+\begin{mathpar}
+\inferrule* [right=Foo]
+  {\alpha \disjoint \tyint \in {\alpha \disjoint \tyint}}
+  {\istype {\alpha \disjoint \tyint} \alpha}
+\end{mathpar}
+is provable by \ldots. But after the substitution of $\tyint$ for $\alpha$, \ldots
+\begin{mathpar}
+\inferrule
+  {}
+  {\istype {\alpha \disjoint \tyint} {\subst \tyint \alpha \alpha}}
+\end{mathpar}
+
+\begin{lemma}
+If $\isdisjoint \Gamma A B$ and the $R$, $\gamma$ pair does not violate any of the disjointness constraints in $\Gamma$, then $\isdisjoint \Gamma {\subst R \gamma A} {\subst R \gamma B}$.
+\end{lemma}
+
 \begin{lemma}{Substitution lemma} \label{substitution-lemma}
-If $\istype \Gamma {\for {\alpha * C} B}$, where $A$, $B$, and $C$ are all well-formed types, then $\istype \Gamma {\subst A \alpha B}$.
+If $\istype \Gamma R$, $\istype \Gamma S$, and the $R$, $\gamma$ pair does not violate any of the disjointness constraints in $\Gamma$\todo{Elaborate}, then $\istype \Gamma {\subst R \beta S}$.
 \end{lemma}
 
 \begin{proof}
-\todo{TODO}
+By induction on the derivation of $\istype \Gamma {\subst R \beta S}$.
+
+\begin{itemize}
+  \item Case
+  \begin{mathpar}
+    \wfvar
+  \end{mathpar}
+  If $\alpha$ happens to be the same as $\beta$, then by the def. of substitution $\subst R \beta \alpha = R$. Since $\istype \Gamma R$, we have $\istype \Gamma {\subst R \beta \alpha}$; On the other hand, if not, then by the def. of substitution $\subst R \beta S = S$. Since $\istype \Gamma S$, we also have $\istype \Gamma {\subst R \beta \alpha}$.
+
+  \item Case
+  \begin{mathpar}
+    \wfbot
+  \end{mathpar}
+  Trivial.
+
+  \item Case
+  \begin{mathpar}
+    \wffun
+  \end{mathpar}
+  By i.h., $\istype \Gamma {\subst R \gamma A}$ and $\istype \Gamma {\subst R \gamma B}$. By the def. of substitution, $\istype \Gamma {\subst R \gamma {A \to B}}$.
+
+  \item Case
+  \begin{mathpar}
+    \wfforall
+  \end{mathpar}
+  By i.h., $\istype \Gamma {\subst R \gamma A}$ and $\istype {\Gamma, \alpha \disjoint A} {\subst R \gamma B}$. By the def. of substitution, $\istype \Gamma {\subst R \gamma {\for {\alpha \disjoint A} B}}$~\todo{How about $A$?}.
+
+  \item Case
+  \begin{mathpar}
+    \wfinter
+  \end{mathpar}
+  By i.h., $\istype \Gamma {\subst R \gamma A}$ and $\istype \Gamma {\subst R \gamma B}$. By some magic lemma~\todo{TODO}, we also have $\isdisjoint \Gamma {\subst R \gamma A} {\subst R \gamma B}$. Therefore by \rulelabel{WFInter}, $\istype \Gamma {\subst R \gamma {A \intersect B}}$.
+\end{itemize}
 \end{proof}
 
 \begin{lemma}{Well-formed typing} \label{wf-typing}
@@ -644,7 +687,7 @@ If $\hastype \Gamma e \tau \yields E$, then $\tau$ is a well-formed type.
 \begin{proof}
 Proof by induction on the derivation.
 
-The special case to consider is $\rulelabelTApp$. $\subst A \alpha B$ is also well-formed by Lemma~\ref{substitution-lemma}.
+The special case to consider is \rulelabel{TyTApp}. $\subst A \alpha B$ is also well-formed by \cref{substitution-lemma}.
 \end{proof}
 
 Given a source expression $e$, elaboration always produces the same target expression $E$.
