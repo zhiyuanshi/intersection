@@ -19,15 +19,15 @@
 
 \inferrule* [right=$\ruleLabelSubAnd$]
   {\tau_1 \subtype \tau_2 \andalso \tau_1 \subtype \tau_3}
-  {\tau_1 \subtype \tau_2 \intersect \tau_3}
+  {\tau_1 \subtype \tau_2 \andOp \tau_3}
 
 \inferrule* [right=$\ruleLabelSubAndLeft$]
   {\tau_1 \subtype \tau_3}
-  {\tau_1 \intersect \tau_2 \subtype \tau_3}
+  {\tau_1 \andOp \tau_2 \subtype \tau_3}
 
 \inferrule* [right=$\ruleLabelSubAndRight$]
   {\tau_2 \subtype \tau_3}
-  {\tau_1 \intersect \tau_2 \subtype \tau_3}
+  {\tau_1 \andOp \tau_2 \subtype \tau_3}
 
 \inferrule* [right=$\ruleLabelSubRec$]
   {\tau_1 \subtype \tau_2}

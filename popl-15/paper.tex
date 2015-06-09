@@ -1,4 +1,4 @@
-\documentclass[nocopyrightspace,preprint,times,10pt]{sigplanconf}
+\documentclass[nocopyrightspace,preprint,times,9pt]{sigplanconf}
 
 \input{preamble.tex}
 
@@ -73,6 +73,50 @@
 \input{sections/fi.tex}
 \input{sections/translation.tex}
 \input{sections/implementation.tex}
+
+\section{Disjoint Intersection Types}
+
+This section shows how to restrict the system presented before 
+so that it supports coherence as well as type soundness. 
+The keys aspects are the notion of disjoint intersections, 
+and disjoint quantification for polymorphic types. 
+
+\subsection{Motivating design choices}\bruno{Maybe this belongs to Section 2?}
+
+We need to motivate the 3 changes:
+
+\paragraph{Well-formed types}: We need a new notion of well-formed types.
+
+\paragraph{Disjoint quantification}: Needed when we have a 
+combination of polymorphism and intersection types.
+
+\paragraph{Restrictions on subtyping}: 
+
+\subsection{Disjointness}
+
+Spec of disjointness/intuition ...
+
+\subsection{Well-formed types}
+
+\subsection{Subtyping}
+
+\subsection{Metatheory}
+
+\section{Algorithmic Disjointness}
+
+Although the system in the previous section shows a formal system of
+disjoint intersection types, it relies on a non-algorithmic
+specification of disjointness. This section shows an algorithmic
+specification of disjointness that is proved to be sound and complete.
+
+\subsection{Formal System}
+
+Explain the rules and intuitions.
+
+\subsection{Soundness and Completeness}
+
+
+
 \input{sections/related-work.tex}
 \input{sections/conclusion.tex}
 

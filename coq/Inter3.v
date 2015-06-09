@@ -6,52 +6,17 @@ data PTyp a = Var a | Forall (a -> PSigma a) | Fun (PSigma a) (PSigma a) | PInt
 data PSigma a = And (PSigma a) (PSigma a) | Typ (PTyp a)
 *)
 
-(*
-Inductive S := Base | Inter.
+Inductive PTyp : Type :=
+  | PInt : PTyp
+  | Fun : PTyp -> PTyp -> PTyp
+  | And : PTyp -> PTyp -> PTyp.
 
-Inductive PTyp A : S -> Type :=
-  | Var : A -> PTyp A Base 
-  | PInt : PTyp A Base
-  | Fun : PTyp A Inter -> PTyp A Inter -> PTyp A Base
-  | And : PTyp A Inter -> PTyp A Inter -> PTyp A Inter
-  | Lift : PTyp A Base -> PTyp A Inter.
-*)
-
-Inductive PTyp A :=
-  | Var : A -> PTyp A
-  | PInt : PTyp A
-  | Forall : (A -> PTyp A) -> PTyp A
-  | Fun : PTyp A -> PTyp A -> PTyp A
-  | And : PTyp A -> PTyp A -> PTyp A.
+(* Atomic types *)
 
 (*
-
-----------
-|t1 <: t2|
-----------
-
-a <: a                             Sub-Var
-
-           t1 <: t2
-------------------------------     Sub-Forall
-forall a . t1 <: forall a . t2
-
-t3 <: t1     t2 <: t4
----------------------              Sub-Arrow
-t1 -> t2 <: t3 -> t4
-
-t <: t1   t <: t2
------------------                  Sub-&1
-t <: t1 & t2
-
-t1 <: t
-------------                       Sub-&2
-t1 & t2 <: t
-
-t2 <: t
-------------                       Sub-&3
-t1 & t2 <: t
-
+Inductive Atomic : PTyp -> Prop :=
+  | AInt : Atomic PInt
+  | AFun : forall t1 t2, Atomic (Fun t1 t2).
 *)
 
 Require Import Arith.
@@ -59,21 +24,253 @@ Require Import Setoid.
 
 (* Subtyping relation *)
 
-Inductive sub : nat -> PTyp nat -> PTyp nat -> Prop :=
-  | SInt : forall i, sub i (PInt nat) (PInt nat)
-  | SVar : forall i x, sub i (Var nat x) (Var nat x)
-  | SForall : forall i f g, sub (i+1) (f i) (g i) -> sub i (Forall nat f) (Forall nat g)
-  | SFun : forall i o1 o2 o3 o4, sub i o3 o1 -> sub i o2 o4 -> sub i (Fun nat o1 o2) (Fun nat o3 o4)
-  | SAnd1 : forall i t t1 t2, sub i t t1 -> sub i t t2 -> sub i t (And nat t1 t2)
-  | SAnd2 : forall i t t1 t2, sub i t1 t -> sub i (And nat t1 t2) t
-  | SAnd3 : forall i t t1 t2, sub i t2 t -> sub i (And nat t1 t2) t.
+Inductive sub : PTyp -> PTyp -> Prop :=
+  | SInt : sub PInt PInt
+  | SFun : forall o1 o2 o3 o4, sub o3 o1 -> sub o2 o4 -> sub (Fun o1 o2) (Fun  o3 o4)
+  | SAnd1 : forall t t1 t2, sub t t1 -> sub t t2 -> sub t (And  t1 t2)
+  | SAnd2 : forall t t1 t2, sub t1 t -> sub (And  t1 t2) t
+  | SAnd3 : forall t t1 t2, sub t2 t -> sub (And  t1 t2) t.
 
-Hint Resolve SVar SInt SForall SFun SAnd1 SAnd2 SAnd3.
+(* Orthogonality: Implementation *)
 
-Lemma reflex : forall t1 i, sub i t1 t1.
+Inductive Ortho : PTyp -> PTyp -> Prop :=
+  | OAnd1 : forall t1 t2 t3, Ortho t1 t3 -> Ortho t2 t3 -> Ortho (And t1 t2) t3
+  | OAnd2 : forall t1 t2 t3, Ortho t1 t2 -> Ortho t1 t3 -> Ortho t1 (And t2 t3)
+  | OFun  : forall t1 t2 t3 t4, Ortho t2 t4 -> Ortho (Fun t1 t2) (Fun t3 t4)
+  | OIntFun : forall t1 t2, Ortho PInt (Fun t1 t2)
+  | OFunInt : forall t1 t2, Ortho (Fun t1 t2) PInt.
+
+(*  | OLift : forall t1 t2, not (sub t1 t2) -> not (sub t2 t1) -> Atomic t1 -> Atomic t2 -> Ortho t1 t2. *)
+
+(* Orthogonality: Specification *)
+
+Definition OrthoS (A B : PTyp) := not (exists C, sub A C /\ sub B C).
+
+(* Well-formed types *)
+
+Inductive WFTyp : PTyp -> Prop := 
+  | WFInt : WFTyp PInt
+  | WFFun : forall t1 t2, WFTyp t1 -> WFTyp t2 -> WFTyp (Fun t1 t2)
+  | WFAnd : forall t1 t2, WFTyp t1 -> WFTyp t2 -> Ortho t1 t2 -> WFTyp (And t1 t2).
+
+
+(* Reflexivity *)
+
+Hint Resolve SInt SFun SAnd1 SAnd2 SAnd3.
+
+Lemma reflex : forall (t1 : PTyp), sub t1 t1.
 Proof.
 induction t1; intros; auto.
 Defined.
+
+
+Lemma invWFSInt : forall t2, WFTyp t2 -> sub PInt t2 -> t2 = PInt. 
+Proof. 
+intro. intro. intro.
+induction H; intros. reflexivity.
+inversion H0.
+inversion H0.
+assert (t1 = PInt). apply  IHWFTyp1. auto. rewrite H8 in H2.
+assert (t2 = PInt). apply  IHWFTyp2. auto. rewrite H9 in H2.
+inversion H2. 
+Defined.
+
+(*
+Lemma invWFSFun : forall t1 t2 t3, WFTyp t3 -> sub (Fun t1 t2) t3 -> exists t4 t5, sub t4 t1 /\ sub t2 t5 /\ t3 = Fun t4 t5. 
+Proof.
+intros.
+induction H.
+inversion H0.
+exists t0. exists t3. split. inversion H0. auto. 
+split. inversion H0. auto. reflexivity.
+inversion H0.
+assert (exists t4 t5 : PTyp, sub t4 t1 /\ sub t2 t5 /\ t0 = Fun t4 t5). apply IHWFTyp1. auto. 
+destruct H8. destruct H8. destruct H8. destruct H9. rewrite H10 in H2.
+assert (exists t4 t5 : PTyp, sub t4 t1 /\ sub t2 t5 /\ t3 = Fun t4 t5). apply IHWFTyp2. auto. 
+destruct H11. destruct H11. destruct H11. destruct H12. rewrite H13 in H2.
+exists x. exists x0. split. exact H8. split. exact H9.
+inversion H2.
+admit.*)
+
+(* Orthogonality algorithm is complete *)
+
+Lemma ortho_completness : forall (t1 t2 : PTyp), OrthoS t1 t2 -> Ortho t1 t2.
+Proof.
+induction t1; intros; unfold OrthoS in H.
+(* Case PInt *)
+induction t2.
+destruct H. exists PInt. split; apply reflex.
+apply OIntFun.
+apply OAnd2. 
+apply IHt2_1. unfold not. unfold not in H. intros; apply H.
+destruct H0. destruct H0. 
+exists x. split. exact H0. apply SAnd2. exact H1.
+apply IHt2_2. unfold not. unfold not in H. intros. apply H.
+destruct H0. destruct H0. exists x.
+split. auto. apply SAnd3.
+auto.
+(* Case Fun t1 t2 *)
+induction t2.
+apply OFunInt. 
+apply OFun.
+apply IHt1_2. unfold OrthoS. unfold not. intros.
+unfold not in H. apply H.
+destruct H0. destruct H0.
+exists (Fun (And t1_1 t2_1) x).
+split.
+apply SFun.
+apply SAnd2.
+apply reflex.
+auto.
+apply SFun.
+apply SAnd3. apply reflex.
+auto.
+(* Case t11 -> t12 _|_ t21 & t22 *)
+apply OAnd2.
+apply IHt2_1.
+unfold not. unfold not in H. intros. apply H.
+destruct H0. destruct H0.
+exists x. split. auto. apply SAnd2. exact H1.
+apply IHt2_2.
+unfold not. unfold not in H. intros. apply H.
+destruct H0. destruct H0.
+exists x. split. auto. apply SAnd3. exact H1.
+(* Case (t11 & t12) _|_ t2 *) 
+apply OAnd1.
+apply IHt1_1.
+unfold OrthoS.
+unfold not. unfold not in H.
+intro.
+apply H.
+clear H. destruct H0. destruct H.
+exists x.
+split.
+apply SAnd2. exact H.
+exact H0.
+apply IHt1_2.
+unfold OrthoS; unfold not; intro. unfold not in H.
+apply H. clear H.
+destruct H0.
+destruct H.
+exists x.
+split.
+apply SAnd3.
+exact H.
+exact H0.
+Defined.
+
+Lemma nosub : forall t1 t2, OrthoS t1 t2 -> not (sub t1 t2) /\ not (sub t2 t1).
+Proof.
+intros; split; unfold not.
+unfold OrthoS in H. unfold not in H. intros.
+apply H.
+exists t2.
+split. auto. apply reflex.
+unfold OrthoS in H. unfold not in H. intros.
+apply H.
+exists t1. split. apply reflex. auto.
+Defined.
+
+
+Lemma invAndS1 : forall t t1 t2, sub t (And t1 t2) -> sub t t1 /\ sub t t2.
+Proof.
+induction t; intros.
+(* Case Int *)
+inversion H.
+split; auto.
+(* Case Fun *)
+inversion H.
+split; auto.
+(* Case And *)
+inversion H.
+split; auto.
+assert (sub t1 t0 /\ sub t1 t3).
+apply IHt1.
+auto.
+destruct H4.
+split.
+apply SAnd2.
+auto.
+apply SAnd2.
+auto.
+assert (sub t2 t0 /\ sub t2 t3).
+apply IHt2.
+auto.
+destruct H4.
+split.
+apply SAnd3.
+auto.
+apply SAnd3.
+auto.
+Defined.
+
+Lemma uniquesub : forall A B C, 
+  OrthoS A B -> sub (And A B) C -> not (sub A C /\ sub B C).
+Proof.
+intros. unfold OrthoS in H. unfold not. intros. apply H. exists C. auto.
+Defined.
+
+(* Lemmas needed to prove soundness of the orthogonality algorithm *)
+
+Lemma ortho_sym : forall A B, OrthoS A B -> OrthoS B A.
+Proof.
+unfold OrthoS. unfold not.
+intros. apply H.
+destruct H0. destruct H0.
+exists x.
+split; auto.
+Defined.
+
+Lemma ortho_and : forall A B C, OrthoS A C -> OrthoS B C -> OrthoS (And A B) C.
+Proof.
+intros. unfold OrthoS.
+unfold not. intros.
+destruct H1. destruct H1.
+induction x. 
+inversion H1. unfold OrthoS in H. apply H. exists (PInt). split; auto.
+unfold OrthoS in H0. apply H0. exists (PInt). split; auto.
+inversion H1. unfold OrthoS in H. apply H. exists (Fun x1 x2). split; auto.
+unfold OrthoS in H0. apply H0. exists (Fun x1 x2). split; auto.
+assert (sub C x1 /\ sub C x2). apply invAndS1. auto. destruct H3.
+inversion H1. apply IHx1; auto.
+unfold OrthoS in H. apply H. exists (And x1 x2). split; auto.
+unfold OrthoS in H0. apply H0. exists (And x1 x2). split; auto.
+Defined.
+
+Lemma ortho_soundness : forall (t1 t2 : PTyp), Ortho t1 t2 -> OrthoS t1 t2.
+intros.
+induction H.
+(* Hard case *)
+assert (OrthoS t1 t3). apply IHOrtho1; auto.
+assert (OrthoS t2 t3). apply IHOrtho2; auto.
+apply ortho_and; auto.
+assert (OrthoS t2 t1). apply ortho_sym. apply IHOrtho1; auto.
+assert (OrthoS t3 t1). apply ortho_sym. apply IHOrtho2; auto.
+apply ortho_sym.
+apply ortho_and; auto.
+(* Case FunFun *)
+unfold OrthoS. unfold not. intros.
+unfold OrthoS in IHOrtho. apply IHOrtho.
+destruct H0. destruct H0. generalize H0. generalize H1. clear H0. clear H1.
+induction x; intros. inversion H1. exists x2.
+split. inversion H0. auto. inversion H1. auto.
+apply IHx1.
+inversion H1. auto.
+inversion H0. auto.
+(* Case IntFun *)
+unfold OrthoS. unfold not. intros.
+destruct H. destruct H. induction x. inversion H0. inversion H.
+apply IHx1.
+inversion H. auto.
+inversion H0. auto. 
+(* Case FunInt *)
+unfold OrthoS. unfold not. intros.
+destruct H. destruct H. induction x. inversion H. inversion H0.
+apply IHx1. inversion H. auto.
+inversion H0. auto.
+Defined.
+
+(* Old theorems *)
 
 Lemma invAndS1 : forall t t1 t2 i, sub i t (And nat t1 t2) -> sub i t t1 /\ sub i t t2.
 Proof.

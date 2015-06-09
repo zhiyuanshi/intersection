@@ -33,13 +33,13 @@
 \newcommand{\ruleOrthogAndLeft}{
 \inferrule* [right=\ruleLabelOrthogAndLeft]
   {\tau_1 \orthog \tau_3 \andalso \tau_2 \orthog \tau_3}
-  {\tau_1 \andOp \tau_2 \orthog \tau_3}
+  {\tau_1 \intersect \tau_2 \orthog \tau_3}
 }
 
 \newcommand{\ruleOrthogAndRight}{
 \inferrule* [right=\ruleLabelOrthogAndRight]
   {\tau_1 \orthog \tau_2 \andalso \tau_1 \orthog \tau_3}
-  {\tau_1 \orthog \tau_2 \andOp \tau_3}
+  {\tau_1 \orthog \tau_2 \intersect \tau_3}
 }
 
 \newcommand{\ruleOrthogRecLab}{

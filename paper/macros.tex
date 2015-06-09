@@ -1,65 +1,68 @@
+% math-mode versions of \rlap, etc
+% from Alexander Perlis, "A complement to \smash, \llap, and lap"
+%   http://math.arizona.edu/~aprl/publications/mathclap/
+\def\clap#1{\hbox to 0pt{\hss#1\hss}}
+\def\mathllap{\mathpalette\mathllapinternal}
+\def\mathrlap{\mathpalette\mathrlapinternal}
+\def\mathclap{\mathpalette\mathclapinternal}
+\def\mathllapinternal#1#2{\llap{$\mathsurround=0pt#1{#2}$}}
+\def\mathrlapinternal#1#2{\rlap{$\mathsurround=0pt#1{#2}$}}
+\def\mathclapinternal#1#2{\clap{$\mathsurround=0pt#1{#2}$}}
+
+\newcommand{\code}[1]{\textsf{#1}}
+\newcommand{\highlight}[1]{\colorbox{GreenYellow}{#1}}
+
+\newcommand{\im}[1]{\lvert #1 \rvert}
+\newcommand{\powerset}[1]{\mathcal{P}(#1)}
+\newcommand{\universe}{\mathbb{U}}
+
+\newcommand{\turns}{\vdash}
 \newcommand{\hast}{\!:\!}
+\newcommand{\To}{\Rightarrow}
+\newcommand{\subtype}{<:}
+\newcommand{\commonsuper}{\Uparrow}
+\newcommand{\commonsub}{\Downarrow}
+\newcommand{\disjoint}{*}
+\newcommand{\subst}[2]{\lbrack #1 / #2 \rbrack~}
 
-% Relations
-\newcommand{\subtype}   {<:}
+\definecolor{lightblue}{rgb}{0.85, 0.95, 1.0}
+\newcommand{\yields}[1]{\colorbox{lightblue}{$\; \hookrightarrow #1$}}
 
-\definecolor{facebook}{HTML}{3B5998}
-\newcommand{\yields}[1]{\textcolor{facebook}{\; \hookrightarrow {#1}}}
-
-% Helpers
 \newcommand{\ftv}[1]{\textit{ftv}({#1})}
 
-% Spacing
-\newcommand{\binderSpacing}{\,}
-\newcommand{\appSpacing}{\;}
+\newcommand{\binderspace}{\,}
+\newcommand{\appspace}{\;}
 
-% Types
-% \newcommand{\top}{\{\}}
-\newcommand{\andOp}{\with}
-
-% Expressions
-\newcommand{\lam}[3]{\lambda (#1 \hast #2).\binderSpacing #3}
+\newcommand{\intersect}{\cap}
+\newcommand{\for}[2]{\forall #1.\binderspace #2}
+\newcommand{\constraints}[2]{(#1) \To #2}
+\newcommand{\lam}[3]{\lambda (#1 \hast #2).\binderspace #3}
+\newcommand{\blam}[2]{\Lambda #1.\binderspace #2}
+\newcommand{\assume}[2]{\textsf{assume} #1.\binderspace #2}
 \newcommand{\mergeOp}{,,}
 \newcommand{\restrictOp}{\setminus}
-\newcommand{\recordUpdate}[3]{#1 \; \mathbf{with} \; \{#2 = #3\}}
+\newcommand{\concatOp}{+\kern-1.3ex+\kern0.8ex}  % http://tex.stackexchange.com/a/4195/73122
+\newcommand{\app}[2]{#1 \; #2}
+\newcommand{\tapp}[2]{#1 \appspace #2}
+\newcommand{\pair}[2]{(#1, #2)}
+\newcommand{\proj}[2]{{\code{proj}}_{#1} #2}
+\newcommand{\recordType}[2]{\{ #1 : #2 \}}
+\newcommand{\recordCon}[2]{\{ #1 = #2 \}}
 
+\newcommand{\integer}{\code{Int}}
+\newcommand{\bool}{\code{Bool}}
+\newcommand{\character}{\code{Char}}
 
-\newcommand{\Int}{\code{Int}}
-\newcommand{\String}{\code{String}}
-\newcommand{\Bool}{\code{Bool}}
-\newcommand{\I}{\code{i}}
-\newcommand{\J}{\code{j}}
+\newcommand{\true}{\code{True}}
+\newcommand{\tyint}{\code{Int}}
+\newcommand{\tybool}{\code{Bool}}
+\newcommand{\tychar}{\code{Char}}
+\newcommand{\tystring}{\code{String}}
 
+% Judgments
+\newcommand{\istype}[2]{#1 \turns #2}
+\newcommand{\isatomic}[1]{#1 \ \text{atomic}}
+\newcommand{\hastype}[3]{#1 \turns #2 \ \hast \ #3}
+\newcommand{\isdisjoint}[3]{#1 \turns #2 \bot #3}
 
-% Rules
-
-% Couleurs
-\colorlet{subColor}{OliveGreen}
-\colorlet{targetColor}{BrickRed}
-
-% Subtyping labels
-\newcommand{\ruleLabelSub}{\bm{\textcolor{subColor}{sub}}}
-\newcommand{\ruleLabelSubVar}{\ruleLabelSub\text{var}}
-\newcommand{\ruleLabelSubTop}{\ruleLabelSub\text{top}}
-\newcommand{\ruleLabelSubFun}{\ruleLabelSub\text{fun}}
-\newcommand{\ruleLabelSubForall}{\ruleLabelSub\text{forall}}
-\newcommand{\ruleLabelSubAnd}{\ruleLabelSub\text{and}}
-\newcommand{\ruleLabelSubAndLeft}{\ruleLabelSub{\text{and}_1}}
-\newcommand{\ruleLabelSubAndRight}{\ruleLabelSub{\text{and}_2}}
-\newcommand{\ruleLabelSubRec}{\ruleLabelSub\text{rec}}
-
-% Source/elaboration and labels
-\newcommand{\judgeSourceWF}[2]{#1 \; \textcolor{sourceColor}{\turns} \; #2}
-\newcommand{\ruleLabelSourceRecUpd}{\ruleLabelSource\text{rec-upd}}
-
-
-% Presentation
-\definecolor{lightyellow}{HTML}{FFFFE0}
-
-
-% To be retired
-\newcommand{\turnsGet}{\turns_{\textrm{get}}}
-\newcommand{\turnsPut}{\turns_{\textrm{put}}}
-\newcommand{\turnsrec}{\turns_{\textrm{rec}}}
-\newcommand{\rulename}[1]{(\textrm{#1})}
-
+\newcommand{\rulelabel}[1]{(\textsc{#1})}

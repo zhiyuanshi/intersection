@@ -1,0 +1,65 @@
+\newcommand{\hast}{\!:\!}
+
+% Relations
+\newcommand{\subtype}   {<:}
+
+\definecolor{facebook}{HTML}{3B5998}
+\newcommand{\yields}[1]{\textcolor{facebook}{\; \hookrightarrow {#1}}}
+
+% Helpers
+\newcommand{\ftv}[1]{\textit{ftv}({#1})}
+
+% Spacing
+\newcommand{\binderSpacing}{\,}
+\newcommand{\appSpacing}{\;}
+
+% Types
+% \newcommand{\top}{\{\}}
+\newcommand{\andOp}{\with}
+
+% Expressions
+\newcommand{\lam}[3]{\lambda (#1 \hast #2).\binderSpacing #3}
+\newcommand{\mergeOp}{,,}
+\newcommand{\restrictOp}{\setminus}
+\newcommand{\recordUpdate}[3]{#1 \; \mathbf{with} \; \{#2 = #3\}}
+
+
+\newcommand{\Int}{\code{Int}}
+\newcommand{\String}{\code{String}}
+\newcommand{\Bool}{\code{Bool}}
+\newcommand{\I}{\code{i}}
+\newcommand{\J}{\code{j}}
+
+
+% Rules
+
+% Couleurs
+\colorlet{subColor}{OliveGreen}
+\colorlet{targetColor}{BrickRed}
+
+% Subtyping labels
+\newcommand{\ruleLabelSub}{\bm{\textcolor{subColor}{sub}}}
+\newcommand{\ruleLabelSubVar}{\ruleLabelSub\text{var}}
+\newcommand{\ruleLabelSubTop}{\ruleLabelSub\text{top}}
+\newcommand{\ruleLabelSubFun}{\ruleLabelSub\text{fun}}
+\newcommand{\ruleLabelSubForall}{\ruleLabelSub\text{forall}}
+\newcommand{\ruleLabelSubAnd}{\ruleLabelSub\text{and}}
+\newcommand{\ruleLabelSubAndLeft}{\ruleLabelSub{\text{and}_1}}
+\newcommand{\ruleLabelSubAndRight}{\ruleLabelSub{\text{and}_2}}
+\newcommand{\ruleLabelSubRec}{\ruleLabelSub\text{rec}}
+
+% Source/elaboration and labels
+\newcommand{\judgeSourceWF}[2]{#1 \; \textcolor{sourceColor}{\turns} \; #2}
+\newcommand{\ruleLabelSourceRecUpd}{\ruleLabelSource\text{rec-upd}}
+
+
+% Presentation
+\definecolor{lightyellow}{HTML}{FFFFE0}
+
+
+% To be retired
+\newcommand{\turnsGet}{\turns_{\textrm{get}}}
+\newcommand{\turnsPut}{\turns_{\textrm{put}}}
+\newcommand{\turnsrec}{\turns_{\textrm{rec}}}
+\newcommand{\rulename}[1]{(\textrm{#1})}
+
