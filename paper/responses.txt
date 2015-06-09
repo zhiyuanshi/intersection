@@ -1,4 +1,4 @@
-We thank all the reviewers for their detailed and thourough reviews!
+We thank all the reviewers for their detailed and thorough reviews!
 We address key concerns and questions next.
 
 * Nondeterminism
@@ -29,7 +29,7 @@ Therefore, ({x=1},,{x=2}).x can only evaluate to 2. Likewise,
 
 More generally, three pairs of rules in our system that cause
 nondeterminism can all be implemented in the same fashion (sub-and2 is
-favored over sub-and1), and (restrict2 is favored over restrict1).
+favoured over sub-and1), and (restrict2 is favoured over restrict1).
 After this treatment, the resulting language is deterministic.
 
 * Usage of restriction
