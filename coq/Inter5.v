@@ -109,7 +109,14 @@ admit.
 Defined.
 
 Definition sand2_atomic : forall t t1 t2, Sub t1 t -> Atomic t -> Sub (And  t1 t2) t.
-admit.
+unfold Sub. intros. destruct t. destruct H.
+exists (fun A => STLam _ (ptyp2styp (And t1 t2)) (fun x1 => 
+       (STApp _ (x A) (STProj1 _ (STVar _ x1))))).
+apply SAnd2. auto. auto. destruct H.
+exists (fun A => STLam _ (ptyp2styp (And t1 t2)) (fun x1 => 
+       (STApp _ (x A) (STProj1 _ (STVar _ x1))))).
+apply SAnd2. auto. auto.
+inversion H0.
 Defined.
 
 Definition sand2 : forall t t1 t2, Sub t1 t -> Sub (And t1 t2) t.
@@ -120,18 +127,21 @@ apply sand2_atomic. auto. exact AInt.
 apply sand2_atomic. auto. apply AFun.
 (* Case And *)
 unfold Sub. unfold Sub in H. destruct H. inversion H.
-assert (Sub (And t0 t1
-
-unfold Sub in IHt1. unfold Sub in IHt2.
-
-
-exists (fun A => STLam _ (ptyp2styp t1) (fun v => 
-       STPair _ (STApp _ (c1 A) (STVar _ v)) (STApp _ (c2 A) (STVar _ v)))).
-
+assert (Sub (And t0 t3) t1). apply IHt1.
+unfold Sub. exists c1. auto. 
+assert (Sub (And t0 t3) t2). apply IHt2.
+unfold Sub. exists c2. auto.
+unfold Sub in H6. destruct H6.
+unfold Sub in H7. destruct H7.
+exists (fun A => STLam _ (ptyp2styp t1) (fun x => 
+       STPair _ (STApp _ (x0 A) (STVar _ x)) (STApp _ (x1 A) (STVar _ x)))).
+apply SAnd1. auto. auto.
+inversion H1.
+inversion H1.
 Defined.
 
 Definition sand3_atomic : forall t t1 t2, Sub t2 t -> Atomic t -> Sub (And  t1 t2) t.
-admit. 
+admit.
 Defined.
 
 Definition sand3 : forall t t1 t2, Sub t2 t -> Sub (And  t1 t2) t.
@@ -141,7 +151,18 @@ apply sand3_atomic. auto. exact AInt.
 (* Case Fun *)
 apply sand3_atomic. auto. apply AFun.
 (* Case And *)
-admit.
+unfold Sub. unfold Sub in H. destruct H. inversion H.
+assert (Sub (And t0 t3) t1). apply IHt1.
+unfold Sub. exists c1. auto. 
+assert (Sub (And t0 t3) t2). apply IHt2.
+unfold Sub. exists c2. auto.
+unfold Sub in H6. destruct H6.
+unfold Sub in H7. destruct H7.
+exists (fun A => STLam _ (ptyp2styp t1) (fun x => 
+       STPair _ (STApp _ (x0 A) (STVar _ x)) (STApp _ (x1 A) (STVar _ x)))).
+apply SAnd1. auto. auto.
+inversion H1.
+inversion H1.
 Defined.
 
 (* Orthogonality: Implementation *)
