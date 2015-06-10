@@ -25,8 +25,7 @@
 \newcommand{\disjoint}{*}
 \newcommand{\subst}[2]{\lbrack #1 / #2 \rbrack~}
 
-\definecolor{lightblue}{rgb}{0.85, 0.95, 1.0}
-\newcommand{\yields}[1]{\colorbox{lightblue}{$\; \hookrightarrow #1$}}
+\newcommand{\yields}[1]{\textcolor{MidnightBlue}{\; \hookrightarrow #1}}
 
 \newcommand{\ftv}[1]{\textit{ftv}({#1})}
 
@@ -60,9 +59,9 @@
 \newcommand{\tystring}{\code{String}}
 
 % Judgments
-\newcommand{\istype}[2]{#1 \turns #2}
+\newcommand{\istype}[2]{#1 \turns #2 \ \text{type}}
 \newcommand{\isatomic}[1]{#1 \ \text{atomic}}
 \newcommand{\hastype}[3]{#1 \turns #2 \ \hast \ #3}
-\newcommand{\isdisjoint}[3]{#1 \turns #2 \bot #3}
+\newcommand{\isdisjoint}[3]{#1 \turns #2 * #3}
 
 \newcommand{\rulelabel}[1]{(\textsc{#1})}

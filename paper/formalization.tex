@@ -613,7 +613,7 @@ The set of rules for generating coercions is syntax-directed except for the thre
   \item \textbf{Case} $A \neq A_1 \intersect A_2$ and $B = B_1 \intersect B_2$: Clearly only \textsc{SubAnd} can apply.
   \item \textbf{Case} $A = A_1 \intersect A_2$ and $B \neq B_1 \intersect B_2$: Only two rules can apply, \textsc{SubAnd1} and \textsc{SubAnd2}. Further, by the unique subtype contributor lemma, it is not possible that $A_1 \subtype B$ and that $A_2 \subtype B$. Thus we are certain that at most one rule of \textsc{SubAnd1} and \textsc{SubAnd2} will apply.
   \item \textbf{Case} $A = A_1 \intersect A_2$ and $B = B_1 \intersect B_2$\footnote{An example of this case is:
-    \[ (\integer \intersect \bool) \intersect \character \subtype \bool \intersect \character \]}: Since $B$ is not atomic, only $\ruleLabelSubAnd$ apply.
+    \[ (\integer \intersect \bool) \intersect \character \subtype \bool \intersect \character \]}: Since $B$ is not atomic, only \rulelabel{SubAnd} apply.
 
   %   Suppose the contrary, that is, more than one of the three rules apply. Since it is not possible that both \textsc{SubAnd1} and \textsc{SubAnd2} apply by the unique subtype contributor lemma, only one of \textsc{SubAnd1} and \textsc{SubAnd2} apply. Therefore \textsc{SubAnd} has to hold. Without the loss of generality, assume \textsc{SubAnd1} apply. Then we have:
   % \[ A_1 \subtype B_1 \intersect B_2 \]
@@ -623,25 +623,22 @@ The set of rules for generating coercions is syntax-directed except for the thre
 
 \end{proof}
 
-A naive substitution can violate the disjoint constraint in the context. For example (assuming the existence of some base type $\tyint$),
+In general, disjointness judgements are not invariant with respect to free-variable substitution. In other words, a careless substitution can violate the disjoint constraint in the context. For example, in the context $\alpha \disjoint \tyint$, $\alpha$ and $\tyint$ are disjoint:
 \begin{mathpar}
-\inferrule* [right=Foo]
-  {\alpha \disjoint \tyint \in {\alpha \disjoint \tyint}}
-  {\istype {\alpha \disjoint \tyint} \alpha}
+\isdisjoint {\alpha \disjoint \tyint} \alpha \tyint
 \end{mathpar}
-is provable by \ldots. But after the substitution of $\tyint$ for $\alpha$, \ldots
+But after the substitution of $\tyint$ for $\alpha$ on the two types, the sentence
 \begin{mathpar}
-\inferrule
-  {}
-  {\istype {\alpha \disjoint \tyint} {\subst \tyint \alpha \alpha}}
+\isdisjoint {\alpha \disjoint \tyint} \tyint \tyint
 \end{mathpar}
+is longer true since $\tyint$ is clearly not disjoint with itself.
 
-\begin{lemma}
-If $\isdisjoint \Gamma A B$ and the $R$, $\gamma$ pair does not violate any of the disjointness constraints in $\Gamma$, then $\isdisjoint \Gamma {\subst R \gamma A} {\subst R \gamma B}$.
+\begin{lemma}{Invariance of disjointness} \label{invariance-of-disjointness}
+If $\isdisjoint \Gamma A B$ and the $\isdisjoint \Gamma \gamma R$, then $\isdisjoint \Gamma {\subst R \gamma A} {\subst R \gamma B}$.
 \end{lemma}
 
-\begin{lemma}{Substitution lemma} \label{substitution-lemma}
-If $\istype \Gamma R$, $\istype \Gamma S$, and the $R$, $\gamma$ pair does not violate any of the disjointness constraints in $\Gamma$\todo{Elaborate}, then $\istype \Gamma {\subst R \beta S}$.
+\begin{lemma}{Substitution} \label{substitution-lemma}
+If $\istype \Gamma R$, $\istype \Gamma S$, and $\isdisjoint \Gamma \gamma R$, then $\istype \Gamma {\subst R \gamma S}$.
 \end{lemma}
 
 \begin{proof}
@@ -681,23 +678,26 @@ By induction on the derivation of $\istype \Gamma {\subst R \beta S}$.
 \end{proof}
 
 \begin{lemma}{Well-formed typing} \label{wf-typing}
-If $\hastype \Gamma e \tau \yields E$, then $\tau$ is a well-formed type.
+If $\hastype \Gamma e A$, then $\istype \Gamma e$.
 \end{lemma}
-
+Typing always produces a well-formed type.
 \begin{proof}
-Proof by induction on the derivation.
-
-The special case to consider is \rulelabel{TyTApp}. $\subst A \alpha B$ is also well-formed by \cref{substitution-lemma}.
+By induction on the derivation of $\hastype \Gamma e A$. The case of \rulelabel{TyTApp} needs special attention since we need to show that the result of substitution ($\subst A \alpha C$) is well-formed.
+\begin{mathpar}
+  \tytapp
+\end{mathpar}
 \end{proof}
 
-Given a source expression $e$, elaboration always produces the same target expression $E$.
-
 \begin{theorem}[Unique elaboration] \label{unique-elaboration}
-If $\hastype \Gamma e {\tau_1} \yields {E_1}$ and $\hastype \Gamma e {\tau_2} \yields {E_2}$, then $E_1 \equiv E_2$
+If $\hastype \Gamma e {A_1} \yields {E_1}$ and $\hastype \Gamma e {A_2} \yields {E_2}$, then $E_1 \equiv E_2$.
 \end{theorem}
-
+Given a source expression $e$, elaboration always produces the same target expression $E$.
 \begin{proof}
-The typing rules are syntax-directed. It suffices to show that $C$ in \textsc{TyApp} is unique. Note that $A_3$ and $A_1$ are well-formed due to Lemma~\ref{wf-typing}. Therefore $C$ is unique.
+The typing rules are syntax-directed. The case of \rulelabel{TyApp} needs special attention since we still need to show that the generated coercion $C$ is unique.
+\begin{mathpar}
+  \tyapp
+\end{mathpar}
+By Lemma~\ref{wf-typing}, we have $\istype \Gamma {A_1}$ and $\istype \Gamma {A_3}$. Therefore we are able to apply Lemma~\ref{unique-coercion} and conclude that $C$ is unique.
 \end{proof}
 
 \section{Application of the theory}

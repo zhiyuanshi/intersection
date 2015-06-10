@@ -48,9 +48,11 @@
 % \newcommand{\rulelabelTApp}{\rulelabel\text{TApp}}
 \newcommand{\tytapp}{
 \inferrule* [right=TyTApp]
-  {\hastype \Gamma e {\for {\alpha * C} B} \yields E \\ \isdisjoint
-  \Gamma A C \\\istype \Gamma A}
-  {\hastype \Gamma {\tapp e A} {\subst A \alpha B} \yields {\tapp E {\im A}}}
+  {\hastype \Gamma e {\for {\alpha * B} C} \yields E \\
+   \istype \Gamma A \\
+   \isdisjoint \Gamma A B
+   }
+  {\hastype \Gamma {\tapp e A} {\subst A \alpha C} \yields {\tapp E {\im A}}}
 }
 
 % Merge
