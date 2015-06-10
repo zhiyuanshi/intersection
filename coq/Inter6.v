@@ -24,16 +24,20 @@ Definition Exp := forall A T, SExp A T.
 
 (* System I (no polymorphism yet) *)
 
-Inductive PTyp : Type :=
-  | PInt : PTyp
-  | Fun : PTyp -> PTyp -> PTyp
-  | And : PTyp -> PTyp -> PTyp.
+Inductive PTyp A : Type :=
+  | TVar : A -> PTyp A
+  | TForall : (A -> PTyp A) -> PTyp A
+  | PInt : PTyp A
+  | Fun : PTyp A -> PTyp A -> PTyp A
+  | And : PTyp A -> PTyp A -> PTyp A.
 
-Fixpoint ptyp2styp (t : PTyp) : forall A, STyp A := fun A =>
+Fixpoint ptyp2styp A (t : PTyp (STyp A)) : STyp A := 
   match t with
+    | TVar x => x
+    | TForall f => STForall _ (fun a => ptyp2styp _ (f (STTVar _ a)))
     | PInt => STInt _
-    | Fun t1 t2 => STFun _ (ptyp2styp t1 A) (ptyp2styp t2 A)
-    | And t1 t2 => STTuple _ (ptyp2styp t1 A) (ptyp2styp t2 A)
+    | Fun t1 t2 => STFun _ (ptyp2styp A t1) (ptyp2styp A t2)
+    | And t1 t2 => STTuple _ (ptyp2styp A t1) (ptyp2styp A t2)
   end.
 
 Require Import Arith.
@@ -41,14 +45,14 @@ Require Import Setoid.
 
 (* Subtyping relation *)
 
-Inductive Atomic : PTyp -> Prop :=
-  | AInt : Atomic PInt
-  | AFun : forall t1 t2, Atomic (Fun t1 t2).
+Inductive Atomic : forall A, PTyp A -> Prop :=
+  | AInt : forall A, Atomic A (PInt _)
+  | AFun : forall A (t1 t2 : PTyp A), Atomic A (Fun _ t1 t2).
 
-Inductive sub : PTyp -> PTyp -> Exp -> Prop :=
-  | SInt : sub PInt PInt (fun A T => STLam _ _ (STInt _) (fun x => STVar _ _ x))
+Inductive sub : PTyp nat -> PTyp nat -> Exp -> Prop :=
+  | SInt : sub (PInt _) (PInt _) (fun A T => STLam _ _ (STInt _) (fun x => STVar _ _ x))
   | SFun : forall o1 o2 o3 o4 c1 c2, sub o3 o1 c1 -> sub o2 o4 c2 -> 
-     sub (Fun o1 o2) (Fun  o3 o4) (fun A T => STLam _ _ (ptyp2styp (Fun o1 o2) _) (fun f => 
+     sub (Fun _ o1 o2) (Fun _ o3 o4) (fun A T => STLam _ _ (ptyp2styp _ (Fun _ o1 o2)) (fun f => 
        STLam _ _ (ptyp2styp o3 _) (fun x => STApp _ _ (c2 A T) (STApp _ _ (STVar _ _ f) (STApp _ _ (c1 A T) (STVar _ _ x))))))
   | SAnd1 : forall t t1 t2 c1 c2, sub t t1 c1 -> sub t t2 c2 -> 
      sub t (And  t1 t2) (fun A T => STLam _ _ (ptyp2styp t1 _) (fun x => 
