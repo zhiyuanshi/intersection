@@ -634,11 +634,15 @@ But after the substitution of $\tyint$ for $\alpha$ on the two types, the senten
 is longer true since $\tyint$ is clearly not disjoint with itself.
 
 \begin{lemma}{Invariance of disjointness} \label{invariance-of-disjointness}
-If $\isdisjoint \Gamma A B$ and the $\isdisjoint \Gamma \gamma R$, then $\isdisjoint \Gamma {\subst R \gamma A} {\subst R \gamma B}$.
+If $\isdisjoint \Gamma A B$ and the $\isdisjoint \Gamma \beta R$, then $\isdisjoint \Gamma {\subst R \beta A} {\subst R \beta B}$.
 \end{lemma}
 
+\begin{proof}
+  
+\end{proof}
+
 \begin{lemma}{Substitution} \label{substitution}
-If $\istype \Gamma R$, $\istype \Gamma S$, and $\isdisjoint \Gamma \gamma R$, then $\istype \Gamma {\subst R \gamma S}$.
+If $\istype \Gamma R$, $\istype \Gamma S$, and $\isdisjoint \Gamma \beta R$, then $\istype \Gamma {\subst R \beta S}$.
 \end{lemma}
 
 \begin{proof}
@@ -661,19 +665,23 @@ By induction on the derivation of $\istype \Gamma {\subst R \beta S}$.
   \begin{mathpar}
     \wffun
   \end{mathpar}
-  By i.h., $\istype \Gamma {\subst R \gamma A}$ and $\istype \Gamma {\subst R \gamma B}$. By the def. of substitution, $\istype \Gamma {\subst R \gamma {A \to B}}$.
+  By i.h., $\istype \Gamma {\subst R \beta A}$ and $\istype \Gamma {\subst R \beta B}$. By the def. of substitution, $\istype \Gamma {\subst R \beta {A \to B}}$.
 
   \item Case
   \begin{mathpar}
     \wfforall
   \end{mathpar}
-  By i.h., $\istype \Gamma {\subst R \gamma A}$ and $\istype {\Gamma, \alpha \disjoint A} {\subst R \gamma B}$. By the def. of substitution, $\istype \Gamma {\subst R \gamma {\for {\alpha \disjoint A} B}}$~\todo{How about $A$?}.
+  By the premise and the i.h.,
+  \[ \istype {\Gamma, \alpha \disjoint A} {\subst R \beta B} \]
+  which by \rulelabel{WFForall} implies
+  \[ \istype \Gamma {\for {\alpha \disjoint A} {\subst R \beta B}} \]
+  By the def. of substitution, $\istype \Gamma {\subst R \beta {\for {\alpha \disjoint A} B}}$~\todo{Subst. of $A$}.
 
   \item Case
   \begin{mathpar}
     \wfinter
   \end{mathpar}
-  By i.h., $\istype \Gamma {\subst R \gamma A}$ and $\istype \Gamma {\subst R \gamma B}$. By some magic lemma~\todo{TODO}, we also have $\isdisjoint \Gamma {\subst R \gamma A} {\subst R \gamma B}$. Therefore by \rulelabel{WFInter}, $\istype \Gamma {\subst R \gamma {A \intersect B}}$.
+  By i.h., $\istype \Gamma {\subst R \beta A}$ and $\istype \Gamma {\subst R \beta B}$. By some magic lemma~\todo{TODO}, we also have $\isdisjoint \Gamma {\subst R \beta A} {\subst R \beta B}$. Therefore by \rulelabel{WFInter}, $\istype \Gamma {\subst R \beta {A \intersect B}}$.
 \end{itemize}
 \end{proof}
 
@@ -695,6 +703,15 @@ by \rulelabel{WFForall} we have
 \begin{mathpar}
   \istype \Gamma B \\ \istype {\Gamma, \alpha \disjoint B} C
 \end{mathpar}
+Next we do a case analysis on the shape of $C$. The interesting case is when $C$ is an intersection type.
+\begin{mathpar}
+  \wfinter
+\end{mathpar}
+Let $C = C_1 \intersect C_2$. We know $\istype \Gamma {C_1 \intersect C_2}$ and need to show
+\[ \istype \Gamma {\subst A \alpha {C_1 \intersect C_2}} \]
+which is just
+\[ \istype \Gamma {\subst A \alpha {C_1} \intersect \subst A \alpha {C_2}} \]
+by the definition of the substitution function.
 \end{proof}
 
 \begin{lemma}{Well-formed typing} \label{wf-typing}
