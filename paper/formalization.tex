@@ -637,7 +637,7 @@ is longer true since $\tyint$ is clearly not disjoint with itself.
 If $\isdisjoint \Gamma A B$ and the $\isdisjoint \Gamma \gamma R$, then $\isdisjoint \Gamma {\subst R \gamma A} {\subst R \gamma B}$.
 \end{lemma}
 
-\begin{lemma}{Substitution} \label{substitution-lemma}
+\begin{lemma}{Substitution} \label{substitution}
 If $\istype \Gamma R$, $\istype \Gamma S$, and $\isdisjoint \Gamma \gamma R$, then $\istype \Gamma {\subst R \gamma S}$.
 \end{lemma}
 
@@ -677,15 +677,36 @@ By induction on the derivation of $\istype \Gamma {\subst R \beta S}$.
 \end{itemize}
 \end{proof}
 
+\begin{lemma}{Instantiation} \label{instantiation}
+If
+  $\istype \Gamma {\for {\alpha \disjoint B} C}$,
+  $\istype \Gamma A$,
+  $\isdisjoint \Gamma A B$,
+then
+  $\istype \Gamma {\subst A \alpha C}$.
+\end{lemma}
+Instantiating a ``forall'' type results in a well-formed type if the type provided satisfies the disjoint constraint.
+\begin{proof}
+Since
+\begin{mathpar}
+  \istype \Gamma {\for {\alpha \disjoint B} C}
+\end{mathpar}
+by \rulelabel{WFForall} we have
+\begin{mathpar}
+  \istype \Gamma B \\ \istype {\Gamma, \alpha \disjoint B} C
+\end{mathpar}
+\end{proof}
+
 \begin{lemma}{Well-formed typing} \label{wf-typing}
 If $\hastype \Gamma e A$, then $\istype \Gamma e$.
 \end{lemma}
 Typing always produces a well-formed type.
 \begin{proof}
-By induction on the derivation of $\hastype \Gamma e A$. The case of \rulelabel{TyTApp} needs special attention since we need to show that the result of substitution ($\subst A \alpha C$) is well-formed.
+By induction on the derivation of $\hastype \Gamma e A$. The case of \rulelabel{TyTApp} needs special attention
 \begin{mathpar}
   \tytapp
 \end{mathpar}
+because we need to show that the result of substitution ($\subst A \alpha C$) is well-formed, which is evident by Lemma~\ref{instantiation}.
 \end{proof}
 
 \begin{theorem}[Unique elaboration] \label{unique-elaboration}

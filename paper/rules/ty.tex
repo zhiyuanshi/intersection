@@ -40,15 +40,15 @@
 % \newcommand{\rulelabelBLam}{\rulelabel\text{BLam}}
 \newcommand{\tyblam}{
 \inferrule* [right=TyBLam]
-  {\hastype {\Gamma, \alpha * B} e A \yields E \\ \istype \Gamma B}
-  {\hastype \Gamma {\blam {\alpha * B} e} {\for {\alpha * B} A} \yields {\blam \alpha E}}
+  {\hastype {\Gamma, \alpha \disjoint B} e A \yields E \\ \istype \Gamma B}
+  {\hastype \Gamma {\blam {\alpha \disjoint B} e} {\for {\alpha \disjoint B} A} \yields {\blam \alpha E}}
 }
 
 % TApp
 % \newcommand{\rulelabelTApp}{\rulelabel\text{TApp}}
 \newcommand{\tytapp}{
 \inferrule* [right=TyTApp]
-  {\hastype \Gamma e {\for {\alpha * B} C} \yields E \\
+  {\hastype \Gamma e {\for {\alpha \disjoint B} C} \yields E \\
    \istype \Gamma A \\
    \isdisjoint \Gamma A B
    }
