@@ -40,7 +40,9 @@
 % \newcommand{\rulelabelBLam}{\rulelabel\text{BLam}}
 \newcommand{\tyblam}{
 \inferrule* [right=TyBLam]
-  {\hastype {\Gamma, \alpha \disjoint B} e A \yields E \\ \istype \Gamma B}
+  {\hastype {\Gamma, \alpha \disjoint B} e A \yields E \\
+   \istype \Gamma B \\
+   \alpha \not \in \ftv \Gamma}
   {\hastype \Gamma {\blam {\alpha \disjoint B} e} {\for {\alpha \disjoint B} A} \yields {\blam \alpha E}}
 }
 
