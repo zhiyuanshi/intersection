@@ -1,18 +1,19 @@
 \colorlet{wfcolor}{BrickRed}
 
-\newcommand{\ruleLabelSourceWF}{\bm{\textcolor{wfcolor}{wf}}}
 
-\newcommand{\ruleLabelSourceWFVar}{\ruleLabelSourceWF\text{var}}
-\newcommand{\ruleLabelSourceWFTop}{\ruleLabelSourceWF\text{top}}
-\newcommand{\ruleLabelSourceWFFun}{\ruleLabelSourceWF\text{fun}}
-\newcommand{\ruleLabelSourceWFForall}{\ruleLabelSourceWF\text{forall}}
-\newcommand{\ruleLabelSourceWFAnd}{\ruleLabelSourceWF{\text{and}}}
-\newcommand{\ruleLabelSourceWFRec}{\ruleLabelSourceWF\text{rec}}
+\newcommand{\rulelabelWF}{\bm{\textcolor{wfcolor}{wf}}}
 
-\newcommand{\ruleSourceWF}{
-\inferrule* [right=$\ruleLabelSourceWF$]
-  {\ftv \tau \in \gamma}
-  {\judgeSourceWF \gamma \tau}
+\newcommand{\rulelabelWFVar}{\rulelabelWF\text{var}}
+\newcommand{\rulelabelWFTop}{\rulelabelWF\text{top}}
+\newcommand{\rulelabelWFFun}{\rulelabelWF\text{fun}}
+\newcommand{\rulelabelWFForall}{\rulelabelWF\text{forall}}
+\newcommand{\rulelabelWFAnd}{\rulelabelWF{\text{and}}}
+\newcommand{\rulelabelWFRec}{\rulelabelWF\text{rec}}
+
+\newcommand{\ruleWF}{
+\inferrule* [right=$\rulelabelWF$]
+  {\ftv \A \in \gamma}
+  {\istype \gamma \A}
 }
 
 \newcommand{\ruleLabelTargetWF}{\ruleLabelTarget\text{wf}}
@@ -24,38 +25,38 @@
 
 % Expanded form of well-formedness
 
-\newcommand{\ruleSourceWFVar}{
-\inferrule* [right=$\ruleLabelSourceWFVar$]
+\newcommand{\ruleWFVar}{
+\inferrule* [right=$\rulelabelWFVar$]
   {\alpha \in \gamma}
-  {\judgeSourceWF \gamma \alpha}
+  {\istype \gamma \alpha}
 }
 
-\newcommand{\ruleSourceWFTop}{
-\inferrule* [right=$\ruleLabelSourceWFTop$]
+\newcommand{\ruleWFTop}{
+\inferrule* [right=$\rulelabelWFTop$]
   { }
-  {\judgeSourceWF \gamma \top}
+  {\istype \gamma \top}
 }
 
-\newcommand{\ruleSourceWFFun}{
-\inferrule* [right=$\ruleLabelSourceWFFun$]
-  {\judgeSourceWF \gamma {\tau_1} \\ \judgeSourceWF \Gamma {\tau_2}}
-  {\judgeSourceWF \gamma {\tau_1 \to \tau_2}}
+\newcommand{\ruleWFFun}{
+\inferrule* [right=$\rulelabelWFFun$]
+  {\istype \gamma {\A_1} \\ \istype \Gamma {\A_2}}
+  {\istype \gamma {\A_1 \to \A_2}}
 }
 
-\newcommand{\ruleSourceWFForall}{
-\inferrule* [right=$\ruleLabelSourceWFForall$]
-  {\judgeSourceWF {\gamma, \alpha} \tau}
-  {\judgeSourceWF \gamma {\for \alpha \tau}}
+\newcommand{\ruleWFForall}{
+\inferrule* [right=$\rulelabelWFForall$]
+  {\istype {\gamma, \alpha} \A}
+  {\istype \gamma {\for \alpha \A}}
 }
 
-\newcommand{\ruleSourceWFAnd}{
-\inferrule* [right=$\ruleLabelSourceWFAnd$]
-  {\judgeSourceWF \gamma {\tau_1} \\ \judgeSourceWF \Gamma {\tau_2} \\ \tau_1 \orthog \tau_2}
-  {\judgeSourceWF \gamma {\tau_1 \andOp \tau_2}}
+\newcommand{\ruleWFAnd}{
+\inferrule* [right=$\rulelabelWFAnd$]
+  {\istype \gamma {\A_1} \\ \istype \Gamma {\A_2}}
+  {\istype \gamma {\A_1 \intersect \A_2}}
 }
 
-\newcommand{\ruleSourceWFRec}{
-\inferrule* [right=$\ruleLabelSourceWFRec$]
-  {\judgeSourceWF \gamma \tau}
-  {\judgeSourceWF \gamma {\recordType l \tau}}
+\newcommand{\ruleWFRec}{
+\inferrule* [right=$\rulelabelWFRec$]
+  {\istype \gamma \A}
+  {\istype \gamma {\recordType l \A}}
 }

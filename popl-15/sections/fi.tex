@@ -17,9 +17,56 @@ for those in the target language.
 % We include only single records because single record types as the multi-records
 % can be desugared into the merge of multiple single records.
 
-\begin{figure}[h]
-  \input{rule_in_figures/fi-syntax.tex}
-  \caption{Syntax of \name.}
+\begin{figure}
+  \[
+  \begin{array}{l}
+    \begin{array}{llrll}
+      \text{Types}
+      & T & \Coloneqq & \alpha     & \text{Type variable} \\
+      &         & \mid & \bot            & \text{Bottom type} \\
+      &        & \mid & A \to B         & \text{Function type}\\
+      &         & \mid & \for {\alpha * B} A   & \text{Universal quantification} \\
+      &         & \mid & A \intersect B  & \text{Intersection type} \\
+%      &         & \mid & \constraints {A \disjoint B} C & \text{Disjoint constraint} \\
+      % &         & \mid & \recordType l A & \text{Record type} \\
+%     \\
+%     \text{Types}
+%     & A, B, C, D & \Coloneqq & \alpha     & \text{Type variable} \\
+%     &  & \mid & A \intersect B  & \text{Intersection type} \\
+%     &         & \mid & A \intersect B  & \text{Intersection type} \\
+%     &         & \mid & T  & \text{Atomic type} \\
+
+      \\
+      \text{Expressions}
+      & e & \Coloneqq & x            & \text{Variable} \\
+%      &   & \mid & \top              & \text{Top} \\
+      &   & \mid & \lam x A e        & \text{Lambda} \\
+      &   & \mid & \app {e_1} {e_2}  & \text{Application} \\
+      &   & \mid & \blam {\alpha * A}  e    & \text{Big lambda} \\
+      &   & \mid & \tapp e A         & \text{Type application} \\
+      &   & \mid &  e_1 \mergeOp e_2 & \text{Merge} \\
+      % &   & \mid & {\_}                 & \text{Disjointness evidence}
+%      &   & \mid & \assume {(A \disjoint B)} e & \text{Constraint intro} \\
+%      &   & \mid & \app e {\_}                 & \text{Constraint elim} \\
+      % &   & \mid & \recordCon l e    & \text{Record} \\
+      % &   & \mid & e.l               & \text{Record selection} \\
+      % &   & \mid & e \restrictOp l   & \text{Record restriction} \\
+
+      \\
+      \text{Contexts}
+      & \Gamma & \Coloneqq & \epsilon         & \\
+      &        & \mid & \Gamma, \alpha * A       & \\
+      &        & \mid & \Gamma, x \hast A     & \\
+%      &        & \mid & \Gamma, A \disjoint B & \\
+
+      % \\
+      \text{Sugar} & \blam {\alpha} e & \equiv & \blam {\alpha * \bot} e & \\
+                   & e : A &  \equiv & (\lambda z : A . z) e &
+    \end{array}
+  \end{array}
+  \]
+
+  \caption{Syntax.}
   \label{fig:fi-syntax}
 \end{figure}
 
@@ -30,13 +77,13 @@ for those in the target language.
 Meta-variables $\tau$ range over types. Types include System $F$ constructs:
 type variables $\alpha$; function types $\tau_1 \to \tau_2$; and type
 abstraction $ \for \alpha \tau $. The top type $\top$ is the supertype of all
-types. $\tau_1 \andOp \tau_2$ denotes
+types. $\tau_1 \intersect \tau_2$ denotes
 the intersection of types $\tau_1$ and $\tau_2$; and $\recordType l \tau$ the types
 for single-field records. Interestingly, single-field record types can be viewed as types
 tagged with a label $l$, while the other type forms are untagged types. We omit
 type constants such as \lstinline$Int$ and \lstinline$String$.
 % \bruno{be consistent: in the source language we use \&, and in the
-% formalization we use $\andOp$}
+% formalization we use $\intersect$}
 
 Expressions include standard constructs in System
 $F$: variables $ x $; abstraction of expressions over variables of a given type
@@ -51,7 +98,7 @@ $e_1 \mergeOp e_2$ is the \emph{merge} of two expressions $e_1$ and $e_2$.
 It can be used as either $ e_1 $ or $ e_2 $. In particular, if one regards $e_1$
 and $e_2$ as objects, their merge will respond to every method that one or
 both of them have. Merge of expressions correspond to intersection types
-$ \tau_1 \andOp \tau_2 $. The expression $ \recordCon l e $ constructs a
+$ \tau_1 \intersect \tau_2 $. The expression $ \recordCon l e $ constructs a
 single-field record, whereas $ e.l $ accesses the field labelled $ l $ in $ e $.
 \begin{comment}
 Note that $ e $ does not
@@ -97,40 +144,56 @@ that are explicitly declared by the programmer.
 \end{comment}
 
 \begin{figure*}
-  \small
-  \input{rule_in_figures/fi-sub.tex}
+  \begin{mathpar}
+    \framebox{$ A \subtype B \yields F $} \\
+
+    \subVar
+
+    \subFun
+
+    \subForall
+
+    \subAnd
+
+    \subAndleft
+
+    \subAndright
+  \end{mathpar}
+
+  \footnote{miss a rule for $\bot$}
+
   \caption{Subtyping in \name.}
   \label{fig:fi-subtyping}
 \end{figure*}
 
 The subtyping rules of \name, shown in Figure~\ref{fig:fi-subtyping}, are syntax-directed
 (different from the approach by Davies and Pfenning~\cite{davies2000intersection},
-and Frisch et. al~\cite{frisch2008semantic}). The rule $\ruleLabelSubFun$ says that a function is
+and Frisch et. al~\cite{frisch2008semantic}). The rule $\rulelabelsubFun$ says that a function is
 contravariant in its parameter type and covariant in its return type. A
 universal quantifier ($\forall$) is covariant in its body. A single-field record
 type is also covariant, which becomes obvious if we regard it as a labelled
 type. The three rules dealing with intersection types are just what one would
 expect when interpreting types as sets. Under this interpretation, for example,
-the rule $\ruleLabelSubAnd$ says that if $\tau_1$ is both the subset of $\tau_2$
+the rule $\rulelabelsubAnd$ says that if $\tau_1$ is both the subset of $\tau_2$
 and the subset of $\tau_3$, then $\tau_1$ is also the subset of the intersection of $\tau_2$
 and $\tau_3$.
 
 % Intersection types introduce natural subtyping relations among types. For
-% example, $ \Int \andOp \Bool $ should be a subtype of $ \Int $, since the former
-% can be viewed as either $ \Int $ or $ \Bool $. To summarize, the subtyping rules
+% example, $ \tyint \intersect \tybool $ should be a subtype of $ \tyint $, since the former
+% can be viewed as either $ \tyint $ or $ \tybool $. To summarize, the subtyping rules
 % are standard except for three points listed below:
 % \begin{enumerate}
-% \item $ \tau_1 \andOp \tau_2 $ is a subtype of $ \tau_3 $, if \emph{either} $ \tau_1 $ or
+% \item $ \tau_1 \intersect \tau_2 $ is a subtype of $ \tau_3 $, if \emph{either} $ \tau_1 $ or
 %   $ \tau_2 $ are subtypes of $ \tau_3 $,
 
-% \item $ \tau_1 $ is a subtype of $ \tau_2 \andOp \tau_3 $, if $ \tau_1 $ is a subtype of
+% \item $ \tau_1 $ is a subtype of $ \tau_2 \intersect \tau_3 $, if $ \tau_1 $ is a subtype of
 %   both $ \tau_2 $ and $ \tau_3 $.
 
 % \item $ \recordType {l_1} {\tau_1} $ is a subtype of $ \recordType {l_2} {\tau_2} $, if
 %   $ l_1 $ and $ l_2 $ are identical and $ \tau_1 $ is a subtype of $ \tau_2 $.
 % \end{enumerate}
-% The first point is captured by two rules $ \ruleLabelSubAndLeft $ and
-% $ \ruleLabelSubAndRight $, whereas the second point by $ \ruleLabelSubAnd $.
+% The first point is captured by two rules $ \rulelabelsubAndLeft $ and
+% $ \rulelabelsubAndRight $, whereas the second point by $ \rulelabelsubAnd $.
 % Note that the last point means that record types are covariant in the type of
 % the fields.
 
@@ -151,19 +214,34 @@ materials submitted with the paper.
 \subsection{Typing}
 
 \begin{figure*}
-  \small
-  \input{rule_in_figures/fi-typing.tex}
+  \begin{mathpar}
+    \framebox{$ \hastype \Gamma e A \yields E $} \\
+
+    \tyvar
+
+    \tylam
+
+    \tyapp
+
+    \tyblam
+
+    \tytapp
+
+    \tymerge
+
+  \end{mathpar}
+
   \caption{The type system of \name.}
   \label{fig:fi-typing}
 \end{figure*}
 
 The syntax-directed typing rules of \name are shown in Figure~\ref{fig:fi-typing}. They consist of one
 main typing judgment and two auxiliary judgments. The main typing judgment is of
-the form: $ \judgeSource \gamma e \tau $. It reads: ``in the typing context
+the form: $ \hastype \gamma e \tau $. It reads: ``in the typing context
 $\gamma$, the expression $e$ is of type $\tau$''. The rules that are the same as
-in System $F$ are rules for variables ($\ruleLabelSourceVar$), lambda abstractions
-($\ruleLabelSourceLam$), type abstractions ($\ruleLabelSourceBLam$), and type applications
-($\ruleLabelSourceTApp$). The rule $\ruleLabelSourceApp$ needs special attention as we add
+in System $F$ are rules for variables (\rulelabel{Var}), lambda abstractions
+(\rulelabel{Lam}), type abstractions (\rulelabel{BLam}), and type applications
+(\rulelabel{TApp}). The rule \rulelabel{App} needs special attention as we add
 a subtyping requirement: the type of the argument ($\tau_3$) is a
 subtype of that of the parameter ($\tau_1$).
 %The advantage is that it then
@@ -171,53 +249,21 @@ subtype of that of the parameter ($\tau_1$).
 For merges
 $e_1 \mergeOp e_2$, we typecheck $e_1$ and $e_2$, and give it the
 intersection of the resulting types. The rule for
-single-field record construction ($\ruleLabelSourceRecConstruct$) is standard. The rules
-for record selection ($\ruleLabelSourceRecSelect$) and restriction
-($\ruleLabelSourceRecRestrict$) are expectedly the most complicated. They turn to the
+single-field record construction is standard. The rules
+for record selection and restriction
+are expectedly the most complicated. They turn to the
 auxiliary ``select'' and ``restrict'' rules to statically check operations and
 to obtain resulting types.
 
-\paragraph{Typing record selection.}
-The ``select'' judgment deals with record selection. For example,
-\[
-\judgeSelect {\recordType {\texttt{id}} \Int \andOp \recordType {\texttt{name}} \String}
-{\texttt{name}} {\String}
-\]
-That means that the $\texttt{name}$ field inside
-$\recordType {\texttt{id}} \Int \andOp \recordType {\texttt{name}} \String$ is of type
-$\texttt{String}$. Generally, $\judgeSelect {\tau_1} l {\tau_2}$ says that a field
-labelled $l$ is present inside $\tau_1$ and is of type $\tau_2$. The judgment is
-made of three inference rules and is inductively defined. $\ruleLabelSelect$ is
-the base case: if we ask for a field labelled $l$ inside $\recordType l \tau$, the
-field is clearly present and is of type $\tau$. $\ruleLabelSelectLeft$ and
-$\ruleLabelSelectRight$ are two symmetric step cases. Take
-$\ruleLabelSelectLeft$ for example, it means that if $l$ is present inside
-$\tau_1$, then it is also present inside $\tau_1 \andOp \tau_2$; and the type of
-the desired field $l$ remains $\tau$ in the conclusion.
-
-\paragraph{Typing record restriction.}
-The ``restrict'' judgment $\judgeRestrict {\tau_1} l {\tau_2}$ deals with record
-restriction and is very similar to the ``select'' judgment. The only difference
-is on the right-hand side of the equal sign: instead of giving the type of field being selected, the judment holds
-the type after the restriction. For example,
-\[
-\judgeRestrict {\recordType {\code{id}} \Int \andOp \recordType {\code{name}} \String}
-{\code{name}} {\recordType {\code{id}} \Int \andOp \top}
-\]
-Note that $\recordType {\code{id}} \Int \andOp \top$, interpreted set-theoretically,
-is equivalent to $\recordType {\code{id}} \Int$ and our system is able to judge
-that they are subtypes of each other.
-
-
 % The last two rules make use of the $ \rulename{fields} $ function just to make
-% sure that the field being accessed ($ \ruleLabelSourceRecSelect $) or updated
-% ($ \ruleLabelSourceRecUpd $) actually exists. The function is defined recursively, in
+% sure that the field being accessed ($ \rulelabelRecSelect $) or updated
+% ($ \rulelabelRecUpd $) actually exists. The function is defined recursively, in
 % Haskell pseudocode, as:
 % \[ \begin{array}{rll}
 %   \fields{\alpha} & = & \rel{\cdot} {\alpha} \\
 %   \fields{\tau_1 \to \tau_2} & = & \rel{\cdot} {\tau_1 \to \tau_2} \\
 %   \fields{\forall \alpha. \tau} & = & \rel{\cdot} {\forall \alpha. \tau} \\
-%   \fields{\tau_1 \andOp \tau_2} & = & \fields{\tau_1} \dplus \fields{\tau_2} \\
+%   \fields{\tau_1 \intersect \tau_2} & = & \fields{\tau_1} \dplus \fields{\tau_2} \\
 %   \fields{\recordType l \tau} & = & \rel l t
 % \end{array} \]
 % where $ \cdot $ means empty list, $ \dplus $ list concatenation, and $ : $ is an

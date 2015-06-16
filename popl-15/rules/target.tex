@@ -1,6 +1,6 @@
-\newcommand{\judgeTargetWF}[2]{#1 \; \textcolor{targetColor}{\turns} \; #2}
-\newcommand{\judgeTarget}[3]{#1 \; \textcolor{targetColor}{\turns} \; #2 \; \textcolor{targetColor}{:} \; #3}
-\newcommand{\ruleLabelTarget}{\bm{\textcolor{targetColor}{T}}}
+\newcommand{\judgeTargetWF}[2]{#1 \; \textcolor{Maroon}{\turns} \; #2}
+\newcommand{\judgeTarget}[3]{#1 \; \textcolor{Maroon}{\turns} \; #2 \; \textcolor{Maroon}{:} \; #3}
+\newcommand{\ruleLabelTarget}{\bm{\textcolor{Maroon}{T}}}
 
 \newcommand{\ruleLabelTargetvar}{\ruleLabelTarget\text{var}}
 \newcommand{\ruleTargetVar} {
@@ -33,8 +33,8 @@
 \newcommand{\ruleLabelTargetBLam}{\ruleLabelTarget\text{blam}}
 \newcommand{\ruleTargetBLam}{
 \inferrule* [right=$\ruleLabelTargetBLam$]
-  {\judgeSource {\Gamma, \alpha} E T}
-  {\judgeSource \Gamma {\blam \alpha E} {\for \alpha T}}
+  {\hastype {\Gamma, \alpha} E T}
+  {\hastype \Gamma {\blam \alpha E} {\for \alpha T}}
 }
 
 \newcommand{\ruleLabelTargetTApp}{\ruleLabelTarget\text{tapp}}
