@@ -200,12 +200,71 @@ Inductive WFTyp : PTyp -> Prop :=
   | WFAnd : forall t1 t2, WFTyp t1 -> WFTyp t2 -> OrthoS t1 t2 -> WFTyp (And t1 t2).
 
 (* Reflexivity *)
-Hint Resolve sint sfun sand1 sand2 sand3.
+Hint Resolve sint sfun sand1 sand2 sand3 SInt SFun SAnd1 SAnd2 SAnd3.
 
 Lemma reflex : forall (t1 : PTyp), Sub t1 t1.
 Proof.
 induction t1; intros; auto.
 Defined.
+
+
+(*
+Definition transitivity_sub S Q T := Sub S Q -> Sub Q T -> Sub S T.
+
+Lemma trans : forall Q T S, transitivity_sub S Q T.
+induction Q.
+unfold transitivity_sub; intros.
+induction T; try (inversion H0; inversion H1); auto.
+apply sand1. apply IHT1. 
+
+unfold Sub. exists x. unfold Sub in IHT1. unfold Sub in IHT2. auto.
+assert (exists e , sub S T1 e). apply IHT1. exists c1. auto.
+assert (exists e, sub S T2 e). apply IHT2. exists c2. auto.
+destruct H8. destruct H9. 
+rewrite <- H6. auto.
+
+admit.
+(*
+rewrite H4 in H. auto.
+unfold transitivity_sub; intros.
+induction T; try (inversion H0); auto.*)
+(* Case Fun *)
+unfold transitivity_sub; intros.
+generalize H0 H. clear H0. clear H.
+generalize S. clear S.
+induction T; intro; intro; try (inversion H0; inversion H); auto.
+induction S; intro; try (inversion H8; inversion H9); auto.
+apply sfun.
+apply IHQ1; unfold Sub. exists c1. auto. exists c0. auto. 
+apply IHQ2; unfold Sub. exists c3. auto. exists c2. auto.
+admit. admit.
+(* Case And *)
+unfold transitivity_sub; intros.
+assert (Sub S Q1 /\ Sub i S Q2).
+apply invAndS1; auto.
+destruct H1.
+generalize H1 H2.
+induction T; intros.
+inversion H0.
+apply IHQ1; auto.
+apply IHQ2; auto.
+inversion H0.
+apply IHQ1; auto.
+apply IHQ2; auto.
+inversion H0.
+apply IHQ1; auto.
+apply IHQ2; auto.
+inversion H0.
+apply IHQ1; auto.
+apply IHQ2; auto.
+inversion H0.
+apply SAnd1.
+apply IHT1; auto.
+apply IHT2; auto.
+apply IHQ1; auto.
+apply IHQ2; auto.
+Defined.
+*)
 
 (* Orthogonality algorithm is complete *)
 
@@ -213,7 +272,7 @@ Lemma ortho_completness : forall (t1 t2 : PTyp), OrthoS t1 t2 -> Ortho t1 t2.
 Proof.
 induction t1; intros; unfold OrthoS in H.
 (* Case PInt *)
-induction t2.
+induction t2. 
 destruct H. exists PInt. split; apply reflex.
 apply OIntFun.
 apply OAnd2. 
@@ -360,8 +419,6 @@ Lemma ortho_soundness : forall (t1 t2 : PTyp), Ortho t1 t2 -> OrthoS t1 t2.
 intros.
 induction H.
 (* Hard case *)
-assert (OrthoS t1 t3). apply IHOrtho1; auto.
-assert (OrthoS t2 t3). apply IHOrtho2; auto.
 apply ortho_and; auto.
 assert (OrthoS t2 t1). apply ortho_sym. apply IHOrtho1; auto.
 assert (OrthoS t3 t1). apply ortho_sym. apply IHOrtho2; auto.

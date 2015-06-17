@@ -237,6 +237,24 @@ unfold OrthoS in H. apply H. exists (And x1 x2). split; auto.
 unfold OrthoS in H0. apply H0. exists (And x1 x2). split; auto.
 Defined.
 
+Lemma common_supertype : forall x a b c d , sub (Fun a b) x -> sub (Fun c d) x -> exists c, sub d c /\ sub b c.
+induction x; intros.
+inversion H.
+exists x2.
+split.
+inversion H0.
+exact H6.
+inversion H.
+exact H6.
+inversion H.
+inversion H0.
+apply (IHx2 a _ c).
+apply H5.
+apply H10.
+Defined.
+
+
+
 Lemma ortho_soundness : forall (t1 t2 : PTyp), Ortho t1 t2 -> OrthoS t1 t2.
 intros.
 induction H.
@@ -250,13 +268,8 @@ apply ortho_sym.
 apply ortho_and; auto.
 (* Case FunFun *)
 unfold OrthoS. unfold not. intros.
-unfold OrthoS in IHOrtho. apply IHOrtho.
-destruct H0. destruct H0. generalize H0. generalize H1. clear H0. clear H1.
-induction x; intros. inversion H1. exists x2.
-split. inversion H0. auto. inversion H1. auto.
-apply IHx1.
-inversion H1. auto.
-inversion H0. auto.
+unfold OrthoS in IHOrtho. unfold not in IHOrtho. apply IHOrtho.
+destruct H0. destruct H0. apply (common_supertype x t3 _ t1); auto.
 (* Case IntFun *)
 unfold OrthoS. unfold not. intros.
 destruct H. destruct H. induction x. inversion H0. inversion H.
