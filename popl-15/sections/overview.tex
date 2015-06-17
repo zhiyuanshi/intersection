@@ -96,7 +96,7 @@ calculi.
 
 % The key constructs are the ``merge'' operator, denoted by $ \mergeOp $
 % at the term level and the corresponding type intersection operator, denoted by
-% $ \andOp $ at the type level.
+% $ \intersect $ at the type level.
 % \bruno{We take a particular approach to intersection types, namely that of
 % Dundfield. Some other approaches are different. The \emph{key feature} in
 % Dunfield's approach is the $\mergeOp$ operator, which allows for run-time
@@ -111,10 +111,10 @@ calculi.
 \subsection{Intersection Types in \name}
 
 % What is an intersection type? One classic view is from set-theoretic
-% interpretation of types: $ A \andOp B $ stands for the intersection of
+% interpretation of types: $ A \intersect B $ stands for the intersection of
 % the set of values of $ A $ and $ B $. A more practical view, adopted in this
 % paper, regards types as a kind of interface: a value of type
-% $ A \andOp B $ satisfies both of the interfaces of $ A $ and $ B $. For
+% $ A \intersect B $ satisfies both of the interfaces of $ A $ and $ B $. For
 % example, \lstinline{eval : Int} is the interface that supports evaluation to
 % integers, while \lstinline{eval : Int & print : String } supports both
 % evaluation and pretty printing. Those interfaces are akin to interfaces in
@@ -228,13 +228,13 @@ and it enjoys of properties such as \emph{idempotence},
 \emph{commutativity} and \emph{associativity}
 (equality is defined as bidirectional subtyping relation): \\
 
-% \noindent {\bf commutativity: } $A \andOp B = B \andOp A$  \\
-% {\bf associativity:~~~~~~}$A \andOp (B \andOp C) = (A \andOp B) \andOp C$
+% \noindent {\bf commutativity: } $A \intersect B = B \intersect A$  \\
+% {\bf associativity:~~~~~~}$A \intersect (B \intersect C) = (A \intersect B) \intersect C$
 
 \begin{tabular}{llrcl}
-  \textbf{Idempotent}  & $A \andOp A$            & $=$ & $A$ \\
-  \textbf{Commutative} & $A \andOp B$            & $=$ & $B \andOp A$ \\
-  \textbf{Associative} & $(A \andOp B) \andOp C$ & $=$ & $A \andOp (B \andOp C)$
+  \textbf{Idempotent}  & $A \intersect A$            & $=$ & $A$ \\
+  \textbf{Commutative} & $A \intersect B$            & $=$ & $B \intersect A$ \\
+  \textbf{Associative} & $(A \intersect B) \intersect C$ & $=$ & $A \intersect (B \intersect C)$
 \end{tabular}
 
 % \bruno{I think this will be a good place to talk about the following material:}

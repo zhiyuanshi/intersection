@@ -86,58 +86,6 @@
 %   {\hastype \Gamma {\app e {\_}} B \yields E}
 % }
 
-% rec-con
-% \newcommand{\rulelabelRecConstruct}{\rulelabel\text{rec-construct}}
-% \newcommand{\rulerecordConstruct}{
-% \inferrule* [right=$\rulelabelRecConstruct$]
-%   {\hastype \Gamma e A \yields E}
-%   {\hastype \Gamma {\recordCon l e} {\recordType l A} \yields E}
-% }
-
-% rec-select
-% \newcommand{\rulelabelRecSelect}{\rulelabel\text{rec-select}}
-% \newcommand{\ruleRecSelect}{
-% \inferrule* [right=$\rulelabelRecSelect$]
-%   {\hastype \Gamma e A \yields E \\
-%    \judgeSelect A l {A_1} \yields C}
-%   {\hastype \Gamma {e.l} {A_1} \yields {\app C E}}
-% }
-
-% rec-restrict
-% \newcommand{\rulelabelRecRestrict}{\rulelabel\text{rec-restrict}}
-% \newcommand{\ruleRecRestrict}{
-% \inferrule* [right=$\rulelabelRecRestrict$]
-%   {\hastype \Gamma e A \yields E \\
-%    \judgeRestrict A l {A_1} \yields C}
-%   {\hastype \Gamma {e \restrictOp l} {A_1} \yields {\app C E}}
-% }
-%
-% \newcommand{\judgeSelect}[3]{#1 \bullet #2 = #3}
-
-% select
-% \newcommand{\ruleGet}{
-%   \inferrule* [right=$\rulelabelSelect$]
-%   { }
-%   {\judgeSelect {\recordType l A} l A \yields {\lam x {\im {\recordType l A}} x}}
-% }
-
-% select1
-% \newcommand{\rulelabelSelectLeft}{{\rulelabelSelect}_1}
-% \newcommand{\ruleGetLeft}{
-%   \inferrule* [right=$\rulelabelSelectLeft$]
-%   {\judgeSelect {A_1} l A \yields C}
-%   {\judgeSelect {A_1 \intersect A_2} l A \yields {\lam x {\im {A_1
-%           \intersect A_2}} {\app C {(\proj 1 x)}}}}
-% }
-
-% select2
-% \newcommand{\rulelabelSelectRight}{{\rulelabelSelect}_2}
-% \newcommand{\ruleGetRight}{
-%   \inferrule* [right=$\rulelabelSelectRight$]
-%   {\judgeSelect {A_2} l A \yields C}
-%   {\judgeSelect {A_1 \intersect A_2} l A \yields {\lam x {\im {A_1
-%           \intersect A_2}} {\app C {(\proj 2 x)}}}}
-% }
 
 % \newcommand{\judgeRestrict}[3]{#1 \bm{\restrictOp} #2 = #3}
 
