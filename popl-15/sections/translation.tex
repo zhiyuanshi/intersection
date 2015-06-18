@@ -119,14 +119,14 @@ $ \im {\tau_1} \to \im {\tau_2} $ (Lemma~\ref{lemma:sub})\bruno{ref
 
 \noindent generates a coercion function from $\tyint \intersect \tybool$ to $\tybool$.
 
-In rules $\rulelabelsubVar$, $\rulelabelsubTop$, $\rulelabelsubForall$,
-coercions are just identity functions. In $\rulelabelsubFun$, we elaborate the
+In rules \rulelabel{SubVar}, \rulelabel{SubTop}, \rulelabel{SubForall},
+coercions are just identity functions. In \rulelabel{SubFun}, we elaborate the
 subtyping of parameter and return types by $\eta$-expanding $f$ to
 $\lam x {\im {\tau_3}} {\app f x}$, applying $C_1$ to the argument and $C_2$ to
-the result. Rules $\rulelabelsubAndLeft$, $\rulelabelsubAndRight$, and
-$\rulelabelsubAnd$ elaborate with intersection types. $\rulelabelsubAnd$ uses
-both coercions to form a pair. Rules $\rulelabelsubAndLeft$ and
-$\rulelabelsubAndRight$ reuse the coercion from the premises and create new ones
+the result. Rules \rulelabel{SubAnd1}, \rulelabel{SubAnd2}, and
+\rulelabel{SubAnd} elaborate with intersection types. \rulelabel{SubAnd} uses
+both coercions to form a pair. Rules \rulelabel{SubAnd1} and
+\rulelabel{SubAnd2} reuse the coercion from the premises and create new ones
 that cater to the changes of the argument type in the conclusions. Note that the
 two rules are syntatically the same and hence a program can be elaborated
 differently, depending on which rule is used. But in the implementation one
@@ -139,7 +139,7 @@ of $\tau_3$ and the new coercion is a function that takes a value $ x $ of type
 $\tau_1\intersect \tau_2$, project $x$ on the first item, and apply $ C $ to it.
 \end{comment}
 
-\begin{restatable}[\rulelabelsub~rules produce type-correct coercion]{lemma}{lemmasub}
+\begin{restatable}[Subtyping rules produce type-correct coercion]{lemma}{lemmasub}
   \label{lemma:sub}
   If $ \tau_1 \subtype \tau_2 \yields C $, then $ \judgeTarget \epsilon C {\im {\tau_1} \to \im {\tau_2}} $.
 \end{restatable}
@@ -198,53 +198,6 @@ into pairs.
 %   By typing rules, the translation of the program is
 %   \[ ("Isaac", 10) \]. If we apply the coercion to it, we get
 %   \[ "Isaac" \]
-
-\newcommand{\crestrictone}{\lam \_ {\im {\recordType \J \tyint}} {()}}
-\newcommand{\crestricttwo}{\lam x {\im {\recordType \I \tyint \intersect \recordType \J \tyint}} {\pair {\proj 1 x} {\  \app {(\crestrictone)} {\proj 2 x}}}}
-
-\begin{comment}
-To illustrate the idea of translation in more detail, we show a step-by-step
-derivation in Figure~\ref{fig:derivation} of translating the \name program
-program:
-\[
-\small
-\recordCon \I 0 \mergeOp \recordCon \J 0 \restrictOp \J
-\]
-into the target language. After evaluation, the target expression becomes just
-$\pair 0 {()}$.
-
-  \begin{figure*}[h]
-    \small
-    \begin{mathpar}
-      \small
-
-      \inferrule* [right=$\ruleLabelRestrictRight$]
-      {\judgeRestrict {\recordType \J \tyint} \J \top \yields {\lam \_ {\im {\recordType \J \tyint}} {()}}}
-      {\judgeRestrict {\recordType \I \tyint \intersect \recordType \J \tyint} \J {\recordType \I \tyint \intersect \top} \yields {\crestricttwo}}
-
-      \inferrule* [right=$\rulelabelRecRestrict$]
-      {
-        \inferrule* [right=$\rulelabelMerge$]
-        {
-          \inferrule* [right=$\rulelabelRecConstruct$]
-          {\ldots}
-          {\hastype \epsilon {\recordCon \I 0} {\recordType \I \tyint} \yields 0}
-          \\
-          \inferrule* [right=$\rulelabelRecConstruct$]
-          {\ldots}
-          {\hastype \epsilon {\recordCon \J 0} {\recordType \J \tyint} \yields 0}
-        }
-        {\hastype \epsilon {\recordCon \I 0 \mergeOp \recordCon \J 0} {\recordType \I \tyint \intersect \recordType \J \tyint} \yields {\pair 0 0}}
-        \\
-        \ldots
-      }
-      {\hastype \epsilon {\recordCon \I 0 \mergeOp \recordCon \J 0 \restrictOp \J} {\recordType \I \tyint \intersect \top} \yields {\app {(\crestricttwo)} {\pair 0 0}}}
-    \end{mathpar}
-
-    \caption{An example of translating record restriction.}
-    \label{fig:derivation}
-  \end{figure*}
-\end{comment}
 
 \begin{restatable}[Translation preserves well-typing]{theorem}{theorempreservation}
   \label{theorem:preservation}

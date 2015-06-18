@@ -19,51 +19,33 @@ for those in the target language.
 
 \begin{figure}
   \[
-  \begin{array}{l}
-    \begin{array}{llrll}
-      \text{Types}
-      & T & \Coloneqq & \alpha     & \text{Type variable} \\
-      &         & \mid & \bot            & \text{Bottom type} \\
-      &        & \mid & A \to B         & \text{Function type}\\
-      &         & \mid & \for {\alpha * B} A   & \text{Universal quantification} \\
-      &         & \mid & A \intersect B  & \text{Intersection type} \\
-%      &         & \mid & \constraints {A \disjoint B} C & \text{Disjoint constraint} \\
-      % &         & \mid & \recordType l A & \text{Record type} \\
-%     \\
-%     \text{Types}
-%     & A, B, C, D & \Coloneqq & \alpha     & \text{Type variable} \\
-%     &  & \mid & A \intersect B  & \text{Intersection type} \\
-%     &         & \mid & A \intersect B  & \text{Intersection type} \\
-%     &         & \mid & T  & \text{Atomic type} \\
+    \begin{array}{l}
+      \begin{array}{llrll}
+        \text{Types}
+        & A, B & \Coloneqq & \alpha                  & \\
+        &      & \mid & \bot                         & \\
+        &      & \mid & A \to B                      & \\
+        &      & \mid & \for {\alpha \disjoint B} A  & \\
+        &      & \mid & A \intersect B               & \\
 
-      \\
-      \text{Expressions}
-      & e & \Coloneqq & x            & \text{Variable} \\
-%      &   & \mid & \top              & \text{Top} \\
-      &   & \mid & \lam x A e        & \text{Lambda} \\
-      &   & \mid & \app {e_1} {e_2}  & \text{Application} \\
-      &   & \mid & \blam {\alpha * A}  e    & \text{Big lambda} \\
-      &   & \mid & \tapp e A         & \text{Type application} \\
-      &   & \mid &  e_1 \mergeOp e_2 & \text{Merge} \\
-      % &   & \mid & {\_}                 & \text{Disjointness evidence}
-%      &   & \mid & \assume {(A \disjoint B)} e & \text{Constraint intro} \\
-%      &   & \mid & \app e {\_}                 & \text{Constraint elim} \\
-      % &   & \mid & \recordCon l e    & \text{Record} \\
-      % &   & \mid & e.l               & \text{Record selection} \\
-      % &   & \mid & e \restrictOp l   & \text{Record restriction} \\
+        \\
+        \text{Terms}
+        & e & \Coloneqq & x                        & \\
+        &   & \mid & \lam x A e                    & \\
+        &   & \mid & \app {e_1} {e_2}              & \\
+        &   & \mid & \blam {\alpha \disjoint A} e  & \\
+        &   & \mid & \tapp e A                     & \\
+        &   & \mid & e_1 \mergeOp e_2              & \\
 
-      \\
-      \text{Contexts}
-      & \Gamma & \Coloneqq & \epsilon         & \\
-      &        & \mid & \Gamma, \alpha * A       & \\
-      &        & \mid & \Gamma, x \hast A     & \\
-%      &        & \mid & \Gamma, A \disjoint B & \\
+        \\
+        \text{Contexts}
+        & \Gamma & \Coloneqq & \cdot
+                   \mid \Gamma, \alpha \disjoint A
+                   \mid \Gamma, x \hast A  & \\
 
-      % \\
-      \text{Sugar} & \blam {\alpha} e & \equiv & \blam {\alpha * \bot} e & \\
-                   & e : A &  \equiv & (\lambda z : A . z) e &
+        \text{Syntactic sugar} & \blam {\alpha} e & \equiv & \blam {\alpha \disjoint \bot} e & \\
+      \end{array}
     \end{array}
-  \end{array}
   \]
 
   \caption{Syntax.}
@@ -168,13 +150,13 @@ that are explicitly declared by the programmer.
 
 The subtyping rules of \name, shown in Figure~\ref{fig:fi-subtyping}, are syntax-directed
 (different from the approach by Davies and Pfenning~\cite{davies2000intersection},
-and Frisch et. al~\cite{frisch2008semantic}). The rule $\rulelabelsubFun$ says that a function is
+and Frisch et. al~\cite{frisch2008semantic}). The rule \rulelabel{SubFun} says that a function is
 contravariant in its parameter type and covariant in its return type. A
 universal quantifier ($\forall$) is covariant in its body. A single-field record
 type is also covariant, which becomes obvious if we regard it as a labelled
 type. The three rules dealing with intersection types are just what one would
 expect when interpreting types as sets. Under this interpretation, for example,
-the rule $\rulelabelsubAnd$ says that if $\tau_1$ is both the subset of $\tau_2$
+the rule \rulelabel{SubAnd} says that if $\tau_1$ is both the subset of $\tau_2$
 and the subset of $\tau_3$, then $\tau_1$ is also the subset of the intersection of $\tau_2$
 and $\tau_3$.
 
@@ -210,6 +192,67 @@ then $ \tau_1 \subtype \tau_3 $.
 
 For the corresponding mechanized proofs in Coq, we refer to the supplementary
 materials submitted with the paper.
+
+\subsection{Disjointness and well-formedness}
+
+\begin{figure}
+  \begin{mathpar}
+    \framebox{$ \isdisjoint \Gamma A B$} \\
+
+    \disjointvar
+
+% \inferrule* [right=DisjointSym]
+%       {\alpha * A \in \Gamma}
+%       {\isdisjoint \Gamma A \alpha}
+
+    \disjointinterleft
+
+    \disjointinterright
+
+    \disjointfun
+
+    \disjointforall
+
+    \disjointatomic
+
+\framebox{$ A \not\sim B$} \\
+
+\inferrule* [right=NotSimBot1]
+      {}
+      {\bot \not\sim A \to B}
+
+\inferrule* [right=NotSimBot2]
+      {}
+      {\bot \not\sim \for {\alpha * B} A}
+
+\inferrule* [right=NotSimFunForall]
+      {}
+      {A \to B \not\sim \for {\alpha * B} A}
+
+\inferrule* [right=NotSimFunForall]
+      {B \not\sim A}
+      {A \not\sim B}
+
+  \end{mathpar}
+  \caption{Disjointness.}
+\end{figure}
+
+\begin{figure}
+  \begin{mathpar}
+    \framebox{$\istype \Gamma \tau$} \\
+
+    \wfvar
+
+    \wfbot
+
+    \wffun
+
+    \wfforall
+
+    \wfinter
+  \end{mathpar}
+  \caption{Well-formed types.}
+\end{figure}
 
 \subsection{Typing}
 

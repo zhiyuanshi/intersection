@@ -20,7 +20,7 @@ languages:
 \end{enumerate}
 
 These two features avoid the use of low-level programming techniques,
-and make the designs less reliant on advanced features of generics. 
+and make the designs less reliant on advanced features of generics.
 
 \begin{comment}
 Various solutions have been proposed to deal with the extensibility problems and
@@ -35,7 +35,7 @@ visitors!}
 
 
 \url{http://repository.cmu.edu/cgi/viewcontent.cgi?article=3018&context=compsci}
-Church encoding allows modelling algebraic data types. 
+Church encoding allows modelling algebraic data types.
 \end{comment}
 
 % Introduce the expression problem
@@ -132,8 +132,8 @@ Oliveira and Cook~\cite{oliveira2012extensibility} proposed a design pattern tha
 Expression Problem in languages like Java. An advantage of the pattern
 over previous solutions is that it is relatively lightweight in terms
 of type system features. In a latter paper, Oliveira et al.~\cite{oliveira2013feature}
-noted some limitations of the original design pattern and proposed 
-some new techniques that generalized the original pattern, allowing it 
+noted some limitations of the original design pattern and proposed
+some new techniques that generalized the original pattern, allowing it
 to express programs in a Feature-Oriented Programming~\cite{Prehofer97} style.
 Key to these techniques was the ability to dynamically compose object
 algebras.
@@ -143,28 +143,28 @@ non-trivial. At the type-level it is possible to express the resulting
 type of the composition using intersection types. Thus, it is still
 possible to solve that part problem nicely in a language like Scala (which
 has basic support for intersection types). However, the dynamic
-composition itself cannot be easily encoded in Scala. The fundamental 
+composition itself cannot be easily encoded in Scala. The fundamental
 issue is that Scala lacks a \lstinline{merge} operator (see the
 discussion in Section~\ref{subsec:interScala}). Although both Oliveira et al.~\cite{oliveira2013feature} and
 Rendell et al.~\cite{rendel14attributes} have shown that such a \lstinline{merge} operator can
 be encoded in Scala, the encoding fundamentally relies in low-level
 programming techniques such as dynamic proxies, reflection or
-meta-programming. 
+meta-programming.
 
 Because \name supports a \lstinline{merge} operator natively, dynamic
 object algebra composition becomes easy to encode. The remainder of
 this section shows how object algebras and object algebra composition
-can be encoded in \name. We will illustrate this point 
-step-by-step by solving the Expression Problem. 
+can be encoded in \name. We will illustrate this point
+step-by-step by solving the Expression Problem.
 %%Prior knowledge of object algebras is not assumed.
- 
+
 % can be cumbersome and
-% language support for intersection types would solve that problem. 
+% language support for intersection types would solve that problem.
 % Our type system is just a simple extension of System $ F $; yet surprisingly, it
 % is able to solve the limitations of using object algebras in languages such as
 % Java and Scala.
 
-\paragraph{A simple system of arithmetic expressions.} 
+\paragraph{A simple system of arithmetic expressions.}
 In the Expression Problem, the idea is to start with a very simple
 system modeling arithmetic expressions and evaluation.
 The initial system considers expressions with two variants (literals and
@@ -190,7 +190,7 @@ type of the interpretation \lstinline$E$.
 \begin{comment}
   \begin{lstlisting}{language=F2J}
     type ExpAlg[E] = {
-      lit: Int -> E, 
+      lit: Int -> E,
       add: E -> E -> E
     };
   \end{lstlisting}
@@ -205,7 +205,7 @@ type of the interpretation \lstinline$E$.
 % interface is of type \lstinline$IEval$ or of a subtype of \lstinline$IEval$.
 % \footnote{Should be mentioned in S2.}
 Having defined the interfaces, we can implement that object algebra interface
-with \lstinline$evalAlg$, which is an object algebra for evaluation. 
+with \lstinline$evalAlg$, which is an object algebra for evaluation.
 \begin{comment}
   \begin{lstlisting}{language=F2J}
     let evalAlg: ExpAlg[IEval] = {
@@ -218,26 +218,26 @@ with \lstinline$evalAlg$, which is an object algebra for evaluation.
 \end{comment}
 
 \lstinputlisting[linerange=15-20]{../src/ObjectAlgebra.sf} % APPLY:linerange=OA_EVALALG
-In this example we implement a record, where the two operations 
+In this example we implement a record, where the two operations
 \lstinline{lit} and \lstinline{add} return a record with type \lstinline{IEval}.
 The type \lstinline$ExpAlg[IEval]$ is the type of object algebras
 supporting evaluation. However, the one interesting point
 of object algebras is that other operations can be supported as
-well. 
+well.
 
 \paragraph{Add a subtraction variant.} The point of the Expression
 Problem is to support the addition of new features to the existing
-program, without modifying existing code. 
+program, without modifying existing code.
 The first feature is adding a new variant, such as subtraction. We can do so by
 simply intersecting the original types and merging with the original values:
 
 \begin{comment}
   \begin{lstlisting}{language=F2J}
-    type SubExpAlg[E] = 
+    type SubExpAlg[E] =
     ExpAlg[E] & {sub: E -> E -> E};
     let subEvalAlg = evalAlg ,, {
-      sub = \(x: IEval) (y: IEval) -> { 
-        eval = x.eval - y.eval 
+      sub = \(x: IEval) (y: IEval) -> {
+        eval = x.eval - y.eval
       }
     };
   \end{lstlisting}
@@ -247,10 +247,10 @@ simply intersecting the original types and merging with the original values:
 
 \noindent Note that here intersection types are used to model \emph{type
   inheritance} and the merge operator models a basic form of
-\emph{dynamic implementation inheritance}. 
+\emph{dynamic implementation inheritance}.
 
 \paragraph{Add a pretty printing operation.}
-A second extension is adding a new operation, such as pretty printing. 
+A second extension is adding a new operation, such as pretty printing.
 Similar to evaluation, the interface of the pretty printing feature
 is modeled as:
 \begin{comment}
@@ -278,11 +278,11 @@ addition, and subtraction is:
 
 \paragraph{Usage.}
 With the definitions above, values are created using the
-appropriate algebras. For example, the expression \lstinline{7 + 2} 
+appropriate algebras. For example, the expression \lstinline{7 + 2}
 is encoded as follows:
 \begin{comment}
   \begin{lstlisting}{language=F2J}
-    let e1[E] (f: SubExpAlg[E]) = 
+    let e1[E] (f: SubExpAlg[E]) =
     f.add (f.lit 7) (f.lit 2);
   \end{lstlisting}
 \end{comment}
@@ -306,7 +306,7 @@ does so by constructing a new object algebra where each field is a
 function that delegates the input to the two algebra parameters.
 \begin{comment}
   \begin{lstlisting}{language=F2J}
-    let combine[A,B](f: ExpAlg[A])(g: ExpAlg[B]) : 
+    let combine[A,B](f: ExpAlg[A])(g: ExpAlg[B]) :
     ExpAlg[A&B] = {
       lit = \(x: Int) -> f.lit x ,, g.lit x,
       add = \(x: A & B) (y: A & B) ->
@@ -318,7 +318,7 @@ function that delegates the input to the two algebra parameters.
 
 \begin{comment}
   \begin{lstlisting}{language=F2J}
-    let newAlg = 
+    let newAlg =
     combine[IEval,IPrint] subEvalAlg printAlg;
     let o = e1[IEval&IPrint] newAlg;
     o.print ++ " = " ++ o.eval.toString()
@@ -335,17 +335,17 @@ evaluation and printing, as the output of the program is
 
 In contrast to the Scala solutions available in the
 literature, \name is able to express object algebra
-composition very directly by using the merge operator. 
+composition very directly by using the merge operator.
 
 \subsection{Back to Visitors}
 
 Object Algebras are closely related to the visitor
 pattern~\cite{gamma1994design}.  Indeed, object algebra interfaces are just
 \emph{internal
-  visitors}~\cite{oliveira09modular,oliveira2012extensibility}. 
+  visitors}~\cite{oliveira09modular,oliveira2012extensibility}.
 What distinguishes object algebras
 from the traditional visitor pattern is the lack of a composite
-interface with an \lstinline{accept} method, which 
+interface with an \lstinline{accept} method, which
 is both a blessing and a curse.  On
 the one hand the trouble with composite interfaces with an
 \lstinline{accept} method is that they make adding new variants to the
@@ -361,8 +361,8 @@ The remainder of the section shows that in \name there is no need to
 have a dillema between extensibility using simple types and
 usability: \emph{in \name it is possible to have extensible visitors with
 simple types}! The key to achieve this is to have type inheritance
-decoupled from subtyping, and allowing contravariant parameter type 
-refinement. 
+decoupled from subtyping, and allowing contravariant parameter type
+refinement.
 
 \subsubsection{The Problem with Extensible Visitors}
 \begin{comment}
@@ -375,7 +375,7 @@ traditional OO styles hard to add a new operation, since operations are defined
 inside object classes that represent data structures. As a result, using the
 visitor pattern allows adding new operations to existing structures without
 modifying code of structures, a style enjoyed by functional
-programming. 
+programming.
 \end{comment}
 We illustrate the problem with extensible visitors using Scala.
 The type for expressions is defined in Scala as:
@@ -384,13 +384,13 @@ trait Exp {
   def accept[E](v: ExpAlg[E]): E
 }
 \end{lstlisting}
-The trait \lstinline{Exp} has only one method 
+The trait \lstinline{Exp} has only one method
 \lstinline$accept$, which takes an internal visitor (or object
-algebra) as an argument. 
+algebra) as an argument.
 Here the type \lstinline{ExpAlg[E]} is the Scala analogous of the
-corresponding type defined in Section~\ref{subsec:OAs} in \name. In terms 
-of the visitor pattern, \lstinline{ExpAlg} defines the visit methods 
-for all variants. 
+corresponding type defined in Section~\ref{subsec:OAs} in \name. In terms
+of the visitor pattern, \lstinline{ExpAlg} defines the visit methods
+for all variants.
 
 \begin{comment}
 The actual shape of the expressions
@@ -407,7 +407,7 @@ trait ExpVisitor[E] {
 \paragraph{Adding a new variant.}
 The difficulties arise when a new variant, such as subtraction is
 added. To do so an extended visitor interface analogous to
-\lstinline$SubExpAlg$ is needed. Moreover a corresponding composite 
+\lstinline$SubExpAlg$ is needed. Moreover a corresponding composite
 interface \lstinline$SubExp$ is needed as well:
 %For example, \lstinline$SubExp$ and \lstinline$SubExpAlg$
 %together represent the type of expressions supporting subtraction, in addition
@@ -419,11 +419,11 @@ trait SubExp extends Exp {
 \end{lstlisting}
 %We extend the original visitor and add the new case.
 The body of \lstinline{Exp} and \lstinline{SubExp} are almost the same: they
-both contain an \lstinline{accept} method that takes an object algebra 
+both contain an \lstinline{accept} method that takes an object algebra
 and returns a value of the type \lstinline{E}. The only difference in
 \lstinline{SubExp} the object algebra
 \lstinline{v} is of type \lstinline{SubExpAlg[E]}, which is a subtype of
-\lstinline{ExpAlg[E]}. 
+\lstinline{ExpAlg[E]}.
 
 \paragraph{Inheritance is not subtyping.}
 Since \lstinline{v} appears in parameter position of
@@ -472,7 +472,7 @@ types we first define two data constructors for simple expressions:
       accept = /\E -> \(f: ExpAlg[E]) -> f.lit n
     };
     let add (e1: Exp) (e2: Exp): Exp = {
-      accept = /\E -> \(f: ExpAlg[E]) -> 
+      accept = /\E -> \(f: ExpAlg[E]) ->
       f.add (e1.accept[E] f) (e2.accept[E] f)
     };
   \end{lstlisting}
@@ -480,20 +480,20 @@ types we first define two data constructors for simple expressions:
 \lstinputlisting[linerange=23-29]{../src/Visitor.sf} % APPLY:linerange=V_LITADD
 
 \noindent Both \lstinline{lit} and \lstinline{add} build values of type
-\lstinline{Exp} and use object algebras of type \lstinline{ExpAlg[E]}. 
+\lstinline{Exp} and use object algebras of type \lstinline{ExpAlg[E]}.
 However, subtraction requires a value of type \lstinline{SubExp} to be created:
 \begin{comment}
   \begin{lstlisting}{language=F2J}
-    let sub (e1: SubExp) (e2: SubExp): SubExp ={ 
+    let sub (e1: SubExp) (e2: SubExp): SubExp ={
       accept = /\E -> \(f : SubExpAlg[E]) ->
-      f.sub (e1.accept[E] f) (e2.accept[E] f) 
+      f.sub (e1.accept[E] f) (e2.accept[E] f)
     };
   \end{lstlisting}
 \end{comment}
 \lstinputlisting[linerange=36-39]{../src/Visitor.sf} % APPLY:linerange=V_SUB
 
 % One big benefit of using the visitor pattern is that programmers are able to
-% define structures in a more natural way. 
+% define structures in a more natural way.
 
 \paragraph{Usage.} With visitors constructing expressions is quite simple:
 
@@ -509,15 +509,15 @@ because because \lstinline$Exp$ is a \emph{subtype} of \lstinline$SubExp$. Code
 reuse is achieved since we can use the constructors from \lstinline$Exp$ as the
 constructor for \lstinline$SubExp$. In Scala, we would have to define two
 literal constructors, one for \lstinline$Exp$ and another for
-\lstinline$SubExp$. 
+\lstinline$SubExp$.
 
 Compared to object algebras, the addition of the composite structure
 allows values to be created much more intuitively, without any
 drawback! All the code developed with object algebras works right
-away with visitors. 
+away with visitors.
 
 Finally note that in terms of typing, this solution does not require
-any advanced use of generics. This is in sharp constrast with previous 
+any advanced use of generics. This is in sharp constrast with previous
 proposals for extensible visitors in the literature.
 
 % \subsection{Yanlin stuff}

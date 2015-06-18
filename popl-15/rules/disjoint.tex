@@ -1,35 +1,35 @@
 \newcommand{\disjointvar}{
   \inferrule* [right=DisjointVar]
     {\alpha * B \in \Gamma}
-    {\isdisjoint \Gamma \alpha B}
+    {\isdisjointi \Gamma \alpha B}
 }
 
 \newcommand{\disjointinterleft}{
   \inferrule* [right=DisjointInter1]
-    {\isdisjoint \Gamma A C \\ \isdisjoint \Gamma B C}
-    {\isdisjoint \Gamma {A \& B} {C}}
+    {\isdisjointi \Gamma A C \\ \isdisjointi \Gamma B C}
+    {\isdisjointi \Gamma {A \intersect B} {C}}
 }
 
 \newcommand{\disjointinterright}{
   \inferrule* [right=DisjointInter2]
-    {\isdisjoint \Gamma A B \\ \isdisjoint \Gamma A C}
-    {\isdisjoint \Gamma {A} {B \& C}}
+    {\isdisjointi \Gamma A B \\ \isdisjointi \Gamma A C}
+    {\isdisjointi \Gamma {A} {B \intersect C}}
 }
 
 \newcommand{\disjointfun}{
   \inferrule* [right=DisjointFun]
-    {\isdisjoint \Gamma B D}
-    {\isdisjoint \Gamma {A \to B} {C \to D}}
+    {\isdisjointi \Gamma B D}
+    {\isdisjointi \Gamma {A \to B} {C \to D}}
 }
 
 \newcommand{\disjointforall}{
   \inferrule* [right=DisjointForall]
-    {\isdisjoint \Gamma A C}
-    {\isdisjoint \Gamma {\for {\alpha * B} A} {\for {\alpha * B} C}}
+    {\isdisjointi \Gamma A C}
+    {\isdisjointi \Gamma {\for {\alpha * B} A} {\for {\alpha * B} C} \text{Subst???}}
 }
 
 \newcommand{\disjointatomic}{
   \inferrule* [right=DisjointAtomic]
     {A \not\sim B}
-    {\isdisjoint \Gamma {A} {B}}
+    {\isdisjointi \Gamma {A} {B}}
 }

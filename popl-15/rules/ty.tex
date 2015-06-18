@@ -5,7 +5,7 @@
 % Var
 % \newcommand{\rulelabelVar}{\rulelabel\text{Var}}
 \newcommand{\tyvar} {
-\inferrule* [right=TyVar]
+\inferrule* [right=T\_Var]
   {x \hast A \in \Gamma}
   {\hastype \Gamma x A \yields x}
 }
@@ -21,7 +21,7 @@
 % Lam
 % \newcommand{\rulelabelLam}{\rulelabel\text{Lam}}
 \newcommand{\tylam} {
-\inferrule* [right=TyLam]
+\inferrule* [right=T\_Lam]
   {\istype \Gamma A \\ \hastype {\Gamma, x \hast A} e B \yields E}
   {\hastype \Gamma {\lam x A e} {A \to B} \yields {\lam x {\im A} E}}
 }
@@ -29,7 +29,7 @@
 % App
 % \newcommand{\rulelabelApp}{\rulelabel\text{App}}
 \newcommand{\tyapp}{
-\inferrule* [right=TyApp]
+\inferrule* [right=T\_App]
   {\hastype \Gamma {e_1} {A_1 \to A_2} \yields {E_1} \\
    \hastype \Gamma {e_2} {A_3} \yields {E_2} \\
    A_3 \subtype A_1 \yields C}
@@ -39,7 +39,7 @@
 % BLam
 % \newcommand{\rulelabelBLam}{\rulelabel\text{BLam}}
 \newcommand{\tyblam}{
-\inferrule* [right=TyBLam]
+\inferrule* [right=T\_BLam]
   {\hastype {\Gamma, \alpha \disjoint B} e A \yields E \\
    \istype \Gamma B \\
    \alpha \not \in \ftv \Gamma}
@@ -49,7 +49,7 @@
 % TApp
 % \newcommand{\rulelabelTApp}{\rulelabel\text{TApp}}
 \newcommand{\tytapp}{
-\inferrule* [right=TyTApp]
+\inferrule* [right=T\_TApp]
   {\hastype \Gamma e {\for {\alpha \disjoint B} C} \yields E \\
    \istype \Gamma A \\
    \isdisjoint \Gamma A B
@@ -60,56 +60,10 @@
 % Merge
 % \newcommand{\rulelabelMerge}{\rulelabel\text{Merge}}
 \newcommand{\tymerge}{
-\inferrule* [right=TyMerge]
+\inferrule* [right=T\_Merge]
   {\hastype \Gamma {e_1} A \yields {E_1} \\
    \hastype \Gamma {e_2} B \yields {E_2} \\
    % A \bot B}
    \isdisjoint \Gamma A B}
   {\hastype \Gamma {e_1 \mergeOp e_2} {A \intersect B} \yields {\pair {E_1} {E_2}}}
 }
-
-% ConstraintIntro
-\newcommand{\rulelabelConstraintIntro}{\rulelabel\text{ConstraintIntro}}
-\newcommand{\ruleConstraintIntro}{
-  \inferrule* [right=$\rulelabelConstraintIntro$]
-    {\istype \Gamma {A_1} \\ \istype \Gamma {A_2} \\
-     \hastype {\Gamma, A_1 \disjoint A_2} e B \yields E}
-    {\hastype \Gamma {\assume {(A_1 \disjoint A_1)} e} {\constraints {A_1   \disjoint A_2} B} \yields E}
-}
-
-% ConstraintElim
-% \newcommand{\rulelabelConstraintElim}{\rulelabel\text{ConstraintElim}}
-% \newcommand{\ruleConstraintElim}{
-% \inferrule* [right=$\rulelabelConstraintElim$]
-%   {\hastype \Gamma e {\constraints {A_1 \disjoint A_2} B} \yields E \\
-%   \isdisjoint \Gamma {A_1} {A_2}}
-%   {\hastype \Gamma {\app e {\_}} B \yields E}
-% }
-
-
-% \newcommand{\judgeRestrict}[3]{#1 \bm{\restrictOp} #2 = #3}
-
-% restrict
-% \newcommand{\ruleRestrict}{
-%   \inferrule* [right=$\rulelabelRestrict$]
-%   { }
-%   {\judgeRestrict {\recordType l A} l \top \yields {\lam x {\im {\recordType l A}} {()}}}
-% }
-
-% restrict1
-% \newcommand{\rulelabelRestrictleft}{{\rulelabelRestrict}_1}
-% \newcommand{\ruleRestrictLeft}{
-%   \inferrule* [right=$\rulelabelRestrictleft$]
-%   {\judgeRestrict {A_1} l A \yields C}
-%   {\judgeRestrict {A_1 \intersect A_2} l {A \intersect A_2} \yields {\lam x {\im {A_1
-%           \intersect A_2}} {\pair {\app C {(\proj 1 x)}} {\proj 2 x}}}}
-% }
-
-% restrict2
-% \newcommand{\rulelabelRestrictRight}{{\rulelabelRestrict}_2}
-% \newcommand{\ruleRestrictRight}{
-%   \inferrule* [right=$\rulelabelRestrictRight$]
-%   {\judgeRestrict {A_2} l A \yields C}
-%   {\judgeRestrict {A_1 \intersect A_2} l {A_1 \intersect A} \yields {\lam x {\im {A_1
-%           \intersect A_2}} {\pair {\proj 1 x} {\app C {(\proj 2 x)}}}}}
-% }

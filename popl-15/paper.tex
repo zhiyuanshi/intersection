@@ -4,15 +4,12 @@
 
 \input{macros.tex}
 
-\input{rules/orthogonality.tex}
-\input{rules/subtyping.tex}
-\input{rules/target.tex}
-\input{rules/wellformedness.tex}
-
 \input{rules/wf.tex}
 \input{rules/disjoint.tex}
 \input{rules/sub.tex}
 \input{rules/ty.tex}
+\input{rules/target.tex}
+
 
 \newcommand{\name}{{\bf $F_{\&}$}\xspace}
 
@@ -95,12 +92,10 @@ of intersection types with a merge operator. However two important
 questions were left open by Dundfield:
 
 \begin{enumerate}
-
 \item How to allow coherent programs only?
 
 \item If a restriction that allows coherent programs is in place, can
   all coherent programs conform to the restriction?
-
 \end{enumerate}
 
 In other words question 1) asks whether we can find sufficient
@@ -245,85 +240,24 @@ type-checks in the restricted system.
 %   \caption{Type translation.}
 % \end{figure*}
 
-\begin{comment}
 \begin{figure}
   \begin{mathpar}
-    \framebox{$ \isatomic A$} \\
+    \framebox{$\isatomic A$} \\
 
     \inferrule*
       {}
       {\isatomic \bot}
 
-\inferrule*
+    \inferrule*
       {}
-      {\isatomic {A \to B}
+      {\isatomic {A \to B}}
 
     \inferrule*
       {}
-      {\isatomic {\for {\alpha * B} A}
+      {\isatomic {\for {\alpha \disjoint B} A}}
 
   \end{mathpar}
   \caption{Atomic types.}
-\end{figure}
-\end{comment}
-
-\begin{figure}
-  \begin{mathpar}
-    \framebox{$ \isdisjoint \Gamma A B$} \\
-
-    \disjointvar
-
-% \inferrule* [right=DisjointSym]
-%       {\alpha * A \in \Gamma}
-%       {\isdisjoint \Gamma A \alpha}
-
-    \disjointinterleft
-
-    \disjointinterright
-
-    \disjointfun
-
-    \disjointforall
-
-    \disjointatomic
-
-\framebox{$ A \not\sim B$} \\
-
-\inferrule* [right=NotSimBot1]
-      {}
-      {\bot \not\sim A \to B}
-
-\inferrule* [right=NotSimBot2]
-      {}
-      {\bot \not\sim \for {\alpha * B} A}
-
-\inferrule* [right=NotSimFunForall]
-      {}
-      {A \to B \not\sim \for {\alpha * B} A}
-
-\inferrule* [right=NotSimFunForall]
-      {B \not\sim A}
-      {A \not\sim B}
-
-  \end{mathpar}
-  \caption{Disjointness.}
-\end{figure}
-
-\begin{figure}
-  \begin{mathpar}
-    \framebox{$\istype \Gamma \tau$} \\
-
-    \wfvar
-
-    \wfbot
-
-    \wffun
-
-    \wfforall
-
-    \wfinter
-  \end{mathpar}
-  \caption{Well-formed types.}
 \end{figure}
 
 \subsection{``Testsuite'' of examples}
@@ -415,14 +349,6 @@ the translation is coherent.
 % Two types $A$ and $B$ are \emph{disjoint} if there does not exist an expression $e$, which is not a merge, such that $\hastype \epsilon e A'$, $\hastype \epsilon e B'$, $A' \subtype A$, and $B' \subtype B$.
 % \end{definition}
 
-We say two types are \emph{disjoint} if they do not share a common supertype.
-
-\begin{definition}[Disjointness]
-$A \bot B = \not \exists C. A <: C \wedge B <: C$
-\end{definition}
-
-We require the types of two terms in a merge $e_1 \mergeOp e_2$ to be disjoint. Why do we require this? That is because if both terms can be assigned some type $C$, both of them can be chosen as the meaning of the merge, which leads to multiple meaning of a term, known as incoherence.
-
 % \begin{figure}
 %   % Typing
 %   \begin{mathpar}
@@ -455,93 +381,7 @@ We require the types of two terms in a merge $e_1 \mergeOp e_2$ to be disjoint. 
 %   \caption{Disjointness.}
 % \end{figure}
 
-\section{Polymorphism with disjoint constraint}
-
-With a subtyping relation in a type system, bounded polymorphism extends the universal quantifier by confining the polymorphic type to be a subtype of a given type. In our type system, the forall binder also extends the parametric polymorphism, but in a different vein: the polymorphic type can only be disjoint with a given type.
-
-\begin{itemize}
-  \item \textbf{Bounded polymorphism}---the instantiation can only be the descendant of a given type
-  \item \textbf{Polymorphism with disjoint constraint}---the instantiation cannot share a common ancestor with a given type
-\end{itemize}
-
-The intuition can be found in figure \ldots.
-
-% http://tex.stackexchange.com/questions/158876/drawing-subgroup-lattices-in-tikz
-\begin{figure}
-
-% center everything in the figure
-\centering
-% horizontal node distance
-\newcommand{\mydistance}{.6cm}
-\begin{tikzpicture}[node distance=2cm]
-\title{Untergruppenverband der $A_4$}
-\node(A4)                           {$A_4$};
-\node(V4)       [below right=2cm and 2cm of A4] {$V_4$};
-\node(C31)      [below left=2cm and 0cm of A4]  {$C_3$};
-\node(C32)      [left=\mydistance of C31]       {$C_3$};
-\node(C33)      [left=\mydistance of C32]       {$C_3$};
-\node(C34)      [left=\mydistance of C33]       {$C_3$};
-\node(C22)      [below=2cm of V4]       {$C_2$};
-\node(C21)      [left=\mydistance of C22]       {$C_2$};
-\node(C23)      [right=\mydistance of C22]      {$C_2$};
-\node(1)            [below=6cm of A4]     {$\left\{1\right\}$};
-\draw(A4)       -- (V4);
-\foreach \x\y in {1,2,3,4} {
-    \draw (A4) -- (C3\x) node [midway, fill=white] {3};
-    \draw (C3\x) -- (1);
-
-}
-\foreach \x\y in {1/2,2/3,3/4} {
-    \draw(V4) -- (C2\x) node [midway, fill=white] {2};
-\draw (C3\x) -- (C3\y);
-\draw (C2\x) -- (1);
-}
-\draw(C21)      -- (C22);
-\draw(C22)      -- (C23);
-\end{tikzpicture}
-\caption{Untergruppenverband}
-\end{figure}
-
-\section{Intuition for the disjoint rules}
-
-The problem with the definition of disjointness is that it is a search problem. In this section, we are going to convert it that into an algorithm.
-
-Let $\universe_0$ be the universe of $\tau$ types. Let $\universe$ be the quotient set of $\universe_0$ by $\approx$, where $\approx$ is defined by \ldots.
-
-Let $\commonsuper$ be the ``common supertype'' function, and $\commonsub$ be the ``common subtype'' function. For example, assume $\integer$ and $\character$ share no common supertype. Then the fact can be expressed by $\commonsuper(\integer,\character)=\emptyset$. Formally,
-\begin{align*}
-  \commonsuper &: \universe \times \universe \to \powerset {\universe} \\
-  \commonsub   &: \universe \times \universe \to \powerset {\universe}
-\end{align*}
-which, given two types, computes the set of their common supertypes. ($\powerset S$ denotes the power set of $S$, that is, the set of all subsets of $S$.)
-
-\begin{align*}
-  \commonsuper(\alpha,\alpha) &= \{ \alpha \} \\
-  \commonsuper(\bot,\bot) &= \{ \bot \} \\
-  \commonsuper(\tau_1 \to \tau_2, \tau_3 \to \tau_4) &= \commonsub(\tau_1,\tau_3) \to \commonsuper(\tau_2,\tau_4) \\
-  % \commonsuper({\tau_1 \intersect \tau_2, \tau_3}) &= \commonsuper(\tau_1, \tau_3) \cup \commonsuper(\tau_1,\tau_3) \\
-  % \commonsuper({\tau_1, \tau_2 \intersect \tau_3}) &= \commonsuper(\tau_1, \tau_2) \cup \commonsuper(\tau_1,\tau_3)
-\end{align*}
-
-Notation. We use $\commonsub(\tau_1,\tau_3) \to \commonsuper(\tau_2,\tau_4)$ as a shorthand for $\{ s \to t ~|~ s \in \commonsub(\tau_1 \to \tau_2), t \in \commonsuper(\tau_2,\tau_4) \}$. Therefore, the problem of determining if $\commonsub(\tau_1,\tau_3) \to \commonsuper(\tau_2,\tau_4)$ is empty reduces to the problem of determining if $\commonsuper(\tau_2,\tau_4)$ is empty.
-
-Note that there always exists a common subtype of any two given types (case disjoint / case nondisjoint).
-
-
-
-\section{Application of the theory}
-
-\subsection{Systems without subtyping}
-
-\subsection{Systems with a top type}
-
-In type systems with a top type (such as \lstinline@Object@ in some OO languages), the definition of disjointness can be modified to:
-
-We say two types are \emph{disjoint} if their only common supertype is the top type.
-
 \section{Introduction}
-
-
 
 The benefit of a merge, compared to a pair, is that you don't need to explicitly extract an item out. For example, \lstinline@fst (1,'c')@
 
@@ -558,68 +398,13 @@ $E_1 \Downarrow v_1$ and $E_2 \Downarrow v_2$,
 then $v_1 = v_2$.
 \end{definition}
 
-\section{Theory}
-
-Types include three constructs: type variables, function types, and family intersections:
-\begin{mathpar}
-A,B,C \Coloneqq \alpha \mid A \to B \mid \cap_{\alpha \in S} A
-\end{mathpar}
-
-A \emph{family intersection}, denoted by $\cap_{\alpha \in S} A$, is the intersection of the family of types $A$ indexed by $\alpha$ (So $\alpha$ may be free in $A$).
-
-Let $\universe$ be the universe of all types.
-
-Then the parametric polymorphism is defined as:
-\begin{displaymath}
-\for \alpha A \coloneqq \cap_{\alpha \in \universe} A
-\end{displaymath}
-
-Binary intersection is a special case of family intersection:
-\begin{displaymath}
-A \cap B \coloneqq \cap_{\alpha \in \{A,B\}} \alpha
-\end{displaymath}
-
-\begin{mathpar}
-\inferrule
-  {(1,,'c') : \integer \intersect \character}
-  {(1,,'c'),,(2,,\true)}
-\end{mathpar}
-
 \begin{definition}{Disjointness}
 Two types $A$ and $B$ are \emph{disjoint} (written as ``$\disjoint A B$'') if there does not exist a type $C$ such that $C \subtype A$ and $C \subtype B$ and $C \subtype A \intersect B$.
 \end{definition}
 
-\begin{mathpar}
-\inferrule* [right=$\text{Formation}$]
-  {\istype \Gamma A \\ \istype B}
-  {\istype \Gamma {A \intersect B}}
-
-\inferrule* [right=$\text{Intro}$]
-  {e : A \\ e : B}
-  {e : A \intersect B}
-
-\inferrule* [right=$\text{Elim}_1$]
-  {e : A \intersect B}
-  {e : A}
-
-\inferrule* [right=$\text{Elim}_2$]
-  {e : A \intersect B}
-  {e : B}
-
-\inferrule* [right=$\text{Merge}_1$]
-  {e_1 : A \\ e_2 : B}
-  {e_1 \mergeOp e_2 : A}
-
-\inferrule* [right=$\text{Merge}_2$]
-  {e_1 : A \\ e_2 : B}
-  {e_1 \mergeOp e_2 : B}
-\end{mathpar}
-
-A well-formed type is such that given any query type, it is always clear which subpart the query is referring to.
-
 \subsection{Equational reasoning}
 
-We can define a \lstinline@fst@ function that extracts the first item of a merged value:
+We can define a \code{fst} function that extracts the first item of a merged value:
 \begin{lstlisting}
 let fst A B (x : A & B) = (\(y : A). y) x in ...
 \end{lstlisting}
@@ -743,7 +528,7 @@ $(\code{Int} \intersect \code{Char}) ((1 \mergeOp 'c') : \code{Int} \intersect
 
 \input{sections/introduction.tex}
 \input{sections/overview.tex}
-\input{sections/application.tex}
+\input{sections/examples.tex}
 \input{sections/fi.tex}
 \input{sections/translation.tex}
 \input{sections/implementation.tex}
@@ -764,13 +549,87 @@ We need to motivate the 3 changes:
 \paragraph{Disjoint quantification}: Needed when we have a
 combination of polymorphism and intersection types.
 
+With a subtyping relation in a type system, bounded polymorphism extends the universal quantifier by confining the polymorphic type to be a subtype of a given type. In our type system, the forall binder also extends the parametric polymorphism, but in a different vein: the polymorphic type can only be disjoint with a given type. Later during an instantiation, if the type provided overlaps with the constraint, such instantiation will be rejected by our type system.
+
+\begin{itemize}
+  \item \textbf{Bounded polymorphism}---the instantiation can only be the descendant of a given type
+  \item \textbf{Polymorphism with disjoint constraint}---the instantiation cannot share a common ancestor with a given type
+\end{itemize}
+
+The intuition can be found in figure \ldots.
+
+% http://tex.stackexchange.com/questions/158876/drawing-subgroup-lattices-in-tikz
+\begin{figure}
+
+% center everything in the figure
+\centering
+% horizontal node distance
+\newcommand{\mydistance}{.6cm}
+\begin{tikzpicture}[node distance=2cm]
+\title{Untergruppenverband der $A_4$}
+\node(A4)                           {$A_4$};
+\node(V4)       [below right=2cm and 2cm of A4] {$V_4$};
+\node(C31)      [below left=2cm and 0cm of A4]  {$C_3$};
+\node(C32)      [left=\mydistance of C31]       {$C_3$};
+\node(C33)      [left=\mydistance of C32]       {$C_3$};
+\node(C34)      [left=\mydistance of C33]       {$C_3$};
+\node(C22)      [below=2cm of V4]       {$C_2$};
+\node(C21)      [left=\mydistance of C22]       {$C_2$};
+\node(C23)      [right=\mydistance of C22]      {$C_2$};
+\node(1)            [below=6cm of A4]     {$\left\{1\right\}$};
+\draw(A4)       -- (V4);
+\foreach \x\y in {1,2,3,4} {
+    \draw (A4) -- (C3\x) node [midway, fill=white] {3};
+    \draw (C3\x) -- (1);
+
+}
+\foreach \x\y in {1/2,2/3,3/4} {
+    \draw(V4) -- (C2\x) node [midway, fill=white] {2};
+\draw (C3\x) -- (C3\y);
+\draw (C2\x) -- (1);
+}
+\draw(C21)      -- (C22);
+\draw(C22)      -- (C23);
+\end{tikzpicture}
+\caption{Untergruppenverband}
+\end{figure}
+
 \paragraph{Restrictions on subtyping}:
+
+The subtyping rules, without the atomic condition are overlapping. With the atomic constraint, one can guarantee that at any moment during the derivation of a subtyping relation, at most one rule can be used. Indeed, our restrictions on subtyping do not make the subtyping relation less expressive to one without such restrictions.\todo{Point to proofs}
+
+\george{Add interpretation of the theorem}
+
+\begin{theorem}
+  If $A \subtype C$, then $A \intersect B \subtype C$.
+  If $B \subtype C$, then $A \intersect B \subtype C$.
+\end{theorem}
+
+\begin{proof}
+  By induction on $C$.
+  If $C \neq C_1 \intersect C_2$, trivial.
+  If $C = C_1 \intersect C_2$,
+  Need to show $A \subtype C_1 \intersect C_2$ implies $A \intersect B \subtype C_1 \intersect C_2$.
+  By inversion $A \subtype C_1$ and $A \subtype C_2$.
+  By the i.h., $A \intersect B \subtype C_1$ and $A \intersect B \subtype C_2$.
+  By \rulelabel{SubAnd}, $A \intersect B \subtype C_1 \intersect C_2$.
+\end{proof}
 
 \subsection{Disjointness}
 
 Spec of disjointness/intuition ...
 
+We say two types are \emph{disjoint} if they do not share a common supertype.
+
+\begin{definition}[Disjointness]
+$A \bot B = \not \exists C. A <: C \wedge B <: C$
+\end{definition}
+
+We require the types of two terms in a merge $e_1 \mergeOp e_2$ to be disjoint. Why do we require this? That is because if both terms can be assigned some type $C$, both of them can be chosen as the meaning of the merge, which leads to multiple meaning of a term, known as incoherence.
+
 \subsection{Well-formed types}
+
+A well-formed type is such that given any query type, it is always clear which subpart the query is referring to. The rules for well-formedness are standard except for intersection types we require the two components to be disjoint.
 
 \subsection{Subtyping}
 
@@ -885,10 +744,7 @@ If $\istype \Gamma R$, $\istype \Gamma S$, and $R$ respects the constraints of $
 By induction on the derivation of $\istype \Gamma {\subst R \beta S}$.
 
 \begin{itemize}
-  \item Case
-  \begin{mathpar}
-    \wfvar
-  \end{mathpar}
+  \item Case \[ \wfvar \]
   If $\alpha$ happens to be the same as $\beta$, then by the def. of substitution $\subst R \beta \alpha = R$. Since $\istype \Gamma R$, we have $\istype \Gamma {\subst R \beta \alpha}$; On the other hand, if not, then by the def. of substitution $\subst R \beta S = S$. Since $\istype \Gamma S$, we also have $\istype \Gamma {\subst R \beta \alpha}$.
 
   \item Case
@@ -993,24 +849,54 @@ disjoint intersection types, it relies on a non-algorithmic
 specification of disjointness. This section shows an algorithmic
 specification of disjointness that is proved to be sound and complete.
 
+The problem with the definition of disjointness is that it is a search problem. In this section, we are going to convert it that into an algorithm.
+
+Let $\universe_0$ be the universe of $\tau$ types. Let $\universe$ be the quotient set of $\universe_0$ by $\approx$, where $\approx$ is defined by \ldots.
+
+Let $\commonsuper$ be the ``common supertype'' function, and $\commonsub$ be the ``common subtype'' function. For example, assume $\integer$ and $\character$ share no common supertype. Then the fact can be expressed by $\commonsuper(\integer,\character)=\emptyset$. Formally,
+\begin{align*}
+  \commonsuper &: \universe \times \universe \to \powerset {\universe} \\
+  \commonsub   &: \universe \times \universe \to \powerset {\universe}
+\end{align*}
+which, given two types, computes the set of their common supertypes. ($\powerset S$ denotes the power set of $S$, that is, the set of all subsets of $S$.)
+
+\begin{align*}
+  \commonsuper(\alpha,\alpha) &= \{ \alpha \} \\
+  \commonsuper(\bot,\bot) &= \{ \bot \} \\
+  \commonsuper(\tau_1 \to \tau_2, \tau_3 \to \tau_4) &= \commonsub(\tau_1,\tau_3) \to \commonsuper(\tau_2,\tau_4) \\
+  % \commonsuper({\tau_1 \intersect \tau_2, \tau_3}) &= \commonsuper(\tau_1, \tau_3) \cup \commonsuper(\tau_1,\tau_3) \\
+  % \commonsuper({\tau_1, \tau_2 \intersect \tau_3}) &= \commonsuper(\tau_1, \tau_2) \cup \commonsuper(\tau_1,\tau_3)
+\end{align*}
+
+Notation. We use $\commonsub(\tau_1,\tau_3) \to \commonsuper(\tau_2,\tau_4)$ as a shorthand for $\{ s \to t ~|~ s \in \commonsub(\tau_1 \to \tau_2), t \in \commonsuper(\tau_2,\tau_4) \}$. Therefore, the problem of determining if $\commonsub(\tau_1,\tau_3) \to \commonsuper(\tau_2,\tau_4)$ is empty reduces to the problem of determining if $\commonsuper(\tau_2,\tau_4)$ is empty.
+
+Note that there always exists a common subtype of any two given types (case disjoint / case nondisjoint).
+
 \subsection{Formal System}
 
 Explain the rules and intuitions.
 
-\subsection{Soundness and Completeness}
+\section{Discussions}
 
+\subsection{Systems without subtyping}
 
+\subsection{Systems with a top type}
+
+In type systems with a top type (such as \lstinline@Object@ in some OO languages), the definition of disjointness can be modified to:
+
+We say two types are \emph{disjoint} if their only common supertype is the top type.
+
+\input{sections/metatheory.tex}
 
 \input{sections/related-work.tex}
+
 \input{sections/conclusion.tex}
 
 \input{sections/bibliography.tex}
 
-\begin{comment}
-\acks
-
-Acknowledgments, if needed.
-\end{comment}
+% \acks
+%
+% Acknowledgments, if needed.
 
 \clearpage
 \onecolumn
