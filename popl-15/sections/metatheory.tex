@@ -16,7 +16,7 @@ The algorithmic rules for disjointness is sound and complete.
 
 \begin{theorem} \label{disjoint-intersect}
   If $\isdisjoint \Gamma A C$ and $\isdisjoint \Gamma B C$,
-  then $\isdisjoint \Gamma {A \intersect B} {C}$.
+  then $\isdisjoint \Gamma {A \inter B} {C}$.
 \end{theorem}
 
 \begin{lemma} \label{common-supertype}
@@ -29,7 +29,7 @@ The algorithmic rules for disjointness is sound and complete.
 \end{proof}
 
 \begin{theorem}{Soundness}
-  For any two type $A$, $B$, $\isdisjointi \Gamma A B$ implies $\isdisjoint \Gamma A B$.
+  For any two types $A$, $B$, $\isdisjointi \Gamma A B$ implies $\isdisjoint \Gamma A B$.
 \end{theorem}
 
 \begin{proof}
@@ -56,7 +56,7 @@ The algorithmic rules for disjointness is sound and complete.
     Need to show there does not exists $C$ such that...
     By induction on $C$.
     Atomic cases...
-    If $C = C_1 \intersect C_2$
+    If $C = C_1 \inter C_2$
     By inversion and the i.h. we arrive at a contradiction.
 
   \end{itemize}
@@ -81,8 +81,8 @@ The algorithmic rules for disjointness is sound and complete.
         \item Case $B = B_1 \to B_2$
         The conclusion is true by the disjoint axioms.
 
-        \item Case $B = B_1 \intersect B_2$.
-        Need to show $\Gamma \turns \bot * B_1 \intersect B_2$ implies $\Gamma \turns \bot *_I B_1 \intersect B_2$. Apply \rulelabel{DisjointInter2} and the resulting conditions can be proved by the i.h.
+        \item Case $B = B_1 \inter B_2$.
+        Need to show $\Gamma \turns \bot * B_1 \inter B_2$ implies $\Gamma \turns \bot *_I B_1 \inter B_2$. Apply \rulelabel{DisjointInter2} and the resulting conditions can be proved by the i.h.
 
         \item Case
       \end{itemize}
@@ -95,11 +95,11 @@ The algorithmic rules for disjointness is sound and complete.
           \item Case $B = B_1 \to B_2$
           Need to show $\Gamma \turns  A_1 \to A_2 * B_1 \to B_2$ implies $\Gamma \turns  A_1 \to A_2 *_I B_1 \to B_2$. Apply \rulelabel{DisjointFun} and the result, $\Gamma \turns A_2 *_I B_2$, can be proved by the i.h.
 
-          \item Case $B = B_1 \intersect B_2$.
-          Need to show $\Gamma \turns A_1 \to A_2 * B_1 \intersect B_2$ implies $\Gamma \turns A_1 \to A_2 *_I B_1 \intersect B_2$. Apply \rulelabel{DisjointInter2} and the resulting conditions can be proved by the i.h.
+          \item Case $B = B_1 \inter B_2$.
+          Need to show $\Gamma \turns A_1 \to A_2 * B_1 \inter B_2$ implies $\Gamma \turns A_1 \to A_2 *_I B_1 \inter B_2$. Apply \rulelabel{DisjointInter2} and the resulting conditions can be proved by the i.h.
         \end{itemize}
 
-        \item $A = A_1 \intersect A_2$
+        \item $A = A_1 \inter A_2$
         By \rulelabel{DisjointInter1} and by the i.h.
 
       \end{itemize}

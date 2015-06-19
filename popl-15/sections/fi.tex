@@ -28,7 +28,7 @@ System $F$ highlighted).
         &      & \mid & \bot                         & \\
         &      & \mid & A \to B                      & \\
         &      & \mid & \for {\alpha \disjoint B} A  & \\
-        &      & \mid & A \intersect B               & \\
+        &      & \mid & A \inter B               & \\
 
         \\
         \text{Terms}
@@ -58,29 +58,22 @@ System $F$ highlighted).
 %   visible. Use gray?}\bruno{there is no \lstinline{with} anymore.
 % Make sure the syntax is consistent with what is presented in the type rules!}
 
-Meta-variables $\tau$ range over types. Types include System $F$ constructs:
-type variables $\alpha$; function types $\tau_1 \to \tau_2$; and type
-abstraction $ \for \alpha \tau $. The bottom type $\bot$ is not inhabited by any
-term. $\tau_1 \intersect \tau_2$ denotes the intersection of types $\tau_1$ and
-$\tau_2$. We omit type constants such as \lstinline$tyint$ and \lstinline$tystring$.
+Meta-variables $A$, $B$ range over types. Types include System $F$ constructs:
+type variables $\alpha$; function types $A \to B$; and type
+abstraction $\for \alpha A$. The bottom type $\bot$ is not inhabited by any
+term. $A \inter B$ denotes the intersection of types $A$ and
+$B$. We omit type constants such as $\tyint$ and $\tystring$.
 
-% \bruno{be consistent: in the source language we use \&, and in the
-% formalization we use $\intersect$}
-
-Terms include standard constructs in System
-$F$: variables $ x $; abstraction of terms over variables of a given type
-$\lam x \tau e$ (concretely written \lstinline$\(x:T) -> e$);
-abstraction of terms over types $\blam \alpha e$ (concretely written \lstinline$/\A -> e$);
-application of terms to terms $\app {e_1} {e_2}$;
-and application of terms to types $\tapp e \tau$ (concretely written \lstinline$e[T]$).
-The last four constructs are novel.
-The canonical term that inhabits the top type is also written as $\top$.
-$e_1 \mergeOp e_2$ is the \emph{merge} of two terms $e_1$ and $e_2$.
-% \bruno{explain further, after all this is new.}
-It can be used as either $ e_1 $ or $ e_2 $. In particular, if one regards $e_1$
-and $e_2$ as objects, their merge will respond to every method that one or
-both of them have. Merge of terms correspond to intersection types
-$ \tau_1 \intersect \tau_2 $.
+Terms include standard constructs in System $F$: variables $x$; abstraction of
+terms over variables of a given type $\lam x A e$; application of terms to
+terms $\app {e_1} {e_2}$; and application of terms to types $\tapp e A$.
+``Big lambdas'' $\blam {\alpha \disjoint A} e$ abstracts a type variable
+$\alpha$ over a term $e$ and constraints the instantiation of $\alpha$ to be
+disjoint with a given type $A$. $e_1 \mergeOp e_2$ is the \emph{merge} of two
+terms $e_1$ and $e_2$. It can be used as either $ e_1 $ or $ e_2 $. In
+particular, if one regards $e_1$ and $e_2$ as objects, their merge will respond
+to every method that one or both of them have. Merge of terms correspond to
+intersection types $A \inter B$.
 
 % Note that $ e $ does not
 % need to be a record type in this case. For example, although the merge of two
@@ -96,9 +89,9 @@ such as fixpoints here, although they are supported in our implementation and
 can be included in formalization in standard ways.
 
 Typing contexts $ \Gamma $ track bound type variables with their disjointness
-constraint, and variables with their type $\tau$. We use use $\subst {\tau_1}
-\alpha {\tau_2}$ for the capture-avoiding substitution of $\tau_1$ for $\alpha$
-inside $\tau_2$ and $\ftv \cdot$ for sets of free variables.
+constraint, and variables with their type $A$. We use use $\subst {A} \alpha
+{B}$ for the capture-avoiding substitution of $A$ for $\alpha$ inside $B$ and
+$\ftv \cdot$ for sets of free variables.
 
 % \paragraph{Discussion.} A natural question the reader might ask is that why we
 % have excluded union types from the language. The answer is we found that
@@ -149,25 +142,25 @@ is contravariant in its parameter type and covariant in its return type. A
 universal quantifier ($\forall$) is covariant in its body. The three rules
 dealing with intersection types are just what one would expect when interpreting
 types as sets. Under this interpretation, for example, the rule
-\rulelabel{SubAnd} says that if $\tau_1$ is both the subset of $\tau_2$ and the
-subset of $\tau_3$, then $\tau_1$ is also the subset of the intersection of
-$\tau_2$ and $\tau_3$. In order to achieve coherence, \rulelabel{SubAnd1} and
+\rulelabel{SubAnd} says that if $A_1$ is both the subset of $A_2$ and the
+subset of $A_3$, then $A_1$ is also the subset of the intersection of
+$A_2$ and $A_3$. In order to achieve coherence, \rulelabel{SubAnd1} and
 \rulelabel{SubAnd2} additionally require the type on the right-hand side is
 atomic.
 
 % Intersection types introduce natural subtyping relations among types. For
-% example, $ \tyint \intersect \tybool $ should be a subtype of $ \tyint $, since the former
+% example, $ \tyint \inter \tybool $ should be a subtype of $ \tyint $, since the former
 % can be viewed as either $ \tyint $ or $ \tybool $. To summarize, the subtyping rules
 % are standard except for three points listed below:
 % \begin{enumerate}
-% \item $ \tau_1 \intersect \tau_2 $ is a subtype of $ \tau_3 $, if \emph{either} $ \tau_1 $ or
-%   $ \tau_2 $ are subtypes of $ \tau_3 $,
+% \item $ A_1 \inter A_2 $ is a subtype of $ A_3 $, if \emph{either} $ A_1 $ or
+%   $ A_2 $ are subtypes of $ A_3 $,
 
-% \item $ \tau_1 $ is a subtype of $ \tau_2 \intersect \tau_3 $, if $ \tau_1 $ is a subtype of
-%   both $ \tau_2 $ and $ \tau_3 $.
+% \item $ A_1 $ is a subtype of $ A_2 \inter A_3 $, if $ A_1 $ is a subtype of
+%   both $ A_2 $ and $ A_3 $.
 
-% \item $ \recordType {l_1} {\tau_1} $ is a subtype of $ \recordType {l_2} {\tau_2} $, if
-%   $ l_1 $ and $ l_2 $ are identical and $ \tau_1 $ is a subtype of $ \tau_2 $.
+% \item $ \recordType {l_1} {A_1} $ is a subtype of $ \recordType {l_2} {A_2} $, if
+%   $ l_1 $ and $ l_2 $ are identical and $ A_1 $ is a subtype of $ A_2 $.
 % \end{enumerate}
 % The first point is captured by two rules $ \rulelabelsubAndLeft $ and
 % $ \rulelabelsubAndRight $, whereas the second point by $ \rulelabelsubAnd $.
@@ -177,12 +170,12 @@ atomic.
 It is easy to see that subtyping is reflexive and transitive.
 
 \begin{lemma}[Subtyping is reflexive] \label{sub-refl}
-Given a type $ \tau $, $ \tau \subtype \tau $.
+Given a type $ A $, $ A \subtype A $.
 \end{lemma}
 
 \begin{lemma}[Subtyping is transitive] \label{sub-trans}
-If $ \tau_1 \subtype \tau_2 $ and $ \tau_2 \subtype \tau_3 $,
-then $ \tau_1 \subtype \tau_3 $.
+If $ A_1 \subtype A_2 $ and $ A_2 \subtype A_3 $,
+then $ A_1 \subtype A_3 $.
 \end{lemma}
 
 For the corresponding mechanized proofs in Coq, we refer to the supplementary
@@ -240,13 +233,13 @@ disjoint in a context $\Gamma$. Two atomic types with different shapes (except
 for the variable) are considered disjoint, which is factored out to the atomic
 disjointness rules. The \rulelabel{DisjointInter1} and
 \rulelabel{DisjointInter2} inductively distribute the relation itself over the
-intersection constructor ($\intersect$). \rulelabel{DisjointFun} is quite
+intersection constructor ($\inter$). \rulelabel{DisjointFun} is quite
 interesting, because it says two function types are disjoint as long as their
 return types are disjoint (regardless of their parameter types).
 
 \begin{figure}
   \begin{mathpar}
-    \framebox{$\istype \Gamma \tau$} \\
+    \framebox{$\istype \Gamma A$} \\
 
     \wfvar
 
@@ -293,16 +286,15 @@ intersection type must be disjoint.
 The syntax-directed typing rules of \name are shown in
 Figure~\ref{fig:fi-typing}. They consist of one main typing judgment and two
 auxiliary judgments. The main typing judgment is of the form: $ \hastype \Gamma
-e \tau $. It reads: ``in the typing context $\Gamma$, the term $e$ is of
-type $\tau$''. The rules that are the same as in System $F$ are rules for
-variables (\rulelabel{Var}), lambda abstractions (\rulelabel{Lam}), type
-abstractions (\rulelabel{BLam}), and type applications (\rulelabel{TApp}). For
-the ease of discussion, in \rulelabel{BLam}, we require the type variable
-introduced by the quantifier is fresh. For programs with type variable
-shadowing, this requirement can be met straighforwardly by variable renaming.
-The rule \rulelabel{App} needs special attention as we add a subtyping
-requirement: the type of the argument ($\tau_3$) is a subtype of that of the
-parameter ($\tau_1$).
+e A $. It reads: ``in the typing context $\Gamma$, the term $e$ is of type
+$A$''. The rules that are the same as in System $F$ are rules for variables
+(\rulelabel{Var}), lambda abstractions (\rulelabel{Lam}), and type applications
+(\rulelabel{TApp}). For the ease of discussion, in \rulelabel{BLam}, we require
+the type variable introduced by the quantifier is fresh. For programs with type
+variable shadowing, this requirement can be met straighforwardly by variable
+renaming. The rule \rulelabel{App} needs special attention as we add a subtyping
+requirement: the type of the argument ($A_3$) is a subtype of that of the
+parameter ($A_1$).
 %The advantage is that it then
 %becomes easier to derive an algorithm for typechecking.
 For merges $e_1 \mergeOp e_2$, we typecheck $e_1$ and $e_2$, check that the two
@@ -315,10 +307,10 @@ types.
 % Haskell pseudocode, as:
 % \[ \begin{array}{rll}
 %   \fields{\alpha} & = & \rel{\cdot} {\alpha} \\
-%   \fields{\tau_1 \to \tau_2} & = & \rel{\cdot} {\tau_1 \to \tau_2} \\
-%   \fields{\forall \alpha. \tau} & = & \rel{\cdot} {\forall \alpha. \tau} \\
-%   \fields{\tau_1 \intersect \tau_2} & = & \fields{\tau_1} \dplus \fields{\tau_2} \\
-%   \fields{\recordType l \tau} & = & \rel l t
+%   \fields{A_1 \to A_2} & = & \rel{\cdot} {A_1 \to A_2} \\
+%   \fields{\forall \alpha. A} & = & \rel{\cdot} {\forall \alpha. A} \\
+%   \fields{A_1 \inter A_2} & = & \fields{A_1} \dplus \fields{A_2} \\
+%   \fields{\recordType l A} & = & \rel l t
 % \end{array} \]
 % where $ \cdot $ means empty list, $ \dplus $ list concatenation, and $ : $ is an
 % infix operator that prepend the first argument to the second. The function

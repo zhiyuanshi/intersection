@@ -96,7 +96,7 @@ calculi.
 
 % The key constructs are the ``merge'' operator, denoted by $ \mergeOp $
 % at the term level and the corresponding type intersection operator, denoted by
-% $ \intersect $ at the type level.
+% $ \inter $ at the type level.
 % \bruno{We take a particular approach to intersection types, namely that of
 % Dundfield. Some other approaches are different. The \emph{key feature} in
 % Dunfield's approach is the $\mergeOp$ operator, which allows for run-time
@@ -111,10 +111,10 @@ calculi.
 \subsection{Intersection Types in \name}
 
 % What is an intersection type? One classic view is from set-theoretic
-% interpretation of types: $ A \intersect B $ stands for the intersection of
+% interpretation of types: $ A \inter B $ stands for the intersection of
 % the set of values of $ A $ and $ B $. A more practical view, adopted in this
 % paper, regards types as a kind of interface: a value of type
-% $ A \intersect B $ satisfies both of the interfaces of $ A $ and $ B $. For
+% $ A \inter B $ satisfies both of the interfaces of $ A $ and $ B $. For
 % example, \lstinline{eval : Int} is the interface that supports evaluation to
 % integers, while \lstinline{eval : Int & print : String } supports both
 % evaluation and pretty printing. Those interfaces are akin to interfaces in
@@ -228,13 +228,13 @@ and it enjoys of properties such as \emph{idempotence},
 \emph{commutativity} and \emph{associativity}
 (equality is defined as bidirectional subtyping relation): \\
 
-% \noindent {\bf commutativity: } $A \intersect B = B \intersect A$  \\
-% {\bf associativity:~~~~~~}$A \intersect (B \intersect C) = (A \intersect B) \intersect C$
+% \noindent {\bf commutativity: } $A \inter B = B \inter A$  \\
+% {\bf associativity:~~~~~~}$A \inter (B \inter C) = (A \inter B) \inter C$
 
 \begin{tabular}{llrcl}
-  \textbf{Idempotent}  & $A \intersect A$            & $=$ & $A$ \\
-  \textbf{Commutative} & $A \intersect B$            & $=$ & $B \intersect A$ \\
-  \textbf{Associative} & $(A \intersect B) \intersect C$ & $=$ & $A \intersect (B \intersect C)$
+  \textbf{Idempotent}  & $A \inter A$            & $=$ & $A$ \\
+  \textbf{Commutative} & $A \inter B$            & $=$ & $B \inter A$ \\
+  \textbf{Associative} & $(A \inter B) \inter C$ & $=$ & $A \inter (B \inter C)$
 \end{tabular}
 
 % \bruno{I think this will be a good place to talk about the following material:}
@@ -252,7 +252,7 @@ and it enjoys of properties such as \emph{idempotence},
 from subtyping. Type-inheritance, as formally defined by Cook et
 al.~\cite{cook1989inheritance}, is:
 \[
-G = F + \{ l_1:\tau_1, \ldots, l_n:\tau_n \}
+G = F + \{ l_1:A_1, \ldots, l_n:A_n \}
 \]
 Here $G$ is a new type defined by adding fields to an existing type $F$.
 The argument that ``Inheritance is not subtyping'' means that structually, $G$ can
@@ -394,7 +394,7 @@ let mixed: Int & {x: Int} = 1 ,, {x=2};
 \end{lstlisting}
 and it is still possible to use record operations on
 \lstinline{mixed}. That is because a record type of the form $ \recordType
-l \tau $ can be thought as a normal type $ \tau $ tagged by the label
+l A $ can be thought as a normal type $ A $ tagged by the label
 $ l $. For instance, \lstinline$mixed.x$ extracts the value of the field
 \lstinline{x} from \lstinline{mixed}.
 

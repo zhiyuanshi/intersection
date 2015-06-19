@@ -143,7 +143,7 @@ type-checks in the restricted system.
 % \begin{mathpar}
 % \begin{array}{l}
 %   \begin{array}{llrl}
-%     \text{Values} & v & \Coloneqq & \top \mid \lam x \tau e \mid \blam \alpha e \mid v_1 \mergeOp v_2 \mid \recordCon l e
+%     \text{Values} & v & \Coloneqq & \top \mid \lam x A e \mid \blam \alpha e \mid v_1 \mergeOp v_2 \mid \recordCon l e
 %   \end{array}
 % \end{array}
 % \end{mathpar}
@@ -183,16 +183,16 @@ type-checks in the restricted system.
 % \begin{figure*}
 %   \begin{mathpar}
 %     \inferrule* [right=Cast/UpCast]
-%       {\tau_1 \subtype \tau}
-%       {\cast \tau {\withType v {\tau_1}} \hookrightarrow v}
+%       {A_1 \subtype A}
+%       {\cast A {\withType v {A_1}} \hookrightarrow v}
 %
 %     \inferrule* [right=Cast/TakeLeft]
-%       {\cast \tau {\withType {v_1} {\tau_1}} \hookrightarrow v}
-%       {\cast \tau {\withType {v_1 \mergeOp v_2} {\tau_1 \intersect \tau_2}} \hookrightarrow v}
+%       {\cast A {\withType {v_1} {A_1}} \hookrightarrow v}
+%       {\cast A {\withType {v_1 \mergeOp v_2} {A_1 \inter A_2}} \hookrightarrow v}
 %
 %     \inferrule* [right=Cast/TakeRight]
-%       {\cast \tau {\withType {v_2} {\tau_2}} \hookrightarrow v}
-%       {\cast \tau {\withType {v_1 \mergeOp v_2} {\tau_1 \intersect \tau_2}} \hookrightarrow v}
+%       {\cast A {\withType {v_2} {A_2}} \hookrightarrow v}
+%       {\cast A {\withType {v_1 \mergeOp v_2} {A_1 \inter A_2}} \hookrightarrow v}
 %   \end{mathpar}
 %
 %   \caption{Casts.}
@@ -205,16 +205,16 @@ type-checks in the restricted system.
 %       {v \Downarrow v}
 %
 %     \inferrule* [right=Dyn/App]
-%       {e_1 \Downarrow \lam x \tau e \\
+%       {e_1 \Downarrow \lam x A e \\
 %        e_2 \Downarrow v_2 \\
-%        \cast \tau {\withType {v_2} {\tau_2}} \hookrightarrow v_3 \\
+%        \cast A {\withType {v_2} {A_2}} \hookrightarrow v_3 \\
 %        \subst {v_3} x e \Downarrow v}
-%       {\app {e_1} {\withType {e_2} {\tau_2}} \Downarrow v}
+%       {\app {e_1} {\withType {e_2} {A_2}} \Downarrow v}
 %
 %     \inferrule* [right=Dyn/TApp]
 %       {e_1 \Downarrow \for \alpha e \\
-%        \subst \tau \alpha e \Downarrow v}
-%       {\tapp {e_1} \tau \Downarrow v}
+%        \subst A \alpha e \Downarrow v}
+%       {\tapp {e_1} A \Downarrow v}
 %
 %     \inferrule* [right=Dyn/Merge]
 %       {e_1 \Downarrow v_1 \\ e_2 \Downarrow v_2}
@@ -338,7 +338,7 @@ the translation is coherent.
 % \begin{mathpar}
 %   \inferrule
 %   {}
-%   {\hastype \epsilon {1 \mergeOp 2} {\constraints {\integer \disjoint \integer} \integer \intersect \integer}}
+%   {\hastype \epsilon {1 \mergeOp 2} {\constraints {\integer \disjoint \integer} \integer \inter \integer}}
 % \end{mathpar}
 
 % \begin{definition}{(Disjointness)}
@@ -368,13 +368,13 @@ the translation is coherent.
 %
 %   % % Selection
 %   % \begin{mathpar}
-%   %   \framebox{$\judgeSelect {\tau_1} l \tau_2 \yields C$} \and
+%   %   \framebox{$\judgeSelect {A_1} l A_2 \yields C$} \and
 %   %   \ruleGet \and \ruleGetLeft \and \ruleGetRight
 %   % \end{mathpar}
 %   %
 %   % % Restriction
 %   % \begin{mathpar}
-%   %   \framebox{$\judgeRestrict {\tau_1} l \tau_2 \yields C$} \and
+%   %   \framebox{$\judgeRestrict {A_1} l A_2 \yields C$} \and
 %   %   \ruleRestrict \and \ruleRestrictLeft \and \ruleRestrictRight
 %   % \end{mathpar}
 %
@@ -386,20 +386,20 @@ the translation is coherent.
 The benefit of a merge, compared to a pair, is that you don't need to explicitly extract an item out. For example, \lstinline@fst (1,'c')@
 
 \begin{definition}{Determinism}
-If $e : \tau_1 \hookrightarrow E_1$ and $e : \tau_2 \hookrightarrow E_2$,
-then $\tau_1 = \tau_2$ and $E_1 = E_2$.
+If $e : A_1 \hookrightarrow E_1$ and $e : A_2 \hookrightarrow E_2$,
+then $A_1 = A_2$ and $E_1 = E_2$.
 \end{definition}
 
 \emph{Coherence} is a property about the relation between syntax and semantics. We say a semantics is \emph{coherent} if the syntax of a term uniquely determines its semantics.
 
 \begin{definition}{Coherence}
-If $e_1 : \tau_1 \hookrightarrow E_1$ and $e_2 : \tau_2 \hookrightarrow E_2$,
+If $e_1 : A_1 \hookrightarrow E_1$ and $e_2 : A_2 \hookrightarrow E_2$,
 $E_1 \Downarrow v_1$ and $E_2 \Downarrow v_2$,
 then $v_1 = v_2$.
 \end{definition}
 
 \begin{definition}{Disjointness}
-Two types $A$ and $B$ are \emph{disjoint} (written as ``$\disjoint A B$'') if there does not exist a type $C$ such that $C \subtype A$ and $C \subtype B$ and $C \subtype A \intersect B$.
+Two types $A$ and $B$ are \emph{disjoint} (written as ``$\disjoint A B$'') if there does not exist a type $C$ such that $C \subtype A$ and $C \subtype B$ and $C \subtype A \inter B$.
 \end{definition}
 
 \subsection{Equational reasoning}
@@ -449,24 +449,24 @@ parametric polymorphism.
 If we would like to have a deterministic elaboration result, another idea is to
 tweak the rules a little bit so that given a term, it is no longer possible that
 both of the twin rules described above can be used. For example, if
-$\tau_1 \intersect \tau_2 \subtype
-\tau_3$, we would like to be certain that either $\tau_1 \subtype
-\tau_3$ holds or $\tau_2 \subtype \tau_3$ holds, but not both.
+$A_1 \inter A_2 \subtype
+A_3$, we would like to be certain that either $A_1 \subtype
+A_3$ holds or $A_2 \subtype A_3$ holds, but not both.
 
 Formally, we can state this theorem as:
 
 \begin{theorem}
-  If $\tau_1$, $\tau_2$, $\tau_3$, and $\tau_1 \intersect \tau_2$ are well-formed
-  types, and $\tau_1 \intersect \tau_2 \subtype \tau_3$, then $\tau_1 \intersect \tau_3$
-  \emph{exclusive} or $\tau_2 \intersect \tau_3$.
+  If $A_1$, $A_2$, $A_3$, and $A_1 \inter A_2$ are well-formed
+  types, and $A_1 \inter A_2 \subtype A_3$, then $A_1 \inter A_3$
+  \emph{exclusive} or $A_2 \inter A_3$.
 \end{theorem}
 
 Note that $A$ \emph{exclusive} or $B$ is true if and only if their truth value
 differ. Next, we are going to investigate the minimal requirement (necessary and
 sufficient conditions) such that the theorem holds.
 
-If $\tau_1$ and $\tau_2$ in this setting are the same, for example,
-$\code{Int} \intersect \code{Int} \subtype \code{Int}$, obviously the theorem will
+If $A_1$ and $A_2$ in this setting are the same, for example,
+$\code{Int} \inter \code{Int} \subtype \code{Int}$, obviously the theorem will
 not hold since both the left $\code{Int}$ and the right $\code{Int}$ are a
 subtype of $\code{Int}$.
 
@@ -475,16 +475,16 @@ $\code{Nat} \subtype_\text{prim} \code{Int}$ (a natural number is also an
 integer), which can be promoted to the normal subtyping with this rule:
 \begin{mathpar}
   \inferrule
-  {\tau_1 \subtype_\text{prim} \tau_2}
-  {\tau_1 \subtype \tau_2}
+  {A_1 \subtype_\text{prim} A_2}
+  {A_1 \subtype A_2}
 \end{mathpar}
 the theorem will also not hold because
-$\code{Int} \intersect \code{Nat} \subtype \code{Int}$ and yet
+$\code{Int} \inter \code{Nat} \subtype \code{Int}$ and yet
 $\code{Int} \subtype \code{Int}$ and $\code{Nat} \subtype \code{Int}$.
 
 We can try to rule out such possibilities by making the requirement of
 well-formedness stronger. This suggests that the two types on the sides of
-$\intersect$ should not ``overlap''. In other words, they should be ``disjoint''. It
+$\inter$ should not ``overlap''. In other words, they should be ``disjoint''. It
 is easy to determine if two base types are disjoint. For example, $\code{Int}$
 and $\code{Int}$ are not disjoint. Neither do $\code{Int}$ and $\code{Nat}$.
 Also, types built with different constructors are disjoint. For example,
@@ -521,9 +521,9 @@ let me see how we can get `1` before the change
 % ----------------------------------------------
 % (Int & Char) ((1 ,, 'c') : Int & Char) ~> 1
 
-With the change, we need $\code{Int} \subtype \code{Int} \intersect \code{Char}$ to
+With the change, we need $\code{Int} \subtype \code{Int} \inter \code{Char}$ to
 hold in order to get the premise, which does not. So it can be shown that
-$(\code{Int} \intersect \code{Char}) ((1 \mergeOp 'c') : \code{Int} \intersect
+$(\code{Int} \inter \code{Char}) ((1 \mergeOp 'c') : \code{Int} \inter
 \code{Char}) \hookrightarrow 1$ is not derivable.
 
 \input{sections/introduction.tex}
@@ -601,18 +601,18 @@ The subtyping rules, without the atomic condition are overlapping. With the atom
 \george{Add interpretation of the theorem}
 
 \begin{theorem}
-  If $A \subtype C$, then $A \intersect B \subtype C$.
-  If $B \subtype C$, then $A \intersect B \subtype C$.
+  If $A \subtype C$, then $A \inter B \subtype C$.
+  If $B \subtype C$, then $A \inter B \subtype C$.
 \end{theorem}
 
 \begin{proof}
   By induction on $C$.
-  If $C \neq C_1 \intersect C_2$, trivial.
-  If $C = C_1 \intersect C_2$,
-  Need to show $A \subtype C_1 \intersect C_2$ implies $A \intersect B \subtype C_1 \intersect C_2$.
+  If $C \neq C_1 \inter C_2$, trivial.
+  If $C = C_1 \inter C_2$,
+  Need to show $A \subtype C_1 \inter C_2$ implies $A \inter B \subtype C_1 \inter C_2$.
   By inversion $A \subtype C_1$ and $A \subtype C_2$.
-  By the i.h., $A \intersect B \subtype C_1$ and $A \intersect B \subtype C_2$.
-  By \rulelabel{SubAnd}, $A \intersect B \subtype C_1 \intersect C_2$.
+  By the i.h., $A \inter B \subtype C_1$ and $A \inter B \subtype C_2$.
+  By \rulelabel{SubAnd}, $A \inter B \subtype C_1 \inter C_2$.
 \end{proof}
 
 \subsection{Disjointness}
@@ -652,19 +652,19 @@ We say the \emph{constraint} of a type variable $\alpha$ inside the context $\Ga
 \end{lemma}
 
 \begin{lemma}[Unique subtype contributor] \label{unique-subtype-contributor}
-If $A \intersect B \subtype C$, where $A \intersect B$ and $C$ are well-formed types, then it is not possible that the following hold at the same time:
+If $A \inter B \subtype C$, where $A \inter B$ and $C$ are well-formed types, then it is not possible that the following hold at the same time:
 \begin{enumerate}
 \item $A \subtype C$
 \item $B \subtype C$
 \end{enumerate}
 \end{lemma}
 
-If $A \intersect B \subtype C$, then either $A$ or $B$ contributes to that subtyping relation, but not both. The implication of this lemma is that during the derivation, it is not possible that two rules are applicable.
+If $A \inter B \subtype C$, then either $A$ or $B$ contributes to that subtyping relation, but not both. The implication of this lemma is that during the derivation, it is not possible that two rules are applicable.
 
 \newcommand{\wfinterlabel}{\textsc{WFInter}}
 
 \begin{proof}
-Since $A \intersect B$ is well-formed, $A \disjoint B$ by the formation rule of intersection types \wfinterlabel. Then by the definition of disjointness, there does not exist a type $C$ such that $A \subtype C$ and $B \subtype C$. It follows that $A \subtype C$ and $B \subtype C$ cannot hold simultaneously.
+Since $A \inter B$ is well-formed, $A \disjoint B$ by the formation rule of intersection types \wfinterlabel. Then by the definition of disjointness, there does not exist a type $C$ such that $A \subtype C$ and $B \subtype C$. It follows that $A \subtype C$ and $B \subtype C$ cannot hold simultaneously.
 \end{proof}
 
 The coercion of a subtyping relation $A \subtype B$ is uniquely determined.
@@ -677,15 +677,15 @@ If $A \subtype B \yields {C_1}$ and $A \subtype B \yields {C_2}$, where $A$ and 
 The set of rules for generating coercions is syntax-directed except for the three rules that involve intersection types in the conclusion. Therefore it suffices to show that if well-formed types $A$ and $B$ satisfy $A \subtype B$, where $A$ or $B$ is an intersection type, then at most one of the three rules applies. In the following, we do a case analysis on the shape of $A$ and $B$:
 
 \begin{itemize}
-  \item \textbf{Case} $A \neq A_1 \intersect A_2$ and $B = B_1 \intersect B_2$: Clearly only \textsc{SubAnd} can apply.
-  \item \textbf{Case} $A = A_1 \intersect A_2$ and $B \neq B_1 \intersect B_2$: Only two rules can apply, \textsc{SubAnd1} and \textsc{SubAnd2}. Further, by the unique subtype contributor lemma, it is not possible that $A_1 \subtype B$ and that $A_2 \subtype B$. Thus we are certain that at most one rule of \textsc{SubAnd1} and \textsc{SubAnd2} will apply.
-  \item \textbf{Case} $A = A_1 \intersect A_2$ and $B = B_1 \intersect B_2$\footnote{An example of this case is:
-    \[ (\integer \intersect \bool) \intersect \character \subtype \bool \intersect \character \]}: Since $B$ is not atomic, only \rulelabel{SubAnd} apply.
+  \item \textbf{Case} $A \neq A_1 \inter A_2$ and $B = B_1 \inter B_2$: Clearly only \textsc{SubAnd} can apply.
+  \item \textbf{Case} $A = A_1 \inter A_2$ and $B \neq B_1 \inter B_2$: Only two rules can apply, \textsc{SubAnd1} and \textsc{SubAnd2}. Further, by the unique subtype contributor lemma, it is not possible that $A_1 \subtype B$ and that $A_2 \subtype B$. Thus we are certain that at most one rule of \textsc{SubAnd1} and \textsc{SubAnd2} will apply.
+  \item \textbf{Case} $A = A_1 \inter A_2$ and $B = B_1 \inter B_2$\footnote{An example of this case is:
+    \[ (\integer \inter \bool) \inter \character \subtype \bool \inter \character \]}: Since $B$ is not atomic, only \rulelabel{SubAnd} apply.
 
   %   Suppose the contrary, that is, more than one of the three rules apply. Since it is not possible that both \textsc{SubAnd1} and \textsc{SubAnd2} apply by the unique subtype contributor lemma, only one of \textsc{SubAnd1} and \textsc{SubAnd2} apply. Therefore \textsc{SubAnd} has to hold. Without the loss of generality, assume \textsc{SubAnd1} apply. Then we have:
-  % \[ A_1 \subtype B_1 \intersect B_2 \]
-  % \[ A_1 \intersect A_2 \subtype B_1 \]
-  % \[ A_1 \intersect A_2 \subtype B_2 \]
+  % \[ A_1 \subtype B_1 \inter B_2 \]
+  % \[ A_1 \inter A_2 \subtype B_1 \]
+  % \[ A_1 \inter A_2 \subtype B_2 \]
 \end{itemize}
 \end{proof}
 
@@ -774,7 +774,7 @@ By induction on the derivation of $\istype \Gamma {\subst R \beta S}$.
   \begin{mathpar}
     \wfinter
   \end{mathpar}
-  By i.h., $\istype \Gamma {\subst R \beta A}$ and $\istype \Gamma {\subst R \beta B}$. By Lemma~\ref{invariance-of-disjointness}, we also have $\isdisjoint \Gamma {\subst R \beta A} {\subst R \beta B}$. Therefore by \rulelabel{WFInter}, $\istype \Gamma {\subst R \beta {A \intersect B}}$.
+  By i.h., $\istype \Gamma {\subst R \beta A}$ and $\istype \Gamma {\subst R \beta B}$. By Lemma~\ref{invariance-of-disjointness}, we also have $\isdisjoint \Gamma {\subst R \beta A} {\subst R \beta B}$. Therefore by \rulelabel{WFInter}, $\istype \Gamma {\subst R \beta {A \inter B}}$.
 \end{itemize}
 \end{proof}
 
@@ -804,15 +804,15 @@ By induction.
   By straightforwardly applying the i.h and the rule itself.
 
   \item Case \[ \wfinter \]
-  Let $C$ in the statement of this lemma be $C_1 \intersect C_2$.
+  Let $C$ in the statement of this lemma be $C_1 \inter C_2$.
   By the condition we know
-  \[ \istype {\Gamma, \alpha \disjoint B} {C_1 \intersect C_2} \]
+  \[ \istype {\Gamma, \alpha \disjoint B} {C_1 \inter C_2} \]
   Thus we must have,
   \[ \istype {\Gamma, \alpha \disjoint B} {C_1} \]
   By the i.h., $\istype \Gamma {\subst A \alpha {C_1}}$ and similarly $\istype \Gamma {\subst A \alpha {C_2}}$. By \rulelabel{WFInter}\todo{Show disjointness},
-  \[ \istype \Gamma {\subst A \alpha {C_1} \intersect \subst A \alpha {C_2}} \]
+  \[ \istype \Gamma {\subst A \alpha {C_1} \inter \subst A \alpha {C_2}} \]
   and hence
-  \[ \istype \Gamma {\subst A \alpha {(C_1 \intersect C_2)}} \]
+  \[ \istype \Gamma {\subst A \alpha {(C_1 \inter C_2)}} \]
 
 \end{itemize}
 
@@ -851,7 +851,7 @@ specification of disjointness that is proved to be sound and complete.
 
 The problem with the definition of disjointness is that it is a search problem. In this section, we are going to convert it that into an algorithm.
 
-Let $\universe_0$ be the universe of $\tau$ types. Let $\universe$ be the quotient set of $\universe_0$ by $\approx$, where $\approx$ is defined by \ldots.
+Let $\universe_0$ be the universe of $A$ types. Let $\universe$ be the quotient set of $\universe_0$ by $\approx$, where $\approx$ is defined by \ldots.
 
 Let $\commonsuper$ be the ``common supertype'' function, and $\commonsub$ be the ``common subtype'' function. For example, assume $\integer$ and $\character$ share no common supertype. Then the fact can be expressed by $\commonsuper(\integer,\character)=\emptyset$. Formally,
 \begin{align*}
@@ -863,12 +863,12 @@ which, given two types, computes the set of their common supertypes. ($\powerset
 \begin{align*}
   \commonsuper(\alpha,\alpha) &= \{ \alpha \} \\
   \commonsuper(\bot,\bot) &= \{ \bot \} \\
-  \commonsuper(\tau_1 \to \tau_2, \tau_3 \to \tau_4) &= \commonsub(\tau_1,\tau_3) \to \commonsuper(\tau_2,\tau_4) \\
-  % \commonsuper({\tau_1 \intersect \tau_2, \tau_3}) &= \commonsuper(\tau_1, \tau_3) \cup \commonsuper(\tau_1,\tau_3) \\
-  % \commonsuper({\tau_1, \tau_2 \intersect \tau_3}) &= \commonsuper(\tau_1, \tau_2) \cup \commonsuper(\tau_1,\tau_3)
+  \commonsuper(A_1 \to A_2, A_3 \to A_4) &= \commonsub(A_1,A_3) \to \commonsuper(A_2,A_4) \\
+  % \commonsuper({A_1 \inter A_2, A_3}) &= \commonsuper(A_1, A_3) \cup \commonsuper(A_1,A_3) \\
+  % \commonsuper({A_1, A_2 \inter A_3}) &= \commonsuper(A_1, A_2) \cup \commonsuper(A_1,A_3)
 \end{align*}
 
-Notation. We use $\commonsub(\tau_1,\tau_3) \to \commonsuper(\tau_2,\tau_4)$ as a shorthand for $\{ s \to t ~|~ s \in \commonsub(\tau_1 \to \tau_2), t \in \commonsuper(\tau_2,\tau_4) \}$. Therefore, the problem of determining if $\commonsub(\tau_1,\tau_3) \to \commonsuper(\tau_2,\tau_4)$ is empty reduces to the problem of determining if $\commonsuper(\tau_2,\tau_4)$ is empty.
+Notation. We use $\commonsub(A_1,A_3) \to \commonsuper(A_2,A_4)$ as a shorthand for $\{ s \to t ~|~ s \in \commonsub(A_1 \to A_2), t \in \commonsuper(A_2,A_4) \}$. Therefore, the problem of determining if $\commonsub(A_1,A_3) \to \commonsuper(A_2,A_4)$ is empty reduces to the problem of determining if $\commonsuper(A_2,A_4)$ is empty.
 
 Note that there always exists a common subtype of any two given types (case disjoint / case nondisjoint).
 

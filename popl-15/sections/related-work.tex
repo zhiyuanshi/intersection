@@ -81,16 +81,16 @@ algorithmic and we formalize a record system.
 % applications, thus avoiding the subsumption rule. Besides, our treatment
 % combines the merge rules ($ k $ ranges over $ \{1, 2\} $)
 % \inferrule
-% {\Gamma \turns e_k : \tau}
-% {\Gamma \turns e_1 \mergeOp e_2 : \tau}
+% {\Gamma \turns e_k : A}
+% {\Gamma \turns e_1 \mergeOp e_2 : A}
 % and the standard intersection-introduction rule
 % \inferrule
-% {\Gamma \turns e : \tau_1 \andalso \Gamma \turns e : \tau_2}
-% {\Gamma \turns e : \tau_1 \intersect \tau_2}
+% {\Gamma \turns e : A_1 \andalso \Gamma \turns e : A_2}
+% {\Gamma \turns e : A_1 \inter A_2}
 % into one rule:
 % \inferrule [Merge]
-% {\Gamma \turns e_1 : \tau_1 \andalso \Gamma \turns e_2 : \tau_2}
-% {\Gamma \turns e_1 \mergeOp e_2 : \tau_1 \intersect \tau_2}
+% {\Gamma \turns e_1 : A_1 \andalso \Gamma \turns e_2 : A_2}
+% {\Gamma \turns e_1 \mergeOp e_2 : A_1 \inter A_2}
 Reynolds invented Forsythe~\cite{reynolds1997design} in the 1980s. Our merge
 operator is analogous to his $ p_1, p_2 $. As Dunfield
 has noted, in Forsythe merges can be only used unambiguously.
@@ -102,8 +102,8 @@ For instance, it is not allowed in Forsythe to merge two functions.
 % formalize elaborating records.
 
 % Both Pierce and Dunfield's system include a subsumption rule, which states that
-% if an term has been inferred of type $ \tau $, then it is also of any
-% supertype of $ \tau $. Our system does not have this rule.
+% if an term has been inferred of type $ A $, then it is also of any
+% supertype of $ A $. Our system does not have this rule.
 
 Refinement
 intersection~\cite{dunfield2007refined,davies2005practical,freeman1991refinement}
@@ -195,19 +195,19 @@ extensibility.
 % records but not intersection of ordinary types like \texttt{Int} and
 % \texttt{Float} by allowing only intersection of record types.
 %
-% $ \turnsrec \tau $ states that $ \tau $ is a record type, or the intersection of
+% $ \turnsrec A $ states that $ A $ is a record type, or the intersection of
 % record types, and so forth.
 %
-% \inferrule [RecBase] {} {\turnsrec \recordType l \tau}
+% \inferrule [RecBase] {} {\turnsrec \recordType l A}
 %
 % \inferrule [RecStep]
-% {\turnsrec \tau_1 \andalso \turnsrec \tau_2}
-% {\turnsrec \tau_1 \intersect \tau_2}
+% {\turnsrec A_1 \andalso \turnsrec A_2}
+% {\turnsrec A_1 \inter A_2}
 %
 % \inferrule [Merge']
-% {\Gamma \turns e_1 : \tau_1 \yields {E_1} \andalso \turnsrec \tau_1 \\
-%  \Gamma \turns e_2 : \tau_2 \yields {E_2} \andalso \turnsrec \tau_2}
-% {\Gamma \turns e_1 \mergeOp e_2 : \tau_1 \intersect \tau_2 \yields {\pair {E_1} {E_2}}}
+% {\Gamma \turns e_1 : A_1 \yields {E_1} \andalso \turnsrec A_1 \\
+%  \Gamma \turns e_2 : A_2 \yields {E_2} \andalso \turnsrec A_2}
+% {\Gamma \turns e_1 \mergeOp e_2 : A_1 \inter A_2 \yields {\pair {E_1} {E_2}}}
 %
 % Of course our approach has its limitation as duplicated labels in a record are
 % allowed. This has been discussed in a larger issue by

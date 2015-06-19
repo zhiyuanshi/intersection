@@ -78,9 +78,9 @@ Figure~\ref{fig:f-syntax} and the typing rules in the appendix.
 % \bruno{Why is this lemma placed here?}
 % \bruno{Generaly Speaking this text seems out of place.Move to 5.4, maybe?}
 
-% The main translation judgment is $ \hastype \gamma e \tau \yields E $ which
+% The main translation judgment is $ \hastype \gamma e A \yields E $ which
 % states that with respect to the typing context $ \gamma $, the \name term
-% $e$ is of $\tau$ and its translation is a target term $ E $.
+% $e$ is of $A$ and its translation is a target term $ E $.
 
 \subsection{Type translation}
 
@@ -92,7 +92,7 @@ Figure~\ref{fig:f-syntax} and the typing rules in the appendix.
 \end{figure}
 
 Figure~\ref{fig:type-and-context-translation} defines the type translation
-function $\im \cdot$ from \name types $\tau$ to target language types $T$. The
+function $\im \cdot$ from \name types $A$ to target language types $T$. The
 notation $\im \cdot$ is also overloaded for context translation from \name
 contexts $\gamma$ to target language contexts $\Gamma$.
 
@@ -104,23 +104,23 @@ contexts $\gamma$ to target language contexts $\Gamma$.
 
 Figure~\todo{fig:elab-subtyping} shows subtyping with coercions. The judgment
 \[
-\tau_1 \subtype \tau_2 \yields C
+A_1 \subtype A_2 \yields C
 \]
 extends the subtyping judgment in Figure~\ref{fig:fi-subtyping} with a coercion
 on the right hand side of $ \yields {} $. A coercion $ C $ is just an term
 in the target language and is ensured to have type
-$ \im {\tau_1} \to \im {\tau_2} $ (Lemma~\ref{lemma:sub})\bruno{ref
+$ \im {A_1} \to \im {A_2} $ (Lemma~\ref{lemma:sub})\bruno{ref
   now showing}. For example,
 \[
-\tyint \intersect \tybool \subtype \tybool \yields {\lam x {\im {\tyint \intersect \tybool}} {\proj 2 x}}
+\tyint \inter \tybool \subtype \tybool \yields {\lam x {\im {\tyint \inter \tybool}} {\proj 2 x}}
 \]
 
-\noindent generates a coercion function from $\tyint \intersect \tybool$ to $\tybool$.
+\noindent generates a coercion function from $\tyint \inter \tybool$ to $\tybool$.
 
 In rules \rulelabel{SubVar}, \rulelabel{SubTop}, \rulelabel{SubForall},
 coercions are just identity functions. In \rulelabel{SubFun}, we elaborate the
 subtyping of parameter and return types by $\eta$-expanding $f$ to
-$\lam x {\im {\tau_3}} {\app f x}$, applying $C_1$ to the argument and $C_2$ to
+$\lam x {\im {A_3}} {\app f x}$, applying $C_1$ to the argument and $C_2$ to
 the result. Rules \rulelabel{SubAnd1}, \rulelabel{SubAnd2}, and
 \rulelabel{SubAnd} elaborate with intersection types. \rulelabel{SubAnd} uses
 both coercions to form a pair. Rules \rulelabel{SubAnd1} and
@@ -131,15 +131,15 @@ differently, depending on which rule is used. But in the implementation one
 usually applies the rules sequentially with pattern matching, essentially
 defining a deterministic order of lookup.
 \begin{comment}
-if we know $\tau_1$ is a subtype of $\tau_3$ and $C$ is a coercion from $\tau_1$
-to $\tau_3$, then we can conclude that $\tau_1 \intersect \tau_2$ is also a subtype
-of $\tau_3$ and the new coercion is a function that takes a value $ x $ of type
-$\tau_1\intersect \tau_2$, project $x$ on the first item, and apply $ C $ to it.
+if we know $A_1$ is a subtype of $A_3$ and $C$ is a coercion from $A_1$
+to $A_3$, then we can conclude that $A_1 \inter A_2$ is also a subtype
+of $A_3$ and the new coercion is a function that takes a value $ x $ of type
+$A_1\inter A_2$, project $x$ on the first item, and apply $ C $ to it.
 \end{comment}
 
 \begin{restatable}[Subtyping rules produce type-correct coercion]{lemma}{lemmasub}
   \label{lemma:sub}
-  If $ \tau_1 \subtype \tau_2 \yields C $, then $ \judgeTarget \epsilon C {\im {\tau_1} \to \im {\tau_2}} $.
+  If $ A_1 \subtype A_2 \yields C $, then $ \judgeTarget \epsilon C {\im {A_1} \to \im {A_2}} $.
 \end{restatable}
 
 \begin{proof}
@@ -159,9 +159,9 @@ those in the previous section with the light-blue part for the translation.
 % \bruno{Don't use itemize and items. Use paragraphs instead!}
 
 \paragraph{Main translation judgment.} The main translation judgment
-$\hastype \gamma e \tau \yields E$ extends the typing judgment with an elaborated
+$\hastype \gamma e A \yields E$ extends the typing judgment with an elaborated
 term on the right hand side of $\yields {}$. The translation ensures
-that $E$ has type $\im \tau$. In \name, one may pass more information to a
+that $E$ has type $\im A$. In \name, one may pass more information to a
 function than what is required; but not in System $F$. To account for this
 difference, in \rulelabel{App}, the coercion $C$ from the subtyping relation is
 applied to the argument. \rulelabel{Merge} straighforwardly translates merges
@@ -186,10 +186,10 @@ into pairs.
 %   which is just $ \lam x {String} x $ according to type translation.
 
 %   By $ \ruleLabelSelectLeft $,
-%   \[ \turnsGet (\recordType {name} {String} \intersect \recordType {age} {Int}; {name}) : String \]
+%   \[ \turnsGet (\recordType {name} {String} \inter \recordType {age} {Int}; {name}) : String \]
 
 %   % we have the coercion
-%   % \[ \abs {\rel x {\im {\recordType {name} {String} \intersect \recordType
+%   % \[ \abs {\rel x {\im {\recordType {name} {String} \inter \recordType
 %   %         {age} {Int}}}} \app {(\abs {\rel x {\im {\recordType {name} {String}}}} x)} {(\fst ~ x)} \]
 %   % which is just $ \abs {\rel x {(String, Int)}} {\app {(\abs {\rel x {String}} x)} {(\fst ~ x)}} $ by type translation.
 
@@ -199,8 +199,8 @@ into pairs.
 
 \begin{restatable}[Translation preserves well-typing]{theorem}{theorempreservation}
   \label{theorem:preservation}
-  If $ \hastype \gamma e \tau \yields E $,
-  then $ \judgeTarget {\im \gamma} E {\im \tau} $.
+  If $ \hastype \gamma e A \yields E $,
+  then $ \judgeTarget {\im \gamma} E {\im A} $.
 \end{restatable}
 \begin{proof}
 (Sketch) By structural induction on the term and the corresponding

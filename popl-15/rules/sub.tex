@@ -23,47 +23,47 @@
 
 \newcommand{\subFun}{
 \inferrule* [right=$\ruleLabelSubFun$]
-  {\tau_3 \subtype \tau_1 \yields {C_1} \\ \tau_2 \subtype \tau_4 \yields {C_2}}
-  {\tau_1 \to \tau_2 \subtype \tau_3 \to \tau_4
+  {A_3 \subtype A_1 \yields {C_1} \\ A_2 \subtype A_4 \yields {C_2}}
+  {A_1 \to A_2 \subtype A_3 \to A_4
   \yields
-      {\lam f {\im {\tau_1 \to \tau_2}}
-      {\lam x {\im {\tau_3}}
+      {\lam f {\im {A_1 \to A_2}}
+      {\lam x {\im {A_3}}
           {\app {C_2} {(\app f {(\app {C_1} x)})}}}}}
 }
 
 \newcommand{\subForall}{
 \inferrule* [right=$\ruleLabelSubForall$]
-  {\tau_1 \subtype \subst {\alpha_1} {\alpha_2} \tau_2 \yields C}
-  {\for {\alpha_1 * \tau_3} \tau_1 \subtype \for {\alpha_2 * \tau_3} \tau_2
+  {A_1 \subtype \subst {\alpha_1} {\alpha_2} A_2 \yields C}
+  {\for {\alpha_1 * A_3} A_1 \subtype \for {\alpha_2 * A_3} A_2
     \yields
-      {\lam f {\im {\for {\alpha_1 * \tau_3} \tau_1}}
+      {\lam f {\im {\for {\alpha_1 * A_3} A_1}}
         {\blam \alpha {\app C {(\app f \alpha)}}}}}
 }
 
 \newcommand{\subAnd}{
 \inferrule* [right=$\ruleLabelSubAnd$]
-  {\tau_1 \subtype \tau_2 \yields {C_1} \\ \tau_1 \subtype \tau_3 \yields {C_2}}
-  {\tau_1 \subtype \tau_2 \intersect \tau_3
+  {A_1 \subtype A_2 \yields {C_1} \\ A_1 \subtype A_3 \yields {C_2}}
+  {A_1 \subtype A_2 \inter A_3
     \yields
-      {\lam x {\im {\tau_1}}
+      {\lam x {\im {A_1}}
         {\pair {\app {C_1} x} {\app {C_2} x}}}}
 }
 
 \newcommand{\subAndleft}{
 \inferrule* [right=$\ruleLabelSubAndLeft$]
-  {\tau_1 \subtype \tau_3 \yields C \\ \isatomic {\tau_3}}
-  {\tau_1 \intersect \tau_2 \subtype \tau_3
+  {A_1 \subtype A_3 \yields C \\ \isatomic {A_3}}
+  {A_1 \inter A_2 \subtype A_3
     \yields
-      {\lam x {\im {\tau_1 \intersect \tau_2}}
+      {\lam x {\im {A_1 \inter A_2}}
         {\app C {(\proj 1 x)}}}}
 }
 
 \newcommand{\subAndright}{
 \inferrule* [right=$\ruleLabelSubAndRight$]
-  {\tau_2 \subtype \tau_3 \yields C \\ \isatomic {\tau_3}}
-  {\tau_1 \intersect \tau_2 \subtype \tau_3
+  {A_2 \subtype A_3 \yields C \\ \isatomic {A_3}}
+  {A_1 \inter A_2 \subtype A_3
     \yields
-      {\lam x {\im {\tau_1 \intersect \tau_2}}
+      {\lam x {\im {A_1 \inter A_2}}
         {\app C {(\proj 2 x)}}}}
 }
 
@@ -81,8 +81,8 @@
 
 \newcommand{\subRec}{
 \inferrule* [right=$\ruleLabelSubRec$]
-  {\tau_1 \subtype \tau_2 \yields C}
-  {\recordType l {\tau_1} \subtype \recordType l {\tau_2}
+  {A_1 \subtype A_2 \yields C}
+  {\recordType l {A_1} \subtype \recordType l {A_2}
     \yields
-      {\lam x {\im {\recordType l {\tau_1}}} {\app C x}}}
+      {\lam x {\im {\recordType l {A_1}}} {\app C x}}}
 }
