@@ -1,31 +1,31 @@
-% Typing
+% Typing 
 \begin{mathpar}
-  \framebox{$ \judgeSource \gamma e \tau \yields E $} \and
-  \ruleSourceVarElab \and \ruleSourceTopElab \and
-  \ruleSourceLamElab  \and \ruleSourceAppElab \and
-  \ruleSourceBLamElab \and \ruleSourceTAppElab \and
-  \ruleSourceMergeElab \and
-  \ruleSourcerecordConstructElab \and
-  \ruleSourceRecSelectElab \and \ruleSourceRecRestrictElab
+  \framebox{$ \judgee \gamma e \tau \yields E $} \and
+  \ruleevarelab \and \ruleetopelab \and
+  \ruleelamelab  \and \ruleeappelab \and
+  \ruleeblamelab \and \ruleetappelab \and
+  \ruleemergeelab \and
+  \ruleerecconstructelab \and
+  \ruleerecselectelab \and \ruleerecrestrictelab
 \end{mathpar}
 
 
 % Selection
 \begin{mathpar}
-  \framebox{$\judgeSelect {\tau_1} l \tau_2 \yields C$} \and
-  \ruleGetElab \and \ruleGetLeftElab \and \ruleGetRightElab
+  \framebox{$\judgeselect {\tau_1} l \tau_2 \yields C$} \and
+  \rulegetelab \and \rulegetleftelab \and \rulegetrightelab
 \end{mathpar}
 
 
 % Restriction
 \begin{mathpar}
-  \framebox{$\judgeRestrict {\tau_1} l \tau_2 \yields C$} \and
-  \ruleRestrictElab \and \ruleRestrictLeftElab \and \ruleRestrictRightElab
+  \framebox{$\judgerestrict {\tau_1} l \tau_2 \yields C$} \and
+  \rulerestrictelab \and \rulerestrictleftelab \and \rulerestrictrightelab
 \end{mathpar}
 
 
 % Update
 % \begin{mathpar}
-%   \framebox{$\judgeUpdate \tau l {\tau \yields E} {\tau_2} {\tau_3} \yields C$} \and
-%   \ruleUpdateElab \and \ruleUpdateLeftElab \and \ruleUpdateRightElab
+%   \framebox{$\judgeupdate \tau l {\tau \yields E} {\tau_2} {\tau_3} \yields C$} \and
+%   \ruleupdateelab \and \ruleupdateleftelab \and \ruleupdaterightelab
 % \end{mathpar}

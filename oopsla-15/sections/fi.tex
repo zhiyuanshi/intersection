@@ -1,7 +1,7 @@
 \section{The \name calculus} \label{sec:fi}
 
 This section presents the syntax, subtyping, and typing of \name.  The
-semantics of \name will be defined by a type-directed translation
+semantics of \name will be defined by a type-directed translation 
 to a simple variant of System $F$ in the next section.
 
 \subsection{Syntax}
@@ -13,7 +13,7 @@ for those in the target language.
 
 % To System $ F $, we add two features: intersection types and single-field
 % records.
-% % ~\bruno{labelled types (single field records are fine too)}
+% % ~\bruno{labelled types (single field records are fine too)} 
 % We include only single records because single record types as the multi-records
 % can be desugared into the merge of multiple single records.
 
@@ -30,40 +30,40 @@ for those in the target language.
 Meta-variables $\tau$ range over types. Types include System $F$ constructs:
 type variables $\alpha$; function types $\tau_1 \to \tau_2$; and type
 abstraction $ \for \alpha \tau $. The top type $\top$ is the supertype of all
-types. $\tau_1 \andOp \tau_2$ denotes
-the intersection of types $\tau_1$ and $\tau_2$; and $\recordType l \tau$ the types
+types. $\tau_1 \andop \tau_2$ denotes
+the intersection of types $\tau_1$ and $\tau_2$; and $\recty l \tau$ the types
 for single-field records. Interestingly, single-field record types can be viewed as types
 tagged with a label $l$, while the other type forms are untagged types. We omit
 type constants such as \lstinline$Int$ and \lstinline$String$.
 % \bruno{be consistent: in the source language we use \&, and in the
-% formalization we use $\andOp$}
+% formalization we use $\andop$}
 
 Expressions include standard constructs in System
 $F$: variables $ x $; abstraction of expressions over variables of a given type
-$\lam x \tau e$ (concretely written \lstinline$\(x:T) -> e$);
-abstraction of expressions over types $\blam \alpha e$ (concretely written \lstinline$/\A -> e$);
-application of expressions to expressions $\app {e_1} {e_2}$;
-and application of expressions to types $\tapp e \tau$ (concretely written \lstinline$e[T]$).
+$\lam x \tau e$ (concretely written \lstinline$\(x:T) -> e$); 
+abstraction of expressions over types $\blam \alpha e$ (concretely written \lstinline$/\A -> e$); 
+application of expressions to expressions $\app {e_1} {e_2}$; 
+and application of expressions to types $\tapp e \tau$ (concretely written \lstinline$e[T]$). 
 The last four constructs are novel.
 The canonical term that inhabits the top type is also written as $\top$.
-$e_1 \mergeOp e_2$ is the \emph{merge} of two expressions $e_1$ and $e_2$.
+$e_1 \mergeop e_2$ is the \emph{merge} of two expressions $e_1$ and $e_2$.
 % \bruno{explain further, after all this is new.}
 It can be used as either $ e_1 $ or $ e_2 $. In particular, if one regards $e_1$
 and $e_2$ as objects, their merge will respond to every method that one or
 both of them have. Merge of expressions correspond to intersection types
-$ \tau_1 \andOp \tau_2 $. The expression $ \recordCon l e $ constructs a
-single-field record, whereas $ e.l $ accesses the field labelled $ l $ in $ e $.
+$ \tau_1 \andop \tau_2 $. The expression $ \reccon l e $ constructs a
+single-field record, whereas $ e.l $ accesses the field labelled $ l $ in $ e $. 
 \begin{comment}
 Note that $ e $ does not
 need to be a record type in this case. For example, although the merge of two
 records
 \[
-x = \recordCon {l_1} {e_1} \mergeOp \recordCon {l_1} {e_2}
+x = \reccon {l_1} {e_1} \mergeop \reccon {l_1} {e_2} 
 \]
 is of an intersection type, $ x.{l_1} $ still gives $ e_1 $. On the other hand,
-$ x.{l_3} $ will be rejected by the type system.
+$ x.{l_3} $ will be rejected by the type system. 
 \end{comment}
-Restriction $e \restrictOp l$ clears the field $l$ inside $e$. In order to
+Restriction $e \restrictop l$ clears the field $l$ inside $e$. In order to
 focus on the most essential features, we do not include other forms such as
 fixpoints here, although they are supported in our implementation and can
 be included in formalization in standard ways.
@@ -105,32 +105,32 @@ that are explicitly declared by the programmer.
 
 The subtyping rules of \name, shown in Figure~\ref{fig:fi-subtyping}, are syntax-directed
 (different from the approach by Davies and Pfenning~\cite{davies2000intersection},
-and Frisch et. al~\cite{frisch2008semantic}). The rule $\ruleLabelSubFun$ says that a function is
+and Frisch et. al~\cite{frisch2008semantic}). The rule $\rulelabelsubfun$ says that a function is
 contravariant in its parameter type and covariant in its return type. A
 universal quantifier ($\forall$) is covariant in its body. A single-field record
 type is also covariant, which becomes obvious if we regard it as a labelled
 type. The three rules dealing with intersection types are just what one would
 expect when interpreting types as sets. Under this interpretation, for example,
-the rule $\ruleLabelSubAnd$ says that if $\tau_1$ is both the subset of $\tau_2$
+the rule $\rulelabelsuband$ says that if $\tau_1$ is both the subset of $\tau_2$
 and the subset of $\tau_3$, then $\tau_1$ is also the subset of the intersection of $\tau_2$
 and $\tau_3$.
 
 % Intersection types introduce natural subtyping relations among types. For
-% example, $ \Int \andOp \Bool $ should be a subtype of $ \Int $, since the former
+% example, $ \Int \andop \Bool $ should be a subtype of $ \Int $, since the former
 % can be viewed as either $ \Int $ or $ \Bool $. To summarize, the subtyping rules
 % are standard except for three points listed below:
 % \begin{enumerate}
-% \item $ \tau_1 \andOp \tau_2 $ is a subtype of $ \tau_3 $, if \emph{either} $ \tau_1 $ or
+% \item $ \tau_1 \andop \tau_2 $ is a subtype of $ \tau_3 $, if \emph{either} $ \tau_1 $ or
 %   $ \tau_2 $ are subtypes of $ \tau_3 $,
 
-% \item $ \tau_1 $ is a subtype of $ \tau_2 \andOp \tau_3 $, if $ \tau_1 $ is a subtype of
+% \item $ \tau_1 $ is a subtype of $ \tau_2 \andop \tau_3 $, if $ \tau_1 $ is a subtype of
 %   both $ \tau_2 $ and $ \tau_3 $.
 
-% \item $ \recordType {l_1} {\tau_1} $ is a subtype of $ \recordType {l_2} {\tau_2} $, if
+% \item $ \recty {l_1} {\tau_1} $ is a subtype of $ \recty {l_2} {\tau_2} $, if
 %   $ l_1 $ and $ l_2 $ are identical and $ \tau_1 $ is a subtype of $ \tau_2 $.
 % \end{enumerate}
-% The first point is captured by two rules $ \ruleLabelSubAndLeft $ and
-% $ \ruleLabelSubAndRight $, whereas the second point by $ \ruleLabelSubAnd $.
+% The first point is captured by two rules $ \rulelabelsubandleft $ and
+% $ \rulelabelsubandright $, whereas the second point by $ \rulelabelsuband $.
 % Note that the last point means that record types are covariant in the type of
 % the fields.
 
@@ -146,7 +146,7 @@ then $ \tau_1 \subtype \tau_3 $.
 \end{lemma}
 
 For the corresponding mechanized proofs in Coq, we refer to the supplementary
-materials submitted with the paper.
+materials submitted with the paper. 
 
 \subsection{Typing}
 
@@ -159,66 +159,66 @@ materials submitted with the paper.
 
 The syntax-directed typing rules of \name are shown in Figure~\ref{fig:fi-typing}. They consist of one
 main typing judgment and two auxiliary judgments. The main typing judgment is of
-the form: $ \judgeSource \gamma e \tau $. It reads: ``in the typing context
+the form: $ \judgee \gamma e \tau $. It reads: ``in the typing context
 $\gamma$, the expression $e$ is of type $\tau$''. The rules that are the same as
-in System $F$ are rules for variables ($\ruleLabelSourceVar$), lambda abstractions
-($\ruleLabelSourceLam$), type abstractions ($\ruleLabelSourceBLam$), and type applications
-($\ruleLabelSourceTApp$). The rule $\ruleLabelSourceApp$ needs special attention as we add
+in System $F$ are rules for variables ($\rulelabelevar$), lambda abstractions
+($\rulelabelelam$), type abstractions ($\rulelabeleblam$), and type applications
+($\rulelabeletapp$). The rule $\rulelabeleapp$ needs special attention as we add
 a subtyping requirement: the type of the argument ($\tau_3$) is a
-subtype of that of the parameter ($\tau_1$).
+subtype of that of the parameter ($\tau_1$). 
 %The advantage is that it then
-%becomes easier to derive an algorithm for typechecking.
+%becomes easier to derive an algorithm for typechecking. 
 For merges
-$e_1 \mergeOp e_2$, we typecheck $e_1$ and $e_2$, and give it the
+$e_1 \mergeop e_2$, we typecheck $e_1$ and $e_2$, and give it the
 intersection of the resulting types. The rule for
-single-field record construction ($\ruleLabelSourceRecConstruct$) is standard. The rules
-for record selection ($\ruleLabelSourceRecSelect$) and restriction
-($\ruleLabelSourceRecRestrict$) are expectedly the most complicated. They turn to the
+single-field record construction ($\rulelabelerecconstruct$) is standard. The rules
+for record selection ($\rulelabelerecselect$) and restriction
+($\rulelabelerecrestrict$) are expectedly the most complicated. They turn to the
 auxiliary ``select'' and ``restrict'' rules to statically check operations and
 to obtain resulting types.
 
 \paragraph{Typing record selection.}
 The ``select'' judgment deals with record selection. For example,
 \[
-\judgeSelect {\recordType {\texttt{id}} \Int \andOp \recordType {\texttt{name}} \String}
+\judgeselect {\recty {\texttt{id}} \Int \andop \recty {\texttt{name}} \String}
 {\texttt{name}} {\String}
 \]
 That means that the $\texttt{name}$ field inside
-$\recordType {\texttt{id}} \Int \andOp \recordType {\texttt{name}} \String$ is of type
-$\texttt{String}$. Generally, $\judgeSelect {\tau_1} l {\tau_2}$ says that a field
+$\recty {\texttt{id}} \Int \andop \recty {\texttt{name}} \String$ is of type
+$\texttt{String}$. Generally, $\judgeselect {\tau_1} l {\tau_2}$ says that a field
 labelled $l$ is present inside $\tau_1$ and is of type $\tau_2$. The judgment is
-made of three inference rules and is inductively defined. $\ruleLabelSelect$ is
-the base case: if we ask for a field labelled $l$ inside $\recordType l \tau$, the
-field is clearly present and is of type $\tau$. $\ruleLabelSelectLeft$ and
-$\ruleLabelSelectRight$ are two symmetric step cases. Take
-$\ruleLabelSelectLeft$ for example, it means that if $l$ is present inside
-$\tau_1$, then it is also present inside $\tau_1 \andOp \tau_2$; and the type of
+made of three inference rules and is inductively defined. $\rulelabelselect$ is
+the base case: if we ask for a field labelled $l$ inside $\recty l \tau$, the
+field is clearly present and is of type $\tau$. $\rulelabelselectleft$ and
+$\rulelabelselectright$ are two symmetric step cases. Take
+$\rulelabelselectleft$ for example, it means that if $l$ is present inside
+$\tau_1$, then it is also present inside $\tau_1 \andop \tau_2$; and the type of
 the desired field $l$ remains $\tau$ in the conclusion.
 
 \paragraph{Typing record restriction.}
-The ``restrict'' judgment $\judgeRestrict {\tau_1} l {\tau_2}$ deals with record
+The ``restrict'' judgment $\judgerestrict {\tau_1} l {\tau_2}$ deals with record
 restriction and is very similar to the ``select'' judgment. The only difference
 is on the right-hand side of the equal sign: instead of giving the type of field being selected, the judment holds
 the type after the restriction. For example,
 \[
-\judgeRestrict {\recordType {\code{id}} \Int \andOp \recordType {\code{name}} \String}
-{\code{name}} {\recordType {\code{id}} \Int \andOp \top}
+\judgerestrict {\recty {\code{id}} \Int \andop \recty {\code{name}} \String}
+{\code{name}} {\recty {\code{id}} \Int \andop \top}
 \]
-Note that $\recordType {\code{id}} \Int \andOp \top$, interpreted set-theoretically,
-is equivalent to $\recordType {\code{id}} \Int$ and our system is able to judge
+Note that $\recty {\code{id}} \Int \andop \top$, interpreted set-theoretically,
+is equivalent to $\recty {\code{id}} \Int$ and our system is able to judge
 that they are subtypes of each other.
 
 
 % The last two rules make use of the $ \rulename{fields} $ function just to make
-% sure that the field being accessed ($ \ruleLabelSourceRecSelect $) or updated
-% ($ \ruleLabelSourceRecUpd $) actually exists. The function is defined recursively, in
+% sure that the field being accessed ($ \rulelabelerecselect $) or updated
+% ($ \rulelabelerecupd $) actually exists. The function is defined recursively, in
 % Haskell pseudocode, as:
 % \[ \begin{array}{rll}
 %   \fields{\alpha} & = & \rel{\cdot} {\alpha} \\
 %   \fields{\tau_1 \to \tau_2} & = & \rel{\cdot} {\tau_1 \to \tau_2} \\
 %   \fields{\forall \alpha. \tau} & = & \rel{\cdot} {\forall \alpha. \tau} \\
-%   \fields{\tau_1 \andOp \tau_2} & = & \fields{\tau_1} \dplus \fields{\tau_2} \\
-%   \fields{\recordType l \tau} & = & \rel l t
+%   \fields{\tau_1 \andop \tau_2} & = & \fields{\tau_1} \dplus \fields{\tau_2} \\
+%   \fields{\recty l \tau} & = & \rel l t
 % \end{array} \]
 % where $ \cdot $ means empty list, $ \dplus $ list concatenation, and $ : $ is an
 % infix operator that prepend the first argument to the second. The function
