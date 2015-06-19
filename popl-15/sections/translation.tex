@@ -1,17 +1,15 @@
-\section{Type-directed Translation to System $ F $}
+\section{Type-directed translation to System $ F $}
 
 In this section we define the dynamic semantics of the call-by-value \name by
 means of a type-directed translation to a variant of System $F$. This
 translation turns merges into usual pairs, similar to Dunfield's elaboration
-approach~\cite{dunfield2014elaborating}. But in addition, our translation
-removes labels of records and rewrites record operations as function
-applications. In the end the translated expressions can be typed and interpreted
+approach~\cite{dunfield2014elaborating}. In the end the translated terms can be typed and interpreted
 within System $F$. We add the blue-color part to our rules presented in the
 previous section. Besides that, they stay the same. We also tacitly assume the
 variables introduced in the blue part are generated from a unique name supply and
 are always fresh.
 
-\subsection{Informal Discussion}
+\subsection{Informal discussion}
 
 This subsection presents the translation informally by explaining the major
 ideas.
@@ -58,14 +56,14 @@ example, the source program
 \begin{lstlisting}
 {distance = {inKilometers = 8, inMiles = 5}}.distance.inMiles
 \end{lstlisting}
-becomes an \name expression
+becomes an \name term
 \[
 \app {(\lam x {\pair \tyint \tyint} {\proj 2 x})} {\pair 8 5}
 \]
 where $\lam x {\pair \tyint \tyint} {\proj 2 x}$
 extracts the desired item $5$.
 
-\subsection{Target Language}
+\subsection{Target language}
 
 Our target language is System $F$ extended with pair and unit types. The syntax
 and typing is completely standard. The syntax of the target language is shown in
@@ -81,10 +79,10 @@ Figure~\ref{fig:f-syntax} and the typing rules in the appendix.
 % \bruno{Generaly Speaking this text seems out of place.Move to 5.4, maybe?}
 
 % The main translation judgment is $ \hastype \gamma e \tau \yields E $ which
-% states that with respect to the typing context $ \gamma $, the \name expression
-% $e$ is of $\tau$ and its translation is a target expression $ E $.
+% states that with respect to the typing context $ \gamma $, the \name term
+% $e$ is of $\tau$ and its translation is a target term $ E $.
 
-\subsection{Type Translation}
+\subsection{Type translation}
 
 \begin{figure}[h]
   \input{rule_in_figures/type-translation.tex}
@@ -102,14 +100,14 @@ contexts $\gamma$ to target language contexts $\Gamma$.
 % Section~\ref{sec:fi}, except for the light blue part. The translation consists
 % of four sets of rules, which are explained below:
 
-\subsection{Coercive Subtyping}
+\subsection{Coercive subtyping}
 
 Figure~\todo{fig:elab-subtyping} shows subtyping with coercions. The judgment
 \[
 \tau_1 \subtype \tau_2 \yields C
 \]
 extends the subtyping judgment in Figure~\ref{fig:fi-subtyping} with a coercion
-on the right hand side of $ \yields {} $. A coercion $ C $ is just an expression
+on the right hand side of $ \yields {} $. A coercion $ C $ is just an term
 in the target language and is ensured to have type
 $ \im {\tau_1} \to \im {\tau_2} $ (Lemma~\ref{lemma:sub})\bruno{ref
   now showing}. For example,
@@ -148,11 +146,11 @@ $\tau_1\intersect \tau_2$, project $x$ on the first item, and apply $ C $ to it.
   By a straighforward induction on the derivation\footnote{The proofs of major lemmata and theorems can be found in the appendix.}.
 \end{proof}
 
-\subsection{Main Translation}
+\subsection{Main translation}
 
 \begin{comment}
 In this subsection we now present formally the translation rules that convert
-\name expressions into System $ F $ ones. This set of rules essentially extends
+\name terms into System $ F $ ones. This set of rules essentially extends
 those in the previous section with the light-blue part for the translation.
 \end{comment}
 
@@ -162,7 +160,7 @@ those in the previous section with the light-blue part for the translation.
 
 \paragraph{Main translation judgment.} The main translation judgment
 $\hastype \gamma e \tau \yields E$ extends the typing judgment with an elaborated
-expression on the right hand side of $\yields {}$. The translation ensures
+term on the right hand side of $\yields {}$. The translation ensures
 that $E$ has type $\im \tau$. In \name, one may pass more information to a
 function than what is required; but not in System $F$. To account for this
 difference, in \rulelabel{App}, the coercion $C$ from the subtyping relation is
@@ -205,12 +203,12 @@ into pairs.
   then $ \judgeTarget {\im \gamma} E {\im \tau} $.
 \end{restatable}
 \begin{proof}
-(Sketch) By structural induction on the expression and the corresponding
+(Sketch) By structural induction on the term and the corresponding
 inference rule.
 \end{proof}
 
 \begin{theorem}[Type safety]
-  If $e$ is a well-typed \name expression, then $e$ evaluates to some System $F$
+  If $e$ is a well-typed \name term, then $e$ evaluates to some System $F$
   value $v$.
 \end{theorem}
 \begin{proof}

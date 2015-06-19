@@ -346,7 +346,7 @@ the translation is coherent.
 % \end{definition}
 
 % \begin{definition}{(Disjointness)}
-% Two types $A$ and $B$ are \emph{disjoint} if there does not exist an expression $e$, which is not a merge, such that $\hastype \epsilon e A'$, $\hastype \epsilon e B'$, $A' \subtype A$, and $B' \subtype B$.
+% Two types $A$ and $B$ are \emph{disjoint} if there does not exist an term $e$, which is not a merge, such that $\hastype \epsilon e A'$, $\hastype \epsilon e B'$, $A' \subtype A$, and $B' \subtype B$.
 % \end{definition}
 
 % \begin{figure}
@@ -833,7 +833,7 @@ because we need to show that the result of substitution ($\subst A \alpha C$) is
 \begin{theorem}[Unique elaboration] \label{unique-elaboration}
 If $\hastype \Gamma e {A_1} \yields {E_1}$ and $\hastype \Gamma e {A_2} \yields {E_2}$, then $E_1 \equiv E_2$.
 \end{theorem}
-Given a source expression $e$, elaboration always produces the same target expression $E$.
+Given a source term $e$, elaboration always produces the same target term $E$.
 \begin{proof}
 The typing rules are syntax-directed. The case of \rulelabel{TyApp} needs special attention since we still need to show that the generated coercion $C$ is unique.
 \begin{mathpar}

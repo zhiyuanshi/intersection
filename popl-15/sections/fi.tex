@@ -1,15 +1,17 @@
 \section{The \name calculus} \label{sec:fi}
 
-This section presents the syntax, subtyping, and typing of \name.  The
-semantics of \name will be defined by a type-directed translation
-to a simple variant of System $F$ in the next section.
+This section presents the syntax, subtyping, and typing of \name, as well as the
+additional judgements that are special in \name. The semantics of \name will be
+defined by a type-directed translation to a simple variant of System $F$ in the
+next section.
 
 \subsection{Syntax}
 
 Figure~\ref{fig:fi-syntax} shows the syntax of \name (with the addition to
-System $F$ highlighted). As a convention in this paper, we will be using
-lowercase letters as meta-variables for sorts in \name, and uppercase letters
-for those in the target language.
+System $F$ highlighted).
+% As a convention in this paper, we will be using
+% lowercase letters as meta-variables for sorts in \name, and uppercase letters
+% for those in the target language.
 
 % To System $ F $, we add two features: intersection types and single-field
 % records.
@@ -48,8 +50,8 @@ for those in the target language.
     \end{array}
   \]
 
-  \caption{Syntax.}
   \label{fig:fi-syntax}
+  \caption{Syntax.}
 \end{figure}
 
 % \bruno{I am not sure if the highlighting will be
@@ -58,72 +60,63 @@ for those in the target language.
 
 Meta-variables $\tau$ range over types. Types include System $F$ constructs:
 type variables $\alpha$; function types $\tau_1 \to \tau_2$; and type
-abstraction $ \for \alpha \tau $. The top type $\top$ is the supertype of all
-types. $\tau_1 \intersect \tau_2$ denotes
-the intersection of types $\tau_1$ and $\tau_2$; and $\recordType l \tau$ the types
-for single-field records. Interestingly, single-field record types can be viewed as types
-tagged with a label $l$, while the other type forms are untagged types. We omit
-type constants such as \lstinline$Int$ and \lstinline$String$.
+abstraction $ \for \alpha \tau $. The bottom type $\bot$ is not inhabited by any
+term. $\tau_1 \intersect \tau_2$ denotes the intersection of types $\tau_1$ and
+$\tau_2$. We omit type constants such as \lstinline$tyint$ and \lstinline$tystring$.
+
 % \bruno{be consistent: in the source language we use \&, and in the
 % formalization we use $\intersect$}
 
-Expressions include standard constructs in System
-$F$: variables $ x $; abstraction of expressions over variables of a given type
+Terms include standard constructs in System
+$F$: variables $ x $; abstraction of terms over variables of a given type
 $\lam x \tau e$ (concretely written \lstinline$\(x:T) -> e$);
-abstraction of expressions over types $\blam \alpha e$ (concretely written \lstinline$/\A -> e$);
-application of expressions to expressions $\app {e_1} {e_2}$;
-and application of expressions to types $\tapp e \tau$ (concretely written \lstinline$e[T]$).
+abstraction of terms over types $\blam \alpha e$ (concretely written \lstinline$/\A -> e$);
+application of terms to terms $\app {e_1} {e_2}$;
+and application of terms to types $\tapp e \tau$ (concretely written \lstinline$e[T]$).
 The last four constructs are novel.
 The canonical term that inhabits the top type is also written as $\top$.
-$e_1 \mergeOp e_2$ is the \emph{merge} of two expressions $e_1$ and $e_2$.
+$e_1 \mergeOp e_2$ is the \emph{merge} of two terms $e_1$ and $e_2$.
 % \bruno{explain further, after all this is new.}
 It can be used as either $ e_1 $ or $ e_2 $. In particular, if one regards $e_1$
 and $e_2$ as objects, their merge will respond to every method that one or
-both of them have. Merge of expressions correspond to intersection types
-$ \tau_1 \intersect \tau_2 $. The expression $ \recordCon l e $ constructs a
-single-field record, whereas $ e.l $ accesses the field labelled $ l $ in $ e $.
-\begin{comment}
-Note that $ e $ does not
-need to be a record type in this case. For example, although the merge of two
-records
-\[
-x = \recordCon {l_1} {e_1} \mergeOp \recordCon {l_1} {e_2}
-\]
-is of an intersection type, $ x.{l_1} $ still gives $ e_1 $. On the other hand,
-$ x.{l_3} $ will be rejected by the type system.
-\end{comment}
-Restriction $e \restrictOp l$ clears the field $l$ inside $e$. In order to
-focus on the most essential features, we do not include other forms such as
-fixpoints here, although they are supported in our implementation and can
-be included in formalization in standard ways.
+both of them have. Merge of terms correspond to intersection types
+$ \tau_1 \intersect \tau_2 $.
 
-Typing contexts $ \gamma $ track bound type variables and variables (and their
-type $\tau$). We use $l$ for labels and use
-$\subst {\tau_1} \alpha {\tau_2}$ for the capture-avoiding substitution of
-$\tau_1$ for $\alpha$ inside $\tau_2$ and $\ftv \cdot$ for sets of free
-variables.
+% Note that $ e $ does not
+% need to be a record type in this case. For example, although the merge of two
+% records
+% \[
+% x = \recordCon {l_1} {e_1} \mergeOp \recordCon {l_1} {e_2}
+% \]
+% is of an intersection type, $ x.{l_1} $ still gives $ e_1 $. On the other hand,
+% $ x.{l_3} $ will be rejected by the type system.
 
-\begin{comment}
-\paragraph{Discussion.} A natural question the reader might ask is that why we
-have excluded union types from the language. The answer is we found that
-intersection types alone are enough support extensible designs. To focus on the
-key features that make this language interesting, we also omit other common
-constructs. For example, fixpoints can be added in standard ways.
+In order to focus on the most essential features, we do not include other forms
+such as fixpoints here, although they are supported in our implementation and
+can be included in formalization in standard ways.
+
+Typing contexts $ \Gamma $ track bound type variables with their disjointness
+constraint, and variables with their type $\tau$. We use use $\subst {\tau_1}
+\alpha {\tau_2}$ for the capture-avoiding substitution of $\tau_1$ for $\alpha$
+inside $\tau_2$ and $\ftv \cdot$ for sets of free variables.
+
+% \paragraph{Discussion.} A natural question the reader might ask is that why we
+% have excluded union types from the language. The answer is we found that
+% intersection types alone are enough support extensible designs. To focus on the
+% key features that make this language interesting, we also omit other common
+% constructs. For example, fixpoints can be added in standard ways.
 % Dunfield has described a language that includes a ``top'' type but it does not
 % appear in our language. Our work differs from Dunfield in that ...
-\end{comment}
 
 \subsection{Subtyping}
 
-\begin{comment}
-In some calculi, the subtyping relation is external to the language: those
-calculi are indifferent to how the subtyping relation is defined. In \name, we
-take a syntatic approach, that is, subtyping is due to the syntax of types.
-However, this approach does not preclude integrating other forms of subtyping
-into our system. One is ``primitive'' subtyping relations such as natural
-numbers being a subtype of integers. The other is nominal subtyping relations
-that are explicitly declared by the programmer.
-\end{comment}
+% In some calculi, the subtyping relation is external to the language: those
+% calculi are indifferent to how the subtyping relation is defined. In \name, we
+% take a syntatic approach, that is, subtyping is due to the syntax of types.
+% However, this approach does not preclude integrating other forms of subtyping
+% into our system. One is ``primitive'' subtyping relations such as natural
+% numbers being a subtype of integers. The other is nominal subtyping relations
+% that are explicitly declared by the programmer.
 
 \begin{figure*}
   \begin{mathpar}
@@ -148,17 +141,19 @@ that are explicitly declared by the programmer.
   \label{fig:fi-subtyping}
 \end{figure*}
 
-The subtyping rules of \name, shown in Figure~\ref{fig:fi-subtyping}, are syntax-directed
-(different from the approach by Davies and Pfenning~\cite{davies2000intersection},
-and Frisch et. al~\cite{frisch2008semantic}). The rule \rulelabel{SubFun} says that a function is
-contravariant in its parameter type and covariant in its return type. A
-universal quantifier ($\forall$) is covariant in its body. A single-field record
-type is also covariant, which becomes obvious if we regard it as a labelled
-type. The three rules dealing with intersection types are just what one would
-expect when interpreting types as sets. Under this interpretation, for example,
-the rule \rulelabel{SubAnd} says that if $\tau_1$ is both the subset of $\tau_2$
-and the subset of $\tau_3$, then $\tau_1$ is also the subset of the intersection of $\tau_2$
-and $\tau_3$.
+The subtyping rules of \name, shown in Figure~\ref{fig:fi-subtyping}, are
+syntax-directed (different from the approach by Davies and
+Pfenning~\cite{davies2000intersection}, and Frisch et.
+al~\cite{frisch2008semantic}). The rule \rulelabel{SubFun} says that a function
+is contravariant in its parameter type and covariant in its return type. A
+universal quantifier ($\forall$) is covariant in its body. The three rules
+dealing with intersection types are just what one would expect when interpreting
+types as sets. Under this interpretation, for example, the rule
+\rulelabel{SubAnd} says that if $\tau_1$ is both the subset of $\tau_2$ and the
+subset of $\tau_3$, then $\tau_1$ is also the subset of the intersection of
+$\tau_2$ and $\tau_3$. In order to achieve coherence, \rulelabel{SubAnd1} and
+\rulelabel{SubAnd2} additionally require the type on the right-hand side is
+atomic.
 
 % Intersection types introduce natural subtyping relations among types. For
 % example, $ \tyint \intersect \tybool $ should be a subtype of $ \tyint $, since the former
@@ -234,8 +229,20 @@ materials submitted with the paper.
       {A \not\sim B}
 
   \end{mathpar}
+
+  \label{fig:disjointness}
   \caption{Disjointness.}
 \end{figure}
+
+The rules for the disjointness judgement are shown in
+Figure~\ref{fig:disjointness}. The judgement says two types $A$ and $B$ are
+disjoint in a context $\Gamma$. Two atomic types with different shapes (except
+for the variable) are considered disjoint, which is factored out to the atomic
+disjointness rules. The \rulelabel{DisjointInter1} and
+\rulelabel{DisjointInter2} inductively distribute the relation itself over the
+intersection constructor ($\intersect$). \rulelabel{DisjointFun} is quite
+interesting, because it says two function types are disjoint as long as their
+return types are disjoint (regardless of their parameter types).
 
 \begin{figure}
   \begin{mathpar}
@@ -251,8 +258,13 @@ materials submitted with the paper.
 
     \wfinter
   \end{mathpar}
+
+  \label{fig:wf}
   \caption{Well-formed types.}
 \end{figure}
+
+The well-formedness of types is standard except that the two components of an
+intersection type must be disjoint.
 
 \subsection{Typing}
 
@@ -278,25 +290,24 @@ materials submitted with the paper.
   \label{fig:fi-typing}
 \end{figure*}
 
-The syntax-directed typing rules of \name are shown in Figure~\ref{fig:fi-typing}. They consist of one
-main typing judgment and two auxiliary judgments. The main typing judgment is of
-the form: $ \hastype \gamma e \tau $. It reads: ``in the typing context
-$\gamma$, the expression $e$ is of type $\tau$''. The rules that are the same as
-in System $F$ are rules for variables (\rulelabel{Var}), lambda abstractions
-(\rulelabel{Lam}), type abstractions (\rulelabel{BLam}), and type applications
-(\rulelabel{TApp}). The rule \rulelabel{App} needs special attention as we add
-a subtyping requirement: the type of the argument ($\tau_3$) is a
-subtype of that of the parameter ($\tau_1$).
+The syntax-directed typing rules of \name are shown in
+Figure~\ref{fig:fi-typing}. They consist of one main typing judgment and two
+auxiliary judgments. The main typing judgment is of the form: $ \hastype \Gamma
+e \tau $. It reads: ``in the typing context $\Gamma$, the term $e$ is of
+type $\tau$''. The rules that are the same as in System $F$ are rules for
+variables (\rulelabel{Var}), lambda abstractions (\rulelabel{Lam}), type
+abstractions (\rulelabel{BLam}), and type applications (\rulelabel{TApp}). For
+the ease of discussion, in \rulelabel{BLam}, we require the type variable
+introduced by the quantifier is fresh. For programs with type variable
+shadowing, this requirement can be met straighforwardly by variable renaming.
+The rule \rulelabel{App} needs special attention as we add a subtyping
+requirement: the type of the argument ($\tau_3$) is a subtype of that of the
+parameter ($\tau_1$).
 %The advantage is that it then
 %becomes easier to derive an algorithm for typechecking.
-For merges
-$e_1 \mergeOp e_2$, we typecheck $e_1$ and $e_2$, and give it the
-intersection of the resulting types. The rule for
-single-field record construction is standard. The rules
-for record selection and restriction
-are expectedly the most complicated. They turn to the
-auxiliary ``select'' and ``restrict'' rules to statically check operations and
-to obtain resulting types.
+For merges $e_1 \mergeOp e_2$, we typecheck $e_1$ and $e_2$, check that the two
+resulting types are disjoint, and give it the intersection of the resulting
+types.
 
 % The last two rules make use of the $ \rulename{fields} $ function just to make
 % sure that the field being accessed ($ \rulelabelRecSelect $) or updated

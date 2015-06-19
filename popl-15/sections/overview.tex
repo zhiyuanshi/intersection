@@ -61,7 +61,7 @@ def merge[A,B] (x: A) (y: B) : A with B = x with y
 \end{lstlisting}
 
 \noindent is rejected by the Scala compiler. The problem is that the
-\lstinline{with} construct for Scala expressions can only be used to
+\lstinline{with} construct for Scala terms can only be used to
 mixin traits or classes, and not arbitrary objects. Note that in the
 definition \lstinline{newAB} both \lstinline{A} and \lstinline{B} are
 \emph{traits}, whereas in the definition of \lstinline{merge} the variables
@@ -130,7 +130,7 @@ operator it is trivial to implement the \lstinline{merge} function in \name:
 let merge[A,B] (x : A) (y : B) : A & B = x ,, y;
 \end{lstlisting}
 
-\noindent In contrast to Scala's expression-level \lstinline{with}
+\noindent In contrast to Scala's term-level \lstinline{with}
 construct, the operator \lstinline{,,} allows two arbitrary values \lstinline{x}
 and \lstinline{y} to be merged. The resulting type is an
 intersection of the types of  \lstinline{x}
@@ -356,7 +356,7 @@ Fields are extracted using the dot notation. For example,
 selects the value of the field labelled \lstinline{open} from the record.
 
 \paragraph{Restriction.}
-Restriction $e \restrictOp l$ removes a field $l$ from an expression $e$. If $e$
+Restriction $e \restrictOp l$ removes a field $l$ from an term $e$. If $e$
 contains multiple fields labelled $l$, only the last field will be removed.
 Restriction was chosen to be a primitive because other common
 record operations can be defined in terms of restriction. For example, we can encode record
@@ -410,12 +410,12 @@ expect: \lstinline${x: Int, y: Int}$ is a subtype of
 % intersections of labelled types.}
 % \bruno{Not a proper sentence! }
 
-% \lstinline{e1} and \lstinline{e2} are two expressions that support both
+% \lstinline{e1} and \lstinline{e2} are two terms that support both
 % evaluation and pretty printing and each has type \lstinline{eval : Int, print :
-%   String}. \lstinline{add} takes two expressions and computes their
+%   String}. \lstinline{add} takes two terms and computes their
 % sum\bruno{Don't inline examples in the text. Give proper separate code
 %   examples.}. Note that in order to compute a sum, \lstinline{add} only requires
-% that the two expressions support evaluation and hence the type of the parameter
+% that the two terms support evaluation and hence the type of the parameter
 % \lstinline{eval : Int}. As a result, the type of \lstinline{e1} and
 % \lstinline{e2} are not exactly the same with that of the parameters of
 % \lstinline{add}. However, under a structural type system, this program should

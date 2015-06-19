@@ -85,7 +85,7 @@ type-checks in the restricted system.
 %     &         & \mid & T  & \text{Atomic type} \\
 
       \\
-      \text{Expressions}
+      \text{terms}
       & e & \Coloneqq & x            & \text{Variable} \\
 %      &   & \mid & \top              & \text{Top} \\
       &   & \mid & \lam x A e        & \text{Lambda} \\
@@ -463,7 +463,7 @@ the translation is coherent.
 % \end{definition}
 
 % \begin{definition}{(Disjointness)}
-% Two types $A$ and $B$ are \emph{disjoint} if there does not exist an expression $e$, which is not a merge, such that $\hastype \epsilon e A'$, $\hastype \epsilon e B'$, $A' \subtype A$, and $B' \subtype B$.
+% Two types $A$ and $B$ are \emph{disjoint} if there does not exist an term $e$, which is not a merge, such that $\hastype \epsilon e A'$, $\hastype \epsilon e B'$, $A' \subtype A$, and $B' \subtype B$.
 % \end{definition}
 
 We say two types are \emph{disjoint} if they do not share a common supertype.
@@ -647,7 +647,7 @@ Proof by induction on the derivation.
 The special case to consider is $\rulelabelTApp$. $\subst A \alpha B$ is also well-formed by Lemma~\ref{substitution-lemma}.
 \end{proof}
 
-Given a source expression $e$, elaboration always produces the same target expression $E$.
+Given a source term $e$, elaboration always produces the same target term $E$.
 
 \begin{theorem}[Unique elaboration] \label{unique-elaboration}
 If $\hastype \Gamma e {\tau_1} \yields {E_1}$ and $\hastype \Gamma e {\tau_2} \yields {E_2}$, then $E_1 \equiv E_2$
