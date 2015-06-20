@@ -11,11 +11,11 @@ def scan(filename, beginpos, endpos, fileloc)
         raise "Symbol '#{$1}' already defined" if fileloc[$1]
         fileloc[$1] = filename
         beginpos[$1] = counter + 1
-        puts "BEGIN #{$1}: #{beginpos[$1]}"
+        # puts "BEGIN #{$1}: #{beginpos[$1]}"
       end
       if line =~ /END_(\w+)/
         endpos[$1] = counter - 1
-        puts "END #{$1}: #{endpos[$1]}"
+        # puts "END #{$1}: #{endpos[$1]}"
       end
       counter += 1
     end
