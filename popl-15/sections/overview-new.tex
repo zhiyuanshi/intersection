@@ -1,0 +1,134 @@
+\section{Overview}
+
+\subsection{Intersection Types and Noncoherence}
+
+What is an intersection type? The intersection of types $A$ and $B$ contains
+exactly those values which can be used as either of type $A$ or of type $B$.
+Just as not all intersection of sets are nonempty, not all intersections of types are inhabited.
+For example, the intersection of a base type $\tyint$ and a function type $\tyint \to \tyint$ is not inhabited.
+The merge operator combines two terms, of type $A$ and $B$
+respectively, to form a term of type $A \inter B$. For example, $1 \mergeop
+`c'$ is of type $\tyint \inter \tychar$. In this case, no matter $1 \mergeop
+`c'$ is used as $\tyint$ or $\tychar$, the result of evaluation is always
+clear. However, with overlapping types, it is not straightforward anymore to
+see the result. For example, what should be the result of this program, which
+asks for an integer out of a merge of two integers:
+\[ \app {(\lam x \tyint x)} {1 \mergeop 2} \]
+Should the result be $1$ or $2$?
+
+The following shows the naive subtyping rules for intersection types:
+\begin{mathpar}
+\inferrule* [right=$\ruleLabelSubAnd$]
+  {A_1 \subtype A_2 \yields {C_1} \\ A_1 \subtype A_3 \yields {C_2}}
+  {A_1 \subtype A_2 \inter A_3
+    \yields
+      {\lam x {\im {A_1}}
+        {\pair {\app {C_1} x} {\app {C_2} x}}}}
+
+\inferrule* [right=$\ruleLabelSubAndLeft$]
+  {A_1 \subtype A_3 \yields C}
+  {A_1 \inter A_2 \subtype A_3
+    \yields
+      {\lam x {\im {A_1 \inter A_2}}
+        {\app C {(\proj 1 x)}}}}
+
+\inferrule* [right=$\ruleLabelSubAndRight$]
+  {A_2 \subtype A_3 \yields C}
+  {A_1 \inter A_2 \subtype A_3
+    \yields
+      {\lam x {\im {A_1 \inter A_2}}
+        {\app C {(\proj 2 x)}}}}
+\end{mathpar}
+The crutial challenge lies in the generation of coercions that are derived by the subtyping rules.
+Since a program can typecheck via multiple derivations, and different derivation builds up multiple derivations,
+noncoherent arises.
+
+If this situation occurs, we say that the semantics is \emph{noncoherent}.
+More precisely, coherence is a property about the function that give meaning to valid programs.
+A system is coherent if any valid program has exactly one meaning.
+
+Therefore, at this point two candidates of solutions occur:
+\begin{itemize}
+    \item To forbid overlapping intersection types in a desired type
+    system;
+    \item To enforce an order of lookup. For example, the right
+    item of a merge will take precedence so that it can ``override'' the left
+    item.
+\end{itemize}
+
+With the second approach, the program above can only evaluate to $2$.
+Unfortunately, although it is more liberal than the first,
+it makes equational reasoning broken in systems with parametric polymorphism.
+
+Obviously the difficulty above is due to the fact that the type of $1 \mergeop
+2$, which is $\tyint \inter \tyint$ is an overlapping intersection.
+Generally, if both terms can be assigned some type $C$,
+both of them can be chosen as the meaning of the merge,
+which leads to multiple meaning of a term.
+
+Therefore the challenge of coherence lies in ensuring that, for any given
+types A and B, the result of $A <: B$ always leads to the same coercions.
+
+\subsection{Equational Reasoning}
+
+We can define a \code{fst} function that extracts the first item of a merged value:
+\[
+\code{fst} \ \alpha \ \beta \ (x : \alpha \inter \beta) = \app {(\lam y \alpha y)} x
+\]
+What should be the result of this program?
+\begin{lstlisting}
+fst Int Int (1,,2)
+\end{lstlisting}
+
+Then we have the following equational reasoning:
+\begin{lstlisting}
+fst Int Int (1,,2) => (\(y : Int). y) (1,,2)
+\end{lstlisting}
+If we favour the second item, the program seems to evaluate to $2$. But in
+reality, the result is $2$. No matter we favour the first or the second item,
+we can always construct a program such that for that program, equational
+reasoning is broken.
+
+Therefore, we require that the two types of an intersection must be not
+overlapping, or \emph{disjoint}, and add this requirement to the well-formedness of types.
+
+A well-formed type is such that given any query type,
+it is always clear which subpart the query is referring to.
+In terms of rules, this notion of well-formedness is almost the same as the one in System $F$
+except for intersection types we require the two components to be disjoint.
+
+With parametric polymorphism, disjointness is harder to determine due to type variables.
+Consider this program:
+\[
+\blam \alpha {\lam x {\alpha \inter \tyint} x}
+\]
+$x$ in the body is of type $\alpha \inter \tyint$ and if $\alpha$ and $\tyint$ are
+disjoint depends on the instantiation of $\alpha$.
+
+\subsection{Intuition of Disjoint Quantification}
+
+Inspired by bounded quantification where a type variable is constrained by a type bound,
+we introduce the idea of disjoint quantification where a type variable is constrained
+to be disjoint with a given type.
+
+There is a nice symmetry between bounded quantification and disjoint quantification.
+In systems with bounded quantification,
+the usual unconstrained quantifier $\for {\alpha} \ldots$
+is a syntactic sugar for $\for {\alpha \subtype \top} \ldots$, and
+$\blam \alpha \ldots$ for $\blam {\alpha \subtype \top} \ldots$.
+In parellel, in our system with disjoint quantification,
+the usual unconstrained quantifier $\for {\alpha} \ldots$
+is a syntactic sugar for $\for {\alpha \disjoint \bot} \ldots$, and
+$\blam \alpha \ldots$ for $\blam {\alpha \disjoint \top} \ldots$.
+The intuition is that since the bottom type is akin to the empty set,
+no other type overlaps with it.
+
+With this tool in hand, we can rewrite the program above to:
+\[
+\blam {\alpha \disjoint \tyint} {\lam x {\alpha \inter \tyint} x}
+\]
+
+This program typechecks because while $x$ is of type $\alpha \inter \tyint$,
+and $\alpha$ is disjoint with $\tyint$. Similarly, in the new system,
+the original program no longer typechecks, thus preventing overlapping types.
+

@@ -82,7 +82,7 @@ algorithmic and we formalize a record system.
 % combines the merge rules ($ k $ ranges over $ \{1, 2\} $)
 % \inferrule
 % {\Gamma \turns e_k : A}
-% {\Gamma \turns e_1 \mergeOp e_2 : A}
+% {\Gamma \turns e_1 \mergeop e_2 : A}
 % and the standard intersection-introduction rule
 % \inferrule
 % {\Gamma \turns e : A_1 \andalso \Gamma \turns e : A_2}
@@ -90,7 +90,7 @@ algorithmic and we formalize a record system.
 % into one rule:
 % \inferrule [Merge]
 % {\Gamma \turns e_1 : A_1 \andalso \Gamma \turns e_2 : A_2}
-% {\Gamma \turns e_1 \mergeOp e_2 : A_1 \inter A_2}
+% {\Gamma \turns e_1 \mergeop e_2 : A_1 \inter A_2}
 Reynolds invented Forsythe~\cite{reynolds1997design} in the 1980s. Our merge
 operator is analogous to his $ p_1, p_2 $. As Dunfield
 has noted, in Forsythe merges can be only used unambiguously.
@@ -207,7 +207,7 @@ extensibility.
 % \inferrule [Merge']
 % {\Gamma \turns e_1 : A_1 \yields {E_1} \andalso \turnsrec A_1 \\
 %  \Gamma \turns e_2 : A_2 \yields {E_2} \andalso \turnsrec A_2}
-% {\Gamma \turns e_1 \mergeOp e_2 : A_1 \inter A_2 \yields {\pair {E_1} {E_2}}}
+% {\Gamma \turns e_1 \mergeop e_2 : A_1 \inter A_2 \yields {\pair {E_1} {E_2}}}
 %
 % Of course our approach has its limitation as duplicated labels in a record are
 % allowed. This has been discussed in a larger issue by

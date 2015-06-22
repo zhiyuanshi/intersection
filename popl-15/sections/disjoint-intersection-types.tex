@@ -51,6 +51,49 @@ The intuition can be found in figure \ldots.
 
 The subtyping rules, without the atomic condition are overlapping. With the atomic constraint, one can guarantee that at any moment during the derivation of a subtyping relation, at most one rule can be used. Indeed, our restrictions on subtyping do not make the subtyping relation less expressive to one without such restrictions.\todo{Point to proofs}
 
+If we would like to have a deterministic elaboration result, another idea is to
+tweak the rules a little bit so that given a term, it is no longer possible that
+both of the twin rules described above can be used. For example, if
+$A_1 \inter A_2 \subtype
+A_3$, we would like to be certain that either $A_1 \subtype
+A_3$ holds or $A_2 \subtype A_3$ holds, but not both.
+
+Note that $A$ \emph{exclusive} or $B$ is true if and only if their truth value
+differ. Next, we are going to investigate the minimal requirement (necessary and
+sufficient conditions) such that the theorem holds.
+
+If $A_1$ and $A_2$ in this setting are the same, for example,
+$\tyint \inter \tyint \subtype \tyint$, obviously the theorem will
+not hold since both the left $\tyint$ and the right $\tyint$ are a
+subtype of $\tyint$.
+
+If our types include primitive subtyping such as
+$\code{Nat} \subtype_\text{prim} \tyint$ (a natural number is also an
+integer), which can be promoted to the normal subtyping with this rule:
+\begin{mathpar}
+  \inferrule
+  {A_1 \subtype_\text{prim} A_2}
+  {A_1 \subtype A_2}
+\end{mathpar}
+the theorem will also not hold because
+$\tyint \inter \code{Nat} \subtype \tyint$ and yet
+$\tyint \subtype \tyint$ and $\code{Nat} \subtype \tyint$.
+
+We can try to rule out such possibilities by making the requirement of
+well-formedness stronger. This suggests that the two types on the sides of
+$\inter$ should not ``overlap''. In other words, they should be ``disjoint''. It
+is easy to determine if two base types are disjoint. For example, $\tyint$
+and $\tyint$ are not disjoint. Neither do $\tyint$ and $\code{Nat}$.
+Also, types built with different constructors are disjoint. For example,
+$\tyint$ and $\tyint \to \tyint$. For function types, disjointness
+is harder to visualise. But bear in the mind that disjointness can defined by
+the very requirement that the theorem holds.
+
+With the change, we need $\tyint \subtype \tyint \inter \code{Char}$ to
+hold in order to get the premise, which does not. So it can be shown that
+$(\tyint \inter \code{Char}) ((1 \mergeop 'c') : \tyint \inter
+\code{Char}) \hookrightarrow 1$ is not derivable.
+
 \george{Add interpretation of the theorem}
 
 \begin{theorem}
@@ -78,11 +121,7 @@ We say two types are \emph{disjoint} if they do not share a common supertype.
 $A \bot B = \not \exists C. A <: C \wedge B <: C$
 \end{definition}
 
-We require the types of two terms in a merge $e_1 \mergeOp e_2$ to be disjoint. Why do we require this? That is because if both terms can be assigned some type $C$, both of them can be chosen as the meaning of the merge, which leads to multiple meaning of a term, known as incoherence.
-
 \subsection{Well-formed types}
-
-A well-formed type is such that given any query type, it is always clear which subpart the query is referring to. The rules for well-formedness are standard except for intersection types we require the two components to be disjoint.
 
 \subsection{Subtyping}
 

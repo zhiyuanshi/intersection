@@ -20,6 +20,12 @@
 \def\mathrlapinternal#1#2{\rlap{$\mathsurround=0pt#1{#2}$}}
 \def\mathclapinternal#1#2{\clap{$\mathsurround=0pt#1{#2}$}}
 
+\newcommand{\horizontalrule}{
+  \begin{center}
+    \line(1,0){250}
+  \end{center}
+}
+
 \newcommand{\code}[1]{\textsf{#1}}
 \newcommand{\highlight}[1]{\colorbox{GreenYellow}{#1}}
 
@@ -48,13 +54,15 @@
 \newcommand{\lam}[3]{\lambda #1 \hast #2.\binderspace #3}
 \newcommand{\blam}[2]{\Lambda #1.\binderspace #2}
 \newcommand{\assume}[2]{\textsf{assume} #1.\binderspace #2}
-\newcommand{\mergeOp}{,,}
+\newcommand{\mergeop}{,,}
 \newcommand{\restrictOp}{\setminus}
 \newcommand{\concatOp}{+\kern-1.3ex+\kern0.8ex}  % http://tex.stackexchange.com/a/4195/73122
 \newcommand{\app}[2]{#1 \; #2}
 \newcommand{\tapp}[2]{#1 \appspace #2}
 \newcommand{\pair}[2]{(#1, #2)}
 \newcommand{\proj}[2]{{\code{proj}}_{#1} #2}
+\newcommand{\fst}[1]{\app {\code{fst}} {#1}}
+\newcommand{\snd}[1]{\app {\code{snd}} {#1}}
 \newcommand{\recordType}[2]{\{ #1 : #2 \}}
 \newcommand{\recordCon}[2]{\{ #1 = #2 \}}
 

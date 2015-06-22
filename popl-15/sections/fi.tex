@@ -37,7 +37,7 @@ System $F$ highlighted).
         &   & \mid & \app {e_1} {e_2}              & \\
         &   & \mid & \blam {\alpha \disjoint A} e  & \\
         &   & \mid & \tapp e A                     & \\
-        &   & \mid & e_1 \mergeOp e_2              & \\
+        &   & \mid & e_1 \mergeop e_2              & \\
 
         \\
         \text{Contexts}
@@ -69,7 +69,7 @@ terms over variables of a given type $\lam x A e$; application of terms to
 terms $\app {e_1} {e_2}$; and application of terms to types $\tapp e A$.
 ``Big lambdas'' $\blam {\alpha \disjoint A} e$ abstracts a type variable
 $\alpha$ over a term $e$ and constraints the instantiation of $\alpha$ to be
-disjoint with a given type $A$. $e_1 \mergeOp e_2$ is the \emph{merge} of two
+disjoint with a given type $A$. $e_1 \mergeop e_2$ is the \emph{merge} of two
 terms $e_1$ and $e_2$. It can be used as either $ e_1 $ or $ e_2 $. In
 particular, if one regards $e_1$ and $e_2$ as objects, their merge will respond
 to every method that one or both of them have. Merge of terms correspond to
@@ -79,7 +79,7 @@ intersection types $A \inter B$.
 % need to be a record type in this case. For example, although the merge of two
 % records
 % \[
-% x = \recordCon {l_1} {e_1} \mergeOp \recordCon {l_1} {e_2}
+% x = \recordCon {l_1} {e_1} \mergeop \recordCon {l_1} {e_2}
 % \]
 % is of an intersection type, $ x.{l_1} $ still gives $ e_1 $. On the other hand,
 % $ x.{l_3} $ will be rejected by the type system.
@@ -219,7 +219,7 @@ requirement: the type of the argument ($A_3$) is a subtype of that of the
 parameter ($A_1$).
 %The advantage is that it then
 %becomes easier to derive an algorithm for typechecking.
-For merges $e_1 \mergeOp e_2$, we typecheck $e_1$ and $e_2$, check that the two
+For merges $e_1 \mergeop e_2$, we typecheck $e_1$ and $e_2$, check that the two
 resulting types are disjoint, and give it the intersection of the resulting
 types.
 
@@ -257,13 +257,13 @@ ideas.
 \paragraph{Turning merges into pairs.}
 The first idea is turning merges into pairs. For example,
 \[
-1 \mergeOp \code{"one"}
+1 \mergeop \code{"one"}
 \]
 becomes \pair 1 {\code{"one"}}.
 In usage, the pair will be coerced according to type information. For example,
 consider the function application:
 \[
-\app {(\lam x \tystring x)} {(1 \mergeOp \code{"one"})}
+\app {(\lam x \tystring x)} {(1 \mergeop \code{"one"})}
 \]
 It will be translated to
 \[
