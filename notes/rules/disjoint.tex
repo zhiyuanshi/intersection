@@ -1,0 +1,35 @@
+\newcommand{\disjointvar}{
+  \inferrule* [right=DisjointVar]
+    {\alpha * B \in \Gamma}
+    {\isdisjointi \Gamma \alpha B}
+}
+
+\newcommand{\disjointinterleft}{
+  \inferrule* [right=DisjointInter1]
+    {\isdisjointi \Gamma A C \\ \isdisjointi \Gamma B C}
+    {\isdisjointi \Gamma {A \inter B} {C}}
+}
+
+\newcommand{\disjointinterright}{
+  \inferrule* [right=DisjointInter2]
+    {\isdisjointi \Gamma A B \\ \isdisjointi \Gamma A C}
+    {\isdisjointi \Gamma {A} {B \inter C}}
+}
+
+\newcommand{\disjointfun}{
+  \inferrule* [right=DisjointFun]
+    {\isdisjointi \Gamma B D}
+    {\isdisjointi \Gamma {A \to B} {C \to D}}
+}
+
+\newcommand{\disjointforall}{
+  \inferrule* [right=DisjointForall]
+    {\isdisjointi \Gamma A C}
+    {\isdisjointi \Gamma {\for {\alpha * B} A} {\for {\alpha * B} C} \text{Subst???}}
+}
+
+\newcommand{\disjointatomic}{
+  \inferrule* [right=DisjointAtomic]
+    {A \not\sim B}
+    {\isdisjointi \Gamma {A} {B}}
+}

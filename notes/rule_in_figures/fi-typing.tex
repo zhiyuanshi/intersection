@@ -1,0 +1,31 @@
+% Typing
+\begin{mathpar}
+  \framebox{$ \judgeSource \gamma e \tau $} \and
+  \ruleSourceVar \and \ruleSourceTop \and
+  \ruleSourceLam  \and \ruleSourceApp \and
+  \ruleSourceBLam \and \ruleSourceTApp \and
+  \ruleSourceMerge \and
+  \ruleSourcerecordConstruct \and
+  \ruleSourceRecSelect \and \ruleSourceRecRestrict
+\end{mathpar}
+
+
+% Selection
+\begin{mathpar}
+  \framebox{$\judgeSelect {\tau_1} l \tau_2 $} \and
+  \ruleGet \and \ruleGetLeft \and \ruleGetRight
+\end{mathpar}
+
+
+% Restriction
+\begin{mathpar}
+  \framebox{$\judgeRestrict {\tau_1} l \tau_2 $} \and
+  \ruleRestrict \and \ruleRestrictLeft \and \ruleRestrictRight
+\end{mathpar}
+
+
+% Update
+% \begin{mathpar}
+%   \framebox{$\judgeUpdate \tau l \tau {\tau_2} {\tau_3}$} \and
+%   \ruleupdate \and \ruleUpdateLeft \and \ruleUpdateRight
+% \end{mathpar}
