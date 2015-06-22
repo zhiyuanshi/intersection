@@ -1,0 +1,88 @@
+\newcommand{\ruleLabelSub}{\text{Sub}}
+\newcommand{\ruleLabelSubVar}{\ruleLabelSub\text{Var}}
+\newcommand{\ruleLabelSubTop}{\ruleLabelSub\text{Top}}
+\newcommand{\ruleLabelSubFun}{\ruleLabelSub\text{Fun}}
+\newcommand{\ruleLabelSubForall}{\ruleLabelSub\text{Forall}}
+\newcommand{\ruleLabelSubAnd}{\ruleLabelSub\text{And}}
+\newcommand{\ruleLabelSubAndLeft}{\ruleLabelSub{\text{And}_1}}
+\newcommand{\ruleLabelSubAndRight}{\ruleLabelSub{\text{And}_2}}
+\newcommand{\ruleLabelSubConstraint}{\ruleLabelSub{\text{Constraint}}}
+\newcommand{\ruleLabelSubRec}{\ruleLabelSub\text{Rec}}
+
+\newcommand{\subVar}{
+\inferrule* [right=$\ruleLabelSubVar$]
+  { }
+  {\alpha \subtype \alpha \yields {\lam x {\im \alpha} x}}
+}
+
+\newcommand{\subTop}{
+\inferrule* [right=$\ruleLabelSubTop$]
+  { }
+  {A \subtype \top \yields {\lam x {\im A} {()}}}
+}
+
+\newcommand{\subFun}{
+\inferrule* [right=$\ruleLabelSubFun$]
+  {\tau_3 \subtype \tau_1 \yields {C_1} \\ \tau_2 \subtype \tau_4 \yields {C_2}}
+  {\tau_1 \to \tau_2 \subtype \tau_3 \to \tau_4
+  \yields
+      {\lam f {\im {\tau_1 \to \tau_2}}
+      {\lam x {\im {\tau_3}}
+          {\app {C_2} {(\app f {(\app {C_1} x)})}}}}}
+}
+
+\newcommand{\subForall}{
+\inferrule* [right=$\ruleLabelSubForall$]
+  {\tau_1 \subtype \subst {\alpha_1} {\alpha_2} \tau_2 \yields C}
+  {\for {\alpha_1 * \tau_3} \tau_1 \subtype \for {\alpha_2 * \tau_3} \tau_2
+    \yields
+      {\lam f {\im {\for {\alpha_1 * \tau_3} \tau_1}}
+        {\blam \alpha {\app C {(\app f \alpha)}}}}}
+}
+
+\newcommand{\subAnd}{
+\inferrule* [right=$\ruleLabelSubAnd$]
+  {\tau_1 \subtype \tau_2 \yields {C_1} \\ \tau_1 \subtype \tau_3 \yields {C_2}}
+  {\tau_1 \subtype \tau_2 \intersect \tau_3
+    \yields
+      {\lam x {\im {\tau_1}}
+        {\pair {\app {C_1} x} {\app {C_2} x}}}}
+}
+
+\newcommand{\subAndleft}{
+\inferrule* [right=$\ruleLabelSubAndLeft$]
+  {\tau_1 \subtype \tau_3 \yields C \\ \isatomic {\tau_3}}
+  {\tau_1 \intersect \tau_2 \subtype \tau_3
+    \yields
+      {\lam x {\im {\tau_1 \intersect \tau_2}}
+        {\app C {(\proj 1 x)}}}}
+}
+
+\newcommand{\subAndright}{
+\inferrule* [right=$\ruleLabelSubAndRight$]
+  {\tau_2 \subtype \tau_3 \yields C \\ \isatomic {\tau_3}}
+  {\tau_1 \intersect \tau_2 \subtype \tau_3
+    \yields
+      {\lam x {\im {\tau_1 \intersect \tau_2}}
+        {\app C {(\proj 2 x)}}}}
+}
+
+\newcommand{\subConstraint}{
+\inferrule* [right=$\ruleLabelSubConstraint$]
+  {A_2 \subtype A_1 \\ B_2 \subtype B_1 \\ C_1 \subtype C_2 \yields E}
+  {\constraints {A_1 \disjoint B_1} {C_1} \subtype \constraints {A_2 \disjoint B_2} {C_2} \yields E}
+}
+
+%\newcommand{\subConstraint1}{
+%\inferrule* [right=$\ruleLabelSubConstraint$]
+%  {A_2 \subtype A_1 \\ B_2 \subtype B_1 \\ C_1 \subtype C_2}
+%  {A \disjoint B \subtype A \disjoint B} }
+%}
+
+\newcommand{\subRec}{
+\inferrule* [right=$\ruleLabelSubRec$]
+  {\tau_1 \subtype \tau_2 \yields C}
+  {\recordType l {\tau_1} \subtype \recordType l {\tau_2}
+    \yields
+      {\lam x {\im {\recordType l {\tau_1}}} {\app C x}}}
+}
