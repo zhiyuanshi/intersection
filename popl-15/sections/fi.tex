@@ -7,7 +7,7 @@ next section.
 
 \subsection{Syntax}
 
-Figure~\ref{fig:fi-syntax} shows the syntax of \name (with the addition to
+Figure~\ref{fig:fi-syntax-old} shows the syntax of \name (with the addition to
 System $F$ highlighted).
 % As a convention in this paper, we will be using
 % lowercase letters as meta-variables for sorts in \name, and uppercase letters
@@ -25,9 +25,8 @@ System $F$ highlighted).
       \begin{array}{llrll}
         \text{Types}
         & A, B & \Coloneqq & \alpha                  & \\
-        &      & \mid & \bot                         & \\
         &      & \mid & A \to B                      & \\
-        &      & \mid & \for {\alpha \disjoint B} A  & \\
+        &      & \mid & \for {\alpha} A  & \\
         &      & \mid & A \inter B               & \\
 
         \\
@@ -35,22 +34,20 @@ System $F$ highlighted).
         & e & \Coloneqq & x                        & \\
         &   & \mid & \lam x A e                    & \\
         &   & \mid & \app {e_1} {e_2}              & \\
-        &   & \mid & \blam {\alpha \disjoint A} e  & \\
+        &   & \mid & \blam {\alpha} e  & \\
         &   & \mid & \tapp e A                     & \\
         &   & \mid & e_1 \mergeop e_2              & \\
 
         \\
         \text{Contexts}
         & \Gamma & \Coloneqq & \cdot
-                   \mid \Gamma, \alpha \disjoint A
+                   \mid \Gamma, \alpha
                    \mid \Gamma, x \hast A  & \\
-
-        \text{Syntactic sugar} & \blam {\alpha} e & \equiv & \blam {\alpha \disjoint \bot} e & \\
       \end{array}
     \end{array}
   \]
 
-  \label{fig:fi-syntax}
+  \label{fig:fi-syntax-old}
   \caption{Syntax.}
 \end{figure}
 

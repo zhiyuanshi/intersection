@@ -14,7 +14,7 @@ def latexmk_cmd(target, options = nil)
   # engine = "lualatex"
 
   # -f     Force latexmk to continue document processing despite errors.
-  "latexmk -pvc -quiet -pdf -pdflatex='#{engine} -file-line-error -halt-on-error -shell-escape %O %S' #{target}.tex"
+  "latexmk -pvc -pdf -pdflatex='#{engine} -file-line-error -halt-on-error -shell-escape %O %S' #{target}.tex"
 end
 
 desc "Generate the PDF of the paper"

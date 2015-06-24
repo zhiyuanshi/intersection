@@ -51,7 +51,7 @@
 
 \newcommand{\subAndleft}{
 \inferrule* [right=$\ruleLabelSubAndLeft$]
-  {A_1 \subtype A_3 \yields C \\ \isatomic {A_3}}
+  {A_1 \subtype A_3 \yields C}
   {A_1 \inter A_2 \subtype A_3
     \yields
       {\lam x {\im {A_1 \inter A_2}}
@@ -60,7 +60,7 @@
 
 \newcommand{\subAndright}{
 \inferrule* [right=$\ruleLabelSubAndRight$]
-  {A_2 \subtype A_3 \yields C \\ \isatomic {A_3}}
+  {A_2 \subtype A_3 \yields C}
   {A_1 \inter A_2 \subtype A_3
     \yields
       {\lam x {\im {A_1 \inter A_2}}
