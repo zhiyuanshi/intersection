@@ -235,7 +235,7 @@ types.
 % infix operator that prepend the first argument to the second. The function
 % returns an associative list whose domain is field labels and range types.
 
-\subsection{Type-directed translation to System $ F $}
+\subsection{Type-directed Translation to System $ F $}
 
 In this section we define the dynamic semantics of the call-by-value \name by
 means of a type-directed translation to a variant of System $F$. This
@@ -246,7 +246,7 @@ previous section. Besides that, they stay the same. We also tacitly assume the
 variables introduced in the blue part are generated from a unique name supply and
 are always fresh.
 
-\subsection{Informal discussion}
+\subsection{Informal Discussion}
 
 This subsection presents the translation informally by explaining the major
 ideas.
@@ -300,7 +300,7 @@ becomes an \name term
 where $\lam x {\pair \tyint \tyint} {\proj 2 x}$
 extracts the desired item $5$.
 
-\subsection{Target language}
+\subsection{Target Language}
 
 Our target language is System $F$ extended with pair and unit types. The syntax
 and typing is completely standard. The syntax of the target language is shown in
@@ -319,7 +319,7 @@ Figure~\ref{fig:f-syntax} and the typing rules in the appendix.
 % states that with respect to the typing context $ \gamma $, the \name term
 % $e$ is of $A$ and its translation is a target term $ E $.
 
-\subsection{Type translation}
+\subsection{Type Translation}
 
 \begin{figure}[h]
   \input{rule_in_figures/type-translation.tex}
@@ -337,9 +337,9 @@ contexts $\gamma$ to target language contexts $\Gamma$.
 % Section~\ref{sec:fi}, except for the light blue part. The translation consists
 % of four sets of rules, which are explained below:
 
-\subsection{Coercive subtyping}
+\subsection{Coercive Subtyping}
 
-Figure~\todo{fig:elab-subtyping} shows subtyping with coercions. The judgment
+Figure~\george{fig:elab-subtyping} shows subtyping with coercions. The judgment
 \[
 A_1 \subtype A_2 \yields C
 \]
@@ -383,7 +383,7 @@ $A_1\inter A_2$, project $x$ on the first item, and apply $ C $ to it.
   By a straighforward induction on the derivation\footnote{The proofs of major lemmata and theorems can be found in the appendix.}.
 \end{proof}
 
-\subsection{Main translation}
+\subsection{Main Translation}
 
 \begin{comment}
 In this subsection we now present formally the translation rules that convert

@@ -1,9 +1,24 @@
 \section{Disjoint Intersection Types and Disjoint Quantification}
 
-This section shows how to amend the system presented before so that it supports
-coherence as well as type soundness. The keys aspects are the notion of disjoint
-intersections, and disjoint quantification for polymorphic types. The full
-specification of the language can be found in the appendix.
+\george{Show that the naive bidirectional subtyping is not disjointness.}
+\george{Highlight new stuff}
+\george{Discuss each point in this order: goal, idea of tweaks, changes, and proofs.}
+
+% Problem
+Although the system shown in the previous section is type-safe, it is not
+coherent.  This section shows how to amend the system presented before so that
+it supports coherence as well as type soundness. The keys aspects are the notion
+of disjoint intersections, and disjoint quantification for polymorphic types.
+The full specification of the language can be found in the appendix.
+
+\begin{theorem}[Unique elaboration] \label{unique-elaboration}
+
+  If $\hastype \Gamma e {A_1} \yields {E_1}$ and $\hastype \Gamma e {A_2}
+  \yields {E_2}$, then $E_1 \equiv E_2$.
+
+\end{theorem}
+
+Given a source term $e$, elaboration always produces the same target term $E$.
 
 % In type systems with a top type (such as \lstinline@Object@ in some OO
 % languages), the definition of disjointness can be modified to:
@@ -48,6 +63,22 @@ specification of the language can be found in the appendix.
 % \caption{Untergruppenverband}
 % \end{figure}
 
+
+\subsection{Disjointness}
+
+We say two types are \emph{disjoint} if they do not share a common supertype. We
+introduce the disjoint judgement.
+\[
+\isdisjoint \Gamma A B
+\]
+says inside the context $\Gamma$, $A$ and $B$ are disjoint. In this section, we
+treat this judgement as oracle. The algorithmic rules will be developed in the next section.
+
+\begin{definition}[Disjointness]
+  $A \bot B = \not \exists C. A <: C \wedge B <: C$
+\end{definition}
+
+
 \subsection{Syntax}
 
 Figure~\ref{fig:fi-syntax} shows the updated syntax with the changes
@@ -58,6 +89,9 @@ quantification quantification be integrated and become a special case of
 disjoint quantification. That is, $\blam {\alpha} e$ is just a syntactic sugar
 for $\blam {\alpha \disjoint \bot} e$. The underlying idea is that any type is
 disjoint with the bottom type.
+
+The top type is the trivial upper bound in bounded quantification, while the
+bottom type is the trivial disjointness constraint in disjoint quantification.
 
 \begin{figure}
   \[
@@ -94,23 +128,10 @@ disjoint with the bottom type.
   \caption{Syntax.}
 \end{figure}
 
-\subsection{Disjointness}
-
-We say two types are \emph{disjoint} if they do not share a common supertype. We
-introduce the disjoint judgement.
-\[
-\isdisjoint \Gamma A B
-\]
-says inside the context $\Gamma$, $A$ and $B$ are disjoint. In this section, we
-treat this judgement as oracle. The algorithmic rules will be developed in the next section.
-
-% \begin{definition}[Disjointness]
-% $A \bot B = \not \exists C. A <: C \wedge B <: C$
-% \end{definition}
-
-\subsection{Disjoint Quantification}
+\subsection{Typing}
 
 \george{Show a diagram here to contrast with bounded polymorphism}
+\george{Missing the merge rule, as it is also changed.}
 
 Disjoint quantification is introduced by the big lambda $\blam {\alpha \disjoint
 A} e$ and eliminated by the usual type application $\tapp e A$. During the type
@@ -164,6 +185,9 @@ well-formed. Under the new rules, intersection types such as $\tyint \inter
 
 \subsection{Subtyping}
 
+\george{Two points are being made here: 1) nondisjoint intersections, 2) atomic
+types. Show an offending example for each?}
+
 First we need to introduce the concept of \emph{atomic types}. Atomic types are
 just those which are not intersection types, and are asserted by the judgement
 \[
@@ -181,7 +205,7 @@ holds, but not both.
 With the atomic constraint, one can guarantee that at any moment during the
 derivation of a subtyping relation, at most one rule can be used. Indeed, our
 restrictions on subtyping do not make the subtyping relation less expressive to
-one without such restrictions.\george{Point to proofs}
+one without such restrictions.\george{Point to proofs and justify why the proof shows this.}
 
 \begin{mathpar}
   \inferrule* [right=$\ruleLabelSubAndLeft$]
@@ -237,10 +261,9 @@ $(\tyint \inter \code{Char}) ((1 \mergeop 'c') : \tyint \inter
 
 \subsection{Metatheory}
 
-Two major metatheoretical results are type safety and coherence. The detailed
-proofs can be found in the appendix.
-
 \subsubsection{Type Safety}
+
+\george{Put type safety to previous section and just say that it also holds here.}
 
 \begin{restatable}[Translation preserves well-typing]{theorem}{theorempreservation}
   \label{theorem:preservation}
@@ -479,14 +502,6 @@ Typing always produces a well-formed type.
 % because we need to show that the result of substitution ($\subst A \alpha C$) is well-formed, which is evident by Lemma~\ref{instantiation}.
 % \end{proof}
 
-\begin{theorem}[Unique elaboration] \label{unique-elaboration}
-
-  If $\hastype \Gamma e {A_1} \yields {E_1}$ and $\hastype \Gamma e {A_2}
-  \yields {E_2}$, then $E_1 \equiv E_2$.
-
-\end{theorem}
-
-Given a source term $e$, elaboration always produces the same target term $E$.
 % \begin{proof}
 % The typing rules are syntax-directed. The case of \rulelabel{TyApp} needs special attention since we still need to show that the generated coercion $C$ is unique.
 % \begin{mathpar}
