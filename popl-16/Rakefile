@@ -18,7 +18,7 @@ def latexmk_cmd(target, options = nil)
 end
 
 desc "Generate the PDF of the paper"
-task(:paper => :embed_code) { system(latexmk_cmd("paper")) }
+task(:paper) { system(latexmk_cmd("paper")) }
 
 desc "Embed code from external files into LaTeX source"
 task(:embed_code) { system("ruby scripts/compute_positions.rb") }
