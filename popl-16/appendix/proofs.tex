@@ -1,0 +1,460 @@
+% \section{Proofs}
+%
+% \paragraph{Notation.} We sketch most of our proofs in two-column style: on the
+% left are the intermediate results and on the right are the justification (for
+% the previous intermediate result to reach the corresponding left-hand side).
+%
+% % \subsection{Subtyping}
+%
+% % \begin{theorem}[Subtyping is reflexive]
+% %   If $A$ is a well-formed type, then $A \subtype A$.
+% % \end{theorem}
+%
+% % \begin{proof}
+% %   \george{TODO}
+% % \end{proof}
+%
+% % \begin{theorem}[Subtyping is transitive]
+% %   If $A_1$, $A_2$, $A_3$ are well-formed types, and
+% %   $A_1 \subtype A_2$ and $A_2 \subtype A_3$, then
+% %   $A_1 \subtype A_3$.
+% % \end{theorem}
+%
+% % \begin{proof}
+% %   \george{TODO}
+% % \end{proof}
+%
+% % \bruno{fix numbering of lemmas}
+% % \bruno{reflexitivity and transitivity missing. You can do a proof
+% %   sketch instead of a full proof. Just say in 1 or 2 sentences what is
+% % the main idea. You can mention that we have a full proof in Coq.}
+% % \bruno{target type system is missing 3 cases: Tunit; Tproj1; TProj2}
+%
+% % \subsection{Elaboration}
+%
+% \lemmasub*
+% \begin{proof}
+%   By structural induction of the derivation.
+%
+%   \begin{itemize}
+%
+%   \item \textbf{Case}
+%     \begin{flalign*}
+%       & \rulesubVar &
+%     \end{flalign*}
+%
+%     \begin{tabular}{rll}
+%       & $ \judgeTarget {\epsilon} {\lam x {\im \alpha} x} {\alpha \to \alpha} $ & By $ \ruleLabelTargetvar $ and $ \ruleLabelTargetlam $
+%     \end{tabular} \\
+%
+%   \item \textbf{Case}
+%     \begin{flalign*}
+%       & \rulesubTop &
+%     \end{flalign*}
+%
+%     \begin{tabular}{rll}
+%       & $ \judgeTarget {\epsilon} {\lam x {\im A} ()} {\im A \to ()} $ & By $ \ruleLabelTargetvar $ and $ \ruleLabelTargetlam $ \\
+%       & $ \judgeTarget {\epsilon} {\lam x {\im A} ()} {\im A \to \im \top} $ & By the definition of $ \im \cdot $
+%     \end{tabular} \\
+%
+%   \item \textbf{Case}
+%     \begin{flalign*}
+%       & \rulesubFun &
+%     \end{flalign*}
+%
+%     \begin{tabular}{rll}
+%       & $ \judgeTarget \epsilon {C_1} {\im {A_3} \to \im {A_1}} $ & By i.h. \\
+%       & $ \judgeTarget \epsilon {C_2} {\im {A_2} \to \im {A_4}} $ & By i.h. \\
+%       & $ \judgeTarget {\epsilon, x \hast {\im {A_3}}} x {\im {A_3}} $ & By $\ruleLabelTargetvar$ \\
+%       & $ A_3 \subtype A_1 \yields {C_1} $ & Premise \\
+%       & $ \judgeTarget {\epsilon, x \hast {\im {A_3}}} {\app {C_1} x} {\im {A_1}} $ & By $\ruleLabelTargetApp$ \\
+%       & $ \judgeTarget {\epsilon, f \hast {\im {A_1 \to A_2}}} f {\im {A_1 \to A_2}} $ & By $\ruleLabelTargetvar$ \\
+%       & $ \judgeTarget {\epsilon, f \hast {\im {A_1 \to A_2}}} f {\im {A_1} \to \im {A_2}} $ & By the definition of $ \im \cdot $ \\
+%       & $ \judgeTarget {\epsilon, f \hast {\im {A_1 \to A_2}}, x \hast {\im {A_3}}} {\app f {(\app {C_1} x})} {\im {A_2}} $ & By $\ruleLabelTargetApp$ \\
+%       & $ \judgeTarget {\epsilon, f \hast {\im {A_1 \to A_2}}, x \hast {\im {A_3}}} {\app {C_2} {(\app f {(\app {C_1} x})})} {\im {A_4}} $ & By $\ruleLabelTargetApp$ \\
+%       & $ \judgeTarget \epsilon {\lam f {\im {A_1 \to A_2}} {\lam x {\im {A_3}} {\app {C_2} {(\app f {(\app {C_1} x)})}}}} {\im {A_1 \to A_2} \to \im {A_3} \to \im {A_4}} $ & By applying $\ruleLabelTargetlam$ twice \\
+%       & $ \judgeTarget \epsilon {\lam f {\im {A_1 \to A_2}} {\lam x {\im {A_3}} {\app {C_2} {(\app f {(\app {C_1} x)})}}}} {\im {A_1 \to A_2} \to \im {A_3 \to A_4}} $ & By the definition of $\im \cdot$
+%     \end{tabular} \\
+%
+%   \item \textbf{Case}
+%     \begin{flalign*}
+%       & \rulesubForall &
+%     \end{flalign*}
+%
+%     \begin{tabular}{rll}
+%       & $ \judgeTarget \epsilon C {\im {A_1} \to {\im {\subst {\alpha_1} {\alpha_2} A_2}}} $ & By i.h. \\
+%       & $ \judgeTarget {\epsilon, f \hast {\im {\for {\alpha_1} {A_1}}}} f {\im {\for {\alpha_1} {A_1}}} $ & By $\ruleLabelTargetvar$ \\
+%       & $ \judgeTarget {\epsilon, f \hast {\im {\for {\alpha_1} {A_1}}}} f {\for {\alpha_1} {\im {A_1}}} $ & By the definition of $ \im \cdot $ \\
+%       & $ \judgeTarget {\epsilon, f \hast {\im {\for {\alpha_1} {A_1}}}, \alpha} {\tapp f \alpha} {\subst \alpha {\alpha_1} {\im {A_1}}} $ & By $\ruleLabelTargetvar$ and $\ruleLabelTargetTApp$ \\
+%       & $ \judgeTarget {\epsilon, f \hast {\im {\for {\alpha_1} {A_1}}}, \alpha} {\app C {(\tapp f \alpha)}} {\subst \alpha {\alpha_1} {\im {\subst {\alpha_1} {\alpha_2} {A_2}}}} $ & By $\ruleLabelTargetApp$ \\
+%       & $ \judgeTarget {\epsilon, f \hast {\im {\for {\alpha_1} {A_1}}}} {\blam \alpha {\app C {(\tapp f \alpha)}}} {\for {\alpha_2} {\im {A_2}}} $ & By $\ruleLabelTargetBLam$ and substitution \george{Substitution is problematic} \\
+%       & $ \judgeTarget \epsilon {\lam f {\im {\for {\alpha_1} {A_1}}} {\blam \alpha {\app C {(\tapp f \alpha)}}}} {\im {\for {\alpha_1} {A_1}} \to \for {\alpha_2} {\im {A_2}}} $ & By $\ruleLabelTargetlam$ \\
+%       & $ \judgeTarget \epsilon {\lam f {\im {\for {\alpha_1} {A_1}}} {\blam \alpha {\app C {(\tapp f \alpha)}}}} {\im {\for {\alpha_1} {A_1}} \to \im {\for {\alpha_2} {A_2}}} $ & By the definition of $\im \cdot$
+%     \end{tabular} \\
+%
+%   \item \textbf{Case}
+%     \begin{flalign*}
+%       & \rulesubAnd &
+%     \end{flalign*}
+%
+%     \begin{tabular}{rll}
+%       & $\judgeTarget {\epsilon, x \hast \im {A_1}} x {\im {A_1}}$ & By $\ruleLabelTargetvar$ \\
+%       & $\judgeTarget \epsilon {C_1} {\im {A_1} \to \im {A_2}}$ & By i.h. \\
+%       & $\judgeTarget {\epsilon, x \hast \im {A_1}} {\app {C_1} x} {\im {A_2}}$ & By $\ruleLabelTargetApp$ and weakening \\
+%       & $\judgeTarget {\epsilon, x \hast \im {A_1}} {\app {C_2} x} {\im {A_3}}$ & Similar \\
+%       & $\judgeTarget {\epsilon, x \hast \im {A_1}} {\pair {\app {C_1} x} {\app {C_2} x}} {\pair {\im {A_2}} {\im {A_3}}}$ & By $\ruleLabelTargetPair$ \\
+%       & $\judgeTarget {\epsilon, x \hast \im {A_1}} {\pair {\app {C_1} x} {\app {C_2} x}} {\im {A_2 \inter A_3}}$ & By the definition of $\im \cdot$ \\
+%       & $\judgeTarget \epsilon {\lam x {\im {A_1}} {\pair {\app {C_1} x} {\app {C_2} x}}} {\im {A_1} \to {\im {A_2 \inter A_3}}}$ & By $\ruleLabelTargetlam$
+%     \end{tabular} \\
+%
+%   \item \textbf{Case}
+%     \begin{flalign*}
+%       & \rulesubAndleft &
+%     \end{flalign*}
+%
+%     \begin{tabular}{rll}
+%       & $ \judgeTarget {\epsilon, x \hast \im {A_1 \inter A_2}} x {\im {A_1 \inter A_2}} $ & By $\ruleLabelTargetvar$ \\
+%       & $ \judgeTarget {\epsilon, x \hast \im {A_1 \inter A_2}} x {\pair {\im {A_1}} {\im {A_2}}} $ & By the definition of $\im \cdot$ \\
+%       & $ \judgeTarget {\epsilon, x \hast \im {A_1 \inter A_2}} {\proj 1 x} {\im {A_1}} $ & By $\ruleLabelTargetProjLeft$ \\
+%       & $ \judgeTarget \epsilon C {\im {A_1} \to \im {A_3}} $ & By i.h. \\
+%       & $ \judgeTarget {\epsilon, x \hast \im {A_1 \inter A_2}} C {\im {A_1} \to \im {A_3}} $ & By weakening \\
+%       & $ \judgeTarget {\epsilon, x \hast \im {A_1 \inter A_2}} {\app C {(\proj 1 x)}} {\im {A_3}} $ & By $\ruleLabelTargetApp$ \\
+%       & $ \judgeTarget \epsilon {\lam x {\im {A_1 \inter A_2}} {\app C {(\proj 1 x)}}} {\im {A_1 \inter A_2} \to \im {A_3}} $ & By $\ruleLabelTargetlam$
+%     \end{tabular} \\
+%
+%   \item \textbf{Case}
+%     \begin{flalign*}
+%       & \rulesubAndright &
+%     \end{flalign*}
+%
+%     By symmetry with the above case. \\
+%
+%   \item \textbf{Case}
+%     \begin{flalign*}
+%       & \rulesubRec &
+%     \end{flalign*}
+%
+%     \begin{tabular}{rll}
+%       & $ A_1 \subtype A_2 \yields C $ & Premise \\
+%       & $ \judgeTarget \epsilon C {\im {A_1} \to \im {A_2}} $ & By i.h. \\
+%       & $ \judgeTarget {\epsilon, x \hast \im {\recordType l {A_1}}} x {\im {\recordType l {A_1}}} $ & By $ \ruleLabelTargetvar $ \\
+%       & $ \judgeTarget {\epsilon, x \hast \im {\recordType l {A_1}}} x {\im {A_1}} $ & By the definition of $ \im \cdot $ \\
+%       & $ \judgeTarget {\epsilon, x \hast \im {\recordType l {A_1}}} {\app C x} {\im {A_2}} $ & By $ \ruleLabelTargetApp $ \\
+%       & $ \judgeTarget {\epsilon, x \hast \im {\recordType l {A_1}}} {\app C x} {\im {\recordType l {A_2}}} $ & By the definition of $ \im \cdot $ \\
+%       & $ \judgeTarget \epsilon {\lam x {\im {\recordType l {A_1}}} {\app C x}} {\im {\recordType l {A_1}} \to \im {\recordType l {A_2}}} $ & By $ \ruleLabelTargetlam $
+%     \end{tabular} \\
+%
+%   \end{itemize}
+%
+% \end{proof}
+%
+% \lemmaselect*
+% \begin{proof}
+%   By structural induction of the derivation.
+%
+%   \begin{itemize}
+%
+%   \item \textbf{Case}
+%     \begin{flalign*}
+%       & \ruleGetElab &
+%     \end{flalign*}
+%
+%     \begin{tabular}{rll}
+%       & $ \judgeTarget \epsilon {\lam x {\im {\recordType l A}} x} {\im {\recordType l A} \to \im {\recordType l A}} $ & By $ \ruleLabelTargetlam $ and $\ruleLabelTargetvar$ \\
+%       & $ \judgeTarget \epsilon {\lam x {\im {\recordType l A}} x} {\im {\recordType l A} \to \im A} $ & By the definition of $ \im \cdot $
+%     \end{tabular} \\
+%
+%   \item \textbf{Case}
+%     \begin{flalign*}
+%       & \ruleGetLeftElab &
+%     \end{flalign*}
+%
+%     \begin{tabular}{rll}
+%       & $ \judgeTarget {\epsilon, x \hast \im {A_1 \inter A_2}} x {\im {A_1 \inter A_2}} $ & By $ \ruleLabelTargetvar $ \\
+%       & $ \judgeTarget {\epsilon, x \hast \im {A_1 \inter A_2}} x {\pair {\im {A_1}} {\im {A_2}}} $ & By the definition of $\im \cdot$ \\
+%       & $ \judgeTarget {\epsilon, x \hast \im {A_1 \inter A_2}} {\proj 1 x} {\im {A_1}} $ & By $\ruleLabelTargetProjLeft$ \\
+%       & $ \judgeTarget \epsilon C {\im {A_1} \to \im A} $ & By i.h. \\
+%       & $ \judgeTarget {\epsilon, x \hast \im {A_1 \inter A_2}} C {\im {A_1} \to \im A} $ & By weakening \\
+%       & $ \judgeTarget {\epsilon, x \hast \im {A_1 \inter A_2}} {\app C {(\proj 1 x)}} {\im A} $ & By $\ruleLabelTargetApp$ \\
+%       & $ \judgeTarget \epsilon {\lam x {\im {A_1 \inter A_2}} {\app C {(\proj 1 x)}}} {\im {A_1 \inter A_2} \to \im A} $ & By $ \ruleLabelTargetlam $
+%     \end{tabular} \\
+%
+%   \item \textbf{Case}
+%     \begin{flalign*}
+%       & \ruleGetRightElab &
+%     \end{flalign*}
+%
+%     By symmetry with the above case. \\
+%
+% \end{itemize}
+% \end{proof}
+%
+%
+% \lemmarestrict*
+% \begin{proof}
+%   By structural induction of the derivation.
+%
+%   \begin{itemize}
+%
+%   \item \textbf{Case}
+%     \begin{flalign*}
+%       & \ruleRestrictElab &
+%     \end{flalign*}
+%
+%     \begin{tabular}{rll}
+%       & $ \judgeTarget \epsilon {\lam x {\im {\recordType l A}} {()}} {\im {\recordType l A} \to ()} $ & By $\ruleLabelTargetUnit$ and $\ruleLabelTargetlam$ \\
+%       & $ \judgeTarget \epsilon {\lam x {\im {\recordType l A}} {()}} {\im {\recordType l A} \to \im \top} $ & By the definition of $\im \cdot$
+%     \end{tabular} \\
+%
+%   \item \textbf{Case}
+%     \begin{flalign*}
+%       & \ruleRestrictLeftElab &
+%     \end{flalign*}
+%
+%     \begin{tabular}{rll}
+%       & $\judgeRestrict {A_1} l A \yields C$ & Premise \\
+%       & $\judgeTarget \epsilon C {\im {A_1} \to \im A} $ & By i.h. \\
+%       & $\judgeTarget {\epsilon, x \hast \im {A_1 \inter A_2}} x {\im {A_1 \inter A_2}} $ & By $\ruleLabelTargetvar$ \\
+%       & $\judgeTarget {\epsilon, x \hast \im {A_1 \inter A_2}} x {\pair {\im {A_1}} {\im {A_2}}} $ & By the definition of $\im \cdot$ \\
+%       & $\judgeTarget {\epsilon, x \hast \im {A_1 \inter A_2}} {\proj 1 x} {\im {A_1}} $ & By $\ruleLabelTargetProjLeft$ \\
+%       & $\judgeTarget {\epsilon, x \hast \im {A_1 \inter A_2}} {\proj 2 x} {\im {A_2}} $ & By $\ruleLabelTargetProjRight$ \\
+%       & $\judgeTarget {\epsilon, x \hast \im {A_1 \inter A_2}} {\app C {(\proj 1 x)}} {\im {A}} $ & By $\ruleLabelTargetApp$ \\
+%       & $\judgeTarget {\epsilon, x \hast \im {A_1 \inter A_2}} {\pair {\app C {(\proj 1 x)}} {\proj 2 x}} {\pair {\im {A}} {\im {A_2}}} $ & By $\ruleLabelTargetPair$ \\
+%       & $\judgeTarget {\epsilon, x \hast \im {A_1 \inter A_2}} {\pair {\app C {(\proj 1 x)}} {\proj 2 x}} {\im {A \inter A_2}} $ & By the definition of $\im \cdot$ \\
+%       & $\judgeTarget \epsilon {\lam x {\im {A_1
+%           \inter A_2}} {\pair {\app C {(\proj 1 x)}} {\proj 2 x}}} {\im {A_1 \inter A_2} \to \im {A \inter A_2}} $ & By $\ruleLabelTargetlam$
+%     \end{tabular} \\
+%
+%   \item \textbf{Case}
+%     \begin{flalign*}
+%       & \ruleRestrictRightElab &
+%     \end{flalign*}
+%
+%     By symmetry with the above case. \\
+%
+% \end{itemize}
+% \end{proof}
+%
+% \begin{comment}
+% \begin{lemma}[\ruleLabelUpdate~rules produce type-correct coercion] \label{lemma:update-correct}
+%   If $ \judgeUpdate A l {A_1 \yields E} {A_2} {A_3} \yields C $ and $
+%   \judgeTarget \Gamma E {\im {A_1}} $ for some $ \Gamma $, then
+%   $ \judgeTarget \Gamma C {\im A \to \im {A_2}} $.
+% \end{lemma}
+%
+% \begin{proof}
+%   By structural induction of the derivation.
+%
+%   \begin{itemize}
+%
+%   \item \textbf{Case}
+%     \begin{flalign*}
+%       & \ruleUpdateElab &
+%     \end{flalign*}
+%
+%     \begin{tabular}{rll}
+%       & $ \judgeTarget \Gamma {\lam \_ {\im {\recordType l A}} E} {\im {\recordType l A}} \to \im {A_1} $ & By $ \ruleLabelTargetlam $, $ \ruleLabelTargetvar $, and the hypothesis
+%     \end{tabular} \\
+%
+%   \item \textbf{Case}
+%     \begin{flalign*}
+%       & \ruleUpdateLeftElab &
+%     \end{flalign*}
+%
+%     \begin{tabular}{rll}
+%       & $ \judgeTarget {\Gamma, x \hast \im {A_1 \inter A_2}} x {\im {A_1 \inter A_2}} $ & By $\ruleLabelTargetvar$ \\
+%       & $ \judgeTarget {\Gamma, x \hast \im {A_1 \inter A_2}} x {\pair {\im {A_1}} {\im {A_2}}} $ & By the definition of $\im \cdot$ \\
+%       & $ \judgeTarget {\Gamma, x \hast \im {A_1 \inter A_2}} {\proj 1 x} {\im {A_1}} $ & By $\ruleLabelTargetProjLeft$ \\
+%       & $ \judgeTarget \Gamma C {\im {A_1} \to \im {A_3}} $ & By i.h. \\
+%       & $ \judgeTarget {\Gamma, x \hast \im {A_1 \inter A_2}} C {{\im {A_1}} \to \im {A_3}} $ & By weakening \\
+%       & $ \judgeTarget {\Gamma, x \hast \im {A_1 \inter A_2}} {\app C {(\proj 1 x)}} {\im {A_3}} $ & By $\ruleLabelTargetApp$ \\
+%       & $ \judgeTarget \Gamma {\lam x {\im {A_1 \inter A_2}} {\app C {(\proj 1 x)}}} {\im {A_1 \inter A_2} \to \im {A_3}} $ & By $\ruleLabelTargetlam$
+%     \end{tabular} \\
+%
+%   \item \textbf{Case}
+%     \begin{flalign*}
+%       & \ruleUpdateRightElab &
+%     \end{flalign*}
+%
+%     By symmetry with the above case. \\
+%
+%   \end{itemize}
+% \end{proof}
+% \end{comment}
+%
+% \begin{lemma}[Preservation of well-formedness under type translation] \label{lemma:preserve-wf}
+%   If $ \istype \gamma A $, then $ \judgeTargetWF {\im \gamma} {\im A} $.
+% \end{lemma}
+%
+% \begin{proof}
+%   By structural induction of the derivation. The only case to consider is $ \rulelabelWF $.
+%
+%   \begin{itemize}
+%
+%   \item \textbf{Case}
+%
+%     \begin{flalign*}
+%       & \ruleWF &
+%     \end{flalign*}
+%
+%     \begin{tabular}{rll}
+%       & $ \ftv A \in \gamma $ & Premise \\
+%       & $ \ftv {\im A} \in \im \gamma $ & By the definition of $ \im \cdot $ \\
+%       & $ \judgeTargetWF {\im \gamma} {\im A} $ & By $ \ruleLabelTargetWF $
+%     \end{tabular} \\
+%
+%   \end{itemize}
+% \end{proof}
+%
+% \theorempreservation*
+% \begin{proof}
+%   By structural induction of the derivation.
+%
+%   \begin{itemize}
+%
+%   \item \textbf{Case}
+%     \begin{flalign*}
+%       & \tyvarElab &
+%     \end{flalign*}
+%
+%     \begin{tabular}{rll}
+%      & $ (x,A) \in \gamma $ & Premise \\
+%      & $ (x,\im A) \in \im \gamma $ & By the definition of $ \im \cdot $ \\
+%      & $ \judgeTarget {\im \gamma} x {\im A} $ & By $ \ruleLabelTargetvar $
+%     \end{tabular} \\
+%
+%   \item \textbf{Case}
+%     \begin{flalign*}
+%       & \ruleTopElab &
+%     \end{flalign*}
+%
+%     \begin{tabular}{rll}
+%       & $\judgeTarget {\im \gamma} {()} {()} $ & By $\ruleLabelTargetUnit$ \\
+%       & $\judgeTarget {\im \gamma} {()} {\im \top}$ & By the definition of $ \im \cdot$
+%     \end{tabular} \\
+%
+%   \item \textbf{Case}
+%     \begin{flalign*}
+%       & \tylamElab &
+%     \end{flalign*}
+%
+%     \begin{tabular}{rll}
+%       & $ \hastype {\gamma, x \hast A} e {A_1} \yields E $ & Premise \\
+%       & $ \judgeTarget {\im {\gamma, x \hast A}} E {\im {A_1}} $ & By i.h. \\
+%       & $ \judgeTarget {\im \gamma, x \hast \im A} E {\im {A_1}} $ & By the definition of $ \im \cdot $ \\
+%       & $ \judgeTarget {\im \gamma} {\lam x {\im A} E} {\im A \to \im {A_1}} $ & By $ \ruleLabelTargetlam $ \\
+%       & $ \judgeTarget {\im \gamma} {\lam x {\im A} E} {\im {A \to A_1}} $ & By the definition of $ \im \cdot $
+%     \end{tabular} \\
+%
+%   \item \textbf{Case}
+%     \begin{flalign*}
+%       & \tyappElab &
+%     \end{flalign*}
+%
+%     \begin{tabular}{rll}
+%      & $ \hastype \gamma {e_1} {A_1 \to A_2} \yields {E_1} $  & Premise \\
+%      & $ \judgeTarget {\im \gamma} {E_1} {\im {A_1 \to A_2}} $ & By i.h. \\
+%      & $ \hastype \gamma {e_2} {A_3} \yields {E_2} $ & Premise \\
+%      & $ \judgeTarget {\im \gamma} {E_2} {\im {A_3}} $ & By i.h. \\
+%      & $ A_3 \subtype A_1 \yields C $ & Premise \\
+%      & $ \judgeTarget \epsilon C {\im {A_3} \to \im {A_1}} $ & By Lemma~\ref{lemma:sub} \\
+%      & $ \judgeTarget {\im \gamma} {\app {E_1} {(\app C E_2)}} {\im {A_2}} $ & By $ \ruleLabelTargetApp $ and the definition of $ \im \cdot $
+%     \end{tabular} \\
+%
+%   \item \textbf{Case}
+%     \begin{flalign*}
+%       & \tyblamElab &
+%     \end{flalign*}
+%
+%     \begin{tabular}{rll}
+%       & $ \hastype {\gamma, \alpha} e A \yields E $ & Premise \\
+%       & $ \judgeTarget {\im {\gamma, \alpha}} E {\im A} $ & By i.h. \\
+%       & $ \judgeTarget {\im \gamma, \alpha} E {\im A} $ & By the definition of $ \im \cdot $ \\
+%       & $ \judgeTarget {\im \gamma} {\blam \alpha E} {\for \alpha {\im A}} $ & By $ \ruleLabelTargetBLam $ \\
+%       & $ \judgeTarget {\im \gamma} {\blam \alpha E} {\im {\for \alpha A}} $ & By the definition of $ \im \cdot $
+%     \end{tabular} \\
+%
+%   \item \textbf{Case}
+%     \begin{flalign*}
+%       & \tytappElab &
+%     \end{flalign*}
+%
+%     \begin{tabular}{rll}
+%      & $ \hastype \gamma e {\for \alpha A_1} \yields E $ & Premise \\
+%      & $ \judgeTarget {\im \gamma} E {\im {\for \alpha A_1}} $ & By i.h. \\
+%      & $ \judgeTarget {\im \gamma} E {\for \alpha \im {A_1}} $ & By the definition of $ \im \cdot $ \\
+%      & $ \istype \gamma A $ & Premise \\
+%      & $ \judgeTargetWF {\im \gamma} {\im A} $ & By Lemma~\ref{lemma:preserve-wf} \\
+%      & $ \judgeTarget \gamma {\tapp E {\im A}} {\subst {\im A} \alpha {\im {A_1}}} $ & By $ \ruleLabelTargetTApp $ \\
+%      & $ \judgeTarget \gamma {\tapp E {\im A}} {\im {\subst A \alpha {A_1}}} $ & By substitution lemma
+%     \end{tabular} \\
+%
+%   \item \textbf{Case}
+%     \begin{flalign*}
+%       & \tymergeElab &
+%     \end{flalign*}
+%
+%     \begin{tabular}{rll}
+%       & $ \hastype \gamma {e_1} {A_1} \yields {E_1} $ & Premise \\
+%       & $ \judgeTarget {\im \gamma} {E_1} {\im {A_1}} $ & By i.h. \\
+%       & $ \judgeTarget {\im \gamma} {E_2} {\im {A_2}} $ & Similar to the above \\
+%       & $ \judgeTarget {\im \gamma} {\pair {E_1} {E_2}} {\pair {\im {A_1}} {\im {A_2}}} $ & By $ \ruleLabelTargetPair $ \\
+%       & $ \judgeTarget {\im \gamma} {\pair {E_1} {E_2}} {\im {A_1 \inter A_2}} $ & By the definition of $ \im \cdot $
+%     \end{tabular} \\
+%
+%   \item \textbf{Case}
+%     \begin{flalign*}
+%       & \rulerecordConstructElab &
+%     \end{flalign*}
+%
+%     \begin{tabular}{rll}
+%       & $ \hastype \gamma e A \yields E $ & Premise \\
+%       & $ \judgeTarget {\im \gamma} E {\im A} $ & By i.h. \\
+%       & $ \judgeTarget {\im \gamma} E {\im {\recordType l A}} $ & By the definition of $ \im \cdot $
+%     \end{tabular} \\
+%
+%   \item \textbf{Case}
+%     \begin{flalign*}
+%       & \ruleRecSelectElab &
+%     \end{flalign*}
+%
+%     \begin{tabular}{rll}
+%      & $ \judgeSelect A l {A_1} \yields C $ & Premise \\
+%      & $ \judgeTarget \epsilon C {\im A \to \im {A_1}} $ & By Lemma~\ref{lemma:select} \\
+%      & $ \judgeTarget {\im \gamma} C {\im A \to \im {A_1}} $ & By weakening \\
+%      & $ \hastype \gamma e A \yields E $ & Premise \\
+%      & $ \judgeTarget {\im \gamma} E {\im A} $ & By i.h. \\
+%      & $ \judgeTarget {\im \gamma} {\app C E} {\im {A_1}} $ & By $ \ruleLabelTargetApp $
+%     \end{tabular} \\
+%
+%   \item \textbf{Case}
+%     \begin{flalign*}
+%       & \ruleRecRestrictElab &
+%     \end{flalign*}
+%
+%     \begin{tabular}{rll}
+%      & $ \judgeRestrict A l {A_1} \yields C $ & Premise \\
+%      & $ \judgeTarget \epsilon C {\im A \to \im {A_1}} $ & By Lemma~\ref{lemma:restrict} \\
+%      & $ \judgeTarget {\im \gamma} C {\im A \to \im {A_1}} $ & By weakening \\
+%      & $ \hastype \gamma e A \yields E $ & Premise \\
+%      & $ \judgeTarget {\im \gamma} E {\im A} $ & By i.h. \\
+%      & $ \judgeTarget {\im \gamma} {\app C E} {\im {A_1}} $ & By $ \ruleLabelTargetApp $
+%     \end{tabular} \\
+%
+%   % \item \textbf{Case}
+%   %   \begin{flalign*}
+%   %     & \rulerecordUpdateelab &
+%   %   \end{flalign*}
+%
+%   %   \begin{tabular}{rll}
+%   %     & $ \hastype \gamma {e_1} {A_1} \yields {E_1} $ & Premise \\
+%   %     & $ \judgeTarget {\im \gamma} {E_1} {\im {A_1}} $ & By i.h. \\
+%   %     & $ \judgeUpdate A l {A_1 \yields {E_1}} {A_2} {A_3} \yields C $ & Premise \\
+%   %     & $ \judgeTarget {\im \gamma} C {\im A \to \im {A_2}} $ & By Lemma~\ref{lemma:update-correct} \\
+%   %     & $ \hastype \gamma e A \yields E $ & Premise \\
+%   %     & $ \judgeTarget {\im \gamma} E {\im A} $ & By i.h. \\
+%   %     & $ \judgeTarget {\im \gamma} {\app C E} {\im {A_2}} $ & By $ \ruleLabelTargetApp $
+%   %   \end{tabular} \\
+%
+%   \end{itemize}
+% \end{proof}

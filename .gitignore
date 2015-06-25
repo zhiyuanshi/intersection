@@ -5,6 +5,7 @@
 
 
 # LaTeX
+bib
 *.aux
 *.bbl
 *.blg

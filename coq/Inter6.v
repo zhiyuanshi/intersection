@@ -49,11 +49,11 @@ Inductive Atomic : forall A, PTyp A -> Prop :=
   | AInt : forall A, Atomic A (PInt _)
   | AFun : forall A (t1 t2 : PTyp A), Atomic A (Fun _ t1 t2).
 
-Inductive sub : PTyp nat -> PTyp nat -> Exp -> Prop :=
-  | SInt : sub (PInt _) (PInt _) (fun A T => STLam _ _ (STInt _) (fun x => STVar _ _ x))
+Inductive sub : PTyp nat -> PTyp nat -> (forall A, SExp A nat) -> Prop :=
+  | SInt : sub (PInt _) (PInt _) (fun A => STLam _ _ (STInt _) (fun x => STVar _ _ x))
   | SFun : forall o1 o2 o3 o4 c1 c2, sub o3 o1 c1 -> sub o2 o4 c2 -> 
-     sub (Fun _ o1 o2) (Fun _ o3 o4) (fun A T => STLam _ _ (ptyp2styp _ (Fun _ o1 o2)) (fun f => 
-       STLam _ _ (ptyp2styp o3 _) (fun x => STApp _ _ (c2 A T) (STApp _ _ (STVar _ _ f) (STApp _ _ (c1 A T) (STVar _ _ x))))))
+     sub (Fun _ o1 o2) (Fun _ o3 o4) (fun A => STLam _ _ (ptyp2styp _ (Fun _ o1 o2)) (fun f => 
+       STLam _ _ (ptyp2styp o3 _) (fun x => STApp _ _ (c2 A) (STApp _ _ (STVar _ _ f) (STApp _ _ (c1 A) (STVar _ _ x)))))).
   | SAnd1 : forall t t1 t2 c1 c2, sub t t1 c1 -> sub t t2 c2 -> 
      sub t (And  t1 t2) (fun A T => STLam _ _ (ptyp2styp t1 _) (fun x => 
        STPair _ _ (STApp _ _ (c1 A _) (STVar _ _ x)) (STApp _ _ (c2 A _) (STVar _ _ x))))

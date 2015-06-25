@@ -1,0 +1,101 @@
+% math-mode versions of \rlap, etc
+% from Alexander Perlis, "A complement to \smash, \llap, and lap"
+%   http://math.arizona.edu/~aprl/publications/mathclap/
+\def\clap#1{\hbox to 0pt{\hss#1\hss}}
+\def\mathllap{\mathpalette\mathllapinternal}
+\def\mathrlap{\mathpalette\mathrlapinternal}
+\def\mathclap{\mathpalette\mathclapinternal}
+\def\mathllapinternal#1#2{\llap{$\mathsurround=0pt#1{#2}$}}
+\def\mathrlapinternal#1#2{\rlap{$\mathsurround=0pt#1{#2}$}}
+\def\mathclapinternal#1#2{\clap{$\mathsurround=0pt#1{#2}$}}
+
+% math-mode versions of \rlap, etc
+% from Alexander Perlis, "A complement to \smash, \llap, and lap"
+%   http://math.arizona.edu/~aprl/publications/mathclap/
+\def\clap#1{\hbox to 0pt{\hss#1\hss}}
+\def\mathllap{\mathpalette\mathllapinternal}
+\def\mathrlap{\mathpalette\mathrlapinternal}
+\def\mathclap{\mathpalette\mathclapinternal}
+\def\mathllapinternal#1#2{\llap{$\mathsurround=0pt#1{#2}$}}
+\def\mathrlapinternal#1#2{\rlap{$\mathsurround=0pt#1{#2}$}}
+\def\mathclapinternal#1#2{\clap{$\mathsurround=0pt#1{#2}$}}
+
+\newcommand{\horizontalrule}{
+  \begin{center}
+    \line(1,0){250}
+  \end{center}
+}
+
+\newcommand{\code}[1]{\textsf{#1}}
+\newcommand{\highlight}[1]{\colorbox{GreenYellow}{#1}}
+
+\newcommand{\im}[1]{\lvert #1 \rvert}
+\newcommand{\powerset}[1]{\mathcal{P}(#1)}
+\newcommand{\universe}{\mathbb{U}}
+
+\newcommand{\turns}{\vdash}
+\newcommand{\hast}{\!:\!}
+\newcommand{\subtype}{<:}
+\newcommand{\commonsuper}{\Uparrow}
+\newcommand{\commonsub}{\Downarrow}
+\newcommand{\disjoint}{*}
+\newcommand{\subst}[2]{\lbrack #1 / #2 \rbrack~}
+
+\newcommand{\yields}[1]{\textcolor{MidnightBlue}{\; \hookrightarrow #1}}
+
+\newcommand{\ftv}[1]{\textsf{ftv}(#1)}
+
+\newcommand{\binderspace}{\,}
+\newcommand{\appspace}{\;}
+
+\newcommand{\inter}{\&}
+\newcommand{\for}[2]{\forall #1.\binderspace #2}
+\newcommand{\constraints}[2]{(#1) \To #2}
+\newcommand{\lam}[3]{\lambda #1 \hast #2.\binderspace #3}
+\newcommand{\blam}[2]{\Lambda #1.\binderspace #2}
+\newcommand{\assume}[2]{\textsf{assume} #1.\binderspace #2}
+\newcommand{\mergeop}{,,}
+\newcommand{\restrictOp}{\setminus}
+\newcommand{\concatOp}{+\kern-1.3ex+\kern0.8ex}  % http://tex.stackexchange.com/a/4195/73122
+\newcommand{\app}[2]{#1 \; #2}
+\newcommand{\tapp}[2]{#1 \appspace #2}
+\newcommand{\pair}[2]{(#1, #2)}
+\newcommand{\proj}[2]{{\code{proj}}_{#1} #2}
+\newcommand{\fst}[1]{\app {\code{fst}} {#1}}
+\newcommand{\snd}[1]{\app {\code{snd}} {#1}}
+\newcommand{\recordType}[2]{\{ #1 : #2 \}}
+\newcommand{\recordCon}[2]{\{ #1 = #2 \}}
+
+\newcommand{\integer}{\code{Int}}
+\newcommand{\bool}{\code{Bool}}
+\newcommand{\character}{\code{Char}}
+
+\newcommand{\true}{\code{True}}
+\newcommand{\tyint}{\code{Int}}
+\newcommand{\tybool}{\code{Bool}}
+\newcommand{\tychar}{\code{Char}}
+\newcommand{\tystring}{\code{String}}
+
+% Judgments
+\newcommand{\istype}[2]{#1 \turns #2 \ \text{type}}
+\newcommand{\isatomic}[1]{#1 \ \text{atomic}}
+\newcommand{\hastype}[3]{#1 \turns #2 \ \hast \ #3}
+\newcommand{\isdisjoint}[3]{#1 \turns #2 * #3}
+\newcommand{\isdisjointi}[3]{#1 \turns #2 *_I #3}
+
+\newcommand{\rulelabel}[1]{(\textsc{#1})}
+
+% Placeholders for removed rules
+\newcommand{\ruleLabelSelect}{\textsc{TySelect}}
+\newcommand{\ruleLabelSelectLeft}{\textsc{TySelect1}}
+\newcommand{\ruleLabelSelectRight}{\textsc{TySelect2}}
+\newcommand{\ruleLabelRestrict}{\textsc{TyRestrict}}
+
+\newcommand{\name}{{\bf $F_{\&}$}\xspace}
+
+\newcommand{\target}{{\bf f}\xspace}
+\newcommand{\Target}{{\bf f}\xspace}
+
+\newcommand{\authornote}[3]{{\color{#2} {\sc #1}: #3}}
+\newcommand\bruno[1]{\authornote{bruno}{red}{#1}}
+\newcommand\george[1]{\authornote{george}{blue}{#1}}

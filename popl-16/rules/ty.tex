@@ -1,0 +1,67 @@
+% \newcommand{\rulelabel}{\text{Ty}}
+\newcommand{\rulelabelSelect}{\text{Sel}}
+\newcommand{\rulelabelRestrict}{\text{Res}}
+
+% Var
+% \newcommand{\rulelabelVar}{\rulelabel\text{Var}}
+\newcommand{\tyvar} {
+\inferrule* [right=T\_Var]
+  {x \hast A \in \Gamma}
+  {\hastype \Gamma x A \yields x}
+}
+
+% Top
+% \newcommand{\rulelabelTop}{\rulelabel\text{Top}}
+\newcommand{\ruleTop} {
+\inferrule* [right=TyTop]
+  { }
+  {\hastype \Gamma \top \top \yields {()}}
+}
+
+% Lam
+% \newcommand{\rulelabelLam}{\rulelabel\text{Lam}}
+\newcommand{\tylam} {
+\inferrule* [right=T\_Lam]
+  {\istype \Gamma A \\ \hastype {\Gamma, x \hast A} e B \yields E}
+  {\hastype \Gamma {\lam x A e} {A \to B} \yields {\lam x {\im A} E}}
+}
+
+% App
+% \newcommand{\rulelabelApp}{\rulelabel\text{App}}
+\newcommand{\tyapp}{
+\inferrule* [right=T\_App]
+  {\hastype \Gamma {e_1} {A_1 \to A_2} \yields {E_1} \\
+   \hastype \Gamma {e_2} {A_3} \yields {E_2} \\
+   A_3 \subtype A_1 \yields C}
+  {\hastype \Gamma {\app {e_1} {e_2}} {A_2} \yields {\app {E_1} {(\app C E_2)}}}
+}
+
+% BLam
+% \newcommand{\rulelabelBLam}{\rulelabel\text{BLam}}
+\newcommand{\tyblam}{
+\inferrule* [right=T\_BLam]
+  {\hastype {\Gamma, \alpha} e A \yields E \\
+   \istype \Gamma B \\
+   \alpha \not \in \ftv \Gamma}
+  {\hastype \Gamma {\blam {\alpha} e} {\for {\alpha} A} \yields {\blam \alpha E}}
+}
+
+% TApp
+% \newcommand{\rulelabelTApp}{\rulelabel\text{TApp}}
+\newcommand{\tytapp}{
+\inferrule* [right=T\_TApp]
+  {\hastype \Gamma e {\for {\alpha \disjoint B} C} \yields E \\
+   \istype \Gamma A}
+  {\hastype \Gamma {\tapp e A} {\subst A \alpha C} \yields {\tapp E {\im A}}}
+}
+
+% Merge
+% \newcommand{\rulelabelMerge}{\rulelabel\text{Merge}}
+\newcommand{\tymerge}{
+\inferrule* [right=T\_Merge]
+  {\hastype \Gamma {e_1} A \yields {E_1} \\
+   \hastype \Gamma {e_2} B \yields {E_2} \\
+   % A \bot B}
+   \isdisjoint \Gamma A B}
+  {\hastype \Gamma {e_1 \mergeop e_2} {A \inter B} \yields {\pair {E_1} {E_2}}}
+}

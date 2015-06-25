@@ -1,0 +1,69 @@
+\documentclass[nocopyrightspace,preprint,times,9pt]{sigplanconf}
+
+\input{packages.tex}
+\input{macros.tex}
+
+\input{rules/wf.tex}
+\input{rules/disjoint.tex}
+\input{rules/sub.tex}
+\input{rules/ty.tex}
+\input{rules/target.tex}
+
+\begin{document}
+
+\special{papersize=8.5in,11in}
+\setlength{\pdfpageheight}{\paperheight}
+\setlength{\pdfpagewidth}{\paperwidth}
+
+\conferenceinfo{CONF 'yy}{Month d--d, 20yy, City, ST, Country}
+\copyrightyear{20yy}
+\copyrightdata{978-1-nnnn-nnnn-n/yy/mm}
+\doi{nnnnnnn.nnnnnnn}
+
+\titlebanner{banner above paper title}        % These are ignored unless
+\preprintfooter{\name}                        % 'preprint' option specified.
+
+\title{Disjoint Intersection Types and Disjoint Quantification}
+
+\authorinfo{Name1}
+           {Affiliation1}
+           {Email1}
+\authorinfo{Name2\and Name3}
+           {Affiliation2/3}
+           {Email2/3}
+
+\maketitle
+
+\begin{abstract}
+  \input{abstract.tex}
+\end{abstract}
+
+\category{CR-number}{subcategory}{third-level}
+
+% general terms are not compulsory anymore,
+% you may leave them out
+\terms Design, Languages, Theory
+
+\keywords Intersecion Types, Polymorphism, Type System
+
+\input{sections/introduction.tex}
+\input{sections/overview-new.tex}
+\input{sections/fi.tex}
+\input{sections/disjoint-intersection-types.tex}
+\input{sections/algorithmic-disjointness.tex}
+\input{sections/discussion.tex}
+\input{sections/related-work.tex}
+\input{sections/conclusion.tex}
+
+\bibliographystyle{abbrvnat}
+\bibliography{references}
+
+\clearpage
+\onecolumn
+
+\appendix
+\input{appendix/type-wellformedness.tex}
+\input{appendix/target-type-system.tex}
+\input{appendix/proofs.tex}
+
+\end{document}
