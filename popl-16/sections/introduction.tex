@@ -1,19 +1,44 @@
 \section{Introduction}
 
-Previous work by Dunfield has shown that a simply typed core calculus with
-intersection types and a merge operator provides a powerful foundation
-for various programming language features.
+Previous work by Dunfield~\cite{} has shown the power of intersection
+types and a merge operator. The presence of a merge operator adds
+significant expressiveness to the language, allowing encodings for
+many other language constructs as syntactic sugar. For example
+single-field records are easily encoded as types with a label, and
+multi-field records are encoded as the concatenation of single-field
+records. Concatenation of records is expressed using intersection
+types at the type-level and the corresponding merge operator and the
+term level. Dunfield formalized a simply typed lambda calculus with
+intersection types and the merge operator, and showed how to give a
+semantics to the calculus by a type-directed translation to a simply
+typed lambda calculus extended with pairs. The type-directed
+translation is simple and elegant, and was shown to be type-safe.
 
-\bruno{Our motivation for Dundfield work: build a language + address
-extensibility issues.}
+Intersection types and the merge operator are also useful in the
+context of software \emph{extensibility}. In recent years there has
+been a wide interest in presenting solutions to the \emph{expression
+  problem} in various communities. Presently there are several
+solutions in the literature of functional
+programming,\bruno{references} object-oriented programming and the
+theorem proving communities. More recently, intersection types and
+encoding of a merge operator in Scala have been shown to be useful to
+solve additional challenges related to extensibility~\cite{}. Despite
+the use of a wide-range of programming languages or theorem provers,
+many solutions follow the similar ideas and are closely related to
+type-theoretic encodings of datatypes. Clearly this seems to indicate
+that a more foundational approach is lacking ... This is precisely
+where the work of Dunfield is relevant: is work can be a starting 
+point for a foundational calculus that can capture the key ideas 
+behind the various solutions. 
 
-Unfortunatelly, while Dunfield calculus is type-safe, it lacks the important
-property of \emph{coherence}: different derivations for the same
-expression can lead to different results. The lack of coherence is
-important disavantage for adoption of his core calculus in
+Unfortunatelly, Dunfield calculus is still insufficient for
+extensibility in two accounts.  Firstly it does not support parametric
+polymorhism. More importantly while Dunfield calculus is type-safe, it
+lacks the property of \emph{coherence}: different derivations for the
+same expression can lead to different results. The lack of coherence
+is important disavantage for adoption of his core calculus in
 implementations of programming languages, as the semantics of the
 programming language becomes implementation dependent.
-\bruno{Also lacks polymorphism, which is important for extensibility.}
 
 This paper presents \name: a core calculus with a variant of
 \emph{intersection types}, \emph{parametric polymorphism} and a
@@ -22,8 +47,9 @@ coherent. Coherence is achieved by ensuring that intersection types
 are \emph{disjoint}. Formally two types are disjoint if they do not
 share a common supertype. We present a type system that prevents
 intersection types that are not disjoint, as well as an algorithmic
-specification to determine whether two types are disjoint. Moreover we
-show that this approach extends to systems with parametric
+specification to determine whether two types are disjoint. 
+
+Moreover we show that this approach extends to systems with parametric
 polymorphism. Parametric polymorphism makes the problem of coherence
 significantly harder. When a type variable occurs in an intersection
 type, it is not statically known whether the instantiated type will
@@ -31,8 +57,9 @@ share a common supertype with other components of the intersection.
 To address this problem we propose \emph{disjoint quantification}: a
 constrained form of parametric polymorphism, that allows programmers
 to specify disjointness constraints for type variables. With disjoint
-quantification the calculus remains very flexible in terms of programs 
-that can be written with intersection types, while retaining coherence.
+quantification the calculus remains very flexible in terms of programs
+that can be written with intersection types, while retaining
+coherence.
 
 In summary, the contributions of this paper are:
 
@@ -40,7 +67,7 @@ In summary, the contributions of this paper are:
 
 \item {\bf Disjoint Intersection Types:} A new form of intersection
   type where only disjoint types (types that do not share a common
-  super type) are allowed. An algorithmic specification for
+  super type) are allowed. A sound and complete algorithmic specification for
   determining whether two types are disjoint is presented.
   
 \item {\bf Disjoint Quantification:}: A novel form of universal
