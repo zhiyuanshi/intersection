@@ -36,6 +36,9 @@ Related to the definition is the disjoint judgement. We write
 \[ \isdisjoint \Gamma A B \]
 if two types $A$ and $B$ are disjoint in the context $\Gamma$.
 
+\bruno{Digressions are bad; they break the flow. I suggest that the
+  point about union types and the point about systems with a top type
+  is moved to a discussion section towards the end of the paper.}
 Given this definiton, now may be the right time to take a short digression to
 consider union types. If a type system ever contains union types (the
 counterpart of intersection types), with the following standard subtyping rules,
@@ -51,6 +54,9 @@ counterpart of intersection types), with the following standard subtyping rules,
 then no two types $A$ and $B$ can ever be disjoint, since there always exists
 the type $A \union B$, which is their common supertype. This serve as the
 motivation that our system does not permit union types.
+\bruno{I wouldn't say this is a motivation: it sounds like we caould
+  not support union types, when I think this is not true. For example 
+we could say something like: there does not exist an \emph{atomic} C ...}
 
 To see this definition in action, $\tyint$ and $\tystring$ are, because there is
 no type that is a supertype of the both. On the other hand, $\tyint$ is not
@@ -68,10 +74,12 @@ bidirectional subtyping, that is, we say two types, $A$ and $B$, are disjoint if
 neither $A \subtype B$ nor $B \subtype A$. However, this implementation is
 wrong. For example, $\tyint \inter \tystring$ and $\tystring \inter \tychar$ are
 not disjoint by specification since $\tystring$ is their common supertype. Yet
-by the implementation they are, since neither of them is a subtype of the other.
+by the implementation they are, since neither of them is a subtype of
+the other. \bruno{You need a concrete code example to make this point.}
 Hence the algorithmic rules are more nuanced. For now, it is enough to treat the
 disjoint judgement $\isdisjoint \Gamma A B$ as oracle and we will coome back to
 this topic in the next section.
+
 
 \subsection{Syntax}
 
@@ -109,6 +117,9 @@ this topic in the next section.
   \label{fig:syntax} \caption{Syntax.}
 \end{figure}
 
+\bruno{do not rely on colors to emphasize parts of rules. Most likely
+  papers will be printed black and white. Use gray and boxes to
+  highlight changes.}
 Figure~\ref{fig:syntax} shows the updated syntax with the changes highlighted.
 Note how similar the changes are to those needed to extend System $F$ with
 bounded quantification. First, type variables are now always associated with
@@ -285,3 +296,5 @@ Also, types built with different constructors are disjoint. For example,
 $\tyint$ and $\tyint \to \tyint$. For function types, disjointness
 is harder to visualise. But bear in the mind that disjointness can defined by
 the very requirement that the theorem holds.
+\bruno{We should be finishing up this section with the key coherence
+  lemma. WHy is that not here?}
