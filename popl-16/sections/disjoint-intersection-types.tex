@@ -1,10 +1,12 @@
 \section{Disjoint Intersection Types and Disjoint Quantification}
+\george{Discuss each point in this order: goal, idea of tweaks, changes, and proofs.}
 
 Although the system shown in the previous section is type-safe, it is not
 coherent. This section shows how to amend the system presented before so that it
 supports coherence as well as type soundness. The keys aspects are the notion of
-disjoint intersections, and disjoint quantification for polymorphic types. The
-full specification of the language can be found in the appendix.
+disjoint intersections, and disjoint quantification for polymorphic types. We
+only highlight the differences here and the full specification of the language
+can be found in the appendix.
 
 \begin{theorem}[Unique elaboration] \label{unique-elaboration}
   If $\hastype \Gamma e {A_1} \yields {E_1}$ and $\hastype \Gamma e {A_2}
@@ -14,6 +16,10 @@ full specification of the language can be found in the appendix.
 Given a source term $e$, elaboration always produces the same target term $E$.
 
 \george{Transition and informally motivates the following definiton here.}
+
+If $A \inter B \subtype C$, then either $A$ or $B$ contributes to that subtyping
+relation, but not both. The implication of this lemma is that during the
+derivation, it is not possible that two rules are applicable.
 
 \begin{definition}[Disjoint types]
   Two types $A$ and $B$ are \emph{disjoint} if they do not share a common
@@ -25,6 +31,10 @@ Given a source term $e$, elaboration always produces the same target term $E$.
   implies $C$ is the top type.
   }
 \end{definition}
+
+Related to the definition is the disjoint judgement. We write
+\[ \isdisjoint \Gamma A B \]
+if two types $A$ and $B$ are disjoint in the context $\Gamma$.
 
 Given this definiton, now may be the right time to take a short digression to
 consider union types. If a type system ever contains union types (the
@@ -59,65 +69,13 @@ neither $A \subtype B$ nor $B \subtype A$. However, this implementation is
 wrong. For example, $\tyint \inter \tystring$ and $\tystring \inter \tychar$ are
 not disjoint by specification since $\tystring$ is their common supertype. Yet
 by the implementation they are, since neither of them is a subtype of the other.
-Hence the algorithmic rules are more nuanced and will be developed in the next
-section. For now, it is enough to treat this judgement as oracle.
-
-\george{Highlight new stuff}
-\george{Discuss each point in this order: goal, idea of tweaks, changes, and proofs.}
-
-% The intuition can be found in figure \ldots.
-%
-% % http://tex.stackexchange.com/questions/158876/drawing-subgroup-lattices-in-tikz
-% \begin{figure}
-%
-% % center everything in the figure
-% \centering
-% % horizontal node distance
-% \newcommand{\mydistance}{.6cm}
-% \begin{tikzpicture}[node distance=2cm]
-% \title{Untergruppenverband der $A_4$}
-% \node(A4)                           {$A_4$};
-% \node(V4)       [below right=2cm and 2cm of A4] {$V_4$};
-% \node(C31)      [below left=2cm and 0cm of A4]  {$C_3$};
-% \node(C32)      [left=\mydistance of C31]       {$C_3$};
-% \node(C33)      [left=\mydistance of C32]       {$C_3$};
-% \node(C34)      [left=\mydistance of C33]       {$C_3$};
-% \node(C22)      [below=2cm of V4]       {$C_2$};
-% \node(C21)      [left=\mydistance of C22]       {$C_2$};
-% \node(C23)      [right=\mydistance of C22]      {$C_2$};
-% \node(1)            [below=6cm of A4]     {$\left\{1\right\}$};
-% \draw(A4)       -- (V4);
-% \foreach \x\y in {1,2,3,4} {
-%     \draw (A4) -- (C3\x) node [midway, fill=white] {3};
-%     \draw (C3\x) -- (1);
-%
-% }
-% \foreach \x\y in {1/2,2/3,3/4} {
-%     \draw(V4) -- (C2\x) node [midway, fill=white] {2};
-% \draw (C3\x) -- (C3\y);
-% \draw (C2\x) -- (1);
-% }
-% \draw(C21)      -- (C22);
-% \draw(C22)      -- (C23);
-% \end{tikzpicture}
-% \caption{Untergruppenverband}
-% \end{figure}
+Hence the algorithmic rules are more nuanced. For now, it is enough to treat the
+disjoint judgement $\isdisjoint \Gamma A B$ as oracle and we will coome back to
+this topic in the next section.
 
 \subsection{Syntax}
 
-Figure~\ref{fig:fi-syntax} shows the updated syntax with the changes
-highlighted. There are two changes. First, type variables are always associated
-with their disjointness constraints, for example $\alpha \disjoint A$, in types,
-terms, and contexts. Second, the bottom type is introduced so that universal
-quantification quantification be integrated and become a special case of
-disjoint quantification. That is, $\blam {\alpha} e$ is just a syntactic sugar
-for $\blam {\alpha \disjoint \bot} e$. The underlying idea is that any type is
-disjoint with the bottom type.
-
-The top type is the trivial upper bound in bounded quantification, while the
-bottom type is the trivial disjointness constraint in disjoint quantification.
-
-\begin{figure}
+\begin{figure}[h]
   \[
     \begin{array}{l}
       \begin{array}{llrll}
@@ -125,15 +83,15 @@ bottom type is the trivial disjointness constraint in disjoint quantification.
         & A, B & \Coloneqq & \alpha                  & \\
         &      & \mid & \highlight {$\bot$}          & \\
         &      & \mid & A \to B                      & \\
-        &      & \mid & \for {\alpha \highlight {$\disjoint B$}} A  & \\
+        &      & \mid & \for {(\alpha \highlight {$\disjoint A$})} B  & \\
         &      & \mid & A \inter B                   & \\
 
         \\
         \text{Terms}
         & e & \Coloneqq & x                        & \\
-        &   & \mid & \lam x A e                    & \\
+        &   & \mid & \lam {(x \hast A)} e          & \\
         &   & \mid & \app {e_1} {e_2}              & \\
-        &   & \mid & \blam {\alpha \highlight {$\disjoint A$}} e  & \\
+        &   & \mid & \blam {(\alpha \highlight {$\disjoint A$})} e  & \\
         &   & \mid & \tapp e A                     & \\
         &   & \mid & e_1 \mergeop e_2              & \\
 
@@ -143,26 +101,118 @@ bottom type is the trivial disjointness constraint in disjoint quantification.
                    \mid \Gamma, \alpha \highlight {$\disjoint A$}
                    \mid \Gamma, x \hast A  & \\
 
-        \text{Syntactic sugar} & \blam {\alpha} e & \equiv & \blam {\alpha \disjoint \bot} e & \\
+        \text{Syntactic sugar} & \blam {\alpha} e & \equiv & \blam {(\alpha \disjoint \bot)} e & \\
       \end{array}
     \end{array}
   \]
 
-  \label{fig:fi-syntax}
-  \caption{Syntax.}
+  \label{fig:syntax} \caption{Syntax.}
 \end{figure}
+
+Figure~\ref{fig:syntax} shows the updated syntax with the changes highlighted.
+Note how similar the changes are to those needed to extend System $F$ with
+bounded quantification. First, type variables are now always associated with
+their disjointness constraints (like $\alpha \disjoint A$) in types, terms, and
+contexts. Second, the bottom type is introduced so that universal quantification
+quantification be integrated and become a special case of disjoint
+quantification: $\blam {\alpha} e$ is really a syntactic sugar for $\blam
+{(\alpha \disjoint \bot)} e$. The underlying idea is that any type is disjoint
+with the bottom type.
+
+As a comparison, the top type is the trivial upper bound in bounded
+quantification, while the bottom type is the trivial disjointness constraint in
+disjoint quantification. Indeed, \george{Show a diagram here to contrast with
+bounded polymorphism.}
 
 \subsection{Typing}
 
-\george{Show a diagram here to contrast with bounded polymorphism}
-\george{Missing the merge rule, as it is also changed.}
+\paragraph{Disjointness judgement} The disjointness judgement appears in the
+well-formedness rule for intersection types and the typing rule for merges:
+\begin{mathpar}
+  \inferrule* [right=WF\_Inter]
+    {\istype \Gamma A \\
+     \istype \Gamma B \\
+     \highlight{$\isdisjoint \Gamma A B$}}
+    {\istype \Gamma {A \inter B}}
 
-Disjoint quantification is introduced by the big lambda $\blam {\alpha \disjoint
-A} e$ and eliminated by the usual type application $\tapp e A$. During the type
-application, the type system makes sure that the type argument satisfies the
-disjointness constraint. The typing rule for disjoint quantification generalises
-the rule for quantification in the same way that the rule for bounded
-quantification does that for quantification.
+  \inferrule* [right=T\_Merge]
+    {\hastype \Gamma {e_1} A \yields {E_1} \\
+     \hastype \Gamma {e_2} B \yields {E_2} \\
+     \highlight{$\isdisjoint \Gamma A B$}}
+    {\hastype \Gamma {e_1 \mergeop e_2} {A \inter B} \yields {\pair {E_1} {E_2}}}
+\end{mathpar}
+
+We require that the two types of an intersection must be disjoint in their
+context, and that the disjointness constraint in a forall type is well-formed:
+\[ \wfforall \]
+
+Under the new rules, intersection types such as $\tyint \inter \tyint$ are no
+longer well-formed because the two types are not disjoint.
+
+\paragraph{Disjoint quantification} A disjoint quantification is introduced by
+the big lambda $\blam {(\alpha \disjoint A)} e$ and eliminated by the usual type
+application $\tapp e A$. The constraint is added to the context with this rule:
+\[
+\inferrule* [right=T\_BLam]
+  {\istype \Gamma A \\
+   \hastype {\Gamma,\alpha \disjoint A} e B \yields E \\
+   \alpha \not \in \ftv \Gamma}
+  {\hastype \Gamma {\blam {(\alpha \disjoint A)} e} {\for {(\alpha \disjoint A)} B}
+    \yields {\blam \alpha E}}
+\]
+During a type application, the type system makes sure that the type argument
+satisfies the disjointness constraint:
+\[
+\inferrule* [right=T\_TApp]
+  {\hastype \Gamma e {\for {\alpha \disjoint B} C} \yields E \\
+   \istype \Gamma A}
+  {\hastype \Gamma {\tapp e A} {\subst A \alpha C} \yields {\tapp E {\im A}}}
+\]
+
+\paragraph{Metatheory} Since in this section we only restrict the system in the
+previous section, it is easy to see that type preservation and type-safety still
+holds. Additionally, we can show that typing always produces a well-formed type.
+With our new definition of well-formed types, this result is nontrivial.
+
+In general, disjointness judgements are not invariant with respect to
+free-variable substitution. In other words, a careless substitution can violate
+the disjoint constraint in the context. For example, in the context $\alpha
+\disjoint \tyint$, $\alpha$ and $\tyint$ are disjoint:
+\[ \isdisjoint {\alpha \disjoint \tyint} \alpha \tyint \]
+But after the substitution of $\tyint$ for $\alpha$ on the two types, the sentence
+\[ \isdisjoint {\alpha \disjoint \tyint} \tyint \tyint \]
+is longer true since $\tyint$ is clearly not disjoint with itself.
+
+\begin{lemma}{Instantiation} \label{instantiation}
+  If $\istype {\Gamma, \alpha \disjoint B} C$, $\istype \Gamma A$, $\isdisjoint
+  \Gamma A B$ then $\istype \Gamma {\subst A \alpha C}$.
+\end{lemma}
+
+\begin{lemma}{Well-formed typing} \label{wf-typing}
+If $\hastype \Gamma e A$, then $\istype \Gamma e$.
+\end{lemma}
+
+\subsection{Subtyping}
+
+The coercion of a subtyping relation $A \subtype B$ is uniquely determined.
+
+\begin{lemma}[Unique coercion] \label{unique-coercion}
+  If $A \subtype B \yields {C_1}$ and $A \subtype B \yields {C_2}$, where $A$
+  and $B$ are well-formed types, then $C_1 \equiv C_2$.
+\end{lemma}
+
+\george{Two points are being made here: 1) nondisjoint intersections, 2) atomic
+types. Show an offending example for each?}
+
+\begin{lemma}[Unique subtype contributor]
+  \label{unique-subtype-contributor}
+  If $A \inter B \subtype C$, where $A \inter B$ and $C$ are well-formed types,
+  then it is not possible that the following hold at the same time:
+\begin{enumerate}
+\item $A \subtype C$
+\item $B \subtype C$
+\end{enumerate}
+\end{lemma}
 
 \begin{mathpar}
   \inferrule* [right=T\_BLam]
@@ -174,53 +224,13 @@ quantification does that for quantification.
     \inferrule* [right=T\_TApp]
       {\hastype \Gamma e {\for {\alpha \disjoint B} C} \yields E \\
        \istype \Gamma A \\
-       \isdisjoint \Gamma A B
+       \highlight{$\isdisjoint \Gamma A B$}
        }
       {\hastype \Gamma {\tapp e A} {\subst A \alpha C} \yields {\tapp E {\im A}}}
 \end{mathpar}
 
-% \begin{theorem}
-%   If $A \subtype C$, then $A \inter B \subtype C$.
-%   If $B \subtype C$, then $A \inter B \subtype C$.
-% \end{theorem}
-%
-% \george{Add interpretation of the theorem}
-
-% \begin{proof}
-%   By induction on $C$.
-%   If $C \neq C_1 \inter C_2$, trivial.
-%   If $C = C_1 \inter C_2$,
-%   Need to show $A \subtype C_1 \inter C_2$ implies $A \inter B \subtype C_1 \inter C_2$.
-%   By inversion $A \subtype C_1$ and $A \subtype C_2$.
-%   By the i.h., $A \inter B \subtype C_1$ and $A \inter B \subtype C_2$.
-%   By \rulelabel{SubAnd}, $A \inter B \subtype C_1 \inter C_2$.
-% \end{proof}
-
-\paragraph{Well-formed Types}
-
-\begin{mathpar}
-  \wfforall \and \wfinter
-\end{mathpar}
-
-We additionally require that the two types of an intersection must be disjoint
-in their context, and that the disjointness constraint in a forall type is
-well-formed. Under the new rules, intersection types such as $\tyint \inter
-\tyint$ are no longer well-formed because the two types are not disjoint.
-
-Since in this section we only restrict the system in the previous section, it is
-easy to see that type preservation and type-safety still holds.
-
-\subsection{Subtyping}
-
-\george{Two points are being made here: 1) nondisjoint intersections, 2) atomic
-types. Show an offending example for each?}
-
-First we need to introduce the concept of \emph{atomic types}. Atomic types are
-just those which are not intersection types, and are asserted by the judgement
-\[
-  \isatomic A
-\]
-The complete rules can be found in the appendix.
+\paragraph{Atomic types} Atomic types are just those which are not intersection
+types, and are asserted by the judgement \[ \isatomic A \]
 
 The subtyping rules, without the atomic condition are overlapping. If we would
 like to have a deterministic elaboration result, the overarching idea is to
@@ -230,20 +240,27 @@ like to be certain that either $A_1 \subtype A_3$ holds or $A_2 \subtype A_3$
 holds, but not both.
 
 With the atomic constraint, one can guarantee that at any moment during the
-derivation of a subtyping relation, at most one rule can be used. Indeed, our
-restrictions on subtyping do not make the subtyping relation less expressive to
-one without such restrictions.\george{Point to proofs and justify why the proof shows this.}
+derivation of a subtyping relation, at most one rule can be used. Yet
+remarkably, our restrictions on subtyping do not sacrifice the expressiveness of
+subtyping since we have the following theorem:
+\begin{theorem}
+  If $A_1 \subtype A_3$, then $A_1 \inter A_2 \subtype A_3$.
+\end{theorem}
+
+The interpretation of the theorem is that: even though the premise is made more
+strict by the atomic condition, we can still derive the every judgement in the
+old systems. \george{Point to proofs and justify why the proof shows this.}
 
 \begin{mathpar}
   \inferrule* [right=$\ruleLabelSubAndLeft$]
-    {A_1 \subtype A_3 \yields C \\ \isatomic {A_3}}
+    {A_1 \subtype A_3 \yields C \\ \highlight{$\isatomic {A_3}$}}
     {A_1 \inter A_2 \subtype A_3
       \yields
         {\lam x {\im {A_1 \inter A_2}}
           {\app C {(\proj 1 x)}}}}
 
   \inferrule* [right=$\ruleLabelSubAndRight$]
-    {A_2 \subtype A_3 \yields C \\ \isatomic {A_3}}
+    {A_2 \subtype A_3 \yields C \\ \highlight{$\isatomic {A_3}$}}
     {A_1 \inter A_2 \subtype A_3
       \yields
         {\lam x {\im {A_1 \inter A_2}}
@@ -259,18 +276,6 @@ $\tyint \inter \tyint \subtype \tyint$, obviously the theorem will
 not hold since both the left $\tyint$ and the right $\tyint$ are a
 subtype of $\tyint$.
 
-If our types include primitive subtyping such as
-$\code{Nat} \subtype_\text{prim} \tyint$ (a natural number is also an
-integer), which can be promoted to the normal subtyping with this rule:
-\begin{mathpar}
-  \inferrule
-  {A_1 \subtype_\text{prim} A_2}
-  {A_1 \subtype A_2}
-\end{mathpar}
-the theorem will also not hold because
-$\tyint \inter \code{Nat} \subtype \tyint$ and yet
-$\tyint \subtype \tyint$ and $\code{Nat} \subtype \tyint$.
-
 We can try to rule out such possibilities by making the requirement of
 well-formedness stronger. This suggests that the two types on the sides of
 $\inter$ should not ``overlap''. In other words, they should be ``disjoint''. It
@@ -280,256 +285,3 @@ Also, types built with different constructors are disjoint. For example,
 $\tyint$ and $\tyint \to \tyint$. For function types, disjointness
 is harder to visualise. But bear in the mind that disjointness can defined by
 the very requirement that the theorem holds.
-
-With the change, we need $\tyint \subtype \tyint \inter \code{Char}$ to
-hold in order to get the premise, which does not. So it can be shown that
-$(\tyint \inter \code{Char}) ((1 \mergeop 'c') : \tyint \inter
-\code{Char}) \hookrightarrow 1$ is not derivable.
-
-\subsection{Metatheory}
-
-\subsubsection{Coherence}
-
-% \begin{definition}{Type variable constraint}
-%   We say the \emph{constraint} of a type variable $\alpha$ inside the context
-%   $\Gamma$ is $A$ if $\alpha \disjoint A \in \Gamma$.
-% \end{definition}
-
-% \begin{lemma}
-% If $A \subtype B$ where both $A$ and $B$ are well-formed, then $A$ and $B$ cannot be disjoint.
-% \end{lemma}
-%
-% \begin{proof}
-% $A \subtype B$ implies $B$ is a common supertype of $A$ and $B$. As a result, $A$ and $B$ are not disjoint by definition.
-% \end{proof}
-
-% \begin{lemma}[Free type variables of disjoint bounds] \label{free-var-disjoint-bounds}
-%   If $\isdisjoint \Gamma \alpha A$, then $\alpha \not \in \ftv A$.
-% \end{lemma}
-
-\begin{lemma}[Unique subtype contributor]
-  \label{unique-subtype-contributor}
-  If $A \inter B \subtype C$, where $A \inter B$ and $C$ are well-formed types,
-  then it is not possible that the following hold at the same time:
-\begin{enumerate}
-\item $A \subtype C$
-\item $B \subtype C$
-\end{enumerate}
-\end{lemma}
-
-If $A \inter B \subtype C$, then either $A$ or $B$ contributes to that subtyping
-relation, but not both. The implication of this lemma is that during the
-derivation, it is not possible that two rules are applicable.
-
-\newcommand{\wfinterlabel}{\textsc{WFInter}}
-
-% \begin{proof}
-% Since $A \inter B$ is well-formed, $A \disjoint B$ by the formation rule of intersection types \wfinterlabel. Then by the definition of disjointness, there does not exist a type $C$ such that $A \subtype C$ and $B \subtype C$. It follows that $A \subtype C$ and $B \subtype C$ cannot hold simultaneously.
-% \end{proof}
-
-The coercion of a subtyping relation $A \subtype B$ is uniquely determined.
-
-\begin{lemma}[Unique coercion] \label{unique-coercion}
-
-  If $A \subtype B \yields {C_1}$ and $A \subtype B \yields {C_2}$, where $A$
-  and $B$ are well-formed types, then $C_1 \equiv C_2$.
-
-\end{lemma}
-
-% \begin{proof}
-% The set of rules for generating coercions is syntax-directed except for the three rules that involve intersection types in the conclusion. Therefore it suffices to show that if well-formed types $A$ and $B$ satisfy $A \subtype B$, where $A$ or $B$ is an intersection type, then at most one of the three rules applies. In the following, we do a case analysis on the shape of $A$ and $B$:
-%
-% \begin{itemize}
-%   \item \textbf{Case} $A \neq A_1 \inter A_2$ and $B = B_1 \inter B_2$: Clearly only \textsc{SubAnd} can apply.
-%   \item \textbf{Case} $A = A_1 \inter A_2$ and $B \neq B_1 \inter B_2$: Only two rules can apply, \textsc{SubAnd1} and \textsc{SubAnd2}. Further, by the unique subtype contributor lemma, it is not possible that $A_1 \subtype B$ and that $A_2 \subtype B$. Thus we are certain that at most one rule of \textsc{SubAnd1} and \textsc{SubAnd2} will apply.
-%   \item \textbf{Case} $A = A_1 \inter A_2$ and $B = B_1 \inter B_2$\footnote{An example of this case is:
-%     \[ (\integer \inter \bool) \inter \character \subtype \bool \inter \character \]}: Since $B$ is not atomic, only \rulelabel{SubAnd} apply.
-%
-%   %   Suppose the contrary, that is, more than one of the three rules apply. Since it is not possible that both \textsc{SubAnd1} and \textsc{SubAnd2} apply by the unique subtype contributor lemma, only one of \textsc{SubAnd1} and \textsc{SubAnd2} apply. Therefore \textsc{SubAnd} has to hold. Without the loss of generality, assume \textsc{SubAnd1} apply. Then we have:
-%   % \[ A_1 \subtype B_1 \inter B_2 \]
-%   % \[ A_1 \inter A_2 \subtype B_1 \]
-%   % \[ A_1 \inter A_2 \subtype B_2 \]
-% \end{itemize}
-% \end{proof}
-
-In general, disjointness judgements are not invariant with respect to
-free-variable substitution. In other words, a careless substitution can violate
-the disjoint constraint in the context. For example, in the context $\alpha
-\disjoint \tyint$, $\alpha$ and $\tyint$ are disjoint:
-
-\[
-  \isdisjoint {\alpha \disjoint \tyint} \alpha \tyint
-\]
-But after the substitution of $\tyint$ for $\alpha$ on the two types, the sentence
-
-\[
-  \isdisjoint {\alpha \disjoint \tyint} \tyint \tyint
-\]
-is longer true since $\tyint$ is clearly not disjoint with itself.
-
-% \begin{lemma}{Invariance of disjointness}
-%   \label{invariance-of-disjointness}
-%
-%   If $\isdisjoint \Gamma A B$ and $R$ respects the constraints of $\beta$, then
-%   $\isdisjoint \Gamma {\subst R \beta A} {\subst R \beta B}$.
-%
-% \end{lemma}
-%
-% This lemma says that substitution for free type variables preserves disjointness
-% of types if the combination of the replacement type and the type variable is
-% proven disjoint.
-
-% \begin{proof}
-% By induction on the derivation of $\isdisjoint \Gamma A B$.
-% \begin{itemize}
-%   \item Case \[ \disjointvar \]
-%   We need to show \[ \isdisjoint \Gamma {\subst R \beta \alpha} {\subst R \beta B} \]
-%   If $\beta$ is not equivalent to $\alpha$ and is not free in $B$, then the above trivially holds by the def. of the substitution function. Otherwise, if $\beta$ is equivalent to $\alpha$, then we need to show
-%   \[ \isdisjoint \Gamma R {\subst R \beta B} \]
-%
-%   % Note that $\beta \not \in \ftv B$. Thus $B$ is equivalent to $\subst R \beta B$.
-%   %
-%   % If $\beta$ is not equivalent to $\alpha$, $\subst R \beta \alpha$ is equivalent to $\alpha$. Therefore $\isdisjoint \Gamma {\subst R \beta \alpha} {\subst R \beta B}$ is true.
-%   % If $\beta$ is equivalent to $\alpha$, then $\subst R \beta \alpha$ is equivalent to $R$ by the def. of the substitution function. It now remains to show \[ \isdisjoint \Gamma R B \].
-%
-%   \item Case \[ \disjointinterleft \]
-%   By applying the i.h. and the def. of the substitution function.
-%
-%   \item Case \[ \disjointinterright \]
-%   Similar.
-%
-%   \item Case \[ \disjointfun \]
-%   By applying the i.h. and the def. of the substitution function.
-%
-%   \item Case \[ \disjointforall \]
-%   By applying the i.h. and the def. of the substitution function. Note that $\alpha$ is fresh.
-%
-%   \item Case \[ \disjointatomic \]
-%   Substitution does not change the shape of types when the variable case is excluded. Therefore, the relation in the premise of the rule continue to hold and hence the conclusion.
-%
-% \end{itemize}
-% \end{proof}
-
-% \begin{lemma}{Substitution} \label{substitution}
-%
-%   If $\istype \Gamma R$, $\istype \Gamma S$, and $R$ respects the constraints of
-%   $\beta$, then $\istype \Gamma {\subst R \beta S}$.
-%
-% \end{lemma}
-
-% \begin{proof}
-% By induction on the derivation of $\istype \Gamma {\subst R \beta S}$.
-%
-% \begin{itemize}
-%   \item Case \[ \wfvar \]
-%   If $\alpha$ happens to be the same as $\beta$, then by the def. of substitution $\subst R \beta \alpha = R$. Since $\istype \Gamma R$, we have $\istype \Gamma {\subst R \beta \alpha}$; On the other hand, if not, then by the def. of substitution $\subst R \beta S = S$. Since $\istype \Gamma S$, we also have $\istype \Gamma {\subst R \beta \alpha}$.
-%
-%   \item Case
-%   \begin{mathpar}
-%     \wfbot
-%   \end{mathpar}
-%   Trivial.
-%
-%   \item Case
-%   \begin{mathpar}
-%     \wffun
-%   \end{mathpar}
-%   By i.h., $\istype \Gamma {\subst R \beta A}$ and $\istype \Gamma {\subst R \beta B}$. By the def. of substitution, $\istype \Gamma {\subst R \beta {A \to B}}$.
-%
-%   \item Case
-%   \begin{mathpar}
-%     \wfforall
-%   \end{mathpar}
-%   By the premise and the i.h.,
-%   \[ \istype {\Gamma} {\subst R \beta A} \]
-%   \[ \istype {\Gamma, \alpha \disjoint A} {\subst R \beta B} \]
-%   which by \rulelabel{WFForall} implies
-%   \[ \istype \Gamma {\for {\alpha \disjoint A} {\subst R \beta B}} \]
-%   By the def. of substitution, $\istype \Gamma {\subst R \beta {\for {\alpha \disjoint A} B}}$~
-% \]{Subst. of $A$}.
-%
-%   \item Case
-%   \begin{mathpar}
-%     \wfinter
-%   \end{mathpar}
-%   By i.h., $\istype \Gamma {\subst R \beta A}$ and $\istype \Gamma {\subst R \beta B}$. By Lemma~\ref{invariance-of-disjointness}, we also have $\isdisjoint \Gamma {\subst R \beta A} {\subst R \beta B}$. Therefore by \rulelabel{WFInter}, $\istype \Gamma {\subst R \beta {A \inter B}}$.
-% \end{itemize}
-% \end{proof}
-
-\begin{lemma}{Instantiation} \label{instantiation}
-
-  If $\istype {\Gamma, \alpha \disjoint B} C$, $\istype \Gamma A$, $\isdisjoint
-  \Gamma A B$ then $\istype \Gamma {\subst A \alpha C}$.
-
-\end{lemma}
-
-% \begin{proof}
-% By induction.
-%
-% \begin{itemize}
-%   \item Case \[ \wfvar \]
-%   If $C = \alpha$, then $\subst A \alpha \alpha = A$. Since $\istype \Gamma A$, it follows that $\istype \Gamma {\subst A \alpha \alpha}$; otherwise, let $C = \beta$, where $\beta$ is a type variable distinct from $\alpha$. Since $\istype {\Gamma, \alpha \disjoint B} \beta$ and $\alpha$ and $\beta$ are distinct, $\beta$ must be in $\Gamma$ and therefore $\istype {\Gamma} \beta$, which is equivalent to $\istype {\Gamma} {\subst A \alpha \beta}$.
-%
-%   \item Case \[ \wffun \]
-%   By straightforwardly applying the i.h and the rule itself.
-%
-%   \item Case \[ \wfbot \]
-%   Trivial.
-%
-%   \item Case \[ \wfforall \]
-%   By straightforwardly applying the i.h and the rule itself.
-%
-%   \item Case \[ \wfinter \]
-%   Let $C$ in the statement of this lemma be $C_1 \inter C_2$.
-%   By the condition we know
-%   \[ \istype {\Gamma, \alpha \disjoint B} {C_1 \inter C_2} \]
-%   Thus we must have,
-%   \[ \istype {\Gamma, \alpha \disjoint B} {C_1} \]
-%   By the i.h., $\istype \Gamma {\subst A \alpha {C_1}}$ and similarly $\istype \Gamma {\subst A \alpha {C_2}}$. By \rulelabel{WFInter}\todo{Show disjointness},
-%   \[ \istype \Gamma {\subst A \alpha {C_1} \inter \subst A \alpha {C_2}} \]
-%   and hence
-%   \[ \istype \Gamma {\subst A \alpha {(C_1 \inter C_2)}} \]
-%
-% \end{itemize}
-%
-% \end{proof}
-
-\begin{lemma}{Well-formed typing} \label{wf-typing}
-If $\hastype \Gamma e A$, then $\istype \Gamma e$.
-\end{lemma}
-Typing always produces a well-formed type.
-% \begin{proof}
-% By induction on the derivation of $\hastype \Gamma e A$. The case of \rulelabel{TyTApp} needs special attention
-% \begin{mathpar}
-%   \tytapp
-% \end{mathpar}
-% because we need to show that the result of substitution ($\subst A \alpha C$) is well-formed, which is evident by Lemma~\ref{instantiation}.
-% \end{proof}
-
-% \begin{proof}
-% The typing rules are syntax-directed. The case of \rulelabel{TyApp} needs special attention since we still need to show that the generated coercion $C$ is unique.
-% \begin{mathpar}
-%   \tyapp
-% \end{mathpar}
-% By Lemma~\ref{wf-typing}, we have $\istype \Gamma {A_1}$ and $\istype \Gamma {A_3}$. Therefore we are able to apply Lemma~\ref{unique-coercion} and conclude that $C$ is unique.
-% \end{proof}
-
-% \begin{figure}
-%   \begin{mathpar}
-%     \framebox{$\isatomic A$} \\
-%
-%     \inferrule*
-%       {}
-%       {\isatomic \bot}
-%
-%     \inferrule*
-%       {}
-%       {\isatomic {A \to B}}
-%
-%     \inferrule*
-%       {}
-%       {\isatomic {\for {\alpha \disjoint B} A}}
-%
-%   \end{mathpar}
-%   \caption{Atomic types.}
-% \end{figure}

@@ -23,7 +23,7 @@
 \newcommand{\tylam} {
 \inferrule* [right=T\_Lam]
   {\istype \Gamma A \\ \hastype {\Gamma, x \hast A} e B \yields E}
-  {\hastype \Gamma {\lam x A e} {A \to B} \yields {\lam x {\im A} E}}
+  {\hastype \Gamma {\lam {(x \hast A)} e} {A \to B} \yields {\lam x {\im A} E}}
 }
 
 % App
@@ -60,8 +60,6 @@
 \newcommand{\tymerge}{
 \inferrule* [right=T\_Merge]
   {\hastype \Gamma {e_1} A \yields {E_1} \\
-   \hastype \Gamma {e_2} B \yields {E_2} \\
-   % A \bot B}
-   \isdisjoint \Gamma A B}
+   \hastype \Gamma {e_2} B \yields {E_2}}
   {\hastype \Gamma {e_1 \mergeop e_2} {A \inter B} \yields {\pair {E_1} {E_2}}}
 }
