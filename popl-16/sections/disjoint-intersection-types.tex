@@ -1,29 +1,69 @@
 \section{Disjoint Intersection Types and Disjoint Quantification}
 
-\george{Show that the naive bidirectional subtyping is not disjointness.}
-\george{Highlight new stuff}
-\george{Discuss each point in this order: goal, idea of tweaks, changes, and proofs.}
-
-% Problem
 Although the system shown in the previous section is type-safe, it is not
-coherent.  This section shows how to amend the system presented before so that
-it supports coherence as well as type soundness. The keys aspects are the notion
-of disjoint intersections, and disjoint quantification for polymorphic types.
-The full specification of the language can be found in the appendix.
+coherent. This section shows how to amend the system presented before so that it
+supports coherence as well as type soundness. The keys aspects are the notion of
+disjoint intersections, and disjoint quantification for polymorphic types. The
+full specification of the language can be found in the appendix.
 
 \begin{theorem}[Unique elaboration] \label{unique-elaboration}
-
   If $\hastype \Gamma e {A_1} \yields {E_1}$ and $\hastype \Gamma e {A_2}
   \yields {E_2}$, then $E_1 \equiv E_2$.
-
 \end{theorem}
 
 Given a source term $e$, elaboration always produces the same target term $E$.
 
-% In type systems with a top type (such as \lstinline@Object@ in some OO
-% languages), the definition of disjointness can be modified to:
-%
-% We say two types are \emph{disjoint} if their only common supertype is the top type.
+\george{Transition and informally motivates the following definiton here.}
+
+\begin{definition}[Disjoint types]
+  Two types $A$ and $B$ are \emph{disjoint} if they do not share a common
+  supertype, that is, there does not exist a type $C$ such that $A \subtype C$
+  and that $B \subtype C$. \footnote{
+  The definition of disjointness can also be adapted to type systems with a top
+  type (such as \lstinline@Object@ in many OO languages): Two types $A$ and $B$
+  are \emph{disjoint} if: the fact that $C$ is a commmon supertype of theirs
+  implies $C$ is the top type.
+  }
+\end{definition}
+
+Given this definiton, now may be the right time to take a short digression to
+consider union types. If a type system ever contains union types (the
+counterpart of intersection types), with the following standard subtyping rules,
+\begin{mathpar}
+  \inferrule* [right=Union-1]
+    { }
+    {A \subtype A \union B}
+
+  \inferrule* [right=Union-2]
+    { }
+    {B \subtype A \union B}
+\end{mathpar}
+then no two types $A$ and $B$ can ever be disjoint, since there always exists
+the type $A \union B$, which is their common supertype. This serve as the
+motivation that our system does not permit union types.
+
+To see this definition in action, $\tyint$ and $\tystring$ are, because there is
+no type that is a supertype of the both. On the other hand, $\tyint$ is not
+disjoint with itself, because $\tyint \subtype \tyint$. This implies that
+disjointness is not reflexive as subtyping is. Two types with different shapes
+are disjoint unless one of them is an intersection type. For example, a function
+type and a forall type must be disjoint. But a function type and an intersection
+type may not be. Consider:
+\[ \tyint \to \tyint \quad \text{and} \quad (\tyint \to \tyint) \inter (\tystring \to \tystring) \]
+They are not disjoint since $\tyint \to \tyint$ is their common supertype.
+
+Now that we have obtained a specification for disjointness, but the definition
+involves an existence problem. How can we implement it? One possibility is
+bidirectional subtyping, that is, we say two types, $A$ and $B$, are disjoint if
+neither $A \subtype B$ nor $B \subtype A$. However, this implementation is
+wrong. For example, $\tyint \inter \tystring$ and $\tystring \inter \tychar$ are
+not disjoint by specification since $\tystring$ is their common supertype. Yet
+by the implementation they are, since neither of them is a subtype of the other.
+Hence the algorithmic rules are more nuanced and will be developed in the next
+section. For now, it is enough to treat this judgement as oracle.
+
+\george{Highlight new stuff}
+\george{Discuss each point in this order: goal, idea of tweaks, changes, and proofs.}
 
 % The intuition can be found in figure \ldots.
 %
@@ -62,22 +102,6 @@ Given a source term $e$, elaboration always produces the same target term $E$.
 % \end{tikzpicture}
 % \caption{Untergruppenverband}
 % \end{figure}
-
-
-\subsection{Disjointness}
-
-We say two types are \emph{disjoint} if they do not share a common supertype. We
-introduce the disjoint judgement.
-\[
-\isdisjoint \Gamma A B
-\]
-says inside the context $\Gamma$, $A$ and $B$ are disjoint. In this section, we
-treat this judgement as oracle. The algorithmic rules will be developed in the next section.
-
-\begin{definition}[Disjointness]
-  $A \bot B = \not \exists C. A <: C \wedge B <: C$
-\end{definition}
-
 
 \subsection{Syntax}
 
