@@ -1,5 +1,29 @@
 \section{Discussion}
 
+\subsection{Union Types}
+
+\bruno{Digressions are bad; they break the flow. I suggest that the
+  point about union types and the point about systems with a top type
+  is moved to a discussion section towards the end of the paper.}
+Given this definiton, now may be the right time to take a short digression to
+consider union types. If a type system ever contains union types (the
+counterpart of intersection types), with the following standard subtyping rules,
+\begin{mathpar}
+  \inferrule* [right=Union-1]
+    { }
+    {A \subtype A \union B}
+
+  \inferrule* [right=Union-2]
+    { }
+    {B \subtype A \union B}
+\end{mathpar}
+then no two types $A$ and $B$ can ever be disjoint, since there always exists
+the type $A \union B$, which is their common supertype. This serve as the
+motivation that our system does not permit union types.
+\bruno{I wouldn't say this is a motivation: it sounds like we caould
+  not support union types, when I think this is not true. For example
+we could say something like: there does not exist an \emph{atomic} C ...}
+
 \subsection{Normalising Types}
 
 Since the order of the two types in a binary intersection does not matter, we
