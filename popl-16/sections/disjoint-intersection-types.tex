@@ -196,7 +196,7 @@ quantification does that for quantification.
 %   By \rulelabel{SubAnd}, $A \inter B \subtype C_1 \inter C_2$.
 % \end{proof}
 
-\subsection{Well-formed Types}
+\paragraph{Well-formed Types}
 
 \begin{mathpar}
   \wfforall \and \wfinter
@@ -206,6 +206,9 @@ We additionally require that the two types of an intersection must be disjoint
 in their context, and that the disjointness constraint in a forall type is
 well-formed. Under the new rules, intersection types such as $\tyint \inter
 \tyint$ are no longer well-formed because the two types are not disjoint.
+
+Since in this section we only restrict the system in the previous section, it is
+easy to see that type preservation and type-safety still holds.
 
 \subsection{Subtyping}
 
@@ -284,29 +287,6 @@ $(\tyint \inter \code{Char}) ((1 \mergeop 'c') : \tyint \inter
 \code{Char}) \hookrightarrow 1$ is not derivable.
 
 \subsection{Metatheory}
-
-\subsubsection{Type Safety}
-
-\george{Put type safety to previous section and just say that it also holds here.}
-
-\begin{restatable}[Translation preserves well-typing]{theorem}{theorempreservation}
-  \label{theorem:preservation}
-  If $ \hastype \Gamma e A \yields E $,
-  then $ \hastype {\im \Gamma} E {\im A} $.
-\end{restatable}
-\begin{proof}
-(Sketch) By structural induction on the term and the corresponding
-inference rule.
-\end{proof}
-
-\begin{theorem}[Type safety]
-  If $e$ is a well-typed \name term, then $e$ evaluates to some System $F$
-  value $v$.
-\end{theorem}
-\begin{proof}
-  Since we define the dynamic semantics of \name in terms of the composition of
-  the type-directed translation and the dynamic semantics of System $F$, type safety follows immediately.
-\end{proof}
 
 \subsubsection{Coherence}
 
