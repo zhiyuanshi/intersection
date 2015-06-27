@@ -7,14 +7,45 @@ disjointness is proved to be sound and complete with respect to the definition.
 
 \subsection{Derivation}
 
-For any two types $A$ and $B$, we can denote all their common
-supertypes by $\commonsuper(A,B)$ and all their common subtypes by
-$\commonsub(A,B)$. For example, since $\tyint$ and $\tychar$ shares no common
-supertype,  $\commonsuper(\integer,\character)$ is empty.
+In this subsection, we illustrate how to derive the algorithmic disjointness
+rules by showing a detailed example for functions. First we introduce some
+notations for the ease of discussion.
 
-\paragraph{Notation} We will use $\commonsub(A_1,A_3) \to \commonsuper(A_2,A_4)$
-as a shorthand for $B_1 \to B_2$, where $B_1 \in \commonsub(A_1,A_3)$ and $B_2
-\in \commonsuper(A_2,A_4)$, and the same for all other constructors of types.
+\begin{definition}[Set of common supertypes]
+  For any two types $A$ and $B$, we can denote the \emph{set of their common
+  supertypes} by $\commonsuper(A,B)$. In other words, a type $C \in
+  \commonsuper(A,B)$ if and only  if $A \subtype C$ and $B \subtype C$.
+\end{definition}
+
+\begin{example}
+  $\commonsuper(\tyint,\tychar)$ is empty, since $\tyint$ and $\tychar$
+  share no common supertype.
+\end{example}
+
+Parellel to the set of common supertypes is the set of common subtypes.
+
+\begin{definition}[Set of common subtypes]
+  For any two types $A$ and $B$, we can denote the \emph{set of their common
+  subtypes} by $\commonsub(A,B)$. In other words, a type $C \in \commonsub(A,B)$
+  if and only  if $C \subtype A$ and $C \subtype B$.
+\end{definition}
+
+\begin{example}
+  $\commonsub(\tyint,\tychar)$ is an infinite set which contains $\tyint \inter
+  \tychar$, $\tychar \inter \tyint$, $(\tyint \inter \tybool) \inter \tychar$
+  and so on. But the type $\tybool$ is not inside as it is not a subtype of
+  $\tyint$.
+\end{example}
+
+\paragraph{Shorthand notation} For brevity, we will use \[ \mathcal{A} \to
+\mathcal{B} \] as a shorthand for the \emph{set} of types of the form $A \to B$,
+where $A \in \mathcal{A}$ and $B \in \mathcal{B}$. The same shorthand applies to
+all other constructors of types, in addition to functions, as well.
+
+\begin{example}
+  $\{ \tyint, \tystring \} \to \{ \tyint \}$ is a shorthand for $\{ \tyint \to
+  \tyint, \tystring \to \tyint \}$.
+\end{example}
 
 Recall that we say two types $A$ and $B$ are disjoint if they do not share a
 common supertype. Therefore, determining if two types $A$ and $B$ are disjoint
@@ -116,13 +147,13 @@ return types are disjoint (regardless of their parameter types).
   \caption{Algorithmic Disjointness.}
 \end{figure}
 
-\begin{lemma}{Symmetry of disjointness} \label{symmetry-of-disjointness}
-  If $\isdisjoint \Gamma A B$, then $\isdisjoint \Gamma B A$.
-\end{lemma}
-
 \subsection{Metatheory}
 
 The algorithmic rules for disjointness is sound and complete.
+
+\begin{lemma}{Symmetry of disjointness} \label{symmetry-of-disjointness}
+  If $\isdisjoint \Gamma A B$, then $\isdisjoint \Gamma B A$.
+\end{lemma}
 
 \begin{theorem} \label{disjoint-intersect}
   If $\isdisjoint \Gamma A C$ and $\isdisjoint \Gamma B C$,
@@ -136,4 +167,8 @@ The algorithmic rules for disjointness is sound and complete.
 
 \begin{theorem}[Soundness]
   For any two types $A$, $B$, $\isdisjointi \Gamma A B$ implies $\isdisjoint \Gamma A B$.
+\end{theorem}
+
+\begin{theorem}[Completeness]
+  For any two types $A$, $B$, $\isdisjoint \Gamma A B$ implies $\isdisjointi \Gamma A B$.
 \end{theorem}
