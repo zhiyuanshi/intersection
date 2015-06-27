@@ -92,21 +92,21 @@ Should the result be $1$ or $2$?
 
 The following shows the naive subtyping rules for intersection types:
 \begin{mathpar}
-\inferrule* [right=$\ruleLabelSubAnd$]
+\inferrule* [right=$\ruleLabelsubinter$]
   {A_1 \subtype A_2 \yields {C_1} \\ A_1 \subtype A_3 \yields {C_2}}
   {A_1 \subtype A_2 \inter A_3
     \yields
       {\lam x {\im {A_1}}
         {\pair {\app {C_1} x} {\app {C_2} x}}}}
 
-\inferrule* [right=$\ruleLabelSubAndLeft$]
+\inferrule* [right=$\ruleLabelsubinterLeft$]
   {A_1 \subtype A_3 \yields C}
   {A_1 \inter A_2 \subtype A_3
     \yields
       {\lam x {\im {A_1 \inter A_2}}
         {\app C {(\proj 1 x)}}}}
 
-\inferrule* [right=$\ruleLabelSubAndRight$]
+\inferrule* [right=$\ruleLabelsubinterRight$]
   {A_2 \subtype A_3 \yields C}
   {A_1 \inter A_2 \subtype A_3
     \yields

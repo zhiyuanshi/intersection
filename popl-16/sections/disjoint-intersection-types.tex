@@ -241,14 +241,14 @@ strict by the atomic condition, we can still derive the every judgement in the
 old systems. \george{Point to proofs and justify why the proof shows this.}
 
 \begin{mathpar}
-  \inferrule* [right=$\ruleLabelSubAndLeft$]
+  \inferrule* [right=$\ruleLabelsubinterLeft$]
     {A_1 \subtype A_3 \yields C \\ \highlight{$\isatomic {A_3}$}}
     {A_1 \inter A_2 \subtype A_3
       \yields
         {\lam x {\im {A_1 \inter A_2}}
           {\app C {(\proj 1 x)}}}}
 
-  \inferrule* [right=$\ruleLabelSubAndRight$]
+  \inferrule* [right=$\ruleLabelsubinterRight$]
     {A_2 \subtype A_3 \yields C \\ \highlight{$\isatomic {A_3}$}}
     {A_1 \inter A_2 \subtype A_3
       \yields
@@ -276,3 +276,8 @@ is harder to visualise. But bear in the mind that disjointness can defined by
 the very requirement that the theorem holds.
 \bruno{We should be finishing up this section with the key coherence
   lemma. WHy is that not here?}
+
+\begin{theorem}[Unique elaboration] \label{unique-elaboration}
+  If $\hastype \Gamma e {A_1} \yields {E_1}$ and $\hastype \Gamma e {A_2}
+  \yields {E_2}$, then $E_1 \equiv E_2$.
+\end{theorem}

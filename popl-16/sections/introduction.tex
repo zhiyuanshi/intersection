@@ -205,11 +205,11 @@ without such advanced features of generics.
 
 
 Technically speaking System \name is mainly inspired by the work of
-Dundfield~\cite{dunfield2014elaborating}.  Dundfield showed how to model a simply typed
+Dunfield~\cite{dunfield2014elaborating}.  Dunfield showed how to model a simply typed
 calculus with intersection types and a merge operator. The presence of
 a merge operator adds significant expressiveness to the language,
 allowing encodings for many other language constructs as syntactic
-sugar. System \name differs from Dundfield's work in a few
+sugar. System \name differs from Dunfield's work in a few
 ways. Firstly, it adds parametric polymorphism and formalizes an
 extension for records to support a basic form of objects. Secondly,
 the elaboration semantics into System F is done directly from the
@@ -280,9 +280,9 @@ but have other merits of intersection been explored?
 
 % \section{Introduction}
 
-% Dundfield's work showed how many language features can be encoded in terms
+% Dunfield's work showed how many language features can be encoded in terms
 % of intersection types with a merge operator. However two important
-% questions were left open by Dundfield:
+% questions were left open by Dunfield:
 
 % \begin{enumerate}
 % \item How to allow coherent programs only?
@@ -362,13 +362,13 @@ but have other merits of intersection been explored?
 
 % The crutial challenge lies in the generation of coercions, which can lead
 % to different results due to multiple possible choices in the rules that
-% can be used. In particular the rules SubAnd1 and SubAnd2 overlap and
+% can be used. In particular the rules subinter1 and subinter2 overlap and
 % can result in coercions that are not equivalent. A simple example is:
 
 % $(\lambda (x:Int) . x) (1,,2)$
 
 % The result of this program can be either 1 or 2 depending on whether
-% we chose SubAnd1 or SubAnd2.
+% we chose subinter1 or subinter2.
 
 % Therefore the challenge of coherence lies in ensuring that, for any given
 % types A and B, the result of $A <: B$ always leads to the same (or semantically

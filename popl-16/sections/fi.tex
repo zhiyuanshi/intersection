@@ -112,17 +112,17 @@ $\ftv \cdot$ for sets of free variables.
   \begin{mathpar}
     \framebox{$ A \subtype B \yields F $} \\
 
-    \subVar
+    \subvar
 
-    \subFun
+    \subfun
 
-    \subForall
+    \subforall
 
-    \subAnd
+    \subinter
 
-    \subAndleft
+    \subinterleft
 
-    \subAndright
+    \subinterright
   \end{mathpar}
 
   \footnote{miss a rule for $\bot$}
@@ -134,15 +134,15 @@ $\ftv \cdot$ for sets of free variables.
 The subtyping rules of \name, shown in Figure~\ref{fig:fi-subtyping}, are
 syntax-directed (different from the approach by Davies and
 Pfenning~\cite{davies2000intersection}, and Frisch et.
-al~\cite{frisch2008semantic}). The rule \rulelabel{SubFun} says that a function
+al~\cite{frisch2008semantic}). The rule \rulelabel{subfun} says that a function
 is contravariant in its parameter type and covariant in its return type. A
 universal quantifier ($\forall$) is covariant in its body. The three rules
 dealing with intersection types are just what one would expect when interpreting
 types as sets. Under this interpretation, for example, the rule
-\rulelabel{SubAnd} says that if $A_1$ is both the subset of $A_2$ and the
+\rulelabel{subinter} says that if $A_1$ is both the subset of $A_2$ and the
 subset of $A_3$, then $A_1$ is also the subset of the intersection of
-$A_2$ and $A_3$. In order to achieve coherence, \rulelabel{SubAnd1} and
-\rulelabel{SubAnd2} additionally require the type on the right-hand side is
+$A_2$ and $A_3$. In order to achieve coherence, \rulelabel{subinter1} and
+\rulelabel{subinter2} additionally require the type on the right-hand side is
 atomic.
 
 % Intersection types introduce natural subtyping relations among types. For
@@ -159,8 +159,8 @@ atomic.
 % \item $ \recordType {l_1} {A_1} $ is a subtype of $ \recordType {l_2} {A_2} $, if
 %   $ l_1 $ and $ l_2 $ are identical and $ A_1 $ is a subtype of $ A_2 $.
 % \end{enumerate}
-% The first point is captured by two rules $ \rulelabelsubAndLeft $ and
-% $ \rulelabelsubAndRight $, whereas the second point by $ \rulelabelsubAnd $.
+% The first point is captured by two rules $ \rulelabelsubinterLeft $ and
+% $ \rulelabelsubinterRight $, whereas the second point by $ \rulelabelsubinter $.
 % Note that the last point means that record types are covariant in the type of
 % the fields.
 
@@ -354,14 +354,14 @@ $ \im {A_1} \to \im {A_2} $ (Lemma~\ref{lemma:sub})\bruno{ref
 
 \noindent generates a coercion function from $\tyint \inter \tybool$ to $\tybool$.
 
-In rules \rulelabel{SubVar}, \rulelabel{SubTop}, \rulelabel{SubForall},
-coercions are just identity functions. In \rulelabel{SubFun}, we elaborate the
+In rules \rulelabel{subvar}, \rulelabel{SubTop}, \rulelabel{subforall},
+coercions are just identity functions. In \rulelabel{subfun}, we elaborate the
 subtyping of parameter and return types by $\eta$-expanding $f$ to
 $\lam x {\im {A_3}} {\app f x}$, applying $C_1$ to the argument and $C_2$ to
-the result. Rules \rulelabel{SubAnd1}, \rulelabel{SubAnd2}, and
-\rulelabel{SubAnd} elaborate with intersection types. \rulelabel{SubAnd} uses
-both coercions to form a pair. Rules \rulelabel{SubAnd1} and
-\rulelabel{SubAnd2} reuse the coercion from the premises and create new ones
+the result. Rules \rulelabel{subinter1}, \rulelabel{subinter2}, and
+\rulelabel{subinter} elaborate with intersection types. \rulelabel{subinter} uses
+both coercions to form a pair. Rules \rulelabel{subinter1} and
+\rulelabel{subinter2} reuse the coercion from the premises and create new ones
 that cater to the changes of the argument type in the conclusions. Note that the
 two rules are syntatically the same and hence a program can be elaborated
 differently, depending on which rule is used. But in the implementation one

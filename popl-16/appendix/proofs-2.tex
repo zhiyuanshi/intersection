@@ -24,12 +24,12 @@
 % The set of rules for generating coercions is syntax-directed except for the three rules that involve intersection types in the conclusion. Therefore it suffices to show that if well-formed types $A$ and $B$ satisfy $A \subtype B$, where $A$ or $B$ is an intersection type, then at most one of the three rules applies. In the following, we do a case analysis on the shape of $A$ and $B$:
 %
 % \begin{itemize}
-%   \item \textbf{Case} $A \neq A_1 \inter A_2$ and $B = B_1 \inter B_2$: Clearly only \textsc{SubAnd} can apply.
-%   \item \textbf{Case} $A = A_1 \inter A_2$ and $B \neq B_1 \inter B_2$: Only two rules can apply, \textsc{SubAnd1} and \textsc{SubAnd2}. Further, by the unique subtype contributor lemma, it is not possible that $A_1 \subtype B$ and that $A_2 \subtype B$. Thus we are certain that at most one rule of \textsc{SubAnd1} and \textsc{SubAnd2} will apply.
+%   \item \textbf{Case} $A \neq A_1 \inter A_2$ and $B = B_1 \inter B_2$: Clearly only \textsc{subinter} can apply.
+%   \item \textbf{Case} $A = A_1 \inter A_2$ and $B \neq B_1 \inter B_2$: Only two rules can apply, \textsc{subinter1} and \textsc{subinter2}. Further, by the unique subtype contributor lemma, it is not possible that $A_1 \subtype B$ and that $A_2 \subtype B$. Thus we are certain that at most one rule of \textsc{subinter1} and \textsc{subinter2} will apply.
 %   \item \textbf{Case} $A = A_1 \inter A_2$ and $B = B_1 \inter B_2$\footnote{An example of this case is:
-%     \[ (\integer \inter \bool) \inter \character \subtype \bool \inter \character \]}: Since $B$ is not atomic, only \rulelabel{SubAnd} apply.
+%     \[ (\integer \inter \bool) \inter \character \subtype \bool \inter \character \]}: Since $B$ is not atomic, only \rulelabel{subinter} apply.
 %
-%   %   Suppose the contrary, that is, more than one of the three rules apply. Since it is not possible that both \textsc{SubAnd1} and \textsc{SubAnd2} apply by the unique subtype contributor lemma, only one of \textsc{SubAnd1} and \textsc{SubAnd2} apply. Therefore \textsc{SubAnd} has to hold. Without the loss of generality, assume \textsc{SubAnd1} apply. Then we have:
+%   %   Suppose the contrary, that is, more than one of the three rules apply. Since it is not possible that both \textsc{subinter1} and \textsc{subinter2} apply by the unique subtype contributor lemma, only one of \textsc{subinter1} and \textsc{subinter2} apply. Therefore \textsc{subinter} has to hold. Without the loss of generality, assume \textsc{subinter1} apply. Then we have:
 %   % \[ A_1 \subtype B_1 \inter B_2 \]
 %   % \[ A_1 \inter A_2 \subtype B_1 \]
 %   % \[ A_1 \inter A_2 \subtype B_2 \]
@@ -209,5 +209,5 @@
 %   Need to show $A \subtype C_1 \inter C_2$ implies $A \inter B \subtype C_1 \inter C_2$.
 %   By inversion $A \subtype C_1$ and $A \subtype C_2$.
 %   By the i.h., $A \inter B \subtype C_1$ and $A \inter B \subtype C_2$.
-%   By \rulelabel{SubAnd}, $A \inter B \subtype C_1 \inter C_2$.
+%   By \rulelabel{subinter}, $A \inter B \subtype C_1 \inter C_2$.
 % \end{proof}

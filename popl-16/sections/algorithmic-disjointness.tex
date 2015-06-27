@@ -1,6 +1,66 @@
 \section{Algorithmic Disjointness}
 
-\subsection{Motivation}
+As promised, in this section we present the set of rules for determining whether
+two types are disjoint, and more importantly, how to derive them from the
+definition we have in the previous sections. The derived set of rules for
+disjointness is proved to be sound and complete with respect to the definition.
+
+\subsection{Derivation}
+
+For any two types $A$ and $B$, we can denote all their common
+supertypes by $\commonsuper(A,B)$ and all their common subtypes by
+$\commonsub(A,B)$. For example, since $\tyint$ and $\tychar$ shares no common
+supertype,  $\commonsuper(\integer,\character)$ is empty.
+
+\paragraph{Notation} We will use $\commonsub(A_1,A_3) \to \commonsuper(A_2,A_4)$
+as a shorthand for $B_1 \to B_2$, where $B_1 \in \commonsub(A_1,A_3)$ and $B_2
+\in \commonsuper(A_2,A_4)$, and the same for all other constructors of types.
+
+Recall that we say two types $A$ and $B$ are disjoint if they do not share a
+common supertype. Therefore, determining if two types $A$ and $B$ are disjoint
+is the same as determining if $\commonsuper(A,B)$ is empty.
+
+\paragraph{Determining disjointness of functions} Now let's dive into the case
+where both $A$ and $B$ are functions and consider how to compute
+$\commonsuper(A_1 \to A_2, B_1 \to B_2)$. By the subtyping rules, the supertype
+of a function must also be a function. Let $C_1 \to C_2$ be a common supertype
+of $A_1 \to A_2$ and $B_1 \to B_2$. Then it must satisfy the following:
+\begin{mathpar}
+  \inferrule* [right=SubFun]
+    {C_1 \subtype A_1 \\ A_2 \subtype C_2}
+    {A_1 \to A_2 \subtype C_1 \to C_2}
+
+  \inferrule* [right=SubFun]
+    {C_1 \subtype B_1 \\ B_2 \subtype C_2}
+    {B_1 \to B_2 \subtype C_1 \to C_2}
+\end{mathpar}
+From which we see that $C_1$ is a common subtype of $A_1$ and $B_1$ and that
+$C_2$ is a common supertype of $A_2$ and $B_2$. Therefore, we can wrtie:
+\[ \commonsuper(A_1 \to A_2, B_1 \to B_2) \ = \ \commonsub(A_1,B_1) \to \commonsuper(A_2,B_2) \]
+$\commonsub(A_1,B_1) \to \commonsuper(A_2,B_2)$ is not empty if an only if both
+$\commonsub(A_1,B_1)$ and $\commonsuper(A_2,B_2)$ is nonempty. However, note
+that with intersection types, $\commonsub(A_1,B_1)$ is always nonempty because
+$A_1 \inter B_1$ belongs to $\commonsub(A_1,B_1)$. Therefore, the problem of
+determining if $\commonsuper(A_1 \to A_2, B_1 \to B_2)$ is empty reduces to the
+problem of determining if $\commonsuper(B_1 \to B_2)$ is empty, which is, by
+definition, if $B_1$ and $B_2$ are disjoint. Finally, we have derived a rule for
+functions:
+\begin{mathpar}
+  \inferrule* [right=DisjointFun]
+    {\isdisjoint \Gamma {B_1} {B_2}}
+    {\isdisjoint \Gamma {A_1 \to A_2} {B_1 \to B_2}}
+\end{mathpar}
+
+The analysis needed for determining if types with other constructors are
+disjoint is similar. Below are the major results of the recursive definitions for
+$\commonsuper$:
+\begin{align*}
+  \commonsuper(A_1 \to A_2, B_1 \to B_2) &= \commonsub(A_1,B_1) \to \commonsuper(A_2,B_2) \\
+  \commonsuper({A_1 \inter A_2, B})      &= \commonsuper(A_1, B) \cup \commonsuper(A_1,B) \\
+  \commonsuper({A, B_1 \inter B_2})      &= \commonsuper(A, B_1) \cup \commonsuper(A,B_2)
+\end{align*}\george{Missing the forall case}
+
+\subsection{Rules}
 
 The rules for the disjointness judgement are shown in
 Figure~\ref{fig:disjointness}. The judgement says two types $A$ and $B$ are
@@ -18,9 +78,9 @@ return types are disjoint (regardless of their parameter types).
 
     \disjointvar
 
-% \inferrule* [right=DisjointSym]
-%       {\alpha * A \in \Gamma}
-%       {\isdisjoint \Gamma A \alpha}
+    \inferrule* [right=DisjointSym]
+          {\alpha * A \in \Gamma}
+          {\isdisjoint \Gamma A \alpha}
 
     \disjointinterleft
 
@@ -56,47 +116,13 @@ return types are disjoint (regardless of their parameter types).
   \caption{Algorithmic Disjointness.}
 \end{figure}
 
-Although the system in the previous section shows a formal system of
-disjoint intersection types, it relies on a non-algorithmic
-specification of disjointness. This section shows an algorithmic
-specification of disjointness that is proved to be sound and complete.
-
-The problem with the definition of disjointness is that it is a search problem. In this section, we are going to convert it that into an algorithm.
-
-Let $\universe_0$ be the universe of $A$ types. Let $\universe$ be the quotient set of $\universe_0$ by $\approx$, where $\approx$ is defined by \ldots.
-
-Let $\commonsuper$ be the ``common supertype'' function, and $\commonsub$ be the ``common subtype'' function. For example, assume $\integer$ and $\character$ share no common supertype. Then the fact can be expressed by $\commonsuper(\integer,\character)=\emptyset$. Formally,
-\begin{align*}
-  \commonsuper &: \universe \times \universe \to \powerset {\universe} \\
-  \commonsub   &: \universe \times \universe \to \powerset {\universe}
-\end{align*}
-which, given two types, computes the set of their common supertypes. ($\powerset S$ denotes the power set of $S$, that is, the set of all subsets of $S$.)
-
-\begin{align*}
-  \commonsuper(\alpha,\alpha) &= \{ \alpha \} \\
-  \commonsuper(\bot,\bot) &= \{ \bot \} \\
-  \commonsuper(A_1 \to A_2, A_3 \to A_4) &= \commonsub(A_1,A_3) \to \commonsuper(A_2,A_4) \\
-  % \commonsuper({A_1 \inter A_2, A_3}) &= \commonsuper(A_1, A_3) \cup \commonsuper(A_1,A_3) \\
-  % \commonsuper({A_1, A_2 \inter A_3}) &= \commonsuper(A_1, A_2) \cup \commonsuper(A_1,A_3)
-\end{align*}
-
-Notation. We use $\commonsub(A_1,A_3) \to \commonsuper(A_2,A_4)$ as a shorthand for $\{ s \to t ~|~ s \in \commonsub(A_1 \to A_2), t \in \commonsuper(A_2,A_4) \}$. Therefore, the problem of determining if $\commonsub(A_1,A_3) \to \commonsuper(A_2,A_4)$ is empty reduces to the problem of determining if $\commonsuper(A_2,A_4)$ is empty.
-
-Note that there always exists a common subtype of any two given types (case disjoint / case nondisjoint).
-
-\subsection{Formal system}
-
-Explain the rules and intuitions.
-
-The algorithmic rules for disjointness is sound and complete.
-
 \begin{lemma}{Symmetry of disjointness} \label{symmetry-of-disjointness}
   If $\isdisjoint \Gamma A B$, then $\isdisjoint \Gamma B A$.
 \end{lemma}
 
-\begin{proof}
-  Trivial by the definition of disjointness.
-\end{proof}
+\subsection{Metatheory}
+
+The algorithmic rules for disjointness is sound and complete.
 
 \begin{theorem} \label{disjoint-intersect}
   If $\isdisjoint \Gamma A C$ and $\isdisjoint \Gamma B C$,
@@ -108,83 +134,6 @@ The algorithmic rules for disjointness is sound and complete.
   then there exists a $C$ such that $A_2 \subtype C$ and $B_2 \subtype C$.
 \end{lemma}
 
-\begin{proof}
-  By induction on $D$.
-\end{proof}
-
-\begin{theorem}{Soundness}
+\begin{theorem}[Soundness]
   For any two types $A$, $B$, $\isdisjointi \Gamma A B$ implies $\isdisjoint \Gamma A B$.
 \end{theorem}
-
-\begin{proof}
-  By induction on $*_I$.
-
-  \begin{itemize}
-    \item Case \[ \disjointfun \]
-
-    Lemma~\ref{common-supertype}
-
-    \george{May need an extracted lemma here}
-
-    \item Case \[ \disjointinterleft \]
-
-    By Lemma~\ref{disjoint-intersect} and the i.h.
-
-    \item Case \[ \disjointinterright \]
-
-    By Lemma~\ref{disjoint-intersect}, Lemma~\ref{symmetry-of-disjointness}, and the i.h.
-
-    \item Case \[ \disjointatomic \]
-    Need to show ...
-    By unfolding the definition of disjointness
-    Need to show there does not exists $C$ such that...
-    By induction on $C$.
-    Atomic cases...
-    If $C = C_1 \inter C_2$
-    By inversion and the i.h. we arrive at a contradiction.
-
-  \end{itemize}
-\end{proof}
-
-\begin{theorem}{Completeness}
-  For any two type $A$, $B$, $\isdisjoint \Gamma A B$ implies $\isdisjointi \Gamma A B$.
-\end{theorem}
-
-\begin{proof}
-  Induction on $A$.
-
-  \begin{itemize}
-    \item Case $\bot$
-
-    Induction on $B$.
-      \begin{itemize}
-        \item Case $B = \bot$
-
-          Need to show $\Gamma \turns \bot * \bot$ implies $\Gamma \turns \bot *_I \bot$. Take $C = \bot$. Clearly the premise is false by definition. Then the whole statement is true. \george{???}
-
-        \item Case $B = B_1 \to B_2$
-        The conclusion is true by the disjoint axioms.
-
-        \item Case $B = B_1 \inter B_2$.
-        Need to show $\Gamma \turns \bot * B_1 \inter B_2$ implies $\Gamma \turns \bot *_I B_1 \inter B_2$. Apply \rulelabel{DisjointInter2} and the resulting conditions can be proved by the i.h.
-
-        \item Case
-      \end{itemize}
-
-      \item $A = A_1 \to A_2$
-        \begin{itemize}
-          \item Case $B = \bot$
-          The conclusion is true by the disjoint axioms.
-
-          \item Case $B = B_1 \to B_2$
-          Need to show $\Gamma \turns  A_1 \to A_2 * B_1 \to B_2$ implies $\Gamma \turns  A_1 \to A_2 *_I B_1 \to B_2$. Apply \rulelabel{DisjointFun} and the result, $\Gamma \turns A_2 *_I B_2$, can be proved by the i.h.
-
-          \item Case $B = B_1 \inter B_2$.
-          Need to show $\Gamma \turns A_1 \to A_2 * B_1 \inter B_2$ implies $\Gamma \turns A_1 \to A_2 *_I B_1 \inter B_2$. Apply \rulelabel{DisjointInter2} and the resulting conditions can be proved by the i.h.
-        \end{itemize}
-
-        \item $A = A_1 \inter A_2$
-        By \rulelabel{DisjointInter1} and by the i.h.
-
-      \end{itemize}
-\end{proof}
