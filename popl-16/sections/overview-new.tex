@@ -1,17 +1,42 @@
 \section{Overview}
 
-This section introduces \name and its support for intersection types
-and polymorphism. It then shows that, without care, the system
-lacks \emph{coherence}. Finally it is shown that by allowing only
+This section introduces \name and its support for intersection types,
+parametric polymorphism and the merge operator. It then discusses 
+the issue of coherence and shows how the notion of disjoint
+intersection types and disjoint quantification is achieves coherence.
+Finally we show that \name is powerful enough to express
+extensible type-theoretic encodings of datatypes.
+
+\begin{comment}
+It then shows that,
+with unrestricted intersection types, the system
+lacks \emph{coherence}. This motivates the introduction of
 disjoint intersection types and extending universal quatification to
-disjoint quantification, coherence is possible.
+disjoint quantification, which is enough to ensure coherence.
+\end{comment}
 
-\subsection{Intersection Types}
-\bruno{First show what intersection types are and why they are useful}
+\subsection{Intersection Types in Existing Languages}
 
-A number of OO languages, such as Java, C\#, Scala, and
-Ceylon\footnote{\url{http://ceylon-lang.org/}}, already support intersection
-types to different degrees. In Java, for example,
+What is an intersection type? The intersection of types $A$ and $B$
+contains exactly those values which can be used as either of type $A$
+or of type $B$.  Just as not all intersection of sets are nonempty,
+not all intersections of types are inhabited.  For example, the
+intersection of a base type $\tyint$ and a function type
+$\tyint \to \tyint$ is not inhabited.\bruno{put this text somewhere?}
+
+Intersection types date back to as early as Coppo et
+al.~\cite{coppo1981functional}. Since then various researchers have 
+studied intersection types, and some languages have adopted in one
+form or another. However, while intersection types are already used 
+in various languages, the lack of a merge operator removes
+considerable expressiveness.
+
+
+A number of OO languages, such as
+Java, C\#, Scala, and Ceylon\footnote{\url{http://ceylon-lang.org/}},
+already support intersection types to different degrees. Intersection
+types are particularly relevant for OOP as they can be used to model 
+multiple interface inheritance. In Java, for example,
 
 \begin{lstlisting}
 interface AwithB extends A, B {}
@@ -62,24 +87,110 @@ construct in Scala~\cite{oliveira2013feature,rendel14attributes}. However, this
 is clearly a hack and it would be better to provide proper language
 support for such a feature.
 
-\subsection{Parametric Polymorphism and Intersection Types}
-\bruno{Then talk about parametric polymorphism}
+\subsection{Intersection Types, Merge and Polymorphism in \name}
 
+To address the limitations of intersection types in languages like
+Scala, \name allows intersecting any two terms at run time using a
+\emph{merge} operator (denoted by $ \mergeop $)~\cite{dunfield2014elaborating}.  With the merge
+operator it is trivial to implement the \lstinline{merge} function in \name:
+
+\begin{lstlisting}
+let merge[A, B * A] (x : A) (y : B) : A & B = x ,, y;
+\end{lstlisting}
+
+\noindent In contrast to Scala's term-level \lstinline{with}
+construct, the operator \lstinline{,,} allows two arbitrary values \lstinline{x}
+and \lstinline{y} to be merged. The resulting type is a \emph{disjoint}
+intersection of the types of  \lstinline{x}
+and \lstinline{y} (\lstinline{A & B} in this case).
+
+\begin{comment}
+The following table
+summarizes the extent of support for intersection types in Java,
+Scala, and \name.
+
+\hspace{-13pt}\begin{tabular}{ l | c | c | c  }
+                                   & Java       & Scala      & \name      \\ \hline
+  Basic intersection types         & \checkmark & \checkmark & \checkmark \\ \hline
+  Anonymous intersection types     &            & \checkmark & \checkmark \\ \hline
+  Intersection of type parameters  &            & \checkmark & \checkmark \\ \hline
+  Term-level intersection          &            &            & \checkmark
+\end{tabular} \\
+\end{comment}
+
+\begin{comment}
+\paragraph{Intersection types for overloading.}
+A typical use-case for intersection types is to do
+\emph{overloading}. The benefit is that programmers can use the same
+operation on different types and delegate the task of choosing a
+concrete implementation to the type system. For example, we can define
+a \lstinline{show} function that takes either an integer or a boolean
+and returns its string representation. In other words, \lstinline{show} is also
+\emph{both} a function from integers to strings as well as a function
+from boolean to strings.  Therefore, in \name \lstinline{show} should be of
+following type:
+\begin{lstlisting}
+show : (Int -> String) & (Bool -> String)
+\end{lstlisting}
+Assuming that the following two functions are available:
+\begin{lstlisting}
+showInt : Int  -> String
+showBool : Bool -> String
+\end{lstlisting}
+
+\noindent The overloaded \lstinline{show} function is defined by
+merging the \lstinline{showInt} and \lstinline{showBool} using the
+merge operator:
+
+\begin{lstlisting}
+let show = showInt ,, showBool;
+\end{lstlisting}
+
+To illustrate the usage, consider the function application \lstinline{show 100}.
+The type system will pick the first component of \lstinline{show}, namely
+\lstinline{showInt}, as the implementation being applied to \lstinline{100}
+because the type of \lstinline{showInt} is compatible with \lstinline{100}, but
+\lstinline{showBool} is not. This example shows that one may regard
+intersections in our system as ``implicit pairs'' whose introduction is explicit
+by the merge operator and elimination is implicit (with no source-level
+construct for elimination).
+
+\paragraph{Subtyping.} The previous example exploits a natural
+subtyping relation on intersection types. That is the type
+
+\begin{lstlisting}
+(Int -> String) & (Bool -> String)
+\end{lstlisting}
+
+\noindent is a \emph{subtype} of both \lstinline{Int -> String} and
+\lstinline{Bool -> String}. This is why \lstinline{show} can take
+\lstinline{100} as its argument. Generally speaking an intersection type
+\lstinline{A & B} is a subtype of both \lstinline{A} and \lstinline{B}.
+Moreover, subtyping of intersection types in \name is purely structural
+and it enjoys of properties such as \emph{idempotence},
+\emph{commutativity} and \emph{associativity}
+(equality is defined as bidirectional subtyping relation): \\
+
+% \noindent {\bf commutativity: } $A \inter B = B \inter A$  \\
+% {\bf associativity:~~~~~~}$A \inter (B \inter C) = (A \inter B) \inter C$
+
+\begin{tabular}{llrcl}
+  \textbf{Idempotent}  & $A \inter A$            & $=$ & $A$ \\
+  \textbf{Commutative} & $A \inter B$            & $=$ & $B \inter A$ \\
+  \textbf{Associative} & $(A \inter B) \inter C$ & $=$ & $A \inter (B \inter C)$
+\end{tabular}
+\end{comment}
+
+\paragraph{Parametric Polymorphism and Intersection Types}
 Both universal quantification and intersection types provide a kind of
 polymorphism. While the former provides parametric polymorphism, the latter
 provides ad-hoc polymorphism. In some systems, parametric polymorphism is
 considered the infinite analog of intersection polymorphism. But in our system
 we do not consider this relationship. \george{Need to argue that why their
 coexistence might be a good thing.} \george{May use the merge example}
-
 \bruno{Some more examples in following subsections?}
 
-\subsection{Intersection Types and Noncoherence}
-
-What is an intersection type? The intersection of types $A$ and $B$ contains
-exactly those values which can be used as either of type $A$ or of type $B$.
-Just as not all intersection of sets are nonempty, not all intersections of types are inhabited.
-For example, the intersection of a base type $\tyint$ and a function type $\tyint \to \tyint$ is not inhabited.
+\subsection{Incoherence}
 The merge operator combines two terms, of type $A$ and $B$
 respectively, to form a term of type $A \inter B$. For example, $1 \mergeop
 `c'$ is of type $\tyint \inter \tychar$. In this case, no matter $1 \mergeop
@@ -90,6 +201,34 @@ asks for an integer out of a merge of two integers:
 \[ \app {(\lam x \tyint x)} {1 \mergeop 2} \]
 Should the result be $1$ or $2$?
 
+If this situation occurs, we say that the semantics is \emph{incoherent}.
+More precisely, coherence is a property about the function that give meaning to valid programs.
+A system is coherent if any valid program has exactly one meaning.
+
+Therefore, at this point two candidates of solutions occur:
+\begin{itemize}
+    \item To forbid overlapping intersection types in a desired type
+    system;
+    \item To enforce an order of lookup. For example, the right
+    item of a merge will take precedence so that it can ``override'' the left
+    item.
+\end{itemize}
+
+With the second approach, the program above can only evaluate to $2$.
+Unfortunately, although it is more liberal than the first,
+it makes equational reasoning broken in systems with parametric polymorphism.
+
+Obviously the difficulty above is due to the fact that the type of $1 \mergeop
+2$, which is $\tyint \inter \tyint$ is an overlapping intersection.
+Generally, if both terms can be assigned some type $C$,
+both of them can be chosen as the meaning of the merge,
+which leads to multiple meaning of a term.
+
+Therefore the challenge of coherence lies in ensuring that, for any given
+types A and B, the result of $A <: B$ always leads to the same coercions.
+
+
+\bruno{
 The following shows the naive subtyping rules for intersection types:
 \begin{mathpar}
 \inferrule* [right=$\ruleLabelSubAnd$]
@@ -116,35 +255,9 @@ The following shows the naive subtyping rules for intersection types:
 The crutial challenge lies in the generation of coercions that are derived by the subtyping rules.
 Since a program can typecheck via multiple derivations, and different derivation builds up multiple derivations,
 noncoherent arises.
+}
 
-If this situation occurs, we say that the semantics is \emph{noncoherent}.
-More precisely, coherence is a property about the function that give meaning to valid programs.
-A system is coherent if any valid program has exactly one meaning.
-
-Therefore, at this point two candidates of solutions occur:
-\begin{itemize}
-    \item To forbid overlapping intersection types in a desired type
-    system;
-    \item To enforce an order of lookup. For example, the right
-    item of a merge will take precedence so that it can ``override'' the left
-    item.
-\end{itemize}
-
-With the second approach, the program above can only evaluate to $2$.
-Unfortunately, although it is more liberal than the first,
-it makes equational reasoning broken in systems with parametric polymorphism.
-
-Obviously the difficulty above is due to the fact that the type of $1 \mergeop
-2$, which is $\tyint \inter \tyint$ is an overlapping intersection.
-Generally, if both terms can be assigned some type $C$,
-both of them can be chosen as the meaning of the merge,
-which leads to multiple meaning of a term.
-
-Therefore the challenge of coherence lies in ensuring that, for any given
-types A and B, the result of $A <: B$ always leads to the same coercions.
-
-\subsection{Equational Reasoning}
-
+\paragraph{Incoherence and Parametric Polymorphism}
 We can define a \code{fst} function that extracts the first item of a merged value:
 \[
 \code{fst} \ \alpha \ \beta \ (x : \alpha \inter \beta) = \app {(\lam y \alpha y)} x
@@ -179,7 +292,7 @@ Consider this program:
 $x$ in the body is of type $\alpha \inter \tyint$ and if $\alpha$ and $\tyint$ are
 disjoint depends on the instantiation of $\alpha$.
 
-\subsection{Intuition of Disjoint Quantification}
+\subsection{Disjoint Intersection Types and Disjoint Quantification}
 
 Inspired by bounded quantification where a type variable is constrained by a type bound,
 we introduce the idea of disjoint quantification where a type variable is constrained
@@ -205,3 +318,215 @@ With this tool in hand, we can rewrite the program above to:
 This program typechecks because while $x$ is of type $\alpha \inter \tyint$,
 and $\alpha$ is disjoint with $\tyint$. Similarly, in the new system,
 the original program no longer typechecks, thus preventing overlapping types.
+
+\subsection{Application: Extensible Encodings of Datatypes}
+\label{subsec:OAs}
+
+Oliveira and Cook~\cite{oliveira2012extensibility} proposed a design pattern that can solve the
+Expression Problem in languages like Java. An advantage of the pattern
+over previous solutions is that it is relatively lightweight in terms
+of type system features. In a latter paper, Oliveira et al.~\cite{oliveira2013feature}
+noted some limitations of the original design pattern and proposed 
+some new techniques that generalized the original pattern, allowing it 
+to express programs in a Feature-Oriented Programming~\cite{Prehofer97} style.
+Key to these techniques was the ability to dynamically compose object
+algebras.
+
+Unfortunatelly, dynamic composition of object algebras is
+non-trivial. At the type-level it is possible to express the resulting
+type of the composition using intersection types. Thus, it is still
+possible to solve that part problem nicely in a language like Scala (which
+has basic support for intersection types). However, the dynamic
+composition itself cannot be easily encoded in Scala. The fundamental 
+issue is that Scala lacks a \lstinline{merge} operator (see the
+discussion in Section~\ref{subsec:interScala}). Although both Oliveira et al.~\cite{oliveira2013feature} and
+Rendell et al.~\cite{rendel14attributes} have shown that such a \lstinline{merge} operator can
+be encoded in Scala, the encoding fundamentally relies in low-level
+programming techniques such as dynamic proxies, reflection or
+meta-programming. 
+
+Because \name supports a \lstinline{merge} operator natively, dynamic
+object algebra composition becomes easy to encode. The remainder of
+this section shows how object algebras and object algebra composition
+can be encoded in \name. We will illustrate this point 
+step-by-step by solving the Expression Problem. 
+%%Prior knowledge of object algebras is not assumed.
+ 
+% can be cumbersome and
+% language support for intersection types would solve that problem. 
+% Our type system is just a simple extension of System $ F $; yet surprisingly, it
+% is able to solve the limitations of using object algebras in languages such as
+% Java and Scala.
+
+\paragraph{A simple system of arithmetic expressions.} 
+In the Expression Problem, the idea is to start with a very simple
+system modeling arithmetic expressions and evaluation.
+The initial system considers expressions with two variants (literals and
+addition) and one operation (evaluation). Here is an interface that supports
+evaluation:
+\begin{comment}
+  \begin{lstlisting}{language=F2J}
+    type IEval = {eval: Int};
+  \end{lstlisting}
+\end{comment}
+\lstinputlisting[linerange=4-4]{../src/ObjectAlgebra.sf} % APPLY:linerange=OA_IEVAL
+
+\noindent In \name the interfaces of objects (or object types) are expressed as
+a record type. A \lstinline{type} declaration allow us to create a
+simple alias for a type.  In this case \lstinline{IEval} is an alias
+for \{\lstinline{eval: Int}\}.
+
+With object algebras, the idea is to create an object algebra
+interface, \lstinline$ExpAlg$, for expression types with the two
+variants. This interface has a fixed number of variants, but abstracts over the
+type of the interpretation \lstinline$E$.
+
+\begin{comment}
+  \begin{lstlisting}{language=F2J}
+    type ExpAlg[E] = {
+      lit: Int -> E, 
+      add: E -> E -> E
+    };
+  \end{lstlisting}
+\end{comment}
+
+\lstinputlisting[linerange=8-11]{../src/ObjectAlgebra.sf} % APPLY:linerange=OA_EXPALG
+
+% whereas
+%\lstinline$ExpAlg[IEval & IPrint]$ will be the type of object algebras that
+%support both evaluation and pretty printing.
+% In \name, record types are structural and hence any value that satisfies this
+% interface is of type \lstinline$IEval$ or of a subtype of \lstinline$IEval$.
+% \footnote{Should be mentioned in S2.}
+Having defined the interfaces, we can implement that object algebra interface
+with \lstinline$evalAlg$, which is an object algebra for evaluation. 
+\begin{comment}
+  \begin{lstlisting}{language=F2J}
+    let evalAlg: ExpAlg[IEval] = {
+      lit = \(x: Int) -> {eval = x},
+      add = \(x: IEval) (y: IEval) -> {
+        eval = x.eval + y.eval
+      }
+    };
+  \end{lstlisting}
+\end{comment}
+
+\lstinputlisting[linerange=15-20]{../src/ObjectAlgebra.sf} % APPLY:linerange=OA_EVALALG
+In this example we implement a record, where the two operations 
+\lstinline{lit} and \lstinline{add} return a record with type \lstinline{IEval}.
+The type \lstinline$ExpAlg[IEval]$ is the type of object algebras
+supporting evaluation. However, the one interesting point
+of object algebras is that other operations can be supported as
+well. 
+
+\paragraph{Add a subtraction variant.} The point of the Expression
+Problem is to support the addition of new features to the existing
+program, without modifying existing code. 
+The first feature is adding a new variant, such as subtraction. We can do so by
+simply intersecting the original types and merging with the original values:
+
+\begin{comment}
+  \begin{lstlisting}{language=F2J}
+    type SubExpAlg[E] = 
+    ExpAlg[E] & {sub: E -> E -> E};
+    let subEvalAlg = evalAlg ,, {
+      sub = \(x: IEval) (y: IEval) -> { 
+        eval = x.eval - y.eval 
+      }
+    };
+  \end{lstlisting}
+\end{comment}
+
+\lstinputlisting[linerange=24-31]{../src/ObjectAlgebra.sf} % APPLY:linerange=OA_SUBEXPALG
+
+\noindent Note that here intersection types are used to model \emph{type
+  inheritance} and the merge operator models a basic form of
+\emph{dynamic implementation inheritance}. 
+
+\paragraph{Add a pretty printing operation.}
+A second extension is adding a new operation, such as pretty printing. 
+Similar to evaluation, the interface of the pretty printing feature
+is modeled as:
+\begin{comment}
+  \begin{lstlisting}{language=F2J}
+    type IPrint = {print : String};
+  \end{lstlisting}
+\end{comment}
+\lstinputlisting[linerange=35-35]{../src/ObjectAlgebra.sf} % APPLY:linerange=OA_IPRINT
+The implementation of pretty printing for expressions that support literals,
+addition, and subtraction is:
+\begin{comment}
+  \begin{lstlisting}{language=F2J}
+    let printAlg : SubExpAlg[IPrint] = {
+      lit = \(x: Int) -> {print = x.toString()},
+      add = \(x: IPrint) (y: IPrint) -> {
+        print = x.print ++ " + " ++ y.print
+      },
+      sub = \(x: IPrint) (y: IPrint) -> {
+        print = x.print ++ " - " ++ y.print
+      }
+    };
+  \end{lstlisting}
+\end{comment}
+\lstinputlisting[linerange=39-47]{../src/ObjectAlgebra.sf} % APPLY:linerange=OA_PRINTALG
+
+\paragraph{Usage.}
+With the definitions above, values are created using the
+appropriate algebras. For example, the expression \lstinline{7 + 2} 
+is encoded as follows:
+\begin{comment}
+  \begin{lstlisting}{language=F2J}
+    let e1[E] (f: SubExpAlg[E]) = 
+    f.add (f.lit 7) (f.lit 2);
+  \end{lstlisting}
+\end{comment}
+\lstinputlisting[linerange=51-52]{../src/ObjectAlgebra.sf} % APPLY:linerange=OA_E1
+
+\noindent The expressions are unusual in the sense that they are
+functions that take an extra argument \lstinline$f$. The extra
+argument is an object algebra that uses the functions in the record
+(\lstinline$lit$, \lstinline$add$ and \lstinline$sub$) as factory
+methods for creating values. Moreover, the algebras themselves are
+abstracted over the allowed operations such as evaluation and pretty
+printing by requiring the expression functions to take an extra
+argument \lstinline$E$.
+
+\paragraph{Dynamic object algebra composition.}
+To obtain an expression that supports both evaluation and pretty
+printing, a mechanism to combine the evaluation and printing
+algebras is needed. \name allows such composition: the \lstinline$combine$
+function, which takes two object algebras to create a combined algebra. It
+does so by constructing a new object algebra where each field is a
+function that delegates the input to the two algebra parameters.
+\begin{comment}
+  \begin{lstlisting}{language=F2J}
+    let combine[A,B](f: ExpAlg[A])(g: ExpAlg[B]) : 
+    ExpAlg[A&B] = {
+      lit = \(x: Int) -> f.lit x ,, g.lit x,
+      add = \(x: A & B) (y: A & B) ->
+      f.add x y ,, g.add x y
+    }
+  \end{lstlisting}
+\end{comment}
+\lstinputlisting[linerange=58-63]{../src/ObjectAlgebra.sf} % APPLY:linerange=OA_COMBINE
+
+\begin{comment}
+  \begin{lstlisting}{language=F2J}
+    let newAlg = 
+    combine[IEval,IPrint] subEvalAlg printAlg;
+    let o = e1[IEval&IPrint] newAlg;
+    o.print ++ " = " ++ o.eval.toString()
+  \end{lstlisting}
+\end{comment}
+
+\lstinputlisting[linerange=67-69]{../src/ObjectAlgebra.sf} % APPLY:linerange=OA_USAGE
+
+Note that \lstinline$o$ is a single object that supports both
+evaluation and printing, as the output of the program is
+\begin{lstlisting}
+> 7 + 2 = 9
+\end{lstlisting}
+
+In contrast to the Scala solutions available in the
+literature, \name is able to express object algebra
+composition very directly by using the merge operator. 
