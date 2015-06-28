@@ -76,7 +76,7 @@ let x : Int & Char = 3 ,, 'a';
 \noindent In \name (following the notation of Dunfield~\cite{}), the
 merge of two values $v_1$ and $v_2$ is denoted as $v_1 ,, v_2$.
 
-\paragraph{Merge Operator and Implicit Pairs}
+\paragraph{Merge Operator and Pairs}
 The merge operator is similar to the introduction construct on pairs. 
 An analogous implementation of \lstinline{x} with pairs would be:
 
@@ -104,71 +104,132 @@ type system to extract the corresponding value.
 
 \subsection{Incoherence}
 The merge operator combines two terms, of type $A$ and $B$
-respectively, to form a term of type $A \inter B$. For example, $1 \mergeop
-`c'$ is of type $\tyint \inter \tychar$. In this case, no matter $1 \mergeop
-`c'$ is used as $\tyint$ or $\tychar$, the result of evaluation is always
-clear. However, with overlapping types, it is not straightforward anymore to
-see the result. For example, what should be the result of this program, which
-asks for an integer out of a merge of two integers:
+respectively, to form a term of type $A \inter B$. For example,
+$1 \mergeop `c'$ is of type $\tyint \inter \tychar$. In this case, no
+matter $1 \mergeop `c'$ is used as $\tyint$ or $\tychar$, the result
+of evaluation is always clear. However, with overlapping types, it is
+not straightforward anymore to see the result. For example, what
+should be the result of this program, which asks for an integer out of
+a merge of two integers:
 \[ \app {(\lambda (x : \tyint). x)} {(1 \mergeop 2)} \]
 Should the result be $1$ or $2$?
 
-If this situation occurs, we say that the semantics is \emph{incoherent}.
-More precisely, coherence is a property about the function that give meaning to valid programs.
-A system is coherent if any valid program has exactly one meaning.
+If both results are accepted, we say that the semantics is
+\emph{incoherent}: there are multiple possible meanings for the same
+valid program. Dunfield's calculus~\cite{} is incoherent and accepts the
+program above. 
 
-Therefore, at this point two candidates of solutions occur:
-\begin{itemize}
-    \item To forbid overlapping intersection types in a desired type
-    system;
-    \item To enforce an order of lookup. For example, the right
-    item of a merge will take precedence so that it can ``override'' the left
-    item.
-\end{itemize}
+In a real implementation of Dunfield calculus a choice has to be made
+on which value to compute. For example, one potential option is to
+take either always take the left-most value matching the type in the
+merge. Similarly, one could take always take the right-most
+value matching the type in the merge. Either way, the meaning
+of a program will always depend on an implementation choice.\bruno{why
+  is this problematic? say more?}
 
-With the second approach, the program above can only evaluate to $2$.
-Unfortunately, although it is more liberal than the first,
-it makes equational reasoning broken in systems with parametric polymorphism.
+Moreover, even if it accept either choice as being a good enough
+candidate to express the semantics, the approach cannot be easily
+extended to systems with parametric polymorphism, as we illustrate 
+in Section~\ref{}.
 
-Obviously the difficulty above is due to the fact that the type of $1 \mergeop
-2$, which is $\tyint \inter \tyint$ is an overlapping intersection.
-Generally, if both terms can be assigned some type $C$,
+\subsection{Restoring Coherence: Disjoint Intersection Types}
+Coherence is a desirable property for a semantics. A semantics is said
+to be coherent if any \emph{valid program} has exactly one meaning.
+One option to restore coherence is to reject programs which may have
+multiple meanings. 
+%Of course, when rejecting programs it is important 
+%not to be too conservative, and reject too many programs which are 
+%actually coherent. 
+Analysing the expression $1 \mergeop 2$, we can see that the reason 
+for incoherence is that there are multiple, overlapping, integers in the
+merge. Generally, if both terms can be assigned some type $C$,
 both of them can be chosen as the meaning of the merge,
 which leads to multiple meaning of a term.
+Thus a natural option is to try to forbid such overlapping 
+values of the same type in a merge. \bruno{this is conservative, but 
+not too much!}
 
-Therefore the challenge of coherence lies in ensuring that, for any given
-types A and B, the result of $A <: B$ always leads to the same coercions.
+\paragraph{Disjoint Intersection Types}
+Therefore, we require that the two types of an intersection must be not
+overlapping, or \emph{disjoint}, and add this requirement to the well-formedness of types.
+
+A well-formed type is such that given any query type,
+it is always clear which subpart the query is referring to.
+In terms of rules, this notion of well-formedness is almost the same as the one in System $F$
+except for intersection types we require the two components to be disjoint.
+
+\paragraph{What does it mean for two types to be disjoint?}
+
+ Given two types $A$ and $B$, two types are disjoint
+($A * B$) if there is no type $C$ such that both $A$ and $B$ are
+subtypes of $C$. Formally this definition is captured as follows:
+\[A * B \equiv \not\exists C.~A <: C \wedge B <: C\]
+
+\paragraph{How to compute disjointness!}
+
+\subsection{Parametric Polymorphism and Intersection Types}
+Both universal quantification and intersection types provide a kind of
+polymorphism. While the former provides parametric polymorphism, the latter
+provides ad-hoc polymorphism. In some systems, parametric polymorphism is
+considered the infinite analog of intersection polymorphism. But in our system
+we do not consider this relationship. \george{Need to argue that why their
+coexistence might be a good thing.} \george{May use the merge example}
+\bruno{Some more examples in following subsections?}
 
 
-\bruno{
-The following shows the naive subtyping rules for intersection types:
-\begin{mathpar}
-\inferrule* [right=$\ruleLabelsubinter$]
-  {A_1 \subtype A_2 \yields {C_1} \\ A_1 \subtype A_3 \yields {C_2}}
-  {A_1 \subtype A_2 \inter A_3
-    \yields
-      {\lam x {\im {A_1}}
-        {\pair {\app {C_1} x} {\app {C_2} x}}}}
+To address the limitations of intersection types in languages like
+Scala, \name allows intersecting any two terms at run time using a
+\emph{merge} operator (denoted by $ \mergeop $)~\cite{dunfield2014elaborating}.  With the merge
+operator it is trivial to implement the \lstinline{merge} function in \name:
 
-\inferrule* [right=$\ruleLabelsubinterLeft$]
-  {A_1 \subtype A_3 \yields C}
-  {A_1 \inter A_2 \subtype A_3
-    \yields
-      {\lam x {\im {A_1 \inter A_2}}
-        {\app C {(\proj 1 x)}}}}
+\begin{lstlisting}
+let merge[A, B * A] (x : A) (y : B) : A & B = x ,, y;
+\end{lstlisting}
 
-\inferrule* [right=$\ruleLabelsubinterRight$]
-  {A_2 \subtype A_3 \yields C}
-  {A_1 \inter A_2 \subtype A_3
-    \yields
-      {\lam x {\im {A_1 \inter A_2}}
-        {\app C {(\proj 2 x)}}}}
-\end{mathpar}
-The crutial challenge lies in the generation of coercions that are derived by the subtyping rules.
-Since a program can typecheck via multiple derivations, and different derivation builds up multiple derivations,
-noncoherent arises.
-}
+\noindent In contrast to Scala's term-level \lstinline{with}
+construct, the operator \lstinline{,,} allows two arbitrary values \lstinline{x}
+and \lstinline{y} to be merged. The resulting type is a \emph{disjoint}
+intersection of the types of  \lstinline{x}
+and \lstinline{y} (\lstinline{A & B} in this case).
 
+
+
+\paragraph{Incoherence and Parametric Polymorphism}
+We can define a \code{fst} function that extracts the first item of a merged value:
+\[
+\code{fst} \ \alpha \ \beta \ (x : \alpha \inter \beta) = \app {(\lam y \alpha y)} x
+\]
+What should be the result of this program?
+\begin{lstlisting}
+fst Int Int (1,,2)
+\end{lstlisting}
+
+Then we have the following equational reasoning:
+\begin{lstlisting}
+fst Int Int (1,,2) => (\(y : Int). y) (1,,2)
+\end{lstlisting}
+If we favour the second item, the program seems to evaluate to $2$. But in
+reality, the result is $2$. No matter we favour the first or the second item,
+we can always construct a program such that for that program, equational
+reasoning is broken.
+
+Therefore, we require that the two types of an intersection must be not
+overlapping, or \emph{disjoint}, and add this requirement to the well-formedness of types.
+
+A well-formed type is such that given any query type,
+it is always clear which subpart the query is referring to.
+In terms of rules, this notion of well-formedness is almost the same as the one in System $F$
+except for intersection types we require the two components to be disjoint.
+
+With parametric polymorphism, disjointness is harder to determine due to type variables.
+Consider this program:
+\[
+\blam \alpha {\lam x {\alpha \inter \tyint} x}
+\]
+$x$ in the body is of type $\alpha \inter \tyint$ and if $\alpha$ and $\tyint$ are
+disjoint depends on the instantiation of $\alpha$.
+
+\begin{comment}
 \subsection{Intersection Types in Existing Languages}
 
 What is an intersection type? The intersection of types $A$ and $B$
@@ -242,68 +303,6 @@ support for such a feature.
 
 
 
-\begin{comment}
-\paragraph{Intersection types for overloading.}
-A typical use-case for intersection types is to do
-\emph{overloading}. The benefit is that programmers can use the same
-operation on different types and delegate the task of choosing a
-concrete implementation to the type system. For example, we can define
-a \lstinline{show} function that takes either an integer or a boolean
-and returns its string representation. In other words, \lstinline{show} is also
-\emph{both} a function from integers to strings as well as a function
-from boolean to strings.  Therefore, in \name \lstinline{show} should be of
-following type:
-\begin{lstlisting}
-show : (Int -> String) & (Bool -> String)
-\end{lstlisting}
-Assuming that the following two functions are available:
-\begin{lstlisting}
-showInt : Int  -> String
-showBool : Bool -> String
-\end{lstlisting}
-
-\noindent The overloaded \lstinline{show} function is defined by
-merging the \lstinline{showInt} and \lstinline{showBool} using the
-merge operator:
-
-\begin{lstlisting}
-let show = showInt ,, showBool;
-\end{lstlisting}
-
-To illustrate the usage, consider the function application \lstinline{show 100}.
-The type system will pick the first component of \lstinline{show}, namely
-\lstinline{showInt}, as the implementation being applied to \lstinline{100}
-because the type of \lstinline{showInt} is compatible with \lstinline{100}, but
-\lstinline{showBool} is not. This example shows that one may regard
-intersections in our system as ``implicit pairs'' whose introduction is explicit
-by the merge operator and elimination is implicit (with no source-level
-construct for elimination).
-
-\paragraph{Subtyping.} The previous example exploits a natural
-subtyping relation on intersection types. That is the type
-
-\begin{lstlisting}
-(Int -> String) & (Bool -> String)
-\end{lstlisting}
-
-\noindent is a \emph{subtype} of both \lstinline{Int -> String} and
-\lstinline{Bool -> String}. This is why \lstinline{show} can take
-\lstinline{100} as its argument. Generally speaking an intersection type
-\lstinline{A & B} is a subtype of both \lstinline{A} and \lstinline{B}.
-Moreover, subtyping of intersection types in \name is purely structural
-and it enjoys of properties such as \emph{idempotence},
-\emph{commutativity} and \emph{associativity}
-(equality is defined as bidirectional subtyping relation): \\
-
-% \noindent {\bf commutativity: } $A \inter B = B \inter A$  \\
-% {\bf associativity:~~~~~~}$A \inter (B \inter C) = (A \inter B) \inter C$
-
-\begin{tabular}{llrcl}
-  \textbf{Idempotent}  & $A \inter A$            & $=$ & $A$ \\
-  \textbf{Commutative} & $A \inter B$            & $=$ & $B \inter A$ \\
-  \textbf{Associative} & $(A \inter B) \inter C$ & $=$ & $A \inter (B \inter C)$
-\end{tabular}
-\end{comment}
 
 \paragraph{Parametric Polymorphism and Intersection Types}
 Both universal quantification and intersection types provide a kind of
@@ -366,6 +365,7 @@ Consider this program:
 \]
 $x$ in the body is of type $\alpha \inter \tyint$ and if $\alpha$ and $\tyint$ are
 disjoint depends on the instantiation of $\alpha$.
+\end{comment}
 
 \subsection{Disjoint Intersection Types and Disjoint Quantification}
 
