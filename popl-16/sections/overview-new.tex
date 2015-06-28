@@ -7,6 +7,15 @@ intersection types and disjoint quantification is achieves coherence.
 Finally we show that \name is powerful enough to express
 extensible type-theoretic encodings of datatypes.
 
+Note that this section uses some syntactic sugar, as well as standard 
+programming language features, to illustrate the various concepts in
+\name. Although the minimal core language that we formalize in
+Section~\ref{} does not present all such features, our implementation 
+supports them. 
+
+\bruno{Need to type-check the programs!}
+
+
 \begin{comment}
 It then shows that,
 with unrestricted intersection types, the system
@@ -14,6 +23,151 @@ lacks \emph{coherence}. This motivates the introduction of
 disjoint intersection types and extending universal quatification to
 disjoint quantification, which is enough to ensure coherence.
 \end{comment}
+
+\subsection{Intersection types and the Merge Operator}
+%%\subsection{Intersection Types, Merge and Polymorphism in \name}
+
+Intersection types date back as early as Coppo et
+al.'s work~\cite{coppo1981functional}. Since then various researchers have
+studied intersection types, and some languages have adopted them in one
+form or another. 
+
+%However, while intersection types are already used in
+%various languages, the lack of a merge operator removes considerable
+%expressiveness.
+
+\paragraph{Intersection Types}
+The intersection of type $A$ and $B$ (denoted as \lstinline{A & B} in
+\name) contains exactly those values
+which can be used as either of type $A$ or of type $B$. For instance,
+consider the following program in \name:
+
+\begin{lstlisting}
+let x : Int & Char = ...;
+let idInt (y : Int) : Int = y;
+let idChar (y : Char) : Char = y;
+(idInt x, idChar x)
+\end{lstlisting} 
+
+\noindent If a value \lstinline{x} has type \lstinline{Int & Char} then
+\lstinline{x} can be used as an integer or a character. Therefore, 
+\lstinline{x} can be used as an argument to any function that takes 
+an integer as an argument, or any 
+function that take a character as an argument. In the program above 
+the functions \lstinline{idInt} and \lstinline{idChar} are the
+identity functions on integers and characters, respectively. Therefore 
+passing \lstinline{x} as an argument to either one (or both) of the
+functions is valid. 
+
+\bruno{text needs to be improved; better connection}
+The previous program did not show how to construct values of an 
+intersection type. Indeed how such values are constructed is a point 
+of divergence between various proposals for intersections types.
+
+\paragraph{Merge Operator}
+\name supports a so-called merge operator. The merge operator allows 
+two values to be merged in a single intersection type. For example, an 
+implementation of \lstinline{x} is constructed as follows:
+
+\begin{lstlisting}
+let x : Int & Char = 3 ,, 'a';
+\end{lstlisting}
+
+\noindent In \name (following the notation of Dunfield~\cite{}), the
+merge of two values $v_1$ and $v_2$ is denoted as $v_1 ,, v_2$.
+
+\paragraph{Merge Operator and Implicit Pairs}
+The merge operator is similar to the introduction construct on pairs. 
+An analogous implementation of \lstinline{x} with pairs would be:
+
+\begin{lstlisting}
+let xPair : (Int, Char) = (3, 'a');
+\end{lstlisting} 
+
+\noindent The significant difference between intersection types with a
+merge operator and pairs is in the elimination construct. With pairs
+there are explicit eliminators (\lstinline{fst} and
+\lstinline{snd}). These eliminators must be used to extract the
+components of the right type. For example, in order to use
+\lstinline{idInt} and \lstinline{idChar} with pairs, we would need to 
+write a program such as: 
+
+\begin{lstlisting}
+(idInt (fst xPair), idChar (snd xPair))
+\end{lstlisting}
+
+\noindent In contrast the elimination of intersection types is done
+implicitly, by following a type-directed process. For example, 
+when a value of type \lstinline{Int} is needed, but an intersection
+of type \lstinline{Int & Char} is found, then the compiler uses the
+type system to extract the corresponding value. 
+
+\subsection{Incoherence}
+The merge operator combines two terms, of type $A$ and $B$
+respectively, to form a term of type $A \inter B$. For example, $1 \mergeop
+`c'$ is of type $\tyint \inter \tychar$. In this case, no matter $1 \mergeop
+`c'$ is used as $\tyint$ or $\tychar$, the result of evaluation is always
+clear. However, with overlapping types, it is not straightforward anymore to
+see the result. For example, what should be the result of this program, which
+asks for an integer out of a merge of two integers:
+\[ \app {(\lambda (x : \tyint). x)} {(1 \mergeop 2)} \]
+Should the result be $1$ or $2$?
+
+If this situation occurs, we say that the semantics is \emph{incoherent}.
+More precisely, coherence is a property about the function that give meaning to valid programs.
+A system is coherent if any valid program has exactly one meaning.
+
+Therefore, at this point two candidates of solutions occur:
+\begin{itemize}
+    \item To forbid overlapping intersection types in a desired type
+    system;
+    \item To enforce an order of lookup. For example, the right
+    item of a merge will take precedence so that it can ``override'' the left
+    item.
+\end{itemize}
+
+With the second approach, the program above can only evaluate to $2$.
+Unfortunately, although it is more liberal than the first,
+it makes equational reasoning broken in systems with parametric polymorphism.
+
+Obviously the difficulty above is due to the fact that the type of $1 \mergeop
+2$, which is $\tyint \inter \tyint$ is an overlapping intersection.
+Generally, if both terms can be assigned some type $C$,
+both of them can be chosen as the meaning of the merge,
+which leads to multiple meaning of a term.
+
+Therefore the challenge of coherence lies in ensuring that, for any given
+types A and B, the result of $A <: B$ always leads to the same coercions.
+
+
+\bruno{
+The following shows the naive subtyping rules for intersection types:
+\begin{mathpar}
+\inferrule* [right=$\ruleLabelsubinter$]
+  {A_1 \subtype A_2 \yields {C_1} \\ A_1 \subtype A_3 \yields {C_2}}
+  {A_1 \subtype A_2 \inter A_3
+    \yields
+      {\lam x {\im {A_1}}
+        {\pair {\app {C_1} x} {\app {C_2} x}}}}
+
+\inferrule* [right=$\ruleLabelsubinterLeft$]
+  {A_1 \subtype A_3 \yields C}
+  {A_1 \inter A_2 \subtype A_3
+    \yields
+      {\lam x {\im {A_1 \inter A_2}}
+        {\app C {(\proj 1 x)}}}}
+
+\inferrule* [right=$\ruleLabelsubinterRight$]
+  {A_2 \subtype A_3 \yields C}
+  {A_1 \inter A_2 \subtype A_3
+    \yields
+      {\lam x {\im {A_1 \inter A_2}}
+        {\app C {(\proj 2 x)}}}}
+\end{mathpar}
+The crutial challenge lies in the generation of coercions that are derived by the subtyping rules.
+Since a program can typecheck via multiple derivations, and different derivation builds up multiple derivations,
+noncoherent arises.
+}
 
 \subsection{Intersection Types in Existing Languages}
 
@@ -24,8 +178,7 @@ not all intersections of types are inhabited.  For example, the
 intersection of a base type $\tyint$ and a function type
 $\tyint \to \tyint$ is not inhabited.\bruno{put this text somewhere?}
 
-Intersection types date back to as early as Coppo et
-al.~\cite{coppo1981functional}. Since then various researchers have 
+Since then various researchers have 
 studied intersection types, and some languages have adopted in one
 form or another. However, while intersection types are already used 
 in various languages, the lack of a merge operator removes
@@ -87,36 +240,7 @@ construct in Scala~\cite{oliveira2013feature,rendel14attributes}. However, this
 is clearly a hack and it would be better to provide proper language
 support for such a feature.
 
-\subsection{Intersection Types, Merge and Polymorphism in \name}
 
-To address the limitations of intersection types in languages like
-Scala, \name allows intersecting any two terms at run time using a
-\emph{merge} operator (denoted by $ \mergeop $)~\cite{dunfield2014elaborating}.  With the merge
-operator it is trivial to implement the \lstinline{merge} function in \name:
-
-\begin{lstlisting}
-let merge[A, B * A] (x : A) (y : B) : A & B = x ,, y;
-\end{lstlisting}
-
-\noindent In contrast to Scala's term-level \lstinline{with}
-construct, the operator \lstinline{,,} allows two arbitrary values \lstinline{x}
-and \lstinline{y} to be merged. The resulting type is a \emph{disjoint}
-intersection of the types of  \lstinline{x}
-and \lstinline{y} (\lstinline{A & B} in this case).
-
-\begin{comment}
-The following table
-summarizes the extent of support for intersection types in Java,
-Scala, and \name.
-
-\hspace{-13pt}\begin{tabular}{ l | c | c | c  }
-                                   & Java       & Scala      & \name      \\ \hline
-  Basic intersection types         & \checkmark & \checkmark & \checkmark \\ \hline
-  Anonymous intersection types     &            & \checkmark & \checkmark \\ \hline
-  Intersection of type parameters  &            & \checkmark & \checkmark \\ \hline
-  Term-level intersection          &            &            & \checkmark
-\end{tabular} \\
-\end{comment}
 
 \begin{comment}
 \paragraph{Intersection types for overloading.}
@@ -190,72 +314,23 @@ we do not consider this relationship. \george{Need to argue that why their
 coexistence might be a good thing.} \george{May use the merge example}
 \bruno{Some more examples in following subsections?}
 
-\subsection{Incoherence}
-The merge operator combines two terms, of type $A$ and $B$
-respectively, to form a term of type $A \inter B$. For example, $1 \mergeop
-`c'$ is of type $\tyint \inter \tychar$. In this case, no matter $1 \mergeop
-`c'$ is used as $\tyint$ or $\tychar$, the result of evaluation is always
-clear. However, with overlapping types, it is not straightforward anymore to
-see the result. For example, what should be the result of this program, which
-asks for an integer out of a merge of two integers:
-\[ \app {(\lam x \tyint x)} {1 \mergeop 2} \]
-Should the result be $1$ or $2$?
 
-If this situation occurs, we say that the semantics is \emph{incoherent}.
-More precisely, coherence is a property about the function that give meaning to valid programs.
-A system is coherent if any valid program has exactly one meaning.
+To address the limitations of intersection types in languages like
+Scala, \name allows intersecting any two terms at run time using a
+\emph{merge} operator (denoted by $ \mergeop $)~\cite{dunfield2014elaborating}.  With the merge
+operator it is trivial to implement the \lstinline{merge} function in \name:
 
-Therefore, at this point two candidates of solutions occur:
-\begin{itemize}
-    \item To forbid overlapping intersection types in a desired type
-    system;
-    \item To enforce an order of lookup. For example, the right
-    item of a merge will take precedence so that it can ``override'' the left
-    item.
-\end{itemize}
+\begin{lstlisting}
+let merge[A, B * A] (x : A) (y : B) : A & B = x ,, y;
+\end{lstlisting}
 
-With the second approach, the program above can only evaluate to $2$.
-Unfortunately, although it is more liberal than the first,
-it makes equational reasoning broken in systems with parametric polymorphism.
-
-Obviously the difficulty above is due to the fact that the type of $1 \mergeop
-2$, which is $\tyint \inter \tyint$ is an overlapping intersection.
-Generally, if both terms can be assigned some type $C$,
-both of them can be chosen as the meaning of the merge,
-which leads to multiple meaning of a term.
-
-Therefore the challenge of coherence lies in ensuring that, for any given
-types A and B, the result of $A <: B$ always leads to the same coercions.
+\noindent In contrast to Scala's term-level \lstinline{with}
+construct, the operator \lstinline{,,} allows two arbitrary values \lstinline{x}
+and \lstinline{y} to be merged. The resulting type is a \emph{disjoint}
+intersection of the types of  \lstinline{x}
+and \lstinline{y} (\lstinline{A & B} in this case).
 
 
-\bruno{
-The following shows the naive subtyping rules for intersection types:
-\begin{mathpar}
-\inferrule* [right=$\ruleLabelsubinter$]
-  {A_1 \subtype A_2 \yields {C_1} \\ A_1 \subtype A_3 \yields {C_2}}
-  {A_1 \subtype A_2 \inter A_3
-    \yields
-      {\lam x {\im {A_1}}
-        {\pair {\app {C_1} x} {\app {C_2} x}}}}
-
-\inferrule* [right=$\ruleLabelsubinterLeft$]
-  {A_1 \subtype A_3 \yields C}
-  {A_1 \inter A_2 \subtype A_3
-    \yields
-      {\lam x {\im {A_1 \inter A_2}}
-        {\app C {(\proj 1 x)}}}}
-
-\inferrule* [right=$\ruleLabelsubinterRight$]
-  {A_2 \subtype A_3 \yields C}
-  {A_1 \inter A_2 \subtype A_3
-    \yields
-      {\lam x {\im {A_1 \inter A_2}}
-        {\app C {(\proj 2 x)}}}}
-\end{mathpar}
-The crutial challenge lies in the generation of coercions that are derived by the subtyping rules.
-Since a program can typecheck via multiple derivations, and different derivation builds up multiple derivations,
-noncoherent arises.
-}
 
 \paragraph{Incoherence and Parametric Polymorphism}
 We can define a \code{fst} function that extracts the first item of a merged value:
