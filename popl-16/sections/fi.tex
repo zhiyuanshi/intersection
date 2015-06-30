@@ -1,14 +1,13 @@
-\section{The \name calculus} \label{sec:fi}
+\section{The \namenaive Calculus} \label{sec:finaive}
 
-This section presents the syntax, subtyping, and typing of \name, as well as the
-additional judgements that are special in \name. The semantics of \name will be
-defined by a type-directed translation to a simple variant of System $F$ in the
-next section.
+This section presents the syntax, subtyping, and typing of \namenaive. The
+semantics of \namenaive is defined by a type-directed translation to a simple
+extension of System $F$.
 
 \subsection{Syntax}
 
-Figure~\ref{fig:fi-syntax-old} shows the syntax of \name (with the addition to
-System $F$ highlighted).
+Figure~\ref{fig:finaive-syntax} shows the syntax of \namenaive (with the
+addition to System $F$ highlighted).
 % As a convention in this paper, we will be using
 % lowercase letters as meta-variables for sorts in \name, and uppercase letters
 % for those in the target language.
@@ -19,24 +18,24 @@ System $F$ highlighted).
 % We include only single records because single record types as the multi-records
 % can be desugared into the merge of multiple single records.
 
-\begin{figure}
+\begin{figure}[h]
   \[
     \begin{array}{l}
       \begin{array}{llrll}
         \text{Types}
-        & A, B & \Coloneqq & \alpha                  & \\
-        &      & \mid & A \to B                      & \\
+        & A, B & \Coloneqq & \alpha      & \\
+        &      & \mid & A \to B          & \\
         &      & \mid & \for {\alpha} A  & \\
-        &      & \mid & A \inter B               & \\
+        &      & \mid & \highlight{$ A \inter B $}  & \\
 
         \\
         \text{Terms}
-        & e & \Coloneqq & x                        & \\
-        &   & \mid & \lam x A e                    & \\
-        &   & \mid & \app {e_1} {e_2}              & \\
+        & e & \Coloneqq & x            & \\
+        &   & \mid & \lamty x A e      & \\
+        &   & \mid & \app {e_1} {e_2}  & \\
         &   & \mid & \blam {\alpha} e  & \\
-        &   & \mid & \tapp e A                     & \\
-        &   & \mid & e_1 \mergeop e_2              & \\
+        &   & \mid & \tapp e A         & \\
+        &   & \mid & \highlight{$ e_1 \mergeop e_2 $}  & \\
 
         \\
         \text{Contexts}
@@ -47,7 +46,7 @@ System $F$ highlighted).
     \end{array}
   \]
 
-  \label{fig:fi-syntax-old}
+  \label{fig:finaive-syntax}
   \caption{Syntax.}
 \end{figure}
 
@@ -55,22 +54,21 @@ System $F$ highlighted).
 %   visible. Use gray?}\bruno{there is no \lstinline{with} anymore.
 % Make sure the syntax is consistent with what is presented in the type rules!}
 
-Meta-variables $A$, $B$ range over types. Types include System $F$ constructs:
-type variables $\alpha$; function types $A \to B$; and type
-abstraction $\for \alpha A$. The bottom type $\bot$ is not inhabited by any
-term. $A \inter B$ denotes the intersection of types $A$ and
-$B$. We omit type constants such as $\tyint$ and $\tystring$.
+\paragraph{Types} Meta-variables $A$, $B$ range over types. Types include
+standard constructs in System $F$: type variables $\alpha$; function types $A
+\to B$; and type abstraction $\for \alpha A$. $A \inter B$ denotes the
+intersection of types $A$ and $B$. We omit type constants such as $\tyint$ and
+$\tystring$.
 
-Terms include standard constructs in System $F$: variables $x$; abstraction of
-terms over variables of a given type $\lam x A e$; application of terms to
-terms $\app {e_1} {e_2}$; and application of terms to types $\tapp e A$.
-``Big lambdas'' $\blam {\alpha \disjoint A} e$ abstracts a type variable
-$\alpha$ over a term $e$ and constraints the instantiation of $\alpha$ to be
-disjoint with a given type $A$. $e_1 \mergeop e_2$ is the \emph{merge} of two
-terms $e_1$ and $e_2$. It can be used as either $ e_1 $ or $ e_2 $. In
-particular, if one regards $e_1$ and $e_2$ as objects, their merge will respond
-to every method that one or both of them have. Merge of terms correspond to
-intersection types $A \inter B$.
+\paragraph{Terms} Meta-variables $e$ range over terms.  Terms include standard
+constructs in System $F$: variables $x$; abstraction of terms over variables of
+a given type $\lamty x A e$; application of terms to terms $\app {e_1} {e_2}$;
+abstraction of type variables over terms $\blam {\alpha \disjoint A} e$;  and
+application of terms to types $\tapp e A$.  $e_1 \mergeop e_2$ is the
+\emph{merge} of two terms $e_1$ and $e_2$. It can be used as either $ e_1 $ or $
+e_2 $. In particular, if one regards $e_1$ and $e_2$ as objects, their merge
+will respond to every method that one or both of them have. Merge of terms
+correspond to intersection types $A \inter B$.
 
 % Note that $ e $ does not
 % need to be a record type in this case. For example, although the merge of two
