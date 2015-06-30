@@ -8,12 +8,12 @@ disjointness is proved to be sound and complete with respect to the definition.
 \subsection{Derivation}
 
 In this subsection, we illustrate how to derive the algorithmic disjointness
-rules by showing a detailed example for functions. First we introduce some
-notations for the ease of discussion.
+rules by showing a detailed example for functions. For the ease of discussion,
+first we introduce some notations.
 
 \begin{definition}[Set of common supertypes]
   For any two types $A$ and $B$, we can denote the \emph{set of their common
-  supertypes} by $\commonsuper(A,B)$. In other words, a type $C \in
+  supertypes} by \[ \commonsuper(A,B) \] In other words, a type $C \in \;
   \commonsuper(A,B)$ if and only  if $A \subtype C$ and $B \subtype C$.
 \end{definition}
 
@@ -22,30 +22,28 @@ notations for the ease of discussion.
   share no common supertype.
 \end{example}
 
-Parellel to the set of common supertypes is the set of common subtypes.
+Parellel to the notion of the set of common supertypes is the notion of the set
+of common subtypes.
 
 \begin{definition}[Set of common subtypes]
   For any two types $A$ and $B$, we can denote the \emph{set of their common
-  subtypes} by $\commonsub(A,B)$. In other words, a type $C \in \commonsub(A,B)$
+  subtypes} by \[ \commonsub(A,B) \] In other words, a type $C \in \; \commonsub(A,B)$
   if and only  if $C \subtype A$ and $C \subtype B$.
 \end{definition}
 
 \begin{example}
   $\commonsub(\tyint,\tychar)$ is an infinite set which contains $\tyint \inter
   \tychar$, $\tychar \inter \tyint$, $(\tyint \inter \tybool) \inter \tychar$
-  and so on. But the type $\tybool$ is not inside as it is not a subtype of
+  and so on. But the type $\tybool$ is not inside, since it is not a subtype of
   $\tyint$.
 \end{example}
 
 \paragraph{Shorthand notation} For brevity, we will use \[ \mathcal{A} \to
 \mathcal{B} \] as a shorthand for the \emph{set} of types of the form $A \to B$,
 where $A \in \mathcal{A}$ and $B \in \mathcal{B}$. The same shorthand applies to
-all other constructors of types, in addition to functions, as well.
-
-\begin{example}
-  $\{ \tyint, \tystring \} \to \{ \tyint \}$ is a shorthand for $\{ \tyint \to
-  \tyint, \tystring \to \tyint \}$.
-\end{example}
+all other constructors of types, in addition to functions, as well. As a simple
+example,  \[ \{ \tyint, \tystring \} \to \{ \tyint, \tychar \} \] is a shorthand for \[ \{
+\tyint \to \tyint, \tyint \to \tychar, \tystring \to \tyint, \tystring \to \tychar \} \]
 
 Recall that we say two types $A$ and $B$ are disjoint if they do not share a
 common supertype. Therefore, determining if two types $A$ and $B$ are disjoint
@@ -54,7 +52,8 @@ is the same as determining if $\commonsuper(A,B)$ is empty.
 \paragraph{Determining disjointness of functions} Now let's dive into the case
 where both $A$ and $B$ are functions and consider how to compute
 $\commonsuper(A_1 \to A_2, B_1 \to B_2)$. By the subtyping rules, the supertype
-of a function must also be a function. Let $C_1 \to C_2$ be a common supertype
+of a function must also be a function.\george{Nah... only after normalizatoin.
+If not, it can also be $\inter$} Let $C_1 \to C_2$ be a common supertype
 of $A_1 \to A_2$ and $B_1 \to B_2$. Then it must satisfy the following:
 \begin{mathpar}
   \inferrule* [right=SubFun]
@@ -68,7 +67,7 @@ of $A_1 \to A_2$ and $B_1 \to B_2$. Then it must satisfy the following:
 From which we see that $C_1$ is a common subtype of $A_1$ and $B_1$ and that
 $C_2$ is a common supertype of $A_2$ and $B_2$. Therefore, we can wrtie:
 \[ \commonsuper(A_1 \to A_2, B_1 \to B_2) \ = \ \commonsub(A_1,B_1) \to \commonsuper(A_2,B_2) \]
-$\commonsub(A_1,B_1) \to \commonsuper(A_2,B_2)$ is not empty if an only if both
+By definition, $\commonsub(A_1,B_1) \to \commonsuper(A_2,B_2)$ is not empty if and only if both
 $\commonsub(A_1,B_1)$ and $\commonsuper(A_2,B_2)$ is nonempty. However, note
 that with intersection types, $\commonsub(A_1,B_1)$ is always nonempty because
 $A_1 \inter B_1$ belongs to $\commonsub(A_1,B_1)$. Therefore, the problem of
@@ -94,18 +93,26 @@ $\commonsuper$:
 \subsection{Rules}
 
 The rules for the disjointness judgement are shown in
-Figure~\ref{fig:disjointness}. The judgement says two types $A$ and $B$ are
-disjoint in a context $\Gamma$. Two atomic types with different shapes (except
-for the variable) are considered disjoint, which is factored out to the atomic
-disjointness rules. The \rulelabel{DisjointInter1} and
-\rulelabel{DisjointInter2} inductively distribute the relation itself over the
-intersection constructor ($\inter$). \rulelabel{DisjointFun} is quite
-interesting, because it says two function types are disjoint as long as their
-return types are disjoint (regardless of their parameter types).
+Figure~\ref{fig:disjointness}, which consists of two judgements.
+
+\paragraph{Main judgement} The judgement $\isdisjoint \Gamma A B$ says two types
+$A$ and $B$ are disjoint in a context $\Gamma$. The \rulelabel{DisjointInter1}
+and \rulelabel{DisjointInter2} inductively distribute the relation itself over
+the intersection constructor ($\inter$). We have derived \rulelabel{DisjointFun}
+in the previous subsection, which says two function types are disjoint as long as
+their return types are disjoint (regardless of their parameter types).
+\rulelabel{DisjointAtomic} says two types are considered disjoint if they are
+judged to be disjoint by the $A \not \sim B$ rules, which is going to be
+explained below.
+
+\paragraph{Axioms} The judgement $A \not \sim B$ says two atomic types $A$ and
+$B$ are of different constructors. Note that intersection types are excluded
+here, since for example, $\tyint \inter (\tychar \to \tychar)$ and $\tychar \to
+\tychar$ have different constructors and yet are not disjoint.
 
 \begin{figure}
   \begin{mathpar}
-    \framebox{$ \isdisjoint \Gamma A B$} \\
+    \framebox{$ \isdisjointi \Gamma A B$} \\
 
     \disjointvar
 

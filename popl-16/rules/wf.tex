@@ -22,8 +22,16 @@
     {\istype \Gamma {\for {(\alpha \disjoint A)} B}}
 }
 
-\newcommand{\wfinter}{
+\newcommand{\wfinterprim}{
   \inferrule* [right=WF\_Inter]
     {\istype \Gamma A \\ \istype \Gamma B}
+    {\istype \Gamma {A \inter B}}
+}
+
+\newcommand{\wfinter}{
+  \inferrule* [right=WF\_Inter]
+    {\istype \Gamma A \\
+     \istype \Gamma B \\
+     \highlight{$\isdisjoint \Gamma A B$}}
     {\istype \Gamma {A \inter B}}
 }

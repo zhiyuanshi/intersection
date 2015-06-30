@@ -248,11 +248,8 @@ are always fresh.
 
 \subsection{Informal Discussion}
 
-This subsection presents the translation informally by explaining the major
-ideas.
-
-\paragraph{Turning merges into pairs.}
-The first idea is turning merges into pairs. For example,
+This subsection presents the translation informally. The idea is turning merges
+into pairs. For example,
 \[
 1 \mergeop \code{"one"}
 \]
@@ -270,35 +267,6 @@ The coercion in this case is $(\lam x {\pair \tyint \tystring} {\proj 2 x})$.
 
 \noindent It extracts the second item from the pair since the function expects a $\tystring$
 but the translated argument is of type $\pair \tyint \tystring$.
-
-\paragraph{Erasing labels.}
-The second idea is erasing record labels. For example,
-\begin{lstlisting}
-{name = "Barbara"}
-\end{lstlisting}
-becomes just \lstinline{"Barbara"}.
-To see how the this and the previous idea are used together, consider the following program:
-\begin{lstlisting}
-{distance = {inKilometers = 8, inMiles = 5}}
-\end{lstlisting}
-Since multi-field records are just merges, the record is desugared as
-\begin{lstlisting}
-{distance = {inKilometers = 8} ,, {inMiles = 5}}
-\end{lstlisting}
-and then translated to \lstinline{(8,5)}.
-
-\paragraph{Record operations as functions.}
-The third idea is translating record operations into normal functions. For
-example, the source program
-\begin{lstlisting}
-{distance = {inKilometers = 8, inMiles = 5}}.distance.inMiles
-\end{lstlisting}
-becomes an \name term
-\[
-\app {(\lam x {\pair \tyint \tyint} {\proj 2 x})} {\pair 8 5}
-\]
-where $\lam x {\pair \tyint \tyint} {\proj 2 x}$
-extracts the desired item $5$.
 
 \subsection{Target Language}
 

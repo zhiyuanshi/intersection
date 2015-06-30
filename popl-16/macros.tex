@@ -27,7 +27,8 @@
 }
 
 \newcommand{\code}[1]{\textsf{#1}}
-\newcommand{\highlight}[1]{\colorbox{SpringGreen}{#1}}
+\definecolor{light-gray}{gray}{0.95}
+\newcommand{\highlight}[1]{\colorbox{light-gray}{#1}}
 
 \newcommand{\im}[1]{\lvert #1 \rvert}
 \newcommand{\powerset}[1]{\mathcal{P}(#1)}
@@ -41,7 +42,7 @@
 \newcommand{\disjoint}{*}
 \newcommand{\subst}[2]{\lbrack #1 / #2 \rbrack~}
 
-\newcommand{\yields}[1]{\textcolor{MidnightBlue}{\; \hookrightarrow #1}}
+\newcommand{\yields}[1]{\highlight{$\; \hookrightarrow #1$}}
 
 \newcommand{\ftv}[1]{\textsf{ftv}(#1)}
 

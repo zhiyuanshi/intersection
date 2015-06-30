@@ -115,15 +115,15 @@ bounded polymorphism.}
 
 \subsection{Typing}
 
-\paragraph{Disjointness judgement} The disjointness judgement appears in the
-well-formedness rule for intersection types and the typing rule for merges:
-\begin{mathpar}
-  \inferrule* [right=WF\_Inter]
-    {\istype \Gamma A \\
-     \istype \Gamma B \\
-     \highlight{$\isdisjoint \Gamma A B$}}
-    {\istype \Gamma {A \inter B}}
+The disjointness judgement appears in the well-formedness rule for intersection
+types and the typing rule for merges.
 
+\paragraph{Formation of disjoint intersection types}
+
+\[ \wfinter \]
+
+\paragraph{Disjointness judgement}
+\begin{mathpar}
   \inferrule* [right=T\_Merge]
     {\hastype \Gamma {e_1} A \yields {E_1} \\
      \hastype \Gamma {e_2} B \yields {E_2} \\
