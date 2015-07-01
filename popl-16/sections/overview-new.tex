@@ -198,19 +198,38 @@ subtypes of $C$:
 
 \noindent This definition of disjointness can prevent the problematic
 merge. Since $Int$ is a common supertype of both $Int \& Char$ and 
-$Int \& Bool$, those two types are not disjoint, and \name would
-reject program using that merge. 
+$Int \& Bool$, those two types are not disjoint. 
 
-\subsection{Parametric Polymorphism and Intersection Types}
-Both universal quantification and intersection types provide a kind of
-polymorphism. While the former provides parametric polymorphism, the latter
-provides ad-hoc polymorphism. In some systems, parametric polymorphism is
-considered the infinite analog of intersection polymorphism. But in our system
-we do not consider this relationship. \george{Need to argue that why their
-coexistence might be a good thing.} \george{May use the merge example}
-\bruno{Some more examples in following subsections?}
+\name's type system only accepts programs that use disjoint
+intersection types. As shown in Section~\ref{} this is sufficient to 
+ensure that the semantics is coherent.  
 
+\subsection{Parametric Polymorphism and Disjointness}
+The interaction between parametric polymorphism and disjoint
+intersection types is non-trivial. The key challange is to have a type
+system that still ensures coherence, but at the same time is not too
+restrictive in the programs that can be accepted. Dunfield~\cite{} provides a 
+good illustrative example of the issues that arize when combining 
+disjoint intersection types and parametric polymorphism:
+\[\lambda x. {\bf let}~y = 0 \mergeop x~{\bf in}~x\]
+This lambda term, in not a valid \name program, since variables are 
+not annotated with types. The question is whether we can find 
+a valid \name program, with type lambdas and type annotations that can 
+be used to accept the program, or otherwise reject it on the grounds 
+that disjointness is violated. A first attempt would be:
+\[\Lambda A.\lambda (x:A). {\bf let}~y : Int \& A = 0 \mergeop x~{\bf in}~x\]
+If $A$ is instantiated to $Bool$ or $Char$, for example, then clearly
+the merge used in the program ($0 \mergeop x$) respects disjointness. However, if $A$
+is instantiated with $Int$ then the merge is problematic as it is not
+disjoint. 
 
+One option would be to reject the program on the grounds
+that $A$ could be instantiated with a type that would allow the
+creation of an intersection type which is not disjoint. However this
+option would be too conservative and it would prevent many useful
+programs using parametric polymorphism and intersection types.
+
+\begin{comment}
 To address the limitations of intersection types in languages like
 Scala, \name allows intersecting any two terms at run time using a
 \emph{merge} operator (denoted by $ \mergeop $)~\cite{dunfield2014elaborating}.  With the merge
@@ -263,7 +282,7 @@ Consider this program:
 $x$ in the body is of type $\alpha \inter \tyint$ and if $\alpha$ and $\tyint$ are
 disjoint depends on the instantiation of $\alpha$.
 
-\begin{comment}
+
 \subsection{Intersection Types in Existing Languages}
 
 What is an intersection type? The intersection of types $A$ and $B$
@@ -363,8 +382,6 @@ and \lstinline{y} to be merged. The resulting type is a \emph{disjoint}
 intersection of the types of  \lstinline{x}
 and \lstinline{y} (\lstinline{A & B} in this case).
 
-
-
 \paragraph{Incoherence and Parametric Polymorphism}
 We can define a \code{fst} function that extracts the first item of a merged value:
 \[
@@ -402,12 +419,19 @@ disjoint depends on the instantiation of $\alpha$.
 \end{comment}
 
 \subsection{Disjoint Quantification}
+To allow for more flexibility \name uses an extension to universal
+quantification called \emph{disjoint quantification}.  Inspired by
+bounded quantification~\cite{}, where a type variable is constrained by a type
+bound, disjoint quantification allows a type variable to be
+constrained so that it is disjoint with a
+given type. With disjoint quantification the previous program, which
+is accepted by \name, can be written as:
+\[\Lambda A * Int.\lambda (x:A). {\bf let}~y : Int \& A = 0 \mergeop x~{\bf in}~x\]
+In this program the type variable $A$ is constrained so that it can be
+instantiated with any type disjoint to $Int$. This ensures that the
+merge used in the program is disjoint for all valid instantiations of $A$.
 
-Inspired by bounded quantification where a type variable is constrained by a type bound,
-we introduce the idea of disjoint quantification where a type variable is constrained
-to be disjoint with a given type.
-
-There is a nice symmetry between bounded quantification and disjoint quantification.
+Note that there is a nice symmetry between bounded quantification and disjoint quantification.
 In systems with bounded quantification,
 the usual unconstrained quantifier $\for {\alpha} \ldots$
 is a syntactic sugar for $\for {\alpha \subtype \top} \ldots$, and
@@ -419,6 +443,7 @@ $\blam \alpha \ldots$ for $\blam {\alpha \disjoint \top} \ldots$.
 The intuition is that since the bottom type is akin to the empty set,
 no other type overlaps with it.
 
+\begin{comment}
 With this tool in hand, we can rewrite the program above to:
 \[
 \blam {\alpha \disjoint \tyint} {\lam x {\alpha \inter \tyint} x}
@@ -427,6 +452,7 @@ With this tool in hand, we can rewrite the program above to:
 This program typechecks because while $x$ is of type $\alpha \inter \tyint$,
 and $\alpha$ is disjoint with $\tyint$. Similarly, in the new system,
 the original program no longer typechecks, thus preventing overlapping types.
+\end{comment}
 
 \subsection{Application: Extensible Encodings of Datatypes}
 \label{subsec:OAs}
