@@ -43,7 +43,7 @@ which can be used as either of type $A$ or of type $B$. For instance,
 consider the following program in \name:
 
 \begin{lstlisting}
-let x : Int & Char = ...;
+let x : Int & Char = ...;  -- definition ommitted
 let idInt (y : Int) : Int = y;
 let idChar (y : Char) : Char = y;
 (idInt x, idChar x)
@@ -70,7 +70,7 @@ two values to be merged in a single intersection type. For example, an
 implementation of \lstinline{x} is constructed as follows:
 
 \begin{lstlisting}
-let x : Int & Char = 3 ,, 'a';
+let x : Int & Char = 1 ,, 'c';
 \end{lstlisting}
 
 \noindent In \name (following the notation of Dunfield~\cite{}), the
@@ -81,7 +81,7 @@ The merge operator is similar to the introduction construct on pairs.
 An analogous implementation of \lstinline{x} with pairs would be:
 
 \begin{lstlisting}
-let xPair : (Int, Char) = (3, 'a');
+let xPair : (Int, Char) = (1, 'c');
 \end{lstlisting} 
 
 \noindent The significant difference between intersection types with a
@@ -146,26 +146,60 @@ merge. Generally, if both terms can be assigned some type $C$,
 both of them can be chosen as the meaning of the merge,
 which leads to multiple meaning of a term.
 Thus a natural option is to try to forbid such overlapping 
-values of the same type in a merge. \bruno{this is conservative, but 
-not too much!}
+values of the same type in a merge. 
 
-\paragraph{Disjoint Intersection Types}
-Therefore, we require that the two types of an intersection must be not
-overlapping, or \emph{disjoint}, and add this requirement to the well-formedness of types.
+This is precisely the approach taken in \name. \name requires that the
+two types of in intersection must be \emph{disjoint}.  However,
+although disjointness seems a natural restriction to impose on
+intersection types, it is not obvious to formalize it. Indeed Dunfield
+has mentioned disjointness as an option to restore coherence, but he
+left it for future work due to the non-triviality of the approach.
 
-A well-formed type is such that given any query type,
-it is always clear which subpart the query is referring to.
-In terms of rules, this notion of well-formedness is almost the same as the one in System $F$
-except for intersection types we require the two components to be disjoint.
+\paragraph{Searching for a Definition of Disjointness}
+The first step towards disjoint intersection types is to come up
+with a definition of disjointness. A first attempt at such definition would
+be to require that, given two types $A$ and $B$, both types are not
+subtypes of each other: 
+\[A * B \equiv A \not<: B \wedge B \not<: A\]
+At first sight this seems a reasonable definition and it does prevent 
+merges such as \lstinline{1 ,, 2}. However some moments of though are enough to realize that 
+such definition does not ensure disjointness. For example, consider
+the following merge:
 
-\paragraph{What does it mean for two types to be disjoint?}
+\begin{lstlisting}
+((1 ,, 'c') ,, (2 ,, True))
+\end{lstlisting}
 
- Given two types $A$ and $B$, two types are disjoint
+\noindent This merge has two components which are also intersection
+types. The first component (\lstinline{(1,,'c')}) has type $Int \&
+Char$, whereas the second component (\lstinline{(2 ,, True)}) has type 
+$Int \& Bool$. Clearly,
+\[Int \& Char \not<: Int \& Bool \wedge Int \& Bool \not<: Int \& Char\]
+Nevertheless the following program still leads to
+incoherence:
+\[ \app {(\lambda (x : \tyint). x)} {((1 \mergeop 'c') \mergeop (2 \mergeop True))} \]
+as both \lstinline{1} or \lstinline{2} are possible outcomes
+of the program. Although this attempt to define disjointness failed, 
+it did bring us some additional insight: although the types of the two 
+components of the merge are not subtypes of each other, they share 
+some types in common. 
+
+\paragraph{A Proper Definition of Disjointness} In order for two types
+to be trully disjoint, they must not have any subcomponents sharing
+the same type. In a system with intersection types this can be ensured 
+by requiring the two types do not share a common supertype. More 
+formally:
+
+\bruno{make this a definition!}
+Given two types $A$ and $B$, two types are disjoint
 ($A * B$) if there is no type $C$ such that both $A$ and $B$ are
-subtypes of $C$. Formally this definition is captured as follows:
+subtypes of $C$:
 \[A * B \equiv \not\exists C.~A <: C \wedge B <: C\]
 
-\paragraph{How to compute disjointness!}
+\noindent This definition of disjointness can prevent the problematic
+merge. Since $Int$ is a common supertype of both $Int \& Char$ and 
+$Int \& Bool$, those two types are not disjoint, and \name would
+reject program using that merge. 
 
 \subsection{Parametric Polymorphism and Intersection Types}
 Both universal quantification and intersection types provide a kind of
@@ -367,7 +401,7 @@ $x$ in the body is of type $\alpha \inter \tyint$ and if $\alpha$ and $\tyint$ a
 disjoint depends on the instantiation of $\alpha$.
 \end{comment}
 
-\subsection{Disjoint Intersection Types and Disjoint Quantification}
+\subsection{Disjoint Quantification}
 
 Inspired by bounded quantification where a type variable is constrained by a type bound,
 we introduce the idea of disjoint quantification where a type variable is constrained
