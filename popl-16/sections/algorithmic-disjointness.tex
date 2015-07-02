@@ -96,14 +96,15 @@ The rules for the disjointness judgement are shown in
 Figure~\ref{fig:disjointness}, which consists of two judgements.
 
 \paragraph{Main judgement} The judgement $\isdisjoint \Gamma A B$ says two types
-$A$ and $B$ are disjoint in a context $\Gamma$. The \rulelabel{DisjointInter1}
-and \rulelabel{DisjointInter2} inductively distribute the relation itself over
-the intersection constructor ($\inter$). We have derived \rulelabel{DisjointFun}
-in the previous subsection, which says two function types are disjoint as long as
-their return types are disjoint (regardless of their parameter types).
-\rulelabel{DisjointAtomic} says two types are considered disjoint if they are
-judged to be disjoint by the $A \not \sim B$ rules, which is going to be
-explained below.
+$A$ and $B$ are disjoint in a context $\Gamma$. \rulelabel{DisjointVar} is the
+base rule and \rulelabel{DisjointVar} is its twin rule.
+\rulelabel{DisjointInter1} and \rulelabel{DisjointInter2} inductively distribute
+the relation itself over the intersection constructor ($\inter$). We have
+derived \rulelabel{DisjointFun} in the previous subsection, which says two
+function types are disjoint as long as their return types are disjoint
+(regardless of their parameter types). \rulelabel{DisjointAtomic} says two types
+are considered disjoint if they are judged to be disjoint by the $A \not \sim B$
+rules, which is going to be explained below.
 
 \paragraph{Axioms} The judgement $A \not \sim B$ says two atomic types $A$ and
 $B$ are of different constructors. Note that intersection types are excluded

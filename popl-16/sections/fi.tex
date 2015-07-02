@@ -1,8 +1,7 @@
 \section{The \namenaive Calculus} \label{sec:finaive}
 
 This section presents the syntax, subtyping, and typing of \namenaive. The
-semantics of \namenaive is defined by a type-directed translation to a simple
-extension of System $F$.
+semantics of \namenaive is defined by a type-directed translation to System $F$ extended with pairs and pair types.
 
 \subsection{Syntax}
 
@@ -63,7 +62,7 @@ $\tystring$.
 \paragraph{Terms} Meta-variables $e$ range over terms.  Terms include standard
 constructs in System $F$: variables $x$; abstraction of terms over variables of
 a given type $\lamty x A e$; application of terms to terms $\app {e_1} {e_2}$;
-abstraction of type variables over terms $\blam {\alpha \disjoint A} e$;  and
+abstraction of type variables over terms $\blam {(\alpha \disjoint A)} e$;  and
 application of terms to types $\tapp e A$.  $e_1 \mergeop e_2$ is the
 \emph{merge} of two terms $e_1$ and $e_2$. It can be used as either $ e_1 $ or $
 e_2 $. In particular, if one regards $e_1$ and $e_2$ as objects, their merge
@@ -132,15 +131,15 @@ $\ftv \cdot$ for sets of free variables.
 The subtyping rules of \name, shown in Figure~\ref{fig:fi-subtyping}, are
 syntax-directed (different from the approach by Davies and
 Pfenning~\cite{davies2000intersection}, and Frisch et.
-al~\cite{frisch2008semantic}). The rule \rulelabel{subfun} says that a function
-is contravariant in its parameter type and covariant in its return type. A
-universal quantifier ($\forall$) is covariant in its body. The three rules
-dealing with intersection types are just what one would expect when interpreting
-types as sets. Under this interpretation, for example, the rule
-\rulelabel{subinter} says that if $A_1$ is both the subset of $A_2$ and the
-subset of $A_3$, then $A_1$ is also the subset of the intersection of
-$A_2$ and $A_3$. In order to achieve coherence, \rulelabel{subinter1} and
-\rulelabel{subinter2} additionally require the type on the right-hand side is
+al~\cite{frisch2008semantic}). The rule \rulelabel{Sub\_Fun} says that a
+function is contravariant in its parameter type and covariant in its return
+type. A universal quantifier ($\forall$) is covariant in its body. The three
+rules dealing with intersection types are just what one would expect when
+interpreting types as sets. Under this interpretation, for example, the rule
+\rulelabel{Sub\_Inter} says that if $A_1$ is both the subset of $A_2$ and the
+subset of $A_3$, then $A_1$ is also the subset of the intersection of $A_2$ and
+$A_3$. In order to achieve coherence, \rulelabel{Sub\_Inter1} and
+\rulelabel{Sub\_Inter2} additionally require the type on the right-hand side is
 atomic.
 
 % Intersection types introduce natural subtyping relations among types. For
@@ -205,8 +204,8 @@ Figure~\ref{fig:fi-typing}. They consist of one main typing judgment and two
 auxiliary judgments. The main typing judgment is of the form: $ \hastype \Gamma
 e A $. It reads: ``in the typing context $\Gamma$, the term $e$ is of type
 $A$''. The rules that are the same as in System $F$ are rules for variables
-(\rulelabel{Var}), lambda abstractions (\rulelabel{Lam}), and type applications
-(\rulelabel{TApp}). For the ease of discussion, in \rulelabel{BLam}, we require
+\rulelabel{Var}, lambda abstractions \rulelabel{Lam}, and type applications
+\rulelabel{TApp}. For the ease of discussion, in \rulelabel{BLam}, we require
 the type variable introduced by the quantifier is fresh. For programs with type
 variable shadowing, this requirement can be met straighforwardly by variable
 renaming. The rule \rulelabel{App} needs special attention as we add a subtyping

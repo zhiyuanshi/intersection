@@ -10,13 +10,13 @@
 \newcommand{\subvar}{
 \inferrule* [right=$\ruleLabelsubvar$]
   { }
-  {\alpha \subtype \alpha \yields {\lam x {\im \alpha} x}}
+  {\alpha \subtype \alpha \yields {\lamty x {\im \alpha} x}}
 }
 
 \newcommand{\subTop}{
 \inferrule* [right=$\ruleLabelSubTop$]
   { }
-  {A \subtype \top \yields {\lam x {\im A} {()}}}
+  {A \subtype \top \yields {\lamty x {\im A} {()}}}
 }
 
 \newcommand{\subfun}{
@@ -24,17 +24,17 @@
   {A_3 \subtype A_1 \yields {C_1} \\ A_2 \subtype A_4 \yields {C_2}}
   {A_1 \to A_2 \subtype A_3 \to A_4
   \yields
-      {\lam f {\im {A_1 \to A_2}}
-      {\lam x {\im {A_3}}
+      {\lamty f {\im {A_1 \to A_2}}
+      {\lamty x {\im {A_3}}
           {\app {C_2} {(\app f {(\app {C_1} x)})}}}}}
 }
 
 \newcommand{\subforall}{
 \inferrule* [right=$\ruleLabelsubforall$]
   {A_1 \subtype \subst {\alpha_1} {\alpha_2} A_2 \yields C}
-  {\for {\alpha_1 * A_3} A_1 \subtype \for {\alpha_2 * A_3} A_2
+  {\for {\alpha_1 * A_3} A_1 \subtype \for {(\alpha_2 * A_3)} A_2
     \yields
-      {\lam f {\im {\for {\alpha_1 * A_3} A_1}}
+      {\lamty f {\im {\for {(\alpha_1 * A_3)} A_1}}
         {\blam \alpha {\app C {(\app f \alpha)}}}}}
 }
 
@@ -43,7 +43,7 @@
   {A_1 \subtype A_2 \yields {C_1} \\ A_1 \subtype A_3 \yields {C_2}}
   {A_1 \subtype A_2 \inter A_3
     \yields
-      {\lam x {\im {A_1}}
+      {\lamty x {\im {A_1}}
         {\pair {\app {C_1} x} {\app {C_2} x}}}}
 }
 
@@ -52,7 +52,7 @@
   {A_1 \subtype A_3 \yields C}
   {A_1 \inter A_2 \subtype A_3
     \yields
-      {\lam x {\im {A_1 \inter A_2}}
+      {\lamty x {\im {A_1 \inter A_2}}
         {\app C {(\proj 1 x)}}}}
 }
 
@@ -61,14 +61,6 @@
   {A_2 \subtype A_3 \yields C}
   {A_1 \inter A_2 \subtype A_3
     \yields
-      {\lam x {\im {A_1 \inter A_2}}
+      {\lamty x {\im {A_1 \inter A_2}}
         {\app C {(\proj 2 x)}}}}
-}
-
-\newcommand{\subRec}{
-\inferrule* [right=$\ruleLabelSubRec$]
-  {A_1 \subtype A_2 \yields C}
-  {\recordType l {A_1} \subtype \recordType l {A_2}
-    \yields
-      {\lam x {\im {\recordType l {A_1}}} {\app C x}}}
 }

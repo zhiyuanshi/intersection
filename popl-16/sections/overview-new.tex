@@ -1,17 +1,17 @@
 \section{Overview}
 
 This section introduces \name and its support for intersection types,
-parametric polymorphism and the merge operator. It then discusses 
+parametric polymorphism and the merge operator. It then discusses
 the issue of coherence and shows how the notion of disjoint
 intersection types and disjoint quantification is achieves coherence.
 Finally we show that \name is powerful enough to express
 extensible type-theoretic encodings of datatypes.
 
-Note that this section uses some syntactic sugar, as well as standard 
+Note that this section uses some syntactic sugar, as well as standard
 programming language features, to illustrate the various concepts in
 \name. Although the minimal core language that we formalize in
-Section~\ref{} does not present all such features, our implementation 
-supports them. 
+Section~\ref{} does not present all such features, our implementation
+supports them.
 
 \bruno{Need to type-check the programs!}
 
@@ -24,13 +24,13 @@ disjoint intersection types and extending universal quatification to
 disjoint quantification, which is enough to ensure coherence.
 \end{comment}
 
-\subsection{Intersection types and the Merge Operator}
+\subsection{Intersection Types and the Merge Operator}
 %%\subsection{Intersection Types, Merge and Polymorphism in \name}
 
 Intersection types date back as early as Coppo et
 al.'s work~\cite{coppo1981functional}. Since then various researchers have
 studied intersection types, and some languages have adopted them in one
-form or another. 
+form or another.
 
 %However, while intersection types are already used in
 %various languages, the lack of a merge operator removes considerable
@@ -47,26 +47,26 @@ let x : Int & Char = ...;  -- definition ommitted
 let idInt (y : Int) : Int = y;
 let idChar (y : Char) : Char = y;
 (idInt x, idChar x)
-\end{lstlisting} 
+\end{lstlisting}
 
 \noindent If a value \lstinline{x} has type \lstinline{Int & Char} then
-\lstinline{x} can be used as an integer or a character. Therefore, 
-\lstinline{x} can be used as an argument to any function that takes 
-an integer as an argument, or any 
-function that take a character as an argument. In the program above 
+\lstinline{x} can be used as an integer or as a character. Therefore,
+\lstinline{x} can be used as an argument to any function that takes
+an integer as an argument, or any
+function that take a character as an argument. In the program above
 the functions \lstinline{idInt} and \lstinline{idChar} are the
-identity functions on integers and characters, respectively. Therefore 
+identity functions on integers and characters, respectively. Therefore
 passing \lstinline{x} as an argument to either one (or both) of the
-functions is valid. 
+functions is valid.
 
 \bruno{text needs to be improved; better connection}
-The previous program did not show how to construct values of an 
-intersection type. Indeed how such values are constructed is a point 
+The previous program did not show how to construct values of an
+intersection type. Indeed how such values are constructed is a point
 of divergence between various proposals for intersections types.
 
 \paragraph{Merge Operator}
-\name supports a so-called merge operator. The merge operator allows 
-two values to be merged in a single intersection type. For example, an 
+\name supports a so-called merge operator. The merge operator allows
+two values to be merged in a single intersection type. For example, an
 implementation of \lstinline{x} is constructed as follows:
 
 \begin{lstlisting}
@@ -77,30 +77,30 @@ let x : Int & Char = 1 ,, 'c';
 merge of two values $v_1$ and $v_2$ is denoted as $v_1 ,, v_2$.
 
 \paragraph{Merge Operator and Pairs}
-The merge operator is similar to the introduction construct on pairs. 
+The merge operator is similar to the introduction construct on pairs.
 An analogous implementation of \lstinline{x} with pairs would be:
 
 \begin{lstlisting}
 let xPair : (Int, Char) = (1, 'c');
-\end{lstlisting} 
+\end{lstlisting}
 
 \noindent The significant difference between intersection types with a
 merge operator and pairs is in the elimination construct. With pairs
 there are explicit eliminators (\lstinline{fst} and
 \lstinline{snd}). These eliminators must be used to extract the
 components of the right type. For example, in order to use
-\lstinline{idInt} and \lstinline{idChar} with pairs, we would need to 
-write a program such as: 
+\lstinline{idInt} and \lstinline{idChar} with pairs, we would need to
+write a program such as:
 
 \begin{lstlisting}
 (idInt (fst xPair), idChar (snd xPair))
 \end{lstlisting}
 
 \noindent In contrast the elimination of intersection types is done
-implicitly, by following a type-directed process. For example, 
+implicitly, by following a type-directed process. For example,
 when a value of type \lstinline{Int} is needed, but an intersection
 of type \lstinline{Int & Char} is found, then the compiler uses the
-type system to extract the corresponding value. 
+type system to extract the corresponding value.
 
 \subsection{Incoherence}
 The merge operator combines two terms, of type $A$ and $B$
@@ -117,7 +117,7 @@ Should the result be $1$ or $2$?
 If both results are accepted, we say that the semantics is
 \emph{incoherent}: there are multiple possible meanings for the same
 valid program. Dunfield's calculus~\cite{} is incoherent and accepts the
-program above. 
+program above.
 
 In a real implementation of Dunfield calculus a choice has to be made
 on which value to compute. For example, one potential option is to
@@ -129,24 +129,24 @@ of a program will always depend on an implementation choice.\bruno{why
 
 Moreover, even if it accept either choice as being a good enough
 candidate to express the semantics, the approach cannot be easily
-extended to systems with parametric polymorphism, as we illustrate 
+extended to systems with parametric polymorphism, as we illustrate
 in Section~\ref{}.
 
 \subsection{Restoring Coherence: Disjoint Intersection Types}
 Coherence is a desirable property for a semantics. A semantics is said
 to be coherent if any \emph{valid program} has exactly one meaning.
 One option to restore coherence is to reject programs which may have
-multiple meanings. 
-%Of course, when rejecting programs it is important 
-%not to be too conservative, and reject too many programs which are 
-%actually coherent. 
-Analysing the expression $1 \mergeop 2$, we can see that the reason 
+multiple meanings.
+%Of course, when rejecting programs it is important
+%not to be too conservative, and reject too many programs which are
+%actually coherent.
+Analysing the expression $1 \mergeop 2$, we can see that the reason
 for incoherence is that there are multiple, overlapping, integers in the
 merge. Generally, if both terms can be assigned some type $C$,
 both of them can be chosen as the meaning of the merge,
 which leads to multiple meaning of a term.
-Thus a natural option is to try to forbid such overlapping 
-values of the same type in a merge. 
+Thus a natural option is to try to forbid such overlapping
+values of the same type in a merge.
 
 This is precisely the approach taken in \name. \name requires that the
 two types of in intersection must be \emph{disjoint}.  However,
@@ -159,10 +159,10 @@ left it for future work due to the non-triviality of the approach.
 The first step towards disjoint intersection types is to come up
 with a definition of disjointness. A first attempt at such definition would
 be to require that, given two types $A$ and $B$, both types are not
-subtypes of each other: 
+subtypes of each other:
 \[A * B \equiv A \not<: B \wedge B \not<: A\]
-At first sight this seems a reasonable definition and it does prevent 
-merges such as \lstinline{1 ,, 2}. However some moments of though are enough to realize that 
+At first sight this seems a reasonable definition and it does prevent
+merges such as \lstinline{1 ,, 2}. However some moments of thought are enough to realize that
 such definition does not ensure disjointness. For example, consider
 the following merge:
 
@@ -171,63 +171,66 @@ the following merge:
 \end{lstlisting}
 
 \noindent This merge has two components which are also intersection
-types. The first component (\lstinline{(1,,'c')}) has type $Int \&
-Char$, whereas the second component (\lstinline{(2 ,, True)}) has type 
-$Int \& Bool$. Clearly,
-\[Int \& Char \not<: Int \& Bool \wedge Int \& Bool \not<: Int \& Char\]
+types. The first component (\lstinline{(1,,'c')}) has type $\tyint \inter
+\tychar$, whereas the second component (\lstinline{(2 ,, True)}) has type
+$\tyint \inter \tybool$. Clearly,
+\[ \tyint \inter \tychar \not \subtype \tyint \inter \tybool \wedge \tyint \inter \tybool \not \subtype \tyint \inter \tychar \]
 Nevertheless the following program still leads to
 incoherence:
-\[ \app {(\lambda (x : \tyint). x)} {((1 \mergeop 'c') \mergeop (2 \mergeop True))} \]
+\[ \app {(\lamty x \tyint x)} {((1 \mergeop 'c') \mergeop (2 \mergeop \code{True}))} \]
 as both \lstinline{1} or \lstinline{2} are possible outcomes
-of the program. Although this attempt to define disjointness failed, 
-it did bring us some additional insight: although the types of the two 
-components of the merge are not subtypes of each other, they share 
-some types in common. 
+of the program. Although this attempt to define disjointness failed,
+it did bring us some additional insight: although the types of the two
+components of the merge are not subtypes of each other, they share
+some types in common.
 
 \paragraph{A Proper Definition of Disjointness} In order for two types
 to be trully disjoint, they must not have any subcomponents sharing
-the same type. In a system with intersection types this can be ensured 
-by requiring the two types do not share a common supertype. More 
+the same type. In a system with intersection types this can be ensured
+by requiring the two types do not share a common supertype. More
 formally:
 
 \bruno{make this a definition!}
-Given two types $A$ and $B$, two types are disjoint
-($A * B$) if there is no type $C$ such that both $A$ and $B$ are
-subtypes of $C$:
-\[A * B \equiv \not\exists C.~A <: C \wedge B <: C\]
+
+\begin{definition}
+  Given two types $A$ and $B$, two types are disjoint
+  (written $A \disjoint B$) if there is no type $C$ such that both $A$ and $B$ are
+  subtypes of $C$:
+  \[A \disjoint B \equiv \not\exists C.~A \subtype C \wedge B \subtype C\]
+\end{definition}
 
 \noindent This definition of disjointness can prevent the problematic
-merge. Since $Int$ is a common supertype of both $Int \& Char$ and 
-$Int \& Bool$, those two types are not disjoint. 
+merge. Since $Int$ is a common supertype of both $Int \& Char$ and
+$Int \& Bool$, those two types are not disjoint.
 
 \name's type system only accepts programs that use disjoint
-intersection types. As shown in Section~\ref{} this is sufficient to 
-ensure that the semantics is coherent.  
+intersection types. As shown in Section~\ref{} this is sufficient to
+ensure that the semantics is coherent.
 
 \subsection{Parametric Polymorphism and Disjointness}
 The interaction between parametric polymorphism and disjoint
 intersection types is non-trivial. The key challange is to have a type
 system that still ensures coherence, but at the same time is not too
-restrictive in the programs that can be accepted. Dunfield~\cite{} provides a 
-good illustrative example of the issues that arize when combining 
+restrictive in the programs that can be accepted. Dunfield~\cite{} provides a
+good illustrative example of the issues that arize when combining
 disjoint intersection types and parametric polymorphism:
 \[\lambda x. {\bf let}~y = 0 \mergeop x~{\bf in}~x\]
-This lambda term, in not a valid \name program, since variables are 
-not annotated with types. The question is whether we can find 
-a valid \name program, with type lambdas and type annotations that can 
-be used to accept the program, or otherwise reject it on the grounds 
+This lambda term, in not a valid \name program, since variables are
+not annotated with types. The question is whether we can find
+a valid \name program, with type lambdas and type annotations that can
+be used to accept the program, or otherwise reject it on the grounds
 that disjointness is violated. A first attempt would be:
-\[\Lambda A.\lambda (x:A). {\bf let}~y : Int \& A = 0 \mergeop x~{\bf in}~x\]
-If $A$ is instantiated to $Bool$ or $Char$, for example, then clearly
+\[\Lambda A. \lambda (x:A). {\bf let}~y : \tyint \& A = 0 \mergeop x~{\bf in}~x\]
+If $A$ is instantiated to $\tybool$ or $\tychar$, for example, then clearly
 the merge used in the program ($0 \mergeop x$) respects disjointness. However, if $A$
 is instantiated with $Int$ then the merge is problematic as it is not
-disjoint. 
+disjoint.
 
 One option would be to reject the program on the grounds
 that $A$ could be instantiated with a type that would allow the
 creation of an intersection type which is not disjoint. However this
 option would be too conservative and it would prevent many useful
-programs using parametric polymorphism and intersection types.
+programs using both parametric polymorphism and intersection types.
 
 \begin{comment}
 To address the limitations of intersection types in languages like
@@ -292,9 +295,9 @@ not all intersections of types are inhabited.  For example, the
 intersection of a base type $\tyint$ and a function type
 $\tyint \to \tyint$ is not inhabited.\bruno{put this text somewhere?}
 
-Since then various researchers have 
+Since then various researchers have
 studied intersection types, and some languages have adopted in one
-form or another. However, while intersection types are already used 
+form or another. However, while intersection types are already used
 in various languages, the lack of a merge operator removes
 considerable expressiveness.
 
@@ -302,7 +305,7 @@ considerable expressiveness.
 A number of OO languages, such as
 Java, C\#, Scala, and Ceylon\footnote{\url{http://ceylon-lang.org/}},
 already support intersection types to different degrees. Intersection
-types are particularly relevant for OOP as they can be used to model 
+types are particularly relevant for OOP as they can be used to model
 multiple interface inheritance. In Java, for example,
 
 \begin{lstlisting}
@@ -441,7 +444,7 @@ the usual unconstrained quantifier $\for {\alpha} \ldots$
 is a syntactic sugar for $\for {\alpha \disjoint \bot} \ldots$, and
 $\blam \alpha \ldots$ for $\blam {\alpha \disjoint \top} \ldots$.
 The intuition is that since the bottom type is akin to the empty set,
-no other type overlaps with it.
+no other type overlaps with it.\george{Format this paragraph better.}
 
 \begin{comment}
 With this tool in hand, we can rewrite the program above to:
@@ -461,8 +464,8 @@ Oliveira and Cook~\cite{oliveira2012extensibility} proposed a design pattern tha
 Expression Problem in languages like Java. An advantage of the pattern
 over previous solutions is that it is relatively lightweight in terms
 of type system features. In a latter paper, Oliveira et al.~\cite{oliveira2013feature}
-noted some limitations of the original design pattern and proposed 
-some new techniques that generalized the original pattern, allowing it 
+noted some limitations of the original design pattern and proposed
+some new techniques that generalized the original pattern, allowing it
 to express programs in a Feature-Oriented Programming~\cite{Prehofer97} style.
 Key to these techniques was the ability to dynamically compose object
 algebras.
@@ -472,28 +475,28 @@ non-trivial. At the type-level it is possible to express the resulting
 type of the composition using intersection types. Thus, it is still
 possible to solve that part problem nicely in a language like Scala (which
 has basic support for intersection types). However, the dynamic
-composition itself cannot be easily encoded in Scala. The fundamental 
+composition itself cannot be easily encoded in Scala. The fundamental
 issue is that Scala lacks a \lstinline{merge} operator (see the
 discussion in Section~\ref{subsec:interScala}). Although both Oliveira et al.~\cite{oliveira2013feature} and
 Rendell et al.~\cite{rendel14attributes} have shown that such a \lstinline{merge} operator can
 be encoded in Scala, the encoding fundamentally relies in low-level
 programming techniques such as dynamic proxies, reflection or
-meta-programming. 
+meta-programming.
 
 Because \name supports a \lstinline{merge} operator natively, dynamic
 object algebra composition becomes easy to encode. The remainder of
 this section shows how object algebras and object algebra composition
-can be encoded in \name. We will illustrate this point 
-step-by-step by solving the Expression Problem. 
+can be encoded in \name. We will illustrate this point
+step-by-step by solving the Expression Problem.
 %%Prior knowledge of object algebras is not assumed.
- 
+
 % can be cumbersome and
-% language support for intersection types would solve that problem. 
+% language support for intersection types would solve that problem.
 % Our type system is just a simple extension of System $ F $; yet surprisingly, it
 % is able to solve the limitations of using object algebras in languages such as
 % Java and Scala.
 
-\paragraph{A simple system of arithmetic expressions.} 
+\paragraph{A simple system of arithmetic expressions.}
 In the Expression Problem, the idea is to start with a very simple
 system modeling arithmetic expressions and evaluation.
 The initial system considers expressions with two variants (literals and
@@ -519,7 +522,7 @@ type of the interpretation \lstinline$E$.
 \begin{comment}
   \begin{lstlisting}{language=F2J}
     type ExpAlg[E] = {
-      lit: Int -> E, 
+      lit: Int -> E,
       add: E -> E -> E
     };
   \end{lstlisting}
@@ -534,7 +537,7 @@ type of the interpretation \lstinline$E$.
 % interface is of type \lstinline$IEval$ or of a subtype of \lstinline$IEval$.
 % \footnote{Should be mentioned in S2.}
 Having defined the interfaces, we can implement that object algebra interface
-with \lstinline$evalAlg$, which is an object algebra for evaluation. 
+with \lstinline$evalAlg$, which is an object algebra for evaluation.
 \begin{comment}
   \begin{lstlisting}{language=F2J}
     let evalAlg: ExpAlg[IEval] = {
@@ -547,26 +550,26 @@ with \lstinline$evalAlg$, which is an object algebra for evaluation.
 \end{comment}
 
 \lstinputlisting[linerange=15-20]{../src/ObjectAlgebra.sf} % APPLY:linerange=OA_EVALALG
-In this example we implement a record, where the two operations 
+In this example we implement a record, where the two operations
 \lstinline{lit} and \lstinline{add} return a record with type \lstinline{IEval}.
 The type \lstinline$ExpAlg[IEval]$ is the type of object algebras
 supporting evaluation. However, the one interesting point
 of object algebras is that other operations can be supported as
-well. 
+well.
 
 \paragraph{Add a subtraction variant.} The point of the Expression
 Problem is to support the addition of new features to the existing
-program, without modifying existing code. 
+program, without modifying existing code.
 The first feature is adding a new variant, such as subtraction. We can do so by
 simply intersecting the original types and merging with the original values:
 
 \begin{comment}
   \begin{lstlisting}{language=F2J}
-    type SubExpAlg[E] = 
+    type SubExpAlg[E] =
     ExpAlg[E] & {sub: E -> E -> E};
     let subEvalAlg = evalAlg ,, {
-      sub = \(x: IEval) (y: IEval) -> { 
-        eval = x.eval - y.eval 
+      sub = \(x: IEval) (y: IEval) -> {
+        eval = x.eval - y.eval
       }
     };
   \end{lstlisting}
@@ -576,10 +579,10 @@ simply intersecting the original types and merging with the original values:
 
 \noindent Note that here intersection types are used to model \emph{type
   inheritance} and the merge operator models a basic form of
-\emph{dynamic implementation inheritance}. 
+\emph{dynamic implementation inheritance}.
 
 \paragraph{Add a pretty printing operation.}
-A second extension is adding a new operation, such as pretty printing. 
+A second extension is adding a new operation, such as pretty printing.
 Similar to evaluation, the interface of the pretty printing feature
 is modeled as:
 \begin{comment}
@@ -607,11 +610,11 @@ addition, and subtraction is:
 
 \paragraph{Usage.}
 With the definitions above, values are created using the
-appropriate algebras. For example, the expression \lstinline{7 + 2} 
+appropriate algebras. For example, the expression \lstinline{7 + 2}
 is encoded as follows:
 \begin{comment}
   \begin{lstlisting}{language=F2J}
-    let e1[E] (f: SubExpAlg[E]) = 
+    let e1[E] (f: SubExpAlg[E]) =
     f.add (f.lit 7) (f.lit 2);
   \end{lstlisting}
 \end{comment}
@@ -635,7 +638,7 @@ does so by constructing a new object algebra where each field is a
 function that delegates the input to the two algebra parameters.
 \begin{comment}
   \begin{lstlisting}{language=F2J}
-    let combine[A,B](f: ExpAlg[A])(g: ExpAlg[B]) : 
+    let combine[A,B](f: ExpAlg[A])(g: ExpAlg[B]) :
     ExpAlg[A&B] = {
       lit = \(x: Int) -> f.lit x ,, g.lit x,
       add = \(x: A & B) (y: A & B) ->
@@ -647,7 +650,7 @@ function that delegates the input to the two algebra parameters.
 
 \begin{comment}
   \begin{lstlisting}{language=F2J}
-    let newAlg = 
+    let newAlg =
     combine[IEval,IPrint] subEvalAlg printAlg;
     let o = e1[IEval&IPrint] newAlg;
     o.print ++ " = " ++ o.eval.toString()
@@ -664,4 +667,4 @@ evaluation and printing, as the output of the program is
 
 In contrast to the Scala solutions available in the
 literature, \name is able to express object algebra
-composition very directly by using the merge operator. 
+composition very directly by using the merge operator.
