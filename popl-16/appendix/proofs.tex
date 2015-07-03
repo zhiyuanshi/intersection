@@ -1,460 +1,549 @@
-% \section{Proofs}
-%
-% \paragraph{Notation.} We sketch most of our proofs in two-column style: on the
-% left are the intermediate results and on the right are the justification (for
-% the previous intermediate result to reach the corresponding left-hand side).
-%
-% % \subsection{Subtyping}
-%
-% % \begin{theorem}[Subtyping is reflexive]
-% %   If $A$ is a well-formed type, then $A \subtype A$.
-% % \end{theorem}
-%
-% % \begin{proof}
-% %   \george{TODO}
-% % \end{proof}
-%
-% % \begin{theorem}[Subtyping is transitive]
-% %   If $A_1$, $A_2$, $A_3$ are well-formed types, and
-% %   $A_1 \subtype A_2$ and $A_2 \subtype A_3$, then
-% %   $A_1 \subtype A_3$.
-% % \end{theorem}
-%
-% % \begin{proof}
-% %   \george{TODO}
-% % \end{proof}
-%
-% % \bruno{fix numbering of lemmas}
-% % \bruno{reflexitivity and transitivity missing. You can do a proof
-% %   sketch instead of a full proof. Just say in 1 or 2 sentences what is
-% % the main idea. You can mention that we have a full proof in Coq.}
-% % \bruno{target type system is missing 3 cases: Tunit; Tproj1; TProj2}
-%
-% % \subsection{Elaboration}
-%
-% \lemmasub*
+\section{Proofs}
+
+\paragraph{Notation.} We sketch most of our proofs in two-column style: on the
+left are the intermediate results and on the right are the justification (for
+the previous intermediate result to reach the corresponding left-hand side).
+
+% \subsection{Subtyping}
+
+% \begin{theorem}[Subtyping is reflexive]
+%   If $A$ is a well-formed type, then $A \subtype A$.
+% \end{theorem}
+
 % \begin{proof}
-%   By structural induction of the derivation.
-%
-%   \begin{itemize}
-%
-%   \item \textbf{Case}
-%     \begin{flalign*}
-%       & \rulesubvar &
-%     \end{flalign*}
-%
-%     \begin{tabular}{rll}
-%       & $ \hastype {\epsilon} {\lam x {\im \alpha} x} {\alpha \to \alpha} $ & By $ \rulelabeltargetvar $ and $ \rulelabeltargetlam $
-%     \end{tabular} \\
-%
-%   \item \textbf{Case}
-%     \begin{flalign*}
-%       & \rulesubTop &
-%     \end{flalign*}
-%
-%     \begin{tabular}{rll}
-%       & $ \hastype {\epsilon} {\lam x {\im A} ()} {\im A \to ()} $ & By $ \rulelabeltargetvar $ and $ \rulelabeltargetlam $ \\
-%       & $ \hastype {\epsilon} {\lam x {\im A} ()} {\im A \to \im \top} $ & By the definition of $ \im \cdot $
-%     \end{tabular} \\
-%
-%   \item \textbf{Case}
-%     \begin{flalign*}
-%       & \rulesubfun &
-%     \end{flalign*}
-%
-%     \begin{tabular}{rll}
-%       & $ \hastype \epsilon {C_1} {\im {A_3} \to \im {A_1}} $ & By i.h. \\
-%       & $ \hastype \epsilon {C_2} {\im {A_2} \to \im {A_4}} $ & By i.h. \\
-%       & $ \hastype {\epsilon, x \hast {\im {A_3}}} x {\im {A_3}} $ & By $\rulelabeltargetvar$ \\
-%       & $ A_3 \subtype A_1 \yields {C_1} $ & Premise \\
-%       & $ \hastype {\epsilon, x \hast {\im {A_3}}} {\app {C_1} x} {\im {A_1}} $ & By $\rulelabeltargetApp$ \\
-%       & $ \hastype {\epsilon, f \hast {\im {A_1 \to A_2}}} f {\im {A_1 \to A_2}} $ & By $\rulelabeltargetvar$ \\
-%       & $ \hastype {\epsilon, f \hast {\im {A_1 \to A_2}}} f {\im {A_1} \to \im {A_2}} $ & By the definition of $ \im \cdot $ \\
-%       & $ \hastype {\epsilon, f \hast {\im {A_1 \to A_2}}, x \hast {\im {A_3}}} {\app f {(\app {C_1} x})} {\im {A_2}} $ & By $\rulelabeltargetApp$ \\
-%       & $ \hastype {\epsilon, f \hast {\im {A_1 \to A_2}}, x \hast {\im {A_3}}} {\app {C_2} {(\app f {(\app {C_1} x})})} {\im {A_4}} $ & By $\rulelabeltargetApp$ \\
-%       & $ \hastype \epsilon {\lam f {\im {A_1 \to A_2}} {\lam x {\im {A_3}} {\app {C_2} {(\app f {(\app {C_1} x)})}}}} {\im {A_1 \to A_2} \to \im {A_3} \to \im {A_4}} $ & By applying $\rulelabeltargetlam$ twice \\
-%       & $ \hastype \epsilon {\lam f {\im {A_1 \to A_2}} {\lam x {\im {A_3}} {\app {C_2} {(\app f {(\app {C_1} x)})}}}} {\im {A_1 \to A_2} \to \im {A_3 \to A_4}} $ & By the definition of $\im \cdot$
-%     \end{tabular} \\
-%
-%   \item \textbf{Case}
-%     \begin{flalign*}
-%       & \rulesubforall &
-%     \end{flalign*}
-%
-%     \begin{tabular}{rll}
-%       & $ \hastype \epsilon C {\im {A_1} \to {\im {\subst {\alpha_1} {\alpha_2} A_2}}} $ & By i.h. \\
-%       & $ \hastype {\epsilon, f \hast {\im {\for {\alpha_1} {A_1}}}} f {\im {\for {\alpha_1} {A_1}}} $ & By $\rulelabeltargetvar$ \\
-%       & $ \hastype {\epsilon, f \hast {\im {\for {\alpha_1} {A_1}}}} f {\for {\alpha_1} {\im {A_1}}} $ & By the definition of $ \im \cdot $ \\
-%       & $ \hastype {\epsilon, f \hast {\im {\for {\alpha_1} {A_1}}}, \alpha} {\tapp f \alpha} {\subst \alpha {\alpha_1} {\im {A_1}}} $ & By $\rulelabeltargetvar$ and $\rulelabeltargetTApp$ \\
-%       & $ \hastype {\epsilon, f \hast {\im {\for {\alpha_1} {A_1}}}, \alpha} {\app C {(\tapp f \alpha)}} {\subst \alpha {\alpha_1} {\im {\subst {\alpha_1} {\alpha_2} {A_2}}}} $ & By $\rulelabeltargetApp$ \\
-%       & $ \hastype {\epsilon, f \hast {\im {\for {\alpha_1} {A_1}}}} {\blam \alpha {\app C {(\tapp f \alpha)}}} {\for {\alpha_2} {\im {A_2}}} $ & By $\rulelabeltargetBLam$ and substitution \george{Substitution is problematic} \\
-%       & $ \hastype \epsilon {\lam f {\im {\for {\alpha_1} {A_1}}} {\blam \alpha {\app C {(\tapp f \alpha)}}}} {\im {\for {\alpha_1} {A_1}} \to \for {\alpha_2} {\im {A_2}}} $ & By $\rulelabeltargetlam$ \\
-%       & $ \hastype \epsilon {\lam f {\im {\for {\alpha_1} {A_1}}} {\blam \alpha {\app C {(\tapp f \alpha)}}}} {\im {\for {\alpha_1} {A_1}} \to \im {\for {\alpha_2} {A_2}}} $ & By the definition of $\im \cdot$
-%     \end{tabular} \\
-%
-%   \item \textbf{Case}
-%     \begin{flalign*}
-%       & \rulesubinter &
-%     \end{flalign*}
-%
-%     \begin{tabular}{rll}
-%       & $\hastype {\epsilon, x \hast \im {A_1}} x {\im {A_1}}$ & By $\rulelabeltargetvar$ \\
-%       & $\hastype \epsilon {C_1} {\im {A_1} \to \im {A_2}}$ & By i.h. \\
-%       & $\hastype {\epsilon, x \hast \im {A_1}} {\app {C_1} x} {\im {A_2}}$ & By $\rulelabeltargetApp$ and weakening \\
-%       & $\hastype {\epsilon, x \hast \im {A_1}} {\app {C_2} x} {\im {A_3}}$ & Similar \\
-%       & $\hastype {\epsilon, x \hast \im {A_1}} {\pair {\app {C_1} x} {\app {C_2} x}} {\pair {\im {A_2}} {\im {A_3}}}$ & By $\rulelabeltargetPair$ \\
-%       & $\hastype {\epsilon, x \hast \im {A_1}} {\pair {\app {C_1} x} {\app {C_2} x}} {\im {A_2 \inter A_3}}$ & By the definition of $\im \cdot$ \\
-%       & $\hastype \epsilon {\lam x {\im {A_1}} {\pair {\app {C_1} x} {\app {C_2} x}}} {\im {A_1} \to {\im {A_2 \inter A_3}}}$ & By $\rulelabeltargetlam$
-%     \end{tabular} \\
-%
-%   \item \textbf{Case}
-%     \begin{flalign*}
-%       & \rulesubinterleft &
-%     \end{flalign*}
-%
-%     \begin{tabular}{rll}
-%       & $ \hastype {\epsilon, x \hast \im {A_1 \inter A_2}} x {\im {A_1 \inter A_2}} $ & By $\rulelabeltargetvar$ \\
-%       & $ \hastype {\epsilon, x \hast \im {A_1 \inter A_2}} x {\pair {\im {A_1}} {\im {A_2}}} $ & By the definition of $\im \cdot$ \\
-%       & $ \hastype {\epsilon, x \hast \im {A_1 \inter A_2}} {\proj 1 x} {\im {A_1}} $ & By $\rulelabeltargetprojl$ \\
-%       & $ \hastype \epsilon C {\im {A_1} \to \im {A_3}} $ & By i.h. \\
-%       & $ \hastype {\epsilon, x \hast \im {A_1 \inter A_2}} C {\im {A_1} \to \im {A_3}} $ & By weakening \\
-%       & $ \hastype {\epsilon, x \hast \im {A_1 \inter A_2}} {\app C {(\proj 1 x)}} {\im {A_3}} $ & By $\rulelabeltargetApp$ \\
-%       & $ \hastype \epsilon {\lam x {\im {A_1 \inter A_2}} {\app C {(\proj 1 x)}}} {\im {A_1 \inter A_2} \to \im {A_3}} $ & By $\rulelabeltargetlam$
-%     \end{tabular} \\
-%
-%   \item \textbf{Case}
-%     \begin{flalign*}
-%       & \rulesubinterright &
-%     \end{flalign*}
-%
-%     By symmetry with the above case. \\
-%
-%   \item \textbf{Case}
-%     \begin{flalign*}
-%       & \rulesubRec &
-%     \end{flalign*}
-%
-%     \begin{tabular}{rll}
-%       & $ A_1 \subtype A_2 \yields C $ & Premise \\
-%       & $ \hastype \epsilon C {\im {A_1} \to \im {A_2}} $ & By i.h. \\
-%       & $ \hastype {\epsilon, x \hast \im {\recordType l {A_1}}} x {\im {\recordType l {A_1}}} $ & By $ \rulelabeltargetvar $ \\
-%       & $ \hastype {\epsilon, x \hast \im {\recordType l {A_1}}} x {\im {A_1}} $ & By the definition of $ \im \cdot $ \\
-%       & $ \hastype {\epsilon, x \hast \im {\recordType l {A_1}}} {\app C x} {\im {A_2}} $ & By $ \rulelabeltargetApp $ \\
-%       & $ \hastype {\epsilon, x \hast \im {\recordType l {A_1}}} {\app C x} {\im {\recordType l {A_2}}} $ & By the definition of $ \im \cdot $ \\
-%       & $ \hastype \epsilon {\lam x {\im {\recordType l {A_1}}} {\app C x}} {\im {\recordType l {A_1}} \to \im {\recordType l {A_2}}} $ & By $ \rulelabeltargetlam $
-%     \end{tabular} \\
-%
-%   \end{itemize}
-%
+%   \george{TODO}
 % \end{proof}
-%
-% \lemmaselect*
+
+% \begin{theorem}[Subtyping is transitive]
+%   If $A_1$, $A_2$, $A_3$ are well-formed types, and
+%   $A_1 \subtype A_2$ and $A_2 \subtype A_3$, then
+%   $A_1 \subtype A_3$.
+% \end{theorem}
+
 % \begin{proof}
-%   By structural induction of the derivation.
-%
-%   \begin{itemize}
-%
-%   \item \textbf{Case}
-%     \begin{flalign*}
-%       & \ruleGetElab &
-%     \end{flalign*}
-%
-%     \begin{tabular}{rll}
-%       & $ \hastype \epsilon {\lam x {\im {\recordType l A}} x} {\im {\recordType l A} \to \im {\recordType l A}} $ & By $ \rulelabeltargetlam $ and $\rulelabeltargetvar$ \\
-%       & $ \hastype \epsilon {\lam x {\im {\recordType l A}} x} {\im {\recordType l A} \to \im A} $ & By the definition of $ \im \cdot $
-%     \end{tabular} \\
-%
-%   \item \textbf{Case}
-%     \begin{flalign*}
-%       & \ruleGetLeftElab &
-%     \end{flalign*}
-%
-%     \begin{tabular}{rll}
-%       & $ \hastype {\epsilon, x \hast \im {A_1 \inter A_2}} x {\im {A_1 \inter A_2}} $ & By $ \rulelabeltargetvar $ \\
-%       & $ \hastype {\epsilon, x \hast \im {A_1 \inter A_2}} x {\pair {\im {A_1}} {\im {A_2}}} $ & By the definition of $\im \cdot$ \\
-%       & $ \hastype {\epsilon, x \hast \im {A_1 \inter A_2}} {\proj 1 x} {\im {A_1}} $ & By $\rulelabeltargetprojl$ \\
-%       & $ \hastype \epsilon C {\im {A_1} \to \im A} $ & By i.h. \\
-%       & $ \hastype {\epsilon, x \hast \im {A_1 \inter A_2}} C {\im {A_1} \to \im A} $ & By weakening \\
-%       & $ \hastype {\epsilon, x \hast \im {A_1 \inter A_2}} {\app C {(\proj 1 x)}} {\im A} $ & By $\rulelabeltargetApp$ \\
-%       & $ \hastype \epsilon {\lam x {\im {A_1 \inter A_2}} {\app C {(\proj 1 x)}}} {\im {A_1 \inter A_2} \to \im A} $ & By $ \rulelabeltargetlam $
-%     \end{tabular} \\
-%
-%   \item \textbf{Case}
-%     \begin{flalign*}
-%       & \ruleGetRightElab &
-%     \end{flalign*}
-%
-%     By symmetry with the above case. \\
-%
-% \end{itemize}
+%   \george{TODO}
 % \end{proof}
-%
-%
-% \lemmarestrict*
-% \begin{proof}
-%   By structural induction of the derivation.
-%
-%   \begin{itemize}
-%
-%   \item \textbf{Case}
-%     \begin{flalign*}
-%       & \ruleRestrictElab &
-%     \end{flalign*}
-%
-%     \begin{tabular}{rll}
-%       & $ \hastype \epsilon {\lam x {\im {\recordType l A}} {()}} {\im {\recordType l A} \to ()} $ & By $\rulelabeltargetUnit$ and $\rulelabeltargetlam$ \\
-%       & $ \hastype \epsilon {\lam x {\im {\recordType l A}} {()}} {\im {\recordType l A} \to \im \top} $ & By the definition of $\im \cdot$
-%     \end{tabular} \\
-%
-%   \item \textbf{Case}
-%     \begin{flalign*}
-%       & \ruleRestrictLeftElab &
-%     \end{flalign*}
-%
-%     \begin{tabular}{rll}
-%       & $\judgeRestrict {A_1} l A \yields C$ & Premise \\
-%       & $\hastype \epsilon C {\im {A_1} \to \im A} $ & By i.h. \\
-%       & $\hastype {\epsilon, x \hast \im {A_1 \inter A_2}} x {\im {A_1 \inter A_2}} $ & By $\rulelabeltargetvar$ \\
-%       & $\hastype {\epsilon, x \hast \im {A_1 \inter A_2}} x {\pair {\im {A_1}} {\im {A_2}}} $ & By the definition of $\im \cdot$ \\
-%       & $\hastype {\epsilon, x \hast \im {A_1 \inter A_2}} {\proj 1 x} {\im {A_1}} $ & By $\rulelabeltargetprojl$ \\
-%       & $\hastype {\epsilon, x \hast \im {A_1 \inter A_2}} {\proj 2 x} {\im {A_2}} $ & By $\rulelabeltargetprojr$ \\
-%       & $\hastype {\epsilon, x \hast \im {A_1 \inter A_2}} {\app C {(\proj 1 x)}} {\im {A}} $ & By $\rulelabeltargetApp$ \\
-%       & $\hastype {\epsilon, x \hast \im {A_1 \inter A_2}} {\pair {\app C {(\proj 1 x)}} {\proj 2 x}} {\pair {\im {A}} {\im {A_2}}} $ & By $\rulelabeltargetPair$ \\
-%       & $\hastype {\epsilon, x \hast \im {A_1 \inter A_2}} {\pair {\app C {(\proj 1 x)}} {\proj 2 x}} {\im {A \inter A_2}} $ & By the definition of $\im \cdot$ \\
-%       & $\hastype \epsilon {\lam x {\im {A_1
-%           \inter A_2}} {\pair {\app C {(\proj 1 x)}} {\proj 2 x}}} {\im {A_1 \inter A_2} \to \im {A \inter A_2}} $ & By $\rulelabeltargetlam$
-%     \end{tabular} \\
-%
-%   \item \textbf{Case}
-%     \begin{flalign*}
-%       & \ruleRestrictRightElab &
-%     \end{flalign*}
-%
-%     By symmetry with the above case. \\
-%
-% \end{itemize}
-% \end{proof}
-%
-% \begin{comment}
-% \begin{lemma}[\rulelabelUpdate~rules produce type-correct coercion] \label{lemma:update-correct}
-%   If $ \judgeUpdate A l {A_1 \yields E} {A_2} {A_3} \yields C $ and $
-%   \hastype \Gamma E {\im {A_1}} $ for some $ \Gamma $, then
-%   $ \hastype \Gamma C {\im A \to \im {A_2}} $.
-% \end{lemma}
-%
-% \begin{proof}
-%   By structural induction of the derivation.
-%
-%   \begin{itemize}
-%
-%   \item \textbf{Case}
-%     \begin{flalign*}
-%       & \ruleUpdateElab &
-%     \end{flalign*}
-%
-%     \begin{tabular}{rll}
-%       & $ \hastype \Gamma {\lam \_ {\im {\recordType l A}} E} {\im {\recordType l A}} \to \im {A_1} $ & By $ \rulelabeltargetlam $, $ \rulelabeltargetvar $, and the hypothesis
-%     \end{tabular} \\
-%
-%   \item \textbf{Case}
-%     \begin{flalign*}
-%       & \ruleUpdateLeftElab &
-%     \end{flalign*}
-%
-%     \begin{tabular}{rll}
-%       & $ \hastype {\Gamma, x \hast \im {A_1 \inter A_2}} x {\im {A_1 \inter A_2}} $ & By $\rulelabeltargetvar$ \\
-%       & $ \hastype {\Gamma, x \hast \im {A_1 \inter A_2}} x {\pair {\im {A_1}} {\im {A_2}}} $ & By the definition of $\im \cdot$ \\
-%       & $ \hastype {\Gamma, x \hast \im {A_1 \inter A_2}} {\proj 1 x} {\im {A_1}} $ & By $\rulelabeltargetprojl$ \\
-%       & $ \hastype \Gamma C {\im {A_1} \to \im {A_3}} $ & By i.h. \\
-%       & $ \hastype {\Gamma, x \hast \im {A_1 \inter A_2}} C {{\im {A_1}} \to \im {A_3}} $ & By weakening \\
-%       & $ \hastype {\Gamma, x \hast \im {A_1 \inter A_2}} {\app C {(\proj 1 x)}} {\im {A_3}} $ & By $\rulelabeltargetApp$ \\
-%       & $ \hastype \Gamma {\lam x {\im {A_1 \inter A_2}} {\app C {(\proj 1 x)}}} {\im {A_1 \inter A_2} \to \im {A_3}} $ & By $\rulelabeltargetlam$
-%     \end{tabular} \\
-%
-%   \item \textbf{Case}
-%     \begin{flalign*}
-%       & \ruleUpdateRightElab &
-%     \end{flalign*}
-%
-%     By symmetry with the above case. \\
-%
-%   \end{itemize}
-% \end{proof}
-% \end{comment}
-%
-% \begin{lemma}[Preservation of well-formedness under type translation] \label{lemma:preserve-wf}
-%   If $ \istype \gamma A $, then $ \istype {\im \gamma} {\im A} $.
-% \end{lemma}
-%
-% \begin{proof}
-%   By structural induction of the derivation. The only case to consider is $ \rulelabelWF $.
-%
-%   \begin{itemize}
-%
-%   \item \textbf{Case}
-%
-%     \begin{flalign*}
-%       & \ruleWF &
-%     \end{flalign*}
-%
-%     \begin{tabular}{rll}
-%       & $ \ftv A \in \gamma $ & Premise \\
-%       & $ \ftv {\im A} \in \im \gamma $ & By the definition of $ \im \cdot $ \\
-%       & $ \istype {\im \gamma} {\im A} $ & By $ \rulelabeltargetWF $
-%     \end{tabular} \\
-%
-%   \end{itemize}
-% \end{proof}
-%
-% \theorempreservation*
-% \begin{proof}
-%   By structural induction of the derivation.
-%
-%   \begin{itemize}
-%
-%   \item \textbf{Case}
-%     \begin{flalign*}
-%       & \tyvarElab &
-%     \end{flalign*}
-%
-%     \begin{tabular}{rll}
-%      & $ (x,A) \in \gamma $ & Premise \\
-%      & $ (x,\im A) \in \im \gamma $ & By the definition of $ \im \cdot $ \\
-%      & $ \hastype {\im \gamma} x {\im A} $ & By $ \rulelabeltargetvar $
-%     \end{tabular} \\
-%
-%   \item \textbf{Case}
-%     \begin{flalign*}
-%       & \ruleTopElab &
-%     \end{flalign*}
-%
-%     \begin{tabular}{rll}
-%       & $\hastype {\im \gamma} {()} {()} $ & By $\rulelabeltargetUnit$ \\
-%       & $\hastype {\im \gamma} {()} {\im \top}$ & By the definition of $ \im \cdot$
-%     \end{tabular} \\
-%
-%   \item \textbf{Case}
-%     \begin{flalign*}
-%       & \tylamElab &
-%     \end{flalign*}
-%
-%     \begin{tabular}{rll}
-%       & $ \hastype {\gamma, x \hast A} e {A_1} \yields E $ & Premise \\
-%       & $ \hastype {\im {\gamma, x \hast A}} E {\im {A_1}} $ & By i.h. \\
-%       & $ \hastype {\im \gamma, x \hast \im A} E {\im {A_1}} $ & By the definition of $ \im \cdot $ \\
-%       & $ \hastype {\im \gamma} {\lam x {\im A} E} {\im A \to \im {A_1}} $ & By $ \rulelabeltargetlam $ \\
-%       & $ \hastype {\im \gamma} {\lam x {\im A} E} {\im {A \to A_1}} $ & By the definition of $ \im \cdot $
-%     \end{tabular} \\
-%
-%   \item \textbf{Case}
-%     \begin{flalign*}
-%       & \tyappElab &
-%     \end{flalign*}
-%
-%     \begin{tabular}{rll}
-%      & $ \hastype \gamma {e_1} {A_1 \to A_2} \yields {E_1} $  & Premise \\
-%      & $ \hastype {\im \gamma} {E_1} {\im {A_1 \to A_2}} $ & By i.h. \\
-%      & $ \hastype \gamma {e_2} {A_3} \yields {E_2} $ & Premise \\
-%      & $ \hastype {\im \gamma} {E_2} {\im {A_3}} $ & By i.h. \\
-%      & $ A_3 \subtype A_1 \yields C $ & Premise \\
-%      & $ \hastype \epsilon C {\im {A_3} \to \im {A_1}} $ & By Lemma~\ref{lemma:sub} \\
-%      & $ \hastype {\im \gamma} {\app {E_1} {(\app C E_2)}} {\im {A_2}} $ & By $ \rulelabeltargetApp $ and the definition of $ \im \cdot $
-%     \end{tabular} \\
-%
-%   \item \textbf{Case}
-%     \begin{flalign*}
-%       & \tyblamElab &
-%     \end{flalign*}
-%
-%     \begin{tabular}{rll}
-%       & $ \hastype {\gamma, \alpha} e A \yields E $ & Premise \\
-%       & $ \hastype {\im {\gamma, \alpha}} E {\im A} $ & By i.h. \\
-%       & $ \hastype {\im \gamma, \alpha} E {\im A} $ & By the definition of $ \im \cdot $ \\
-%       & $ \hastype {\im \gamma} {\blam \alpha E} {\for \alpha {\im A}} $ & By $ \rulelabeltargetBLam $ \\
-%       & $ \hastype {\im \gamma} {\blam \alpha E} {\im {\for \alpha A}} $ & By the definition of $ \im \cdot $
-%     \end{tabular} \\
-%
-%   \item \textbf{Case}
-%     \begin{flalign*}
-%       & \tytappElab &
-%     \end{flalign*}
-%
-%     \begin{tabular}{rll}
-%      & $ \hastype \gamma e {\for \alpha A_1} \yields E $ & Premise \\
-%      & $ \hastype {\im \gamma} E {\im {\for \alpha A_1}} $ & By i.h. \\
-%      & $ \hastype {\im \gamma} E {\for \alpha \im {A_1}} $ & By the definition of $ \im \cdot $ \\
-%      & $ \istype \gamma A $ & Premise \\
-%      & $ \istype {\im \gamma} {\im A} $ & By Lemma~\ref{lemma:preserve-wf} \\
-%      & $ \hastype \gamma {\tapp E {\im A}} {\subst {\im A} \alpha {\im {A_1}}} $ & By $ \rulelabeltargetTApp $ \\
-%      & $ \hastype \gamma {\tapp E {\im A}} {\im {\subst A \alpha {A_1}}} $ & By substitution lemma
-%     \end{tabular} \\
-%
-%   \item \textbf{Case}
-%     \begin{flalign*}
-%       & \tymergeElab &
-%     \end{flalign*}
-%
-%     \begin{tabular}{rll}
-%       & $ \hastype \gamma {e_1} {A_1} \yields {E_1} $ & Premise \\
-%       & $ \hastype {\im \gamma} {E_1} {\im {A_1}} $ & By i.h. \\
-%       & $ \hastype {\im \gamma} {E_2} {\im {A_2}} $ & Similar to the above \\
-%       & $ \hastype {\im \gamma} {\pair {E_1} {E_2}} {\pair {\im {A_1}} {\im {A_2}}} $ & By $ \rulelabeltargetPair $ \\
-%       & $ \hastype {\im \gamma} {\pair {E_1} {E_2}} {\im {A_1 \inter A_2}} $ & By the definition of $ \im \cdot $
-%     \end{tabular} \\
-%
-%   \item \textbf{Case}
-%     \begin{flalign*}
-%       & \rulerecordConstructElab &
-%     \end{flalign*}
-%
-%     \begin{tabular}{rll}
-%       & $ \hastype \gamma e A \yields E $ & Premise \\
-%       & $ \hastype {\im \gamma} E {\im A} $ & By i.h. \\
-%       & $ \hastype {\im \gamma} E {\im {\recordType l A}} $ & By the definition of $ \im \cdot $
-%     \end{tabular} \\
-%
-%   \item \textbf{Case}
-%     \begin{flalign*}
-%       & \ruleRecSelectElab &
-%     \end{flalign*}
-%
-%     \begin{tabular}{rll}
-%      & $ \judgeSelect A l {A_1} \yields C $ & Premise \\
-%      & $ \hastype \epsilon C {\im A \to \im {A_1}} $ & By Lemma~\ref{lemma:select} \\
-%      & $ \hastype {\im \gamma} C {\im A \to \im {A_1}} $ & By weakening \\
-%      & $ \hastype \gamma e A \yields E $ & Premise \\
-%      & $ \hastype {\im \gamma} E {\im A} $ & By i.h. \\
-%      & $ \hastype {\im \gamma} {\app C E} {\im {A_1}} $ & By $ \rulelabeltargetApp $
-%     \end{tabular} \\
-%
-%   \item \textbf{Case}
-%     \begin{flalign*}
-%       & \ruleRecRestrictElab &
-%     \end{flalign*}
-%
-%     \begin{tabular}{rll}
-%      & $ \judgeRestrict A l {A_1} \yields C $ & Premise \\
-%      & $ \hastype \epsilon C {\im A \to \im {A_1}} $ & By Lemma~\ref{lemma:restrict} \\
-%      & $ \hastype {\im \gamma} C {\im A \to \im {A_1}} $ & By weakening \\
-%      & $ \hastype \gamma e A \yields E $ & Premise \\
-%      & $ \hastype {\im \gamma} E {\im A} $ & By i.h. \\
-%      & $ \hastype {\im \gamma} {\app C E} {\im {A_1}} $ & By $ \rulelabeltargetApp $
-%     \end{tabular} \\
-%
-%   % \item \textbf{Case}
-%   %   \begin{flalign*}
-%   %     & \rulerecordUpdateelab &
-%   %   \end{flalign*}
-%
-%   %   \begin{tabular}{rll}
-%   %     & $ \hastype \gamma {e_1} {A_1} \yields {E_1} $ & Premise \\
-%   %     & $ \hastype {\im \gamma} {E_1} {\im {A_1}} $ & By i.h. \\
-%   %     & $ \judgeUpdate A l {A_1 \yields {E_1}} {A_2} {A_3} \yields C $ & Premise \\
-%   %     & $ \hastype {\im \gamma} C {\im A \to \im {A_2}} $ & By Lemma~\ref{lemma:update-correct} \\
-%   %     & $ \hastype \gamma e A \yields E $ & Premise \\
-%   %     & $ \hastype {\im \gamma} E {\im A} $ & By i.h. \\
-%   %     & $ \hastype {\im \gamma} {\app C E} {\im {A_2}} $ & By $ \rulelabeltargetApp $
-%   %   \end{tabular} \\
-%
-%   \end{itemize}
-% \end{proof}
+
+% \bruno{fix numbering of lemmas}
+% \bruno{reflexitivity and transitivity missing. You can do a proof
+%   sketch instead of a full proof. Just say in 1 or 2 sentences what is
+% the main idea. You can mention that we have a full proof in Coq.}
+% \bruno{target type system is missing 3 cases: Tunit; Tproj1; TProj2}
+
+% \subsection{Elaboration}
+
+\lemmasub*
+\begin{proof}
+  By structural induction of the derivation.
+
+  \begin{itemize}
+
+  \item \textbf{Case}
+    \begin{flalign*}
+      & \rulesubvar &
+    \end{flalign*}
+
+    \begin{tabular}{rll}
+      & $ \hastype {\epsilon} {\lam x {\im \alpha} x} {\alpha \to \alpha} $ & By $ \rulelabeltargetvar $ and $ \rulelabeltargetlam $
+    \end{tabular} \\
+
+  \item \textbf{Case}
+    \begin{flalign*}
+      & \rulesubfun &
+    \end{flalign*}
+
+    \begin{tabular}{rll}
+      & $ \hastype \epsilon {C_1} {\im {A_3} \to \im {A_1}} $ & By i.h. \\
+      & $ \hastype \epsilon {C_2} {\im {A_2} \to \im {A_4}} $ & By i.h. \\
+      & $ \hastype {\epsilon, x \hast {\im {A_3}}} x {\im {A_3}} $ & By $\rulelabeltargetvar$ \\
+      & $ A_3 \subtype A_1 \yields {C_1} $ & Premise \\
+      & $ \hastype {\epsilon, x \hast {\im {A_3}}} {\app {C_1} x} {\im {A_1}} $ & By $\rulelabeltargetApp$ \\
+      & $ \hastype {\epsilon, f \hast {\im {A_1 \to A_2}}} f {\im {A_1 \to A_2}} $ & By $\rulelabeltargetvar$ \\
+      & $ \hastype {\epsilon, f \hast {\im {A_1 \to A_2}}} f {\im {A_1} \to \im {A_2}} $ & By the definition of $ \im \cdot $ \\
+      & $ \hastype {\epsilon, f \hast {\im {A_1 \to A_2}}, x \hast {\im {A_3}}} {\app f {(\app {C_1} x})} {\im {A_2}} $ & By $\rulelabeltargetApp$ \\
+      & $ \hastype {\epsilon, f \hast {\im {A_1 \to A_2}}, x \hast {\im {A_3}}} {\app {C_2} {(\app f {(\app {C_1} x})})} {\im {A_4}} $ & By $\rulelabeltargetApp$ \\
+      & $ \hastype \epsilon {\lam f {\im {A_1 \to A_2}} {\lam x {\im {A_3}} {\app {C_2} {(\app f {(\app {C_1} x)})}}}} {\im {A_1 \to A_2} \to \im {A_3} \to \im {A_4}} $ & By applying $\rulelabeltargetlam$ twice \\
+      & $ \hastype \epsilon {\lam f {\im {A_1 \to A_2}} {\lam x {\im {A_3}} {\app {C_2} {(\app f {(\app {C_1} x)})}}}} {\im {A_1 \to A_2} \to \im {A_3 \to A_4}} $ & By the definition of $\im \cdot$
+    \end{tabular} \\
+
+  \item \textbf{Case}
+    \begin{flalign*}
+      & \rulesubforall &
+    \end{flalign*}
+
+    \begin{tabular}{rll}
+      & $ \hastype \epsilon C {\im {A_1} \to {\im {\subst {\alpha_1} {\alpha_2} A_2}}} $ & By i.h. \\
+      & $ \hastype {\epsilon, f \hast {\im {\for {\alpha_1} {A_1}}}} f {\im {\for {\alpha_1} {A_1}}} $ & By $\rulelabeltargetvar$ \\
+      & $ \hastype {\epsilon, f \hast {\im {\for {\alpha_1} {A_1}}}} f {\for {\alpha_1} {\im {A_1}}} $ & By the definition of $ \im \cdot $ \\
+      & $ \hastype {\epsilon, f \hast {\im {\for {\alpha_1} {A_1}}}, \alpha} {\tapp f \alpha} {\subst \alpha {\alpha_1} {\im {A_1}}} $ & By $\rulelabeltargetvar$ and $\rulelabeltargetTApp$ \\
+      & $ \hastype {\epsilon, f \hast {\im {\for {\alpha_1} {A_1}}}, \alpha} {\app C {(\tapp f \alpha)}} {\subst \alpha {\alpha_1} {\im {\subst {\alpha_1} {\alpha_2} {A_2}}}} $ & By $\rulelabeltargetApp$ \\
+      & $ \hastype {\epsilon, f \hast {\im {\for {\alpha_1} {A_1}}}} {\blam \alpha {\app C {(\tapp f \alpha)}}} {\for {\alpha_2} {\im {A_2}}} $ & By $\rulelabeltargetBLam$ and substitution \george{Substitution is problematic} \\
+      & $ \hastype \epsilon {\lam f {\im {\for {\alpha_1} {A_1}}} {\blam \alpha {\app C {(\tapp f \alpha)}}}} {\im {\for {\alpha_1} {A_1}} \to \for {\alpha_2} {\im {A_2}}} $ & By $\rulelabeltargetlam$ \\
+      & $ \hastype \epsilon {\lam f {\im {\for {\alpha_1} {A_1}}} {\blam \alpha {\app C {(\tapp f \alpha)}}}} {\im {\for {\alpha_1} {A_1}} \to \im {\for {\alpha_2} {A_2}}} $ & By the definition of $\im \cdot$
+    \end{tabular} \\
+
+  \item \textbf{Case}
+    \begin{flalign*}
+      & \rulesubinter &
+    \end{flalign*}
+
+    \begin{tabular}{rll}
+      & $\hastype {\epsilon, x \hast \im {A_1}} x {\im {A_1}}$ & By $\rulelabeltargetvar$ \\
+      & $\hastype \epsilon {C_1} {\im {A_1} \to \im {A_2}}$ & By i.h. \\
+      & $\hastype {\epsilon, x \hast \im {A_1}} {\app {C_1} x} {\im {A_2}}$ & By $\rulelabeltargetApp$ and weakening \\
+      & $\hastype {\epsilon, x \hast \im {A_1}} {\app {C_2} x} {\im {A_3}}$ & Similar \\
+      & $\hastype {\epsilon, x \hast \im {A_1}} {\pair {\app {C_1} x} {\app {C_2} x}} {\pair {\im {A_2}} {\im {A_3}}}$ & By $\rulelabeltargetPair$ \\
+      & $\hastype {\epsilon, x \hast \im {A_1}} {\pair {\app {C_1} x} {\app {C_2} x}} {\im {A_2 \inter A_3}}$ & By the definition of $\im \cdot$ \\
+      & $\hastype \epsilon {\lam x {\im {A_1}} {\pair {\app {C_1} x} {\app {C_2} x}}} {\im {A_1} \to {\im {A_2 \inter A_3}}}$ & By $\rulelabeltargetlam$
+    \end{tabular} \\
+
+  \item \textbf{Case}
+    \begin{flalign*}
+      & \rulesubinterl &
+    \end{flalign*}
+
+    \begin{tabular}{rll}
+      & $ \hastype {\epsilon, x \hast \im {A_1 \inter A_2}} x {\im {A_1 \inter A_2}} $ & By $\rulelabeltargetvar$ \\
+      & $ \hastype {\epsilon, x \hast \im {A_1 \inter A_2}} x {\pair {\im {A_1}} {\im {A_2}}} $ & By the definition of $\im \cdot$ \\
+      & $ \hastype {\epsilon, x \hast \im {A_1 \inter A_2}} {\proj 1 x} {\im {A_1}} $ & By $\rulelabeltargetprojl$ \\
+      & $ \hastype \epsilon C {\im {A_1} \to \im {A_3}} $ & By i.h. \\
+      & $ \hastype {\epsilon, x \hast \im {A_1 \inter A_2}} C {\im {A_1} \to \im {A_3}} $ & By weakening \\
+      & $ \hastype {\epsilon, x \hast \im {A_1 \inter A_2}} {\app C {(\proj 1 x)}} {\im {A_3}} $ & By $\rulelabeltargetApp$ \\
+      & $ \hastype \epsilon {\lam x {\im {A_1 \inter A_2}} {\app C {(\proj 1 x)}}} {\im {A_1 \inter A_2} \to \im {A_3}} $ & By $\rulelabeltargetlam$
+    \end{tabular} \\
+
+  \item \textbf{Case}
+    \begin{flalign*}
+      & \rulesubinterr &
+    \end{flalign*}
+
+    By symmetry with the above case. \\
+
+  \end{itemize}
+
+\end{proof}
+
+\begin{lemma}[Preservation of well-formedness under type translation] \label{lemma:preserve-wf}
+  If $ \istype \Gamma A $, then $ \istype {\im \Gamma} {\im A} $.
+\end{lemma}
+
+\begin{proof}
+  By structural induction of the derivation. The only case to consider is $ \rulelabelWF $.
+
+  \begin{itemize}
+
+  \item \textbf{Case}
+
+    \begin{flalign*}
+      & \ruleWF &
+    \end{flalign*}
+
+    \begin{tabular}{rll}
+      & $ \ftv A \in \Gamma $ & Premise \\
+      & $ \ftv {\im A} \in \im \Gamma $ & By the definition of $ \im \cdot $ \\
+      & $ \istype {\im \Gamma} {\im A} $ & By $ \rulelabeltargetWF $
+    \end{tabular} \\
+
+  \end{itemize}
+\end{proof}
+
+\theorempreservation*
+\begin{proof}
+  By structural induction of the derivation.
+
+  \begin{itemize}
+
+  \item \textbf{Case}
+    \begin{flalign*}
+      & \rulevar &
+    \end{flalign*}
+
+    \begin{tabular}{rll}
+     & $ (x,A) \in \Gamma $ & Premise \\
+     & $ (x,\im A) \in \im \Gamma $ & By the definition of $ \im \cdot $ \\
+     & $ \hastype {\im \Gamma} x {\im A} $ & By $ \rulelabeltargetvar $
+    \end{tabular} \\
+
+  \item \textbf{Case}
+    \begin{flalign*}
+      & \rulelam &
+    \end{flalign*}
+
+    \begin{tabular}{rll}
+      & $ \hastype {\Gamma, x \hast A} e {A_1} \yields E $ & Premise \\
+      & $ \hastype {\im {\Gamma, x \hast A}} E {\im {A_1}} $ & By i.h. \\
+      & $ \hastype {\im \Gamma, x \hast \im A} E {\im {A_1}} $ & By the definition of $ \im \cdot $ \\
+      & $ \hastype {\im \Gamma} {\lam x {\im A} E} {\im A \to \im {A_1}} $ & By $ \rulelabeltargetlam $ \\
+      & $ \hastype {\im \Gamma} {\lam x {\im A} E} {\im {A \to A_1}} $ & By the definition of $ \im \cdot $
+    \end{tabular} \\
+
+  \item \textbf{Case}
+    \begin{flalign*}
+      & \ruleapp &
+    \end{flalign*}
+
+    \begin{tabular}{rll}
+     & $ \hastype \Gamma {e_1} {A_1 \to A_2} \yields {E_1} $  & Premise \\
+     & $ \hastype {\im \Gamma} {E_1} {\im {A_1 \to A_2}} $ & By i.h. \\
+     & $ \hastype \Gamma {e_2} {A_3} \yields {E_2} $ & Premise \\
+     & $ \hastype {\im \Gamma} {E_2} {\im {A_3}} $ & By i.h. \\
+     & $ A_3 \subtype A_1 \yields C $ & Premise \\
+     & $ \hastype \epsilon C {\im {A_3} \to \im {A_1}} $ & By Lemma~\ref{lemma:sub} \\
+     & $ \hastype {\im \Gamma} {\app {E_1} {(\app C E_2)}} {\im {A_2}} $ & By $ \rulelabeltargetApp $ and the definition of $ \im \cdot $
+    \end{tabular} \\
+
+  \item \textbf{Case}
+    \begin{flalign*}
+      & \ruleblam &
+    \end{flalign*}
+
+    \begin{tabular}{rll}
+      & $ \hastype {\Gamma, \alpha} e A \yields E $ & Premise \\
+      & $ \hastype {\im {\Gamma, \alpha}} E {\im A} $ & By i.h. \\
+      & $ \hastype {\im \Gamma, \alpha} E {\im A} $ & By the definition of $ \im \cdot $ \\
+      & $ \hastype {\im \Gamma} {\blam \alpha E} {\for \alpha {\im A}} $ & By $ \rulelabeltargetBLam $ \\
+      & $ \hastype {\im \Gamma} {\blam \alpha E} {\im {\for \alpha A}} $ & By the definition of $ \im \cdot $
+    \end{tabular} \\
+
+  \item \textbf{Case}
+    \begin{flalign*}
+      & \ruletapp &
+    \end{flalign*}
+
+    \begin{tabular}{rll}
+     & $ \hastype \Gamma e {\for \alpha A_1} \yields E $ & Premise \\
+     & $ \hastype {\im \Gamma} E {\im {\for \alpha A_1}} $ & By i.h. \\
+     & $ \hastype {\im \Gamma} E {\for \alpha \im {A_1}} $ & By the definition of $ \im \cdot $ \\
+     & $ \istype \Gamma A $ & Premise \\
+     & $ \istype {\im \Gamma} {\im A} $ & By Lemma~\ref{lemma:preserve-wf} \\
+     & $ \hastype \Gamma {\tapp E {\im A}} {\subst {\im A} \alpha {\im {A_1}}} $ & By $ \rulelabeltargetTApp $ \\
+     & $ \hastype \Gamma {\tapp E {\im A}} {\im {\subst A \alpha {A_1}}} $ & By substitution lemma
+    \end{tabular} \\
+
+  \item \textbf{Case}
+    \begin{flalign*}
+      & \rulemerge &
+    \end{flalign*}
+
+    \begin{tabular}{rll}
+      & $ \hastype \Gamma {e_1} {A_1} \yields {E_1} $ & Premise \\
+      & $ \hastype {\im \Gamma} {E_1} {\im {A_1}} $ & By i.h. \\
+      & $ \hastype {\im \Gamma} {E_2} {\im {A_2}} $ & Similar to the above \\
+      & $ \hastype {\im \Gamma} {\pair {E_1} {E_2}} {\pair {\im {A_1}} {\im {A_2}}} $ & By $ \rulelabeltargetPair $ \\
+      & $ \hastype {\im \Gamma} {\pair {E_1} {E_2}} {\im {A_1 \inter A_2}} $ & By the definition of $ \im \cdot $
+    \end{tabular} \\
+
+  \end{itemize}
+\end{proof}
+
+\begin{definition}{Type variable constraint}
+  We say the \emph{constraint} of a type variable $\alpha$ inside the context
+  $\Gamma$ is $A$ if $\alpha \disjoint A \in \Gamma$.
+\end{definition}
+
+\begin{lemma}
+If $A \subtype B$ where both $A$ and $B$ are well-formed, then $A$ and $B$ cannot be disjoint.
+\end{lemma}
+
+\begin{proof}
+$A \subtype B$ implies $B$ is a common supertype of $A$ and $B$. As a result, $A$ and $B$ are not disjoint by definition.
+\end{proof}
+
+
+\begin{lemma}[Free type variables of disjoint bounds] \label{free-var-disjoint-bounds}
+  If $\isdisjoint \Gamma \alpha A$, then $\alpha \not \in \ftv A$.
+\end{lemma}
+
+\begin{proof}
+Since $A \inter B$ is well-formed, $A \disjoint B$ by the formation rule of intersection types \rulelabel{WF\_Inter}. Then by the definition of disjointness, there does not exist a type $C$ such that $A \subtype C$ and $B \subtype C$. It follows that $A \subtype C$ and $B \subtype C$ cannot hold simultaneously.
+\end{proof}
+
+\begin{proof}
+The set of rules for generating coercions is syntax-directed except for the three rules that involve intersection types in the conclusion. Therefore it suffices to show that if well-formed types $A$ and $B$ satisfy $A \subtype B$, where $A$ or $B$ is an intersection type, then at most one of the three rules applies. In the following, we do a case analysis on the shape of $A$ and $B$:
+
+\begin{itemize}
+  \item \textbf{Case} $A \neq A_1 \inter A_2$ and $B = B_1 \inter B_2$: Clearly only \textsc{subinter} can apply.
+  \item \textbf{Case} $A = A_1 \inter A_2$ and $B \neq B_1 \inter B_2$: Only two rules can apply, \textsc{subinter1} and \textsc{subinter2}. Further, by the unique subtype contributor lemma, it is not possible that $A_1 \subtype B$ and that $A_2 \subtype B$. Thus we are certain that at most one rule of \textsc{subinter1} and \textsc{subinter2} will apply.
+  \item \textbf{Case} $A = A_1 \inter A_2$ and $B = B_1 \inter B_2$\footnote{An example of this case is:
+    \[ (\integer \inter \bool) \inter \character \subtype \bool \inter \character \]}: Since $B$ is not atomic, only \rulelabel{subinter} apply.
+
+  %   Suppose the contrary, that is, more than one of the three rules apply. Since it is not possible that both \textsc{subinter1} and \textsc{subinter2} apply by the unique subtype contributor lemma, only one of \textsc{subinter1} and \textsc{subinter2} apply. Therefore \textsc{subinter} has to hold. Without the loss of generality, assume \textsc{subinter1} apply. Then we have:
+  % \[ A_1 \subtype B_1 \inter B_2 \]
+  % \[ A_1 \inter A_2 \subtype B_1 \]
+  % \[ A_1 \inter A_2 \subtype B_2 \]
+\end{itemize}
+\end{proof}
+
+\begin{lemma}{Invariance of disjointness}
+  \label{invariance-of-disjointness}
+
+  If $\isdisjoint \Gamma A B$ and $R$ respects the constraints of $\beta$, then
+  $\isdisjoint \Gamma {\subst R \beta A} {\subst R \beta B}$.
+
+\end{lemma}
+
+This lemma says that substitution for free type variables preserves disjointness
+of types if the combination of the replacement type and the type variable is
+proven disjoint.
+
+\begin{proof}
+By induction on the derivation of $\isdisjoint \Gamma A B$.
+\begin{itemize}
+  \item Case \[ \disjointvar \]
+  We need to show \[ \isdisjoint \Gamma {\subst R \beta \alpha} {\subst R \beta B} \]
+  If $\beta$ is not equivalent to $\alpha$ and is not free in $B$, then the above trivially holds by the def. of the substitution function. Otherwise, if $\beta$ is equivalent to $\alpha$, then we need to show
+  \[ \isdisjoint \Gamma R {\subst R \beta B} \]
+
+  % Note that $\beta \not \in \ftv B$. Thus $B$ is equivalent to $\subst R \beta B$.
+  %
+  % If $\beta$ is not equivalent to $\alpha$, $\subst R \beta \alpha$ is equivalent to $\alpha$. Therefore $\isdisjoint \Gamma {\subst R \beta \alpha} {\subst R \beta B}$ is true.
+  % If $\beta$ is equivalent to $\alpha$, then $\subst R \beta \alpha$ is equivalent to $R$ by the def. of the substitution function. It now remains to show \[ \isdisjoint \Gamma R B \].
+
+  \item Case \[ \disjointinterleft \]
+  By applying the i.h. and the def. of the substitution function.
+
+  \item Case \[ \disjointinterright \]
+  Similar.
+
+  \item Case \[ \disjointfun \]
+  By applying the i.h. and the def. of the substitution function.
+
+  \item Case \[ \disjointforall \]
+  By applying the i.h. and the def. of the substitution function. Note that $\alpha$ is fresh.
+
+  \item Case \[ \disjointatomic \]
+  Substitution does not change the shape of types when the variable case is excluded. Therefore, the relation in the premise of the rule continue to hold and hence the conclusion.
+
+\end{itemize}
+\end{proof}
+
+\begin{lemma}{Substitution} \label{substitution}
+
+  If $\istype \Gamma R$, $\istype \Gamma S$, and $R$ respects the constraints of
+  $\beta$, then $\istype \Gamma {\subst R \beta S}$.
+
+\end{lemma}
+
+\begin{proof}
+By induction on the derivation of $\istype \Gamma {\subst R \beta S}$.
+
+\begin{itemize}
+  \item Case \[ \wfvar \]
+  If $\alpha$ happens to be the same as $\beta$, then by the def. of substitution $\subst R \beta \alpha = R$. Since $\istype \Gamma R$, we have $\istype \Gamma {\subst R \beta \alpha}$; On the other hand, if not, then by the def. of substitution $\subst R \beta S = S$. Since $\istype \Gamma S$, we also have $\istype \Gamma {\subst R \beta \alpha}$.
+
+  \item Case
+  \begin{mathpar}
+    \wfbot
+  \end{mathpar}
+  Trivial.
+
+  \item Case
+  \begin{mathpar}
+    \wffun
+  \end{mathpar}
+  By i.h., $\istype \Gamma {\subst R \beta A}$ and $\istype \Gamma {\subst R \beta B}$. By the def. of substitution, $\istype \Gamma {\subst R \beta {A \to B}}$.
+
+  \item Case
+  \begin{mathpar}
+    \wfforall
+  \end{mathpar}
+  By the premise and the i.h.,
+  \[ \istype {\Gamma} {\subst R \beta A} \]
+  \[ \istype {\Gamma, \alpha \disjoint A} {\subst R \beta B} \]
+  which by \rulelabel{WFForall} implies
+  \[ \istype \Gamma {\for {\alpha \disjoint A} {\subst R \beta B}} \]
+  By the def. of substitution, $\istype \Gamma {\subst R \beta {\for {\alpha \disjoint A} B}}$~
+
+  \item Case
+  \begin{mathpar}
+    \wfinter
+  \end{mathpar}
+  By i.h., $\istype \Gamma {\subst R \beta A}$ and $\istype \Gamma {\subst R \beta B}$. By Lemma~\ref{invariance-of-disjointness}, we also have $\isdisjoint \Gamma {\subst R \beta A} {\subst R \beta B}$. Therefore by \rulelabel{WFInter}, $\istype \Gamma {\subst R \beta {A \inter B}}$.
+\end{itemize}
+\end{proof}
+
+
+
+\begin{proof}
+By induction.
+
+\begin{itemize}
+  \item Case \[ \wfvar \]
+  If $C = \alpha$, then $\subst A \alpha \alpha = A$. Since $\istype \Gamma A$, it follows that $\istype \Gamma {\subst A \alpha \alpha}$; otherwise, let $C = \beta$, where $\beta$ is a type variable distinct from $\alpha$. Since $\istype {\Gamma, \alpha \disjoint B} \beta$ and $\alpha$ and $\beta$ are distinct, $\beta$ must be in $\Gamma$ and therefore $\istype {\Gamma} \beta$, which is equivalent to $\istype {\Gamma} {\subst A \alpha \beta}$.
+
+  \item Case \[ \wffun \]
+  By straightforwardly applying the i.h and the rule itself.
+
+  \item Case \[ \wfbot \]
+  Trivial.
+
+  \item Case \[ \wfforall \]
+  By straightforwardly applying the i.h and the rule itself.
+
+  \item Case \[ \wfinter \]
+  Let $C$ in the statement of this lemma be $C_1 \inter C_2$.
+  By the condition we know
+  \[ \istype {\Gamma, \alpha \disjoint B} {C_1 \inter C_2} \]
+  Thus we must have,
+  \[ \istype {\Gamma, \alpha \disjoint B} {C_1} \]
+  By the i.h., $\istype \Gamma {\subst A \alpha {C_1}}$ and similarly $\istype \Gamma {\subst A \alpha {C_2}}$. By \rulelabel{WFInter}\george{Show disjointness},
+  \[ \istype \Gamma {\subst A \alpha {C_1} \inter \subst A \alpha {C_2}} \]
+  and hence
+  \[ \istype \Gamma {\subst A \alpha {(C_1 \inter C_2)}} \]
+
+\end{itemize}
+
+\end{proof}
+
+\begin{proof}
+By induction on the derivation of $\hastype \Gamma e A$. The case of \rulelabel{TyTApp} needs special attention
+\begin{mathpar}
+  \ruletapp
+\end{mathpar}
+because we need to show that the result of substitution ($\subst A \alpha C$) is well-formed, which is evident by Lemma~\ref{instantiation}.
+\end{proof}
+
+\begin{proof}
+The typing rules are syntax-directed. The case of \rulelabel{TyApp} needs special attention since we still need to show that the generated coercion $C$ is unique.
+\begin{mathpar}
+  \ruleapp
+\end{mathpar}
+By Lemma~\ref{wf-typing}, we have $\istype \Gamma {A_1}$ and $\istype \Gamma {A_3}$. Therefore we are able to apply Lemma~\ref{unique-coercion} and conclude that $C$ is unique.
+\end{proof}
+
+\begin{figure}
+  \begin{mathpar}
+    \framebox{$\isatomic A$} \\
+
+    \inferrule*
+      {}
+      {\isatomic \bot}
+
+    \inferrule*
+      {}
+      {\isatomic {A \to B}}
+
+    \inferrule*
+      {}
+      {\isatomic {\for {\alpha \disjoint B} A}}
+
+  \end{mathpar}
+  \caption{Atomic types.}
+\end{figure}
+
+
+\begin{theorem}
+  If $A \subtype C$, then $A \inter B \subtype C$.
+  If $B \subtype C$, then $A \inter B \subtype C$.
+\end{theorem}
+
+\george{Add interpretation of the theorem}
+
+\begin{proof}
+  By induction on $C$.
+  If $C \neq C_1 \inter C_2$, trivial.
+  If $C = C_1 \inter C_2$,
+  Need to show $A \subtype C_1 \inter C_2$ implies $A \inter B \subtype C_1 \inter C_2$.
+  By inversion $A \subtype C_1$ and $A \subtype C_2$.
+  By the i.h., $A \inter B \subtype C_1$ and $A \inter B \subtype C_2$.
+  By \rulelabel{subinter}, $A \inter B \subtype C_1 \inter C_2$.
+\end{proof}
+
+\begin{lemma}{Symmetry of disjointness} \label{symmetry-of-disjointness}
+  If $\isdisjoint \Gamma A B$, then $\isdisjoint \Gamma B A$.
+\end{lemma}
+
+\begin{proof}
+  Trivial by the definition of disjointness.
+\end{proof}
+
+\begin{theorem} \label{disjoint-intersect}
+  If $\isdisjoint \Gamma A C$ and $\isdisjoint \Gamma B C$,
+  then $\isdisjoint \Gamma {A \inter B} {C}$.
+\end{theorem}
+
+\begin{lemma} \label{common-supertype}
+  If $A_1 \to A_2 \subtype D$ and $B_1 \to B_2 \subtype D$,
+  then there exists a $C$ such that $A_2 \subtype C$ and $B_2 \subtype C$.
+\end{lemma}
+
+\begin{proof}
+  By induction on $D$.
+\end{proof}
+
+\begin{theorem}{Soundness}
+  For any two types $A$, $B$, $\isdisjointi \Gamma A B$ implies $\isdisjoint \Gamma A B$.
+\end{theorem}
+
+\begin{proof}
+  By induction on $*_I$.
+
+  \begin{itemize}
+    \item Case \[ \disjointfun \]
+
+    Lemma~\ref{common-supertype}
+
+    \george{May need an extracted lemma here}
+
+    \item Case \[ \disjointinterleft \]
+
+    By Lemma~\ref{disjoint-intersect} and the i.h.
+
+    \item Case \[ \disjointinterright \]
+
+    By Lemma~\ref{disjoint-intersect}, Lemma~\ref{symmetry-of-disjointness}, and the i.h.
+
+    \item Case \[ \disjointatomic \]
+    Need to show ...
+    By unfolding the definition of disjointness
+    Need to show there does not exists $C$ such that...
+    By induction on $C$.
+    Atomic cases...
+    If $C = C_1 \inter C_2$
+    By inversion and the i.h. we arrive at a contradiction.
+
+  \end{itemize}
+\end{proof}
+
+\begin{theorem}{Completeness}
+  For any two type $A$, $B$, $\isdisjoint \Gamma A B$ implies $\isdisjointi \Gamma A B$.
+\end{theorem}
+
+\begin{proof}
+  Induction on $A$.
+
+  \begin{itemize}
+    \item Case $\bot$
+
+    Induction on $B$.
+      \begin{itemize}
+        \item Case $B = \bot$
+
+          Need to show $\Gamma \turns \bot * \bot$ implies $\Gamma \turns \bot *_I \bot$. Take $C = \bot$. Clearly the premise is false by definition. Then the whole statement is true. \george{???}
+
+        \item Case $B = B_1 \to B_2$
+        The conclusion is true by the disjoint axioms.
+
+        \item Case $B = B_1 \inter B_2$.
+        Need to show $\Gamma \turns \bot * B_1 \inter B_2$ implies $\Gamma \turns \bot *_I B_1 \inter B_2$. Apply \rulelabel{DisjointInter2} and the resulting conditions can be proved by the i.h.
+
+        \item Case
+      \end{itemize}
+
+      \item $A = A_1 \to A_2$
+        \begin{itemize}
+          \item Case $B = \bot$
+          The conclusion is true by the disjoint axioms.
+
+          \item Case $B = B_1 \to B_2$
+          Need to show $\Gamma \turns  A_1 \to A_2 * B_1 \to B_2$ implies $\Gamma \turns  A_1 \to A_2 *_I B_1 \to B_2$. Apply \rulelabel{DisjointFun} and the result, $\Gamma \turns A_2 *_I B_2$, can be proved by the i.h.
+
+          \item Case $B = B_1 \inter B_2$.
+          Need to show $\Gamma \turns A_1 \to A_2 * B_1 \inter B_2$ implies $\Gamma \turns A_1 \to A_2 *_I B_1 \inter B_2$. Apply \rulelabel{DisjointInter2} and the resulting conditions can be proved by the i.h.
+        \end{itemize}
+
+        \item $A = A_1 \inter A_2$
+        By \rulelabel{DisjointInter1} and by the i.h.
+
+      \end{itemize}
+\end{proof}

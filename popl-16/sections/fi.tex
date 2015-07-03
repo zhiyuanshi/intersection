@@ -107,25 +107,42 @@ $\ftv \cdot$ for sets of free variables.
 
 \begin{figure*}
   \begin{mathpar}
-    \framebox{$ A \subtype B \yields F $} \\
+    \framebox{$ A \subtype B \yields E $} \\
 
-    \subvar
+    \rulesubvar
 
-    \subfun
+    \rulesubfun
 
-    \subforall
+    \rulesubforall
 
-    \subinter
+    \rulesubinter
 
-    \subinterleft
+    \rulesubinterl
 
-    \subinterright
+    \rulesubinterr
   \end{mathpar}
 
   \footnote{miss a rule for $\bot$}
 
-  \caption{Subtyping in \name.}
-  \label{fig:fi-subtyping}
+  \begin{mathpar}
+    \framebox{$ \hastype \Gamma e A \yields E $} \\
+
+    \rulevar
+
+    \rulelam
+
+    \ruleapp
+
+    \ruleblam
+
+    \ruletapp
+
+    \rulemerge
+
+  \end{mathpar}
+
+  \caption{The type system of \name.}
+  \label{fig:fi-typing}
 \end{figure*}
 
 The subtyping rules of \name, shown in Figure~\ref{fig:fi-subtyping}, are
@@ -156,8 +173,8 @@ atomic.
 % \item $ \recordType {l_1} {A_1} $ is a subtype of $ \recordType {l_2} {A_2} $, if
 %   $ l_1 $ and $ l_2 $ are identical and $ A_1 $ is a subtype of $ A_2 $.
 % \end{enumerate}
-% The first point is captured by two rules $ \rulelabelsubinterLeft $ and
-% $ \rulelabelsubinterRight $, whereas the second point by $ \rulelabelsubinter $.
+% The first point is captured by two rules $ \rulelabelsubinterl $ and
+% $ \rulelabelsubinterr $, whereas the second point by $ \rulelabelsubinter $.
 % Note that the last point means that record types are covariant in the type of
 % the fields.
 
@@ -176,28 +193,6 @@ For the corresponding mechanized proofs in Coq, we refer to the supplementary
 materials submitted with the paper.
 
 \subsection{Typing}
-
-\begin{figure*}
-  \begin{mathpar}
-    \framebox{$ \hastype \Gamma e A \yields E $} \\
-
-    \tyvar
-
-    \tylam
-
-    \tyapp
-
-    \tyblam
-
-    \tytapp
-
-    \tymerge
-
-  \end{mathpar}
-
-  \caption{The type system of \name.}
-  \label{fig:fi-typing}
-\end{figure*}
 
 The syntax-directed typing rules of \name are shown in
 Figure~\ref{fig:fi-typing}. They consist of one main typing judgment and two
@@ -280,8 +275,8 @@ Figure~\ref{fig:f-syntax} and the typing rules in the appendix.
 % \bruno{Why is this lemma placed here?}
 % \bruno{Generaly Speaking this text seems out of place.Move to 5.4, maybe?}
 
-% The main translation judgment is $ \hastype \gamma e A \yields E $ which
-% states that with respect to the typing context $ \gamma $, the \name term
+% The main translation judgment is $ \hastype \Gamma e A \yields E $ which
+% states that with respect to the typing context $ \Gamma $, the \name term
 % $e$ is of $A$ and its translation is a target term $ E $.
 
 \subsection{Type Translation}
@@ -296,7 +291,7 @@ Figure~\ref{fig:f-syntax} and the typing rules in the appendix.
 Figure~\ref{fig:type-and-context-translation} defines the type translation
 function $\im \cdot$ from \name types $A$ to target language types $T$. The
 notation $\im \cdot$ is also overloaded for context translation from \name
-contexts $\gamma$ to target language contexts $\Gamma$.
+contexts $\Gamma$ to target language contexts $\Gamma$.
 
 % The rules given in this section are identical with those in
 % Section~\ref{sec:fi}, except for the light blue part. The translation consists
@@ -361,7 +356,7 @@ those in the previous section with the light-blue part for the translation.
 % \bruno{Don't use itemize and items. Use paragraphs instead!}
 
 \paragraph{Main translation judgment.} The main translation judgment
-$\hastype \gamma e A \yields E$ extends the typing judgment with an elaborated
+$\hastype \Gamma e A \yields E$ extends the typing judgment with an elaborated
 term on the right hand side of $\yields {}$. The translation ensures
 that $E$ has type $\im A$. In \name, one may pass more information to a
 function than what is required; but not in System $F$. To account for this
@@ -401,8 +396,8 @@ into pairs.
 
 \begin{restatable}[Translation preserves well-typing]{theorem}{theorempreservation}
   \label{theorem:preservation}
-  If $ \hastype \gamma e A \yields E $,
-  then $ \hastype {\im \gamma} E {\im A} $.
+  If $ \hastype \Gamma e A \yields E $,
+  then $ \hastype {\im \Gamma} E {\im A} $.
 \end{restatable}
 \begin{proof}
 (Sketch) By structural induction on the term and the corresponding
