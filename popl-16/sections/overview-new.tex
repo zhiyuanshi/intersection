@@ -460,6 +460,15 @@ the original program no longer typechecks, thus preventing overlapping types.
 \subsection{Application: Extensible Encodings of Datatypes}
 \label{subsec:OAs}
 
+The combination of parametric polymorphism, intersection types and the
+merge operator is useful to encode datatypes with subtyping and
+support extensibility in \name. Moreover, the combination of
+polymorphism and the merge operator is essential to allow the
+composition of multiple operations over datatypes. In the following 
+we present a step-by-step solution to the Expression Problem in \name, 
+and illustrate how to combine multiple operations.
+
+\begin{comment}
 Oliveira and Cook~\cite{oliveira2012extensibility} proposed a design pattern that can solve the
 Expression Problem in languages like Java. An advantage of the pattern
 over previous solutions is that it is relatively lightweight in terms
@@ -489,53 +498,70 @@ this section shows how object algebras and object algebra composition
 can be encoded in \name. We will illustrate this point
 step-by-step by solving the Expression Problem.
 %%Prior knowledge of object algebras is not assumed.
-
+\end{comment}
+ 
 % can be cumbersome and
 % language support for intersection types would solve that problem.
 % Our type system is just a simple extension of System $ F $; yet surprisingly, it
 % is able to solve the limitations of using object algebras in languages such as
 % Java and Scala.
 
-\paragraph{A simple system of arithmetic expressions.}
+\paragraph{Church Encoded Arithmetic Expressions}
 In the Expression Problem, the idea is to start with a very simple
 system modeling arithmetic expressions and evaluation.
-The initial system considers expressions with two variants (literals and
-addition) and one operation (evaluation). Here is an interface that supports
-evaluation:
-\begin{comment}
-  \begin{lstlisting}{language=F2J}
-    type IEval = {eval: Int};
-  \end{lstlisting}
-\end{comment}
-\lstinputlisting[linerange=4-4]{../src/ObjectAlgebra.sf} % APPLY:linerange=OA_IEVAL
+The standard Church encoding for arithmetic expressions, 
+denoted as the type \lstinline{CExp}, is:
 
-\noindent In \name the interfaces of objects (or object types) are expressed as
-a record type. A \lstinline{type} declaration allow us to create a
-simple alias for a type.  In this case \lstinline{IEval} is an alias
-for \{\lstinline{eval: Int}\}.
+\begin{lstlisting}{language=F2J}
+type CExp = forall E. (Int -> E) -> (E -> E -> E) -> E
+\end{lstlisting}
 
-With object algebras, the idea is to create an object algebra
-interface, \lstinline$ExpAlg$, for expression types with the two
-variants. This interface has a fixed number of variants, but abstracts over the
-type of the interpretation \lstinline$E$.
+\noindent However, for extensibility purposes~\cite{}, it is better to break
+down the type of the Church encoding into two parts: 
 
-\begin{comment}
-  \begin{lstlisting}{language=F2J}
-    type ExpAlg[E] = {
-      lit: Int -> E,
-      add: E -> E -> E
-    };
-  \end{lstlisting}
-\end{comment}
+\begin{lstlisting}{language=F2J}
+type ExpAlg[E] = {
+  lit: Int -> E, 
+  add: E -> E -> E
+};
+\end{lstlisting}
 
-\lstinputlisting[linerange=8-11]{../src/ObjectAlgebra.sf} % APPLY:linerange=OA_EXPALG
+\noindent The first part, captured by the type \lstinline{ExpAlg[E]}
+is constitutes the so-called algebra of the datatype. For additional 
+clarity of presentation, we use records to capture the two components
+of the algebra. The first component abstracts over the type of the
+constructor for literal expressions (\lstinline{Int -> E}). The second 
+component abstracts over the type of addition expressions 
+(\lstinline{E -> E -> E}). 
 
-% whereas
-%\lstinline$ExpAlg[IEval & IPrint]$ will be the type of object algebras that
-%support both evaluation and pretty printing.
-% In \name, record types are structural and hence any value that satisfies this
-% interface is of type \lstinline$IEval$ or of a subtype of \lstinline$IEval$.
-% \footnote{Should be mentioned in S2.}
+The second part, which is the actual type of the Church encoding, is:
+
+\begin{lstlisting}{language=F2J}
+type Exp = {accept : forall E. ExpAlg[E] -> E};
+\end{lstlisting}
+
+\noindent It should be clear that, modulo some refactoring, and the
+use of records, the type \lstinline{Exp} and \lstinline{CExp}
+are equivalent.\bruno{more explanation?}
+
+Using \lstinline{Exp} the two data constructors are defined as follows:
+
+\begin{lstlisting}{language=F2J}
+let lit (n: Int): Exp = {
+  accept = /\E -> \(f: ExpAlg[E]) -> f.lit n
+};
+let add (e1: Exp) (e2: Exp): Exp = {
+  accept = /\E -> \(f: ExpAlg[E]) -> 
+   f.add (e1.accept[E] f) (e2.accept[E] f)
+};
+\end{lstlisting}
+
+Here is an interface that supports evaluation:
+
+\begin{lstlisting}{language=F2J}
+ type IEval = {eval: Int};
+\end{lstlisting}
+
 Having defined the interfaces, we can implement that object algebra interface
 with \lstinline$evalAlg$, which is an object algebra for evaluation.
 \begin{comment}
@@ -557,29 +583,37 @@ supporting evaluation. However, the one interesting point
 of object algebras is that other operations can be supported as
 well.
 
-\paragraph{Add a subtraction variant.} The point of the Expression
-Problem is to support the addition of new features to the existing
-program, without modifying existing code.
-The first feature is adding a new variant, such as subtraction. We can do so by
-simply intersecting the original types and merging with the original values:
+\paragraph{Extensibility and Subtyping} In the Expression Problem the goal is to
+achieve extensibility in two dimensions: constructors and operations. 
 
-\begin{comment}
-  \begin{lstlisting}{language=F2J}
-    type SubExpAlg[E] =
-    ExpAlg[E] & {sub: E -> E -> E};
-    let subEvalAlg = evalAlg ,, {
-      sub = \(x: IEval) (y: IEval) -> {
-        eval = x.eval - y.eval
-      }
-    };
-  \end{lstlisting}
-\end{comment}
+Arithmetic expressions with subtyping are defined using the type \lstinline{SubExp}:
 
-\lstinputlisting[linerange=24-31]{../src/ObjectAlgebra.sf} % APPLY:linerange=OA_SUBEXPALG
+\begin{lstlisting}{language=F2J}
+type SubExpAlg[E] = 
+   ExpAlg[E] & {sub: E -> E -> E};
 
-\noindent Note that here intersection types are used to model \emph{type
-  inheritance} and the merge operator models a basic form of
-\emph{dynamic implementation inheritance}.
+type SubExp = {
+   accept: forall A. SubExpAlg[A] -> A
+};
+
+let sub (e1: SubExp) (e2: SubExp): SubExp ={ 
+  accept = /\E -> \(f : SubExpAlg[E]) ->
+  f.sub (e1.accept[E] f) (e2.accept[E] f) 
+};
+\end{lstlisting}
+
+
+Due to the structural subtyping relation of \name, \lstinline{SubExp}
+is a subtype of \lstinline{Exp}.
+
+\begin{lstlisting}{language=F2J}
+let subEvalAlg = evalAlg ,, {
+  sub = \(x: IEval) (y: IEval) -> { 
+    eval = x.eval - y.eval 
+  }
+};
+\end{lstlisting}
+
 
 \paragraph{Add a pretty printing operation.}
 A second extension is adding a new operation, such as pretty printing.
@@ -608,26 +642,21 @@ addition, and subtraction is:
 \end{comment}
 \lstinputlisting[linerange=39-47]{../src/ObjectAlgebra.sf} % APPLY:linerange=OA_PRINTALG
 
-\paragraph{Usage.}
-With the definitions above, values are created using the
-appropriate algebras. For example, the expression \lstinline{7 + 2}
-is encoded as follows:
+\paragraph{Usage.} With visitors constructing expressions is quite simple:
+
 \begin{comment}
   \begin{lstlisting}{language=F2J}
-    let e1[E] (f: SubExpAlg[E]) =
-    f.add (f.lit 7) (f.lit 2);
+    e2 = sub (lit 7) (lit 2)
   \end{lstlisting}
 \end{comment}
-\lstinputlisting[linerange=51-52]{../src/ObjectAlgebra.sf} % APPLY:linerange=OA_E1
-
-\noindent The expressions are unusual in the sense that they are
-functions that take an extra argument \lstinline$f$. The extra
-argument is an object algebra that uses the functions in the record
-(\lstinline$lit$, \lstinline$add$ and \lstinline$sub$) as factory
-methods for creating values. Moreover, the algebras themselves are
-abstracted over the allowed operations such as evaluation and pretty
-printing by requiring the expression functions to take an extra
-argument \lstinline$E$.
+\lstinputlisting[linerange=49-50]{../src/Visitor.sf} % APPLY:linerange=V_USAGE
+The result is \lstinline$"7 - 2"$. Note that the programmer is able to pass \lstinline{lit 2}, which is of type \lstinline{Exp},
+to \lstinline{sub}, which expects a \lstinline{SubExp}. The types are compatible
+because because \lstinline$Exp$ is a \emph{subtype} of \lstinline$SubExp$. Code
+reuse is achieved since we can use the constructors from \lstinline$Exp$ as the
+constructor for \lstinline$SubExp$. In Scala, we would have to define two
+literal constructors, one for \lstinline$Exp$ and another for
+\lstinline$SubExp$. 
 
 \paragraph{Dynamic object algebra composition.}
 To obtain an expression that supports both evaluation and pretty
