@@ -341,7 +341,7 @@ $A_1\inter A_2$, project $x$ on the first item, and apply $ C $ to it.
 
 \begin{restatable}[Subtyping rules produce type-correct coercion]{lemma}{lemmasub}
   \label{lemma:sub}
-  If $ A_1 \subtype A_2 \yields C $, then $ \judgeTarget \epsilon C {\im {A_1} \to \im {A_2}} $.
+  If $ A_1 \subtype A_2 \yields C $, then $ \hastype \epsilon C {\im {A_1} \to \im {A_2}} $.
 \end{restatable}
 
 \begin{proof}
@@ -379,7 +379,7 @@ into pairs.
 %     ({ name = "Isaac"} ,, { age = 10 }).name
 %   \end{lstlisting}
 
-%   By $ \ruleLabelSelect $,
+%   By $ \rulelabelSelect $,
 %   \[ \turnsGet (\recordType {name} {String}; {name}) : String \]
 
 %   we have the coercion
@@ -387,7 +387,7 @@ into pairs.
 
 %   which is just $ \lam x {String} x $ according to type translation.
 
-%   By $ \ruleLabelSelectLeft $,
+%   By $ \rulelabelSelectLeft $,
 %   \[ \turnsGet (\recordType {name} {String} \inter \recordType {age} {Int}; {name}) : String \]
 
 %   % we have the coercion
@@ -402,7 +402,7 @@ into pairs.
 \begin{restatable}[Translation preserves well-typing]{theorem}{theorempreservation}
   \label{theorem:preservation}
   If $ \hastype \gamma e A \yields E $,
-  then $ \judgeTarget {\im \gamma} E {\im A} $.
+  then $ \hastype {\im \gamma} E {\im A} $.
 \end{restatable}
 \begin{proof}
 (Sketch) By structural induction on the term and the corresponding

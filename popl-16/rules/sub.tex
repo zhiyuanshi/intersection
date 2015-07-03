@@ -1,26 +1,26 @@
-\newcommand{\ruleLabelSub}{\text{Sub}}
-\newcommand{\ruleLabelsubvar}{\ruleLabelSub\text{Var}}
-\newcommand{\ruleLabelSubTop}{\ruleLabelSub\text{Top}}
-\newcommand{\ruleLabelsubfun}{\ruleLabelSub\text{Fun}}
-\newcommand{\ruleLabelsubforall}{\ruleLabelSub\text{Forall}}
-\newcommand{\ruleLabelsubinter}{\ruleLabelSub\text{And}}
-\newcommand{\ruleLabelsubinterLeft}{\ruleLabelSub{\text{And}_1}}
-\newcommand{\ruleLabelsubinterRight}{\ruleLabelSub{\text{And}_2}}
+\newcommand{\rulelabelSub}{\text{Sub}}
+\newcommand{\rulelabelsubvar}{\rulelabelSub\text{Var}}
+\newcommand{\rulelabelSubTop}{\rulelabelSub\text{Top}}
+\newcommand{\rulelabelsubfun}{\rulelabelSub\text{Fun}}
+\newcommand{\rulelabelsubforall}{\rulelabelSub\text{Forall}}
+\newcommand{\rulelabelsubinter}{\rulelabelSub\text{And}}
+\newcommand{\rulelabelsubinterLeft}{\rulelabelSub{\text{And}_1}}
+\newcommand{\rulelabelsubinterRight}{\rulelabelSub{\text{And}_2}}
 
 \newcommand{\subvar}{
-\inferrule* [right=$\ruleLabelsubvar$]
+\inferrule* [right=$\rulelabelsubvar$]
   { }
   {\alpha \subtype \alpha \yields {\lamty x {\im \alpha} x}}
 }
 
 \newcommand{\subTop}{
-\inferrule* [right=$\ruleLabelSubTop$]
+\inferrule* [right=$\rulelabelSubTop$]
   { }
   {A \subtype \top \yields {\lamty x {\im A} {()}}}
 }
 
 \newcommand{\subfun}{
-\inferrule* [right=$\ruleLabelsubfun$]
+\inferrule* [right=$\rulelabelsubfun$]
   {A_3 \subtype A_1 \yields {C_1} \\ A_2 \subtype A_4 \yields {C_2}}
   {A_1 \to A_2 \subtype A_3 \to A_4
   \yields
@@ -30,7 +30,7 @@
 }
 
 \newcommand{\subforall}{
-\inferrule* [right=$\ruleLabelsubforall$]
+\inferrule* [right=$\rulelabelsubforall$]
   {A_1 \subtype \subst {\alpha_1} {\alpha_2} A_2 \yields C}
   {\for {\alpha_1 * A_3} A_1 \subtype \for {(\alpha_2 * A_3)} A_2
     \yields
@@ -39,7 +39,7 @@
 }
 
 \newcommand{\subinter}{
-\inferrule* [right=$\ruleLabelsubinter$]
+\inferrule* [right=$\rulelabelsubinter$]
   {A_1 \subtype A_2 \yields {C_1} \\ A_1 \subtype A_3 \yields {C_2}}
   {A_1 \subtype A_2 \inter A_3
     \yields
@@ -48,7 +48,7 @@
 }
 
 \newcommand{\subinterleft}{
-\inferrule* [right=$\ruleLabelsubinterLeft$]
+\inferrule* [right=$\rulelabelsubinterLeft$]
   {A_1 \subtype A_3 \yields C}
   {A_1 \inter A_2 \subtype A_3
     \yields
@@ -57,7 +57,7 @@
 }
 
 \newcommand{\subinterright}{
-\inferrule* [right=$\ruleLabelsubinterRight$]
+\inferrule* [right=$\rulelabelsubinterRight$]
   {A_2 \subtype A_3 \yields C}
   {A_1 \inter A_2 \subtype A_3
     \yields

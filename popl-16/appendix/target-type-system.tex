@@ -1,26 +1,24 @@
 \section{Target Type System}
 
 \begin{figure}[h]
-  \framebox{$ \judgeTarget \Gamma E T $}
+  \framebox{$ \hastype G E T $}
   \begin{mathpar}
 
-    \ruleTargetVar
+    \ruletargetvar
 
-    \ruleTargetUnit
+    \ruletargetlam
 
-    \ruleTargetLam
+    \ruletargetapp
 
-    \ruleTargetApp
+    \ruletargetblam
 
-    \ruleTargetBLam
+    \ruletargettapp
 
-    \ruleTargetTApp
+    \ruletargetpair
 
-    \ruleTargetPair
+    \ruletargetprojl
 
-    \ruleTargetProjLeft
-
-    \ruleTargetProjRight
+    \ruletargetprojr
 
   \end{mathpar}
 

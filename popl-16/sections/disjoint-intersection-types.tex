@@ -241,14 +241,14 @@ strict by the atomic condition, we can still derive the every judgement in the
 old systems. \george{Point to proofs and justify why the proof shows this.}
 
 \begin{mathpar}
-  \inferrule* [right=$\ruleLabelsubinterLeft$]
+  \inferrule* [right=$\rulelabelsubinterLeft$]
     {A_1 \subtype A_3 \yields C \\ \highlight{$\isatomic {A_3}$}}
     {A_1 \inter A_2 \subtype A_3
       \yields
         {\lam x {\im {A_1 \inter A_2}}
           {\app C {(\proj 1 x)}}}}
 
-  \inferrule* [right=$\ruleLabelsubinterRight$]
+  \inferrule* [right=$\rulelabelsubinterRight$]
     {A_2 \subtype A_3 \yields C \\ \highlight{$\isatomic {A_3}$}}
     {A_1 \inter A_2 \subtype A_3
       \yields
