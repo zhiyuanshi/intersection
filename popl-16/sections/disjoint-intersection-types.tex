@@ -10,7 +10,7 @@ disjoint intersections, and disjoint quantification for polymorphic types. We
 only highlight the differences here and the full specification of the language
 can be found in the appendix.
 
-\begin{theorem}[Unique elaboration] \label{unique-elaboration}
+\begin{theorem}[Unique elaboration] \label{theorem:unique-elaboration}
   If $\jtype \Gamma e {A_1} \yields {E_1}$ and $\jtype \Gamma e {A_2}
   \yields {E_2}$, then $E_1 \equiv E_2$.
 \end{theorem}
@@ -122,6 +122,22 @@ types and the typing rule for merges.
 
 \begin{figure*}
   \begin{mathpar}
+    \framebox{$\isatomic A$} \\
+
+    \inferrule*
+    {}
+    {\isatomic \bot}
+
+    \inferrule*
+    {}
+    {\isatomic {A \to B}}
+
+    \inferrule*
+    {}
+    {\isatomic {\fordis \alpha B A}}
+  \end{mathpar}
+
+  \begin{mathpar}
     \formsub \\ \rulesubinterldis \and \rulesubinterrdis
   \end{mathpar}
 
@@ -165,12 +181,12 @@ But after the substitution of $\tyint$ for $\alpha$ on the two types, the senten
 \[ \jdis {\alpha \disjoint \tyint} \tyint \tyint \]
 is longer true since $\tyint$ is clearly not disjoint with itself.
 
-\begin{lemma}{Instantiation} \label{instantiation}
+\begin{lemma}{Instantiation} \label{lemma:instantiation}
   If $\jwf {\Gamma, \alpha \disjoint B} C$, $\jwf \Gamma A$, $\jdis
   \Gamma A B$ then $\jwf \Gamma {\subst A \alpha C}$.
 \end{lemma}
 
-\begin{lemma}{Well-formed typing} \label{wf-typing}
+\begin{lemma}{Well-formed typing} \label{lemma:wf-typing}
 If $\jtype \Gamma e A$, then $\jwf \Gamma e$.
 \end{lemma}
 
@@ -178,7 +194,7 @@ If $\jtype \Gamma e A$, then $\jwf \Gamma e$.
 
 The coercion of a subtyping relation $A \subtype B$ is uniquely determined.
 
-\begin{lemma}[Unique coercion] \label{unique-coercion}
+\begin{lemma}[Unique coercion] \label{lemma:unique-coercion}
   If $A \subtype B \yields {C_1}$ and $A \subtype B \yields {C_2}$, where $A$
   and $B$ are well-formed types, then $C_1 \equiv C_2$.
 \end{lemma}
@@ -239,7 +255,7 @@ the very requirement that the theorem holds.
 \bruno{We should be finishing up this section with the key coherence
   lemma. Why is that not here?}
 
-\begin{theorem}[Unique elaboration] \label{unique-elaboration}
+\begin{theorem}[Unique elaboration] \label{theorem:unique-elaboration}
   If $\jtype \Gamma e {A_1} \yields {E_1}$ and $\jtype \Gamma e {A_2}
   \yields {E_2}$, then $E_1 \equiv E_2$.
 \end{theorem}

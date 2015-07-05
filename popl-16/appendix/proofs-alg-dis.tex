@@ -1,0 +1,143 @@
+\subsection{Soundness and Completeness of Algorithmic Disjointness}
+
+\begin{proof}
+By induction on the derivation of $\jtype \Gamma e A$. The case of \reflabel{TyTApp} needs special attention
+\begin{mathpar}
+  \rulettapp
+\end{mathpar}
+because we need to show that the result of substitution ($\subst A \alpha C$) is well-formed, which is evident by Lemma~\ref{instantiation}.
+\end{proof}
+
+\begin{proof}
+The typing rules are syntax-directed. The case of \reflabel{TyApp} needs special attention since we still need to show that the generated coercion $C$ is unique.
+\begin{mathpar}
+  \rulettapp
+\end{mathpar}
+By Lemma~\ref{wf-typing}, we have $\jwf \Gamma {A_1}$ and $\jwf \Gamma {A_3}$. Therefore we are able to apply Lemma~\ref{unique-coercion} and conclude that $C$ is unique.
+\end{proof}
+
+\begin{theorem}
+  If $A \subtype C$, then $A \inter B \subtype C$.
+  If $B \subtype C$, then $A \inter B \subtype C$.
+\end{theorem}
+
+\george{Add interpretation of the theorem}
+
+\begin{proof}
+  By induction on $C$.
+  If $C \neq E_1 \inter E_2$, trivial.
+  If $C = E_1 \inter E_2$,
+  Need to show $A \subtype E_1 \inter E_2$ implies $A \inter B \subtype E_1 \inter E_2$.
+  By inversion $A \subtype E_1$ and $A \subtype E_2$.
+  By the i.h., $A \inter B \subtype E_1$ and $A \inter B \subtype E_2$.
+  By \reflabel{subinter}, $A \inter B \subtype E_1 \inter E_2$.
+\end{proof}
+
+\begin{lemma}{Symmetry of disjointness} \label{lemma:symmetry-of-disjointness}
+  If $\jdis \Gamma A B$, then $\jdis \Gamma B A$.
+\end{lemma}
+
+\begin{proof}
+  Trivial by the definition of disjointness.
+\end{proof}
+
+\begin{theorem} \label{theorem:disjoint-intersect}
+  If $\jdis \Gamma A C$ and $\jdis \Gamma B C$,
+  then $\jdis \Gamma {A \inter B} {C}$.
+\end{theorem}
+
+\begin{lemma} \label{lemma:common-supertype}
+  If $A_1 \to A_2 \subtype D$ and $B_1 \to B_2 \subtype D$,
+  then there exists a $C$ such that $A_2 \subtype C$ and $B_2 \subtype C$.
+\end{lemma}
+
+\begin{proof}
+  By induction on $D$.
+\end{proof}
+
+\soundness*
+
+\begin{proof}
+  By induction on $*_I$.
+
+  \begin{itemize}
+    \item Case
+    \begin{flalign*}
+      & \ruledisfun &
+    \end{flalign*}
+
+    Lemma~\ref{common-supertype}
+
+    \george{May need an extracted lemma here} \\
+
+    \item Case
+    \begin{flalign*}
+      & \ruledisinterl &
+    \end{flalign*}
+
+    By Lemma~\ref{disjoint-intersect} and the i.h. \\
+
+    \item Case
+    \begin{flalign*}
+      & \ruledisinterr &
+    \end{flalign*}
+
+    By Lemma~\ref{disjoint-intersect}, Lemma~\ref{lemma:symmetry-of-disjointness}, and the i.h. \\
+
+    \item Case
+    \begin{flalign*}
+      & \ruledisatomic &
+    \end{flalign*}
+
+    Need to show ...
+    By unfolding the definition of disjointness
+    Need to show there does not exists $C$ such that...
+    By induction on $C$.
+    Atomic cases...
+    If $C = E_1 \inter E_2$
+    By inversion and the i.h. we arrive at a contradiction.
+
+  \end{itemize}
+\end{proof}
+
+
+\completeness*
+
+\begin{proof}
+  Induction on $A$.
+
+  \begin{itemize}
+    \item Case $\bot$
+
+    Induction on $B$.
+      \begin{itemize}
+        \item Case $B = \bot$
+
+          Need to show $\Gamma \turns \bot * \bot$ implies $\Gamma \turns \bot *_I \bot$. Take $C = \bot$. Clearly the premise is false by definition. Then the whole statement is true. \george{???} \\
+
+        \item Case $B = B_1 \to B_2$
+        The conclusion is true by the disjoint axioms. \\
+
+        \item Case $B = B_1 \inter B_2$.
+        Need to show $\Gamma \turns \bot * B_1 \inter B_2$ implies $\Gamma \turns \bot *_I B_1 \inter B_2$. Apply \reflabel{\labeldisinterr} and the resulting conditions can be proved by the i.h. \\
+
+        \item Case
+      \end{itemize}
+
+      \item $A = A_1 \to A_2$
+        \begin{itemize}
+          \item Case $B = \bot$
+          The conclusion is true by the disjoint axioms. \\
+
+          \item Case $B = B_1 \to B_2$
+          Need to show $\Gamma \turns  A_1 \to A_2 * B_1 \to B_2$ implies $\Gamma \turns  A_1 \to A_2 *_I B_1 \to B_2$. Apply \reflabel{\labeldisfun} and the result, $\Gamma \turns A_2 *_I B_2$, can be proved by the i.h. \\
+
+          \item Case $B = B_1 \inter B_2$.
+          Need to show $\Gamma \turns A_1 \to A_2 * B_1 \inter B_2$ implies $\Gamma \turns A_1 \to A_2 *_I B_1 \inter B_2$. Apply \reflabel{\labeldisinterr} and the resulting conditions can be proved by the i.h.
+        \end{itemize}
+
+        \item $A = A_1 \inter A_2$
+        By \reflabel{\labeldisinterl} and by the i.h.
+
+      \end{itemize}
+\end{proof}

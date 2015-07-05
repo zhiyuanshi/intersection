@@ -1,6 +1,6 @@
 \newcommand{\formt}{\framebox{$ \jtype \Gamma e A \yields E $}}
 
-\newcommand{\makelabelt}[1]{T\_#1}
+\newcommand{\makelabelt}[1]{F\_Ty\_#1}
 
 \newcommand{\labeltvar}{\makelabelt Var}
 \newcommand{\ruletvar} {
@@ -35,7 +35,7 @@
 }
 
 \newcommand{\ruletblamdis}{
-\inferrule* [right=T\_BLam]
+\inferrule* [right=\labeltblam]
   {\jwf \Gamma A \\
    \jtype {\Gamma,\alpha \disjoint A} e B \yields E \\
    \alpha \not \in \ftv \Gamma}

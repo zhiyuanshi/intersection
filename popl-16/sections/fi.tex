@@ -311,11 +311,13 @@ not in System $F$. To account for this difference, in \reflabel{\labeltapp}, the
 coercion $E$ from the subtyping relation is applied to the argument.
 \reflabel{\labeltmerge} straighforwardly translates merges into pairs.
 
-\begin{restatable}[Translation preserves well-typing]{theorem}{theorempreservation}
-  \label{theorem:preservation}
+\begin{restatable}[Type preservation]{theorem}{typepreservation}
+  \label{theorem:type-preservation}
+
   If $ \jtype \Gamma e A \yields E $,
   then $ \jtype {\im \Gamma} E {\im A} $.
 \end{restatable}
+
 \begin{proof}
   (Sketch) By structural induction on the term and the corresponding
   inference rule.
@@ -325,6 +327,7 @@ coercion $E$ from the subtyping relation is applied to the argument.
   If $e$ is a well-typed \name term, then $e$ evaluates to some System $F$
   value $v$.
 \end{theorem}
+
 \begin{proof}
   Since we define the dynamic semantics of \name in terms of the composition of
   the type-directed translation and the dynamic semantics of System $F$, type safety follows immediately.
