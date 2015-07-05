@@ -92,7 +92,8 @@ this topic in the next section.
     \end{array}
   \]
 
-  \label{fig:syntax} \caption{Syntax.}
+  \label{fig:syntax}
+  \caption{Amendments of the rules.}
 \end{figure}
 
 \bruno{do not rely on colors to emphasize parts of rules. Most likely
@@ -120,43 +121,61 @@ types and the typing rule for merges.
 
 \paragraph{Formation of disjoint intersection types}
 
-\[ \wfinter \]
+\begin{figure*}
+  \begin{mathpar}
+    \inferrule* [right=$\rulelabelsubinterl$]
+      {A_1 \subtype A_3 \yields C \\ \highlight{$\isatomic {A_3}$}}
+      {A_1 \inter A_2 \subtype A_3
+        \yields
+          {\lam x {\im {A_1 \inter A_2}}
+            {\app C {(\proj 1 x)}}}}
+
+    \inferrule* [right=$\rulelabelsubinterr$]
+      {A_2 \subtype A_3 \yields C \\ \highlight{$\isatomic {A_3}$}}
+      {A_1 \inter A_2 \subtype A_3
+        \yields
+          {\lam x {\im {A_1 \inter A_2}}
+            {\app C {(\proj 2 x)}}}}
+
+    \wfforall
+
+    \wfinter
+
+    \inferrule* [right=T\_BLam]
+      {\istype \Gamma A \\
+       \hastype {\Gamma,\alpha \disjoint A} e B \yields E \\
+       \alpha \not \in \ftv \Gamma}
+      {\hastype \Gamma {\blam {(\alpha \disjoint A)} e} {\for {(\alpha \disjoint A)} B}
+        \yields {\blam \alpha E}}
+
+    \inferrule* [right=T\_TApp]
+      {\hastype \Gamma e {\for {\alpha \disjoint B} C} \yields E \\
+       \istype \Gamma A}
+      {\hastype \Gamma {\tapp e A} {\subst A \alpha C} \yields {\tapp E {\im A}}}
+
+    \inferrule* [right=T\_Merge]
+      {\hastype \Gamma {e_1} A \yields {E_1} \\
+       \hastype \Gamma {e_2} B \yields {E_2} \\
+       \highlight{$\isdisjoint \Gamma A B$}}
+      {\hastype \Gamma {e_1 \mergeop e_2} {A \inter B} \yields {\pair {E_1} {E_2}}}
+
+  \end{mathpar}
+  \label{fig:fi-typing}
+\end{figure*}
 
 \paragraph{Disjointness judgement}
-\begin{mathpar}
-  \inferrule* [right=T\_Merge]
-    {\hastype \Gamma {e_1} A \yields {E_1} \\
-     \hastype \Gamma {e_2} B \yields {E_2} \\
-     \highlight{$\isdisjoint \Gamma A B$}}
-    {\hastype \Gamma {e_1 \mergeop e_2} {A \inter B} \yields {\pair {E_1} {E_2}}}
-\end{mathpar}
 
 We require that the two types of an intersection must be disjoint in their
-context, and that the disjointness constraint in a forall type is well-formed:
-\[ \wfforall \]
+context, and that the disjointness constraint in a forall type is well-formed.
 
 Under the new rules, intersection types such as $\tyint \inter \tyint$ are no
 longer well-formed because the two types are not disjoint.
 
 \paragraph{Disjoint quantification} A disjoint quantification is introduced by
 the big lambda $\blam {(\alpha \disjoint A)} e$ and eliminated by the usual type
-application $\tapp e A$. The constraint is added to the context with this rule:
-\[
-\inferrule* [right=T\_BLam]
-  {\istype \Gamma A \\
-   \hastype {\Gamma,\alpha \disjoint A} e B \yields E \\
-   \alpha \not \in \ftv \Gamma}
-  {\hastype \Gamma {\blam {(\alpha \disjoint A)} e} {\for {(\alpha \disjoint A)} B}
-    \yields {\blam \alpha E}}
-\]
+application $\tapp e A$. The constraint is added to the context with this rule.
 During a type application, the type system makes sure that the type argument
-satisfies the disjointness constraint:
-\[
-\inferrule* [right=T\_TApp]
-  {\hastype \Gamma e {\for {\alpha \disjoint B} C} \yields E \\
-   \istype \Gamma A}
-  {\hastype \Gamma {\tapp e A} {\subst A \alpha C} \yields {\tapp E {\im A}}}
-\]
+satisfies the disjointness constraint.
 
 \paragraph{Metatheory} Since in this section we only restrict the system in the
 previous section, it is easy to see that type preservation and type-safety still
@@ -203,21 +222,6 @@ types. Show an offending example for each?}
 \end{enumerate}
 \end{lemma}
 
-\begin{mathpar}
-  \inferrule* [right=T\_BLam]
-    {\hastype {\Gamma, \alpha \disjoint B} e A \yields E \\
-     \istype \Gamma B \\
-     \alpha \not \in \ftv \Gamma}
-    {\hastype \Gamma {\blam {\alpha \disjoint B} e} {\for {\alpha \disjoint B} A} \yields {\blam \alpha E}}
-
-    \inferrule* [right=T\_TApp]
-      {\hastype \Gamma e {\for {\alpha \disjoint B} C} \yields E \\
-       \istype \Gamma A \\
-       \highlight{$\isdisjoint \Gamma A B$}
-       }
-      {\hastype \Gamma {\tapp e A} {\subst A \alpha C} \yields {\tapp E {\im A}}}
-\end{mathpar}
-
 \paragraph{Atomic types} Atomic types are just those which are not intersection
 types, and are asserted by the judgement \[ \isatomic A \]
 
@@ -239,22 +243,6 @@ subtyping since we have the following theorem:
 The interpretation of the theorem is that: even though the premise is made more
 strict by the atomic condition, we can still derive the every judgement in the
 old systems. \george{Point to proofs and justify why the proof shows this.}
-
-\begin{mathpar}
-  \inferrule* [right=$\rulelabelsubinterl$]
-    {A_1 \subtype A_3 \yields C \\ \highlight{$\isatomic {A_3}$}}
-    {A_1 \inter A_2 \subtype A_3
-      \yields
-        {\lam x {\im {A_1 \inter A_2}}
-          {\app C {(\proj 1 x)}}}}
-
-  \inferrule* [right=$\rulelabelsubinterr$]
-    {A_2 \subtype A_3 \yields C \\ \highlight{$\isatomic {A_3}$}}
-    {A_1 \inter A_2 \subtype A_3
-      \yields
-        {\lam x {\im {A_1 \inter A_2}}
-          {\app C {(\proj 2 x)}}}}
-\end{mathpar}
 
 Note that $A$ \emph{exclusive} or $B$ is true if and only if their truth value
 differ. Next, we are going to investigate the minimal requirement (necessary and
