@@ -25,9 +25,9 @@
   {\jtype \Gamma {\app {e_1} {e_2}} {A_2} \yields {\app {E_1} {(\app C E_2)}}}
 }
 
-\newcommand{\labeltbLam}{\makelabelt BLam}
+\newcommand{\labeltblam}{\makelabelt BLam}
 \newcommand{\ruletblam}{
-\inferrule* [right=\labeltbLam]
+\inferrule* [right=\labeltblam]
   {\jtype {\Gamma, \alpha} e A \yields E \\
    \jwf \Gamma B \\
    \alpha \not \in \ftv \Gamma}

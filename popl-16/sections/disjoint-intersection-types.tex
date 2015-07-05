@@ -1,4 +1,6 @@
 \section{Disjoint Intersection Types and Disjoint Quantification}
+\label{sec:dis-inter}
+
 \george{Discuss each point in this order: goal, idea of tweaks, changes, and proofs.}
 
 Although the system shown in the previous section is type-safe, it is not
@@ -92,14 +94,11 @@ this topic in the next section.
     \end{array}
   \]
 
-  \label{fig:syntax}
   \caption{Amendments of the rules.}
+  \label{fig:fi-syntax-dis}
 \end{figure}
 
-\bruno{do not rely on colors to emphasize parts of rules. Most likely
-  papers will be printed black and white. Use gray and boxes to
-  highlight changes.}
-Figure~\ref{fig:syntax} shows the updated syntax with the changes highlighted.
+Figure~\ref{fig:fi-syntax-dis} shows the updated syntax with the changes highlighted.
 Note how similar the changes are to those needed to extend System $F$ with
 bounded quantification. First, type variables are now always associated with
 their disjointness constraints (like $\alpha \disjoint A$) in types, terms, and
@@ -134,8 +133,8 @@ types and the typing rule for merges.
     \formt \\ \ruletblamdis \and \rulettappdis \and \ruletmergedis
   \end{mathpar}
 
-  \label{fig:fi-patch}
   \caption{Affected rules.}
+  \label{fig:fi-type-patch}
 \end{figure*}
 
 \paragraph{Disjointness judgement}

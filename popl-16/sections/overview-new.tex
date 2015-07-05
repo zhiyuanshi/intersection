@@ -1,4 +1,4 @@
-\section{Overview}
+\section{Overview} \label{sec:overview}
 
 This section introduces \name and its support for intersection types,
 parametric polymorphism and the merge operator. It then discusses
@@ -464,8 +464,8 @@ The combination of parametric polymorphism, intersection types and the
 merge operator is useful to encode datatypes with subtyping and
 support extensibility in \name. Moreover, the combination of
 polymorphism and the merge operator is essential to allow the
-composition of multiple operations over datatypes. In the following 
-we present a step-by-step solution to the Expression Problem in \name, 
+composition of multiple operations over datatypes. In the following
+we present a step-by-step solution to the Expression Problem in \name,
 and illustrate how to combine multiple operations.
 
 \begin{comment}
@@ -499,7 +499,7 @@ can be encoded in \name. We will illustrate this point
 step-by-step by solving the Expression Problem.
 %%Prior knowledge of object algebras is not assumed.
 \end{comment}
- 
+
 % can be cumbersome and
 % language support for intersection types would solve that problem.
 % Our type system is just a simple extension of System $ F $; yet surprisingly, it
@@ -509,7 +509,7 @@ step-by-step by solving the Expression Problem.
 \paragraph{Church Encoded Arithmetic Expressions}
 In the Expression Problem, the idea is to start with a very simple
 system modeling arithmetic expressions and evaluation.
-The standard Church encoding for arithmetic expressions, 
+The standard Church encoding for arithmetic expressions,
 denoted as the type \lstinline{CExp}, is:
 
 \begin{lstlisting}{language=F2J}
@@ -517,22 +517,22 @@ type CExp = forall E. (Int -> E) -> (E -> E -> E) -> E
 \end{lstlisting}
 
 \noindent However, for extensibility purposes~\cite{}, it is better to break
-down the type of the Church encoding into two parts: 
+down the type of the Church encoding into two parts:
 
 \begin{lstlisting}{language=F2J}
 type ExpAlg[E] = {
-  lit: Int -> E, 
+  lit: Int -> E,
   add: E -> E -> E
 };
 \end{lstlisting}
 
 \noindent The first part, captured by the type \lstinline{ExpAlg[E]}
-is constitutes the so-called algebra of the datatype. For additional 
+is constitutes the so-called algebra of the datatype. For additional
 clarity of presentation, we use records to capture the two components
 of the algebra. The first component abstracts over the type of the
-constructor for literal expressions (\lstinline{Int -> E}). The second 
-component abstracts over the type of addition expressions 
-(\lstinline{E -> E -> E}). 
+constructor for literal expressions (\lstinline{Int -> E}). The second
+component abstracts over the type of addition expressions
+(\lstinline{E -> E -> E}).
 
 The second part, which is the actual type of the Church encoding, is:
 
@@ -551,7 +551,7 @@ let lit (n: Int): Exp = {
   accept = /\E -> \(f: ExpAlg[E]) -> f.lit n
 };
 let add (e1: Exp) (e2: Exp): Exp = {
-  accept = /\E -> \(f: ExpAlg[E]) -> 
+  accept = /\E -> \(f: ExpAlg[E]) ->
    f.add (e1.accept[E] f) (e2.accept[E] f)
 };
 \end{lstlisting}
@@ -584,21 +584,21 @@ of object algebras is that other operations can be supported as
 well.
 
 \paragraph{Extensibility and Subtyping} In the Expression Problem the goal is to
-achieve extensibility in two dimensions: constructors and operations. 
+achieve extensibility in two dimensions: constructors and operations.
 
 Arithmetic expressions with subtyping are defined using the type \lstinline{SubExp}:
 
 \begin{lstlisting}{language=F2J}
-type SubExpAlg[E] = 
+type SubExpAlg[E] =
    ExpAlg[E] & {sub: E -> E -> E};
 
 type SubExp = {
    accept: forall A. SubExpAlg[A] -> A
 };
 
-let sub (e1: SubExp) (e2: SubExp): SubExp ={ 
+let sub (e1: SubExp) (e2: SubExp): SubExp ={
   accept = /\E -> \(f : SubExpAlg[E]) ->
-  f.sub (e1.accept[E] f) (e2.accept[E] f) 
+  f.sub (e1.accept[E] f) (e2.accept[E] f)
 };
 \end{lstlisting}
 
@@ -608,8 +608,8 @@ is a subtype of \lstinline{Exp}.
 
 \begin{lstlisting}{language=F2J}
 let subEvalAlg = evalAlg ,, {
-  sub = \(x: IEval) (y: IEval) -> { 
-    eval = x.eval - y.eval 
+  sub = \(x: IEval) (y: IEval) -> {
+    eval = x.eval - y.eval
   }
 };
 \end{lstlisting}
@@ -656,7 +656,7 @@ because because \lstinline$Exp$ is a \emph{subtype} of \lstinline$SubExp$. Code
 reuse is achieved since we can use the constructors from \lstinline$Exp$ as the
 constructor for \lstinline$SubExp$. In Scala, we would have to define two
 literal constructors, one for \lstinline$Exp$ and another for
-\lstinline$SubExp$. 
+\lstinline$SubExp$.
 
 \paragraph{Dynamic object algebra composition.}
 To obtain an expression that supports both evaluation and pretty
