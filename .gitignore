@@ -35,3 +35,7 @@ bib
 # Ruby script
 *.tex-old
 footempfile.txt
+
+
+# Ott
+ott_distro_0.25*

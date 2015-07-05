@@ -1,37 +1,52 @@
-\newcommand{\wfvar}{
-  \inferrule* [right=WF\_Var]
-    {\alpha * A \in \Gamma}
-    {\istype \Gamma \alpha}
+\newcommand{\formwf}{\framebox{$ \jwf \Gamma A $}}
+
+\newcommand{\makelabelwf}[1]{WF\_#1}
+
+\newcommand{\labelwfvar}{\makelabelwf Var}
+\newcommand{\rulewfvar}{
+  \inferrule* [right=\labelwfvar]
+    {\alpha \in \Gamma}
+    {\jwf \Gamma \alpha}
 }
 
-\newcommand{\wfbot}{
-  \inferrule* [right=WF\_Bot]
+\newcommand{\labelwfbot}{\makelabelwf Bot}
+\newcommand{\rulewfbot}{
+  \inferrule* [right=\labelwfbot]
     { }
-    {\istype \Gamma \bot}
+    {\jwf \Gamma \bot}
 }
 
-\newcommand{\wffun}{
-  \inferrule* [right=WF\_Fun]
-    {\istype \Gamma A \\ \istype \Gamma B}
-    {\istype \Gamma {A \to B}}
+\newcommand{\labelwffun}{\makelabelwf Fun}
+\newcommand{\rulewffun}{
+  \inferrule* [right=\labelwffun]
+    {\jwf \Gamma A \\ \jwf \Gamma B}
+    {\jwf \Gamma {A \to B}}
 }
 
-\newcommand{\wfforall}{
-  \inferrule* [right=WF\_Forall]
-    {\istype \Gamma A \\ \istype {\Gamma, \alpha \disjoint A} B}
-    {\istype \Gamma {\for {(\alpha \disjoint A)} B}}
+\newcommand{\labelwfforall}{\makelabelwf Forall}
+\newcommand{\rulewfforall}{
+  \inferrule* [right=\labelwfforall]
+    {\jwf {\Gamma, \alpha} A}
+    {\jwf \Gamma {\for \alpha A}}
 }
 
-\newcommand{\wfinterprim}{
-  \inferrule* [right=WF\_Inter]
-    {\istype \Gamma A \\ \istype \Gamma B}
-    {\istype \Gamma {A \inter B}}
+\newcommand{\rulewfforalldis}{
+  \inferrule* [right=\labelwfforall]
+    {\jwf \Gamma A \\ \jwf {\Gamma, \alpha \disjoint A} B}
+    {\jwf \Gamma {\fordis \alpha A B}}
 }
 
-\newcommand{\wfinter}{
-  \inferrule* [right=WF\_Inter]
-    {\istype \Gamma A \\
-     \istype \Gamma B \\
-     \highlight{$\isdisjoint \Gamma A B$}}
-    {\istype \Gamma {A \inter B}}
+\newcommand{\labelwfinter}{\makelabelwf Inter}
+\newcommand{\rulewfinter}{
+  \inferrule* [right=\labelwfinter]
+    {\jwf \Gamma A \\ \jwf \Gamma B}
+    {\jwf \Gamma {A \inter B}}
+}
+
+\newcommand{\rulewfinterdis}{
+  \inferrule* [right=\labelwfinter]
+    {\jwf \Gamma A \\
+     \jwf \Gamma B \\
+     \highlight{$\jdis \Gamma A B$}}
+    {\jwf \Gamma {A \inter B}}
 }

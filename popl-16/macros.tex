@@ -27,7 +27,7 @@
 }
 
 \newcommand{\code}[1]{\textsf{#1}}
-\definecolor{light-gray}{gray}{0.95}
+\definecolor{light-gray}{gray}{0.9}
 \newcommand{\highlight}[1]{\colorbox{light-gray}{#1}}
 
 \newcommand{\im}[1]{\lvert #1 \rvert}
@@ -35,12 +35,12 @@
 \newcommand{\universe}{\mathbb{U}}
 
 \newcommand{\turns}{\vdash}
-\newcommand{\hast}{\!:\!}
+\newcommand{\oftype}{\!:\!}
 \newcommand{\subtype}{<:}
 \newcommand{\commonsuper}{\Uparrow}
 \newcommand{\commonsub}{\Downarrow}
 \newcommand{\disjoint}{*}
-\newcommand{\subst}[2]{\lbrack #1 / #2 \rbrack~}
+\newcommand{\subst}[2]{\lbrack #2 := #1 \rbrack~}
 
 \newcommand{\yields}[1]{\highlight{$\; \hookrightarrow #1$}}
 
@@ -52,10 +52,12 @@
 \newcommand{\inter}{\&}
 \newcommand{\union}{|}
 \newcommand{\for}[2]{\forall #1.\binderspace #2}
+\newcommand{\fordis}[3]{\for {(#1 \disjoint #2)} {#3}}
 \newcommand{\constraints}[2]{(#1) \To #2}
 \newcommand{\lam}[2]{\lambda #1.\binderspace #2}
-\newcommand{\lamty}[3]{\lam {(#1 \hast #2)} #3}
+\newcommand{\lamty}[3]{\lam {(#1 \oftype #2)} #3}
 \newcommand{\blam}[2]{\Lambda #1.\binderspace #2}
+\newcommand{\blamdis}[3]{\blam {(#1 \disjoint #2)} #3}
 \newcommand{\assume}[2]{\textsf{assume} #1.\binderspace #2}
 \newcommand{\mergeop}{,,}
 \newcommand{\restrictOp}{\setminus}
@@ -80,16 +82,16 @@
 \newcommand{\tystring}{\code{String}}
 
 % Judgments
-\newcommand{\istype}[2]{#1 \turns #2 \ \text{type}}
+\newcommand{\jwf}[2]{#1 \turns #2 \; \text{type}}
 \newcommand{\isatomic}[1]{#1 \ \text{atomic}}
-\newcommand{\hastype}[3]{#1 \turns #2 \ \hast \ #3}
-\newcommand{\isdisjoint}[3]{#1 \turns #2 * #3}
-\newcommand{\isdisjointi}[3]{#1 \turns #2 *_I #3}
+\newcommand{\jtype}[3]{#1 \turns #2 \ \oftype \ #3}
+\newcommand{\jdis}[3]{#1 \turns #2 * #3}
+\newcommand{\jdisimpl}[3]{#1 \turns #2 *_I #3}
 
 \newcommand{\rulelabel}[1]{(\textsc{#1})}
 \newcommand{\ruleWF}{\george{\text{ruleWF}}}
-\newcommand{\rulelabelWF}{\george{\text{rulelabelWF}}}
-\newcommand{\rulelabeltargetWF}{\george{\text{rulelabeltargetWF}}}
+\newcommand{\labelWF}{\george{\text{labelWF}}}
+\newcommand{\labeltgtWF}{\george{\text{labeltgtWF}}}
 
 \newcommand{\namenaive}{{\bf $F_{\&}^{X}$}\xspace}
 \newcommand{\name}{{\bf $F_{\&}$}\xspace}

@@ -1,60 +1,79 @@
-\newcommand{\rulelabelSub}{\text{Sub\_}}
-\newcommand{\rulelabelsubvar}{\rulelabelSub\text{Var}}
-\newcommand{\rulelabelSubTop}{\rulelabelSub\text{Top}}
-\newcommand{\rulelabelsubfun}{\rulelabelSub\text{Fun}}
-\newcommand{\rulelabelsubforall}{\rulelabelSub\text{Forall}}
-\newcommand{\rulelabelsubinter}{\rulelabelSub\text{And}}
-\newcommand{\rulelabelsubinterl}{\rulelabelSub{\text{And}_1}}
-\newcommand{\rulelabelsubinterr}{\rulelabelSub{\text{And}_2}}
+\newcommand{\formsub}{\framebox{$ A \subtype B \yields E $}}
 
+\newcommand{\makelabelsub}[1]{Sub\_#1}
+
+\newcommand{\labelsubvar}{\makelabelsub Var}
 \newcommand{\rulesubvar}{
-\inferrule* [right=$\rulelabelsubvar$]
-  { }
-  {\alpha \subtype \alpha \yields {\lamty x {\im \alpha} x}}
+  \inferrule* [right=\labelsubvar]
+    { }
+    {\alpha \subtype \alpha \yields {\lamty x {\im \alpha} x}}
 }
 
+\newcommand{\labelsubfun}{\makelabelsub Fun}
 \newcommand{\rulesubfun}{
-\inferrule* [right=$\rulelabelsubfun$]
-  {A_3 \subtype A_1 \yields {C_1} \\ A_2 \subtype A_4 \yields {C_2}}
-  {A_1 \to A_2 \subtype A_3 \to A_4
-  \yields
-      {\lamty f {\im {A_1 \to A_2}}
-      {\lamty x {\im {A_3}}
-          {\app {C_2} {(\app f {(\app {C_1} x)})}}}}}
+  \inferrule* [right=\labelsubfun]
+    {B_1 \subtype A_1 \yields {E_1} \\ A_2 \subtype B_2 \yields {E_2}}
+    {A_1 \to A_2 \subtype B_1 \to B_2
+    \yields
+        {\lamty f {\im {A_1 \to A_2}}
+        {\lamty x {\im {B_1}}
+            {\app {E_2} {(\app f {(\app {E_1} x)})}}}}}
 }
 
+\newcommand{\labelsubforall}{\makelabelsub Forall}
 \newcommand{\rulesubforall}{
-\inferrule* [right=$\rulelabelsubforall$]
-  {A_1 \subtype \subst {\alpha_1} {\alpha_2} A_2 \yields C}
-  {\for {\alpha_1} A_1 \subtype \for {\alpha_2} A_2
-    \yields
-      {\lamty f {\im {\for {\alpha_1} A_1}}
-        {\blam \alpha {\app C {(\app f \alpha)}}}}}
+  \inferrule* [right=\labelsubforall]
+    {A_1 \subtype \subst {\alpha_1} {\alpha_2} A_2 \yields E}
+    {\for {\alpha_1} A_1 \subtype \for {\alpha_2} A_2
+      \yields
+        {\lamty f {\im {\for {\alpha_1} A_1}}
+          {\blam \alpha {\app E {(\app f \alpha)}}}}}
 }
 
+\newcommand{\labelsubinter}{\makelabelsub Inter}
 \newcommand{\rulesubinter}{
-\inferrule* [right=$\rulelabelsubinter$]
-  {A_1 \subtype A_2 \yields {C_1} \\ A_1 \subtype A_3 \yields {C_2}}
-  {A_1 \subtype A_2 \inter A_3
-    \yields
-      {\lamty x {\im {A_1}}
-        {\pair {\app {C_1} x} {\app {C_2} x}}}}
+  \inferrule* [right=\labelsubinter]
+    {A_1 \subtype A_2 \yields {E_1} \\ A_1 \subtype A_3 \yields {E_2}}
+    {A_1 \subtype A_2 \inter A_3
+      \yields
+        {\lamty x {\im {A_1}}
+          {\pair {\app {E_1} x} {\app {E_2} x}}}}
 }
 
+\newcommand{\labelsubinterl}{\makelabelsub {Inter\_1}}
 \newcommand{\rulesubinterl}{
-\inferrule* [right=$\rulelabelsubinterl$]
-  {A_1 \subtype A_3 \yields C}
-  {A_1 \inter A_2 \subtype A_3
-    \yields
-      {\lamty x {\im {A_1 \inter A_2}}
-        {\app C {(\proj 1 x)}}}}
+  \inferrule* [right=\labelsubinterl]
+    {A_1 \subtype A_3 \yields E}
+    {A_1 \inter A_2 \subtype A_3
+      \yields
+        {\lamty x {\im {A_1 \inter A_2}}
+          {\app E {(\proj 1 x)}}}}
 }
 
+\newcommand{\rulesubinterldis}{
+\inferrule* [right=\labelsubinterl]
+    {A_1 \subtype A_3 \yields E \\ \highlight{$\isatomic {A_3}$}}
+    {A_1 \inter A_2 \subtype A_3
+      \yields
+        {\lamty x {\im {A_1 \inter A_2}}
+          {\app E {(\proj 1 x)}}}}
+}
+
+\newcommand{\labelsubinterr}{\makelabelsub {Inter\_2}}
 \newcommand{\rulesubinterr}{
-\inferrule* [right=$\rulelabelsubinterr$]
-  {A_2 \subtype A_3 \yields C}
-  {A_1 \inter A_2 \subtype A_3
-    \yields
-      {\lamty x {\im {A_1 \inter A_2}}
-        {\app C {(\proj 2 x)}}}}
+  \inferrule* [right=\labelsubinterr]
+    {A_2 \subtype A_3 \yields E}
+    {A_1 \inter A_2 \subtype A_3
+      \yields
+        {\lamty x {\im {A_1 \inter A_2}}
+          {\app E {(\proj 2 x)}}}}
+}
+
+\newcommand{\rulesubinterrdis}{
+  \inferrule* [right=\labelsubinterr]
+    {A_2 \subtype A_3 \yields E \\ \highlight{$\isatomic {A_3}$}}
+    {A_1 \inter A_2 \subtype A_3
+      \yields
+        {\lamty x {\im {A_1 \inter A_2}}
+          {\app E {(\proj 2 x)}}}}
 }

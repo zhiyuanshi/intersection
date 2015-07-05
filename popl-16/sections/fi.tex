@@ -1,4 +1,4 @@
-\section{The \namenaive Calculus} \label{sec:finaive}
+\section{The \namenaive Calculus} \rulelabel{sec:finaive}
 
 This section presents the syntax, subtyping, and typing of \namenaive. The
 semantics of \namenaive is defined by a type-directed translation to System $F$ extended with pairs and pair types.
@@ -45,7 +45,7 @@ addition to System $F$ highlighted).
     \end{array}
   \]
 
-  \label{fig:finaive-syntax}
+  \rulelabel{fig:finaive-syntax}
   \caption{Syntax.}
 \end{figure}
 
@@ -107,42 +107,26 @@ $\ftv \cdot$ for sets of free variables.
 
 \begin{figure*}
   \begin{mathpar}
-    \framebox{$ A \subtype B \yields E $} \\
-
-    \rulesubvar
-
-    \rulesubfun
-
-    \rulesubforall
-
-    \rulesubinter
-
-    \rulesubinterl
-
-    \rulesubinterr
+    \formsub \\
+    \rulesubvar \and \rulesubfun \and \rulesubforall \and \rulesubinter \and
+    \rulesubinterl \and \rulesubinterr
   \end{mathpar}
-
-  \footnote{miss a rule for $\bot$}
 
   \begin{mathpar}
-    \framebox{$ \hastype \Gamma e A \yields E $} \\
-
-    \rulevar
-
-    \rulelam
-
-    \ruleapp
-
-    \ruleblam
-
-    \ruletapp
-
-    \rulemerge
-
+    \formwf \\
+    \rulewfvar \and \rulewffun \and \rulewfforall \and \rulewfinter
   \end{mathpar}
 
-  \caption{The type system of \name.}
+  \footnote{miss a rule for $\bot$?}
+
+  \begin{mathpar}
+    \formt \\
+    \ruletvar \and \ruletlam \and \ruletapp \and \ruletblam \and \rulettapp
+    \ruletmerge
+  \end{mathpar}
+
   \label{fig:fi-typing}
+  \caption{The type system of \name.}
 \end{figure*}
 
 The subtyping rules of \name, shown in Figure~\ref{fig:fi-subtyping}, are
@@ -180,11 +164,11 @@ atomic.
 
 It is easy to see that subtyping is reflexive and transitive.
 
-\begin{lemma}[Subtyping is reflexive] \label{sub-refl}
+\begin{lemma}[Subtyping is reflexive] \rulelabel{sub-refl}
 Given a type $ A $, $ A \subtype A $.
 \end{lemma}
 
-\begin{lemma}[Subtyping is transitive] \label{sub-trans}
+\begin{lemma}[Subtyping is transitive] \rulelabel{sub-trans}
 If $ A_1 \subtype A_2 $ and $ A_2 \subtype A_3 $,
 then $ A_1 \subtype A_3 $.
 \end{lemma}
@@ -196,7 +180,7 @@ materials submitted with the paper.
 
 The syntax-directed typing rules of \name are shown in
 Figure~\ref{fig:fi-typing}. They consist of one main typing judgment and two
-auxiliary judgments. The main typing judgment is of the form: $ \hastype \Gamma
+auxiliary judgments. The main typing judgment is of the form: $ \jtype \Gamma
 e A $. It reads: ``in the typing context $\Gamma$, the term $e$ is of type
 $A$''. The rules that are the same as in System $F$ are rules for variables
 \rulelabel{Var}, lambda abstractions \rulelabel{Lam}, and type applications
@@ -267,15 +251,22 @@ and typing is completely standard. The syntax of the target language is shown in
 Figure~\ref{fig:f-syntax} and the typing rules in the appendix.
 % \bruno{fill!}
 \begin{figure}[h]
-  \input{rule_in_figures/f-syntax.tex}
+  \[
+  \begin{array}{llrl}
+    \text{Types}    & T & \Coloneqq & \alpha \mid () \mid {T_1} \to {T_2} \mid \for \alpha T \mid \pair {T_1} {T_2} \\
+    \text{Terms}    & E & \Coloneqq & x \mid \lam {(x \oftype T)} E \mid \app {E_1} {E_2} \mid \blam \alpha E \\
+                    &   & \mid      & \tapp E T \mid \pair {E_1} {E_2} \mid \proj k E \\
+    \text{Contexts} & G & \Coloneqq & \epsilon \mid G, \alpha \mid G, x \oftype T \\
+  \end{array}
+  \]
   \caption{Target language syntax.}
-  \label{fig:f-syntax}
+  \rulelabel{fig:f-syntax}
 \end{figure}
 
 % \bruno{Why is this lemma placed here?}
 % \bruno{Generaly Speaking this text seems out of place.Move to 5.4, maybe?}
 
-% The main translation judgment is $ \hastype \Gamma e A \yields E $ which
+% The main translation judgment is $ \jtype \Gamma e A \yields E $ which
 % states that with respect to the typing context $ \Gamma $, the \name term
 % $e$ is of $A$ and its translation is a target term $ E $.
 
@@ -285,8 +276,9 @@ Figure~\ref{fig:f-syntax} and the typing rules in the appendix.
   \input{rule_in_figures/type-translation.tex}
   \input{rule_in_figures/context-translation.tex}
   \caption{Type and context translation.}
-  \label{fig:type-and-context-translation}
+  \rulelabel{fig:type-and-context-translation}
 \end{figure}
+\george{Also need two versions for this.}
 
 Figure~\ref{fig:type-and-context-translation} defines the type translation
 function $\im \cdot$ from \name types $A$ to target language types $T$. The
@@ -335,8 +327,8 @@ $A_1\inter A_2$, project $x$ on the first item, and apply $ C $ to it.
 \end{comment}
 
 \begin{restatable}[Subtyping rules produce type-correct coercion]{lemma}{lemmasub}
-  \label{lemma:sub}
-  If $ A_1 \subtype A_2 \yields C $, then $ \hastype \epsilon C {\im {A_1} \to \im {A_2}} $.
+  \rulelabel{lemma:sub}
+  If $ A_1 \subtype A_2 \yields C $, then $ \jtype \epsilon C {\im {A_1} \to \im {A_2}} $.
 \end{restatable}
 
 \begin{proof}
@@ -356,7 +348,7 @@ those in the previous section with the light-blue part for the translation.
 % \bruno{Don't use itemize and items. Use paragraphs instead!}
 
 \paragraph{Main translation judgment.} The main translation judgment
-$\hastype \Gamma e A \yields E$ extends the typing judgment with an elaborated
+$\jtype \Gamma e A \yields E$ extends the typing judgment with an elaborated
 term on the right hand side of $\yields {}$. The translation ensures
 that $E$ has type $\im A$. In \name, one may pass more information to a
 function than what is required; but not in System $F$. To account for this
@@ -395,9 +387,9 @@ into pairs.
 %   \[ "Isaac" \]
 
 \begin{restatable}[Translation preserves well-typing]{theorem}{theorempreservation}
-  \label{theorem:preservation}
-  If $ \hastype \Gamma e A \yields E $,
-  then $ \hastype {\im \Gamma} E {\im A} $.
+  \rulelabel{theorem:preservation}
+  If $ \jtype \Gamma e A \yields E $,
+  then $ \jtype {\im \Gamma} E {\im A} $.
 \end{restatable}
 \begin{proof}
 (Sketch) By structural induction on the term and the corresponding

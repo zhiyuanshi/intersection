@@ -1,35 +1,52 @@
-\newcommand{\disjointvar}{
-  \inferrule* [right=DisjointVar]
+\newcommand{\formdis}{\framebox{$ \jdisimpl \Gamma A B $}}
+
+\newcommand{\makelabeldis}[1]{Dis\_#1}
+
+\newcommand{\labeldisvar}{\makelabeldis Var}
+\newcommand{\ruledisvar}{
+  \inferrule* [right=\labeldisvar]
     {\alpha * B \in \Gamma}
-    {\isdisjointi \Gamma \alpha B}
+    {\jdisimpl \Gamma \alpha B}
 }
 
-\newcommand{\disjointinterleft}{
-  \inferrule* [right=DisjointInter1]
-    {\isdisjointi \Gamma A C \\ \isdisjointi \Gamma B C}
-    {\isdisjointi \Gamma {A \inter B} {C}}
+\newcommand{\labeldissym}{\makelabeldis Sym}
+\newcommand{\ruledissym}{
+  \inferrule* [right=\labeldissym]
+    {\alpha \disjoint A \in \Gamma}
+    {\jdis \Gamma A \alpha}
 }
 
-\newcommand{\disjointinterright}{
-  \inferrule* [right=DisjointInter2]
-    {\isdisjointi \Gamma A B \\ \isdisjointi \Gamma A C}
-    {\isdisjointi \Gamma {A} {B \inter C}}
+\newcommand{\labeldisinterl}{\makelabeldis {Inter\_1}}
+\newcommand{\ruledisinterl}{
+  \inferrule* [right=\labeldisinterl]
+    {\jdisimpl \Gamma A C \\ \jdisimpl \Gamma B C}
+    {\jdisimpl \Gamma {A \inter B} {C}}
 }
 
-\newcommand{\disjointfun}{
-  \inferrule* [right=DisjointFun]
-    {\isdisjointi \Gamma {B_1} {B_2}}
-    {\isdisjointi \Gamma {A_1 \to A_2} {B_1 \to B_2}}
+\newcommand{\labeldisinterr}{\makelabeldis {Inter\_2}}
+\newcommand{\ruledisinterr}{
+  \inferrule* [right=\labeldisinterr]
+    {\jdisimpl \Gamma A B \\ \jdisimpl \Gamma A C}
+    {\jdisimpl \Gamma {A} {B \inter C}}
 }
 
-\newcommand{\disjointforall}{
-  \inferrule* [right=DisjointForall]
-    {\isdisjointi \Gamma A C}
-    {\isdisjointi \Gamma {\for {\alpha * B} A} {\for {\alpha * B} C} \text{Subst???}}
+\newcommand{\labeldisfun}{\makelabeldis Fun}
+\newcommand{\ruledisfun}{
+  \inferrule* [right=\labeldisfun]
+    {\jdisimpl \Gamma {B_1} {B_2}}
+    {\jdisimpl \Gamma {A_1 \to A_2} {B_1 \to B_2}}
 }
 
-\newcommand{\disjointatomic}{
-  \inferrule* [right=DisjointAtomic]
-    {A \not\sim B}
-    {\isdisjointi \Gamma {A} {B}}
+\newcommand{\labeldisforall}{\makelabeldis Forall}
+\newcommand{\ruledisforall}{
+  \inferrule* [right=\labeldisforall]
+    {\jdisimpl \Gamma A C}
+    {\jdisimpl \Gamma {\fordis \alpha B A} {\fordis \alpha B C} \george{Subst???}}
+}
+
+\newcommand{\labeldisatom}{\makelabeldis Atom}
+\newcommand{\ruledisatomic}{
+  \inferrule* [right=\labeldisatom]
+    {A \not \sim B}
+    {\jdisimpl \Gamma A B}
 }

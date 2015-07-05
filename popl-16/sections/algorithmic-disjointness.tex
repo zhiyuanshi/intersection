@@ -77,8 +77,8 @@ definition, if $B_1$ and $B_2$ are disjoint. Finally, we have derived a rule for
 functions:
 \begin{mathpar}
   \inferrule* [right=DisjointFun]
-    {\isdisjoint \Gamma {B_1} {B_2}}
-    {\isdisjoint \Gamma {A_1 \to A_2} {B_1 \to B_2}}
+    {\jdis \Gamma {B_1} {B_2}}
+    {\jdis \Gamma {A_1 \to A_2} {B_1 \to B_2}}
 \end{mathpar}
 
 The analysis needed for determining if types with other constructors are
@@ -95,14 +95,14 @@ $\commonsuper$:
 The rules for the disjointness judgement are shown in
 Figure~\ref{fig:disjointness}, which consists of two judgements.
 
-\paragraph{Main judgement} The judgement $\isdisjoint \Gamma A B$ says two types
-$A$ and $B$ are disjoint in a context $\Gamma$. \rulelabel{DisjointVar} is the
-base rule and \rulelabel{DisjointVar} is its twin rule.
-\rulelabel{DisjointInter1} and \rulelabel{DisjointInter2} inductively distribute
+\paragraph{Main judgement} The judgement $\jdis \Gamma A B$ says two types
+$A$ and $B$ are disjoint in a context $\Gamma$. \label{DisjointVar} is the
+base rule and \label{DisjointVar} is its twin rule.
+\label{DisjointInter1} and \label{DisjointInter2} inductively distribute
 the relation itself over the intersection constructor ($\inter$). We have
-derived \rulelabel{DisjointFun} in the previous subsection, which says two
+derived \label{DisjointFun} in the previous subsection, which says two
 function types are disjoint as long as their return types are disjoint
-(regardless of their parameter types). \rulelabel{DisjointAtomic} says two types
+(regardless of their parameter types). \label{DisjointAtomic} says two types
 are considered disjoint if they are judged to be disjoint by the $A \not \sim B$
 rules, which is going to be explained below.
 
@@ -113,42 +113,29 @@ here, since for example, $\tyint \inter (\tychar \to \tychar)$ and $\tychar \to
 
 \begin{figure}
   \begin{mathpar}
-    \framebox{$ \isdisjointi \Gamma A B$} \\
+    \formdis \\
+    \ruledisvar \and \ruledissym \and \ruledisinterl \and \ruledisinterr
+    \ruledisfun \and \ruledisforall \and \ruledisatomic
+  \end{mathpar}
 
-    \disjointvar
+  \begin{mathpar}
+    \framebox{$ A \not\sim B$} \\
 
-    \inferrule* [right=DisjointSym]
-          {\alpha * A \in \Gamma}
-          {\isdisjoint \Gamma A \alpha}
-
-    \disjointinterleft
-
-    \disjointinterright
-
-    \disjointfun
-
-    \disjointforall
-
-    \disjointatomic
-
-\framebox{$ A \not\sim B$} \\
-
-\inferrule* [right=NotSimBot1]
+    \inferrule* [right=NotSimBot1]
       {}
       {\bot \not\sim A \to B}
 
-\inferrule* [right=NotSimBot2]
+    \inferrule* [right=NotSimBot2]
       {}
-      {\bot \not\sim \for {\alpha * B} A}
+      {\bot \not\sim \fordis \alpha B A}
 
-\inferrule* [right=NotSimFunForall]
+    \inferrule* [right=NotSimFunForall]
       {}
-      {A \to B \not\sim \for {\alpha * B} A}
+      {A \to B \not\sim \fordis \alpha B A}
 
-\inferrule* [right=NotSimFunForall]
+    \inferrule* [right=NotSimFunForall]
       {B \not\sim A}
       {A \not\sim B}
-
   \end{mathpar}
 
   \label{fig:disjointness}
@@ -160,12 +147,12 @@ here, since for example, $\tyint \inter (\tychar \to \tychar)$ and $\tychar \to
 The algorithmic rules for disjointness is sound and complete.
 
 \begin{lemma}{Symmetry of disjointness} \label{symmetry-of-disjointness}
-  If $\isdisjoint \Gamma A B$, then $\isdisjoint \Gamma B A$.
+  If $\jdis \Gamma A B$, then $\jdis \Gamma B A$.
 \end{lemma}
 
 \begin{theorem} \label{disjoint-intersect}
-  If $\isdisjoint \Gamma A C$ and $\isdisjoint \Gamma B C$,
-  then $\isdisjoint \Gamma {A \inter B} {C}$.
+  If $\jdis \Gamma A C$ and $\jdis \Gamma B C$,
+  then $\jdis \Gamma {A \inter B} {C}$.
 \end{theorem}
 
 \begin{lemma} \label{common-supertype}
@@ -174,9 +161,9 @@ The algorithmic rules for disjointness is sound and complete.
 \end{lemma}
 
 \begin{theorem}[Soundness]
-  For any two types $A$, $B$, $\isdisjointi \Gamma A B$ implies $\isdisjoint \Gamma A B$.
+  For any two types $A$, $B$, $\jdisimpl \Gamma A B$ implies $\jdis \Gamma A B$.
 \end{theorem}
 
 \begin{theorem}[Completeness]
-  For any two types $A$, $B$, $\isdisjoint \Gamma A B$ implies $\isdisjointi \Gamma A B$.
+  For any two types $A$, $B$, $\jdis \Gamma A B$ implies $\jdisimpl \Gamma A B$.
 \end{theorem}

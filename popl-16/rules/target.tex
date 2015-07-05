@@ -1,57 +1,57 @@
-\newcommand{\rulelabeltarget}{\text{T\_}}
+\newcommand{\makelabeltgt}[1]{Tgt\_#1}
 
-\newcommand{\rulelabeltargetvar}{\rulelabeltarget\text{var}}
+\newcommand{\labeltgtvar}{\makelabeltgt Var}
 \newcommand{\ruletargetvar} {
-\inferrule* [right=$\rulelabeltargetvar$]
+\inferrule* [right=\labeltgtvar]
   {(x,T) \in \Gamma}
-  {\hastype \Gamma x T}
+  {\jtype \Gamma x T}
 }
 
-\newcommand{\rulelabeltargetlam}{\rulelabeltarget\text{Lam}}
+\newcommand{\labeltgtlam}{\makelabeltgt Lam}
 \newcommand{\ruletargetlam} {
-\inferrule* [right=$\rulelabeltargetlam$]
-  {\hastype {\Gamma, x \hast T} E {T_1} \andalso \istype \Gamma T}
-  {\hastype \Gamma {\lamty x T E} {T \to T_1}}
+\inferrule* [right=\labeltgtlam]
+  {\jtype {\Gamma, x \oftype T} E {T_1} \andalso \jwf \Gamma T}
+  {\jtype \Gamma {\lamty x T E} {T \to T_1}}
 }
 
-\newcommand{\rulelabeltargetApp}{\rulelabeltarget\text{App}}
+\newcommand{\labeltgtApp}{\makelabeltgt App}
 \newcommand{\ruletargetapp}{
-\inferrule* [right=$\rulelabeltargetApp$]
-  {\hastype \Gamma {E_1} {T_1 \to T_2} \andalso \hastype \Gamma {E_2} {T_1}}
-  {\hastype \Gamma {\app {E_1} {E_2}} {T_2}}
+\inferrule* [right=\labeltgtApp]
+  {\jtype \Gamma {E_1} {T_1 \to T_2} \andalso \jtype \Gamma {E_2} {T_1}}
+  {\jtype \Gamma {\app {E_1} {E_2}} {T_2}}
 }
 
-\newcommand{\rulelabeltargetBLam}{\rulelabeltarget\text{BLam}}
+\newcommand{\labeltgtBLam}{\makelabeltgt BLam}
 \newcommand{\ruletargetblam}{
-\inferrule* [right=$\rulelabeltargetBLam$]
-  {\hastype {\Gamma, \alpha} E T}
-  {\hastype \Gamma {\blam \alpha E} {\for \alpha T}}
+\inferrule* [right=\labeltgtBLam]
+  {\jtype {\Gamma, \alpha} E T}
+  {\jtype \Gamma {\blam \alpha E} {\for \alpha T}}
 }
 
-\newcommand{\rulelabeltargetTApp}{\rulelabeltarget\text{TApp}}
+\newcommand{\labeltgtTApp}{\makelabeltgt TApp}
 \newcommand{\ruletargettapp}{
-\inferrule* [right=$\rulelabeltargetTApp$]
-  {\hastype \Gamma E {\for \alpha {T_1}} \andalso \istype \Gamma T}
-  {\hastype \Gamma {\tapp E T} {\subst T \alpha T_1}}
+\inferrule* [right=\labeltgtTApp]
+  {\jtype \Gamma E {\for \alpha {T_1}} \andalso \jwf \Gamma T}
+  {\jtype \Gamma {\tapp E T} {\subst T \alpha T_1}}
 }
 
-\newcommand{\rulelabeltargetPair}{\rulelabeltarget\text{Pair}}
+\newcommand{\labeltgtPair}{\makelabeltgt Pair}
 \newcommand{\ruletargetpair}{
-\inferrule* [right=$\rulelabeltargetPair$]
-  {\hastype \Gamma {E_1} {T_1} \andalso \hastype \Gamma {E_2} {T_2}}
-  {\hastype \Gamma {\pair {E_1} {E_2}} {\pair {T_1} {T_2}}}
+\inferrule* [right=\labeltgtPair]
+  {\jtype \Gamma {E_1} {T_1} \andalso \jtype \Gamma {E_2} {T_2}}
+  {\jtype \Gamma {\pair {E_1} {E_2}} {\pair {T_1} {T_2}}}
 }
 
-\newcommand{\rulelabeltargetprojl}{\rulelabeltarget\text{Proj}_1}
+\newcommand{\labeltgtprojl}{\makelabeltgt {Proj\_1}}
 \newcommand{\ruletargetprojl}{
-\inferrule* [right=$\rulelabeltargetprojl$]
-  {\hastype \Gamma E {\pair {T_1} {T_2}}}
-  {\hastype \Gamma {\proj 1 E} {T_1}}
+\inferrule* [right=\labeltgtprojl]
+  {\jtype \Gamma E {\pair {T_1} {T_2}}}
+  {\jtype \Gamma {\proj 1 E} {T_1}}
 }
 
-\newcommand{\rulelabeltargetprojr}{\rulelabeltarget\text{Proj}_2}
+\newcommand{\labeltgtprojr}{\makelabeltgt {Proj\_2}}
 \newcommand{\ruletargetprojr}{
-\inferrule* [right=$\rulelabeltargetprojr$]
-  {\hastype \Gamma E {\pair {T_1} {T_2}}}
-  {\hastype \Gamma {\proj 2 E} {T_2}}
+\inferrule* [right=\labeltgtprojr]
+  {\jtype \Gamma E {\pair {T_1} {T_2}}}
+  {\jtype \Gamma {\proj 2 E} {T_2}}
 }

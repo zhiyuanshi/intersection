@@ -9,7 +9,7 @@ only highlight the differences here and the full specification of the language
 can be found in the appendix.
 
 \begin{theorem}[Unique elaboration] \label{unique-elaboration}
-  If $\hastype \Gamma e {A_1} \yields {E_1}$ and $\hastype \Gamma e {A_2}
+  If $\jtype \Gamma e {A_1} \yields {E_1}$ and $\jtype \Gamma e {A_2}
   \yields {E_2}$, then $E_1 \equiv E_2$.
 \end{theorem}
 
@@ -33,7 +33,7 @@ derivation, it is not possible that two rules are applicable.
 \end{definition}
 
 Related to the definition is the disjoint judgement. We write
-\[ \isdisjoint \Gamma A B \]
+\[ \jdis \Gamma A B \]
 if two types $A$ and $B$ are disjoint in the context $\Gamma$.
 
 To see this definition in action, $\tyint$ and $\tystring$ are, because there is
@@ -55,7 +55,7 @@ not disjoint by specification since $\tystring$ is their common supertype. Yet
 by the implementation they are, since neither of them is a subtype of
 the other. \bruno{You need a concrete code example to make this point.}
 Hence the algorithmic rules are more nuanced. For now, it is enough to treat the
-disjoint judgement $\isdisjoint \Gamma A B$ as oracle and we will coome back to
+disjoint judgement $\jdis \Gamma A B$ as oracle and we will coome back to
 this topic in the next section.
 
 
@@ -75,7 +75,7 @@ this topic in the next section.
         \\
         \text{Terms}
         & e & \Coloneqq & x                        & \\
-        &   & \mid & \lam {(x \hast A)} e          & \\
+        &   & \mid & \lam {(x \oftype A)} e          & \\
         &   & \mid & \app {e_1} {e_2}              & \\
         &   & \mid & \blam {(\alpha \highlight {$\disjoint A$})} e  & \\
         &   & \mid & \tapp e A                     & \\
@@ -85,9 +85,9 @@ this topic in the next section.
         \text{Contexts}
         & \Gamma & \Coloneqq & \cdot
                    \mid \Gamma, \alpha \highlight {$\disjoint A$}
-                   \mid \Gamma, x \hast A  & \\
+                   \mid \Gamma, x \oftype A  & \\
 
-        \text{Syntactic sugar} & \blam {\alpha} e & \equiv & \blam {(\alpha \disjoint \bot)} e & \\
+        \text{Syntactic sugar} & \blam \alpha e & \equiv & \blamdis \alpha \bot e & \\
       \end{array}
     \end{array}
   \]
@@ -105,8 +105,8 @@ bounded quantification. First, type variables are now always associated with
 their disjointness constraints (like $\alpha \disjoint A$) in types, terms, and
 contexts. Second, the bottom type is introduced so that universal quantification
 quantification be integrated and become a special case of disjoint
-quantification: $\blam {\alpha} e$ is really a syntactic sugar for $\blam
-{(\alpha \disjoint \bot)} e$. The underlying idea is that any type is disjoint
+quantification: $\blam \alpha e$ is really a syntactic sugar for $\blamdis
+\alpha \bot e$. The underlying idea is that any type is disjoint
 with the bottom type.
 
 As a comparison, the top type is the trivial upper bound in bounded
@@ -123,44 +123,19 @@ types and the typing rule for merges.
 
 \begin{figure*}
   \begin{mathpar}
-    \inferrule* [right=$\rulelabelsubinterl$]
-      {A_1 \subtype A_3 \yields C \\ \highlight{$\isatomic {A_3}$}}
-      {A_1 \inter A_2 \subtype A_3
-        \yields
-          {\lam x {\im {A_1 \inter A_2}}
-            {\app C {(\proj 1 x)}}}}
-
-    \inferrule* [right=$\rulelabelsubinterr$]
-      {A_2 \subtype A_3 \yields C \\ \highlight{$\isatomic {A_3}$}}
-      {A_1 \inter A_2 \subtype A_3
-        \yields
-          {\lam x {\im {A_1 \inter A_2}}
-            {\app C {(\proj 2 x)}}}}
-
-    \wfforall
-
-    \wfinter
-
-    \inferrule* [right=T\_BLam]
-      {\istype \Gamma A \\
-       \hastype {\Gamma,\alpha \disjoint A} e B \yields E \\
-       \alpha \not \in \ftv \Gamma}
-      {\hastype \Gamma {\blam {(\alpha \disjoint A)} e} {\for {(\alpha \disjoint A)} B}
-        \yields {\blam \alpha E}}
-
-    \inferrule* [right=T\_TApp]
-      {\hastype \Gamma e {\for {\alpha \disjoint B} C} \yields E \\
-       \istype \Gamma A}
-      {\hastype \Gamma {\tapp e A} {\subst A \alpha C} \yields {\tapp E {\im A}}}
-
-    \inferrule* [right=T\_Merge]
-      {\hastype \Gamma {e_1} A \yields {E_1} \\
-       \hastype \Gamma {e_2} B \yields {E_2} \\
-       \highlight{$\isdisjoint \Gamma A B$}}
-      {\hastype \Gamma {e_1 \mergeop e_2} {A \inter B} \yields {\pair {E_1} {E_2}}}
-
+    \formsub \\ \rulesubinterldis \and \rulesubinterrdis
   \end{mathpar}
-  \label{fig:fi-typing}
+
+  \begin{mathpar}
+    \formwf \\ \rulewfforalldis \and \rulewfinterdis
+  \end{mathpar}
+
+  \begin{mathpar}
+    \formt \\ \ruletblamdis \and \rulettappdis \and \ruletmergedis
+  \end{mathpar}
+
+  \label{fig:fi-patch}
+  \caption{Affected rules.}
 \end{figure*}
 
 \paragraph{Disjointness judgement}
@@ -172,7 +147,7 @@ Under the new rules, intersection types such as $\tyint \inter \tyint$ are no
 longer well-formed because the two types are not disjoint.
 
 \paragraph{Disjoint quantification} A disjoint quantification is introduced by
-the big lambda $\blam {(\alpha \disjoint A)} e$ and eliminated by the usual type
+the big lambda $\blamdis \alpha A e$ and eliminated by the usual type
 application $\tapp e A$. The constraint is added to the context with this rule.
 During a type application, the type system makes sure that the type argument
 satisfies the disjointness constraint.
@@ -186,18 +161,18 @@ In general, disjointness judgements are not invariant with respect to
 free-variable substitution. In other words, a careless substitution can violate
 the disjoint constraint in the context. For example, in the context $\alpha
 \disjoint \tyint$, $\alpha$ and $\tyint$ are disjoint:
-\[ \isdisjoint {\alpha \disjoint \tyint} \alpha \tyint \]
+\[ \jdis {\alpha \disjoint \tyint} \alpha \tyint \]
 But after the substitution of $\tyint$ for $\alpha$ on the two types, the sentence
-\[ \isdisjoint {\alpha \disjoint \tyint} \tyint \tyint \]
+\[ \jdis {\alpha \disjoint \tyint} \tyint \tyint \]
 is longer true since $\tyint$ is clearly not disjoint with itself.
 
 \begin{lemma}{Instantiation} \label{instantiation}
-  If $\istype {\Gamma, \alpha \disjoint B} C$, $\istype \Gamma A$, $\isdisjoint
-  \Gamma A B$ then $\istype \Gamma {\subst A \alpha C}$.
+  If $\jwf {\Gamma, \alpha \disjoint B} C$, $\jwf \Gamma A$, $\jdis
+  \Gamma A B$ then $\jwf \Gamma {\subst A \alpha C}$.
 \end{lemma}
 
 \begin{lemma}{Well-formed typing} \label{wf-typing}
-If $\hastype \Gamma e A$, then $\istype \Gamma e$.
+If $\jtype \Gamma e A$, then $\jwf \Gamma e$.
 \end{lemma}
 
 \subsection{Subtyping}
@@ -263,9 +238,9 @@ $\tyint$ and $\tyint \to \tyint$. For function types, disjointness
 is harder to visualise. But bear in the mind that disjointness can defined by
 the very requirement that the theorem holds.
 \bruno{We should be finishing up this section with the key coherence
-  lemma. WHy is that not here?}
+  lemma. Why is that not here?}
 
 \begin{theorem}[Unique elaboration] \label{unique-elaboration}
-  If $\hastype \Gamma e {A_1} \yields {E_1}$ and $\hastype \Gamma e {A_2}
+  If $\jtype \Gamma e {A_1} \yields {E_1}$ and $\jtype \Gamma e {A_2}
   \yields {E_2}$, then $E_1 \equiv E_2$.
 \end{theorem}
