@@ -1,21 +1,5 @@
 \subsection{Soundness and Completeness of Algorithmic Disjointness}
 
-\begin{proof}
-By induction on the derivation of $\jtype \Gamma e A$. The case of \reflabel{TyTApp} needs special attention
-\begin{mathpar}
-  \rulettapp
-\end{mathpar}
-because we need to show that the result of substitution ($\subst A \alpha C$) is well-formed, which is evident by Lemma~\ref{instantiation}.
-\end{proof}
-
-\begin{proof}
-The typing rules are syntax-directed. The case of \reflabel{TyApp} needs special attention since we still need to show that the generated coercion $C$ is unique.
-\begin{mathpar}
-  \rulettapp
-\end{mathpar}
-By Lemma~\ref{wf-typing}, we have $\jwf \Gamma {A_1}$ and $\jwf \Gamma {A_3}$. Therefore we are able to apply Lemma~\ref{unique-coercion} and conclude that $C$ is unique.
-\end{proof}
-
 \begin{theorem}
   If $A \subtype C$, then $A \inter B \subtype C$.
   If $B \subtype C$, then $A \inter B \subtype C$.
@@ -30,23 +14,29 @@ By Lemma~\ref{wf-typing}, we have $\jwf \Gamma {A_1}$ and $\jwf \Gamma {A_3}$. T
   Need to show $A \subtype E_1 \inter E_2$ implies $A \inter B \subtype E_1 \inter E_2$.
   By inversion $A \subtype E_1$ and $A \subtype E_2$.
   By the i.h., $A \inter B \subtype E_1$ and $A \inter B \subtype E_2$.
-  By \reflabel{subinter}, $A \inter B \subtype E_1 \inter E_2$.
+  By \reflabel{\labelsubinter}, $A \inter B \subtype E_1 \inter E_2$.
 \end{proof}
 
-\begin{lemma}{Symmetry of disjointness} \label{lemma:symmetry-of-disjointness}
-  If $\jdis \Gamma A B$, then $\jdis \Gamma B A$.
-\end{lemma}
+% \begin{lemma}{Symmetry of disjointness}
+%   \label{lemma:symmetry-of-disjointness}
+%
+%   If $\jdis \Gamma A B$, then $\jdis \Gamma B A$.
+% \end{lemma}
+%
+% \begin{proof}
+%   Trivial by the definition of disjointness.
+% \end{proof}
 
-\begin{proof}
-  Trivial by the definition of disjointness.
-\end{proof}
+\begin{theorem}
+  \label{theorem:disjoint-intersect}
 
-\begin{theorem} \label{theorem:disjoint-intersect}
   If $\jdis \Gamma A C$ and $\jdis \Gamma B C$,
   then $\jdis \Gamma {A \inter B} {C}$.
 \end{theorem}
 
-\begin{lemma} \label{lemma:common-supertype}
+\begin{lemma}
+  \label{lemma:common-supertype}
+
   If $A_1 \to A_2 \subtype D$ and $B_1 \to B_2 \subtype D$,
   then there exists a $C$ such that $A_2 \subtype C$ and $B_2 \subtype C$.
 \end{lemma}

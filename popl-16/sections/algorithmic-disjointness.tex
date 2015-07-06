@@ -86,59 +86,58 @@ $\commonsuper$:
   \commonsuper(A_1 \to A_2, B_1 \to B_2) &= \commonsub(A_1,B_1) \to \commonsuper(A_2,B_2) \\
   \commonsuper({A_1 \inter A_2, B})      &= \commonsuper(A_1, B) \cup \commonsuper(A_1,B) \\
   \commonsuper({A, B_1 \inter B_2})      &= \commonsuper(A, B_1) \cup \commonsuper(A,B_2)
-\end{align*}\george{Missing the forall case}
+\end{align*}\george{Missing the forall case. But we're just going to drop the formulae.}
 
 \subsection{Rules}
 
 The rules for the disjointness judgement are shown in
 Figure~\ref{fig:disjointness}, which consists of two judgements.
 
-\paragraph{Main judgement} The judgement $\jdis \Gamma A B$ says two types
+\paragraph{Main judgement} The judgement $\jdisimpl \Gamma A B$ says two types
 $A$ and $B$ are disjoint in a context $\Gamma$. \reflabel{\labeldisvar} is the
 base rule and \reflabel{\labeldissym} is its twin rule.
 \reflabel{\labeldisinterl} and \reflabel{\labeldisinterr} inductively distribute
-the relation itself over the intersection constructor ($\inter$). We have
-derived \reflabel{DisjointFun} in the previous subsection, which says two
-function types are disjoint as long as their return types are disjoint
-(regardless of their parameter types). \reflabel{\labeldisatom} says two types
-are considered disjoint if they are judged to be disjoint by the $A \not \sim B$
-rules, which is going to be explained below.
+the relation itself over the intersection constructor ($\inter$).
+\reflabel{\labeldisfun} is the most interesting rule---it says two function
+types are disjoint if and only if their return types are disjoint (regardless of
+their parameter types!). For example, consider the two function types:
+\[ \tyint \to \tystring \qquad \tybool \to \tystring \]
+Even though their parameter types are disjoint, we are still able to think of a
+type which is a supertype for both of them. For example, $ \tyint \inter \tybool
+\to \tystring $. Therefore, by definition, the two function types are not
+disjoint. The lesson from this example is that the parameter types of two
+function types do not have a voice in determining whether that two function
+types are disjoint or not, because in our system given any two types there
+exists a subtype of the both.
 
-\paragraph{Axioms} The judgement $A \not \sim B$ says two atomic types $A$ and
-$B$ are of different constructors. Note that intersection types are excluded
-here, since for example, $\tyint \inter (\tychar \to \tychar)$ and $\tychar \to
-\tychar$ have different constructors and yet are not disjoint.
+\reflabel{\labeldisax} says two types are considered disjoint if they are
+judged to be disjoint by the axiom rules, which is explained below.
 
-\begin{figure}
+\paragraph{Axioms} Up till now, the rules of $ \jdisimpl \Gamma A B $ have only
+taken care of two types of the same constructors. But how can be the fact that
+$\tyint$ and $\tyint \to \tyint$ are disjoint be decided? That is exactly the
+place where the judgement $ A \disjointax B $ comes in handy. It provides the
+axioms for disjointness. What is captured by the set of rules is that $ A
+\disjointax B $ holds for all two types of different constructors unless any of
+them is an intersection type. That is because for example, $ \tyint \inter
+(\tychar \to \tychar) $ and $ \tychar \to \tychar $ have different constructors
+and yet are not disjoint. \george{Can you decide that $\bot \disjoint \tyint \inter \tychar$?}
+
+\begin{figure*}[h]
   \begin{mathpar}
     \formdis \\
-    \ruledisvar \and \ruledissym \and \ruledisinterl \and \ruledisinterr
+    \ruledisvar \and \ruledissym \and \ruledisinterl \and \ruledisinterr \and
     \ruledisfun \and \ruledisforall \and \ruledisatomic
   \end{mathpar}
 
   \begin{mathpar}
-    \framebox{$ A \not\sim B$} \\
-
-    \inferrule* [right=NotSimBot1]
-      {}
-      {\bot \not\sim A \to B}
-
-    \inferrule* [right=NotSimBot2]
-      {}
-      {\bot \not\sim \fordis \alpha B A}
-
-    \inferrule* [right=NotSimFunForall]
-      {}
-      {A \to B \not\sim \fordis \alpha B A}
-
-    \inferrule* [right=NotSimFunForall]
-      {B \not\sim A}
-      {A \not\sim B}
+    \formax \\
+    \ruleaxbotfun \and \ruleaxbotforall \and \ruleaxfunforall \and \ruleaxsym
   \end{mathpar}
 
   \caption{Algorithmic Disjointness.}
   \label{fig:disjointness}
-\end{figure}
+\end{figure*}
 
 \subsection{Metatheory}
 
@@ -164,8 +163,16 @@ The algorithmic rules for disjointness is sound and complete.
   For any two types $A$, $B$, $\jdisimpl \Gamma A B$ implies $\jdis \Gamma A B$.
 \end{restatable}
 
+\begin{proof}
+  By induction on the derivation of $\jdisimpl \Gamma A B$.
+\end{proof}
+
 \begin{restatable}[Completeness]{theorem}{completeness}
   \label{theorem:completeness}
 
   For any two types $A$, $B$, $\jdis \Gamma A B$ implies $\jdisimpl \Gamma A B$.
 \end{restatable}
+
+\begin{proof}
+  By induction on the derivation of $\jdis \Gamma A B$.
+\end{proof}

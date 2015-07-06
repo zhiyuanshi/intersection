@@ -1,5 +1,7 @@
 \subsection{Type Safety of \name}
 
+We show the type safety of the version of \name without coherence.
+
 % \subsection{Subtyping}
 
 % \begin{theorem}[Subtyping is reflexive]
@@ -124,7 +126,9 @@
 
 \end{proof}
 
-\begin{lemma}[Preservation of well-formedness under type translation] \label{lemma:preserve-wf}
+\begin{lemma}[Preservation of well-formedness]
+  \label{lemma:preserve-wf}
+
   If $ \jwf \Gamma A $, then $ \jwf {\im \Gamma} {\im A} $.
 \end{lemma}
 

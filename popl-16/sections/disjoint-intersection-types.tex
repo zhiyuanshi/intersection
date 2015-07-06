@@ -1,28 +1,21 @@
 \section{Disjoint Intersection Types and Disjoint Quantification}
-\label{sec:dis-inter}
-
-\george{Discuss each point in this order: goal, idea of tweaks, changes, and proofs.}
 
 Although the system shown in the previous section is type-safe, it is not
-coherent. This section shows how to amend the system presented before so that it
+coherent. This section shows how to patch the system presented before so that it
 supports coherence as well as type soundness. The keys aspects are the notion of
 disjoint intersections, and disjoint quantification for polymorphic types. We
-only highlight the differences here and the full specification of the language
-can be found in the appendix.
+only highlight the changes here.
 
-\begin{theorem}[Unique elaboration] \label{theorem:unique-elaboration}
+Formally, the goal of this section is to tweak the system so that elaboration is deterministic, expressed by this theorem:
+\begin{restatable}[Unique elaboration]{theorem}{uniqueelaboration}
+  \label{theorem:unique-elaboration}
+
   If $\jtype \Gamma e {A_1} \yields {E_1}$ and $\jtype \Gamma e {A_2}
   \yields {E_2}$, then $E_1 \equiv E_2$.
-\end{theorem}
-
-Given a source term $e$, elaboration always produces the same target term $E$.
-
-\george{Transition and informally motivates the following definiton here.}
-
-If $A \inter B \subtype C$, then either $A$ or $B$ contributes to that subtyping
-relation, but not both. The implication of this lemma is that during the
-derivation, it is not possible that two rules are applicable.
-
+\end{restatable}
+In other words, given a source term $e$, elaboration always produces the same
+target term $E$. The most important hurdle we need to overcome is that if $A \inter B \subtype C$, then either $A$ or $B$ contributes to that subtyping
+relation, resulting in two possible coercions. The sufficient condition to rule out that case is that $A$ and $B$ are said to be disjoint:
 \begin{definition}[Disjoint types]
   Two types $A$ and $B$ are \emph{disjoint} if they do not share a common
   supertype, that is, there does not exist a type $C$ such that $A \subtype C$
@@ -59,7 +52,6 @@ the other. \bruno{You need a concrete code example to make this point.}
 Hence the algorithmic rules are more nuanced. For now, it is enough to treat the
 disjoint judgement $\jdis \Gamma A B$ as oracle and we will coome back to
 this topic in the next section.
-
 
 \subsection{Syntax}
 
@@ -118,23 +110,21 @@ bounded polymorphism.}
 The disjointness judgement appears in the well-formedness rule for intersection
 types and the typing rule for merges.
 
-\paragraph{Formation of disjoint intersection types}
-
 \begin{figure*}
   \begin{mathpar}
-    \framebox{$\isatomic A$} \\
+    \framebox{$\jatomic A$} \\
 
     \inferrule*
     {}
-    {\isatomic \bot}
+    {\jatomic \bot}
 
     \inferrule*
     {}
-    {\isatomic {A \to B}}
+    {\jatomic {A \to B}}
 
     \inferrule*
     {}
-    {\isatomic {\fordis \alpha B A}}
+    {\jatomic {\fordis \alpha B A}}
   \end{mathpar}
 
   \begin{mathpar}
@@ -153,11 +143,10 @@ types and the typing rule for merges.
   \label{fig:fi-type-patch}
 \end{figure*}
 
-\paragraph{Disjointness judgement}
+\paragraph{Formation of disjoint intersection types}
 
 We require that the two types of an intersection must be disjoint in their
 context, and that the disjointness constraint in a forall type is well-formed.
-
 Under the new rules, intersection types such as $\tyint \inter \tyint$ are no
 longer well-formed because the two types are not disjoint.
 
@@ -181,39 +170,43 @@ But after the substitution of $\tyint$ for $\alpha$ on the two types, the senten
 \[ \jdis {\alpha \disjoint \tyint} \tyint \tyint \]
 is longer true since $\tyint$ is clearly not disjoint with itself.
 
-\begin{lemma}{Instantiation} \label{lemma:instantiation}
-  If $\jwf {\Gamma, \alpha \disjoint B} C$, $\jwf \Gamma A$, $\jdis
-  \Gamma A B$ then $\jwf \Gamma {\subst A \alpha C}$.
-\end{lemma}
+\begin{restatable}[Instantiation]{lemma}{instantiation}
+  \label{lemma:instantiation}
 
-\begin{lemma}{Well-formed typing} \label{lemma:wf-typing}
-If $\jtype \Gamma e A$, then $\jwf \Gamma e$.
-\end{lemma}
+  If $\jwf {\Gamma, \alpha \disjoint B} C$, $\jwf \Gamma A$, $\jdis \Gamma A B$
+  then $\jwf \Gamma {\subst A \alpha C}$.
+\end{restatable}
+
+\begin{proof}
+  By induction.
+\end{proof}
+
+\begin{restatable}[Well-formed typing]{lemma}{wellformedtyping}
+  \label{lemma:wellformed-typing}
+
+  If $\jtype \Gamma e A$, then $\jwf \Gamma A$.
+\end{restatable}
+
+\begin{proof}
+  By induction on the derivation that leads to $\jtype \Gamma e A$ and applying
+  Lemma~\ref{lemma:instantiation} in the case of \reflabel{\labelttapp}.
+\end{proof}
 
 \subsection{Subtyping}
 
 The coercion of a subtyping relation $A \subtype B$ is uniquely determined.
+\begin{restatable}[Unique coercion]{lemma}{uniquecoercion}
+  \label{lemma:unique-coercion}
 
-\begin{lemma}[Unique coercion] \label{lemma:unique-coercion}
-  If $A \subtype B \yields {C_1}$ and $A \subtype B \yields {C_2}$, where $A$
-  and $B$ are well-formed types, then $C_1 \equiv C_2$.
-\end{lemma}
+  If $A \subtype B \yields {E_1}$ and $A \subtype B \yields {E_2}$, where $A$
+  and $B$ are well-formed types, then $E_1 \equiv E_2$.
+\end{restatable}
 
 \george{Two points are being made here: 1) nondisjoint intersections, 2) atomic
 types. Show an offending example for each?}
 
-\begin{lemma}[Unique subtype contributor]
-  \label{unique-subtype-contributor}
-  If $A \inter B \subtype C$, where $A \inter B$ and $C$ are well-formed types,
-  then it is not possible that the following hold at the same time:
-\begin{enumerate}
-\item $A \subtype C$
-\item $B \subtype C$
-\end{enumerate}
-\end{lemma}
-
 \paragraph{Atomic types} Atomic types are just those which are not intersection
-types, and are asserted by the judgement \[ \isatomic A \]
+types, and are asserted by the judgement \[ \jatomic A \]
 
 The subtyping rules, without the atomic condition are overlapping. If we would
 like to have a deterministic elaboration result, the overarching idea is to
@@ -221,6 +214,17 @@ tweak the rules so that given a term, it is no longer possible that both of the
 twin rules can be used. For example, if $A_1 \inter A_2 \subtype A_3$, we would
 like to be certain that either $A_1 \subtype A_3$ holds or $A_2 \subtype A_3$
 holds, but not both.
+
+\begin{lemma}[Unique subtype contributor]
+  \label{lemma:unique-subtype-contributor}
+
+  If $A_1 \inter A_2 \subtype B$, where $A_1 \inter A_2$ and $B$ are well-formed types,
+  then it is not possible that the following hold at the same time:
+  \begin{enumerate}
+    \item $A_1 \subtype B$
+    \item $A_2 \subtype B$
+  \end{enumerate}
+\end{lemma}
 
 With the atomic constraint, one can guarantee that at any moment during the
 derivation of a subtyping relation, at most one rule can be used. Yet
@@ -252,10 +256,13 @@ Also, types built with different constructors are disjoint. For example,
 $\tyint$ and $\tyint \to \tyint$. For function types, disjointness
 is harder to visualise. But bear in the mind that disjointness can defined by
 the very requirement that the theorem holds.
-\bruno{We should be finishing up this section with the key coherence
-  lemma. Why is that not here?}
 
-\begin{theorem}[Unique elaboration] \label{theorem:unique-elaboration}
-  If $\jtype \Gamma e {A_1} \yields {E_1}$ and $\jtype \Gamma e {A_2}
-  \yields {E_2}$, then $E_1 \equiv E_2$.
-\end{theorem}
+\uniqueelaboration*
+
+\begin{proof}
+  The typing rules are syntax-directed. The case of \reflabel{\labeltapp} needs special attention since we still need to show that the generated coercion $C$ is unique.
+  \begin{mathpar}
+    \rulettapp
+  \end{mathpar}
+  By Lemma~\ref{lemma:wellformed-typing}, we have $\jwf \Gamma {A_1}$ and $\jwf \Gamma {A_3}$. Therefore we are able to apply Lemma~\ref{lemma:unique-coercion} and conclude that $C$ is unique.
+\end{proof}
