@@ -14,6 +14,7 @@ Section~\ref{sec:fi} does not present all such features, our implementation
 supports them.
 
 \bruno{Need to type-check the programs!}
+\bruno{Need to make code formatting homogeneous!}
 
 
 \begin{comment}
@@ -133,7 +134,8 @@ in Section~\ref{subsec:polymorphism}.
 
 \subsection{Restoring Coherence: Disjoint Intersection Types}
 Coherence is a desirable property for a semantics. A semantics is said
-to be coherent if any \emph{valid program} has exactly one meaning.
+to be coherent if any \emph{valid program} has exactly one
+meaning~\cite{Reynolds:1991} (that is, the semantics is not ambiguous).
 One option to restore coherence is to reject programs which may have
 multiple meanings.
 %Of course, when rejecting programs it is important
@@ -204,85 +206,82 @@ $Int \& Bool$, those two types are not disjoint.
 intersection types. As shown in Section~\ref{sec:disjoint} disjoint intersection
 types will play a crutial rule in guaranteing that the semantics is coherent.
 
-\subsection{Parametric Polymorphism and Disjointness}\label{subsec:polymorphism}
-The interaction between parametric polymorphism and disjoint
-intersection types is non-trivial. The key challange is to have a type
+\subsection{Parametric Polymorphism and Intersection Types}\label{subsec:polymorphism}
+The interaction between parametric polymorphism and
+intersection types when coherence is a goal is non-trivial. 
+The key challenge is to have a type
 system that still ensures coherence, but at the same time is not too
-restrictive in the programs that can be accepted. Dunfield~\cite{} provides a
+restrictive in the programs that can be accepted. 
+\begin{comment}
+Dunfield~\cite{} provides a
 good illustrative example of the issues that arize when combining
 disjoint intersection types and parametric polymorphism:
 \[\lambda x. {\bf let}~y = 0 \mergeop x~{\bf in}~x\]
-This lambda term, in not a valid \name program, since variables are
-not annotated with types. The question is whether we can find
-a valid \name program, with type lambdas and type annotations that can
-be used to accept the program, or otherwise reject it on the grounds
-that disjointness is violated. A first attempt would be:
-\[\Lambda A. \lambda (x:A). {\bf let}~y : \tyint \& A = 0 \mergeop x~{\bf in}~x\]
-If $A$ is instantiated to $\tybool$ or $\tychar$, for example, then clearly
-the merge used in the program ($0 \mergeop x$) respects disjointness. However, if $A$
-is instantiated with $Int$ then the merge is problematic as it is not
-disjoint.
+\end{comment}
+Consider the attempt to write 
+the following polymorphic function in \name:
+\[{\bf let}~fst~A~B~(x : A \& B) = (\lambda z : A. z)~x;\] The
+\code{fst} function is supposed to extract a value from the merge that
+matches the type of the first type parameter (\lstinline{A}).  However
+this function is problematic.  The reason is that when
+\lstinline{A} and \lstinline{B} are instantiated to non-disjoint
+types, then uses of \lstinline{fst} may lead to incoherence.
+For example, consider the following use of \lstinline{fst}:
+\[fst~Int~Int~(1,,2)\]
+\noindent This program is clearly incoherent as both 
+$1$ and $2$ can be extracted from the merge and still match the type
+of the first argument of \lstinline{fst}.
 
-One option would be to reject the program on the grounds
-that $A$ could be instantiated with a type that would allow the
-creation of an intersection type which is not disjoint. However this
-option would be too conservative and it would prevent many useful
+\paragraph{Biased Choice and Polymorphism} At first sight, one option 
+to restore coherence would be to bias the type-based merge lookup 
+to the left or to the right (as discussed in
+Section~\ref{}). For example, suppose we chose to always pick the
+rightmost value in a merge when multiple values of same type exist.
+Intuitively, it would appear that the result of the use of
+\lstinline{fst} above is $2$. Indeed simple equational reasoning
+seems to validate this:
+
+\vspace{5pt}
+\noindent$fst~Int~Int~(1,,2)$\\
+$\equiv\{\text{definition of}~fst\}$\\
+$(\lambda (z : Int). z) (1,,2)$\\
+$\equiv\{\text{coercion (biased to the right)}\}$\\
+$(\lambda (z : Int). z)~2$\\
+$\equiv\{\beta\text{-reduction}\}$\\
+$2$
+\vspace{5pt}
+
+However (assumming a straightforward implementation of right-biased
+choice) the result of the program would be 1! The reason for this has
+todo with \emph{when} the type-based lookup on the merge
+happens. In the case of \lstinline{fst}, lookup is triggered by 
+a coercion function inserted in the definition of
+\lstinline{fst} at compile-time. In the definition of $fst$ 
+all it is known is that a value of type $A$ should be
+returned from a merge with an intersection type $A\&B$. 
+Clearly the only type-safe choice at this point is to take the left component 
+of the merge, since it is not know in advance whether $B$ is going to 
+be instantiated to the same type as $A$.  Thus when given the merge 
+$(1,,2)$ the value $1$ will be looked-up by \lstinline{fst}.
+
+Unfortunatelly this result means that equational reasoning is broken!
+In the equational reasoning steps above, doing apparently correct
+substitutions lead us to a wrong result. This is a major problem for
+biased choice and a reason to dismiss it as a possible implementation
+choice for \name.
+
+\paragraph{Conservatively Rejecting Intersections}
+To avoid incoherence, and the issues of biased choice, another option 
+is simply to reject programs where the
+instantiations of type variables may lead to non-disjoint intersection
+types. Unfortunatelly this is too restrictive and prevents many useful
 programs using both parametric polymorphism and intersection types.
+In particular, in the case of \lstinline{fst}, if the two type
+parameters are used with two disjoint intersection
+types, then the merge will not lead to ambiguity. 
+
 
 \begin{comment}
-To address the limitations of intersection types in languages like
-Scala, \name allows intersecting any two terms at run time using a
-\emph{merge} operator (denoted by $ \mergeop $)~\cite{dunfield2014elaborating}.  With the merge
-operator it is trivial to implement the \lstinline{merge} function in \name:
-
-\begin{lstlisting}
-let merge[A, B * A] (x : A) (y : B) : A & B = x ,, y;
-\end{lstlisting}
-
-\noindent In contrast to Scala's term-level \lstinline{with}
-construct, the operator \lstinline{,,} allows two arbitrary values \lstinline{x}
-and \lstinline{y} to be merged. The resulting type is a \emph{disjoint}
-intersection of the types of  \lstinline{x}
-and \lstinline{y} (\lstinline{A & B} in this case).
-
-
-
-\paragraph{Incoherence and Parametric Polymorphism}
-We can define a \code{fst} function that extracts the first item of a merged value:
-\[
-\code{fst} \ \alpha \ \beta \ (x : \alpha \inter \beta) = \app {(\lam y \alpha y)} x
-\]
-What should be the result of this program?
-\begin{lstlisting}
-fst Int Int (1,,2)
-\end{lstlisting}
-
-Then we have the following equational reasoning:
-\begin{lstlisting}
-fst Int Int (1,,2) => (\(y : Int). y) (1,,2)
-\end{lstlisting}
-If we favour the second item, the program seems to evaluate to $2$. But in
-reality, the result is $2$. No matter we favour the first or the second item,
-we can always construct a program such that for that program, equational
-reasoning is broken.
-
-Therefore, we require that the two types of an intersection must be not
-overlapping, or \emph{disjoint}, and add this requirement to the well-formedness of types.
-
-A well-formed type is such that given any query type,
-it is always clear which subpart the query is referring to.
-In terms of rules, this notion of well-formedness is almost the same as the one in System $F$
-except for intersection types we require the two components to be disjoint.
-
-With parametric polymorphism, disjointness is harder to determine due to type variables.
-Consider this program:
-\[
-\blam \alpha {\lam x {\alpha \inter \tyint} x}
-\]
-$x$ in the body is of type $\alpha \inter \tyint$ and if $\alpha$ and $\tyint$ are
-disjoint depends on the instantiation of $\alpha$.
-
-
 \subsection{Intersection Types in Existing Languages}
 
 What is an intersection type? The intersection of types $A$ and $B$
@@ -419,7 +418,8 @@ disjoint depends on the instantiation of $\alpha$.
 \end{comment}
 
 \subsection{Disjoint Quantification}
-To allow for more flexibility \name uses an extension to universal
+The solution to the interaction between parametric polymorphism and
+intersection types in \name is to use an extension to universal
 quantification called \emph{disjoint quantification}.  Inspired by
 bounded quantification~\cite{}, where a type variable is constrained by a type
 bound, disjoint quantification allows a type variable to be
