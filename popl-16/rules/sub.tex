@@ -6,14 +6,15 @@
 \newcommand{\rulesubvar}{
   \inferrule* [right=\labelsubvar]
     { }
-    {\alpha \subtype \alpha \yields {\lamty x {\im \alpha} x}}
+    {\jsub \Gamma \alpha \alpha \yields {\lamty x {\im \alpha} x}}
 }
 
 \newcommand{\labelsubfun}{\makelabelsub Fun}
 \newcommand{\rulesubfun}{
   \inferrule* [right=\labelsubfun]
-    {B_1 \subtype A_1 \yields {E_1} \\ A_2 \subtype B_2 \yields {E_2}}
-    {A_1 \to A_2 \subtype B_1 \to B_2
+    {\jsub \Gamma {B_1} {A_1} \yields {E_1} \\
+     \jsub \Gamma {A_2} {B_2} \yields {E_2}}
+    {\jsub \Gamma {A_1 \to A_2} {B_1 \to B_2}
     \yields
         {\lamty f {\im {A_1 \to A_2}}
         {\lamty x {\im {B_1}}

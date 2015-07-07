@@ -20,21 +20,21 @@
 \newcommand{\labeltgtvar}{\makelabeltgtty Var}
 \newcommand{\ruletgtvar} {
 \inferrule* [right=\labeltgtvar]
-  {(x,T) \in \Gamma}
+  {x \oftype T \in \Gamma}
   {\jtype \Gamma x T}
 }
 
 \newcommand{\labeltgtlam}{\makelabeltgtty Lam}
 \newcommand{\ruletgtlam} {
 \inferrule* [right=\labeltgtlam]
-  {\jtype {\Gamma, x \oftype T} E {T_1} \andalso \jwf \Gamma T}
-  {\jtype \Gamma {\lamty x T E} {T \to T_1}}
+  {\jwf \Gamma T \\ \jtype {\Gamma, x \oftype T} E {T_2}}
+  {\jtype \Gamma {\lamty x {T_1} E} {T_1 \to T_2}}
 }
 
 \newcommand{\labeltgtapp}{\makelabeltgtty App}
 \newcommand{\ruletgtapp}{
 \inferrule* [right=\labeltgtapp]
-  {\jtype \Gamma {E_1} {T_1 \to T_2} \andalso \jtype \Gamma {E_2} {T_1}}
+  {\jtype \Gamma {E_1} {T_1 \to T_2} \\ \jtype \Gamma {E_2} {T_1}}
   {\jtype \Gamma {\app {E_1} {E_2}} {T_2}}
 }
 
@@ -48,14 +48,14 @@
 \newcommand{\labeltgttapp}{\makelabeltgtty TApp}
 \newcommand{\ruletgttapp}{
 \inferrule* [right=\labeltgttapp]
-  {\jtype \Gamma E {\for \alpha {T_1}} \andalso \jwf \Gamma T}
+  {\jtype \Gamma E {\for \alpha {T_1}} \\ \jwf \Gamma T}
   {\jtype \Gamma {\tapp E T} {\subst T \alpha T_1}}
 }
 
 \newcommand{\labeltgtpair}{\makelabeltgtty Pair}
 \newcommand{\ruletgtpair}{
 \inferrule* [right=\labeltgtpair]
-  {\jtype \Gamma {E_1} {T_1} \andalso \jtype \Gamma {E_2} {T_2}}
+  {\jtype \Gamma {E_1} {T_1} \\ \jtype \Gamma {E_2} {T_2}}
   {\jtype \Gamma {\pair {E_1} {E_2}} {\pair {T_1} {T_2}}}
 }
 

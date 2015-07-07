@@ -157,17 +157,17 @@ The algorithmic rules for disjointness is sound and complete.
   then there exists a $C$ such that $A_2 \subtype C$ and $B_2 \subtype C$.
 \end{lemma}
 
-\begin{restatable}[Soundness]{theorem}{soundness}
+\begin{restatable}[Soundness of algorithmic disjointness]{theorem}{algodissoundness}
   \label{theorem:soundness}
 
-  For any two types $A$, $B$, $\jdisimpl \Gamma A B$ implies $\jdis \Gamma A B$.
+  For any two types $A$ and $B$, $\jdisimpl \Gamma A B$ implies $\jdis \Gamma A B$.
 \end{restatable}
 
 \begin{proof}
   By induction on the derivation of $\jdisimpl \Gamma A B$.
 \end{proof}
 
-\begin{restatable}[Completeness]{theorem}{completeness}
+\begin{restatable}[Completeness of algorithmic disjointness]{theorem}{algodiscompleteness}
   \label{theorem:completeness}
 
   For any two types $A$, $B$, $\jdis \Gamma A B$ implies $\jdisimpl \Gamma A B$.

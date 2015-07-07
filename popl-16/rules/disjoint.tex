@@ -5,8 +5,8 @@
 \newcommand{\labeldisvar}{\makelabeldis Var}
 \newcommand{\ruledisvar}{
   \inferrule* [right=\labeldisvar]
-    {\alpha * B \in \Gamma}
-    {\jdisimpl \Gamma \alpha B}
+    {\alpha \disjoint A \in \Gamma}
+    {\jdisimpl \Gamma \alpha A}
 }
 
 \newcommand{\labeldissym}{\makelabeldis Sym}
@@ -19,15 +19,15 @@
 \newcommand{\labeldisinterl}{\makelabeldis {Inter\_1}}
 \newcommand{\ruledisinterl}{
   \inferrule* [right=\labeldisinterl]
-    {\jdisimpl \Gamma A C \\ \jdisimpl \Gamma B C}
-    {\jdisimpl \Gamma {A \inter B} {C}}
+    {\jdisimpl \Gamma {A_1} B \\ \jdisimpl \Gamma {A_2} B}
+    {\jdisimpl \Gamma {A_1 \inter A_2} {B}}
 }
 
 \newcommand{\labeldisinterr}{\makelabeldis {Inter\_2}}
 \newcommand{\ruledisinterr}{
   \inferrule* [right=\labeldisinterr]
-    {\jdisimpl \Gamma A B \\ \jdisimpl \Gamma A C}
-    {\jdisimpl \Gamma {A} {B \inter C}}
+    {\jdisimpl \Gamma A {B_1} \\ \jdisimpl \Gamma A {B_2}}
+    {\jdisimpl \Gamma {A} {B_1 \inter B_2}}
 }
 
 \newcommand{\labeldisfun}{\makelabeldis Fun}
@@ -40,7 +40,7 @@
 \newcommand{\labeldisforall}{\makelabeldis Forall}
 \newcommand{\ruledisforall}{
   \inferrule* [right=\labeldisforall]
-    {\jdisimpl \Gamma {A_2} {B_2}}
+    {\jdisimpl {\Gamma \text{\george{Where is $\alpha$?}}} {A_2} {B_2}}
     {\jdisimpl \Gamma {\fordis \alpha {A_1} {A_2}} {\fordis \alpha {B_1} {B_2}}}
 }
 
@@ -54,7 +54,14 @@
 
 \newcommand{\formax}{\framebox{$ A \disjointax B$}}
 
-\newcommand{\makelabelax}[1]{Ax\_#1}
+\newcommand{\makelabelax}[1]{DisAx\_#1}
+
+\newcommand{\labeldisaxbotbot}{\makelabelax Bot\_Bot}
+\newcommand{\ruledisaxbotbot}{
+  \inferrule* [right=\labeldisaxbotbot]
+    {}
+    {\bot \disjointax \bot}
+}
 
 \newcommand{\labelaxbotfun}{\makelabelax Bot\_Fun}
 \newcommand{\ruleaxbotfun}{
@@ -74,7 +81,7 @@
 \newcommand{\ruleaxfunforall}{
   \inferrule* [right=\labelaxfunforall]
     {}
-    {A \to B \disjointax \fordis \alpha B A}
+    {A_1 \to A_2 \disjointax \fordis \alpha {B_1} {B_2}}
 }
 
 \newcommand{\labelaxsym}{\makelabelax Sym}
