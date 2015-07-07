@@ -17,15 +17,15 @@
   By \reflabel{\labelsubinter}, $A \inter B \subtype E_1 \inter E_2$.
 \end{proof}
 
-% \begin{lemma}{Symmetry of disjointness}
-%   \label{lemma:symmetry-of-disjointness}
-%
-%   If $\jdis \Gamma A B$, then $\jdis \Gamma B A$.
-% \end{lemma}
-%
-% \begin{proof}
-%   Trivial by the definition of disjointness.
-% \end{proof}
+\begin{lemma}{Symmetry of disjointness}
+  \label{lemma:symmetry-of-disjointness}
+
+  If $\jdis \Gamma A B$, then $\jdis \Gamma B A$.
+\end{lemma}
+
+\begin{proof}
+  Trivial by the definition of disjointness.
+\end{proof}
 
 \begin{theorem}
   \label{theorem:disjoint-intersect}
@@ -56,7 +56,7 @@
       & \ruledisfun &
     \end{flalign*}
 
-    Lemma~\ref{common-supertype}
+    Lemma~\ref{lemma:common-supertype}
 
     \george{May need an extracted lemma here} \\
 
@@ -65,14 +65,14 @@
       & \ruledisinterl &
     \end{flalign*}
 
-    By Lemma~\ref{disjoint-intersect} and the i.h. \\
+    By Lemma~\ref{lemma:disjoint-intersect} and the i.h. \\
 
     \item Case
     \begin{flalign*}
       & \ruledisinterr &
     \end{flalign*}
 
-    By Lemma~\ref{disjoint-intersect}, Lemma~\ref{lemma:symmetry-of-disjointness}, and the i.h. \\
+    By Lemma~\ref{lemma:disjoint-intersect}, Lemma~\ref{lemma:symmetry-of-disjointness}, and the i.h. \\
 
     \item Case
     \begin{flalign*}
@@ -124,6 +124,9 @@
 
           \item Case $B = B_1 \inter B_2$.
           Need to show $\Gamma \turns A_1 \to A_2 * B_1 \inter B_2$ implies $\Gamma \turns A_1 \to A_2 *_I B_1 \inter B_2$. Apply \reflabel{\labeldisinterr} and the resulting conditions can be proved by the i.h.
+
+          \item Case $B = \fordis \alpha {B_1} B_2$.
+          Need to show $\Gamma \turns A_1 \to A_2 * \fordis \alpha {B_1} B_2$.
         \end{itemize}
 
         \item $A = A_1 \inter A_2$

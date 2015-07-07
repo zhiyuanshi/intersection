@@ -152,22 +152,23 @@ materials submitted with the paper.
 
 \subsection{Typing}
 
-\george{Well-formedness still needs to be shown.}
-
-The typing rules are shown in the bottom part of Figure~\ref{fig:fi-type}.
-Again, the reader are advised to omit the gray-shaded part here, as they will be
-explained later. The typing judgement is of the form: \[ \jtype \Gamma e A \] It
-reads: ``in the typing context $\Gamma$, the term $e$ is of type $A$'' The rules
-that are the same as in System $F$ are rules for variables
-\reflabel{\labeltvar}, lambda abstractions \reflabel{\labeltlam}, and type
-applications \reflabel{\labelttapp}. For the ease of discussion, in
-\reflabel{\labeltblam}, we require the type variable introduced by the
-quantifier is fresh. For programs with type variable shadowing, this requirement
-can be met straighforwardly by variable renaming. The rule \reflabel{\labeltapp}
-needs special attention as we add a subtyping requirement: the type of the
-argument ($A_3$) is a subtype of that of the parameter ($A_1$).
-\reflabel{\labeltmerge} means for merges $e_1 \mergeop e_2$, we typecheck $e_1$
-and $e_2$ separately, and give it the intersection of the resulting types.
+The well-formedness rules are shown in the middle part of
+Figure~\ref{fig:fi-type}. In addition to the standard rules,
+\reflabel{\labelwfinter} is also not surprising. The typing rules are shown in
+the bottom part of the figure. Again, the reader are advised to omit the
+gray-shaded part here, as they will be explained later. The typing judgement is
+of the form: \[ \jtype \Gamma e A \] It reads: ``in the typing context $\Gamma$,
+the term $e$ is of type $A$'' The rules that are the same as in System $F$ are
+rules for variables \reflabel{\labeltvar}, lambda abstractions
+\reflabel{\labeltlam}, and type applications \reflabel{\labelttapp}. For the
+ease of discussion, in \reflabel{\labeltblam}, we require the type variable
+introduced by the quantifier is fresh. For programs with type variable
+shadowing, this requirement can be met straighforwardly by variable renaming.
+The rule \reflabel{\labeltapp} needs special attention as we add a subtyping
+requirement: the type of the argument ($A_3$) is a subtype of that of the
+parameter ($A_1$). \reflabel{\labeltmerge} means for merges $e_1 \mergeop e_2$,
+we typecheck $e_1$ and $e_2$ separately, and give it the intersection of the
+resulting types.
 
 \subsection{Semantics}
 
