@@ -4,19 +4,24 @@
 Although the system shown in the previous section is type-safe, it is not
 coherent. This section shows how to patch the system presented before so that it
 supports coherence as well as type soundness. The keys aspects are the notion of
-disjoint intersections, and disjoint quantification for polymorphic types. We
-only highlight the changes here.
+disjoint intersections, and disjoint quantification for polymorphic types.
 
 Formally, the goal of this section is to tweak the system so that elaboration is deterministic, expressed by this theorem:
 \begin{restatable}[Unique elaboration]{theorem}{uniqueelaboration}
   \label{theorem:unique-elaboration}
 
-  If $\jtype \Gamma e {A_1} \yields {E_1}$ and $\jtype \Gamma e {A_2}
-  \yields {E_2}$, then $E_1 \equiv E_2$.
+  If $\jtype \Gamma e {A_1} \yields {E_1}$ and $\jtype \Gamma e {A_2} \yields
+  {E_2}$, then $E_1 \equiv E_2$. (``$\equiv$'' means syntactical equality, up to
+  $\alpha$-equality.)
+
 \end{restatable}
-In other words, given a source term $e$, elaboration always produces the same
-target term $E$. The most important hurdle we need to overcome is that if $A \inter B \subtype C$, then either $A$ or $B$ contributes to that subtyping
-relation, resulting in two possible coercions. The sufficient condition to rule out that case is that $A$ and $B$ are said to be disjoint:
+
+\noindent In other words, given a source term $e$, elaboration always produces
+the same target term $E$. The most important hurdle we need to overcome is that
+if $A \inter B \subtype C$, then either $A$ or $B$ contributes to that subtyping
+relation, resulting in two possible coercions. The sufficient condition to rule
+out that case is that $A$ and $B$ are said to be disjoint:
+
 \begin{definition}[Disjoint types]
   Two types $A$ and $B$ are \emph{disjoint} if they do not share a common
   supertype, that is, there does not exist a type $C$ such that $A \subtype C$
@@ -234,10 +239,9 @@ subtyping since we have the following theorem:
 \begin{theorem}
   If $A_1 \subtype A_3$, then $A_1 \inter A_2 \subtype A_3$.
 \end{theorem}
-
 The interpretation of the theorem is that: even though the premise is made more
 strict by the atomic condition, we can still derive the every judgement in the
-old systems. \george{Point to proofs and justify why the proof shows this.}
+old systems. \george{Explain why the proof shows this.}
 
 Note that $A$ \emph{exclusive} or $B$ is true if and only if their truth value
 differ. Next, we are going to investigate the minimal requirement (necessary and
@@ -258,12 +262,19 @@ $\tyint$ and $\tyint \to \tyint$. For function types, disjointness
 is harder to visualise. But bear in the mind that disjointness can defined by
 the very requirement that the theorem holds.
 
+Combining the previous results, we are able to show the central theorem:
 \uniqueelaboration*
 
 \begin{proof}
-  The typing rules are syntax-directed. The case of \reflabel{\labeltapp} needs special attention since we still need to show that the generated coercion $C$ is unique.
+  Note that the typing rules are already syntax-directed but the case of
+  \reflabel{\labeltapp} (copied below) still needs special attention since we
+  need to show that the generated coercion $E$ is unique.
   \begin{mathpar}
-    \rulettapp
+    \ruletapp
   \end{mathpar}
-  By Lemma~\ref{lemma:wellformed-typing}, we have $\jwf \Gamma {A_1}$ and $\jwf \Gamma {A_3}$. Therefore we are able to apply Lemma~\ref{lemma:unique-coercion} and conclude that $C$ is unique.
+  Luckily, by Lemma~\ref{lemma:wellformed-typing}, we know that typing
+  judgements give well-formed types, and thus $\jwf \Gamma {A_1}$ and $\jwf
+  \Gamma {A_3}$. Therefore we are able to apply
+  Lemma~\ref{lemma:unique-coercion} and conclude that $E$ is unique.
+
 \end{proof}

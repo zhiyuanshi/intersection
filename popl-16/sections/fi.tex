@@ -1,14 +1,14 @@
 \section{The \name Calculus} \label{sec:fi}
 
-This section presents the syntax, subtyping, typing, as well as the semantics of
-\name.
+This section presents the syntax, subtyping, typing, as well as the (incoherent)
+semantics of \name.
 
 \subsection{Syntax}
 
 Figure~\ref{fig:fi-syntax} shows the syntax of \name. The differences with
 System $F$, highlighted in gray, are intersection types $A \inter B$ at the
 type-level and the ``merges'' $e_1 \mergeop e_2$ at the term level. Below are
-explanations in details.
+the explanations in details.
 
 \begin{figure}[h]
   \[
@@ -49,23 +49,23 @@ intersection of types $A$ and $B$.
 
 \paragraph{Terms} Metavariables $e$ range over terms.  Terms include standard
 constructs in System $F$: variables $x$; abstraction of terms over variables of
-a given type $\lamty x A e$; application of terms to terms $\app {e_1} {e_2}$;
-abstraction of type variables over terms $\blam \alpha e$; and
-application of terms to types $\tapp e A$.  $e_1 \mergeop e_2$ is the
+a given type $\lamty x A e$; application of terms $e_1$ to terms $e_2$, written
+$\app {e_1} {e_2}$; abstraction of type variables over terms $\blam \alpha e$;
+and application of terms to types $\tapp e A$.  $e_1 \mergeop e_2$ is the
 \emph{merge} of two terms $e_1$ and $e_2$. It can be used as either $ e_1 $ or $
-e_2 $. In particular, if one regards $e_1$ and $e_2$ as objects, their merge
-will respond to every method that one or both of them have. Merge of terms
-correspond to intersection types $A \inter B$.
+e_2 $. If one regards $e_1$ and $e_2$ as objects, their merge will respond to
+every method that one or both of them have. Merges of terms correspond to
+intersections of types $A \inter B$.
 
-\paragraph{Contexts} Typing contexts $ \Gamma $ track bound type variables and
-variables with their type $A$. We use $\subst {A} \alpha {B}$ to denote the
-capture-avoiding substitution of $A$ for $\alpha$ inside $B$ and $\ftv \cdot$
-for sets of free variables.
+\paragraph{Contexts} Typing contexts $ \Gamma $ track bound type variables
+$\alpha$ and variables $x$ with their type $A$. We use $\subst {A} \alpha {B}$
+to denote the capture-avoiding substitution of $A$ for $\alpha$ inside $B$ and
+$\ftv \cdot$ for sets of free type variables.
 
-To focus on the key features that make this language interesting, we do not
-include other forms such as type constants such as $\tyint$ and $\tystring$, and
-fixpoints here, although they can be included in the formalization in standard
-ways.
+In order to focus on the key features that make this language interesting, we do
+not include other forms such as type constants such as $\tyint$ and $\tystring$,
+and fixpoints here, although they can be included in the formalization in
+standard ways and we are using them in discussions.
 
 % \paragraph{Discussion.} A natural question the reader might ask is that why we
 % have excluded union types from the language. The answer is we found that
@@ -125,21 +125,21 @@ ways.
 % the fields.
 
 The subtyping rules of the form $A \subtype B$ are shown in the top part of
-Figure~\ref{fig:fi-type}. At the moment, the reader are advised to omit the
+Figure~\ref{fig:fi-type}. At the moment, the reader is advised to omit the
 gray-shaded part in the rules, which will be explained later. The rule
 \reflabel{\labelsubfun} says that a function is contravariant in its parameter
-type and covariant in its return type. A universal quantifier ($\forall$) is
-covariant in its body. The three rules dealing with intersection types are just
-what one would expect when interpreting types as sets. Under this
-interpretation, for example, the rule \reflabel{\labelsubinter} says that if
-$A_1$ is both the subset of $A_2$ and the subset of $A_3$, then $A_1$ is also
-the subset of the intersection of $A_2$ and $A_3$.
+type and covariant in its return type. \reflabel{\labelsubforall} a universal
+quantifier ($\forall$) is covariant in its body. The three rules dealing with
+intersection types are just what one would expect when interpreting types as
+sets. Under this interpretation, for example, the rule \reflabel{\labelsubinter}
+says that if $A_1$ is both the subset of $A_2$ and the subset of $A_3$, then
+$A_1$ is also the subset of the intersection of $A_2$ and $A_3$.
 
 \paragraph{Metatheory} As other sane subtyping relations, we can show that
 subtyping defined by $\subtype$ is also reflexive and transitive.
 
 \begin{lemma}[Subtyping is reflexive] \label{lemma:sub-refl}
-  Given a type $ A $, $ A \subtype A $.
+  For all type $ A $, $ A \subtype A $.
 \end{lemma}
 
 \begin{lemma}[Subtyping is transitive] \label{lemma:sub-trans}

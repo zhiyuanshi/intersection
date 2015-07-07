@@ -21,8 +21,8 @@
 \inferrule* [right=\labeltapp]
   {\jtype \Gamma {e_1} {A_1 \to A_2} \yields {E_1} \\
    \jtype \Gamma {e_2} {A_3} \yields {E_2} \\
-   A_3 \subtype A_1 \yields C}
-  {\jtype \Gamma {\app {e_1} {e_2}} {A_2} \yields {\app {E_1} {(\app C E_2)}}}
+   A_3 \subtype A_1 \yields E}
+  {\jtype \Gamma {\app {e_1} {e_2}} {A_2} \yields {\app {E_1} {(\app E E_2)}}}
 }
 
 \newcommand{\labeltblam}{\makelabelt BLam}
