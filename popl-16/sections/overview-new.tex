@@ -108,7 +108,7 @@ types built with a merge operator can lead to incoherence.
 The merge operator combines two terms, of type $A$ and $B$
 respectively, to form a term of type $A \inter B$. For example,
 $1 \mergeop `c'$ is of type $\tyint \inter \tychar$. In this case, no
-matter $1 \mergeop `c'$ is used as $\tyint$ or $\tychar$, the result
+matter if $1 \mergeop `c'$ is used as $\tyint$ or $\tychar$, the result
 of evaluation is always clear. However, with overlapping types, it is
 not straightforward anymore to see the result. For example, what
 should be the result of this program, which asks for an integer out of
@@ -121,15 +121,16 @@ If both results are accepted, we say that the semantics is
 valid program. Dunfield's calculus~\cite{dunfield2014elaborating} is incoherent and accepts the
 program above.
 
+\paragraph{Biased Choice}
 In a real implementation of Dunfield calculus a choice has to be made
 on which value to compute. For example, one potential option is to
 take either always take the left-most value matching the type in the
 merge. Similarly, one could take always take the right-most
 value matching the type in the merge. Either way, the meaning
-of a program will always depend on an implementation choice.
-Moreover, even if it accept a particular implementation choice as
+of a program will always depend on a biased implementation choice.
+Moreover, even if it accept a particular biased choice as
 being good enough, the approach cannot be easily
-extended to systems with parametric polymorphism, as we illustrate
+extended to systems with parametric polymorphism, as we illustrate 
 in Section~\ref{subsec:polymorphism}.
 
 \subsection{Restoring Coherence: Disjoint Intersection Types}
@@ -207,11 +208,15 @@ intersection types. As shown in Section~\ref{sec:disjoint} disjoint intersection
 types will play a crutial rule in guaranteing that the semantics is coherent.
 
 \subsection{Parametric Polymorphism and Intersection Types}\label{subsec:polymorphism}
-The interaction between parametric polymorphism and
-intersection types when coherence is a goal is non-trivial. 
-The key challenge is to have a type
-system that still ensures coherence, but at the same time is not too
-restrictive in the programs that can be accepted. 
+Before we show how \name extends the idea of disjointness to parametric 
+polymorphism, we discuss some non-trivial issues that arize from 
+the interaction between parametric polymorphism and intersection types. 
+%The interaction between parametric polymorphism and
+%intersection types when coherence is a goal is non-trivial. 
+%In particular biased choice . 
+%The key challenge is to have a type
+%system that still ensures coherence, but at the same time is not too
+%restrictive in the programs that can be accepted. 
 \begin{comment}
 Dunfield~\cite{} provides a
 good illustrative example of the issues that arize when combining
@@ -232,7 +237,7 @@ For example, consider the following use of \lstinline{fst}:
 $1$ and $2$ can be extracted from the merge and still match the type
 of the first argument of \lstinline{fst}.
 
-\paragraph{Biased Choice and Polymorphism} At first sight, one option 
+\paragraph{Biased Choice Breaks Equational Reasoning} At first sight, one option 
 to restore coherence would be to bias the type-based merge lookup 
 to the left or to the right (as discussed in
 Section~\ref{}). For example, suppose we chose to always pick the
@@ -245,7 +250,7 @@ seems to validate this:
 \noindent$fst~Int~Int~(1,,2)$\\
 $\equiv\{\text{definition of}~fst\}$\\
 $(\lambda (z : Int). z) (1,,2)$\\
-$\equiv\{\text{coercion (biased to the right)}\}$\\
+$\equiv\{\text{implicit coercion (biased to the right)}\}$\\
 $(\lambda (z : Int). z)~2$\\
 $\equiv\{\beta\text{-reduction}\}$\\
 $2$
@@ -253,18 +258,23 @@ $2$
 
 However (assumming a straightforward implementation of right-biased
 choice) the result of the program would be 1! The reason for this has
-todo with \emph{when} the type-based lookup on the merge
-happens. In the case of \lstinline{fst}, lookup is triggered by 
-a coercion function inserted in the definition of
-\lstinline{fst} at compile-time. In the definition of $fst$ 
-all it is known is that a value of type $A$ should be
-returned from a merge with an intersection type $A\&B$. 
-Clearly the only type-safe choice at this point is to take the left component 
-of the merge, since it is not know in advance whether $B$ is going to 
-be instantiated to the same type as $A$.  Thus when given the merge 
-$(1,,2)$ the value $1$ will be looked-up by \lstinline{fst}.
+todo with \emph{when} the type-based lookup on the merge happens. In
+the case of \lstinline{fst}, lookup is triggered by a coercion
+function inserted in the definition of \lstinline{fst} at
+compile-time. In the definition of $fst$ all it is known is that a
+value of type $A$ should be returned from a merge with an intersection
+type $A\&B$.  Clearly the only type-safe choice at this point is to
+take the left component of the merge. This works perfectly for merges
+such as $(1,,'c')$, where the types of the first and second components
+of the merge are disjoint. For the merge $(1,,'c')$, if a integer lookup 
+is needed, then $1$ is the rightmost integer, which is consistent with the 
+biased choice. Unfortunatelly, when given the merge $(1,,2)$ the 
+left-component ($1$) is also picked up, even though in this case $2$
+is the rightmost integer in the merge. Clearly this is inconsistent 
+with the biased choice!
 
-Unfortunatelly this result means that equational reasoning is broken!
+Unfortunatelly this subtle interaction of polymorphism and type-based lookup
+ means that equational reasoning is broken!
 In the equational reasoning steps above, doing apparently correct
 substitutions lead us to a wrong result. This is a major problem for
 biased choice and a reason to dismiss it as a possible implementation
@@ -273,12 +283,15 @@ choice for \name.
 \paragraph{Conservatively Rejecting Intersections}
 To avoid incoherence, and the issues of biased choice, another option 
 is simply to reject programs where the
-instantiations of type variables may lead to non-disjoint intersection
-types. Unfortunatelly this is too restrictive and prevents many useful
+instantiations of type variables may lead to incoherent programs. 
+Unfortunatelly this is too restrictive and prevents many useful
 programs using both parametric polymorphism and intersection types.
 In particular, in the case of \lstinline{fst}, if the two type
 parameters are used with two disjoint intersection
 types, then the merge will not lead to ambiguity. 
+
+In summary, it seems hard to have parametric polymorphism, intersection 
+types and coherence without being overly conservative. 
 
 
 \begin{comment}
@@ -418,19 +431,34 @@ disjoint depends on the instantiation of $\alpha$.
 \end{comment}
 
 \subsection{Disjoint Quantification}
-The solution to the interaction between parametric polymorphism and
-intersection types in \name is to use an extension to universal
-quantification called \emph{disjoint quantification}.  Inspired by
-bounded quantification~\cite{}, where a type variable is constrained by a type
+To avoid being overly conservative, while still retaining coherence in the 
+presence of parametric polymorphism and intersection types, \name uses 
+an extension to universal quantification called \emph{disjoint quantification}. 
+Inspired by
+bounded quantification~\cite{Cardelli:1994}, 
+where a type variable is constrained by a type
 bound, disjoint quantification allows a type variable to be
 constrained so that it is disjoint with a
-given type. With disjoint quantification the previous program, which
-is accepted by \name, can be written as:
-\[\Lambda A * Int.\lambda (x:A). {\bf let}~y : Int \& A = 0 \mergeop x~{\bf in}~x\]
-In this program the type variable $A$ is constrained so that it can be
-instantiated with any type disjoint to $Int$. This ensures that the
-merge used in the program is disjoint for all valid instantiations of $A$.
+given type. With disjoint quantification a variant of the program $fst$, which
+is accepted by \name, would be written as:
+\[{\bf let}~fst~A~(\fcolorbox{light-gray}{light-gray}{B*A})~(x : A \& B) = (\lambda z : A. z)~x;\]
+The small change is in the declaration of the type parameter $B$. The notation 
+$B*A$ means that in this program the type variable $B$ is constrained so that 
+it can only be instantiated with any type disjoint to $A$. 
+This ensures that the
+merge denoted by $x$ is disjoint for all valid instantiations of $A$ and $B$.
 
+The nice thing about this solution is that many uses of $fst$ are accepted. 
+For example, the following use of $fst$:
+\[fst~Int~Char~(1,,'c')\]
+is accepted since $Int$ and $Char$ are disjoint, thus satisfying the constraint 
+on the second type parameter of $fst$.
+However, problematic uses of $fst$ are rejected. For example:
+\[fst~Int~Int~(1,,2)\]
+is rejected because $Int$ is not disjoint with $Int$, thus failing to satisfy the 
+disjointness constraint on the second type parameter of $fst$.
+
+\begin{comment}
 Note that there is a nice symmetry between bounded quantification and disjoint quantification.
 In systems with bounded quantification,
 the usual unconstrained quantifier $\for {\alpha} \ldots$
@@ -442,6 +470,8 @@ is a syntactic sugar for $\for {\alpha \disjoint \bot} \ldots$, and
 $\blam \alpha \ldots$ for $\blam {\alpha \disjoint \top} \ldots$.
 The intuition is that since the bottom type is akin to the empty set,
 no other type overlaps with it.\george{Format this paragraph better.}
+\end{comment}
+
 
 \begin{comment}
 With this tool in hand, we can rewrite the program above to:
