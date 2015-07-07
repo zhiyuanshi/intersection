@@ -48,17 +48,49 @@
 \soundness*
 
 \begin{proof}
-  By induction on $*_I$.
+  By induction on the derivation of $\jdisimpl \Gamma A B$.
 
   \begin{itemize}
+    \item Case
+    \begin{flalign*}
+      & \ruledisvar &
+    \end{flalign*}
+
+    \item Case
+    \begin{flalign*}
+      & \ruledissym &
+    \end{flalign*}
+
+    Similar. \\
+
     \item Case
     \begin{flalign*}
       & \ruledisfun &
     \end{flalign*}
 
-    Lemma~\ref{lemma:common-supertype}
+    Suppose the contrary. Then by the definition of disjointness, there exists a
+    type $A$ such that $A_1 \to A_2 \subtype A$ and that $B_1 \to B_2 \subtype
+    A$. Therefore by Lemma~\ref{lemma:common-supertype} we know $A_2 \subtype A$
+    and $B_2 \subtype A$. That is, $A_2$ and $B_2$ are not disjoint. But by
+    inversion, we must have $\jdisimpl \Gamma {A_2} {B_2}$ and further by the
+    i.h., $\jdis \Gamma {A_2} {B_2}$, which contradicts with the above
+    consequence that $A_2$ and $B_2$ are not disjoint.
 
-    \george{May need an extracted lemma here} \\
+    \george{May need an extracted lemma here.} \\
+
+    \item Case
+    \begin{flalign*}
+      & \ruledisforall &
+    \end{flalign*}
+
+    Suppose the contrary. Then by the definition of disjointness, there exists a
+    type $C$ such that $\fordis \alpha {A_1} {A_2} \subtype A$ and that $\fordis
+    \alpha {B_1} {B_2} \subtype A$. By the subtyping rules, $A$ must be of the
+    form $\fordis \alpha {C_1} {C_2}$. Thus, \[ \fordis \alpha {A_1} {A_2}
+    \subtype \fordis \alpha {C_1} {C_2} \] and by inversion, $A_2 \subtype C_2$.
+    Similarly $B_2 \subtype C_2$. But by inversion we must have $\jdisimpl
+    \Gamma {A_2} {B_2}$ and by the i.h. $\jdis \Gamma {A_2} {B_2}$. A
+    contradiction similar to the above case arises.
 
     \item Case
     \begin{flalign*}
@@ -79,13 +111,15 @@
       & \ruledisatomic &
     \end{flalign*}
 
-    Need to show ...
-    By unfolding the definition of disjointness
-    Need to show there does not exists $C$ such that...
-    By induction on $C$.
-    Atomic cases...
-    If $C = E_1 \inter E_2$
-    By inversion and the i.h. we arrive at a contradiction.
+    Straightforward.
+
+    % Need to show ...
+    % By unfolding the definition of disjointness
+    % Need to show there does not exists $C$ such that...
+    % By induction on $C$.
+    % Atomic cases...
+    % If $C = E_1 \inter E_2$
+    % By inversion and the i.h. we arrive at a contradiction.
 
   \end{itemize}
 \end{proof}
@@ -94,43 +128,53 @@
 \completeness*
 
 \begin{proof}
-  Induction on $A$.
+
+  Consider the combinations of the shape of $A$ and $B$. If $A$ and $B$ are of
+  different shape and neither of them is an intersection type, then by the
+  disjoint axioms we already can conclude that $A \disjointax B$. Thus by
+  \reflabel{\labeldisax}, $\jdisimpl \Gamma A B$. The other cases are as
+  follow.
 
   \begin{itemize}
-    \item Case $\bot$
+    \item Case $A = \bot$:
+    \begin{itemize}
+      \item Case $B = \bot$: Trivial.
 
-    Induction on $B$.
-      \begin{itemize}
-        \item Case $B = \bot$
+      \item Case $B = B_1 \inter B_2$: Need to show $\jdis \Gamma \bot {B_1}
+      \inter B_2$ implies $\jdisimpl \Gamma \bot {B_1 \inter B_2}$. Apply
+      \reflabel{\labeldisinterr} and the resulting conditions can be proved by
+      the i.h.
+    \end{itemize}
 
-          Need to show $\Gamma \turns \bot * \bot$ implies $\Gamma \turns \bot *_I \bot$. Take $C = \bot$. Clearly the premise is false by definition. Then the whole statement is true. \george{???} \\
+    \item Case $A = A_1 \to A_2$:
 
-        \item Case $B = B_1 \to B_2$
-        The conclusion is true by the disjoint axioms. \\
+    \begin{itemize}
 
-        \item Case $B = B_1 \inter B_2$.
-        Need to show $\Gamma \turns \bot * B_1 \inter B_2$ implies $\Gamma \turns \bot *_I B_1 \inter B_2$. Apply \reflabel{\labeldisinterr} and the resulting conditions can be proved by the i.h. \\
+      \item Case $B = B_1 \to B_2$:
+      Need to show $\Gamma \turns A_1 \to A_2 * B_1 \to B_2$ implies
+      $\Gamma \turns  A_1 \to A_2 *_I B_1 \to B_2$. Apply
+      \reflabel{\labeldisfun} and the result, $\Gamma \turns A_2 *_I B_2$,
+      can be proved by the i.h.
 
-        \item Case
-      \end{itemize}
+      \item Case $B = B_1 \inter B_2$: Need to show $\Gamma \turns A_1 \to
+      A_2 * B_1 \inter B_2$ implies $\Gamma \turns A_1 \to A_2 *_I B_1
+      \inter B_2$. Apply \reflabel{\labeldisinterr} and the resulting
+      conditions can be proved by the i.h.
 
-      \item $A = A_1 \to A_2$
-        \begin{itemize}
-          \item Case $B = \bot$
-          The conclusion is true by the disjoint axioms. \\
+    \end{itemize}
+    \item Case $A = \fordis \alpha {A_1} {A_2}$:
 
-          \item Case $B = B_1 \to B_2$
-          Need to show $\Gamma \turns  A_1 \to A_2 * B_1 \to B_2$ implies $\Gamma \turns  A_1 \to A_2 *_I B_1 \to B_2$. Apply \reflabel{\labeldisfun} and the result, $\Gamma \turns A_2 *_I B_2$, can be proved by the i.h. \\
+    \begin{itemize}
+      \item Case $B = \fordis \alpha {B_1} {B_2}$
 
-          \item Case $B = B_1 \inter B_2$.
-          Need to show $\Gamma \turns A_1 \to A_2 * B_1 \inter B_2$ implies $\Gamma \turns A_1 \to A_2 *_I B_1 \inter B_2$. Apply \reflabel{\labeldisinterr} and the resulting conditions can be proved by the i.h.
+      \item Case $B = B_1 \inter B_2$:
+    \end{itemize}
 
-          \item Case $B = \fordis \alpha {B_1} B_2$.
-          Need to show $\Gamma \turns A_1 \to A_2 * \fordis \alpha {B_1} B_2$.
-        \end{itemize}
+    \item Case $A = A_1 \inter A_2$:
 
-        \item $A = A_1 \inter A_2$
-        By \reflabel{\labeldisinterl} and by the i.h.
+    \begin{itemize}
+      \item Case $B = B_1 \inter B_2$: By \reflabel{\labeldisinterl} and by the i.h.
+    \end{itemize}
 
-      \end{itemize}
+  \end{itemize}
 \end{proof}

@@ -13,7 +13,7 @@
 \newcommand{\ruledissym}{
   \inferrule* [right=\labeldissym]
     {\alpha \disjoint A \in \Gamma}
-    {\jdis \Gamma A \alpha}
+    {\jdisimpl \Gamma A \alpha}
 }
 
 \newcommand{\labeldisinterl}{\makelabeldis {Inter\_1}}
@@ -40,8 +40,8 @@
 \newcommand{\labeldisforall}{\makelabeldis Forall}
 \newcommand{\ruledisforall}{
   \inferrule* [right=\labeldisforall]
-    {\jdisimpl \Gamma A C}
-    {\jdisimpl \Gamma {\fordis \alpha B A} {\fordis \alpha B C} \text{\george{Think of subst.}}}
+    {\jdisimpl \Gamma {A_2} {B_2}}
+    {\jdisimpl \Gamma {\fordis \alpha {A_1} {A_2}} {\fordis \alpha {B_1} {B_2}}}
 }
 
 \newcommand{\labeldisax}{\makelabeldis Axiom}
