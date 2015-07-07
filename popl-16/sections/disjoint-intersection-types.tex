@@ -2,11 +2,12 @@
 \label{sec:disjoint}
 
 Although the system shown in the previous section is type-safe, it is not
-coherent. This section shows how to patch the system presented before so that it
+coherent. This section shows how to modify the system presented before so that it
 supports coherence as well as type soundness. The keys aspects are the notion of
 disjoint intersections, and disjoint quantification for polymorphic types.
 
-Formally, the goal of this section is to tweak the system so that elaboration is deterministic, expressed by this theorem:
+From the theoretical point-of-view, the end goal of this section is to show that the resulting system has
+a coherent (or unique) elaboration semantics:
 \begin{restatable}[Unique elaboration]{theorem}{uniqueelaboration}
   \label{theorem:unique-elaboration}
 
@@ -19,8 +20,11 @@ Formally, the goal of this section is to tweak the system so that elaboration is
 \noindent In other words, given a source term $e$, elaboration always produces
 the same target term $E$. The most important hurdle we need to overcome is that
 if $A \inter B \subtype C$, then either $A$ or $B$ contributes to that subtyping
-relation, resulting in two possible coercions. The sufficient condition to rule
-out that case is that $A$ and $B$ are said to be disjoint:
+relation, resulting in two possible coercions. 
+
+\subsection{Disjointness}
+\bruno{This subsection needs polishing}
+A sufficient condition to rule out that case is that $A$ and $B$ are said to be disjoint:
 
 \begin{definition}[Disjoint types]
   Two types $A$ and $B$ are \emph{disjoint} if they do not share a common
@@ -31,7 +35,7 @@ out that case is that $A$ and $B$ are said to be disjoint:
   are \emph{disjoint} if: the fact that $C$ is a commmon supertype of theirs
   implies $C$ is the top type.
   }
-\end{definition}
+\end{definition}\bruno{This definition is too informal, I think.}
 
 Related to the definition is the disjoint judgement. We write
 \[ \jdis \Gamma A B \]
@@ -61,7 +65,7 @@ this topic in the next section.
 
 \subsection{Syntax}
 
-\begin{figure}[h]
+\begin{figure}
   \[
     \begin{array}{l}
       \begin{array}{llrll}
@@ -100,20 +104,22 @@ Figure~\ref{fig:fi-syntax-dis} shows the updated syntax with the changes highlig
 Note how similar the changes are to those needed to extend System $F$ with
 bounded quantification. First, type variables are now always associated with
 their disjointness constraints (like $\alpha \disjoint A$) in types, terms, and
-contexts. Second, the bottom type is introduced so that universal quantification
-quantification be integrated and become a special case of disjoint
+contexts. Second, the bottom type ($\bot$) is introduced so that universal quantification
+quantification becomes a special case of disjoint
 quantification: $\blam \alpha e$ is really a syntactic sugar for $\blamdis
 \alpha \bot e$. The underlying idea is that any type is disjoint
 with the bottom type.
 
 As a comparison, the top type is the trivial upper bound in bounded
 quantification, while the bottom type is the trivial disjointness constraint in
-disjoint quantification. Indeed, \george{Mabe show a diagram here to contrast
+disjoint quantification. Indeed, \bruno{unfinidhed sentence}\george{Mabe show a diagram here to contrast
 with bounded polymorphism.}
 
 \subsection{Typing}
-
-The disjointness judgement appears in the well-formedness rule for intersection
+Figure~\ref{fig:fi-type-patch} shows modifications to Figure~\ref{} in
+order to support disjoint intersection types and disjoint
+quantification. Only new rules or rules that different are shown.
+Importantly, the disjointness judgement appears in the well-formedness rule for intersection
 types and the typing rule for merges.
 
 \begin{figure*}
@@ -149,8 +155,7 @@ types and the typing rule for merges.
   \label{fig:fi-type-patch}
 \end{figure*}
 
-\paragraph{Formation of disjoint intersection types}
-
+\paragraph{Well-Formedness}
 We require that the two types of an intersection must be disjoint in their
 context, and that the disjointness constraint in a forall type is well-formed.
 Under the new rules, intersection types such as $\tyint \inter \tyint$ are no
@@ -160,9 +165,11 @@ longer well-formed because the two types are not disjoint.
 the big lambda $\blamdis \alpha A e$ and eliminated by the usual type
 application $\tapp e A$. The constraint is added to the context with this rule.
 During a type application, the type system makes sure that the type argument
-satisfies the disjointness constraint.
+satisfies the disjointness constraint\bruno{hummm, is the rule really
+  enforcing that? do we miss a disjointness coinstraint}.
 
-\paragraph{Metatheory} Since in this section we only restrict the system in the
+\paragraph{Metatheory} Since in this section we only restrict the type
+system in the
 previous section, it is easy to see that type preservation and type-safety still
 holds. Additionally, we can show that typing always produces a well-formed type.
 With our new definition of well-formed types, this result is nontrivial.
