@@ -48,13 +48,22 @@
 \algodissoundness*
 
 \begin{proof}
-  By induction on the derivation of $\jdisimpl \Gamma A B$.
+  \george{State the definition of disjointness more clearly in the text.}
+
+  We need to show that $A$ and $B$ are disjoint in $\Gamma$. The proof is by
+  induction on the derivation of $\jdisimpl \Gamma A B$.
 
   \begin{itemize}
     \item Case
     \begin{flalign*}
       & \ruledisvar &
     \end{flalign*}
+
+    Suppose the contrary. Then by the definition of disjointness, there exists a
+    type $B$ such that $\jsub \Gamma \alpha B$ and $\jsub \Gamma A B$. By
+    \george{ftv subtyping lemma}, $\alpha \in \ftv B$. Combining the fact that
+    $\jsub \Gamma A B$, we also have $\alpha \in \ftv A$. But by \george{another
+    lemma}, we know $\alpha \not \in \ftv A$. Contradiction. \\
 
     \item Case
     \begin{flalign*}
