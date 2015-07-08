@@ -1,12 +1,12 @@
 Dunfield has shown that a simply typed core calculus with
-intersection types and a merge operator provides a powerful foundation
-for various programming language features. However, while his calculus
-is type-safe, it lacks the important property of \emph{coherence}:
+intersection types and a merge operator forms a powerful foundation
+for various programming language features. While his calculus
+is type-safe, it lacks \emph{coherence}:
 different derivations for the same expression can lead to different
 results. The lack of coherence is important disadvantage for adoption
 of his core calculus in implementations of programming languages, as
 the semantics of the programming language becomes implementation
-dependent.
+dependent. Moreover his calculus did not account for parametric polymorphism.
 
 This paper presents \name: a core calculus with a variant of
 \emph{intersection types}, \emph{parametric polymorphism} and a

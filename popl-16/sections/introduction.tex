@@ -9,7 +9,7 @@ records are encoded as the concatenation of single-field
 records. Concatenation of records is expressed using intersection
 types at the type-level and the corresponding merge operator at the
 term level. Dunfield formalized a simply typed lambda calculus with
-intersection types a the merge operator, and showed how to give a
+intersection types and a merge operator. He showed how to give a
 semantics to the calculus by a type-directed translation to a simply
 typed lambda calculus extended with pairs. The type-directed
 translation is simple, elegant, and type-safe.
@@ -46,7 +46,7 @@ essence of various solutions to extensibility problems.
 
 Dunfield calculus seems to provide a good basis for a foundational
 calculus for studying extensibility.  However, his calculus is still
-insufficient for extensibility for two different reasons.  Firstly it does not
+insufficient for studying extensibility for two different reasons.  Firstly it does not
 support parametric polymorhism. This is a pressing limitation because
 type-theoretic encodings of datatypes fundamentally rely on parametric
 polymorphism.  Secondly, and more importantly, while Dunfield calculus
@@ -69,7 +69,11 @@ type-theoretic encodings of datatypes.
 
 Coherence is achieved by ensuring that intersection types are
 \emph{disjoint}. Given two types $A$ and $B$, two types are disjoint
-($A * B$) if there is no type $C$ such that both $A$ and $B$ are
+($A * B$)
+%\footnote{The notation $A * B$ is inspired by the
+%  \emph{separating conjunction} construct in separation
+%  logic~\cite{}.} 
+if there is no type $C$ such that both $A$ and $B$ are
 subtypes of $C$. Formally this definition is captured as follows:
 \[A * B \equiv \not\exists C.~A <: C \wedge B <: C\]
 With this definition of disjointness we present a formal specification

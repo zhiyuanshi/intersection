@@ -121,19 +121,21 @@ If both results are accepted, we say that the semantics is
 valid program. Dunfield's calculus~\cite{dunfield2014elaborating} is incoherent and accepts the
 program above.
 
-\paragraph{Biased Choice}
+\paragraph{Getting Around Incoherence: Biased Choice}
 In a real implementation of Dunfield calculus a choice has to be made
 on which value to compute. For example, one potential option is to
 take either always take the left-most value matching the type in the
 merge. Similarly, one could take always take the right-most
 value matching the type in the merge. Either way, the meaning
-of a program will always depend on a biased implementation choice.
+of a program will always depend on a biased implementation choice, 
+which is clearly unsatisfying from the theoretical point of view
+(although perhaps acceptable in practice).
 Moreover, even if it accept a particular biased choice as
 being good enough, the approach cannot be easily
 extended to systems with parametric polymorphism, as we illustrate 
 in Section~\ref{subsec:polymorphism}.
 
-\subsection{Restoring Coherence: Disjoint Intersection Types}
+\subsection{Restoring Coherence: Disjoint Intersection Types}\label{sec:restoring}
 Coherence is a desirable property for a semantics. A semantics is said
 to be coherent if any \emph{valid program} has exactly one
 meaning~\cite{Reynolds:1991} (that is, the semantics is not ambiguous).
@@ -238,13 +240,15 @@ $1$ and $2$ can be extracted from the merge and still match the type
 of the first argument of \lstinline{fst}.
 
 \paragraph{Biased Choice Breaks Equational Reasoning} At first sight, one option 
-to restore coherence would be to bias the type-based merge lookup 
+to workaround the issue incoherence would be to bias the type-based merge lookup 
 to the left or to the right (as discussed in
-Section~\ref{}). For example, suppose we chose to always pick the
+Section~\ref{subsec:incoherence}). Unfortunatelly, biased choice is
+very problematic when parametric polymorphism is present in the language.
+To see the issue, suppose we chose to always pick the
 rightmost value in a merge when multiple values of same type exist.
 Intuitively, it would appear that the result of the use of
 \lstinline{fst} above is $2$. Indeed simple equational reasoning
-seems to validate this:
+seems to validate such result:
 
 \vspace{5pt}
 \noindent$fst~Int~Int~(1,,2)$\\
@@ -261,9 +265,11 @@ choice) the result of the program would be 1! The reason for this has
 todo with \emph{when} the type-based lookup on the merge happens. In
 the case of \lstinline{fst}, lookup is triggered by a coercion
 function inserted in the definition of \lstinline{fst} at
-compile-time. In the definition of $fst$ all it is known is that a
+compile-time. 
+In the definition of $fst$ all it is known is that a
 value of type $A$ should be returned from a merge with an intersection
-type $A\&B$.  Clearly the only type-safe choice at this point is to
+type $A\&B$.  Clearly the only type-safe choice to coerce the value of
+type $A\&B$ into $A$ is to
 take the left component of the merge. This works perfectly for merges
 such as $(1,,'c')$, where the types of the first and second components
 of the merge are disjoint. For the merge $(1,,'c')$, if a integer lookup 
@@ -284,6 +290,8 @@ choice for \name.
 To avoid incoherence, and the issues of biased choice, another option 
 is simply to reject programs where the
 instantiations of type variables may lead to incoherent programs. 
+In this case the definition of $fst$ would be rejected, since there
+are indeed some cases that may lead to incoherent programs. 
 Unfortunatelly this is too restrictive and prevents many useful
 programs using both parametric polymorphism and intersection types.
 In particular, in the case of \lstinline{fst}, if the two type
@@ -484,16 +492,37 @@ and $\alpha$ is disjoint with $\tyint$. Similarly, in the new system,
 the original program no longer typechecks, thus preventing overlapping types.
 \end{comment}
 
-\subsection{Application: Extensible Encodings of Datatypes}
+\section{Application: Extensibility}
 \label{subsec:OAs}
 
+Various solutions to the Expression
+Problem~\cite{wadler1998expression} in the 
+literature~\cite{Swierstra:2008,finally-tagless,oliveira09modular,DelawareOS13}
+are closely related to type-theoretic encodings of datatypes. Indeed, variants 
+of the same idea keep appearing in different programming languages,
+because the encoding of the idea needs to exploit the particular
+features of the programming language (or theorem prover). 
+Unfortunatelly language-specific constructs obscure the key ideas
+behind those solutions. 
+
+In this section we show a solution to the
+Expression Problem that intends to capture the key ideas of various
+solutions in the literature. Moreover, it is shown how \emph{all the
+  features} of \name (intersection types, the merge operator,
+parametric polymorphism and disjoint quantification) are needed to
+properly encode one important combinator~\cite{oliveira2013feature} used to compose
+multiple operations over datatype.
+
+\begin{comment}
 The combination of parametric polymorphism, intersection types and the
 merge operator is useful to encode datatypes with subtyping and
-support extensibility in \name. Moreover, the combination of
+support extensibility in \name. The combination of
 polymorphism and the merge operator is essential to allow the
-composition of multiple operations over datatypes. In the following
+composition of multiple operations over datatypes. 
+In the following
 we present a step-by-step solution to the Expression Problem in \name,
 and illustrate how to combine multiple operations.
+\end{comment}
 
 \begin{comment}
 Oliveira and Cook~\cite{oliveira2012extensibility} proposed a design pattern that can solve the
@@ -533,10 +562,10 @@ step-by-step by solving the Expression Problem.
 % is able to solve the limitations of using object algebras in languages such as
 % Java and Scala.
 
-\paragraph{Church Encoded Arithmetic Expressions}
+\subsection{Church Encoded Arithmetic Expressions}
 In the Expression Problem, the idea is to start with a very simple
 system modeling arithmetic expressions and evaluation.
-The standard Church encoding for arithmetic expressions,
+The standard typed Church encoding ~\cite{} for arithmetic expressions,
 denoted as the type \lstinline{CExp}, is:
 
 \begin{lstlisting}{language=F2J}
@@ -556,7 +585,8 @@ type ExpAlg[E] = {
 \noindent The first part, captured by the type \lstinline{ExpAlg[E]}
 is constitutes the so-called algebra of the datatype. For additional
 clarity of presentation, we use records to capture the two components
-of the algebra. The first component abstracts over the type of the
+of the algebra. Records are supported in our implementation of \name.
+The first component abstracts over the type of the
 constructor for literal expressions (\lstinline{Int -> E}). The second
 component abstracts over the type of addition expressions
 (\lstinline{E -> E -> E}).
@@ -569,8 +599,9 @@ type Exp = {accept : forall E. ExpAlg[E] -> E};
 
 \noindent It should be clear that, modulo some refactoring, and the
 use of records, the type \lstinline{Exp} and \lstinline{CExp}
-are equivalent.\bruno{more explanation?}
+are equivalent. 
 
+\paragraph{Data Constructors}
 Using \lstinline{Exp} the two data constructors are defined as follows:
 
 \begin{lstlisting}{language=F2J}
@@ -583,37 +614,64 @@ let add (e1: Exp) (e2: Exp): Exp = {
 };
 \end{lstlisting}
 
-Here is an interface that supports evaluation:
+Note that the notation \lstinline{/\E} in the definition of the
+\lstinline{accept} fields is a type abstraction: it
+introduces a type variable in the environment. The definition of the
+constructors themselves follows the usual Church encodings.
+
+Simple expressions, can be built using the data constructors:
+
+\begin{lstlisting}{language=F2J}
+let five : Exp = add (lit 3) (lit 2)
+\end{lstlisting}
+
+\paragraph{Operations} Defining operations over expressions requires
+implementing \lstinline{ExpAlg[E]}. For example, an interesting
+operation over expressions is evaluation. The first step is to define
+the evaluation operation is to chose how to instantiate the type
+parameter \lstinline{E} in \lstinline{ExpAlg[E]} with a suitable
+concrete type for evaluation. One such suitable type is:
 
 \begin{lstlisting}{language=F2J}
  type IEval = {eval: Int};
 \end{lstlisting}
 
-Having defined the interfaces, we can implement that object algebra interface
-with \lstinline$evalAlg$, which is an object algebra for evaluation.
-\begin{comment}
-  \begin{lstlisting}{language=F2J}
+\noindent Using \lstinline{IEval}, a record \lstinline{evalAlg}
+implementing \lstinline{ExpAlg} is defined as follows:
+
+\begin{lstlisting}{language=F2J}
     let evalAlg: ExpAlg[IEval] = {
       lit = \(x: Int) -> {eval = x},
       add = \(x: IEval) (y: IEval) -> {
         eval = x.eval + y.eval
       }
     };
-  \end{lstlisting}
-\end{comment}
+\end{lstlisting}
 
-\lstinputlisting[linerange=15-20]{../src/ObjectAlgebra.sf} % APPLY:linerange=OA_EVALALG
-In this example we implement a record, where the two operations
-\lstinline{lit} and \lstinline{add} return a record with type \lstinline{IEval}.
-The type \lstinline$ExpAlg[IEval]$ is the type of object algebras
-supporting evaluation. However, the one interesting point
-of object algebras is that other operations can be supported as
-well.
+In this record, where the two operations
+\lstinline{lit} and \lstinline{add} return a record with type
+\lstinline{IEval}. The definition of \lstinline{eval} for
+\lstinline{lit} and \lstinline{add} is straightforward. 
 
-\paragraph{Extensibility and Subtyping} In the Expression Problem the goal is to
-achieve extensibility in two dimensions: constructors and operations.
 
-Arithmetic expressions with subtyping are defined using the type \lstinline{SubExp}:
+%The type \lstinline$ExpAlg[IEval]$ is the type of object algebras
+%supporting evaluation. 
+%However, the one interesting point
+%of object algebras is that other operations can be supported as
+%well.
+
+Finally, using \lstinline{evalAlg}, the expression \lstinline{five} can 
+be evaluated as follows:
+
+\begin{lstlisting}{language=F2J}
+(five.accept[IEval] evalAlg).eval
+\end{lstlisting}
+
+\subsection{Extensibility and Subtyping} Of course, in the Expression
+Problem the goal is to achieve extensibility in two dimensions: constructors and operations.
+
+\paragraph{New Constructors} Here is the code needed to add a new subtraction constructor:
+%Arithmetic expressions with subtyping are defined using the type \lstinline{SubExp}:
 
 \begin{lstlisting}{language=F2J}
 type SubExpAlg[E] =
@@ -629,9 +687,20 @@ let sub (e1: SubExp) (e2: SubExp): SubExp ={
 };
 \end{lstlisting}
 
+\noindent Firstly \lstinline{SubExpAlg} defines an extended algebra
+that contains the constructors of \lstinline{ExpAlg} plus the new
+subtraction constructors. Intersection types are used to do the type 
+composition. Secondly, a new type of expressions with subtraction
+(\lstinline{SubExp}) is needed. For \lstinline{SubExp} it is important
+that the \lstinline{accept} field now takes an algebra of type
+\lstinline{SubExpAlg} as argument. This is necessary to define the
+constructor for subtraction (\lstinline{sub}), which requires the
+algebra to have the field \lstinline{sub}. 
 
-Due to the structural subtyping relation of \name, \lstinline{SubExp}
-is a subtype of \lstinline{Exp}.
+
+\paragraph{Extending Existing Operations} In order to use evaluation 
+with the new type of expressions, it is necessary to also extend
+evaluation. Importantly, extension is achieved using the merge operator:
 
 \begin{lstlisting}{language=F2J}
 let subEvalAlg = evalAlg ,, {
@@ -641,10 +710,48 @@ let subEvalAlg = evalAlg ,, {
 };
 \end{lstlisting}
 
+\noindent In the code, the merge operator takes \lstinline{evalAlg}
+and a new record with the implementation of evaluation for
+subtraction, to define the implementation for arithmetic expressions 
+with subtraction.
 
-\paragraph{Add a pretty printing operation.}
-A second extension is adding a new operation, such as pretty printing.
-Similar to evaluation, the interface of the pretty printing feature
+\paragraph{Subtyping} In the presence of subtyping, there are
+interesting subtyping relations between datatypes and their
+extensions~\cite{oliveira09modular}.  Such subtyping relations are usually not
+discussed in theoretical treatments of Church encodings. This is
+probably partly due to most work on typed Church encodings been
+done in calculi without subtyping.
+
+The interesting aspect about subtyping in typed Church encodings is
+that subtyping follows the opposite direction of the extension.  In
+other words subtyping is contravariant with respect to the
+extension. Such contravariance is explained by the type of the 
+\lstinline{accept} field, which is a function where the argument type 
+is refined in the extensions. Thus, due to the contravariance of
+subtyping on functions, the extension becomes a supertype of the
+original datatype. 
+
+In the particular case of expressions \lstinline{Exp} (the original and smaller
+datatype) is a subtype of \lstinline{SubExp} (the larger and extended
+datatype). Because of this subtyping relation, writting the following
+expression is valid in \name:
+
+\begin{lstlisting}{language=F2J}
+let three : SubExp = sub five (lit 2)
+\end{lstlisting}
+
+\noindent Note the \lstinline{three} is of type \lstinline{SubExp},
+but the first argument (\lstinline{five}) to the constructor
+\lstinline{sub} is of type \lstinline{Exp}. This can only type-check
+if \lstinline{Exp} is indeed a subtype of \lstinline{SubExp}.
+
+
+
+
+
+\paragraph{New Operations}
+The second type of extension is adding a new operation, such as pretty printing.
+Similarly to evaluation, the interface of the pretty printing feature
 is modeled as:
 \begin{comment}
   \begin{lstlisting}{language=F2J}
@@ -654,29 +761,28 @@ is modeled as:
 \lstinputlisting[linerange=35-35]{../src/ObjectAlgebra.sf} % APPLY:linerange=OA_IPRINT
 The implementation of pretty printing for expressions that support literals,
 addition, and subtraction is:
-\begin{comment}
-  \begin{lstlisting}{language=F2J}
-    let printAlg : SubExpAlg[IPrint] = {
-      lit = \(x: Int) -> {print = x.toString()},
-      add = \(x: IPrint) (y: IPrint) -> {
-        print = x.print ++ " + " ++ y.print
-      },
-      sub = \(x: IPrint) (y: IPrint) -> {
-        print = x.print ++ " - " ++ y.print
-      }
-    };
-  \end{lstlisting}
-\end{comment}
-\lstinputlisting[linerange=39-47]{../src/ObjectAlgebra.sf} % APPLY:linerange=OA_PRINTALG
 
-\paragraph{Usage.} With visitors constructing expressions is quite simple:
+\begin{lstlisting}{language=F2J}
+let printAlg : SubExpAlg[IPrint] = {
+  lit = \(x: Int) -> {print = x.toString()},
+  add = \(x: IPrint) (y: IPrint) -> {
+    print = x.print ++ " + " ++ y.print
+  },
+  sub = \(x: IPrint) (y: IPrint) -> {
+    print = x.print ++ " - " ++ y.print
+  }
+};
+\end{lstlisting}
+
+\noindent The definition of \lstinline{printAlg} is unremarkable.  
+With \lstinline{prinAlg} we can pretty print the expression represented
+by \lstinline{three}:
+
+\begin{lstlisting}{language=F2J}
+(three.accept[IPrint] printAlg).print
+\end{lstlisting}
 
 \begin{comment}
-  \begin{lstlisting}{language=F2J}
-    e2 = sub (lit 7) (lit 2)
-  \end{lstlisting}
-\end{comment}
-\lstinputlisting[linerange=49-50]{../src/Visitor.sf} % APPLY:linerange=V_USAGE
 The result is \lstinline$"7 - 2"$. Note that the programmer is able to pass \lstinline{lit 2}, which is of type \lstinline{Exp},
 to \lstinline{sub}, which expects a \lstinline{SubExp}. The types are compatible
 because because \lstinline$Exp$ is a \emph{subtype} of \lstinline$SubExp$. Code
@@ -684,43 +790,55 @@ reuse is achieved since we can use the constructors from \lstinline$Exp$ as the
 constructor for \lstinline$SubExp$. In Scala, we would have to define two
 literal constructors, one for \lstinline$Exp$ and another for
 \lstinline$SubExp$.
-
-\paragraph{Dynamic object algebra composition.}
-To obtain an expression that supports both evaluation and pretty
-printing, a mechanism to combine the evaluation and printing
-algebras is needed. \name allows such composition: the \lstinline$combine$
-function, which takes two object algebras to create a combined algebra. It
-does so by constructing a new object algebra where each field is a
-function that delegates the input to the two algebra parameters.
-\begin{comment}
-  \begin{lstlisting}{language=F2J}
-    let combine[A,B](f: ExpAlg[A])(g: ExpAlg[B]) :
-    ExpAlg[A&B] = {
-      lit = \(x: Int) -> f.lit x ,, g.lit x,
-      add = \(x: A & B) (y: A & B) ->
-      f.add x y ,, g.add x y
-    }
-  \end{lstlisting}
-\end{comment}
-\lstinputlisting[linerange=58-63]{../src/ObjectAlgebra.sf} % APPLY:linerange=OA_COMBINE
-
-\begin{comment}
-  \begin{lstlisting}{language=F2J}
-    let newAlg =
-    combine[IEval,IPrint] subEvalAlg printAlg;
-    let o = e1[IEval&IPrint] newAlg;
-    o.print ++ " = " ++ o.eval.toString()
-  \end{lstlisting}
 \end{comment}
 
-\lstinputlisting[linerange=67-69]{../src/ObjectAlgebra.sf} % APPLY:linerange=OA_USAGE
+\subsection{Composition of Algebras}
+The final example shows a non-trivial combinator for algebras that
+allows multiple algebras to be combined into one. A version of this
+combinator has been encoded in Scala using intersection types
+(which Scala supports) and an encoding of the merge
+operator~\cite{oliveira2013feature,rendel14attributes}.
+Unfortunatelly, the Scala encoding of the merge operator is quite complex as
+it relies on low-level type-unsafe programming features such as
+dynamic proxies, reflection or other meta-programming techniques.
+Fortunatelly in \name there is no need for such hacky encoding, as the
+merge operator is nativelly supported. Therefore the combinator for 
+composing algebras is implemented much more elegantly. 
+The combinator is defined by the \lstinline$combine$ function, which takes two object algebras to create
+a combined algebra. It does so by constructing a new object algebra
+where each field is a function that delegates the input to the two
+algebra parameters.
 
-Note that \lstinline$o$ is a single object that supports both
-evaluation and printing, as the output of the program is
-\begin{lstlisting}
-> 7 + 2 = 9
+\begin{lstlisting}{language=F2J}
+ let combine[A,B * A](f: ExpAlg[A])(g: ExpAlg[B]) : 
+   ExpAlg[A&B] = {
+     lit = \(x: Int) -> f.lit x ,, g.lit x,
+     add = \(x: A & B) (y: A & B) ->
+        f.add x y ,, g.add x y
+}
 \end{lstlisting}
 
-In contrast to the Scala solutions available in the
-literature, \name is able to express object algebra
-composition very directly by using the merge operator.
+Note how \lstinline{combine} requires all the interesting
+features of \name. Parametric polymorphism is needed because
+\lstinline{combine} must compose algebras with arbitrary type
+parameters. Intersection types are needed because the resulting
+algebra will create values with an intersection type composing
+the two type parameters of the two input algebras. The merge operator 
+is needed to compose the results of each algebra together. Finally, 
+a disjointness constraint is needed to ensure that the two input
+algebras build values of disjoint types (otherwise ambiguity could
+arize).  
+
+With \lstinline{combine} printing and evaluation of expressions with
+subtraction is done as follows:
+
+\begin{lstlisting}{language=F2J}
+let newAlg =
+    combine[IEval,IPrint] subEvalAlg printAlg;
+let o = three.accept[IEval&IPrint] newAlg;
+o.print ++ " = " ++ o.eval.toString()
+\end{lstlisting}
+
+Note that \lstinline$o$ is a value that supports both
+evaluation and printing. The final expression uses \lstinline{o}
+for doing both printing and evaluation.
