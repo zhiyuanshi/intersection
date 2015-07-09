@@ -59,13 +59,23 @@ Some ways to rule out the possibility of disjointness.
 \end{proof}
 
 \begin{lemma}
-  \label{lemma:subtype-ftv}
+  \label{lemma:subtype-ftv-var}
 
   If $\alpha \subtype A$, then $\alpha \in \ftv A$.
 \end{lemma}
 
 \begin{proof}
-  Straightforward by checking the subtyping rules.
+  By straightforwardly checking the subtyping rules.
+\end{proof}
+
+\begin{lemma}
+  \label{lemma:subtype-ftv}
+
+  If $A \subtype B$, then $\ftv B$ is a subset of $\ftv A$.
+\end{lemma}
+
+\begin{proof}
+  By straightforwardly checking the subtyping rules.
 \end{proof}
 
 \algodissoundness*
@@ -84,9 +94,10 @@ Some ways to rule out the possibility of disjointness.
 
     Suppose the contrary. Then by the definition of disjointness, there exists a
     type $B$ such that $\alpha \subtype B$ and $A \subtype B$. By
-    Lemma~\ref{lemma:subtype-ftv}, $\alpha \in \ftv B$. Combining the fact that
-    $A \subtype B$, we also have $\alpha \in \ftv A$. But by the typing rules,
-    we know $\alpha \not \in \ftv A$. Contradiction. \\
+    Lemma~\ref{lemma:subtype-ftv-var}, $\alpha \in \ftv B$. Considering the fact
+    that $A \subtype B$, we also have $\alpha \in \ftv B \subset \ftv A$ due to
+    Lemma~\ref{lemma:subtype-ftv}. But by the typing rules, we know $\alpha \not
+    \in \ftv A$. Contradiction. \\
 
     \item Case
     \begin{flalign*}
