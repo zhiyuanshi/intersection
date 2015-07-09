@@ -1,5 +1,17 @@
 \section{Algorithmic Disjointness} \label{sec:alg-dis}
 
+Now that we have obtained a specification for disjointness, but the definition
+involves an existence problem. How can we implement it? One possibility is
+bidirectional subtyping, that is, we say two types, $A$ and $B$, are disjoint if
+neither $A \subtype B$ nor $B \subtype A$. However, this implementation is
+wrong. For example, $\tyint \inter \tystring$ and $\tystring \inter \tychar$ are
+not disjoint by specification since $\tystring$ is their common supertype. Yet
+by the implementation they are, since neither of them is a subtype of
+the other. \bruno{You need a concrete code example to make this point.}
+Hence the algorithmic rules are more nuanced. For now, it is enough to treat the
+disjoint judgement $\jdis \Gamma A B$ as oracle and we will coome back to
+this topic in the next section.
+
 As promised, in this section we present the set of rules for determining whether
 two types are disjoint, and more importantly, how to derive them from the
 definition we have in the previous sections. The derived set of rules for
