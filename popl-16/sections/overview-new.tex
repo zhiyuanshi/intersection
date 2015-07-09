@@ -497,7 +497,7 @@ the original program no longer typechecks, thus preventing overlapping types.
 
 Various solutions to the Expression
 Problem~\cite{wadler1998expression} in the 
-literature~\cite{Swierstra:2008,finally-tagless,oliveira09modular,DelawareOS13}
+literature~\cite{Swierstra:2008,finally-tagless,oliveira09modular,oliveira2012extensibility,DelawareOS13}
 are closely related to type-theoretic encodings of datatypes. Indeed, variants 
 of the same idea keep appearing in different programming languages,
 because the encoding of the idea needs to exploit the particular
@@ -511,7 +511,7 @@ solutions in the literature. Moreover, it is shown how \emph{all the
   features} of \name (intersection types, the merge operator,
 parametric polymorphism and disjoint quantification) are needed to
 properly encode one important combinator~\cite{oliveira2013feature} used to compose
-multiple operations over datatype.
+multiple operations over datatypes.
 
 \begin{comment}
 The combination of parametric polymorphism, intersection types and the
@@ -565,14 +565,14 @@ step-by-step by solving the Expression Problem.
 \subsection{Church Encoded Arithmetic Expressions}
 In the Expression Problem, the idea is to start with a very simple
 system modeling arithmetic expressions and evaluation.
-The standard typed Church encoding ~\cite{} for arithmetic expressions,
+The standard typed Church encoding ~\cite{BoehmBerarducci} for arithmetic expressions,
 denoted as the type \lstinline{CExp}, is:
 
 \begin{lstlisting}{language=F2J}
 type CExp = forall E. (Int -> E) -> (E -> E -> E) -> E
 \end{lstlisting}
 
-\noindent However, for extensibility purposes~\cite{}, it is better to break
+\noindent However, as done in various solutions to extensibility, it is better to break
 down the type of the Church encoding into two parts:
 
 \begin{lstlisting}{language=F2J}
@@ -584,8 +584,8 @@ type ExpAlg[E] = {
 
 \noindent The first part, captured by the type \lstinline{ExpAlg[E]}
 is constitutes the so-called algebra of the datatype. For additional
-clarity of presentation, we use records to capture the two components
-of the algebra. Records are supported in our implementation of \name.
+clarity of presentation, records (supported in the implementation of \name)
+are used to capture the two components of the algebra. 
 The first component abstracts over the type of the
 constructor for literal expressions (\lstinline{Int -> E}). The second
 component abstracts over the type of addition expressions
@@ -648,7 +648,7 @@ implementing \lstinline{ExpAlg} is defined as follows:
     };
 \end{lstlisting}
 
-In this record, where the two operations
+In this record, the two operations
 \lstinline{lit} and \lstinline{add} return a record with type
 \lstinline{IEval}. The definition of \lstinline{eval} for
 \lstinline{lit} and \lstinline{add} is straightforward. 
@@ -660,7 +660,7 @@ In this record, where the two operations
 %of object algebras is that other operations can be supported as
 %well.
 
-Finally, using \lstinline{evalAlg}, the expression \lstinline{five} can 
+Using \lstinline{evalAlg}, the expression \lstinline{five} can 
 be evaluated as follows:
 
 \begin{lstlisting}{language=F2J}
@@ -669,6 +669,8 @@ be evaluated as follows:
 
 \subsection{Extensibility and Subtyping} Of course, in the Expression
 Problem the goal is to achieve extensibility in two dimensions: constructors and operations.
+Moreover, in the presence of subtyping it is also interesting to see how the extended datatypes 
+relate to the original datatypes. We discuss the two topics next.
 
 \paragraph{New Constructors} Here is the code needed to add a new subtraction constructor:
 %Arithmetic expressions with subtyping are defined using the type \lstinline{SubExp}:
@@ -719,7 +721,7 @@ with subtraction.
 interesting subtyping relations between datatypes and their
 extensions~\cite{oliveira09modular}.  Such subtyping relations are usually not
 discussed in theoretical treatments of Church encodings. This is
-probably partly due to most work on typed Church encodings been
+probably partly due to most work on typed Church encodings being
 done in calculi without subtyping.
 
 The interesting aspect about subtyping in typed Church encodings is
@@ -775,7 +777,7 @@ let printAlg : SubExpAlg[IPrint] = {
 \end{lstlisting}
 
 \noindent The definition of \lstinline{printAlg} is unremarkable.  
-With \lstinline{prinAlg} we can pretty print the expression represented
+With \lstinline{printAlg} we can pretty print the expression represented
 by \lstinline{three}:
 
 \begin{lstlisting}{language=F2J}
@@ -795,13 +797,13 @@ literal constructors, one for \lstinline$Exp$ and another for
 \subsection{Composition of Algebras}
 The final example shows a non-trivial combinator for algebras that
 allows multiple algebras to be combined into one. A version of this
-combinator has been encoded in Scala using intersection types
+combinator has been encoded in Scala before using intersection types
 (which Scala supports) and an encoding of the merge
 operator~\cite{oliveira2013feature,rendel14attributes}.
 Unfortunatelly, the Scala encoding of the merge operator is quite complex as
 it relies on low-level type-unsafe programming features such as
 dynamic proxies, reflection or other meta-programming techniques.
-Fortunatelly in \name there is no need for such hacky encoding, as the
+In \name there is no need for such hacky encoding, as the
 merge operator is nativelly supported. Therefore the combinator for 
 composing algebras is implemented much more elegantly. 
 The combinator is defined by the \lstinline$combine$ function, which takes two object algebras to create
@@ -833,11 +835,11 @@ With \lstinline{combine} printing and evaluation of expressions with
 subtraction is done as follows:
 
 \begin{lstlisting}{language=F2J}
-let newAlg =
-    combine[IEval,IPrint] subEvalAlg printAlg;
-let o = three.accept[IEval&IPrint] newAlg;
+let newAlg : ExpAlg[IEval&IPrint] =
+    combine[IEval,IPrint] evalAlg printAlg;
+let o = five.accept[IEval&IPrint] newAlg;
 o.print ++ " = " ++ o.eval.toString()
-\end{lstlisting}\bruno{type error!}
+\end{lstlisting}
 
 Note that \lstinline$o$ is a value that supports both
 evaluation and printing. The final expression uses \lstinline{o}
