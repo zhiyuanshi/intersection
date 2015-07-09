@@ -837,7 +837,7 @@ let newAlg =
     combine[IEval,IPrint] subEvalAlg printAlg;
 let o = three.accept[IEval&IPrint] newAlg;
 o.print ++ " = " ++ o.eval.toString()
-\end{lstlisting}
+\end{lstlisting}\bruno{type error!}
 
 Note that \lstinline$o$ is a value that supports both
 evaluation and printing. The final expression uses \lstinline{o}
