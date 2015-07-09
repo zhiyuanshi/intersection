@@ -58,6 +58,16 @@ Some ways to rule out the possibility of disjointness.
   By induction on $D$.
 \end{proof}
 
+\begin{lemma}
+  \label{lemma:subtype-ftv}
+
+  If $\alpha \subtype A$, then $\alpha \in \ftv A$.
+\end{lemma}
+
+\begin{proof}
+  Straightforward by checking the subtyping rules.
+\end{proof}
+
 \algodissoundness*
 
 \begin{proof}
@@ -73,10 +83,10 @@ Some ways to rule out the possibility of disjointness.
     \end{flalign*}
 
     Suppose the contrary. Then by the definition of disjointness, there exists a
-    type $B$ such that $\jsub \Gamma \alpha B$ and $\jsub \Gamma A B$. By
-    \george{ftv subtyping lemma}, $\alpha \in \ftv B$. Combining the fact that
-    $\jsub \Gamma A B$, we also have $\alpha \in \ftv A$. But by \george{another
-    lemma}, we know $\alpha \not \in \ftv A$. Contradiction. \\
+    type $B$ such that $\alpha \subtype B$ and $A \subtype B$. By
+    Lemma~\ref{lemma:subtype-ftv}, $\alpha \in \ftv B$. Combining the fact that
+    $A \subtype B$, we also have $\alpha \in \ftv A$. But by the typing rules,
+    we know $\alpha \not \in \ftv A$. Contradiction. \\
 
     \item Case
     \begin{flalign*}

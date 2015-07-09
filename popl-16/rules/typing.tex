@@ -54,7 +54,8 @@
 \newcommand{\rulettappdis}{
 \inferrule* [right=\labelttapp]
   {\jtype \Gamma e {\for {\alpha \disjoint B} C} \yields E \\
-   \jwf \Gamma A}
+   \jwf \Gamma A \\
+   \jdis \Gamma A B}
   {\jtype \Gamma {\tapp e A} {\subst A \alpha C} \yields {\tapp E {\im A}}}
 }
 
