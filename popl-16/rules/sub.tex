@@ -1,4 +1,4 @@
-\newcommand{\formsub}{\framebox{$ \jsub \Gamma A B \yields E $}}
+\newcommand{\formsub}{\framebox{$ A \subtype B \yields E $}}
 
 \newcommand{\makelabelsub}[1]{Sub\_#1}
 
@@ -6,15 +6,15 @@
 \newcommand{\rulesubvar}{
   \inferrule* [right=\labelsubvar]
     { }
-    {\jsub \Gamma \alpha \alpha \yields {\lamty x {\im \alpha} x}}
+    {\alpha \subtype \alpha \yields {\lamty x {\im \alpha} x}}
 }
 
 \newcommand{\labelsubfun}{\makelabelsub Fun}
 \newcommand{\rulesubfun}{
   \inferrule* [right=\labelsubfun]
-    {\jsub \Gamma {B_1} {A_1} \yields {E_1} \\
-     \jsub \Gamma {A_2} {B_2} \yields {E_2}}
-    {\jsub \Gamma {A_1 \to A_2} {B_1 \to B_2}
+    {{B_1} \subtype {A_1} \yields {E_1} \\
+     {A_2} \subtype {B_2} \yields {E_2}}
+    {{A_1 \to A_2} \subtype {B_1 \to B_2}
     \yields
         {\lamty f {\im {A_1 \to A_2}}
         {\lamty x {\im {B_1}}
@@ -24,8 +24,8 @@
 \newcommand{\labelsubforall}{\makelabelsub Forall}
 \newcommand{\rulesubforall}{
   \inferrule* [right=\labelsubforall]
-    {\jsub \Gamma {A_1} {\subst {\alpha_1} {\alpha_2} A_2} \yields E}
-    {\jsub \Gamma {\for {\alpha_1} A_1} {\for {\alpha_2} A_2}
+    {{A_1} \subtype {\subst {\alpha_1} {\alpha_2} A_2} \yields E}
+    {{\for {\alpha_1} A_1} \subtype {\for {\alpha_2} A_2}
       \yields
         {\lamty f {\im {\for {\alpha_1} A_1}}
           {\blam \alpha {\app E {(\app f \alpha)}}}}}
@@ -34,9 +34,9 @@
 \newcommand{\labelsubinter}{\makelabelsub Inter}
 \newcommand{\rulesubinter}{
   \inferrule* [right=\labelsubinter]
-    {\jsub \Gamma {A_1} {A_2} \yields {E_1} \\
-     \jsub \Gamma {A_1} {A_3} \yields {E_2}}
-    {\jsub \Gamma {A_1} {A_2 \inter A_3}
+    {{A_1} \subtype {A_2} \yields {E_1} \\
+     {A_1} \subtype {A_3} \yields {E_2}}
+    {{A_1} \subtype {A_2 \inter A_3}
       \yields
         {\lamty x {\im {A_1}}
           {\pair {\app {E_1} x} {\app {E_2} x}}}}
@@ -45,8 +45,8 @@
 \newcommand{\labelsubinterl}{\makelabelsub {Inter\_1}}
 \newcommand{\rulesubinterl}{
   \inferrule* [right=\labelsubinterl]
-    {\jsub \Gamma {A_1} {A_3} \yields E}
-    {\jsub \Gamma {A_1 \inter A_2} {A_3}
+    {{A_1} \subtype {A_3} \yields E}
+    {{A_1 \inter A_2} \subtype {A_3}
       \yields
         {\lamty x {\im {A_1 \inter A_2}}
           {\app E {(\proj 1 x)}}}}
@@ -54,8 +54,8 @@
 
 \newcommand{\rulesubinterldis}{
 \inferrule* [right=\labelsubinterl]
-    {\jsub \Gamma {A_1} {A_3} \yields E \\ \highlight{$\jatomic {A_3}$}}
-    {\jsub \Gamma {A_1 \inter A_2} {A_3}
+    {{A_1} \subtype {A_3} \yields E \\ \highlight{$\jatomic {A_3}$}}
+    {{A_1 \inter A_2} \subtype {A_3}
       \yields
         {\lamty x {\im {A_1 \inter A_2}}
           {\app E {(\proj 1 x)}}}}
@@ -64,8 +64,8 @@
 \newcommand{\labelsubinterr}{\makelabelsub {Inter\_2}}
 \newcommand{\rulesubinterr}{
   \inferrule* [right=\labelsubinterr]
-    {\jsub \Gamma {A_2} {A_3} \yields E}
-    {\jsub \Gamma {A_1 \inter A_2} {A_3}
+    {{A_2} \subtype {A_3} \yields E}
+    {{A_1 \inter A_2} \subtype {A_3}
       \yields
         {\lamty x {\im {A_1 \inter A_2}}
           {\app E {(\proj 2 x)}}}}
@@ -73,8 +73,8 @@
 
 \newcommand{\rulesubinterrdis}{
   \inferrule* [right=\labelsubinterr]
-    {\jsub \Gamma {A_2} {A_3} \yields E \\ \highlight{$\jatomic {A_3}$}}
-    {\jsub \Gamma {A_1 \inter A_2} {A_3}
+    {{A_2} \subtype {A_3} \yields E \\ \highlight{$\jatomic {A_3}$}}
+    {{A_1 \inter A_2} \subtype {A_3}
       \yields
         {\lamty x {\im {A_1 \inter A_2}}
           {\app E {(\proj 2 x)}}}}
