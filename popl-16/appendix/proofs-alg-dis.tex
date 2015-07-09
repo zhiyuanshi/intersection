@@ -181,7 +181,7 @@ Some ways to rule out the possibility of disjointness.
   \begin{itemize}
     \item Case $A = \bot$:
     \begin{itemize}
-      \item Case $B = \bot$: Trivial.
+      \item Case $B = \bot$: Immediate, by \reflabel{\labeldisaxbotbot}.
 
       \item Case $B = B_1 \inter B_2$: Need to show $\jdis \Gamma \bot {B_1}
       \inter B_2$ implies $\jdisimpl \Gamma \bot {B_1 \inter B_2}$. Apply
@@ -205,13 +205,13 @@ Some ways to rule out the possibility of disjointness.
       conditions can be proved by the i.h.
 
     \end{itemize}
-    \item Case $A = \fordis \alpha {A_1} {A_2}$:
+    \item Case $A = \fordis \alpha {A_1} {A_2}$: Similar to the above case.
 
-    \begin{itemize}
-      \item Case $B = \fordis \alpha {B_1} {B_2}$
-
-      \item Case $B = B_1 \inter B_2$:
-    \end{itemize}
+    % \begin{itemize}
+    %   \item Case $B = \fordis \alpha {B_1} {B_2}$
+    %
+    %   \item Case $B = B_1 \inter B_2$:
+    % \end{itemize}
 
     \item Case $A = A_1 \inter A_2$:
 
