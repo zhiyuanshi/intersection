@@ -1,67 +1,66 @@
-\section{Disjoint Intersection Types and Disjoint Quantification}
+\section{Disjointness and Coherence}
 \label{sec:disjoint}
 
-Although the system shown in the previous section is type-safe, it is not
-coherent. This section shows how to modify the system presented before so that it
-supports coherence as well as type soundness. The keys aspects are the notion of
-disjoint intersections, and disjoint quantification for polymorphic types.
+Although the system shown in the Section~\ref{sec:overview} is
+type-safe, it is not coherent. This section shows how to modify the
+system presented before so that it guarantees coherence as well as
+type soundness. The keys aspects are the notion of disjoint
+intersections, and disjoint quantification for polymorphic types.
 
-From the theoretical point-of-view, the end goal of this section is to show that the resulting system has
-a coherent (or unique) elaboration semantics:
-\begin{restatable}[Unique elaboration]{theorem}{uniqueelaboration}
-  \label{theorem:unique-elaboration}
+%From the theoretical point-of-view, the end goal of this section is to show that the resulting system has
+%a coherent (or unique) elaboration semantics:
+%\begin{restatable}[Unique elaboration]{theorem}{uniqueelaboration}
+%  \label{theorem:unique-elaboration}
+%
+%  If $\jtype \Gamma e {A_1} \yields {E_1}$ and $\jtype \Gamma e {A_2} \yields
+%  {E_2}$, then $E_1 \equiv E_2$. (``$\equiv$'' means syntactical equality, up to
+%  $\alpha$-equality.)
+%
+%\end{restatable}
+%
+%\noindent In other words, given a source term $e$, elaboration always produces
+%the same target term $E$. The most important hurdle we need to overcome is that
+%if $A \inter B \subtype C$, then either $A$ or $B$ contributes to that subtyping
+%relation, resulting in two possible coercions. 
 
-  If $\jtype \Gamma e {A_1} \yields {E_1}$ and $\jtype \Gamma e {A_2} \yields
-  {E_2}$, then $E_1 \equiv E_2$. (``$\equiv$'' means syntactical equality, up to
-  $\alpha$-equality.)
 
-\end{restatable}
-
-\noindent In other words, given a source term $e$, elaboration always produces
-the same target term $E$. The most important hurdle we need to overcome is that
-if $A \inter B \subtype C$, then either $A$ or $B$ contributes to that subtyping
-relation, resulting in two possible coercions. 
-
-\subsection{Disjointness}
-\bruno{This subsection needs polishing}
-A sufficient condition to rule out that case is that $A$ and $B$ are said to be disjoint:
+\subsection{Disjointness} Throughout the paper we already presented an intuitive  
+definition for disjoiness. Here such definition is made a bit more precise, and 
+well-suited to \name. 
 
 \begin{definition}[Disjoint types]
-  Two types $A$ and $B$ are \emph{disjoint} if they do not share a common
-  supertype, that is, there does not exist a type $C$ such that $A \subtype C$
-  and that $B \subtype C$. \footnote{
+  Given a type enviroment $\Gamma$ and two types $A$ and $B$. The two types are said to be disjoint
+  ($\Gamma \vdash A * B$) if they do not share a common supertype. That is, there does not exist a 
+  type $C$ such that $\Gamma \vdash A \subtype C$
+  and that $\Gamma \vdash B \subtype C$: \footnote{
   The definition of disjointness can also be adapted to type systems with a top
   type (such as \lstinline@Object@ in many OO languages): Two types $A$ and $B$
   are \emph{disjoint} if: the fact that $C$ is a commmon supertype of theirs
   implies $C$ is the top type.
   }
-\end{definition}\bruno{This definition is too informal, I think.}
 
-Related to the definition is the disjoint judgement. We write
-\[ \jdis \Gamma A B \]
-if two types $A$ and $B$ are disjoint in the context $\Gamma$.
+\[\Gamma \vdash A * B \equiv \not\exists C.~\Gamma \vdash A <: C \wedge \Gamma \vdash B <: C\]
 
-To see this definition in action, $\tyint$ and $\tystring$ are, because there is
+\noindent Note that any free variables in $A$, $B$ or $C$ must be bound in $\Gamma$.
+
+\end{definition}
+
+%Related to the definition is the disjoint judgement. We write
+%\[ \jdis \Gamma A B \]
+%if two types $A$ and $B$ are disjoint in the context $\Gamma$.
+
+To see this definition in action, $\tyint$ and $\tychar$ are disjoint, 
+because there is
 no type that is a supertype of the both. On the other hand, $\tyint$ is not
 disjoint with itself, because $\tyint \subtype \tyint$. This implies that
 disjointness is not reflexive as subtyping is. Two types with different shapes
-are disjoint unless one of them is an intersection type. For example, a function
-type and a forall type must be disjoint. But a function type and an intersection
+are always disjoint, unless one of them is an intersection type. For example, a function
+type and a universal type must be disjoint. But a function type and an intersection
 type may not be. Consider:
 \[ \tyint \to \tyint \quad \text{and} \quad (\tyint \to \tyint) \inter (\tystring \to \tystring) \]
-They are not disjoint since $\tyint \to \tyint$ is their common supertype.
+The two types are not disjoint since $\tyint \to \tyint$ is their common supertype.
 
-Now that we have obtained a specification for disjointness, but the definition
-involves an existence problem. How can we implement it? One possibility is
-bidirectional subtyping, that is, we say two types, $A$ and $B$, are disjoint if
-neither $A \subtype B$ nor $B \subtype A$. However, this implementation is
-wrong. For example, $\tyint \inter \tystring$ and $\tystring \inter \tychar$ are
-not disjoint by specification since $\tystring$ is their common supertype. Yet
-by the implementation they are, since neither of them is a subtype of
-the other. \bruno{You need a concrete code example to make this point.}
-Hence the algorithmic rules are more nuanced. For now, it is enough to treat the
-disjoint judgement $\jdis \Gamma A B$ as oracle and we will coome back to
-this topic in the next section.
+
 
 \subsection{Syntax}
 
@@ -92,6 +91,7 @@ this topic in the next section.
                    \mid \Gamma, x \oftype A  & \\
 
         \text{Syntactic sugar} & \blam \alpha e & \equiv & \blamdis \alpha \bot e & \\
+                               & \forall \alpha.~A & \equiv & \forall (\alpha * \bot)~.~A & \\
       \end{array}
     \end{array}
   \]
@@ -100,23 +100,25 @@ this topic in the next section.
   \label{fig:fi-syntax-dis}
 \end{figure}
 
-Figure~\ref{fig:fi-syntax-dis} shows the updated syntax with the changes highlighted.
-Note how similar the changes are to those needed to extend System $F$ with
-bounded quantification. First, type variables are now always associated with
-their disjointness constraints (like $\alpha \disjoint A$) in types, terms, and
-contexts. Second, the bottom type ($\bot$) is introduced so that universal quantification
-quantification becomes a special case of disjoint
-quantification: $\blam \alpha e$ is really a syntactic sugar for $\blamdis
-\alpha \bot e$. The underlying idea is that any type is disjoint
-with the bottom type.
+Figure~\ref{fig:fi-syntax-dis} shows the updated syntax with the
+changes highlighted.  Note how similar the changes are to those needed
+to extend System $F$ with bounded quantification. First, type
+variables are now always associated with their disjointness
+constraints (like $\alpha \disjoint A$) in types, terms, and
+contexts. Second, the bottom type ($\bot$) is introduced so that
+universal quantification becomes a special case of disjoint
+quantification: $\blam \alpha e$ is really a syntactic sugar for
+$\blamdis \alpha \bot e$. The underlying idea is that any type is
+disjoint with the bottom type.  Note the analogy with bounded
+quantification, where the top type is the trivial upper bound in
+bounded quantification, while the bottom type is the trivial
+disjointness constraint in disjoint quantification.
 
-As a comparison, the top type is the trivial upper bound in bounded
-quantification, while the bottom type is the trivial disjointness constraint in
-disjoint quantification. Indeed, \bruno{unfinidhed sentence}\george{Mabe show a diagram here to contrast
-with bounded polymorphism.}
+%Indeed, \bruno{unfinidhed sentence}\george{Mabe show a diagram here to contrast
+%with bounded polymorphism.}
 
 \subsection{Typing}
-Figure~\ref{fig:fi-type-patch} shows modifications to Figure~\ref{} in
+Figure~\ref{fig:fi-type-patch} shows modifications to Figure~\ref{fig:fi-type} in
 order to support disjoint intersection types and disjoint
 quantification. Only new rules or rules that different are shown.
 Importantly, the disjointness judgement appears in the well-formedness rule for intersection
@@ -155,9 +157,14 @@ types and the typing rule for merges.
   \label{fig:fi-type-patch}
 \end{figure*}
 
+%\paragraph{Atomic Types} The new system introduces atomic types. Essentially a type 
+%is atomic if it is any type, which is not an intersection type. 
+%The notion of atomic 
+%type will be helpful 
+
 \paragraph{Well-Formedness}
 We require that the two types of an intersection must be disjoint in their
-context, and that the disjointness constraint in a forall type is well-formed.
+context, and that the disjointness constraint in a universal type is well-formed.
 Under the new rules, intersection types such as $\tyint \inter \tyint$ are no
 longer well-formed because the two types are not disjoint.
 
@@ -183,6 +190,7 @@ But after the substitution of $\tyint$ for $\alpha$ on the two types, the senten
 \[ \jdis {\alpha \disjoint \tyint} \tyint \tyint \]
 is longer true since $\tyint$ is clearly not disjoint with itself.
 
+\bruno{Some connecting text seems to be missing here.}
 \begin{restatable}[Instantiation]{lemma}{instantiation}
   \label{lemma:instantiation}
 
@@ -192,7 +200,7 @@ is longer true since $\tyint$ is clearly not disjoint with itself.
 
 \begin{proof}
   By induction.
-\end{proof}
+\end{proof}\bruno{by induction on what?}
 
 \begin{restatable}[Well-formed typing]{lemma}{wellformedtyping}
   \label{lemma:wellformed-typing}
@@ -205,57 +213,79 @@ is longer true since $\tyint$ is clearly not disjoint with itself.
   Lemma~\ref{lemma:instantiation} in the case of \reflabel{\labelttapp}.
 \end{proof}
 
-\subsection{Subtyping}
+\subsection{Subtyping} The subtyping rules need some adjustment. An important 
+problem with the subtyping rules in Figure~\ref{fig:fi-type} is that the all three rules 
+dealing with intersection types 
+(\reflabel{\labelsubinterl} and \reflabel{\labelsubinterr} and \reflabel{\labelsubinter})
+overlap. Unfortunatelly, 
+this means that different coercions may be given when checking the subtyping 
+between two types, depending on which derivation is chosen. This is ultimately the reason 
+for incoherence.
+There are two important types of overlap:
 
-\george{Note that $\bot$ does not participate in subtyping and why (because the
-empty set intersecting the empty set is still empty).}
+\begin{enumerate}
 
-\george{What's the variance of the disjoint constraint? C.f. bounded
-polymorphism.}
+\item The left decomposition rules for intersections (\reflabel{\labelsubinterl} and \reflabel{\labelsubinterr}) overlap with each other. 
 
-The coercion of a subtyping relation $A \subtype B$ is uniquely determined.
-\begin{restatable}[Unique coercion]{lemma}{uniquecoercion}
-  \label{lemma:unique-coercion}
+\item The left decomposition rules for intersections (\reflabel{\labelsubinterl} and \reflabel{\labelsubinterr})
+overlap with the right decomposition rules for intersections (\reflabel{\labelsubinter}).
 
-  If $A \subtype B \yields {E_1}$ and $A \subtype B \yields {E_2}$, where $A$
-  and $B$ are well-formed types, then $E_1 \equiv E_2$.
-\end{restatable}
+\end{enumerate}
 
-\george{Two points are being made here: 1) nondisjoint intersections, 2) atomic
-types. Show an offending example for each?}
-
-\paragraph{Atomic types} Atomic types are just those which are not intersection
-types, and are asserted by the judgement \[ \jatomic A \]
-
-The subtyping rules, without the atomic condition are overlapping. If we would
-like to have a deterministic elaboration result, the overarching idea is to
-tweak the rules so that given a term, it is no longer possible that both of the
-twin rules can be used. For example, if $A_1 \inter A_2 \subtype A_3$, we would
-like to be certain that either $A_1 \subtype A_3$ holds or $A_2 \subtype A_3$
-holds, but not both.
+\noindent Fortunatelly, disjoint intersections (which are enforced by well-formedness) 
+deal with problem 1): only one of the two left decomposition rules
+can be chosen for a disjoint instersection type. Since the two types in the intersection 
+are disjoint it is impossible that both of the preconditions of the left decompositions are satisfied 
+at the same time. More formally, with disjoint intersections, we have the following theorem:
 
 \begin{lemma}[Unique subtype contributor]
   \label{lemma:unique-subtype-contributor}
 
-  If $A_1 \inter A_2 \subtype B$, where $A_1 \inter A_2$ and $B$ are well-formed types,
-  then it is not possible that the following hold at the same time:
+  If $\Gamma \vdash A_1 \inter A_2 \subtype B$, where $A_1 \inter A_2$ and $B$ are well-formed types,
+  then it is not possible that the following holds at the same time:
   \begin{enumerate}
-    \item $A_1 \subtype B$
-    \item $A_2 \subtype B$
+    \item $\Gamma \vdash A_1 \subtype B$
+    \item $\Gamma \vdash A_2 \subtype B$
   \end{enumerate}
-\end{lemma}
+\end{lemma}\bruno{missing proof sketch}
 
+Unfortunatelly, disjoint intersections alone are insufficient to deal with problem 2). 
+In order to deal with problem 2), we introduce a distinction between types, and atomic types.
+
+\paragraph{Atomic types} Atomic types are just those which are not intersection
+types, and are asserted by the judgement \[ \jatomic A \]
+
+In the left decomposition rules for intersections we introduce a requirement that
+$A_3$ is atomic. The consequence of this requirement is that when $A_3$ is an intersection type, then 
+the only rule that can be applied is \reflabel{\labelsubinter}. 
 With the atomic constraint, one can guarantee that at any moment during the
-derivation of a subtyping relation, at most one rule can be used. Yet
-remarkably, our restrictions on subtyping do not sacrifice the expressiveness of
-subtyping since we have the following theorem:
+derivation of a subtyping relation, at most one rule can be used. 
+Consequentely, the coercion of a subtyping relation $A \subtype B$ is uniquely determined.
+This fact is captured by the following lemma:
+
+\begin{restatable}[Unique coercion]{lemma}{uniquecoercion}
+  \label{lemma:unique-coercion}
+
+  If $\Gamma \vdash A \subtype B \yields {E_1}$ and $\Gamma \vdash A \subtype B \yields {E_2}$, where $A$
+  and $B$ are well-formed types, then $E_1 \equiv E_2$.
+\end{restatable}\bruno{proof sketch}
+
+\paragraph{Expressiveness}
+Remarkably, our restrictions on subtyping do not sacrifice the expressiveness of
+subtyping since we have the following two theorems:
 \begin{theorem}
   If $A_1 \subtype A_3$, then $A_1 \inter A_2 \subtype A_3$.
 \end{theorem}
+\begin{theorem}
+If $A_2 \subtype A_3$, then $A_1 \inter A_2 \subtype A_3$.
+\end{theorem}\bruno{missing proof sketch}
+
+
 The interpretation of the theorem is that: even though the premise is made more
 strict by the atomic condition, we can still derive the every judgement in the
 old systems. \george{Explain why the proof shows this.}
 
+\begin{comment}
 Note that $A$ \emph{exclusive} or $B$ is true if and only if their truth value
 differ. Next, we are going to investigate the minimal requirement (necessary and
 sufficient conditions) such that the theorem holds.
@@ -275,8 +305,36 @@ $\tyint$ and $\tyint \to \tyint$. For function types, disjointness
 is harder to visualise. But bear in the mind that disjointness can defined by
 the very requirement that the theorem holds.
 
+
+This result is captured more formally by the following lemma:
+\end{comment}
+
+
+
+
+\george{Note that $\bot$ does not participate in subtyping and why (because the
+empty set intersecting the empty set is still empty).}
+
+\george{What's the variance of the disjoint constraint? C.f. bounded
+polymorphism.}
+
+
+
+\george{Two points are being made here: 1) nondisjoint intersections, 2) atomic
+types. Show an offending example for each?}
+
+
+\subsection{Coherence of the Elaboration}
 Combining the previous results, we are able to show the central theorem:
-\uniqueelaboration*
+
+\begin{restatable}[Unique elaboration]{theorem}{uniqueelaboration}
+  \label{theorem:unique-elaboration}
+
+  If $\jtype \Gamma e {A_1} \yields {E_1}$ and $\jtype \Gamma e {A_2} \yields
+  {E_2}$, then $E_1 \equiv E_2$. (``$\equiv$'' means syntactical equality, up to
+  $\alpha$-equality.)
+
+\end{restatable}
 
 \begin{proof}
   Note that the typing rules are already syntax-directed but the case of

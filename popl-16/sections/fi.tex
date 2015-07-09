@@ -14,9 +14,6 @@ quantificantion.
 
 \george{Add context to the subtyping rules.}
 
-This section presents the syntax, subtyping, typing, as well as the (incoherent)
-semantics of \name.
-
 \subsection{Syntax}
 
 Figure~\ref{fig:fi-syntax} shows the syntax of \name. The differences with
@@ -64,9 +61,8 @@ intersection of types $A$ and $B$.
 constructs in System $F$: variables $x$; abstraction of terms over variables of
 a given type $\lamty x A e$; application of terms $e_1$ to terms $e_2$, written
 $\app {e_1} {e_2}$; abstraction of type variables over terms $\blam \alpha e$;
-and application of terms to types $\tapp e A$.  $e_1 \mergeop e_2$ is the
-\emph{merge} of two terms $e_1$ and $e_2$. It can be used as either $ e_1 $ or $
-e_2 $. 
+and application of terms to types $\tapp e A$. The expression $e_1 \mergeop e_2$ is the
+\emph{merge} of two terms $e_1$ and $e_2$.
 %If one regards $e_1$ and $e_2$ as objects, their merge will respond to
 %every method that one or both of them have. 
 Merges of terms correspond to intersections of types $A \inter B$.
@@ -139,7 +135,7 @@ standard ways and we are using them in discussions and examples.
 % the fields.
 
 The subtyping rules of the form $A \subtype B$ are shown in the top part of
-Figure~\ref{fig:fi-type}. At the moment, the reader is advised to omit the
+Figure~\ref{fig:fi-type}. At the moment, the reader is advised to ignore the
 gray-shaded part in the rules, which will be explained later. The rule
 \reflabel{\labelsubfun} says that a function is contravariant in its parameter
 type and covariant in its return type. In \reflabel{\labelsubforall} a universal
@@ -162,24 +158,24 @@ subtyping defined by $\subtype$ is also reflexive and transitive.
 \end{lemma}
 
 For the corresponding mechanized proofs in Coq, we refer to the supplementary
-materials submitted with the paper.\bruno{should we mention the coq proofs?}
+materials submitted with the paper. 
 
 \subsection{Typing}
 
 The well-formedness rules are shown in the middle part of
 Figure~\ref{fig:fi-type}. In addition to the standard rules,
 \reflabel{\labelwfinter} is also not surprising. The typing rules are shown in
-the bottom part of the figure. Again, the reader is advised to omit the
+the bottom part of the figure. Again, the reader is advised to ignore the
 gray-shaded part here, as these parts will be explained later. The typing judgement is
 of the form: \[ \jtype \Gamma e A \] It reads: ``in the typing context $\Gamma$,
 the term $e$ is of type $A$'' The rules that are the same as in System $F$ are
 rules for variables \reflabel{\labeltvar}, lambda abstractions
 \reflabel{\labeltlam}, and type applications \reflabel{\labelttapp}. For the
 ease of discussion, in \reflabel{\labeltblam}, we require the type variable
-introduced by the quantifier is fresh. For programs with type variable
+introduced by the quantifier to be fresh. For programs with type variable
 shadowing, this requirement can be met straighforwardly by variable renaming.
 The rule \reflabel{\labeltapp} needs special attention as we add a subtyping
-requirement: the type of the argument ($A_3$) is a subtype of that of the
+requirement: the type of the argument ($A_3$) is a subtype of the type of the
 parameter ($A_1$). \reflabel{\labeltmerge} means that a merge $e_1 \mergeop e_2$,
 is assigned an intersection type composed of the resulting types of
 $e_1$ and $e_2$.
@@ -273,7 +269,7 @@ contexts $\Gamma$ to target language contexts $G$.
 % Section~\ref{sec:fi}, except for the light blue part. The translation consists
 % of four sets of rules, which are explained below:
 
-\paragraph{Coercive subtyping}
+\paragraph{Coercive subtyping}\bruno{Figure needs to be updated with $\Gamma$}
 
 The judgement
 \[
@@ -286,7 +282,7 @@ $ \im {A_1} \to \im {A_2} $ (by Lemma~\ref{lemma:sub}). For example,
 \[
 \tyint \inter \tybool \subtype \tybool \yields {\lamty x {\im {\tyint \inter \tybool}} {\proj 2 x}}
 \]
-generates a coercion function from $\tyint \inter \tybool \to \tybool$.
+generates a coercion function with type: $\tyint \inter \tybool \to \tybool$.
 
 In rules \reflabel{\labelsubvar}, \reflabel{\labelsubforall}, coercions are just
 identity functions. In \reflabel{\labelsubfun}, we elaborate the subtyping of
