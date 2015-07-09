@@ -20,6 +20,7 @@ We show the type safety of the version of \name without coherence.
 % \bruno{target type system is missing 3 cases: Tunit; Tproj1; TProj2}
 
 \lemmasub*
+
 \begin{proof}
   By structural induction of the derivation.
 
@@ -38,20 +39,20 @@ We show the type safety of the version of \name without coherence.
     \end{flalign*}
 
       By i.h., $ \jtype \cdot {E_1} {\im {A_3} \to \im {A_1}} $ and $ \jtype
-      \cdot {E_2} {\im {A_2} \to \im {A_4}} $. By \reflabel{\labeltgtvar}, $
-      \jtype {\cdot, x \oftype {\im {A_3}}} x {\im {A_3}} $. By premise, $ A_3
-      \subtype A_1 \yields {E_1} $. By \reflabel{\labeltgtapp}, $ \jtype {\cdot,
-      x \oftype {\im {A_3}}} {\app {E_1} x} {\im {A_1}} $. By
+      \cdot {E_2} {\im {A_2} \to \im {A_4}} $. \\ By \reflabel{\labeltgtvar}, $
+      \jtype {\cdot, x \oftype {\im {A_3}}} x {\im {A_3}} $. \\ By premise, $ A_3
+      \subtype A_1 \yields {E_1} $. \\ By \reflabel{\labeltgtapp}, $ \jtype {\cdot,
+      x \oftype {\im {A_3}}} {\app {E_1} x} {\im {A_1}} $. \\ By
       \reflabel{\labeltgtvar}, $ \jtype {\cdot, f \oftype {\im {A_1 \to A_2}}} f
-      {\im {A_1 \to A_2}} $. By the definition of $ \im \cdot $, $ \jtype
-      {\cdot, f \oftype {\im {A_1 \to A_2}}} f {\im {A_1} \to \im {A_2}} $. By
+      {\im {A_1 \to A_2}} $. \\ By the definition of $ \im \cdot $, $ \jtype
+      {\cdot, f \oftype {\im {A_1 \to A_2}}} f {\im {A_1} \to \im {A_2}} $. \\ By
       \reflabel{\labeltgtapp}, $ \jtype {\cdot, f \oftype {\im {A_1 \to A_2}}, x
-      \oftype {\im {A_3}}} {\app f {(\app {E_1} x})} {\im {A_2}} $. By
+      \oftype {\im {A_3}}} {\app f {(\app {E_1} x})} {\im {A_2}} $. \\ By
       \reflabel{\labeltgtapp}, $ \jtype {\cdot, f \oftype {\im {A_1 \to A_2}}, x
       \oftype {\im {A_3}}} {\app {E_2} {(\app f {(\app {E_1} x})})} {\im {A_4}} $.
-      By applying \reflabel{\labeltgtlam} twice, $ \jtype \cdot {\lamty f {\im
+      \\ By applying \reflabel{\labeltgtlam} twice, $ \jtype \cdot {\lamty f {\im
       {A_1 \to A_2}} {\lamty x {\im {A_3}} {\app {E_2} {(\app f {(\app {E_1}
-      x)})}}}} {\im {A_1 \to A_2} \to \im {A_3} \to \im {A_4}} $. By the
+      x)})}}}} {\im {A_1 \to A_2} \to \im {A_3} \to \im {A_4}} $. \\ By the
       definition of $\im \cdot$, $ \jtype \cdot {\lamty f {\im {A_1 \to A_2}}
       {\lamty x {\im {A_3}} {\app {E_2} {(\app f {(\app {E_1} x)})}}}} {\im {A_1
       \to A_2} \to \im {A_3 \to A_4}} $ \\
@@ -62,22 +63,22 @@ We show the type safety of the version of \name without coherence.
     \end{flalign*}
 
       By i.h., $ \jtype \cdot E {\im {A_1} \to {\im {\subst {\alpha_1}
-      {\alpha_2} A_2}}} $. By \reflabel{\labeltgtvar}, $ \jtype {\cdot, f
+      {\alpha_2} A_2}}} $. \\ By \reflabel{\labeltgtvar}, $ \jtype {\cdot, f
       \oftype {\im {\for {\alpha_1} {A_1}}}} f {\im {\for {\alpha_1} {A_1}}} $.
-      By the definition of $ \im \cdot $, $ \jtype {\cdot, f \oftype {\im {\for
-      {\alpha_1} {A_1}}}} f {\for {\alpha_1} {\im {A_1}}} $. By
+      \\ By the definition of $ \im \cdot $, $ \jtype {\cdot, f \oftype {\im {\for
+      {\alpha_1} {A_1}}}} f {\for {\alpha_1} {\im {A_1}}} $. \\ By
       \reflabel{\labeltgtvar} and \reflabel{\labeltgttapp}, $ \jtype {\cdot, f
       \oftype {\im {\for {\alpha_1} {A_1}}}, \alpha} {\tapp f \alpha} {\subst
-      \alpha {\alpha_1} {\im {A_1}}} $. By \reflabel{\labeltgtapp}, $ \jtype
+      \alpha {\alpha_1} {\im {A_1}}} $. \\ By \reflabel{\labeltgtapp}, $ \jtype
       {\cdot, f \oftype {\im {\for {\alpha_1} {A_1}}}, \alpha} {\app C {(\tapp f
       \alpha)}} {\subst \alpha {\alpha_1} {\im {\subst {\alpha_1} {\alpha_2}
-      {A_2}}}} $. By \reflabel{\labeltgtblam} and substitution
+      {A_2}}}} $. \\ By \reflabel{\labeltgtblam} and substitution
       \george{Substitution is problematic}, $ \jtype {\cdot, f \oftype {\im
       {\for {\alpha_1} {A_1}}}} {\blam \alpha {\app E {(\tapp f \alpha)}}} {\for
-      {\alpha_2} {\im {A_2}}} $. By \reflabel{\labeltgtlam}, $ \jtype \cdot
+      {\alpha_2} {\im {A_2}}} $. \\ By \reflabel{\labeltgtlam}, $ \jtype \cdot
       {\lamty f {\im {\for {\alpha_1} {A_1}}} {\blam \alpha {\app E {(\tapp f
       \alpha)}}}} {\im {\for {\alpha_1} {A_1}} \to \for {\alpha_2} {\im {A_2}}} $.
-      By the definition of $\im \cdot$, $ \jtype \cdot {\lamty f {\im {\for
+      \\ By the definition of $\im \cdot$, $ \jtype \cdot {\lamty f {\im {\for
       {\alpha_1} {A_1}}} {\blam \alpha {\app E {(\tapp f \alpha)}}}} {\im {\for
       {\alpha_1} {A_1}} \to \im {\for {\alpha_2} {A_2}}} $. \\
 
@@ -87,14 +88,14 @@ We show the type safety of the version of \name without coherence.
     \end{flalign*}
 
       By \reflabel{\labeltgtvar}, $\jtype {\cdot, x \oftype \im {A_1}} x {\im
-      {A_1}}$. By i.h., $\jtype \cdot {E_1} {\im {A_1} \to \im {A_2}}$. By
+      {A_1}}$. \\ By i.h., $\jtype \cdot {E_1} {\im {A_1} \to \im {A_2}}$. \\ By
       \reflabel{\labeltgtapp} and weakening, $\jtype {\cdot, x \oftype \im
       {A_1}} {\app {E_1} x} {\im {A_2}}$. Similarly, $\jtype {\cdot, x \oftype
-      \im {A_1}} {\app {E_2} x} {\im {A_3}}$. By \reflabel{\labeltgtpair},
+      \im {A_1}} {\app {E_2} x} {\im {A_3}}$. \\ By \reflabel{\labeltgtpair},
       $\jtype {\cdot, x \oftype \im {A_1}} {\pair {\app {E_1} x} {\app {E_2} x}}
-      {\pair {\im {A_2}} {\im {A_3}}}$. By the definition of $\im \cdot$,
+      {\pair {\im {A_2}} {\im {A_3}}}$. \\ By the definition of $\im \cdot$,
       $\jtype {\cdot, x \oftype \im {A_1}} {\pair {\app {E_1} x} {\app {E_2} x}}
-      {\im {A_2 \inter A_3}}$. By \reflabel{\labeltgtlam}, $\jtype \cdot {\lamty
+      {\im {A_2 \inter A_3}}$. \\ By \reflabel{\labeltgtlam}, $\jtype \cdot {\lamty
       x {\im {A_1}} {\pair {\app {E_1} x} {\app {E_2} x}}} {\im {A_1} \to {\im
       {A_2 \inter A_3}}}$ \\
 
@@ -104,14 +105,14 @@ We show the type safety of the version of \name without coherence.
     \end{flalign*}
 
       By \reflabel{\labeltgtvar}, $ \jtype {\cdot, x \oftype \im {A_1 \inter
-      A_2}} x {\im {A_1 \inter A_2}} $. By the definition of $\im \cdot$, $
+      A_2}} x {\im {A_1 \inter A_2}} $. \\ By the definition of $\im \cdot$, $
       \jtype {\cdot, x \oftype \im {A_1 \inter A_2}} x {\pair {\im {A_1}} {\im
-      {A_2}}} $. By \reflabel{\labeltgtprojl}, $ \jtype {\cdot, x \oftype \im
-      {A_1 \inter A_2}} {\proj 1 x} {\im {A_1}} $. By i.h., $ \jtype \cdot E
-      {\im {A_1} \to \im {A_3}} $. By weakening, $ \jtype {\cdot, x \oftype \im
-      {A_1 \inter A_2}} E {\im {A_1} \to \im {A_3}} $. By
+      {A_2}}} $. \\ By \reflabel{\labeltgtprojl}, $ \jtype {\cdot, x \oftype \im
+      {A_1 \inter A_2}} {\proj 1 x} {\im {A_1}} $. \\ By i.h., $ \jtype \cdot E
+      {\im {A_1} \to \im {A_3}} $. \\ By weakening, $ \jtype {\cdot, x \oftype \im
+      {A_1 \inter A_2}} E {\im {A_1} \to \im {A_3}} $. \\ By
       \reflabel{\labeltgtapp}, $ \jtype {\cdot, x \oftype \im {A_1 \inter A_2}}
-      {\app E {(\proj 1 x)}} {\im {A_3}} $. By \reflabel{\labeltgtlam}, $ \jtype
+      {\app E {(\proj 1 x)}} {\im {A_3}} $. \\ By \reflabel{\labeltgtlam}, $ \jtype
       \cdot {\lamty x {\im {A_1 \inter A_2}} {\app E {(\proj 1 x)}}} {\im {A_1
       \inter A_2} \to \im {A_3}} $. \\
 
