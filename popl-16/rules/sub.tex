@@ -24,10 +24,19 @@
 \newcommand{\labelsubforall}{\makelabelsub Forall}
 \newcommand{\rulesubforall}{
   \inferrule* [right=\labelsubforall]
-    {{A_1} \subtype {\subst {\alpha_1} {\alpha_2} A_2} \yields E}
-    {{\for {\alpha_1} A_1} \subtype {\for {\alpha_2} A_2}
+    {{A_1} \subtype {A_2} \yields E}
+    {\for {\alpha} {A_1} \subtype \for {\alpha} {A_2}
       \yields
-        {\lamty f {\im {\for {\alpha_1} A_1}}
+        {\lamty f {\im {\for {\alpha} {A_1}}}
+          {\blam \alpha {\app E {(\app f \alpha)}}}}}
+}
+
+\newcommand{\rulesubforalldis}{
+  \inferrule* [right=\labelsubforall]
+    {{B_1} \subtype {B_2} \yields E}
+    {\fordis {\alpha} A {B_1} \subtype \fordis {\alpha} A {B_2}
+      \yields
+        {\lamty f {\im {\for {\alpha} {B_1}}}
           {\blam \alpha {\app E {(\app f \alpha)}}}}}
 }
 

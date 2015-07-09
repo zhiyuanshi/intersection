@@ -21,16 +21,16 @@ intersections, and disjoint quantification for polymorphic types.
 %\noindent In other words, given a source term $e$, elaboration always produces
 %the same target term $E$. The most important hurdle we need to overcome is that
 %if $A \inter B \subtype C$, then either $A$ or $B$ contributes to that subtyping
-%relation, resulting in two possible coercions. 
+%relation, resulting in two possible coercions.
 
 
-\subsection{Disjointness} Throughout the paper we already presented an intuitive  
-definition for disjoiness. Here such definition is made a bit more precise, and 
-well-suited to \name. 
+\subsection{Disjointness} Throughout the paper we already presented an intuitive
+definition for disjoiness. Here such definition is made a bit more precise, and
+well-suited to \name.
 
 \begin{definition}[Disjoint types]
   Given a type enviroment $\Gamma$ and two types $A$ and $B$. The two types are said to be disjoint
-  ($\Gamma \vdash A * B$) if they do not share a common supertype. That is, there does not exist a 
+  ($\Gamma \vdash A * B$) if they do not share a common supertype. That is, there does not exist a
   type $C$ such that $\Gamma \vdash A \subtype C$
   and that $\Gamma \vdash B \subtype C$: \footnote{
   The definition of disjointness can also be adapted to type systems with a top
@@ -49,7 +49,7 @@ well-suited to \name.
 %\[ \jdis \Gamma A B \]
 %if two types $A$ and $B$ are disjoint in the context $\Gamma$.
 
-To see this definition in action, $\tyint$ and $\tychar$ are disjoint, 
+To see this definition in action, $\tyint$ and $\tychar$ are disjoint,
 because there is
 no type that is a supertype of the both. On the other hand, $\tyint$ is not
 disjoint with itself, because $\tyint \subtype \tyint$. This implies that
@@ -142,7 +142,7 @@ types and the typing rule for merges.
   \end{mathpar}
 
   \begin{mathpar}
-    \formsub \\ \rulesubinterldis \and \rulesubinterrdis
+    \formsub \\ \rulesubinterldis \and \rulesubinterrdis \and \rulesubforalldis
   \end{mathpar}
 
   \begin{mathpar}
@@ -157,10 +157,10 @@ types and the typing rule for merges.
   \label{fig:fi-type-patch}
 \end{figure*}
 
-%\paragraph{Atomic Types} The new system introduces atomic types. Essentially a type 
-%is atomic if it is any type, which is not an intersection type. 
-%The notion of atomic 
-%type will be helpful 
+%\paragraph{Atomic Types} The new system introduces atomic types. Essentially a type
+%is atomic if it is any type, which is not an intersection type.
+%The notion of atomic
+%type will be helpful
 
 \paragraph{Well-Formedness}
 We require that the two types of an intersection must be disjoint in their
@@ -213,29 +213,33 @@ is longer true since $\tyint$ is clearly not disjoint with itself.
   Lemma~\ref{lemma:instantiation} in the case of \reflabel{\labelttapp}.
 \end{proof}
 
-\subsection{Subtyping} The subtyping rules need some adjustment. An important 
-problem with the subtyping rules in Figure~\ref{fig:fi-type} is that the all three rules 
-dealing with intersection types 
+\subsection{Subtyping}
+
+\george{Explain \reflabel{\labelsubforall} and distinction of kernel and all version.}
+
+The subtyping rules need some adjustment. An important
+problem with the subtyping rules in Figure~\ref{fig:fi-type} is that the all three rules
+dealing with intersection types
 (\reflabel{\labelsubinterl} and \reflabel{\labelsubinterr} and \reflabel{\labelsubinter})
-overlap. Unfortunatelly, 
-this means that different coercions may be given when checking the subtyping 
-between two types, depending on which derivation is chosen. This is ultimately the reason 
+overlap. Unfortunatelly,
+this means that different coercions may be given when checking the subtyping
+between two types, depending on which derivation is chosen. This is ultimately the reason
 for incoherence.
 There are two important types of overlap:
 
 \begin{enumerate}
 
-\item The left decomposition rules for intersections (\reflabel{\labelsubinterl} and \reflabel{\labelsubinterr}) overlap with each other. 
+\item The left decomposition rules for intersections (\reflabel{\labelsubinterl} and \reflabel{\labelsubinterr}) overlap with each other.
 
 \item The left decomposition rules for intersections (\reflabel{\labelsubinterl} and \reflabel{\labelsubinterr})
 overlap with the right decomposition rules for intersections (\reflabel{\labelsubinter}).
 
 \end{enumerate}
 
-\noindent Fortunatelly, disjoint intersections (which are enforced by well-formedness) 
+\noindent Fortunatelly, disjoint intersections (which are enforced by well-formedness)
 deal with problem 1): only one of the two left decomposition rules
-can be chosen for a disjoint instersection type. Since the two types in the intersection 
-are disjoint it is impossible that both of the preconditions of the left decompositions are satisfied 
+can be chosen for a disjoint instersection type. Since the two types in the intersection
+are disjoint it is impossible that both of the preconditions of the left decompositions are satisfied
 at the same time. More formally, with disjoint intersections, we have the following theorem:
 
 \begin{lemma}[Unique subtype contributor]
@@ -249,17 +253,17 @@ at the same time. More formally, with disjoint intersections, we have the follow
   \end{enumerate}
 \end{lemma}\bruno{missing proof sketch}
 
-Unfortunatelly, disjoint intersections alone are insufficient to deal with problem 2). 
+Unfortunatelly, disjoint intersections alone are insufficient to deal with problem 2).
 In order to deal with problem 2), we introduce a distinction between types, and atomic types.
 
 \paragraph{Atomic types} Atomic types are just those which are not intersection
 types, and are asserted by the judgement \[ \jatomic A \]
 
 In the left decomposition rules for intersections we introduce a requirement that
-$A_3$ is atomic. The consequence of this requirement is that when $A_3$ is an intersection type, then 
-the only rule that can be applied is \reflabel{\labelsubinter}. 
+$A_3$ is atomic. The consequence of this requirement is that when $A_3$ is an intersection type, then
+the only rule that can be applied is \reflabel{\labelsubinter}.
 With the atomic constraint, one can guarantee that at any moment during the
-derivation of a subtyping relation, at most one rule can be used. 
+derivation of a subtyping relation, at most one rule can be used.
 Consequentely, the coercion of a subtyping relation $A \subtype B$ is uniquely determined.
 This fact is captured by the following lemma:
 
