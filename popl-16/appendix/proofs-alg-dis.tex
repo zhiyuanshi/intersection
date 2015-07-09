@@ -1,5 +1,18 @@
 \subsection{Soundness and Completeness of Algorithmic Disjointness}
 
+Some ways to rule out the possibility of disjointness.
+
+\begin{itemize}
+  \item If one type is a subtype of the other, then they cannot be disjoint.
+  \item If the set of free type variables of two types overlap, then they cannot
+  be disjoint.
+\end{itemize}
+
+\begin{lemma}
+  If $A$ and $B$ are two types and $\ftv A \cap \ftv B \neq \varnothing$, then
+  there does not exist a $\Gamma$ such that $\jdis \Gamma A B$.
+\end{lemma}
+
 \begin{theorem}
   If $A \subtype C$, then $A \inter B \subtype C$.
   If $B \subtype C$, then $A \inter B \subtype C$.
