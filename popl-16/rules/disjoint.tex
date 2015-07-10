@@ -40,7 +40,7 @@
 \newcommand{\labeldisforall}{\makelabeldis Forall}
 \newcommand{\ruledisforall}{
   \inferrule* [right=\labeldisforall]
-    {\jdisimpl {\Gamma \text{\george{Where is $\alpha$?}}} {A_2} {B_2}}
+    {\jdisimpl {\Gamma, \alpha * A_1} {A_2} {B_2} \\ \jdisimpl {\Gamma, \alpha * B_1} {A_2} {B_2}}
     {\jdisimpl \Gamma {\fordis \alpha {A_1} {A_2}} {\fordis \alpha {B_1} {B_2}}}
 }
 
