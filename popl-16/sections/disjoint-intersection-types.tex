@@ -179,25 +179,25 @@ types and the typing rule for merges.
   \label{fig:fi-type-patch}
 \end{figure*}
 
-%\paragraph{Atomic Types} The new system introduces atomic types. Essentially a type
+%\paragraph{Atomic Types.} The new system introduces atomic types. Essentially a type
 %is atomic if it is any type, which is not an intersection type.
 %The notion of atomic
 %type will be helpful
 
-\paragraph{Well-Formedness}
+\paragraph{Well-formedness.}
 We require that the two types of an intersection must be disjoint in their
 context, and that the disjointness constraint in a universal type is well-formed.
 Under the new rules, intersection types such as $\tyint \inter \tyint$ are no
 longer well-formed because the two types are not disjoint.
 
-\paragraph{Disjoint quantification} A disjoint quantification is introduced by
+\paragraph{Disjoint quantification.} A disjoint quantification is introduced by
 the big lambda $\blamdis \alpha A e$ and eliminated by the usual type
 application $\tapp e A$. The constraint is added to the context with this rule.
 During a type application, the type system makes sure that the type argument
 satisfies the disjointness constraint\bruno{hummm, is the rule really
   enforcing that? do we miss a disjointness coinstraint}.
 
-\paragraph{Metatheory} Since in this section we only restrict the type
+\paragraph{Metatheory.} Since in this section we only restrict the type
 system in the
 previous section, it is easy to see that type preservation and type-safety still
 holds. Additionally, we can show that typing always produces a well-formed type.
@@ -278,7 +278,7 @@ at the same time. More formally, with disjoint intersections, we have the follow
 Unfortunatelly, disjoint intersections alone are insufficient to deal with problem 2).
 In order to deal with problem 2), we introduce a distinction between types, and atomic types.
 
-\paragraph{Atomic types} Atomic types are just those which are not intersection
+\paragraph{Atomic types.} Atomic types are just those which are not intersection
 types, and are asserted by the judgement \[ \jatomic A \]
 
 In the left decomposition rules for intersections we introduce a requirement that
@@ -296,7 +296,7 @@ This fact is captured by the following lemma:
   and $B$ are well-formed types, then $E_1 \equiv E_2$.
 \end{restatable}\bruno{proof sketch}
 
-\paragraph{Expressiveness}
+\paragraph{Expressiveness.}
 Remarkably, our restrictions on subtyping do not sacrifice the expressiveness of
 subtyping since we have the following two theorems:
 \begin{theorem}

@@ -36,7 +36,7 @@ form or another.
 %Section~\ref{subsec:incoherence}, it also introduces difficulties. In what follows
 %intersection types and the merge operator are informally introduced.
 
-\paragraph{Intersection Types}
+\paragraph{Intersection types.}
 The intersection of type $A$ and $B$ (denoted as \lstinline{A & B} in
 \name) contains exactly those values
 which can be used as either of type $A$ or of type $B$. For instance,
@@ -59,7 +59,7 @@ identity functions on integers and characters, respectively.
 Passing \lstinline{x} as an argument to either one (or both) of the
 functions is valid.
 
-\paragraph{Merge Operator}
+\paragraph{Merge operator.}
 In the previous program we deliberatly did not show how to introduce values of an
 intersection type. There are many variants of intersection types
 in the literature. Our work follows a particular formulation, where
@@ -76,7 +76,7 @@ let x : Int & Char = 1 ,, 'c' in (*$ \ldots $*)
 \noindent In \name (following Dunfield's notation), the
 merge of two values $v_1$ and $v_2$ is denoted as $v_1 ,, v_2$.
 
-\paragraph{Merge Operator and Pairs}
+\paragraph{Merge operator and pairs.}
 The merge operator is similar to the introduction construct on pairs.
 An analogous implementation of \lstinline{x} with pairs would be:
 
@@ -123,7 +123,7 @@ If both results are accepted, we say that the semantics is
 valid program. Dunfield's calculus~\cite{dunfield2014elaborating} is incoherent and accepts the
 program above.
 
-\paragraph{Getting Around Incoherence: Biased Choice}
+\paragraph{Getting around incoherence: biased choice.}
 In a real implementation of Dunfield calculus a choice has to be made
 on which value to compute. For example, one potential option is to
 take either always take the left-most value matching the type in the
@@ -161,7 +161,7 @@ intersection types, it is not obvious to formalize it. Indeed Dunfield
 has mentioned disjointness as an option to restore coherence, but he
 left it for future work due to the non-triviality of the approach.
 
-\paragraph{Searching for a Definition of Disjointness}
+\paragraph{Searching for a definition of disjointness.}
 The first step towards disjoint intersection types is to come up
 with a definition of disjointness. A first attempt at such definition would
 be to require that, given two types $A$ and $B$, both types are not
@@ -190,7 +190,7 @@ it did bring us some additional insight: although the types of the two
 components of the merge are not subtypes of each other, they share
 some types in common.
 
-\paragraph{A Proper Definition of Disjointness} In order for two types
+\paragraph{A proper definition of disjointness.} In order for two types
 to be trully disjoint, they must not have any subcomponents sharing
 the same type. In a system with intersection types this can be ensured
 by requiring the two types do not share a common supertype. The
@@ -246,7 +246,7 @@ fst Int Int (1 ,, 2)
 $1$ and $2$ can be extracted from the merge and still match the type
 of the first argument of \lstinline{fst}.
 
-\paragraph{Biased Choice Breaks Equational Reasoning} At first sight, one option
+\paragraph{Biased choice breaks equational reasoning.} At first sight, one option
 to workaround the issue incoherence would be to bias the type-based merge lookup
 to the left or to the right (as discussed in
 Section~\ref{subsec:incoherence}). Unfortunatelly, biased choice is
@@ -293,7 +293,7 @@ substitutions lead us to a wrong result. This is a major problem for
 biased choice and a reason to dismiss it as a possible implementation
 choice for \name.
 
-\paragraph{Conservatively Rejecting Intersections}
+\paragraph{Conservatively rejecting intersections.}
 To avoid incoherence, and the issues of biased choice, another option
 is simply to reject programs where the
 instantiations of type variables may lead to incoherent programs.
@@ -384,7 +384,7 @@ support for such a feature.
 
 
 
-\paragraph{Parametric Polymorphism and Intersection Types}
+\paragraph{Parametric polymorphism and intersection types.}
 Both universal quantification and intersection types provide a kind of
 polymorphism. While the former provides parametric polymorphism, the latter
 provides ad-hoc polymorphism. In some systems, parametric polymorphism is
@@ -409,7 +409,7 @@ and \lstinline{y} to be merged. The resulting type is a \emph{disjoint}
 intersection of the types of  \lstinline{x}
 and \lstinline{y} (\lstinline{A & B} in this case).
 
-\paragraph{Incoherence and Parametric Polymorphism}
+\paragraph{Incoherence and parametric Polymorphism}
 We can define a \code{fst} function that extracts the first item of a merged value:
 \[
 \code{fst} \ \alpha \ \beta \ (x : \alpha \inter \beta) = \app {(\lam y \alpha y)} x

@@ -48,12 +48,12 @@ type-level and the ``merges'' $e_1 \mergeop e_2$ at the term level.
   \label{fig:fi-syntax}
 \end{figure}
 
-\paragraph{Types} Metavariables $A$, $B$ range over types. Types include
+\paragraph{Types.} Metavariables $A$, $B$ range over types. Types include
 standard constructs in System $F$: type variables $\alpha$; function types $A
 \to B$; and type abstraction $\for \alpha A$. $A \inter B$ denotes the
 intersection of types $A$ and $B$.
 
-\paragraph{Terms} Metavariables $e$ range over terms.  Terms include standard
+\paragraph{Terms.} Metavariables $e$ range over terms.  Terms include standard
 constructs in System $F$: variables $x$; abstraction of terms over variables of
 a given type $\lamty x A e$; application of terms $e_1$ to terms $e_2$, written
 $\app {e_1} {e_2}$; abstraction of type variables over terms $\blam \alpha e$;
@@ -63,7 +63,7 @@ and application of terms to types $\tapp e A$. The expression $e_1 \mergeop e_2$
 %every method that one or both of them have.
 Merges of terms correspond to intersections of types $A \inter B$.
 
-\paragraph{Contexts} Typing contexts $ \Gamma $ track bound type variables
+\paragraph{Contexts.} Typing contexts $ \Gamma $ track bound type variables
 $\alpha$ and variables $x$ with their type $A$. We use $\subst {A} \alpha {B}$
 to denote the capture-avoiding substitution of $A$ for $\alpha$ inside $B$ and
 $\ftv \cdot$ for sets of free type variables.
@@ -141,7 +141,7 @@ sets. Under this interpretation, for example, the rule \reflabel{\labelsubinter}
 says that if $A_1$ is both the subset of $A_2$ and the subset of $A_3$, then
 $A_1$ is also the subset of the intersection of $A_2$ and $A_3$.
 
-\paragraph{Metatheory} As other sane subtyping relations, we can show that
+\paragraph{Metatheory.} As other sane subtyping relations, we can show that
 subtyping defined by $\subtype$ is also reflexive and transitive.
 
 \begin{lemma}[Subtyping is reflexive] \label{lemma:sub-refl}
@@ -187,13 +187,13 @@ a type-directed translation to an extension of System $F$~\footnote{
 %gray.
 
 
-\paragraph{Target language}
+\paragraph{Target language.}
 The syntax and typing of our target language is unsurprising. The syntax of the
 target language is shown in Figure~\ref{fig:f-syntax}. The highlighted part
 shows its difference with the standard System $F$. The typing rules can be found
 in the appendix.
 
-\paragraph{Key Idea of the Translation}
+\paragraph{Key idea of the translation.}
 This translation turns merges into usual pairs, similar to Dunfield's
 elaboration approach~\cite{dunfield2014elaborating}.
 For example, \[ 1 \mergeop \code{"one"} \] becomes \pair 1
@@ -229,7 +229,7 @@ the function expects a $\tystring$ but the translated argument is of type $\pair
   \label{fig:f-syntax}
 \end{figure}
 
-\paragraph{Type and context translation}
+\paragraph{Type and context translation.}
 
 Figure~\ref{fig:type-and-context-translation} defines the type translation
 function $\im \cdot$ from \name types $A$ to target language types $T$. The
@@ -265,7 +265,7 @@ contexts $\Gamma$ to target language contexts $G$.
 % Section~\ref{sec:fi}, except for the light blue part. The translation consists
 % of four sets of rules, which are explained below:
 
-\paragraph{Coercive subtyping}
+\paragraph{Coercive subtyping.}
 
 The judgement
 \[
@@ -308,7 +308,7 @@ hence a program can be elaborated differently, depending on which rule is used.
   By a straighforward induction on the derivation\footnote{The proofs of major lemmata and theorems can be found in the appendix.}.
 \end{proof}
 
-\paragraph{The translation judgement} The translation judgement $\jtype \Gamma e
+\paragraph{The translation judgement.} The translation judgement $\jtype \Gamma e
 A \yields E$ extends the typing judgement with an elaborated term on the right
 hand side of $\yields {}$. The translation ensures that $E$ has type $\im A$. In
 \name, one may pass more information to a function than what is required; but

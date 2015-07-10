@@ -108,7 +108,7 @@ type Exp = {accept : fun E. ExpAlg[E] (*$ \to $*) E} in (*$ \ldots $*)
 use of records, the type \lstinline{Exp} and \lstinline{CExp}
 are equivalent.
 
-\paragraph{Data Constructors}
+\paragraph{Data constructors.}
 Using \lstinline{Exp} the two data constructors are defined as follows:
 
 \begin{lstlisting}
@@ -133,7 +133,7 @@ Simple expressions, can be built using the data constructors:
 let five : Exp = add (lit 3) (lit 2) in (*$ \ldots $*)
 \end{lstlisting}
 
-\paragraph{Operations} Defining operations over expressions requires
+\paragraph{Operations.} Defining operations over expressions requires
 implementing \lstinline{ExpAlg[E]}. For example, an interesting
 operation over expressions is evaluation. The first step is to define
 the evaluation operation is to chose how to instantiate the type
@@ -180,7 +180,7 @@ Problem the goal is to achieve extensibility in two dimensions: constructors and
 Moreover, in the presence of subtyping it is also interesting to see how the extended datatypes
 relate to the original datatypes. We discuss the two topics next.
 
-\paragraph{New Constructors} Here is the code needed to add a new subtraction constructor:
+\paragraph{New constructors.} Here is the code needed to add a new subtraction constructor:
 %Arithmetic expressions with subtyping are defined using the type \lstinline{SubExp}:
 
 \begin{lstlisting}
@@ -204,7 +204,7 @@ constructor for subtraction (\lstinline{sub}), which requires the
 algebra to have the field \lstinline{sub}.
 
 
-\paragraph{Extending Existing Operations} In order to use evaluation
+\paragraph{Extending existing operations.} In order to use evaluation
 with the new type of expressions, it is necessary to also extend
 evaluation. Importantly, extension is achieved using the merge operator:
 
@@ -221,7 +221,7 @@ and a new record with the implementation of evaluation for
 subtraction, to define the implementation for arithmetic expressions
 with subtraction.
 
-\paragraph{Subtyping} In the presence of subtyping, there are
+\paragraph{Subtyping.} In the presence of subtyping, there are
 interesting subtyping relations between datatypes and their
 extensions~\cite{oliveira09modular}.  Such subtyping relations are usually not
 discussed in theoretical treatments of Church encodings. This is
@@ -255,7 +255,7 @@ if \lstinline{Exp} is indeed a subtype of \lstinline{SubExp}.
 
 
 
-\paragraph{New Operations}
+\paragraph{New operations.}
 The second type of extension is adding a new operation, such as pretty printing.
 Similarly to evaluation, the interface of the pretty printing feature
 is modeled as:
