@@ -4,7 +4,7 @@ This section introduces \name and its support for intersection types,
 parametric polymorphism and the merge operator. It then discusses
 the issue of coherence and shows how the notion of disjoint
 intersection types and disjoint quantification achieve a coherent semantics.
-Finally we illustrate the expressive power of \name by encoding 
+Finally we illustrate the expressive power of \name by encoding
 extensible type-theoretic encodings of datatypes.
 
 Note that this section uses some syntactic sugar, as well as standard
@@ -31,9 +31,9 @@ disjoint quantification, which is enough to ensure coherence.
 Intersection types date back as early as Coppo et
 al.'s work~\cite{coppo1981functional}. Since then various researchers have
 studied intersection types, and some languages have adopted them in one
-form or another. 
+form or another.
 %However, as we shall see in
-%Section~\ref{subsec:incoherence}, it also introduces difficulties. In what follows 
+%Section~\ref{subsec:incoherence}, it also introduces difficulties. In what follows
 %intersection types and the merge operator are informally introduced.
 
 \paragraph{Intersection Types}
@@ -43,9 +43,9 @@ which can be used as either of type $A$ or of type $B$. For instance,
 consider the following program in \name:
 
 \begin{lstlisting}
-let x : Int & Char = ...;  -- definition ommitted
-let idInt (y : Int) : Int = y;
-let idChar (y : Char) : Char = y;
+let x : Int & Char = (*$ \ldots $*) in -- definition ommitted
+let idInt (y : Int) : Int = y in
+let idChar (y : Char) : Char = y in
 (idInt x, idChar x)
 \end{lstlisting}
 
@@ -55,7 +55,7 @@ let idChar (y : Char) : Char = y;
 an integer as an argument, or any
 function that take a character as an argument. In the program above
 the functions \lstinline{idInt} and \lstinline{idChar} are the
-identity functions on integers and characters, respectively. 
+identity functions on integers and characters, respectively.
 Passing \lstinline{x} as an argument to either one (or both) of the
 functions is valid.
 
@@ -63,14 +63,14 @@ functions is valid.
 In the previous program we deliberatly did not show how to introduce values of an
 intersection type. There are many variants of intersection types
 in the literature. Our work follows a particular formulation, where
-intersection types are introduced by a \emph{merge operator}. 
+intersection types are introduced by a \emph{merge operator}.
 As Dunfield~\cite{dunfield2014elaborating} has argued a merge operator adds considerable
 expressiveness to a calculus. The merge operator allows
 two values to be merged in a single intersection type. For example, an
 implementation of \lstinline{x} is constructed in \name as follows:
 
 \begin{lstlisting}
-let x : Int & Char = 1 ,, 'c';
+let x : Int & Char = 1 ,, 'c' in (*$ \ldots $*)
 \end{lstlisting}
 
 \noindent In \name (following Dunfield's notation), the
@@ -81,7 +81,7 @@ The merge operator is similar to the introduction construct on pairs.
 An analogous implementation of \lstinline{x} with pairs would be:
 
 \begin{lstlisting}
-let xPair : (Int, Char) = (1, 'c');
+let xPair : (Int, Char) = (1, 'c') in (*$ \ldots $*)
 \end{lstlisting}
 
 \noindent The significant difference between intersection types with a
@@ -113,7 +113,9 @@ of evaluation is always clear. However, with overlapping types, it is
 not straightforward anymore to see the result. For example, what
 should be the result of this program, which asks for an integer out of
 a merge of two integers:
-\[ \app {(\lambda (x : \tyint). x)} {(1 \mergeop 2)} \]
+\begin{lstlisting}
+(fun (x: Int) (*$ \to $*) x) (1 ,, 2)
+\end{lstlisting}
 Should the result be $1$ or $2$?
 
 If both results are accepted, we say that the semantics is
@@ -127,12 +129,12 @@ on which value to compute. For example, one potential option is to
 take either always take the left-most value matching the type in the
 merge. Similarly, one could take always take the right-most
 value matching the type in the merge. Either way, the meaning
-of a program will always depend on a biased implementation choice, 
+of a program will always depend on a biased implementation choice,
 which is clearly unsatisfying from the theoretical point of view
 (although perhaps acceptable in practice).
 Moreover, even if it accept a particular biased choice as
 being good enough, the approach cannot be easily
-extended to systems with parametric polymorphism, as we illustrate 
+extended to systems with parametric polymorphism, as we illustrate
 in Section~\ref{subsec:polymorphism}.
 
 \subsection{Restoring Coherence: Disjoint Intersection Types}\label{sec:restoring}
@@ -210,37 +212,42 @@ intersection types. As shown in Section~\ref{sec:disjoint} disjoint intersection
 types will play a crutial rule in guaranteing that the semantics is coherent.
 
 \subsection{Parametric Polymorphism and Intersection Types}\label{subsec:polymorphism}
-Before we show how \name extends the idea of disjointness to parametric 
-polymorphism, we discuss some non-trivial issues that arize from 
-the interaction between parametric polymorphism and intersection types. 
+Before we show how \name extends the idea of disjointness to parametric
+polymorphism, we discuss some non-trivial issues that arize from
+the interaction between parametric polymorphism and intersection types.
 %The interaction between parametric polymorphism and
-%intersection types when coherence is a goal is non-trivial. 
-%In particular biased choice . 
+%intersection types when coherence is a goal is non-trivial.
+%In particular biased choice .
 %The key challenge is to have a type
 %system that still ensures coherence, but at the same time is not too
-%restrictive in the programs that can be accepted. 
+%restrictive in the programs that can be accepted.
 \begin{comment}
 Dunfield~\cite{} provides a
 good illustrative example of the issues that arize when combining
 disjoint intersection types and parametric polymorphism:
 \[\lambda x. {\bf let}~y = 0 \mergeop x~{\bf in}~x\]
 \end{comment}
-Consider the attempt to write 
+Consider the attempt to write
 the following polymorphic function in \name:
-\[{\bf let}~fst~A~B~(x : A \& B) = (\lambda z : A. z)~x;\] The
+\begin{lstlisting}
+let fst (*$ \alpha $*) (*$ \beta $*) (x: (*$ \alpha $*) & (*$ \beta $*)) = (fun (z: (*$ \alpha $*)) (*$ \to $*) z) x in (*$ \ldots $*)
+\end{lstlisting}
+The
 \code{fst} function is supposed to extract a value from the merge that
 matches the type of the first type parameter (\lstinline{A}).  However
 this function is problematic.  The reason is that when
 \lstinline{A} and \lstinline{B} are instantiated to non-disjoint
 types, then uses of \lstinline{fst} may lead to incoherence.
 For example, consider the following use of \lstinline{fst}:
-\[fst~Int~Int~(1,,2)\]
-\noindent This program is clearly incoherent as both 
+\begin{lstlisting}
+fst Int Int (1 ,, 2)
+\end{lstlisting}
+\noindent This program is clearly incoherent as both
 $1$ and $2$ can be extracted from the merge and still match the type
 of the first argument of \lstinline{fst}.
 
-\paragraph{Biased Choice Breaks Equational Reasoning} At first sight, one option 
-to workaround the issue incoherence would be to bias the type-based merge lookup 
+\paragraph{Biased Choice Breaks Equational Reasoning} At first sight, one option
+to workaround the issue incoherence would be to bias the type-based merge lookup
 to the left or to the right (as discussed in
 Section~\ref{subsec:incoherence}). Unfortunatelly, biased choice is
 very problematic when parametric polymorphism is present in the language.
@@ -265,18 +272,18 @@ choice) the result of the program would be 1! The reason for this has
 todo with \emph{when} the type-based lookup on the merge happens. In
 the case of \lstinline{fst}, lookup is triggered by a coercion
 function inserted in the definition of \lstinline{fst} at
-compile-time. 
+compile-time.
 In the definition of $fst$ all it is known is that a
 value of type $A$ should be returned from a merge with an intersection
 type $A\&B$.  Clearly the only type-safe choice to coerce the value of
 type $A\&B$ into $A$ is to
 take the left component of the merge. This works perfectly for merges
 such as $(1,,'c')$, where the types of the first and second components
-of the merge are disjoint. For the merge $(1,,'c')$, if a integer lookup 
-is needed, then $1$ is the rightmost integer, which is consistent with the 
-biased choice. Unfortunatelly, when given the merge $(1,,2)$ the 
+of the merge are disjoint. For the merge $(1,,'c')$, if a integer lookup
+is needed, then $1$ is the rightmost integer, which is consistent with the
+biased choice. Unfortunatelly, when given the merge $(1,,2)$ the
 left-component ($1$) is also picked up, even though in this case $2$
-is the rightmost integer in the merge. Clearly this is inconsistent 
+is the rightmost integer in the merge. Clearly this is inconsistent
 with the biased choice!
 
 Unfortunatelly this subtle interaction of polymorphism and type-based lookup
@@ -287,19 +294,19 @@ biased choice and a reason to dismiss it as a possible implementation
 choice for \name.
 
 \paragraph{Conservatively Rejecting Intersections}
-To avoid incoherence, and the issues of biased choice, another option 
+To avoid incoherence, and the issues of biased choice, another option
 is simply to reject programs where the
-instantiations of type variables may lead to incoherent programs. 
+instantiations of type variables may lead to incoherent programs.
 In this case the definition of $fst$ would be rejected, since there
-are indeed some cases that may lead to incoherent programs. 
+are indeed some cases that may lead to incoherent programs.
 Unfortunatelly this is too restrictive and prevents many useful
 programs using both parametric polymorphism and intersection types.
 In particular, in the case of \lstinline{fst}, if the two type
 parameters are used with two disjoint intersection
-types, then the merge will not lead to ambiguity. 
+types, then the merge will not lead to ambiguity.
 
-In summary, it seems hard to have parametric polymorphism, intersection 
-types and coherence without being overly conservative. 
+In summary, it seems hard to have parametric polymorphism, intersection
+types and coherence without being overly conservative.
 
 
 \begin{comment}
@@ -393,7 +400,7 @@ Scala, \name allows intersecting any two terms at run time using a
 operator it is trivial to implement the \lstinline{merge} function in \name:
 
 \begin{lstlisting}
-let merge[A, B * A] (x : A) (y : B) : A & B = x ,, y;
+let merge[A, B * A] (x : A) (y : B) : A & B = x ,, y in (*$ \ldots $*)
 \end{lstlisting}
 
 \noindent In contrast to Scala's term-level \lstinline{with}
@@ -439,31 +446,38 @@ disjoint depends on the instantiation of $\alpha$.
 \end{comment}
 
 \subsection{Disjoint Quantification}
-To avoid being overly conservative, while still retaining coherence in the 
-presence of parametric polymorphism and intersection types, \name uses 
-an extension to universal quantification called \emph{disjoint quantification}. 
+To avoid being overly conservative, while still retaining coherence in the
+presence of parametric polymorphism and intersection types, \name uses
+an extension to universal quantification called \emph{disjoint quantification}.
 Inspired by
-bounded quantification~\cite{Cardelli:1994}, 
+bounded quantification~\cite{Cardelli:1994},
 where a type variable is constrained by a type
 bound, disjoint quantification allows a type variable to be
 constrained so that it is disjoint with a
 given type. With disjoint quantification a variant of the program $fst$, which
 is accepted by \name, would be written as:
-\[{\bf let}~fst~A~(\fcolorbox{light-gray}{light-gray}{B*A})~(x : A \& B) = (\lambda z : A. z)~x;\]
-The small change is in the declaration of the type parameter $B$. The notation 
-$B*A$ means that in this program the type variable $B$ is constrained so that 
-it can only be instantiated with any type disjoint to $A$. 
+\begin{lstlisting}
+let fst (*$ \alpha $*) ((*$ \highlight {$\beta * \alpha$} $*)) (x: (*$ \alpha $*) & (*$ \beta $*)) = (fun (z: (*$ \alpha $*)) (*$ \to $*) z) x
+in (*$ \ldots $*)
+\end{lstlisting}
+The small change is in the declaration of the type parameter $B$. The notation
+$B*A$ means that in this program the type variable $B$ is constrained so that
+it can only be instantiated with any type disjoint to $A$.
 This ensures that the
 merge denoted by $x$ is disjoint for all valid instantiations of $A$ and $B$.
 
-The nice thing about this solution is that many uses of $fst$ are accepted. 
+The nice thing about this solution is that many uses of $fst$ are accepted.
 For example, the following use of $fst$:
-\[fst~Int~Char~(1,,'c')\]
-is accepted since $Int$ and $Char$ are disjoint, thus satisfying the constraint 
+\begin{lstlisting}
+fst Int Char (1 ,, 'c')
+\end{lstlisting}
+is accepted since $Int$ and $Char$ are disjoint, thus satisfying the constraint
 on the second type parameter of $fst$.
 However, problematic uses of $fst$ are rejected. For example:
-\[fst~Int~Int~(1,,2)\]
-is rejected because $Int$ is not disjoint with $Int$, thus failing to satisfy the 
+\begin{lstlisting}
+fst Int Int (1 ,, 2)
+\end{lstlisting}
+is rejected because $Int$ is not disjoint with $Int$, thus failing to satisfy the
 disjointness constraint on the second type parameter of $fst$.
 
 \begin{comment}
@@ -496,14 +510,14 @@ the original program no longer typechecks, thus preventing overlapping types.
 \label{subsec:OAs}
 
 Various solutions to the Expression
-Problem~\cite{wadler1998expression} in the 
+Problem~\cite{wadler1998expression} in the
 literature~\cite{Swierstra:2008,finally-tagless,oliveira09modular,oliveira2012extensibility,DelawareOS13}
-are closely related to type-theoretic encodings of datatypes. Indeed, variants 
+are closely related to type-theoretic encodings of datatypes. Indeed, variants
 of the same idea keep appearing in different programming languages,
 because the encoding of the idea needs to exploit the particular
-features of the programming language (or theorem prover). 
+features of the programming language (or theorem prover).
 Unfortunatelly language-specific constructs obscure the key ideas
-behind those solutions. 
+behind those solutions.
 
 In this section we show a solution to the
 Expression Problem that intends to capture the key ideas of various
@@ -518,7 +532,7 @@ The combination of parametric polymorphism, intersection types and the
 merge operator is useful to encode datatypes with subtyping and
 support extensibility in \name. The combination of
 polymorphism and the merge operator is essential to allow the
-composition of multiple operations over datatypes. 
+composition of multiple operations over datatypes.
 In the following
 we present a step-by-step solution to the Expression Problem in \name,
 and illustrate how to combine multiple operations.
@@ -568,50 +582,51 @@ system modeling arithmetic expressions and evaluation.
 The standard typed Church encoding ~\cite{BoehmBerarducci} for arithmetic expressions,
 denoted as the type \lstinline{CExp}, is:
 
-\begin{lstlisting}{language=F2J}
-type CExp = forall E. (Int -> E) -> (E -> E -> E) -> E
+\begin{lstlisting}
+type CExp = forall E. (Int (*$ \to $*) E) (*$ \to $*) (E (*$ \to $*) E (*$ \to $*) E) (*$ \to $*) E
 \end{lstlisting}
 
 \noindent However, as done in various solutions to extensibility, it is better to break
 down the type of the Church encoding into two parts:
 
-\begin{lstlisting}{language=F2J}
+\begin{lstlisting}
 type ExpAlg[E] = {
-  lit: Int -> E,
-  add: E -> E -> E
-};
+  lit: Int (*$ \to $*) E,
+  add: E (*$ \to $*) E (*$ \to $*) E
+} in (*$ \ldots $*)
 \end{lstlisting}
 
 \noindent The first part, captured by the type \lstinline{ExpAlg[E]}
 is constitutes the so-called algebra of the datatype. For additional
 clarity of presentation, records (supported in the implementation of \name)
-are used to capture the two components of the algebra. 
+are used to capture the two components of the algebra.
 The first component abstracts over the type of the
-constructor for literal expressions (\lstinline{Int -> E}). The second
+constructor for literal expressions ($\tyint \to E$). The second
 component abstracts over the type of addition expressions
-(\lstinline{E -> E -> E}).
+($E \to E \to E$).
 
 The second part, which is the actual type of the Church encoding, is:
 
-\begin{lstlisting}{language=F2J}
-type Exp = {accept : forall E. ExpAlg[E] -> E};
+\begin{lstlisting}
+type Exp = {accept : fun E. ExpAlg[E] (*$ \to $*) E} in (*$ \ldots $*)
 \end{lstlisting}
 
 \noindent It should be clear that, modulo some refactoring, and the
 use of records, the type \lstinline{Exp} and \lstinline{CExp}
-are equivalent. 
+are equivalent.
 
 \paragraph{Data Constructors}
 Using \lstinline{Exp} the two data constructors are defined as follows:
 
-\begin{lstlisting}{language=F2J}
+\begin{lstlisting}
 let lit (n: Int): Exp = {
-  accept = /\E -> \(f: ExpAlg[E]) -> f.lit n
-};
+  accept = fun E (*$ \to $*) fun (f: ExpAlg[E]) (*$ \to $*) f.lit n
+} in
 let add (e1: Exp) (e2: Exp): Exp = {
-  accept = /\E -> \(f: ExpAlg[E]) ->
+  accept = fun E (*$ \to $*) fun (f: ExpAlg[E]) (*$ \to $*)
    f.add (e1.accept[E] f) (e2.accept[E] f)
-};
+} in
+(*$ \ldots $*)
 \end{lstlisting}
 
 Note that the notation \lstinline{/\E} in the definition of the
@@ -621,8 +636,8 @@ constructors themselves follows the usual Church encodings.
 
 Simple expressions, can be built using the data constructors:
 
-\begin{lstlisting}{language=F2J}
-let five : Exp = add (lit 3) (lit 2)
+\begin{lstlisting}
+let five : Exp = add (lit 3) (lit 2) in (*$ \ldots $*)
 \end{lstlisting}
 
 \paragraph{Operations} Defining operations over expressions requires
@@ -632,89 +647,85 @@ the evaluation operation is to chose how to instantiate the type
 parameter \lstinline{E} in \lstinline{ExpAlg[E]} with a suitable
 concrete type for evaluation. One such suitable type is:
 
-\begin{lstlisting}{language=F2J}
- type IEval = {eval: Int};
+\begin{lstlisting}
+type IEval = { eval: Int } in (*$ \ldots $*)
 \end{lstlisting}
 
 \noindent Using \lstinline{IEval}, a record \lstinline{evalAlg}
 implementing \lstinline{ExpAlg} is defined as follows:
 
-\begin{lstlisting}{language=F2J}
-    let evalAlg: ExpAlg[IEval] = {
-      lit = \(x: Int) -> {eval = x},
-      add = \(x: IEval) (y: IEval) -> {
-        eval = x.eval + y.eval
-      }
-    };
+\begin{lstlisting}
+let evalAlg: ExpAlg[IEval] = {
+  lit = fun (x: Int) (*$ \to $*) {eval = x},
+  add = fun (x: IEval) (y: IEval) (*$ \to $*) {
+    eval = x.eval + y.eval
+  }
+} in (*$ \ldots $*)
 \end{lstlisting}
 
 In this record, the two operations
 \lstinline{lit} and \lstinline{add} return a record with type
 \lstinline{IEval}. The definition of \lstinline{eval} for
-\lstinline{lit} and \lstinline{add} is straightforward. 
+\lstinline{lit} and \lstinline{add} is straightforward.
 
 
 %The type \lstinline$ExpAlg[IEval]$ is the type of object algebras
-%supporting evaluation. 
+%supporting evaluation.
 %However, the one interesting point
 %of object algebras is that other operations can be supported as
 %well.
 
-Using \lstinline{evalAlg}, the expression \lstinline{five} can 
+Using \lstinline{evalAlg}, the expression \lstinline{five} can
 be evaluated as follows:
 
-\begin{lstlisting}{language=F2J}
+\begin{lstlisting}
 (five.accept[IEval] evalAlg).eval
 \end{lstlisting}
 
 \subsection{Extensibility and Subtyping} Of course, in the Expression
 Problem the goal is to achieve extensibility in two dimensions: constructors and operations.
-Moreover, in the presence of subtyping it is also interesting to see how the extended datatypes 
+Moreover, in the presence of subtyping it is also interesting to see how the extended datatypes
 relate to the original datatypes. We discuss the two topics next.
 
 \paragraph{New Constructors} Here is the code needed to add a new subtraction constructor:
 %Arithmetic expressions with subtyping are defined using the type \lstinline{SubExp}:
 
-\begin{lstlisting}{language=F2J}
-type SubExpAlg[E] =
-   ExpAlg[E] & {sub: E -> E -> E};
-
-type SubExp = {
-   accept: forall A. SubExpAlg[A] -> A
-};
-
-let sub (e1: SubExp) (e2: SubExp): SubExp ={
-  accept = /\E -> \(f : SubExpAlg[E]) ->
+\begin{lstlisting}
+type SubExpAlg[E] = ExpAlg[E] & { sub: E (*$ \to $*) E (*$ \to $*) E } in
+type SubExp = { accept: fun A. SubExpAlg[A] (*$ \to $*) A } in
+let sub (e1: SubExp) (e2: SubExp): SubExp = {
+  accept = fun E (*$ \to $*) fun (f : SubExpAlg[E]) (*$ \to $*)
   f.sub (e1.accept[E] f) (e2.accept[E] f)
-};
+} in
+(*$ \ldots $*)
 \end{lstlisting}
 
 \noindent Firstly \lstinline{SubExpAlg} defines an extended algebra
 that contains the constructors of \lstinline{ExpAlg} plus the new
-subtraction constructors. Intersection types are used to do the type 
+subtraction constructors. Intersection types are used to do the type
 composition. Secondly, a new type of expressions with subtraction
 (\lstinline{SubExp}) is needed. For \lstinline{SubExp} it is important
 that the \lstinline{accept} field now takes an algebra of type
 \lstinline{SubExpAlg} as argument. This is necessary to define the
 constructor for subtraction (\lstinline{sub}), which requires the
-algebra to have the field \lstinline{sub}. 
+algebra to have the field \lstinline{sub}.
 
 
-\paragraph{Extending Existing Operations} In order to use evaluation 
+\paragraph{Extending Existing Operations} In order to use evaluation
 with the new type of expressions, it is necessary to also extend
 evaluation. Importantly, extension is achieved using the merge operator:
 
-\begin{lstlisting}{language=F2J}
+\begin{lstlisting}
 let subEvalAlg = evalAlg ,, {
-  sub = \(x: IEval) (y: IEval) -> {
+  sub = fun (x: IEval) (y: IEval) (*$ \to $*) {
     eval = x.eval - y.eval
   }
-};
+} in (*$ \ldots $*)
 \end{lstlisting}
 
 \noindent In the code, the merge operator takes \lstinline{evalAlg}
 and a new record with the implementation of evaluation for
-subtraction, to define the implementation for arithmetic expressions 
+subtraction, to define the implementation for arithmetic expressions
 with subtraction.
 
 \paragraph{Subtyping} In the presence of subtyping, there are
@@ -727,18 +738,18 @@ done in calculi without subtyping.
 The interesting aspect about subtyping in typed Church encodings is
 that subtyping follows the opposite direction of the extension.  In
 other words subtyping is contravariant with respect to the
-extension. Such contravariance is explained by the type of the 
-\lstinline{accept} field, which is a function where the argument type 
+extension. Such contravariance is explained by the type of the
+\lstinline{accept} field, which is a function where the argument type
 is refined in the extensions. Thus, due to the contravariance of
 subtyping on functions, the extension becomes a supertype of the
-original datatype. 
+original datatype.
 
 In the particular case of expressions \lstinline{Exp} (the original and smaller
 datatype) is a subtype of \lstinline{SubExp} (the larger and extended
 datatype). Because of this subtyping relation, writting the following
 expression is valid in \name:
 
-\begin{lstlisting}{language=F2J}
+\begin{lstlisting}
 let three : SubExp = sub five (lit 2)
 \end{lstlisting}
 
@@ -756,31 +767,33 @@ The second type of extension is adding a new operation, such as pretty printing.
 Similarly to evaluation, the interface of the pretty printing feature
 is modeled as:
 \begin{comment}
-  \begin{lstlisting}{language=F2J}
-    type IPrint = {print : String};
+  \begin{lstlisting}
+    type IPrint = { print : String } in (*$ \ldots $*)
   \end{lstlisting}
 \end{comment}
 \lstinputlisting[linerange=35-35]{../src/ObjectAlgebra.sf} % APPLY:linerange=OA_IPRINT
 The implementation of pretty printing for expressions that support literals,
 addition, and subtraction is:
 
-\begin{lstlisting}{language=F2J}
+\begin{lstlisting}
 let printAlg : SubExpAlg[IPrint] = {
-  lit = \(x: Int) -> {print = x.toString()},
-  add = \(x: IPrint) (y: IPrint) -> {
+  lit = fun (x: Int) (*$ \to $*) {
+    print = x.toString()
+  },
+  add = fun (x: IPrint) (y: IPrint) (*$ \to $*) {
     print = x.print ++ " + " ++ y.print
   },
-  sub = \(x: IPrint) (y: IPrint) -> {
+  sub = fun (x: IPrint) (y: IPrint) (*$ \to $*) {
     print = x.print ++ " - " ++ y.print
   }
-};
+} in (*$ \ldots $*)
 \end{lstlisting}
 
-\noindent The definition of \lstinline{printAlg} is unremarkable.  
+\noindent The definition of \lstinline{printAlg} is unremarkable.
 With \lstinline{printAlg} we can pretty print the expression represented
 by \lstinline{three}:
 
-\begin{lstlisting}{language=F2J}
+\begin{lstlisting}
 (three.accept[IPrint] printAlg).print
 \end{lstlisting}
 
@@ -804,19 +817,19 @@ Unfortunatelly, the Scala encoding of the merge operator is quite complex as
 it relies on low-level type-unsafe programming features such as
 dynamic proxies, reflection or other meta-programming techniques.
 In \name there is no need for such hacky encoding, as the
-merge operator is nativelly supported. Therefore the combinator for 
-composing algebras is implemented much more elegantly. 
+merge operator is nativelly supported. Therefore the combinator for
+composing algebras is implemented much more elegantly.
 The combinator is defined by the \lstinline$combine$ function, which takes two object algebras to create
 a combined algebra. It does so by constructing a new algebra
 where each field is a function that delegates the input to the two
 algebra parameters.
 
-\begin{lstlisting}{language=F2J}
- let combine[A,B * A](f: ExpAlg[A])(g: ExpAlg[B]) : 
-   ExpAlg[A&B] = {
-     lit = \(x: Int) -> f.lit x ,, g.lit x,
-     add = \(x: A & B) (y: A & B) ->
-        f.add x y ,, g.add x y
+\begin{lstlisting}
+let combine (*$ \alpha $*) ((*$ \beta $*) * (*$ \alpha $*)) (f: ExpAlg[(*$ \alpha $*)]) (g: ExpAlg[(*$ \beta $*)]) :
+  ExpAlg[(*$ \alpha $*) & (*$ \beta $*)] = {
+    lit = fun (x: Int) (*$ \to $*) f.lit x ,, g.lit x,
+    add = fun (x: (*$ \alpha $*) & (*$ \beta $*)) (y: (*$ \alpha $*) & (*$ \beta $*)) (*$ \to $*)
+      f.add x y ,, g.add x y
 }
 \end{lstlisting}
 
@@ -825,19 +838,19 @@ features of \name. Parametric polymorphism is needed because
 \lstinline{combine} must compose algebras with arbitrary type
 parameters. Intersection types are needed because the resulting
 algebra will create values with an intersection type composing
-the two type parameters of the two input algebras. The merge operator 
-is needed to compose the results of each algebra together. Finally, 
+the two type parameters of the two input algebras. The merge operator
+is needed to compose the results of each algebra together. Finally,
 a disjointness constraint is needed to ensure that the two input
 algebras build values of disjoint types (otherwise ambiguity could
-arize).  
+arize).
 
 With \lstinline{combine} printing and evaluation of expressions with
 subtraction is done as follows:
 
-\begin{lstlisting}{language=F2J}
+\begin{lstlisting}
 let newAlg : ExpAlg[IEval&IPrint] =
-    combine[IEval,IPrint] evalAlg printAlg;
-let o = five.accept[IEval&IPrint] newAlg;
+    combine[IEval,IPrint] evalAlg printAlg in
+let o = five.accept[IEval&IPrint] newAlg in
 o.print ++ " = " ++ o.eval.toString()
 \end{lstlisting}
 

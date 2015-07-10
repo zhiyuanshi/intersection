@@ -70,7 +70,7 @@ whereas our language allows intersections of type variables, such as
 the generic \texttt{merge} function (below) for all interpretations of
 a given algebra, and would incur boilerplate code:
 
-\begin{lstlisting}{language=haskell}
+\begin{lstlisting}
 let merge [A, B] (f: ExpAlg A) (g: ExpAlg B) = {
   lit (x : Int) = f.lit x ,, g.lit x,
   add (x : A & B) (y : A & B) =

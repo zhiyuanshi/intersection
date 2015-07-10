@@ -376,7 +376,7 @@ of \{\lstinline{name: String}\}. With such a type the function
 \paragraph{Encoding bounded polymorphism in \name.}
 \name does not have bounded polymorphism. However the same effect can
 be achieved with a combination of intersection types and parametric polymorphism:
-\begin{lstlisting}{language=F2J}
+\begin{lstlisting}
 let id[A] (user: A & {name: String}) = user;
 (id [{admin: Bool}] user).admin
 \end{lstlisting}
@@ -502,7 +502,7 @@ Church encoding allows modelling algebraic data types.
 % parameter \lstinline{E}.
 
 % which can be expressed similarly in \name as:
-% \begin{lstlisting}{language=F2J}
+% \begin{lstlisting}
 % type ExpAlg E = {
 %   lit : Int -> E,
 %   add : E -> E -> E
@@ -567,7 +567,7 @@ The initial system considers expressions with two variants (literals and
 addition) and one operation (evaluation). Here is an interface that supports
 evaluation:
 \begin{comment}
-  \begin{lstlisting}{language=F2J}
+  \begin{lstlisting}
     type IEval = {eval: Int};
   \end{lstlisting}
 \end{comment}
@@ -584,7 +584,7 @@ variants. This interface has a fixed number of variants, but abstracts over the
 type of the interpretation \lstinline$E$.
 
 \begin{comment}
-  \begin{lstlisting}{language=F2J}
+  \begin{lstlisting}
     type ExpAlg[E] = {
       lit: Int -> E,
       add: E -> E -> E
@@ -603,7 +603,7 @@ type of the interpretation \lstinline$E$.
 Having defined the interfaces, we can implement that object algebra interface
 with \lstinline$evalAlg$, which is an object algebra for evaluation.
 \begin{comment}
-  \begin{lstlisting}{language=F2J}
+  \begin{lstlisting}
     let evalAlg: ExpAlg[IEval] = {
       lit = \(x: Int) -> {eval = x},
       add = \(x: IEval) (y: IEval) -> {
@@ -628,7 +628,7 @@ The first feature is adding a new variant, such as subtraction. We can do so by
 simply intersecting the original types and merging with the original values:
 
 \begin{comment}
-  \begin{lstlisting}{language=F2J}
+  \begin{lstlisting}
     type SubExpAlg[E] =
     ExpAlg[E] & {sub: E -> E -> E};
     let subEvalAlg = evalAlg ,, {
@@ -650,7 +650,7 @@ A second extension is adding a new operation, such as pretty printing.
 Similar to evaluation, the interface of the pretty printing feature
 is modeled as:
 \begin{comment}
-  \begin{lstlisting}{language=F2J}
+  \begin{lstlisting}
     type IPrint = {print : String};
   \end{lstlisting}
 \end{comment}
@@ -658,7 +658,7 @@ is modeled as:
 The implementation of pretty printing for expressions that support literals,
 addition, and subtraction is:
 \begin{comment}
-  \begin{lstlisting}{language=F2J}
+  \begin{lstlisting}
     let printAlg : SubExpAlg[IPrint] = {
       lit = \(x: Int) -> {print = x.toString()},
       add = \(x: IPrint) (y: IPrint) -> {
@@ -677,7 +677,7 @@ With the definitions above, values are created using the
 appropriate algebras. For example, the expression \lstinline{7 + 2}
 is encoded as follows:
 \begin{comment}
-  \begin{lstlisting}{language=F2J}
+  \begin{lstlisting}
     let e1[E] (f: SubExpAlg[E]) =
     f.add (f.lit 7) (f.lit 2);
   \end{lstlisting}
@@ -701,7 +701,7 @@ function, which takes two object algebras to create a combined algebra. It
 does so by constructing a new object algebra where each field is a
 function that delegates the input to the two algebra parameters.
 \begin{comment}
-  \begin{lstlisting}{language=F2J}
+  \begin{lstlisting}
     let combine[A,B](f: ExpAlg[A])(g: ExpAlg[B]) :
     ExpAlg[A&B] = {
       lit = \(x: Int) -> f.lit x ,, g.lit x,
@@ -713,7 +713,7 @@ function that delegates the input to the two algebra parameters.
 \lstinputlisting[linerange=58-63]{../src/ObjectAlgebra.sf} % APPLY:linerange=OA_COMBINE
 
 \begin{comment}
-  \begin{lstlisting}{language=F2J}
+  \begin{lstlisting}
     let newAlg =
     combine[IEval,IPrint] subEvalAlg printAlg;
     let o = e1[IEval&IPrint] newAlg;
@@ -849,7 +849,7 @@ from the ``Inheritance is Not Subtyping'' problem.
 Such limitation does not exist in \name. For example, we can define the similar
 interfaces for \lstinline{Exp} and \lstinline{SubExp}:
 \begin{comment}
-  \begin{lstlisting}{language=F2J}
+  \begin{lstlisting}
     type Exp    = {
       accept: forall A. ExpAlg[A] -> A
     };
@@ -863,7 +863,7 @@ interfaces for \lstinline{Exp} and \lstinline{SubExp}:
 \lstinline{SubExp} is a supertype of \lstinline{Exp}. Using these
 types we first define two data constructors for simple expressions:
 \begin{comment}
-  \begin{lstlisting}{language=F2J}
+  \begin{lstlisting}
     let lit (n: Int): Exp = {
       accept = /\E -> \(f: ExpAlg[E]) -> f.lit n
     };
@@ -879,7 +879,7 @@ types we first define two data constructors for simple expressions:
 \lstinline{Exp} and use object algebras of type \lstinline{ExpAlg[E]}.
 However, subtraction requires a value of type \lstinline{SubExp} to be created:
 \begin{comment}
-  \begin{lstlisting}{language=F2J}
+  \begin{lstlisting}
     let sub (e1: SubExp) (e2: SubExp): SubExp ={
       accept = /\E -> \(f : SubExpAlg[E]) ->
       f.sub (e1.accept[E] f) (e2.accept[E] f)
@@ -894,7 +894,7 @@ However, subtraction requires a value of type \lstinline{SubExp} to be created:
 \paragraph{Usage.} With visitors constructing expressions is quite simple:
 
 \begin{comment}
-  \begin{lstlisting}{language=F2J}
+  \begin{lstlisting}
     e2 = sub (lit 7) (lit 2)
   \end{lstlisting}
 \end{comment}
@@ -988,7 +988,7 @@ proposals for extensible visitors in the literature.
 % denotes call-by-name arguments similar to the \lstinline{=>} notation in the
 % Scala language.
 
-% \begin{lstlisting}{language=F2J}
+% \begin{lstlisting}
 % type Mixin S = 'S -> 'S -> S;
 % let zero S (super : 'S) (this : 'S) : S = super;
 % let rec mixin S (f : Mixin S) : S
@@ -1002,7 +1002,7 @@ proposals for extensible visitors in the literature.
 % are composed using the \lstinline{mixin} and \lstinline{extends} combinators.
 % The result is the \lstinline{noisyFact} function that prints ``Hello'' every
 % time it is called and computes factorial.
-% \begin{lstlisting}{language=F2J}
+% \begin{lstlisting}
 % let fact (super : 'Int -> Int) (this : 'Int -> Int) : Int -> Int
 %   = \ (n : Int). if n == 0 then 1 else n * this (n - 1)
 % let noisy (super : 'Int -> Int) (this : 'Int -> Int) : Int -> Int

@@ -52,69 +52,32 @@
 
 \usepackage{listings}   % For code listings
 
-\lstdefinelanguage{scala}{
-  morekeywords={abstract,case,catch,class,def,%
-    do,else,extends,false,final,finally,%
-    for,if,implicit,import,match,mixin,%
-    new,null,object,override,package,%
-    private,protected,requires,return,sealed,%
-    super,this,throw,trait,true,try,%
-    type,val,var,while,with,yield},
-  otherkeywords={=>,<-,<\%,<:,>:,\#,@},
-  sensitive=true,
-  morecomment=[l]{//},
-  morecomment=[n]{/*}{*/},
-  morestring=[b]",
-  morestring=[b]',
-  morestring=[b]"""
-}
-
-\lstdefinelanguage{F2J}{
-  morekeywords={let,rec,type,in},
-  otherkeywords={->},
-  sensitive=true,
-  morecomment=[l]{--},
-  morestring=[b]", % 'b' means inside a string delimiters are escaped by a backslash.
-  morestring=[b]'
-}
-
-\lstset{ %
-  % language=F2J,                % choose the language of the code
+\lstset{%
+  basicstyle=\ttfamily\small, % the size of the fonts that are used for the code
+  keywordstyle=\sffamily\bfseries,
+  captionpos=none,
   columns=flexible,
   lineskip=-1pt,
-  basicstyle=\ttfamily\small,       % the size of the fonts that are used for the code
-  numbers=none,                   % where to put the line-numbers
-  stepnumber=1,                   % the step between two line-numbers. If it's 1 each line will be numbered
-  numbersep=5pt,                  % how far the line-numbers are from the code
-  backgroundcolor=\color{white},  % choose the background color. You must add \usepackage{color}
+  keepspaces=true,
   showspaces=false,               % show spaces adding particular underscores
   showstringspaces=false,         % underline spaces within strings
   showtabs=false,                 % show tabs within strings adding particular underscores
-  tabsize=2,                  % sets default tabsize to 2 spaces
-  captionpos=none,                   % sets the caption-position to bottom
   breaklines=true,                % sets automatic line breaking
-  breakatwhitespace=false,        % sets if automatic breaks should only happen at whitespace
-  title=\lstname,                 % show the filename of files included with \lstinputlisting; also try caption instead of title
-  escapeinside={(*}{*)},          % if you want to add a comment within your code
-  keywordstyle=\ttfamily\bfseries,
-% commentstyle=\color{Gray}
-% stringstyle=\color{Green}
+  breakatwhitespace=true,         % sets if automatic breaks should only happen at whitespace
+  escapeinside={(*}{*)},
+  sensitive=true
 }
 
-%% Code listings
-\usepackage{listings}
-
-\lstdefinestyle{f2j}{
-    basicstyle=\sffamily\small,
-    keywordstyle=\sffamily\bfseries,
-    tabsize=2,
-    keepspaces=true,
-    showstringspaces=false,
-    escapeinside={(*}{*)},
-    morekeywords={let,in,type,trait,def,interface}
+\lstdefinestyle{fi}{
+  tabsize=2, % sets default tabsize to 2 spaces
+  morekeywords={type,forall,let,rec,in,fun},
+  otherkeywords={->},
+  morecomment=[l]{--},
+  morestring=[b]", % 'b' means inside a string delimiters are escaped by a backslash.
+  morestring=[b]',
 }
 
-\lstset{style=f2j}
+\lstset{style=fi}
 
 % Copied from the FCore paper:
 \usepackage[colorlinks=true,allcolors=black,breaklinks,draft=false]{hyperref}   % hyperlinks, including DOIs and URLs in bibliography
