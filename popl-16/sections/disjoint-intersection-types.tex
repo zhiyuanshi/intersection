@@ -100,8 +100,30 @@ The two types are not disjoint since $\tyint \to \tyint$ is their common superty
   \label{fig:fi-syntax-dis}
 \end{figure}
 
+\begin{figure}
+  \framebox{$\im A = T$}
+
+  \begin{align*}
+    \im \bot                  &= () \\
+    \im {\fordis \alpha A B}  &= \for \alpha \im B \\
+  \end{align*}
+
+  \framebox{$\im \Gamma = G$}
+
+  \begin{align*}
+    \im {\Gamma, \alpha \disjoint A} &= \im \Gamma, \alpha \\
+  \end{align*}
+
+  \caption{Additional type and context translation.}
+  \label{fig:additional-type-and-context-translation}
+\end{figure}
+
+\george{May also note on the scoping of type variables inside contexts.}
+
 Figure~\ref{fig:fi-syntax-dis} shows the updated syntax with the
-changes highlighted.  Note how similar the changes are to those needed
+changes highlighted and Figure~\ref{fig:additional-type-and-context-translation}
+shows type and context translations for the new constructs.
+Note how similar the changes are to those needed
 to extend System $F$ with bounded quantification. First, type
 variables are now always associated with their disjointness
 constraints (like $\alpha \disjoint A$) in types, terms, and
