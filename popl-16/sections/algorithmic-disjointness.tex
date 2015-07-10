@@ -143,13 +143,13 @@ Figure~\ref{fig:disjointness}, which consists of two judgements.
 
 \paragraph{Main judgement} The judgement $\jdisimpl \Gamma A B$ says
 two types $A$ and $B$ are disjoint in a context
-$\Gamma$. 
+$\Gamma$.
 
 \reflabel{\labeldisvar} is the base rule and
 \reflabel{\labeldissym} is its twin rule. Both rules state that a
 type variable is disjoint to some type $A$, if $\Gamma$ contains a
 corresponding disjointness constraint. The \reflabel{\labeldissym}
-rule is needed because disjointness is a symetric relation.
+rule is needed because disjointness is a symmetric relation.
 
 The rules dealing with intersection types (\reflabel{\labeldisinterl}
 and \reflabel{\labeldisinterr}) are quite intuitive. The intuition is
@@ -178,14 +178,14 @@ types are disjoint or not: only the return types matter.
 The rule for disjoint quantification (\reflabel{\labeldisforall}) is
 also interesting. Consider the following two types:
 \[ (\forall (\alpha * \tyint).~\tyint \& \alpha) \qquad (\forall (\alpha * \tychar). ~\tychar \& \alpha) \]
-The question is under which conditions are those two types disjoint. 
+The question is under which conditions are those two types disjoint.
 In the first type $\alpha$ cannot be instantiated with $\tyint$ and in
-the second case $\alpha$ cannot be instantiated with $\tychar$. 
+the second case $\alpha$ cannot be instantiated with $\tychar$.
 Therefore we can see that for the two bodies to be considered
 disjoint, $\alpha$ cannot be instantiated with either $\tyint$ or
 $\tychar$. The rule for disjoint quantification captures this fact by
-requiring the bodies of disjoint quantification to be checked for 
-disjointness under both constraints. 
+requiring the bodies of disjoint quantification to be checked for
+disjointness under both constraints.
 
 Finally, the rule \reflabel{\labeldisax} says two types are considered disjoint if they are
 judged to be disjoint by the axiom rules, which are explained below.

@@ -3,10 +3,14 @@
 
 \paragraph{Coherent intersection types.}
 
-Reynolds~\ref{reynolds1991coherence} proved coherence in a language with
+Reynolds~\cite{reynolds1991coherence} proved coherence in a language with
 intersection types based on lambda-calculus. But his language does not support
-quantification. To the best of our knowledge, this is the only work that deals
-with the coherence problem in languages having intersection types.
+quantification. Pierce~\cite{pierce1991programming2} made a comprehensive review
+of coherence, especially on Curien and Ghelli~\cite{curienl1990coherence} and
+Reynolds' methods of proving coherence; but he was not able to prove coherence
+for his $F_\wedge$ calculus. He introduced a primitive $\code{glue}$ function as
+a language extension which corresponds to our merge operator. However, in his
+system users can ``glue'' two arbitrary values, which can lead to incoherence.
 
 % \url{http://homepages.inf.ed.ac.uk/gdp/publications/Sub_Par.pdf}
 
@@ -82,8 +86,7 @@ al.~\cite{coppo1981functional}. As emphasized throughout the paper our
 work is inspired by Dunfield~\cite{dunfield2014elaborating}. He described a similar approach to ours:
 compiling a system with intersection types into ordinary $ \lambda $-calculus
 terms. The major difference is that his system does not include parametric
-polymorphism, while ours does not include unions. Besides, our rules are
-algorithmic and we formalize a record system.
+polymorphism, while ours does not include unions.
 % Although similar in spirit,
 % our elaboration typing is simpler: we require subtyping in the case of
 % applications, thus avoiding the subsumption rule. Besides, our treatment
