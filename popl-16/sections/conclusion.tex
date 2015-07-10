@@ -1,10 +1,42 @@
 \section{Conclusion and Future Work}
 \label{sec:conclusion}
 
-We have described a System $F$-based language that combines subtyping,
-polymorphism, and intersection types. The language has also a term-level
-introduction form for intersection types. We have proved that the language is
-type-safe and coherent.
+This paper described \name: a System $F$-based language that combines 
+intersection types, parametric polymorphism and a merge operator. 
+The language is proved to be type-safe and coherent. 
+To ensure coherence the type system accepts only
+disjoint intersections. To provide flexibility in the presence of parametric polymorphism, 
+universal quantification is extended with
+disjointness constraints. We believe that disjoint intersection types
+and disjoint quantification are intuitive, and at the same time
+expressive. 
+
+We implemented the core functionalities of the \name as part of a JVM-based
+compiler. Based on the type system of \name, we have built an ML-like
+source language compiler that offers interoperability with Java (such as object
+creation and method calls). The source language is loosely based on the more
+general System $F_{\omega}$ and supports a
+number of other features, including records, mutually recursive
+\code{let} bindings, type aliases, algebraic data types, pattern matching, and
+first-class modules that are encoded using \code{letrec} and records.
+
+For the future, we intend to improve our source language
+and show the power of disjoint intersection types and disjoint
+quantification in large case studies. 
+We are also interested in extending our work 
+to systems with a $\top$ type. This will also require an adjustment 
+to the notion of disjoint types. A suitable notion of
+disjointness between two types $A$ and $B$ in the presence of $\top$ 
+would be to require that the only common supertype of $A$ and $B$ is $\top$.
+Finally we would like to study the
+addition of union types. This will also require changes in our
+notion of disjointness, since with union types there always exists
+a type $A \union B$, which is the common supertype of two
+types $A$ and $B$. 
+
+\begin{comment}
+Some immediate topics for
+further improvement of the results in this paper are discussed next.
 
 \paragraph{Union types.}
 
@@ -25,6 +57,7 @@ conjecture that such system cannot be coherent.
 \bruno{I wouldn't say this is a motivation: it sounds like we caould
   not support union types, when I think this is not true. For example
 we could say something like: there does not exist an \emph{atomic} C ...}
+
 
 \paragraph{Implementation.}
 
@@ -56,6 +89,7 @@ collectively turn source programs into System $F$:
 
 Phase 3 is what we have formalized in this paper.
 
+
 \paragraph{Reduce the number of coercions.}
 
 Our translation inserts a coercion (many of them are identity functions)
@@ -68,3 +102,4 @@ translation so that the unwanted identity functions are not introduced during
 the translation. Besides, since the order of the two types in a binary
 intersection does not matter, we may normalise them to avoid unnecessary
 coercions.
+\end{comment}
