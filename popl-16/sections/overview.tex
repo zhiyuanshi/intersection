@@ -70,7 +70,7 @@ two values to be merged in a single intersection type. For example, an
 implementation of \lstinline{x} is constructed in \name as follows:
 
 \begin{lstlisting}
-let x : Int & Char = 1 ,, 'c' in (*$ \ldots $*)
+let x : Int & Char = 1,,'c' in (*$ \ldots $*)
 \end{lstlisting}
 
 \noindent In \name (following Dunfield's notation), the
@@ -114,7 +114,7 @@ not straightforward anymore to see the result. For example, what
 should be the result of this program, which asks for an integer out of
 a merge of two integers:
 \begin{lstlisting}
-(fun (x: Int) (*$ \to $*) x) (1 ,, 2)
+(fun (x: Int) (*$ \to $*) x) (1,,2)
 \end{lstlisting}
 Should the result be $1$ or $2$?
 
@@ -168,12 +168,12 @@ be to require that, given two types $A$ and $B$, both types are not
 subtypes of each other. Thus, denoting disjointness as $A * B$, we would have:
 \[A * B \equiv A \not<: B \wedge B \not<: A\]
 At first sight this seems a reasonable definition and it does prevent
-merges such as \lstinline{1 ,, 2}. However some moments of thought are enough to realize that
+merges such as \lstinline{1,,2}. However some moments of thought are enough to realize that
 such definition does not ensure disjointness. For example, consider
 the following merge:
 
 \begin{lstlisting}
-((1 ,, 'c') ,, (2 ,, True))
+((1,,'c') ,, (2,,True))
 \end{lstlisting}
 
 \noindent This merge has two components which are also intersection
@@ -240,7 +240,7 @@ this function is problematic.  The reason is that when
 types, then uses of \lstinline{fst} may lead to incoherence.
 For example, consider the following use of \lstinline{fst}:
 \begin{lstlisting}
-fst Int Int (1 ,, 2)
+fst Int Int (1,,2)
 \end{lstlisting}
 \noindent This program is clearly incoherent as both
 $1$ and $2$ can be extracted from the merge and still match the type
@@ -256,16 +256,12 @@ rightmost value in a merge when multiple values of same type exist.
 Intuitively, it would appear that the result of the use of
 \lstinline{fst} above is $2$. Indeed simple equational reasoning
 seems to validate such result:
-
-\vspace{5pt}
-\noindent$fst~Int~Int~(1,,2)$\\
-$\equiv\{\text{definition of}~fst\}$\\
-$(\lambda (z : Int). z) (1,,2)$\\
-$\equiv\{\text{implicit coercion (biased to the right)}\}$\\
-$(\lambda (z : Int). z)~2$\\
-$\equiv\{\beta\text{-reduction}\}$\\
-$2$
-\vspace{5pt}
+\begin{lstlisting}
+   fst Int Int (1,,2)
+(*$ \rightsquigarrow $*) (fun (z: Int) (*$ \to $*) z) (1,,2) -- (* \textnormal{By the definition of \code{fst}} *)
+(*$ \rightsquigarrow $*) (fun (z: Int) (*$ \to $*) z) 2      -- (* \textnormal{Right-biased implicit coecion} *)
+(*$ \rightsquigarrow $*) 2                          -- (* \textnormal{By $\beta$-reduction} *)
+\end{lstlisting}
 
 However (assumming a straightforward implementation of right-biased
 choice) the result of the program would be 1! The reason for this has
@@ -469,13 +465,13 @@ merge denoted by $x$ is disjoint for all valid instantiations of $A$ and $B$.
 The nice thing about this solution is that many uses of $fst$ are accepted.
 For example, the following use of $fst$:
 \begin{lstlisting}
-fst Int Char (1 ,, 'c')
+fst Int Char (1,,'c')
 \end{lstlisting}
 is accepted since $Int$ and $Char$ are disjoint, thus satisfying the constraint
 on the second type parameter of $fst$.
 However, problematic uses of $fst$ are rejected. For example:
 \begin{lstlisting}
-fst Int Int (1 ,, 2)
+fst Int Int (1,,2)
 \end{lstlisting}
 is rejected because $Int$ is not disjoint with $Int$, thus failing to satisfy the
 disjointness constraint on the second type parameter of $fst$.

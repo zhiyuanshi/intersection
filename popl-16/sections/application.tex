@@ -76,7 +76,7 @@ The standard typed Church encoding ~\cite{BoehmBerarducci} for arithmetic expres
 denoted as the type \lstinline{CExp}, is:
 
 \begin{lstlisting}
-type CExp = forall E. (Int (*$ \to $*) E) (*$ \to $*) (E (*$ \to $*) E (*$ \to $*) E) (*$ \to $*) E
+type CExp = (*$ \forall $*)E. (Int (*$ \to $*) E) (*$ \to $*) (E (*$ \to $*) E (*$ \to $*) E) (*$ \to $*) E
 \end{lstlisting}
 
 \noindent However, as done in various solutions to extensibility, it is better to break
@@ -101,7 +101,7 @@ component abstracts over the type of addition expressions
 The second part, which is the actual type of the Church encoding, is:
 
 \begin{lstlisting}
-type Exp = {accept : (*$ \Lambda $*)E. ExpAlg[E] (*$ \to $*) E} in (*$ \ldots $*)
+type Exp = { accept: (*$ \Lambda $*)E. ExpAlg[E] (*$ \to $*) E } in (*$ \ldots $*)
 \end{lstlisting}
 
 \noindent It should be clear that, modulo some refactoring, and the
@@ -149,7 +149,7 @@ implementing \lstinline{ExpAlg} is defined as follows:
 
 \begin{lstlisting}
 let evalAlg: ExpAlg[IEval] = {
-  lit = fun (x: Int) (*$ \to $*) {eval = x},
+  lit = fun (x: Int) (*$ \to $*) { eval = x },
   add = fun (x: IEval) (y: IEval) (*$ \to $*) {
     eval = x.eval + y.eval
   }
@@ -185,7 +185,7 @@ relate to the original datatypes. We discuss the two topics next.
 
 \begin{lstlisting}
 type SubExpAlg[E] = ExpAlg[E] & { sub: E (*$ \to $*) E (*$ \to $*) E } in
-type SubExp = { accept: fun A. SubExpAlg[A] (*$ \to $*) A } in
+type SubExp = { accept: (*$ \forall $*)A (*$ \to $*) SubExpAlg[A] (*$ \to $*) A } in
 let sub (e1: SubExp) (e2: SubExp): SubExp = {
   accept = (*$ \Lambda $*)E (*$ \to $*) fun (f : SubExpAlg[E]) (*$ \to $*)
   f.sub (e1.accept[E] f) (e2.accept[E] f)
@@ -264,12 +264,14 @@ is modeled as:
     type IPrint = { print : String } in (*$ \ldots $*)
   \end{lstlisting}
 \end{comment}
-\lstinputlisting[linerange=35-35]{../src/ObjectAlgebra.sf} % APPLY:linerange=OA_IPRINT
+\begin{lstlisting}
+type IPrint = { print: String } in (*$ \ldots $*)
+\end{lstlisting}
 The implementation of pretty printing for expressions that support literals,
 addition, and subtraction is:
 
 \begin{lstlisting}
-let printAlg : SubExpAlg[IPrint] = {
+let printAlg: SubExpAlg[IPrint] = {
   lit = fun (x: Int) (*$ \to $*) {
     print = x.toString()
   },
@@ -341,7 +343,7 @@ With \lstinline{combine} printing and evaluation of expressions with
 subtraction is done as follows:
 
 \begin{lstlisting}
-let newAlg : ExpAlg[IEval&IPrint] =
+let newAlg: ExpAlg[IEval&IPrint] =
     combine[IEval,IPrint] evalAlg printAlg in
 let o = five.accept[IEval&IPrint] newAlg in
 o.print ++ " = " ++ o.eval.toString()
