@@ -36,18 +36,17 @@ By induction.
 
   \item Case
   \begin{flalign*}
-    & \rulewfinter &
+    & \rulewfinterdis &
   \end{flalign*}
 
-  Let $C$ in the statement of this lemma be $E_1 \inter E_2$.
-  By the condition we know
-  \[ \jwf {\Gamma, \alpha \disjoint B} {E_1 \inter E_2} \]
-  Thus we must have,
-  \[ \jwf {\Gamma, \alpha \disjoint B} {E_1} \]
-  By the i.h., $\jwf \Gamma {\subst A \alpha {E_1}}$ and similarly $\jwf \Gamma {\subst A \alpha {E_2}}$. By \reflabel{\labelwfinter},
-  \[ \jwf \Gamma {\subst A \alpha {E_1} \inter \subst A \alpha {E_2}} \]
-  and hence
-  \[ \jwf \Gamma {\subst A \alpha {(E_1 \inter E_2)}} \]
+  Let $C$ in the statement of this lemma be $C_1 \inter C_2$. By the condition
+  we know \[ \jwf {\Gamma, \alpha \disjoint B} {C_1 \inter C_2} \] Thus we must
+  have, \[ \jwf {\Gamma, \alpha \disjoint B} {C_1} \] By the i.h., $\jwf \Gamma
+  {\subst A \alpha {C_1}}$ and similarly $\jwf \Gamma {\subst A \alpha {C_2}}$.
+  Note that $\ftv {C_1} \cap \ftv {C_2} = \varnothing $. Otherwise $C_1$ and
+  $C_2$ cannot be disjoint. By \reflabel{\labelwfinter}, \[ \jwf \Gamma {\subst
+  A \alpha {C_1} \inter \subst A \alpha {C_2}} \] and hence \[ \jwf \Gamma
+  {\subst A \alpha {(C_1 \inter C_2)}} \]
 
 \end{itemize}
 \end{proof}
@@ -58,7 +57,7 @@ By induction.
 \begin{proof}
   By induction on the derivation of $\jtype \Gamma e A$. The case of \reflabel{\labelttapp} needs special attention
   \begin{mathpar}
-    \rulettapp
+    \rulettappdis
   \end{mathpar}
   because we need to show that the result of substitution ($\subst A \alpha C$) is well-formed, which is evident by Lemma~\ref{lemma:instantiation}.
 \end{proof}

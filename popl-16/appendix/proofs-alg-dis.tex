@@ -1,17 +1,22 @@
 \subsection{Soundness and Completeness of Algorithmic Disjointness}
 
-Some ways to rule out the possibility of disjointness.
-
-\begin{itemize}
-  \item If one type is a subtype of the other, then they cannot be disjoint.
-  \item If the set of free type variables of two types overlap, then they cannot
-  be disjoint.
-\end{itemize}
+% Some ways to rule out the possibility of disjointness.
+%
+% \begin{itemize}
+%   \item If one type is a subtype of the other, then they cannot be disjoint.
+%   \item If the set of free type variables of two types overlap, then they cannot
+%   be disjoint.
+% \end{itemize}
 
 \begin{lemma}
   If $A$ and $B$ are two types and $\ftv A \cap \ftv B \neq \varnothing$, then
-  there does not exist a $\Gamma$ such that $\jdis \Gamma A B$.
+  $A$ and $B$ cannot be disjoint.
 \end{lemma}
+
+\begin{proof}
+  Let $\alpha \in \ftv A \cap \ftv B$. Then by the subtyping rules we can show
+  that $A \subtype \alpha$ and $B \subtype \alpha$.
+\end{proof}
 
 \begin{theorem}
   If $A \subtype C$, then $A \inter B \subtype C$.
@@ -47,6 +52,10 @@ Some ways to rule out the possibility of disjointness.
   then $\jdis \Gamma {A \inter B} {C}$.
 \end{theorem}
 
+\begin{proof}
+  Straightforward proof by contradiction.
+\end{proof}
+
 \begin{lemma}
   \label{lemma:common-supertype}
 
@@ -81,10 +90,8 @@ Some ways to rule out the possibility of disjointness.
 \algodissoundness*
 
 \begin{proof}
-  \george{State the definition of disjointness more clearly in the text.}
-
-  We need to show that $A$ and $B$ are disjoint in $\Gamma$. The proof is by
-  induction on the derivation of $\jdisimpl \Gamma A B$.
+  By induction on the derivation of $\jdisimpl \Gamma A B$. The interesting
+  cases are:
 
   \begin{itemize}
     \item Case
@@ -95,9 +102,9 @@ Some ways to rule out the possibility of disjointness.
     Suppose the contrary. Then by the definition of disjointness, there exists a
     type $B$ such that $\alpha \subtype B$ and $A \subtype B$. By
     Lemma~\ref{lemma:subtype-ftv-var}, $\alpha \in \ftv B$. Since $A \subtype
-    B$, we also have $\alpha \in \ftv B \subseteq \ftv A$ due to
-    Lemma~\ref{lemma:subtype-ftv}. But by the typing rules, we know $\alpha \not
-    \in \ftv A$. Contradiction. \\
+    B$, we also have $\ftv B \subseteq \ftv A$ due to
+    Lemma~\ref{lemma:subtype-ftv}, and thus $\alpha \in \ftv A$. But by the
+    typing rules, we know $\alpha \not \in \ftv A$. Contradiction. \\
 
     \item Case
     \begin{flalign*}
@@ -147,14 +154,7 @@ Some ways to rule out the possibility of disjointness.
       & \ruledisinterr &
     \end{flalign*}
 
-    By Lemma~\ref{lemma:disjoint-intersect}, Lemma~\ref{lemma:symmetry-of-disjointness}, and the i.h. \\
-
-    \item Case
-    \begin{flalign*}
-      & \ruledisatomic &
-    \end{flalign*}
-
-    By straightforwardly checking the subtyping rules.
+    By Lemma~\ref{lemma:disjoint-intersect}, Lemma~\ref{lemma:symmetry-of-disjointness}, and the i.h.
 
     % Need to show ...
     % By unfolding the definition of disjointness
@@ -172,22 +172,21 @@ Some ways to rule out the possibility of disjointness.
 
 \begin{proof}
 
-  Consider the combinations of the shape of $A$ and $B$. If $A$ and $B$ are of
+  Consider the shapes of $A$ and $B$. If $A$ and $B$ are of
   different shape and neither of them is an intersection type, then by the
   disjoint axioms we already can conclude that $A \disjointax B$. Thus by
-  \reflabel{\labeldisax}, $\jdisimpl \Gamma A B$. The other cases are as
-  follow.
+  \reflabel{\labeldisax}, $\jdisimpl \Gamma A B$. The other interesting cases are:
 
   \begin{itemize}
-    \item Case $A = \bot$:
-    \begin{itemize}
-      \item Case $B = \bot$: Immediate, by \reflabel{\labeldisaxbotbot}.
-
-      \item Case $B = B_1 \inter B_2$: Need to show $\jdis \Gamma \bot {B_1}
-      \inter B_2$ implies $\jdisimpl \Gamma \bot {B_1 \inter B_2}$. Apply
-      \reflabel{\labeldisinterr} and the resulting conditions can be proved by
-      the i.h.
-    \end{itemize}
+    % \item Case $A = \bot$:
+    % \begin{itemize}
+    %   \item Case $B = \bot$: Immediate, by \reflabel{\labeldisaxbotbot}.
+    %
+    %   \item Case $B = B_1 \inter B_2$: Need to show $\jdis \Gamma \bot {B_1}
+    %   \inter B_2$ implies $\jdisimpl \Gamma \bot {B_1 \inter B_2}$. Apply
+    %   \reflabel{\labeldisinterr} and the resulting conditions can be proved by
+    %   the i.h.
+    % \end{itemize}
 
     \item Case $A = A_1 \to A_2$:
 
