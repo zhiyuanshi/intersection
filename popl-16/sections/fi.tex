@@ -4,16 +4,16 @@
 This section presents the syntax, subtyping, typing, as well as the
 (incoherent) semantics of \name: a calculus with intersection types,
 parametric polymorphism and a merge
-operator. Section~\ref{sec:disjoint} shows the necessary changes to
-this calculus for supporting disjoint intersection types and disjoint
-quantificantion.
-\bruno{I liked the name that you gave this
-  intermediate calculus before. It is confusing to have the same name
-  for both calculus.}
+operator. This calculus borrows key ideas from Dunfield's
+calculus~\cite{dunfield2014elaborating}, but is extended with parametric polymorphism. Like Dunfield calculus
+\name is type-safe, but it has an incoherent semantics. 
+Section~\ref{sec:disjoint} introduces \namedis, which shows the necessary changes to
+for supporting disjoint intersection types and disjoint
+quantification and ensuring coherence.
 
 \subsection{Syntax}
 
-Figure~\ref{fig:fi-syntax} shows the syntax of \name. The differences with
+Figure~\ref{fig:fi-syntax} shows the syntax of \name. The differences to
 System $F$, highlighted in gray, are intersection types $A \inter B$ at the
 type-level and the ``merges'' $e_1 \mergeop e_2$ at the term level.
 
@@ -165,7 +165,7 @@ Figure~\ref{fig:fi-type}. In addition to the standard rules,
 the bottom part of the figure. Again, the reader is advised to ignore the
 gray-shaded part here, as these parts will be explained later. The typing judgement is
 of the form: \[ \jtype \Gamma e A \] It reads: ``in the typing context $\Gamma$,
-the term $e$ is of type $A$'' The rules that are the same as in System $F$ are
+the term $e$ is of type $A$''. The rules that are the same as in System $F$ are
 rules for variables \reflabel{\labeltvar}, lambda abstractions
 \reflabel{\labeltlam}, and type applications \reflabel{\labelttapp}. For the
 ease of discussion, in \reflabel{\labeltblam}, we require the type variable
@@ -289,7 +289,9 @@ parameter and return types by $\eta$-expanding $f$ to $\lamty x {\im {A_3}}
 \reflabel{\labelsubinterl} and \reflabel{\labelsubinterr} reuse the coercion
 from the premises and create new ones that cater to the changes of the argument
 type in the conclusions. Note that the two rules are overlapping and
-hence a program can be elaborated differently, depending on which rule is used.
+hence a program can be elaborated differently, depending on which rule
+is used. Finally, all rules produce type-correct coercions:
+
 %But in the implementation one usually applies the rules sequentially with
 %pattern matching, essentially defining a deterministic order of lookup.
 
@@ -314,6 +316,9 @@ hand side of $\yields {}$. The translation ensures that $E$ has type $\im A$. In
 not in System $F$. To account for this difference, in \reflabel{\labeltapp}, the
 coercion $E$ from the subtyping relation is applied to the argument.
 \reflabel{\labeltmerge} straighforwardly translates merges into pairs.
+
+The type-directed translation is type-safe. This property is captured
+by the following two theorems.
 
 \begin{restatable}[Type preservation]{theorem}{typepreservation}
   \label{theorem:type-preservation}
