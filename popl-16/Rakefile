@@ -23,8 +23,8 @@ task(:paper => :clean) { system(latexmk_cmd("paper")) }
 desc "Embed code from external files into LaTeX source"
 task(:embed_code) { system("ruby scripts/compute_positions.rb") }
 
-desc "Generate the PDF for supplementary materials"
-task(:supp) { system(latexmk_cmd("supplementary_materials"))}
+desc "Generate the PDF of paper-no-appendix"
+task(:paperna => :clean) { system(latexmk_cmd("paper-no-appendix")) }
 
 desc "Clean"
 task(:clean => :git_clean) { system("latexmk -c") }
