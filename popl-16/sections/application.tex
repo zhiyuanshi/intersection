@@ -15,7 +15,7 @@ behind those solutions.
 In this section we show a solution to the
 Expression Problem that intends to capture the key ideas of various
 solutions in the literature. Moreover, it is shown how \emph{all the
-  features} of \name (intersection types, the merge operator,
+  features} of \namedis (intersection types, the merge operator,
 parametric polymorphism and disjoint quantification) are needed to
 properly encode one important combinator~\cite{oliveira2013feature} used to compose
 multiple operations over datatypes.
@@ -23,11 +23,11 @@ multiple operations over datatypes.
 \begin{comment}
 The combination of parametric polymorphism, intersection types and the
 merge operator is useful to encode datatypes with subtyping and
-support extensibility in \name. The combination of
+support extensibility in \namedis. The combination of
 polymorphism and the merge operator is essential to allow the
 composition of multiple operations over datatypes.
 In the following
-we present a step-by-step solution to the Expression Problem in \name,
+we present a step-by-step solution to the Expression Problem in \namedis,
 and illustrate how to combine multiple operations.
 \end{comment}
 
@@ -55,10 +55,10 @@ be encoded in Scala, the encoding fundamentally relies in low-level
 programming techniques such as dynamic proxies, reflection or
 meta-programming.
 
-Because \name supports a \lstinline{merge} operator natively, dynamic
+Because \namedis supports a \lstinline{merge} operator natively, dynamic
 object algebra composition becomes easy to encode. The remainder of
 this section shows how object algebras and object algebra composition
-can be encoded in \name. We will illustrate this point
+can be encoded in \namedis. We will illustrate this point
 step-by-step by solving the Expression Problem.
 %%Prior knowledge of object algebras is not assumed.
 \end{comment}
@@ -91,7 +91,7 @@ type ExpAlg[E] = {
 
 \noindent The first part, captured by the type \lstinline{ExpAlg[E]}
 is constitutes the so-called algebra of the datatype. For additional
-clarity of presentation, records (supported in the implementation of \name)
+clarity of presentation, records (supported in the implementation of \namedis)
 are used to capture the two components of the algebra.
 The first component abstracts over the type of the
 constructor for literal expressions ($\tyint \to E$). The second
@@ -240,7 +240,7 @@ original datatype.
 In the particular case of expressions \lstinline{Exp} (the original and smaller
 datatype) is a subtype of \lstinline{SubExp} (the larger and extended
 datatype). Because of this subtyping relation, writting the following
-expression is valid in \name:
+expression is valid in \namedis:
 
 \begin{lstlisting}
 let three : SubExp = sub five (lit 2)
@@ -311,7 +311,7 @@ operator~\cite{oliveira2013feature,rendel14attributes}.
 Unfortunatelly, the Scala encoding of the merge operator is quite complex as
 it relies on low-level type-unsafe programming features such as
 dynamic proxies, reflection or other meta-programming techniques.
-In \name there is no need for such hacky encoding, as the
+In \namedis there is no need for such hacky encoding, as the
 merge operator is nativelly supported. Therefore the combinator for
 composing algebras is implemented much more elegantly.
 The combinator is defined by the \lstinline$combine$ function, which takes two object algebras to create
@@ -329,7 +329,7 @@ let combine (*$ \alpha $*) ((*$ \beta $*) * (*$ \alpha $*)) (f: ExpAlg[(*$ \alph
 \end{lstlisting}
 
 Note how \lstinline{combine} requires all the interesting
-features of \name. Parametric polymorphism is needed because
+features of \namedis. Parametric polymorphism is needed because
 \lstinline{combine} must compose algebras with arbitrary type
 parameters. Intersection types are needed because the resulting
 algebra will create values with an intersection type composing
