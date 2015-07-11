@@ -30,16 +30,16 @@ well-suited to \name.
 
 \begin{definition}[Disjoint types]
   Given a type enviroment $\Gamma$ and two types $A$ and $B$. The two types are said to be disjoint
-  ($\Gamma \vdash A * B$) if they do not share a common supertype. That is, there does not exist a
-  type $C$ such that $\Gamma \vdash A \subtype C$
-  and that $\Gamma \vdash B \subtype C$: \footnote{
+  ($\jdis \Gamma A B$) if they do not share a common supertype. That is, there does not exist a
+  type $C$ such that $A \subtype C$
+  and that $B \subtype C$: \footnote{
   The definition of disjointness can also be adapted to type systems with a top
   type (such as \lstinline@Object@ in many OO languages): Two types $A$ and $B$
   are \emph{disjoint} if: the fact that $C$ is a commmon supertype of theirs
   implies $C$ is the top type.
   }
 
-\[\Gamma \vdash A * B \equiv \not\exists C.~\Gamma \vdash A <: C \wedge \Gamma \vdash B <: C\]
+\[\jdis \Gamma A B \equiv \not \exists C.~A \subtype C \wedge B \subtype C\]
 
 \noindent Note that any free variables in $A$, $B$ or $C$ must be bound in $\Gamma$.
 
