@@ -239,7 +239,7 @@ original datatype.
 
 In the particular case of expressions \lstinline{Exp} (the original and smaller
 datatype) is a subtype of \lstinline{SubExp} (the larger and extended
-datatype). Because of this subtyping relation, writting the following
+datatype). Because of this subtyping relation, writing the following
 expression is valid in \namedis:
 
 \begin{lstlisting}
@@ -312,7 +312,7 @@ Unfortunatelly, the Scala encoding of the merge operator is quite complex as
 it relies on low-level type-unsafe programming features such as
 dynamic proxies, reflection or other meta-programming techniques.
 In \namedis there is no need for such hacky encoding, as the
-merge operator is nativelly supported. Therefore the combinator for
+merge operator is natively supported. Therefore the combinator for
 composing algebras is implemented much more elegantly.
 The combinator is defined by the \lstinline$combine$ function, which takes two object algebras to create
 a combined algebra. It does so by constructing a new algebra

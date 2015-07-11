@@ -223,7 +223,7 @@ the interaction between parametric polymorphism and intersection types.
 %restrictive in the programs that can be accepted.
 \begin{comment}
 Dunfield~\cite{} provides a
-good illustrative example of the issues that arize when combining
+good illustrative example of the issues that arise when combining
 disjoint intersection types and parametric polymorphism:
 \[\lambda x. {\bf let}~y = 0 \mergeop x~{\bf in}~x\]
 \end{comment}
@@ -250,7 +250,7 @@ of the first argument of \lstinline{fst}.
 \paragraph{Biased choice breaks equational reasoning.} At first sight, one option
 to workaround the issue incoherence would be to bias the type-based merge lookup
 to the left or to the right (as discussed in
-Section~\ref{subsec:incoherence}). Unfortunatelly, biased choice is
+Section~\ref{subsec:incoherence}). Unfortunately, biased choice is
 very problematic when parametric polymorphism is present in the language.
 To see the issue, suppose we chose to always pick the
 rightmost value in a merge when multiple values of same type exist.
@@ -283,7 +283,7 @@ left-component (\lstinline$1$) is also picked up, even though in this case \lsti
 is the rightmost integer in the merge. Clearly this is inconsistent
 with the biased choice!
 
-Unfortunatelly this subtle interaction of polymorphism and type-based lookup
+Unfortunately this subtle interaction of polymorphism and type-based lookup
  means that equational reasoning is broken!
 In the equational reasoning steps above, doing apparently correct
 substitutions lead us to a wrong result. This is a major problem for
@@ -296,7 +296,7 @@ is simply to reject programs where the
 instantiations of type variables may lead to incoherent programs.
 In this case the definition of $fst$ would be rejected, since there
 are indeed some cases that may lead to incoherent programs.
-Unfortunatelly this is too restrictive and prevents many useful
+Unfortunately this is too restrictive and prevents many useful
 programs using both parametric polymorphism and intersection types.
 In particular, in the case of \lstinline{fst}, if the two type
 parameters are used with two disjoint intersection
@@ -351,7 +351,7 @@ val newAB : A with B = new A with B
 \begin{lstlisting}
 def merge[A,B] (x: A) (y: B) : A with B = ...
 \end{lstlisting}
-uses the annonymous intersection of two type parameters \lstinline{A} and
+uses the anonymous intersection of two type parameters \lstinline{A} and
 \lstinline{B}. However, in Scala it is not possible to dynamically
 compose two objects. For example, the following code:
 
@@ -369,8 +369,8 @@ definition \lstinline{newAB} both \lstinline{A} and \lstinline{B} are
 
 This limitation essentially put intersection types in Scala in a second-class
 status. Although \lstinline{merge} returns an intersection type, it is
-hard to actually build values with such types. In essense an
-object-level introduction contruct for intersection types is missing.
+hard to actually build values with such types. In essence an
+object-level introduction construct for intersection types is missing.
 As it turns out using low-level type-unsafe programming features such
 as dynamic proxies, reflection or other meta-programming techniques,
 it is possible to implement such an introduction
@@ -420,8 +420,8 @@ Then we have the following equational reasoning:
 \begin{lstlisting}
 fst Int Int (1,,2) => (\(y : Int). y) (1,,2)
 \end{lstlisting}
-If we favour the second item, the program seems to evaluate to $2$. But in
-reality, the result is $2$. No matter we favour the first or the second item,
+If we favor the second item, the program seems to evaluate to $2$. But in
+reality, the result is $2$. No matter we favor the first or the second item,
 we can always construct a program such that for that program, equational
 reasoning is broken.
 

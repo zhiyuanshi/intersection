@@ -48,15 +48,15 @@ essence of various solutions to extensibility problems.
 Dunfield calculus seems to provide a good basis for a foundational
 calculus for studying extensibility.  However, his calculus is still
 insufficient for studying extensibility for two different reasons.  Firstly it does not
-support parametric polymorhism. This is a pressing limitation because
+support parametric polymorphism. This is a pressing limitation because
 type-theoretic encodings of datatypes fundamentally rely on parametric
 polymorphism.  Secondly, and more importantly, while Dunfield calculus
 is type-safe, it lacks the property of \emph{coherence}: different
 derivations for the same expression can lead to different results. The
-lack of coherence is an important disavantage for adoption of his core
+lack of coherence is an important disadvantage for adoption of his core
 calculus in implementations of programming languages, as the semantics
 of the programming language becomes implementation dependent.
-Moreover, from the theoretic point-of-view, the ambiguity that arizes
+Moreover, from the theoretic point-of-view, the ambiguity that arises
 from the lack of coherence makes the calculus unsatisfying when the
 goal is to precisely capture the essence of solutions to
 extensibility.
@@ -102,7 +102,7 @@ We also investigate how to do type-theoretic encodings of datatypes in
 \name. In particular it is shown that extensions of datatype
 encodings have subtyping relations with the datatype they
 extend. Moreover, it is possible to reuse code from the operations on
-the original datatype and consequentely solve the Expression Problem.
+the original datatype and consequently solve the Expression Problem.
 Finally, it is shown how \emph{all the features} of \name
 (intersection types, the merge operator, parametric polymorphism and
 disjoint quantification) are needed to properly encode one important

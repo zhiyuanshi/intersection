@@ -244,9 +244,9 @@ overlap with the right decomposition rules for intersections (\reflabel{\labelsu
 
 \end{enumerate}
 
-\noindent Fortunatelly, disjoint intersections (which are enforced by well-formedness)
+\noindent Fortunately, disjoint intersections (which are enforced by well-formedness)
 deal with problem 1): only one of the two left decomposition rules
-can be chosen for a disjoint instersection type. Since the two types in the intersection
+can be chosen for a disjoint intersection type. Since the two types in the intersection
 are disjoint it is impossible that both of the preconditions of the left decompositions are satisfied
 at the same time. More formally, with disjoint intersections, we have the following theorem:
 
@@ -272,7 +272,7 @@ $A_3$ is atomic. The consequence of this requirement is that when $A_3$ is an in
 the only rule that can be applied is \reflabel{\labelsubinter}.
 With the atomic constraint, one can guarantee that at any moment during the
 derivation of a subtyping relation, at most one rule can be used.
-Consequentely, the coercion of a subtyping relation $A \subtype B$ is uniquely determined.
+Consequently, the coercion of a subtyping relation $A \subtype B$ is uniquely determined.
 This fact is captured by the following lemma:
 
 \begin{restatable}[Unique coercion]{lemma}{uniquecoercion}
@@ -314,7 +314,7 @@ is easy to determine if two base types are disjoint. For example, $\tyint$
 and $\tyint$ are not disjoint. Neither do $\tyint$ and $\code{Nat}$.
 Also, types built with different constructors are disjoint. For example,
 $\tyint$ and $\tyint \to \tyint$. For function types, disjointness
-is harder to visualise. But bear in the mind that disjointness can defined by
+is harder to visualize. But bear in the mind that disjointness can defined by
 the very requirement that the theorem holds.
 
 
