@@ -72,8 +72,10 @@ We show the type safety of the version of \name without coherence.
       \alpha {\alpha_1} {\im {A_1}}} $. \\ By \reflabel{\labeltgtapp}, $ \jtype
       {\cdot, f \oftype {\im {\for {\alpha_1} {A_1}}}, \alpha} {\app C {(\tapp f
       \alpha)}} {\subst \alpha {\alpha_1} {\im {\subst {\alpha_1} {\alpha_2}
-      {A_2}}}} $. \\ By \reflabel{\labeltgtblam} and substitution
-      \george{Substitution is problematic}, $ \jtype {\cdot, f \oftype {\im
+      {A_2}}}} $. \\
+      By \reflabel{\labeltgtblam} and substitution,
+      % \george{Substitution is problematic}
+      $ \jtype {\cdot, f \oftype {\im
       {\for {\alpha_1} {A_1}}}} {\blam \alpha {\app E {(\tapp f \alpha)}}} {\for
       {\alpha_2} {\im {A_2}}} $. \\ By \reflabel{\labeltgtlam}, $ \jtype \cdot
       {\lamty f {\im {\for {\alpha_1} {A_1}}} {\blam \alpha {\app E {(\tapp f
