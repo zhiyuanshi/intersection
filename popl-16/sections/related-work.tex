@@ -153,7 +153,38 @@ Semantic subtyping seems to have important advantages over syntactic
 subtyping. One worthy avenue for future work is to study languages
 with a intersection types and merge operator in a semantic subtyping setting.
 
-\paragraph{Languages for extensibility.}
+\paragraph{Extensibility.} One of our motivations to study systems
+with intersections types is to better understand the
+type system requirements needed to address extensibility problems. 
+A well-known problem in programming languages is the Expression
+Problem~\cite{wadler1998expression}. In recent years there have been 
+various solutions to the Expression Problem in the literature. Mostly
+the solutions are presented in a specific language, using the language
+constructs of that language. For example, in Haskell, type classes~\cite{WadlerB89}
+can be used to implement type-theoretic encodings of
+datatypes~\cite{Hinze:2006}. It has been shown~\cite{finally-tagless}
+that, when encodings of datatypes are modelled with type classes, 
+the subclassing mechanism of type classes can be used to achieve
+extensibility and reuse of operations. Using such techniques provides
+a solution to the Expression Problem. Similarly, in OO languages with
+generics, it is possible to use generic interfaces and classes to
+implement type-theoretic encodings of datatypes. Conventional
+subtyping allows the interfaces and classes to be extended, which can
+also be used to provide extensibility and reuse of operations. Using
+such techniques, it is also possible to solve the Expression Problem 
+in OO languages~\cite{oliveira09modular,oliveira2012extensibility}.
+It is even possible to solve the Expression Problem in theorem provers
+like Coq, by exploiting Coq's type class mechanism~\cite{DelawareOS13}.
+Nevertheless, although there is a clear connection between all those
+techniques and type-theoretic encodings of datatypes, as far as we
+know, no one has studied the expression problem from a more
+type-theoretic point of view. As shown in Section~\ref{subsec:OAs}, a system
+with intersection types, parametric polymorphism, the merge operator 
+and disjoint quantification can be used to explain type-theoretic
+encodings with subtyping and extensibility. 
+
+
+\begin{comment}
 To improve support for extensibility various researchers have proposed
 new OOP languages or programming mechanisms. It is interesting to
 note that design patterns such as object algebras or modular visitors
@@ -178,7 +209,6 @@ use delegation for doing dynamic composition in a system
 with virtual classes. This in contrast with most other approaches
 that use class-based composition, but closer to the dynamic
 composition that we use in \name.
-\begin{comment}
 In contrast to type systems for virtual classes
 and similar mechanisms, the goal of our work is to study the type
 systems and basic language mechanism to better support such design patterns.
