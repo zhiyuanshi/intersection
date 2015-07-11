@@ -253,11 +253,11 @@ at the same time. More formally, with disjoint intersections, we have the follow
 \begin{lemma}[Unique subtype contributor]
   \label{lemma:unique-subtype-contributor}
 
-  If $\Gamma \vdash A_1 \inter A_2 \subtype B$, where $A_1 \inter A_2$ and $B$ are well-formed types,
+  If $A_1 \inter A_2 \subtype B$, where $A_1 \inter A_2$ and $B$ are well-formed types,
   then it is not possible that the following holds at the same time:
   \begin{enumerate}
-    \item $\Gamma \vdash A_1 \subtype B$
-    \item $\Gamma \vdash A_2 \subtype B$
+    \item $A_1 \subtype B$
+    \item $A_2 \subtype B$
   \end{enumerate}
 \end{lemma}
 
@@ -278,7 +278,7 @@ This fact is captured by the following lemma:
 \begin{restatable}[Unique coercion]{lemma}{uniquecoercion}
   \label{lemma:unique-coercion}
 
-  If $\Gamma \vdash A \subtype B \yields {E_1}$ and $\Gamma \vdash A \subtype B \yields {E_2}$, where $A$
+  If $A \subtype B \yields {E_1}$ and $A \subtype B \yields {E_2}$, where $A$
   and $B$ are well-formed types, then $E_1 \equiv E_2$.
 \end{restatable}
 
