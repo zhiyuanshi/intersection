@@ -228,14 +228,14 @@ disjoint intersection types and parametric polymorphism:
 \[\lambda x. {\bf let}~y = 0 \mergeop x~{\bf in}~x\]
 \end{comment}
 Consider the attempt to write
-the following polymorphic function in \namedis (we will use Greek letters and
+the following polymorphic function in \namedis (we use
 uppercase Latin letters to denote type variables):
 \begin{lstlisting}
 let fst A B (x: A & B) = (fun (z:A) (*$ \to $*) z) x in (*$ \ldots $*)
 \end{lstlisting}
 The
-\code{fst} function is supposed to extract a value from the merge that
-matches the type of the first type parameter (\lstinline{A}). However
+\code{fst} function is supposed to extract a value of type
+(\lstinline{A}) from the merge value $x$ (of type \lstinline{A&B}). However
 this function is problematic.  The reason is that when
 \lstinline{A} and \lstinline{B} are instantiated to non-disjoint
 types, then uses of \lstinline{fst} may lead to incoherence.
