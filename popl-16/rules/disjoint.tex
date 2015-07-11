@@ -40,8 +40,8 @@
 \newcommand{\labeldisforall}{\makelabeldis Forall}
 \newcommand{\ruledisforall}{
   \inferrule* [right=\labeldisforall]
-    {\jdisimpl {\Gamma, \alpha * A_1} {A_2} {B_2} \\ \jdisimpl {\Gamma, \alpha * B_1} {A_2} {B_2}}
-    {\jdisimpl \Gamma {\fordis \alpha {A_1} {A_2}} {\fordis \alpha {B_1} {B_2}}}
+    {\jdisimpl {\Gamma, \alpha * A} {B} {C}}
+    {\jdisimpl \Gamma {\fordis \alpha {A} {B}} {\fordis \alpha {A} {C}}}
 }
 
 \newcommand{\labeldisax}{\makelabeldis Axiom}

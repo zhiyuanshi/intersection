@@ -156,9 +156,12 @@ and \reflabel{\labeldisinterr}) are quite intuitive. The intuition is
 that if two types $A$ and $B$ are disjoint to some type $C$, then
 their intersection ($A\&B$) is also clearly disjoint to $C$.  The
 rules capture this intuition by inductively distributing the relation
-itself over the intersection constructor ($\inter$).
+itself over the intersection constructor ($\inter$). The rule 
+for disjoint quantification (\reflabel{\labeldisforall}) is also
+rather intuitive. It adds the constraint into $\Gamma$ and checks for 
+disjointness in the bodies.
 
-The rule for functions (\reflabel{\labeldisfun}) is interesting. It says that two function
+The rule for functions (\reflabel{\labeldisfun}) is more interesting. It says that two function
 types are disjoint if and only if their return types are disjoint (regardless of
 their parameter types!). At first this rule may look surprising
 because the parameter types play no role in the definition of
@@ -175,8 +178,8 @@ The lesson from this example is that the parameter types of two
 function types do not any influence in determining whether those two function
 types are disjoint or not: only the return types matter.
 
-The rule for disjoint quantification (\reflabel{\labeldisforall}) is
-also interesting. Consider the following two types:
+\begin{comment}
+The rule for disjoint quantification (\reflabel{\labeldisforall}) . Consider the following two types:
 \[ (\forall (\alpha * \tyint).~\tyint \& \alpha) \qquad (\forall (\alpha * \tychar). ~\tychar \& \alpha) \]
 The question is under which conditions are those two types disjoint.
 In the first type $\alpha$ cannot be instantiated with $\tyint$ and in
@@ -186,6 +189,7 @@ disjoint, $\alpha$ cannot be instantiated with either $\tyint$ or
 $\tychar$. The rule for disjoint quantification captures this fact by
 requiring the bodies of disjoint quantification to be checked for
 disjointness under both constraints.
+\end{comment}
 
 Finally, the rule \reflabel{\labeldisax} says two types are considered disjoint if they are
 judged to be disjoint by the axiom rules, which are explained below.
