@@ -1,16 +1,50 @@
 \section{Related Work}
 \label{sec:related-work}
 
-\paragraph{Coherent intersection types.}
+\paragraph{Coherence}
+Reynolds invented Forsythe~\cite{reynolds1997design} in the 1980s. Our
+merge operator is analogous to his operator $p_1, p_2 $. Forsythe has
+a coherent semantics. The result was proved formally by
+Reynolds~\cite{reynolds1991coherence} in a lambda calculus with
+intersection types and a merge operator. However there are two key
+differences to our work. Firstly the way coherence is ensured is
+rather ad-hoc. He has four different typing rules for the merge
+operator, each accounting for various possibilities of what the types 
+of the first and second components are. In some cases the meaning of
+the second component takes precedence (that is, is biased) over the
+first component. The set of rules is restrictive and it forbids, for
+instance, the merge of two functions (even when they a provably
+disjoint). In contrast, disjointness in \name has a well-defined
+specification and it is quite flexible. Secondly, Reynolds calculus
+does not support universal quantification. It is unclear to us whether
+his set of rules would still ensure disjointness in the presence of
+universal quantification. Since some biased choice is allowed in
+Reynold's calculus the issues illustrated in Section~\ref{subsec:polymorphism} could be a problem. 
 
-Reynolds~\cite{reynolds1991coherence} proved coherence in a language with
-intersection types based on lambda-calculus. But his language does not support
-quantification. Pierce~\cite{pierce1991programming2} made a comprehensive review
+Pierce~\cite{pierce1991programming2} made a comprehensive review
 of coherence, especially on Curien and Ghelli~\cite{curienl1990coherence} and
 Reynolds' methods of proving coherence; but he was not able to prove coherence
 for his $F_\wedge$ calculus. He introduced a primitive $\code{glue}$ function as
 a language extension which corresponds to our merge operator. However, in his
 system users can ``glue'' two arbitrary values, which can lead to incoherence.
+
+Our work is largely inspired by
+Dunfield~\cite{dunfield2014elaborating}. He described a similar
+approach to ours: compiling a system with intersection types and a
+merge operator into
+ordinary $ \lambda $-calculus terms with pairs. One major difference
+is that his system does not include parametric polymorphism, while
+ours does not include unions. The calculus presented in
+Section~\ref{sec:fi} can be seen as a relatively straightforward
+extension of Dunfield's calculus with parametric
+polymorphism. However, as acknowledged by Dunfield, his calculus lacks
+of coherence. He discusses the issue of coherence throughout his
+paper, mentioning biased choice as an option (albeit a rather
+unsatisfying one). He also mentioned that the notion of disjoint
+intersection could be a good way to address the problem, but he did not
+pursue this option in his work. In contrast to his work, we developed a type
+system with disjoint intersection types and proposed disjoint
+quantification to guarantee coherence in our calculus.
 
 % \url{http://homepages.inf.ed.ac.uk/gdp/publications/Sub_Par.pdf}
 
@@ -33,7 +67,9 @@ meta-theoretical results and his calculus does not have a merge
 operator.  Pierce also studied a system where both intersection
 types and bounded polymorphism are present in his Ph.D.
 dissertation~\cite{pierce1991programming2} and a 1997
-report~\cite{pierce1997intersection}. Going in the direction of higher
+report~\cite{pierce1997intersection}. 
+
+Going in the direction of higher
 kinds, Compagnoni and Pierce~\cite{compagnoni1996higher} added
 intersection types to System $ F_{\omega} $ and used the new calculus,
 $ F^{\omega}_{\wedge} $, to model multiple inheritance. In their
@@ -46,6 +82,7 @@ value restriction on parametric polymorphism. Although they proposed a system wi
 parametric polymorphism, their subtyping rules are significantly different from ours,
 since they consider parametric polymorphism
 as the ``infinit analog'' of intersection polymorphism.
+
 There have been attempts to provide a foundational calculus
 for Scala that incorporates intersection
 types~\cite{amin2014foundations,amin2012dependent}.
@@ -60,7 +97,7 @@ types has been adopted in object-oriented languages such as Scala,
 Ceylon, and Grace. Generally speaking,
 the most significant difference to \name is that in all previous systems
 there is no explicit introduction construct like our merge operator. As shown in
-Section~\ref{sec:overview}, this feature is pivotal in supporting modularity
+Section~\ref{subsec:OAs}, this feature is pivotal in supporting modularity
 and extensibility because it allows dynamic composition of values.
 
 \begin{comment}
@@ -82,11 +119,7 @@ let merge [A, B] (f: ExpAlg A) (g: ExpAlg B) = {
 
 \paragraph{Other type systems with intersection types.}
 Intersection types date back to as early as Coppo et
-al.~\cite{coppo1981functional}. As emphasized throughout the paper our
-work is inspired by Dunfield~\cite{dunfield2014elaborating}. He described a similar approach to ours:
-compiling a system with intersection types into ordinary $ \lambda $-calculus
-terms. The major difference is that his system does not include parametric
-polymorphism, while ours does not include unions.
+al.~\cite{coppo1981functional}. 
 % Although similar in spirit,
 % our elaboration typing is simpler: we require subtyping in the case of
 % applications, thus avoiding the subsumption rule. Besides, our treatment
@@ -102,20 +135,13 @@ polymorphism, while ours does not include unions.
 % \inferrule [Merge]
 % {\Gamma \turns e_1 : A_1 \andalso \Gamma \turns e_2 : A_2}
 % {\Gamma \turns e_1 \mergeop e_2 : A_1 \inter A_2}
-Reynolds invented Forsythe~\cite{reynolds1997design} in the 1980s. Our merge
-operator is analogous to his $ p_1, p_2 $. As Dunfield
-has noted, in Forsythe merges can be only used unambiguously.
-For instance, it is not allowed in Forsythe to merge two functions.
-
 %Castagna, and Dunfield describe
 %elaborating multi-fields records into merge of single-field records.
 % Reynolds and Castagna do not consider elaboration and Dunfield do not
 % formalize elaborating records.
-
 % Both Pierce and Dunfield's system include a subsumption rule, which states that
 % if an term has been inferred of type $ A $, then it is also of any
 % supertype of $ A $. Our system does not have this rule.
-
 Refinement
 intersection~\cite{dunfield2007refined,davies2005practical,freeman1991refinement}
 is the more conservative approach of adopting intersection types. It increases
@@ -123,6 +149,9 @@ only the expressiveness of types but not terms. But without a term-level
 construct like ``merge'', it is not possible to encode various language
 features. As an alternative to syntatic subtyping described in this paper,
 Frisch et al.~\cite{frisch2008semantic} studied semantic subtyping.
+Semantic subtyping seems to have important advantages over syntactic
+subtyping. One worthy avenue for future work is to study languages
+with a intersection types and merge operator in a semantic subtyping setting.
 
 \paragraph{Languages for extensibility.}
 To improve support for extensibility various researchers have proposed
