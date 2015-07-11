@@ -175,7 +175,7 @@ The lesson from this example is that the parameter types of two
 function types do not any influence in determining whether those two function
 types are disjoint or not: only the return types matter.
 
-The rule for disjoint quantification (\reflabel{\labeldisforall}) is
+The rule for disjoint quantification \reflabel{\labeldisforall} is
 also interesting. Consider the following two types:
 \[ (\forall (\alpha * \tyint).~\tyint \& \alpha) \qquad (\forall (\alpha * \tychar). ~\tychar \& \alpha) \]
 The question is under which conditions are those two types disjoint.
@@ -206,21 +206,20 @@ form to ensure symetry. The rule \reflabel{\labelaxsym} takes care of that.
 \subsection{Metatheory}
 
 The algorithmic rules for disjointness are sound and complete.
-\bruno{A bit of text and proof sketches are missing.}
 
-\begin{lemma}{Symmetry of disjointness} \label{lemma:symmetry-of-disjointness}
-  If $\jdis \Gamma A B$, then $\jdis \Gamma B A$.
-\end{lemma}
-
-\begin{theorem} \label{lemma:disjoint-intersect}
-  If $\jdis \Gamma A C$ and $\jdis \Gamma B C$,
-  then $\jdis \Gamma {A \inter B} {C}$.
-\end{theorem}
-
-\begin{lemma} \label{lemma:common-supertype}
-  If $A_1 \to A_2 \subtype D$ and $B_1 \to B_2 \subtype D$,
-  then there exists a $C$ such that $A_2 \subtype C$ and $B_2 \subtype C$.
-\end{lemma}
+% \begin{lemma}{Symmetry of disjointness} \label{lemma:symmetry-of-disjointness}
+%   If $\jdis \Gamma A B$, then $\jdis \Gamma B A$.
+% \end{lemma}
+%
+% \begin{theorem} \label{lemma:disjoint-intersect}
+%   If $\jdis \Gamma A C$ and $\jdis \Gamma B C$,
+%   then $\jdis \Gamma {A \inter B} {C}$.
+% \end{theorem}
+%
+% \begin{lemma} \label{lemma:common-supertype}
+%   If $A_1 \to A_2 \subtype D$ and $B_1 \to B_2 \subtype D$,
+%   then there exists a $C$ such that $A_2 \subtype C$ and $B_2 \subtype C$.
+% \end{lemma}
 
 \begin{restatable}[Soundness of algorithmic disjointness]{theorem}{algodissoundness}
   \label{theorem:soundness}
