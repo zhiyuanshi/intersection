@@ -38,7 +38,7 @@ We show the type safety of the version of \name without coherence.
       & \rulesubfun &
     \end{flalign*}
 
-      By i.h., $ \jtype \cdot {E_1} {\im {A_3} \to \im {A_1}} $ and $ \jtype
+      By induction hypothesis, $ \jtype \cdot {E_1} {\im {A_3} \to \im {A_1}} $ and $ \jtype
       \cdot {E_2} {\im {A_2} \to \im {A_4}} $. \\ By \reflabel{\labeltgtvar}, $
       \jtype {\cdot, x \oftype {\im {A_3}}} x {\im {A_3}} $. \\ By premise, $ A_3
       \subtype A_1 \yields {E_1} $. \\ By \reflabel{\labeltgtapp}, $ \jtype {\cdot,
@@ -62,7 +62,7 @@ We show the type safety of the version of \name without coherence.
       & \rulesubforall &
     \end{flalign*}
 
-      By i.h., $ \jtype \cdot E {\im {A_1} \to {\im {\subst {\alpha_1}
+      By induction hypothesis, $ \jtype \cdot E {\im {A_1} \to {\im {\subst {\alpha_1}
       {\alpha_2} A_2}}} $. \\ By \reflabel{\labeltgtvar}, $ \jtype {\cdot, f
       \oftype {\im {\for {\alpha_1} {A_1}}}} f {\im {\for {\alpha_1} {A_1}}} $.
       \\ By the definition of $ \im \cdot $, $ \jtype {\cdot, f \oftype {\im {\for
@@ -88,7 +88,7 @@ We show the type safety of the version of \name without coherence.
     \end{flalign*}
 
       By \reflabel{\labeltgtvar}, $\jtype {\cdot, x \oftype \im {A_1}} x {\im
-      {A_1}}$. \\ By i.h., $\jtype \cdot {E_1} {\im {A_1} \to \im {A_2}}$. \\ By
+      {A_1}}$. \\ By induction hypothesis, $\jtype \cdot {E_1} {\im {A_1} \to \im {A_2}}$. \\ By
       \reflabel{\labeltgtapp} and weakening, $\jtype {\cdot, x \oftype \im
       {A_1}} {\app {E_1} x} {\im {A_2}}$. Similarly, $\jtype {\cdot, x \oftype
       \im {A_1}} {\app {E_2} x} {\im {A_3}}$. \\ By \reflabel{\labeltgtpair},
@@ -108,7 +108,7 @@ We show the type safety of the version of \name without coherence.
       A_2}} x {\im {A_1 \inter A_2}} $. \\ By the definition of $\im \cdot$, $
       \jtype {\cdot, x \oftype \im {A_1 \inter A_2}} x {\pair {\im {A_1}} {\im
       {A_2}}} $. \\ By \reflabel{\labeltgtprojl}, $ \jtype {\cdot, x \oftype \im
-      {A_1 \inter A_2}} {\proj 1 x} {\im {A_1}} $. \\ By i.h., $ \jtype \cdot E
+      {A_1 \inter A_2}} {\proj 1 x} {\im {A_1}} $. \\ By induction hypothesis, $ \jtype \cdot E
       {\im {A_1} \to \im {A_3}} $. \\ By weakening, $ \jtype {\cdot, x \oftype \im
       {A_1 \inter A_2}} E {\im {A_1} \to \im {A_3}} $. \\ By
       \reflabel{\labeltgtapp}, $ \jtype {\cdot, x \oftype \im {A_1 \inter A_2}}
@@ -166,21 +166,21 @@ We show the type safety of the version of \name without coherence.
       & \ruletlam &
     \end{flalign*}
 
-    By premise, $ \jtype {\Gamma, x \oftype A} e {A_1} \yields E $. By i.h., $ \jtype {\im {\Gamma, x \oftype A}} E {\im {A_1}} $. By the definition of $ \im \cdot $, $ \jtype {\im \Gamma, x \oftype \im A} E {\im {A_1}} $. By \reflabel{\labeltgtlam}, $ \jtype {\im \Gamma} {\lamty x {\im A} E} {\im A \to \im {A_1}}$. By the definition of $ \im \cdot $, $ \jtype {\im \Gamma} {\lamty x {\im A} E} {\im {A \to A_1}} $. \\
+    By premise, $ \jtype {\Gamma, x \oftype A} e {A_1} \yields E $. By induction hypothesis, $ \jtype {\im {\Gamma, x \oftype A}} E {\im {A_1}} $. By the definition of $ \im \cdot $, $ \jtype {\im \Gamma, x \oftype \im A} E {\im {A_1}} $. By \reflabel{\labeltgtlam}, $ \jtype {\im \Gamma} {\lamty x {\im A} E} {\im A \to \im {A_1}}$. By the definition of $ \im \cdot $, $ \jtype {\im \Gamma} {\lamty x {\im A} E} {\im {A \to A_1}} $. \\
 
   \item \textbf{Case}
     \begin{flalign*}
       & \rulettapp &
     \end{flalign*}
 
-    By premise, $ \jtype \Gamma {e_1} {A_1 \to A_2} \yields {E_1} $. By i.h., $ \jtype {\im \Gamma} {E_1} {\im {A_1 \to A_2}} $. By premise, $ \jtype \Gamma {e_2} {A_3} \yields {E_2} $. By i.h., $ \jtype {\im \Gamma} {E_2} {\im {A_3}} $. By premise, $ A_3 \subtype A_1 \yields C $. By Lemma~\ref{lemma:sub}, $ \jtype \cdot C {\im {A_3} \to \im {A_1}} $. By \reflabel{\labeltgtapp} and the definition of $ \im \cdot $, $ \jtype {\im \Gamma} {\app {E_1} {(\app C E_2)}} {\im {A_2}} $. \\
+    By premise, $ \jtype \Gamma {e_1} {A_1 \to A_2} \yields {E_1} $. By induction hypothesis, $ \jtype {\im \Gamma} {E_1} {\im {A_1 \to A_2}} $. By premise, $ \jtype \Gamma {e_2} {A_3} \yields {E_2} $. By induction hypothesis, $ \jtype {\im \Gamma} {E_2} {\im {A_3}} $. By premise, $ A_3 \subtype A_1 \yields C $. By Lemma~\ref{lemma:sub}, $ \jtype \cdot C {\im {A_3} \to \im {A_1}} $. By \reflabel{\labeltgtapp} and the definition of $ \im \cdot $, $ \jtype {\im \Gamma} {\app {E_1} {(\app C E_2)}} {\im {A_2}} $. \\
 
   \item \textbf{Case}
     \begin{flalign*}
       & \ruletblam &
     \end{flalign*}
 
-    By premise, $ \jtype {\Gamma, \alpha} e A \yields E $. By i.h., $ \jtype
+    By premise, $ \jtype {\Gamma, \alpha} e A \yields E $. By induction hypothesis, $ \jtype
     {\im {\Gamma, \alpha}} E {\im A} $. By the definition of $\im \cdot $, $
     \jtype {\im \Gamma, \alpha} E {\im A} $. By \reflabel{\labeltgtblam}, $
     \jtype {\im \Gamma} {\blam \alpha E} {\for \alpha {\im A}} $. By the
@@ -192,7 +192,7 @@ We show the type safety of the version of \name without coherence.
       & \rulettapp &
     \end{flalign*}
 
-     By premise, $ \jtype \Gamma e {\for \alpha A_1} \yields E $. By i.h., $
+     By premise, $ \jtype \Gamma e {\for \alpha A_1} \yields E $. By induction hypothesis, $
      \jtype {\im \Gamma} E {\im {\for \alpha A_1}} $. By the definition of $ \im
      \cdot $, $ \jtype {\im \Gamma} E {\for \alpha \im {A_1}} $. By premise, $
      \jwf \Gamma A $. By Lemma~\ref{lemma:preserve-wf}, $ \jwf {\im \Gamma} {\im
@@ -205,7 +205,7 @@ We show the type safety of the version of \name without coherence.
       & \ruletmerge &
     \end{flalign*}
 
-      By premise, $ \jtype \Gamma {e_1} {A_1} \yields {E_1} $. By i.h., $ \jtype
+      By premise, $ \jtype \Gamma {e_1} {A_1} \yields {E_1} $. By induction hypothesis, $ \jtype
       {\im \Gamma} {E_1} {\im {A_1}} $. Similar to the above , $ \jtype {\im
       \Gamma} {E_2} {\im {A_2}} $. By \reflabel{\labeltgtpair}, $ \jtype {\im
       \Gamma} {\pair {E_1} {E_2}} {\pair {\im {A_1}} {\im {A_2}}} $. By the

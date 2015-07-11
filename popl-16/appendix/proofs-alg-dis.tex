@@ -23,7 +23,7 @@
   If $B \subtype C$, then $A \inter B \subtype C$.
 \end{theorem}
 
-\george{Add interpretation of the theorem}
+% \george{Add interpretation of the theorem}
 
 \begin{proof}
   By induction on $C$.
@@ -31,7 +31,7 @@
   If $C = E_1 \inter E_2$,
   Need to show $A \subtype E_1 \inter E_2$ implies $A \inter B \subtype E_1 \inter E_2$.
   By inversion $A \subtype E_1$ and $A \subtype E_2$.
-  By the i.h., $A \inter B \subtype E_1$ and $A \inter B \subtype E_2$.
+  By the induction hypothesis, $A \inter B \subtype E_1$ and $A \inter B \subtype E_2$.
   By \reflabel{\labelsubinter}, $A \inter B \subtype E_1 \inter E_2$.
 \end{proof}
 
@@ -64,7 +64,7 @@
 \end{lemma}
 
 \begin{proof}
-  By induction on $A_3$. \george{Check.}
+  By induction on $A_3$.
 \end{proof}
 
 \begin{lemma}
@@ -123,7 +123,7 @@
     A_3$. Therefore by Lemma~\ref{lemma:common-supertype} we know that there is
     a type $A_4$ such that $A_2 \subtype A_4$ and $B_2 \subtype A_4$. That is,
     $A_2$ and $B_2$ are not disjoint. But by inversion, we must have $\jdisimpl
-    \Gamma {A_2} {B_2}$ and further by the i.h., $\jdis \Gamma {A_2} {B_2}$.
+    \Gamma {A_2} {B_2}$ and further by the induction hypothesis, $\jdis \Gamma {A_2} {B_2}$.
     Contradiction. \\
 
     \item Case
@@ -139,7 +139,7 @@
     % form $\fordis \alpha {C_1} {C_2}$. Thus, \[ \fordis \alpha {A_1} {A_2}
     % \subtype \fordis \alpha {C_1} {C_2} \] and by inversion, $A_2 \subtype C_2$.
     % Similarly $B_2 \subtype C_2$. But by inversion we must have $\jdisimpl
-    % \Gamma {A_2} {B_2}$ and by the i.h. $\jdis \Gamma {A_2} {B_2}$. A
+    % \Gamma {A_2} {B_2}$ and by the induction hypothesis $\jdis \Gamma {A_2} {B_2}$. A
     % contradiction similar to the above case arises.
 
     \item Case
@@ -147,14 +147,14 @@
       & \ruledisinterl &
     \end{flalign*}
 
-    By Lemma~\ref{lemma:disjoint-intersect} and the i.h. \\
+    By Lemma~\ref{theorem:disjoint-intersect} and the induction hypothesis. \\
 
     \item Case
     \begin{flalign*}
       & \ruledisinterr &
     \end{flalign*}
 
-    By Lemma~\ref{lemma:disjoint-intersect}, Lemma~\ref{lemma:symmetry-of-disjointness}, and the i.h.
+    Similar to the above case.
 
     % Need to show ...
     % By unfolding the definition of disjointness
@@ -162,7 +162,7 @@
     % By induction on $C$.
     % Atomic cases...
     % If $C = E_1 \inter E_2$
-    % By inversion and the i.h. we arrive at a contradiction.
+    % By inversion and the induction hypothesis we arrive at a contradiction.
 
   \end{itemize}
 \end{proof}
@@ -172,10 +172,10 @@
 
 \begin{proof}
 
-  Consider the shapes of $A$ and $B$. If $A$ and $B$ are of
-  different shape and neither of them is an intersection type, then by the
-  disjoint axioms we already can conclude that $A \disjointax B$. Thus by
-  \reflabel{\labeldisax}, $\jdisimpl \Gamma A B$. The other interesting cases are:
+  If $A$ and $B$ are of different shape and neither of them is an intersection
+  type, then by the disjoint axioms we can already conclude that $A \disjointax
+  B$. Thus by \reflabel{\labeldisax}, $\jdisimpl \Gamma A B$. The other
+  interesting cases are:
 
   \begin{itemize}
     % \item Case $A = \bot$:
@@ -185,7 +185,7 @@
     %   \item Case $B = B_1 \inter B_2$: Need to show $\jdis \Gamma \bot {B_1}
     %   \inter B_2$ implies $\jdisimpl \Gamma \bot {B_1 \inter B_2}$. Apply
     %   \reflabel{\labeldisinterr} and the resulting conditions can be proved by
-    %   the i.h.
+    %   the induction hypothesis
     % \end{itemize}
 
     \item Case $A = A_1 \to A_2$:
@@ -193,15 +193,11 @@
     \begin{itemize}
 
       \item Case $B = B_1 \to B_2$:
-      Need to show $\Gamma \turns A_1 \to A_2 * B_1 \to B_2$ implies
-      $\Gamma \turns  A_1 \to A_2 *_I B_1 \to B_2$. Apply
-      \reflabel{\labeldisfun} and the result, $\Gamma \turns A_2 *_I B_2$,
-      can be proved by the i.h.
+      Apply \reflabel{\labeldisfun} and the result, $\Gamma \turns A_2 *_I B_2$,
+      can be proved by the induction hypothesis
 
-      \item Case $B = B_1 \inter B_2$: Need to show $\Gamma \turns A_1 \to
-      A_2 * B_1 \inter B_2$ implies $\Gamma \turns A_1 \to A_2 *_I B_1
-      \inter B_2$. Apply \reflabel{\labeldisinterr} and the resulting
-      conditions can be proved by the i.h.
+      \item Case $B = B_1 \inter B_2$: Apply \reflabel{\labeldisinterr} and the
+      resulting conditions can be proved by the induction hypothesis
 
     \end{itemize}
     \item Case $A = \fordis \alpha {A_1} {A_2}$: Similar to the above case.
@@ -215,7 +211,8 @@
     \item Case $A = A_1 \inter A_2$:
 
     \begin{itemize}
-      \item Case $B = B_1 \inter B_2$: By \reflabel{\labeldisinterl} and by the i.h.
+      \item Case $B = B_1 \inter B_2$: By \reflabel{\labeldisinterl} and by the induction hypothesis
+      \item The rest cases can be proved by the symmetry of disjointness.
     \end{itemize}
 
   \end{itemize}

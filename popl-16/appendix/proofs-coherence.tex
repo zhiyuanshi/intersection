@@ -41,7 +41,7 @@ By induction.
 
   Let $C$ in the statement of this lemma be $C_1 \inter C_2$. By the condition
   we know \[ \jwf {\Gamma, \alpha \disjoint B} {C_1 \inter C_2} \] Thus we must
-  have, \[ \jwf {\Gamma, \alpha \disjoint B} {C_1} \] By the i.h., $\jwf \Gamma
+  have, \[ \jwf {\Gamma, \alpha \disjoint B} {C_1} \] By the induction hypothesis, $\jwf \Gamma
   {\subst A \alpha {C_1}}$ and similarly $\jwf \Gamma {\subst A \alpha {C_2}}$.
   Note that $\ftv {C_1} \cap \ftv {C_2} = \varnothing $. Otherwise $C_1$ and
   $C_2$ cannot be disjoint. By \reflabel{\labelwfinter}, \[ \jwf \Gamma {\subst
@@ -138,7 +138,7 @@ The set of rules for generating coercions is syntax-directed except for the thre
 %     & \ruledisinterl &
 %   \end{flalign*}
 %
-%   By applying the i.h. and the def. of the substitution function. \\
+%   By applying the induction hypothesis and the def. of the substitution function. \\
 %
 %   \item Case
 %   \begin{flalign*}
@@ -152,14 +152,14 @@ The set of rules for generating coercions is syntax-directed except for the thre
 %     & \ruledisfun &
 %   \end{flalign*}
 %
-%   By applying the i.h. and the def. of the substitution function. \\
+%   By applying the induction hypothesis and the def. of the substitution function. \\
 %
 %   \item Case
 %   \begin{flalign*}
 %     & \ruledisforall &
 %   \end{flalign*}
 %
-%   By applying the i.h. and the def. of the substitution function. Note that $\alpha$ is fresh. \\
+%   By applying the induction hypothesis and the def. of the substitution function. Note that $\alpha$ is fresh. \\
 %
 %   \item Case
 %   \begin{flalign*}
@@ -203,14 +203,14 @@ The set of rules for generating coercions is syntax-directed except for the thre
 %     & \rulewffun &
 %   \end{flalign*}
 %
-%   By i.h., $\jwf \Gamma {\subst R \beta A}$ and $\jwf \Gamma {\subst R \beta B}$. By the def. of substitution, $\jwf \Gamma {\subst R \beta {A \to B}}$. \\
+%   By induction hypothesis, $\jwf \Gamma {\subst R \beta A}$ and $\jwf \Gamma {\subst R \beta B}$. By the def. of substitution, $\jwf \Gamma {\subst R \beta {A \to B}}$. \\
 %
 %   \item Case
 %   \begin{flalign*}
 %     & \rulewfforall &
 %   \end{flalign*}
 %
-%   By the premise and the i.h.,
+%   By the premise and the induction hypothesis,
 %   \[ \jwf {\Gamma} {\subst R \beta A} \]
 %   \[ \jwf {\Gamma, \alpha \disjoint A} {\subst R \beta B} \]
 %   which by \reflabel{WFForall} implies
@@ -222,6 +222,6 @@ The set of rules for generating coercions is syntax-directed except for the thre
 %     & \rulewfinter &
 %   \end{flalign*}
 %
-%   By i.h., $\jwf \Gamma {\subst R \beta A}$ and $\jwf \Gamma {\subst R \beta B}$. By Lemma~\ref{lemma:invariance-of-disjointness}, we also have $\jdis \Gamma {\subst R \beta A} {\subst R \beta B}$. Therefore by \reflabel{WFInter}, $\jwf \Gamma {\subst R \beta {A \inter B}}$.
+%   By induction hypothesis, $\jwf \Gamma {\subst R \beta A}$ and $\jwf \Gamma {\subst R \beta B}$. By Lemma~\ref{lemma:invariance-of-disjointness}, we also have $\jdis \Gamma {\subst R \beta A} {\subst R \beta B}$. Therefore by \reflabel{WFInter}, $\jwf \Gamma {\subst R \beta {A \inter B}}$.
 % \end{itemize}
 % \end{proof}
