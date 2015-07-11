@@ -19,7 +19,7 @@ supports them.
 It then shows that,
 with unrestricted intersection types, the system
 lacks \emph{coherence}. This motivates the introduction of
-disjoint intersection types and extending universal quatification to
+disjoint intersection types and extending universal quantification to
 disjoint quantification, which is enough to ensure coherence.
 \end{comment}
 
@@ -41,7 +41,7 @@ which can be used as either values of type $A$ or of type $B$. For instance,
 consider the following program in \namedis:
 
 \begin{lstlisting}
-let x : Int & Char = (*$ \ldots $*) in -- definition ommitted
+let x : Int & Char = (*$ \ldots $*) in -- definition omitted
 let idInt (y : Int) : Int = y in
 let idChar (y : Char) : Char = y in
 (idInt x, idChar x)
@@ -58,7 +58,7 @@ Passing \lstinline{x} as an argument to either one (or both) of the
 functions is valid.
 
 \paragraph{Merge operator.}
-In the previous program we deliberatly did not show how to introduce values of an
+In the previous program we deliberately did not show how to introduce values of an
 intersection type. There are many variants of intersection types
 in the literature. Our work follows a particular formulation, where
 intersection types are introduced by a \emph{merge operator}.
@@ -144,7 +144,7 @@ multiple meanings.
 %Of course, when rejecting programs it is important
 %not to be too conservative, and reject too many programs which are
 %actually coherent.
-Analysing the expression $1 \mergeop 2$, we can see that the reason
+Analyzing the expression $1 \mergeop 2$, we can see that the reason
 for incoherence is that there are multiple, overlapping, integers in the
 merge. Generally speaking, if both terms can be assigned some type $C$,
 both of them can be chosen as the meaning of the merge,
@@ -235,7 +235,7 @@ let fst A B (x: A & B) = (fun (z:A) (*$ \to $*) z) x in (*$ \ldots $*)
 \end{lstlisting}
 The
 \code{fst} function is supposed to extract a value from the merge that
-matches the type of the first type parameter (\lstinline{A}).  However
+matches the type of the first type parameter (\lstinline{A}). However
 this function is problematic.  The reason is that when
 \lstinline{A} and \lstinline{B} are instantiated to non-disjoint
 types, then uses of \lstinline{fst} may lead to incoherence.
@@ -278,7 +278,7 @@ take the left component of the merge. This works perfectly for merges
 such as \lstinline$(1,,'c')$, where the types of the first and second components
 of the merge are disjoint. For the merge \lstinline$(1,,'c')$, if a integer lookup
 is needed, then \lstinline$1$ is the rightmost integer, which is consistent with the
-biased choice. Unfortunatelly, when given the merge \lstinline$(1,,2)$ the
+biased choice. Unfortunately, when given the merge \lstinline$(1,,2)$ the
 left-component (\lstinline$1$) is also picked up, even though in this case \lstinline$2$
 is the rightmost integer in the merge. Clearly this is inconsistent
 with the biased choice!
