@@ -101,7 +101,7 @@ component abstracts over the type of addition expressions
 The second part, which is the actual type of the Church encoding, is:
 
 \begin{lstlisting}
-type Exp = {accept : fun E. ExpAlg[E] (*$ \to $*) E} in (*$ \ldots $*)
+type Exp = {accept : (*$ \Lambda $*)E. ExpAlg[E] (*$ \to $*) E} in (*$ \ldots $*)
 \end{lstlisting}
 
 \noindent It should be clear that, modulo some refactoring, and the
@@ -113,10 +113,10 @@ Using \lstinline{Exp} the two data constructors are defined as follows:
 
 \begin{lstlisting}
 let lit (n: Int): Exp = {
-  accept = fun E (*$ \to $*) fun (f: ExpAlg[E]) (*$ \to $*) f.lit n
+  accept = (*$ \Lambda $*)E (*$ \to $*) fun (f: ExpAlg[E]) (*$ \to $*) f.lit n
 } in
 let add (e1: Exp) (e2: Exp): Exp = {
-  accept = fun E (*$ \to $*) fun (f: ExpAlg[E]) (*$ \to $*)
+  accept = (*$ \Lambda $*)E (*$ \to $*) fun (f: ExpAlg[E]) (*$ \to $*)
    f.add (e1.accept[E] f) (e2.accept[E] f)
 } in
 (*$ \ldots $*)
@@ -187,7 +187,7 @@ relate to the original datatypes. We discuss the two topics next.
 type SubExpAlg[E] = ExpAlg[E] & { sub: E (*$ \to $*) E (*$ \to $*) E } in
 type SubExp = { accept: fun A. SubExpAlg[A] (*$ \to $*) A } in
 let sub (e1: SubExp) (e2: SubExp): SubExp = {
-  accept = fun E (*$ \to $*) fun (f : SubExpAlg[E]) (*$ \to $*)
+  accept = (*$ \Lambda $*)E (*$ \to $*) fun (f : SubExpAlg[E]) (*$ \to $*)
   f.sub (e1.accept[E] f) (e2.accept[E] f)
 } in
 (*$ \ldots $*)
