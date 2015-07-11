@@ -1,18 +1,18 @@
 \section{Conclusion and Future Work}
 \label{sec:conclusion}
 
-This paper described \name: a System $F$-based language that combines 
-intersection types, parametric polymorphism and a merge operator. 
-The language is proved to be type-safe and coherent. 
+This paper described \namedis: a System $F$-based language that combines
+intersection types, parametric polymorphism and a merge operator.
+The language is proved to be type-safe and coherent.
 To ensure coherence the type system accepts only
-disjoint intersections. To provide flexibility in the presence of parametric polymorphism, 
+disjoint intersections. To provide flexibility in the presence of parametric polymorphism,
 universal quantification is extended with
 disjointness constraints. We believe that disjoint intersection types
 and disjoint quantification are intuitive, and at the same time
-expressive. 
+expressive.
 
-We implemented the core functionalities of the \name as part of a JVM-based
-compiler. Based on the type system of \name, we have built an ML-like
+We implemented the core functionalities of the \namedis as part of a JVM-based
+compiler. Based on the type system of \namedis, we have built an ML-like
 source language compiler that offers interoperability with Java (such as object
 creation and method calls). The source language is loosely based on the more
 general System $F_{\omega}$ and supports a
@@ -22,17 +22,17 @@ first-class modules that are encoded using \code{letrec} and records.
 
 For the future, we intend to improve our source language
 and show the power of disjoint intersection types and disjoint
-quantification in large case studies. 
-We are also interested in extending our work 
-to systems with a $\top$ type. This will also require an adjustment 
+quantification in large case studies.
+We are also interested in extending our work
+to systems with a $\top$ type. This will also require an adjustment
 to the notion of disjoint types. A suitable notion of
-disjointness between two types $A$ and $B$ in the presence of $\top$ 
+disjointness between two types $A$ and $B$ in the presence of $\top$
 would be to require that the only common supertype of $A$ and $B$ is $\top$.
 Finally we would like to study the
 addition of union types. This will also require changes in our
 notion of disjointness, since with union types there always exists
 a type $A \union B$, which is the common supertype of two
-types $A$ and $B$. 
+types $A$ and $B$.
 
 \begin{comment}
 Some immediate topics for
@@ -61,8 +61,8 @@ we could say something like: there does not exist an \emph{atomic} C ...}
 
 \paragraph{Implementation.}
 
-We implemented the core functionalities of the \name as part of a JVM-based
-compiler. Based on the type system of \name, we built an ML-like
+We implemented the core functionalities of the \namedis as part of a JVM-based
+compiler. Based on the type system of \namedis, we built an ML-like
 source language compiler that offers interoperability with Java (such as object
 creation and method calls). The source language is loosely based on the more
 general System $F_{\omega}$ and supports a
@@ -74,16 +74,16 @@ Relevant to this paper are the three phases in the compiler, which
 collectively turn source programs into System $F$:
 
 \begin{enumerate}
-\item A \emph{typechecking} phase that checks the usage of \name features and
+\item A \emph{typechecking} phase that checks the usage of \namedis features and
   other source language features against an abstract syntax tree that follows
   the source syntax.
 
 \item A \emph{desugaring} phase that translates well-typed source terms into
-  \name terms. Source-level features such as multi-field records, type aliases
-  are removed at this phase. The resulting program is just an \name term
+  \namedis terms. Source-level features such as multi-field records, type aliases
+  are removed at this phase. The resulting program is just an \namedis term
   extended with some other constructs necessary for code generation.
 
-\item A \emph{translation} phase that turns well-typed \name terms into System
+\item A \emph{translation} phase that turns well-typed \namedis terms into System
   $F$ ones.
 \end{enumerate}
 
