@@ -1,11 +1,11 @@
 \section{Disjointness and Coherence}
 \label{sec:disjoint}
 
-Although the system shown in the Section~\ref{sec:overview} is
-type-safe, it is not coherent. This section shows how to modify the
-system presented before so that it guarantees coherence as well as
-type soundness. The keys aspects are the notion of disjoint
-intersections, and disjoint quantification for polymorphic types.
+Although the system shown in the Section~\ref{sec:fi} is type-safe, it is not
+coherent. This section shows how to modify \name so that it guarantees coherence
+as well as type soundness. The result is calculus named \namedis. The keys
+aspects are the notion of disjoint intersections, and disjoint quantification
+for polymorphic types.
 
 %From the theoretical point-of-view, the end goal of this section is to show that the resulting system has
 %a coherent (or unique) elaboration semantics:
@@ -23,31 +23,23 @@ intersections, and disjoint quantification for polymorphic types.
 %if $A \inter B \subtype C$, then either $A$ or $B$ contributes to that subtyping
 %relation, resulting in two possible coercions.
 
-
 \subsection{Disjointness} Throughout the paper we already presented an intuitive
 definition for disjoiness. Here such definition is made a bit more precise, and
-well-suited to \name.
+well-suited to \namedis.
 
 \begin{definition}[Disjoint types]
-  Given a type enviroment $\Gamma$ and two types $A$ and $B$. The two types are said to be disjoint
-  ($\jdis \Gamma A B$) if they do not share a common supertype. That is, there does not exist a
-  type $C$ such that $A \subtype C$
-  and that $B \subtype C$: \footnote{
-  The definition of disjointness can also be adapted to type systems with a top
-  type (such as \lstinline@Object@ in many OO languages): Two types $A$ and $B$
-  are \emph{disjoint} if: the fact that $C$ is a commmon supertype of theirs
-  implies $C$ is the top type.
-  }
 
-\[\jdis \Gamma A B \equiv \not \exists C.~A \subtype C \wedge B \subtype C\]
+  Given a context $\Gamma$, two types $A$ and $B$ are said to be disjoint
+  (written $\jdis \Gamma A B$) if they do not share a common supertype. That is,
+  there does not exist a type $C$ such that $A \subtype C$ and that $B \subtype
+  C$: \footnote{ The definition of disjointness can also be adapted to type
+  systems with a top type (such as \lstinline@Object@ in many OO languages): Two
+  types $A$ and $B$ are \emph{disjoint} if: the fact that $C$ is a commmon
+  supertype of theirs implies $C$ is the top type. }
 
-\noindent Note that any free variables in $A$, $B$ or $C$ must be bound in $\Gamma$.
+  \[\jdis \Gamma A B \equiv \not \exists C.~A \subtype C \wedge B \subtype C\]
 
 \end{definition}
-
-%Related to the definition is the disjoint judgement. We write
-%\[ \jdis \Gamma A B \]
-%if two types $A$ and $B$ are disjoint in the context $\Gamma$.
 
 To see this definition in action, $\tyint$ and $\tychar$ are disjoint,
 because there is
@@ -55,12 +47,10 @@ no type that is a supertype of the both. On the other hand, $\tyint$ is not
 disjoint with itself, because $\tyint \subtype \tyint$. This implies that
 disjointness is not reflexive as subtyping is. Two types with different shapes
 are always disjoint, unless one of them is an intersection type. For example, a function
-type and a universal type must be disjoint. But a function type and an intersection
+type and a universally quantified type must be disjoint. But a function type and an intersection
 type may not be. Consider:
 \[ \tyint \to \tyint \quad \text{and} \quad (\tyint \to \tyint) \inter (\tystring \to \tystring) \]
-The two types are not disjoint since $\tyint \to \tyint$ is their common supertype.
-
-
+Those two types are not disjoint since $\tyint \to \tyint$ is their common supertype.
 
 \subsection{Syntax}
 

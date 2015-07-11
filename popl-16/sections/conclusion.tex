@@ -1,15 +1,16 @@
 \section{Conclusion and Future Work}
 \label{sec:conclusion}
 
+
 This paper described \namedis: a System $F$-based language that combines 
 intersection types, parametric polymorphism and a merge operator. 
 The language is proved to be type-safe and coherent. 
 To ensure coherence the type system accepts only
-disjoint intersections. To provide flexibility in the presence of parametric polymorphism, 
+disjoint intersections. To provide flexibility in the presence of parametric polymorphism,
 universal quantification is extended with
 disjointness constraints. We believe that disjoint intersection types
 and disjoint quantification are intuitive, and at the same time
-expressive. 
+expressive.
 
 We implemented the core functionalities of the \namedis as part of a JVM-based
 compiler. Based on the type system of \namedis, we have built an ML-like
@@ -22,17 +23,17 @@ first-class modules that are encoded using \code{letrec} and records.
 
 For the future, we intend to improve our source language
 and show the power of disjoint intersection types and disjoint
-quantification in large case studies. 
-We are also interested in extending our work 
-to systems with a $\top$ type. This will also require an adjustment 
+quantification in large case studies.
+We are also interested in extending our work
+to systems with a $\top$ type. This will also require an adjustment
 to the notion of disjoint types. A suitable notion of
-disjointness between two types $A$ and $B$ in the presence of $\top$ 
+disjointness between two types $A$ and $B$ in the presence of $\top$
 would be to require that the only common supertype of $A$ and $B$ is $\top$.
 Finally we would like to study the
 addition of union types. This will also require changes in our
 notion of disjointness, since with union types there always exists
 a type $A \union B$, which is the common supertype of two
-types $A$ and $B$. 
+types $A$ and $B$.
 
 \begin{comment}
 Some immediate topics for

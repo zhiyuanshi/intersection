@@ -155,9 +155,9 @@ Castagna et al.~\cite{Castagna:2014} studied an very expressive calculus that
 has polymorphism and set-theoretic type connectives (such as intersections,
 unions, and negations). As a result, in their calculus one is also able to
 express a type variable that can be instantiated to any type other than
-$\code{Int}$ as $\alpha \setminus \code{Int}$, which is a shorthand for $\alpha
-\wedge \neg \code{Int}$. As a comparison, such a type will need a disjoint
-quantifier, like $\fordis \alpha {\code{Int}} \alpha$, in our system.
+$\code{Int}$ as $\alpha \setminus \code{Int}$, which is syntactic sugar for
+$\alpha \wedge \neg \code{Int}$. As a comparison, such a type will need a
+disjoint quantifier, like $\fordis \alpha {\code{Int}} \alpha$, in our system.
 Unfortunately their calculus does not include a merge operator like ours. One
 worthy avenue for future work is to study languages with a intersection types
 and merge operator in a semantic subtyping setting.
