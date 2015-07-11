@@ -14,8 +14,6 @@ Section~\ref{sec:fi} does not present all such features, our implementation
 supports them.
 
 \bruno{Need to type-check the programs!}
-\bruno{Need to make code formatting homogeneous!}
-
 
 \begin{comment}
 It then shows that,
@@ -116,7 +114,7 @@ a merge of two integers:
 \begin{lstlisting}
 (fun (x: Int) (*$ \to $*) x) (1,,2)
 \end{lstlisting}
-Should the result be $1$ or $2$?
+Should the result be \lstinline$1$ or \lstinline$2$?
 
 If both results are accepted, we say that the semantics is
 \emph{incoherent}: there are multiple possible meanings for the same
@@ -183,7 +181,9 @@ $\tyint \inter \tybool$. Clearly,
 \[ \tyint \inter \tychar \not \subtype \tyint \inter \tybool \wedge \tyint \inter \tybool \not \subtype \tyint \inter \tychar \]
 Nevertheless the following program still leads to
 incoherence:
-\[ \app {(\lamty x \tyint x)} {((1 \mergeop 'c') \mergeop (2 \mergeop \code{True}))} \]
+\begin{lstlisting}
+(fun (x: Int) (*$ \to $*) x) ((1,,'c'),,(2,,True))
+\end{lstlisting}
 as both \lstinline{1} or \lstinline{2} are possible outcomes
 of the program. Although this attempt to define disjointness failed,
 it did bring us some additional insight: although the types of the two
@@ -269,16 +269,16 @@ todo with \emph{when} the type-based lookup on the merge happens. In
 the case of \lstinline{fst}, lookup is triggered by a coercion
 function inserted in the definition of \lstinline{fst} at
 compile-time.
-In the definition of $fst$ all it is known is that a
+In the definition of \lstinline$fst$ all it is known is that a
 value of type $A$ should be returned from a merge with an intersection
 type $A\&B$.  Clearly the only type-safe choice to coerce the value of
 type $A\&B$ into $A$ is to
 take the left component of the merge. This works perfectly for merges
-such as $(1,,'c')$, where the types of the first and second components
-of the merge are disjoint. For the merge $(1,,'c')$, if a integer lookup
-is needed, then $1$ is the rightmost integer, which is consistent with the
-biased choice. Unfortunatelly, when given the merge $(1,,2)$ the
-left-component ($1$) is also picked up, even though in this case $2$
+such as \lstinline$(1,,'c')$, where the types of the first and second components
+of the merge are disjoint. For the merge \lstinline$(1,,'c')$, if a integer lookup
+is needed, then \lstinline$1$ is the rightmost integer, which is consistent with the
+biased choice. Unfortunatelly, when given the merge \lstinline$(1,,2)$ the
+left-component (\lstinline$1$) is also picked up, even though in this case \lstinline$2$
 is the rightmost integer in the merge. Clearly this is inconsistent
 with the biased choice!
 
@@ -462,19 +462,19 @@ it can only be instantiated with any type disjoint to $A$.
 This ensures that the
 merge denoted by $x$ is disjoint for all valid instantiations of $A$ and $B$.
 
-The nice thing about this solution is that many uses of $fst$ are accepted.
-For example, the following use of $fst$:
+The nice thing about this solution is that many uses of \lstinline$fst$ are accepted.
+For example, the following use of \lstinline$fst$:
 \begin{lstlisting}
 fst Int Char (1,,'c')
 \end{lstlisting}
-is accepted since $Int$ and $Char$ are disjoint, thus satisfying the constraint
-on the second type parameter of $fst$.
-However, problematic uses of $fst$ are rejected. For example:
+is accepted since \lstinline$Int$ and \lstinline$Char$ are disjoint, thus satisfying the constraint
+on the second type parameter of \lstinline$fst$.
+However, problematic uses of \lstinline$fst$ are rejected. For example:
 \begin{lstlisting}
 fst Int Int (1,,2)
 \end{lstlisting}
-is rejected because $Int$ is not disjoint with $Int$, thus failing to satisfy the
-disjointness constraint on the second type parameter of $fst$.
+is rejected because \lstinline$Int$ is not disjoint with \lstinline$Int$, thus failing to satisfy the
+disjointness constraint on the second type parameter of \lstinline$fst$.
 
 \begin{comment}
 Note that there is a nice symmetry between bounded quantification and disjoint quantification.

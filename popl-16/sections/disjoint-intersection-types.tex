@@ -118,7 +118,7 @@ The two types are not disjoint since $\tyint \to \tyint$ is their common superty
   \label{fig:additional-type-and-context-translation}
 \end{figure}
 
-\george{May also note on the scoping of type variables inside contexts.}
+% \george{May also note on the scoping of type variables inside contexts.}
 
 Figure~\ref{fig:fi-syntax-dis} shows the updated syntax with the
 changes highlighted and Figure~\ref{fig:additional-type-and-context-translation}
@@ -239,7 +239,9 @@ is longer true since $\tyint$ is clearly not disjoint with itself.
 
 \george{Explain \reflabel{\labelsubforall} and distinction of kernel and all version.}
 
-The subtyping rules need some adjustment. An important
+The subtyping rules need some adjustment.
+Note that the $\bot$ type does not participate in subtyping since it holds no value.
+An important
 problem with the subtyping rules in Figure~\ref{fig:fi-type} is that the all three rules
 dealing with intersection types
 (\reflabel{\labelsubinterl} and \reflabel{\labelsubinterr} and \reflabel{\labelsubinter})
@@ -306,10 +308,10 @@ subtyping since we have the following two theorems:
 If $A_2 \subtype A_3$, then $A_1 \inter A_2 \subtype A_3$.
 \end{theorem}\bruno{missing proof sketch}
 
-
 The interpretation of the theorem is that: even though the premise is made more
-strict by the atomic condition, we can still derive the every judgement in the
-old systems. \george{Explain why the proof shows this.}
+strict by the atomic condition, we can still derive the every subtyping relation
+in the unrestricted systems.
+% \george{Explain why the proof shows this.}
 
 \begin{comment}
 Note that $A$ \emph{exclusive} or $B$ is true if and only if their truth value
@@ -335,20 +337,14 @@ the very requirement that the theorem holds.
 This result is captured more formally by the following lemma:
 \end{comment}
 
+% \george{Note that $\bot$ does not participate in subtyping and why (because the
+% empty set intersecting the empty set is still empty).}
 
+% \george{What's the variance of the disjoint constraint? C.f. bounded
+% polymorphism.}
 
-
-\george{Note that $\bot$ does not participate in subtyping and why (because the
-empty set intersecting the empty set is still empty).}
-
-\george{What's the variance of the disjoint constraint? C.f. bounded
-polymorphism.}
-
-
-
-\george{Two points are being made here: 1) nondisjoint intersections, 2) atomic
-types. Show an offending example for each?}
-
+% \george{Two points are being made here: 1) nondisjoint intersections, 2) atomic
+% types. Show an offending example for each?}
 
 \subsection{Coherence of the Elaboration}
 Combining the previous results, we are able to show the central theorem:
