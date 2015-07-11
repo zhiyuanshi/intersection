@@ -4,8 +4,8 @@ This section introduces \namedis and its support for intersection types,
 parametric polymorphism and the merge operator. It then discusses
 the issue of coherence and shows how the notion of disjoint
 intersection types and disjoint quantification achieve a coherent semantics.
-Finally we illustrate the expressive power of \namedis by encoding
-extensible type-theoretic encodings of datatypes.
+%Finally we illustrate the expressive power of \namedis by encoding
+%extensible type-theoretic encodings of datatypes.
 
 Note that this section uses some syntactic sugar, as well as standard
 programming language features, to illustrate the various concepts in
@@ -13,7 +13,7 @@ programming language features, to illustrate the various concepts in
 Section~\ref{sec:fi} does not present all such features, our implementation
 supports them.
 
-\bruno{Need to type-check the programs!}
+%\bruno{Need to type-check the programs!}
 
 \begin{comment}
 It then shows that,
@@ -37,7 +37,7 @@ form or another.
 \paragraph{Intersection types.}
 The intersection of type $A$ and $B$ (denoted as \lstinline{A & B} in
 \namedis) contains exactly those values
-which can be used as either of type $A$ or of type $B$. For instance,
+which can be used as either values of type $A$ or of type $B$. For instance,
 consider the following program in \namedis:
 
 \begin{lstlisting}
@@ -124,13 +124,13 @@ program above.
 \paragraph{Getting around incoherence: biased choice.}
 In a real implementation of Dunfield calculus a choice has to be made
 on which value to compute. For example, one potential option is to
-take either always take the left-most value matching the type in the
-merge. Similarly, one could take always take the right-most
+always take the left-most value matching the type in the
+merge. Similarly, one could always take the right-most
 value matching the type in the merge. Either way, the meaning
-of a program will always depend on a biased implementation choice,
+of a program will depend on a biased implementation choice,
 which is clearly unsatisfying from the theoretical point of view
 (although perhaps acceptable in practice).
-Moreover, even if it accept a particular biased choice as
+Moreover, even if we accept a particular biased choice as
 being good enough, the approach cannot be easily
 extended to systems with parametric polymorphism, as we illustrate
 in Section~\ref{subsec:polymorphism}.
@@ -138,7 +138,7 @@ in Section~\ref{subsec:polymorphism}.
 \subsection{Restoring Coherence: Disjoint Intersection Types}\label{sec:restoring}
 Coherence is a desirable property for a semantics. A semantics is said
 to be coherent if any \emph{valid program} has exactly one
-meaning~\cite{Reynolds:1991} (that is, the semantics is not ambiguous).
+meaning~\cite{reynolds1991coherence} (that is, the semantics is not ambiguous).
 One option to restore coherence is to reject programs which may have
 multiple meanings.
 %Of course, when rejecting programs it is important
@@ -230,7 +230,7 @@ disjoint intersection types and parametric polymorphism:
 Consider the attempt to write
 the following polymorphic function in \namedis:
 \begin{lstlisting}
-let fst (*$ \alpha $*) (*$ \beta $*) (x: (*$ \alpha $*) & (*$ \beta $*)) = (fun (z: (*$ \alpha $*)) (*$ \to $*) z) x in (*$ \ldots $*)
+let fst A B (x: A & B) = (fun (z:A) (*$ \to $*) z) x in (*$ \ldots $*)
 \end{lstlisting}
 The
 \code{fst} function is supposed to extract a value from the merge that
@@ -259,7 +259,7 @@ seems to validate such result:
 \begin{lstlisting}
    fst Int Int (1,,2)
 (*$ \rightsquigarrow $*) (fun (z: Int) (*$ \to $*) z) (1,,2) -- (* \textnormal{By the definition of \code{fst}} *)
-(*$ \rightsquigarrow $*) (fun (z: Int) (*$ \to $*) z) 2      -- (* \textnormal{Right-biased implicit coecion} *)
+(*$ \rightsquigarrow $*) (fun (z: Int) (*$ \to $*) z) 2      -- (* \textnormal{Right-biased coercion} *)
 (*$ \rightsquigarrow $*) 2                          -- (* \textnormal{By $\beta$-reduction} *)
 \end{lstlisting}
 
