@@ -83,6 +83,16 @@ parametric polymorphism, their subtyping rules are significantly different from 
 since they consider parametric polymorphism
 as the ``infinit analog'' of intersection polymorphism.
 
+Recently,
+Castagna et al.~\cite{Castagna:2014} studied an very expressive calculus that
+has polymorphism and set-theoretic type connectives (such as intersections,
+unions, and negations). As a result, in their calculus one is also able to
+express a type variable that can be instantiated to any type other than
+$\code{Int}$ as $\alpha \setminus \code{Int}$, which is syntactic sugar for
+$\alpha \wedge \neg \code{Int}$. As a comparison, such a type will need a
+disjoint quantifier, like $\fordis \alpha {\code{Int}} \alpha$, in our system.
+Unfortunately their calculus does not include a merge operator like ours.
+
 There have been attempts to provide a foundational calculus
 for Scala that incorporates intersection
 types~\cite{amin2014foundations,amin2012dependent}.
@@ -147,16 +157,8 @@ only the expressiveness of types but not terms. But without a term-level
 construct like ``merge'', it is not possible to encode various language
 features. As an alternative to syntatic subtyping described in this paper,
 Frisch et al.~\cite{frisch2008semantic} studied semantic subtyping. Semantic
-subtyping seems to have important advantages over syntactic subtyping. Recently,
-Castagna et al.~\cite{Castagna:2014} studied an very expressive calculus that
-has polymorphism and set-theoretic type connectives (such as intersections,
-unions, and negations). As a result, in their calculus one is also able to
-express a type variable that can be instantiated to any type other than
-$\code{Int}$ as $\alpha \setminus \code{Int}$, which is syntactic sugar for
-$\alpha \wedge \neg \code{Int}$. As a comparison, such a type will need a
-disjoint quantifier, like $\fordis \alpha {\code{Int}} \alpha$, in our system.
-Unfortunately their calculus does not include a merge operator like ours. One
-worthy avenue for future work is to study languages with a intersection types
+subtyping seems to have important advantages over syntactic subtyping. One
+worthy avenue for future work is to study languages with intersection types
 and merge operator in a semantic subtyping setting.
 
 \paragraph{Extensibility.} One of our motivations to study systems
