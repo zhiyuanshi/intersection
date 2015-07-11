@@ -32,10 +32,8 @@ well-suited to \namedis.
   Given a context $\Gamma$, two types $A$ and $B$ are said to be disjoint
   (written $\jdis \Gamma A B$) if they do not share a common supertype. That is,
   there does not exist a type $C$ such that $A \subtype C$ and that $B \subtype
-  C$: \footnote{ The definition of disjointness can also be adapted to type
-  systems with a top type (such as \lstinline@Object@ in many OO languages): Two
-  types $A$ and $B$ are \emph{disjoint} if: the fact that $C$ is a commmon
-  supertype of theirs implies $C$ is the top type. }
+  C$. Note that we assume that all free type variables in $A$,
+    $B$ and $C$ are bound in $\Gamma$.
 
   \[\jdis \Gamma A B \equiv \not \exists C.~A \subtype C \wedge B \subtype C\]
 
@@ -184,8 +182,7 @@ longer well-formed because the two types are not disjoint.
 the big lambda $\blamdis \alpha A e$ and eliminated by the usual type
 application $\tapp e A$. The constraint is added to the context with this rule.
 During a type application, the type system makes sure that the type argument
-satisfies the disjointness constraint\bruno{hummm, is the rule really
-  enforcing that? do we miss a disjointness coinstraint}.
+satisfies the disjointness constraint.
 
 \paragraph{Metatheory.} Since in this section we only restrict the type
 system in the
@@ -202,7 +199,8 @@ But after the substitution of $\tyint$ for $\alpha$ on the two types, the senten
 \[ \jdis {\alpha \disjoint \tyint} \tyint \tyint \]
 is longer true since $\tyint$ is clearly not disjoint with itself.
 
-\bruno{Some connecting text seems to be missing here.}
+\bruno{text is missing here!}
+
 \begin{restatable}[Instantiation]{lemma}{instantiation}
   \label{lemma:instantiation}
 
