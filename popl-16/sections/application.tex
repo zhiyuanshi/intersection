@@ -101,7 +101,7 @@ component abstracts over the type of addition expressions
 The second part, which is the actual type of the Church encoding, is:
 
 \begin{lstlisting}
-type Exp = { accept: (*$ \Lambda $*)E. ExpAlg[E] (*$ \to $*) E } in (*$ \ldots $*)
+type Exp = { accept: (*$ \forall $*)E. ExpAlg[E] (*$ \to $*) E } in (*$ \ldots $*)
 \end{lstlisting}
 
 \noindent It should be clear that, modulo some refactoring, and the
@@ -117,12 +117,12 @@ let lit (n: Int): Exp = {
 } in
 let add (e1: Exp) (e2: Exp): Exp = {
   accept = (*$ \Lambda $*)E (*$ \to $*) fun (f: ExpAlg[E]) (*$ \to $*)
-   f.add (e1.accept[E] f) (e2.accept[E] f)
+    f.add (e1.accept[E] f) (e2.accept[E] f)
 } in
 (*$ \ldots $*)
 \end{lstlisting}
 
-Note that the notation \lstinline{/\E} in the definition of the
+Note that the notation $\Lambda E$ in the definition of the
 \lstinline{accept} fields is a type abstraction: it
 introduces a type variable in the environment. The definition of the
 constructors themselves follows the usual Church encodings.
@@ -185,17 +185,17 @@ relate to the original datatypes. We discuss the two topics next.
 
 \begin{lstlisting}
 type SubExpAlg[E] = ExpAlg[E] & { sub: E (*$ \to $*) E (*$ \to $*) E } in
-type SubExp = { accept: (*$ \forall $*)A (*$ \to $*) SubExpAlg[A] (*$ \to $*) A } in
+type SubExp = { accept: (*$ \forall $*)A. SubExpAlg[A] (*$ \to $*) A } in
 let sub (e1: SubExp) (e2: SubExp): SubExp = {
   accept = (*$ \Lambda $*)E (*$ \to $*) fun (f : SubExpAlg[E]) (*$ \to $*)
-  f.sub (e1.accept[E] f) (e2.accept[E] f)
+    f.sub (e1.accept[E] f) (e2.accept[E] f)
 } in
 (*$ \ldots $*)
 \end{lstlisting}
 
 \noindent Firstly \lstinline{SubExpAlg} defines an extended algebra
 that contains the constructors of \lstinline{ExpAlg} plus the new
-subtraction constructors. Intersection types are used to do the type
+subtraction constructor. Intersection types are used to do the type
 composition. Secondly, a new type of expressions with subtraction
 (\lstinline{SubExp}) is needed. For \lstinline{SubExp} it is important
 that the \lstinline{accept} field now takes an algebra of type
@@ -320,10 +320,10 @@ where each field is a function that delegates the input to the two
 algebra parameters.
 
 \begin{lstlisting}
-let combine (*$ \alpha $*) ((*$ \beta $*) * (*$ \alpha $*)) (f: ExpAlg[(*$ \alpha $*)]) (g: ExpAlg[(*$ \beta $*)]) :
-  ExpAlg[(*$ \alpha $*) & (*$ \beta $*)] = {
+let combine A (B * A) (f: ExpAlg[A]) (g: ExpAlg[B]) :
+  ExpAlg[A & B] = {
     lit = fun (x: Int) (*$ \to $*) f.lit x ,, g.lit x,
-    add = fun (x: (*$ \alpha $*) & (*$ \beta $*)) (y: (*$ \alpha $*) & (*$ \beta $*)) (*$ \to $*)
+    add = fun (x: A & B) (y: A & B) (*$ \to $*)
       f.add x y ,, g.add x y
 }
 \end{lstlisting}
