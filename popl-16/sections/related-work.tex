@@ -9,7 +9,7 @@ Reynolds~\cite{reynolds1991coherence} in a lambda calculus with
 intersection types and a merge operator. However there are two key
 differences to our work. Firstly the way coherence is ensured is
 rather ad-hoc. He has four different typing rules for the merge
-operator, each accounting for various possibilities of what the types 
+operator, each accounting for various possibilities of what the types
 of the first and second components are. In some cases the meaning of
 the second component takes precedence (that is, is biased) over the
 first component. The set of rules is restrictive and it forbids, for
@@ -19,7 +19,7 @@ specification and it is quite flexible. Secondly, Reynolds calculus
 does not support universal quantification. It is unclear to us whether
 his set of rules would still ensure disjointness in the presence of
 universal quantification. Since some biased choice is allowed in
-Reynold's calculus the issues illustrated in Section~\ref{subsec:polymorphism} could be a problem. 
+Reynold's calculus the issues illustrated in Section~\ref{subsec:polymorphism} could be a problem.
 
 Pierce~\cite{pierce1991programming2} made a comprehensive review
 of coherence, especially on Curien and Ghelli~\cite{curienl1990coherence} and
@@ -67,7 +67,7 @@ meta-theoretical results and his calculus does not have a merge
 operator.  Pierce also studied a system where both intersection
 types and bounded polymorphism are present in his Ph.D.
 dissertation~\cite{pierce1991programming2} and a 1997
-report~\cite{pierce1997intersection}. 
+report~\cite{pierce1997intersection}.
 
 Going in the direction of higher
 kinds, Compagnoni and Pierce~\cite{compagnoni1996higher} added
@@ -119,7 +119,7 @@ let merge [A, B] (f: ExpAlg A) (g: ExpAlg B) = {
 
 \paragraph{Other type systems with intersection types.}
 Intersection types date back to as early as Coppo et
-al.~\cite{coppo1981functional}. 
+al.~\cite{coppo1981functional}.
 % Although similar in spirit,
 % our elaboration typing is simpler: we require subtyping in the case of
 % applications, thus avoiding the subsumption rule. Besides, our treatment
@@ -142,28 +142,37 @@ al.~\cite{coppo1981functional}.
 % Both Pierce and Dunfield's system include a subsumption rule, which states that
 % if an term has been inferred of type $ A $, then it is also of any
 % supertype of $ A $. Our system does not have this rule.
+
 Refinement
 intersection~\cite{dunfield2007refined,davies2005practical,freeman1991refinement}
 is the more conservative approach of adopting intersection types. It increases
 only the expressiveness of types but not terms. But without a term-level
 construct like ``merge'', it is not possible to encode various language
 features. As an alternative to syntatic subtyping described in this paper,
-Frisch et al.~\cite{frisch2008semantic} studied semantic subtyping.
-Semantic subtyping seems to have important advantages over syntactic
-subtyping. One worthy avenue for future work is to study languages
-with a intersection types and merge operator in a semantic subtyping setting.
+Frisch et al.~\cite{frisch2008semantic} studied semantic subtyping. Semantic
+subtyping seems to have important advantages over syntactic subtyping. Recently,
+Castagna et al.~\cite{Castagna:2014} studied an very expressive calculus that
+has polymorphism and set-theoretic type connectives (such as intersections,
+unions, and negations). As a result, in their calculus one is also able to
+express a type variable that can be instantiated to any type other than
+$\code{Int}$ as $\alpha \setminus \code{Int}$, which is a shorthand for $\alpha
+\wedge \neg \code{Int}$. As a comparison, such a type will need a disjoint
+quantifier, like $\fordis \alpha {\code{Int}} \alpha$, in our system.
+Unfortunately their calculus does not include a merge operator like ours. One
+worthy avenue for future work is to study languages with a intersection types
+and merge operator in a semantic subtyping setting.
 
 \paragraph{Extensibility.} One of our motivations to study systems
 with intersections types is to better understand the
-type system requirements needed to address extensibility problems. 
+type system requirements needed to address extensibility problems.
 A well-known problem in programming languages is the Expression
-Problem~\cite{wadler1998expression}. In recent years there have been 
+Problem~\cite{wadler1998expression}. In recent years there have been
 various solutions to the Expression Problem in the literature. Mostly
 the solutions are presented in a specific language, using the language
 constructs of that language. For example, in Haskell, type classes~\cite{WadlerB89}
 can be used to implement type-theoretic encodings of
 datatypes~\cite{Hinze:2006}. It has been shown~\cite{finally-tagless}
-that, when encodings of datatypes are modelled with type classes, 
+that, when encodings of datatypes are modelled with type classes,
 the subclassing mechanism of type classes can be used to achieve
 extensibility and reuse of operations. Using such techniques provides
 a solution to the Expression Problem. Similarly, in OO languages with
@@ -171,7 +180,7 @@ generics, it is possible to use generic interfaces and classes to
 implement type-theoretic encodings of datatypes. Conventional
 subtyping allows the interfaces and classes to be extended, which can
 also be used to provide extensibility and reuse of operations. Using
-such techniques, it is also possible to solve the Expression Problem 
+such techniques, it is also possible to solve the Expression Problem
 in OO languages~\cite{oliveira09modular,oliveira2012extensibility}.
 It is even possible to solve the Expression Problem in theorem provers
 like Coq, by exploiting Coq's type class mechanism~\cite{DelawareOS13}.
@@ -179,9 +188,9 @@ Nevertheless, although there is a clear connection between all those
 techniques and type-theoretic encodings of datatypes, as far as we
 know, no one has studied the expression problem from a more
 type-theoretic point of view. As shown in Section~\ref{subsec:OAs}, a system
-with intersection types, parametric polymorphism, the merge operator 
+with intersection types, parametric polymorphism, the merge operator
 and disjoint quantification can be used to explain type-theoretic
-encodings with subtyping and extensibility. 
+encodings with subtyping and extensibility.
 
 
 \begin{comment}

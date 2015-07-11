@@ -228,7 +228,8 @@ disjoint intersection types and parametric polymorphism:
 \[\lambda x. {\bf let}~y = 0 \mergeop x~{\bf in}~x\]
 \end{comment}
 Consider the attempt to write
-the following polymorphic function in \namedis:
+the following polymorphic function in \namedis (we will use Greek letters and
+uppercase Latin letters to denote type variables):
 \begin{lstlisting}
 let fst (*$ \alpha $*) (*$ \beta $*) (x: (*$ \alpha $*) & (*$ \beta $*)) = (fun (z: (*$ \alpha $*)) (*$ \to $*) z) x in (*$ \ldots $*)
 \end{lstlisting}
