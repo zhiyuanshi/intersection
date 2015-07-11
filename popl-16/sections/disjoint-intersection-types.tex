@@ -3,7 +3,7 @@
 
 Although the system shown in the Section~\ref{sec:fi} is type-safe, it is not
 coherent. This section shows how to modify \name so that it guarantees coherence
-as well as type soundness. The result is calculus named \namedis. The keys
+as well as type soundness. The result is a calculus named \namedis. The keys
 aspects are the notion of disjoint intersections, and disjoint quantification
 for polymorphic types.
 
@@ -294,7 +294,7 @@ If $A_2 \subtype A_3$, then $A_1 \inter A_2 \subtype A_3$.
 
 The interpretation of the theorem is that: even though the premise is made more
 strict by the atomic condition, we can still derive the every subtyping relation
-in the unrestricted systems.
+in the unrestricted system.
 % \george{Explain why the proof shows this.}
 
 \begin{comment}
