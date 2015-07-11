@@ -454,7 +454,7 @@ constrained so that it is disjoint with a
 given type. With disjoint quantification a variant of the program $fst$, which
 is accepted by \namedis, would be written as:
 \begin{lstlisting}
-let fst (*$ \alpha $*) ((*$ \highlight {$\beta * \alpha$} $*)) (x: (*$ \alpha $*) & (*$ \beta $*)) = (fun (z: (*$ \alpha $*)) (*$ \to $*) z) x
+let fst A ((*$ \highlight {B *~A} $*)) (x: A & B) = (fun (z: A) (*$ \to $*) z) x
 in (*$ \ldots $*)
 \end{lstlisting}
 The small change is in the declaration of the type parameter $B$. The notation
