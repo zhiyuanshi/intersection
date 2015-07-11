@@ -1,15 +1,15 @@
 \section{Overview} \label{sec:overview}
 
-This section introduces \name and its support for intersection types,
+This section introduces \namedis and its support for intersection types,
 parametric polymorphism and the merge operator. It then discusses
 the issue of coherence and shows how the notion of disjoint
 intersection types and disjoint quantification achieve a coherent semantics.
-Finally we illustrate the expressive power of \name by encoding
+Finally we illustrate the expressive power of \namedis by encoding
 extensible type-theoretic encodings of datatypes.
 
 Note that this section uses some syntactic sugar, as well as standard
 programming language features, to illustrate the various concepts in
-\name. Although the minimal core language that we formalize in
+\namedis. Although the minimal core language that we formalize in
 Section~\ref{sec:fi} does not present all such features, our implementation
 supports them.
 
@@ -24,7 +24,7 @@ disjoint quantification, which is enough to ensure coherence.
 \end{comment}
 
 \subsection{Intersection Types and the Merge Operator}
-%%\subsection{Intersection Types, Merge and Polymorphism in \name}
+%%\subsection{Intersection Types, Merge and Polymorphism in \namedis}
 
 Intersection types date back as early as Coppo et
 al.'s work~\cite{coppo1981functional}. Since then various researchers have
@@ -36,9 +36,9 @@ form or another.
 
 \paragraph{Intersection types.}
 The intersection of type $A$ and $B$ (denoted as \lstinline{A & B} in
-\name) contains exactly those values
+\namedis) contains exactly those values
 which can be used as either of type $A$ or of type $B$. For instance,
-consider the following program in \name:
+consider the following program in \namedis:
 
 \begin{lstlisting}
 let x : Int & Char = (*$ \ldots $*) in -- definition ommitted
@@ -65,13 +65,13 @@ intersection types are introduced by a \emph{merge operator}.
 As Dunfield~\cite{dunfield2014elaborating} has argued a merge operator adds considerable
 expressiveness to a calculus. The merge operator allows
 two values to be merged in a single intersection type. For example, an
-implementation of \lstinline{x} is constructed in \name as follows:
+implementation of \lstinline{x} is constructed in \namedis as follows:
 
 \begin{lstlisting}
 let x : Int & Char = 1,,'c' in (*$ \ldots $*)
 \end{lstlisting}
 
-\noindent In \name (following Dunfield's notation), the
+\noindent In \namedis (following Dunfield's notation), the
 merge of two values $v_1$ and $v_2$ is denoted as $v_1 ,, v_2$.
 
 \paragraph{Merge operator and pairs.}
@@ -152,7 +152,7 @@ which leads to multiple meanings of a term.
 Thus a natural option is to try to forbid such overlapping
 values of the same type in a merge.
 
-This is precisely the approach taken in \name. \name requires that the
+This is precisely the approach taken in \namedis. \namedis requires that the
 two types of in intersection must be \emph{disjoint}.  However,
 although disjointness seems a natural restriction to impose on
 intersection types, it is not obvious to formalize it. Indeed Dunfield
@@ -207,12 +207,12 @@ following definition captures this idea more formally.
 merge. Since $Int$ is a common supertype of both $Int \& Char$ and
 $Int \& Bool$, those two types are not disjoint.
 
-\name's type system only accepts programs that use disjoint
+\namedis's type system only accepts programs that use disjoint
 intersection types. As shown in Section~\ref{sec:disjoint} disjoint intersection
 types will play a crutial rule in guaranteing that the semantics is coherent.
 
 \subsection{Parametric Polymorphism and Intersection Types}\label{subsec:polymorphism}
-Before we show how \name extends the idea of disjointness to parametric
+Before we show how \namedis extends the idea of disjointness to parametric
 polymorphism, we discuss some non-trivial issues that arize from
 the interaction between parametric polymorphism and intersection types.
 %The interaction between parametric polymorphism and
@@ -228,7 +228,7 @@ disjoint intersection types and parametric polymorphism:
 \[\lambda x. {\bf let}~y = 0 \mergeop x~{\bf in}~x\]
 \end{comment}
 Consider the attempt to write
-the following polymorphic function in \name:
+the following polymorphic function in \namedis:
 \begin{lstlisting}
 let fst (*$ \alpha $*) (*$ \beta $*) (x: (*$ \alpha $*) & (*$ \beta $*)) = (fun (z: (*$ \alpha $*)) (*$ \to $*) z) x in (*$ \ldots $*)
 \end{lstlisting}
@@ -287,7 +287,7 @@ Unfortunatelly this subtle interaction of polymorphism and type-based lookup
 In the equational reasoning steps above, doing apparently correct
 substitutions lead us to a wrong result. This is a major problem for
 biased choice and a reason to dismiss it as a possible implementation
-choice for \name.
+choice for \namedis.
 
 \paragraph{Conservatively rejecting intersections.}
 To avoid incoherence, and the issues of biased choice, another option
@@ -391,9 +391,9 @@ coexistence might be a good thing.} \george{May use the merge example}
 
 
 To address the limitations of intersection types in languages like
-Scala, \name allows intersecting any two terms at run time using a
+Scala, \namedis allows intersecting any two terms at run time using a
 \emph{merge} operator (denoted by $ \mergeop $)~\cite{dunfield2014elaborating}.  With the merge
-operator it is trivial to implement the \lstinline{merge} function in \name:
+operator it is trivial to implement the \lstinline{merge} function in \namedis:
 
 \begin{lstlisting}
 let merge[A, B * A] (x : A) (y : B) : A & B = x ,, y in (*$ \ldots $*)
@@ -443,7 +443,7 @@ disjoint depends on the instantiation of $\alpha$.
 
 \subsection{Disjoint Quantification}
 To avoid being overly conservative, while still retaining coherence in the
-presence of parametric polymorphism and intersection types, \name uses
+presence of parametric polymorphism and intersection types, \namedis uses
 an extension to universal quantification called \emph{disjoint quantification}.
 Inspired by
 bounded quantification~\cite{Cardelli:1994},
@@ -451,7 +451,7 @@ where a type variable is constrained by a type
 bound, disjoint quantification allows a type variable to be
 constrained so that it is disjoint with a
 given type. With disjoint quantification a variant of the program $fst$, which
-is accepted by \name, would be written as:
+is accepted by \namedis, would be written as:
 \begin{lstlisting}
 let fst (*$ \alpha $*) ((*$ \highlight {$\beta * \alpha$} $*)) (x: (*$ \alpha $*) & (*$ \beta $*)) = (fun (z: (*$ \alpha $*)) (*$ \to $*) z) x
 in (*$ \ldots $*)
