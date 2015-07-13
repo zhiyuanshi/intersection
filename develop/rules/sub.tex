@@ -1,0 +1,90 @@
+\newcommand{\formsub}{\framebox{$ A \subtype B \yields E $}}
+
+\newcommand{\makelabelsub}[1]{Sub\_#1}
+
+\newcommand{\labelsubvar}{\makelabelsub Var}
+\newcommand{\rulesubvar}{
+  \inferrule* [right=\labelsubvar]
+    { }
+    {\alpha \subtype \alpha \yields {\lamty x {\im \alpha} x}}
+}
+
+\newcommand{\labelsubfun}{\makelabelsub Fun}
+\newcommand{\rulesubfun}{
+  \inferrule* [right=\labelsubfun]
+    {{B_1} \subtype {A_1} \yields {E_1} \\
+     {A_2} \subtype {B_2} \yields {E_2}}
+    {{A_1 \to A_2} \subtype {B_1 \to B_2}
+    \yields
+        {\lamty f {\im {A_1 \to A_2}}
+        {\lamty x {\im {B_1}}
+            {\app {E_2} {(\app f {(\app {E_1} x)})}}}}}
+}
+
+\newcommand{\labelsubforall}{\makelabelsub Forall}
+\newcommand{\rulesubforall}{
+  \inferrule* [right=\labelsubforall]
+    {{A_1} \subtype {A_2} \yields E}
+    {\for {\alpha} {A_1} \subtype \for {\alpha} {A_2}
+      \yields
+        {\lamty f {\im {\for {\alpha} {A_1}}}
+          {\blam \alpha {\app E {(\app f \alpha)}}}}}
+}
+
+\newcommand{\rulesubforalldis}{
+  \inferrule* [right=\labelsubforall]
+    {{B_1} \subtype {B_2} \yields E}
+    {\fordis {\alpha} A {B_1} \subtype \fordis {\alpha} A {B_2}
+      \yields
+        {\lamty f {\im {\for {\alpha} {B_1}}}
+          {\blam \alpha {\app E {(\app f \alpha)}}}}}
+}
+
+\newcommand{\labelsubinter}{\makelabelsub Inter}
+\newcommand{\rulesubinter}{
+  \inferrule* [right=\labelsubinter]
+    {{A_1} \subtype {A_2} \yields {E_1} \\
+     {A_1} \subtype {A_3} \yields {E_2}}
+    {{A_1} \subtype {A_2 \inter A_3}
+      \yields
+        {\lamty x {\im {A_1}}
+          {\pair {\app {E_1} x} {\app {E_2} x}}}}
+}
+
+\newcommand{\labelsubinterl}{\makelabelsub {Inter\_1}}
+\newcommand{\rulesubinterl}{
+  \inferrule* [right=\labelsubinterl]
+    {{A_1} \subtype {A_3} \yields E}
+    {{A_1 \inter A_2} \subtype {A_3}
+      \yields
+        {\lamty x {\im {A_1 \inter A_2}}
+          {\app E {(\proj 1 x)}}}}
+}
+
+\newcommand{\rulesubinterldis}{
+\inferrule* [right=\labelsubinterl]
+    {{A_1} \subtype {A_3} \yields E \\ \highlight{$\jatomic {A_3}$}}
+    {{A_1 \inter A_2} \subtype {A_3}
+      \yields
+        {\lamty x {\im {A_1 \inter A_2}}
+          {\app E {(\proj 1 x)}}}}
+}
+
+\newcommand{\labelsubinterr}{\makelabelsub {Inter\_2}}
+\newcommand{\rulesubinterr}{
+  \inferrule* [right=\labelsubinterr]
+    {{A_2} \subtype {A_3} \yields E}
+    {{A_1 \inter A_2} \subtype {A_3}
+      \yields
+        {\lamty x {\im {A_1 \inter A_2}}
+          {\app E {(\proj 2 x)}}}}
+}
+
+\newcommand{\rulesubinterrdis}{
+  \inferrule* [right=\labelsubinterr]
+    {{A_2} \subtype {A_3} \yields E \\ \highlight{$\jatomic {A_3}$}}
+    {{A_1 \inter A_2} \subtype {A_3}
+      \yields
+        {\lamty x {\im {A_1 \inter A_2}}
+          {\app E {(\proj 2 x)}}}}
+}

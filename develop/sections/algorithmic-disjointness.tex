@@ -1,0 +1,246 @@
+\section{Algorithmic Disjointness} \label{sec:alg-dis}
+
+Section~\ref{sec:disjoint} presented a type system with disjoint
+intersection types and disjoint quantification that is both type-safe
+and coherent. Unfortunatelly the type system is not algorithmic
+because the specification of disjointness does not lend itself to an
+implementation directly. This is a problem, because we need an
+algorithm for checking whether two types are disjoint or not in order
+to implement the type-system.
+
+\begin{comment}
+Now that we have obtained a specification for disjointness, but the definition
+involves an existence problem. How can we implement it? One possibility is
+bidirectional subtyping, that is, we say two types, $A$ and $B$, are disjoint if
+neither $A \subtype B$ nor $B \subtype A$. However, this implementation is
+wrong. For example, $\tyint \inter \tystring$ and $\tystring \inter \tychar$ are
+not disjoint by specification since $\tystring$ is their common supertype. Yet
+by the implementation they are, since neither of them is a subtype of
+the other. \bruno{You need a concrete code example to make this point.}
+Hence the algorithmic rules are more nuanced. For now, it is enough to treat the
+disjoint judgement $\jdis \Gamma A B$ as oracle and we will come back to
+this topic in the next section.
+\end{comment}
+
+This section presents the set of rules for determining whether two
+types are disjoint. The set of rules is algorithmic and an
+implementation is easily derived from them. Therefore we solve the
+problem of finding an algorithm to compute disjointness.  The derived
+set of rules for disjointness is proved to be sound and complete with
+respect to the definition of disjointness in
+Section~\ref{sec:disjoint}.
+
+\begin{comment}
+\subsection{Derivation of the Algorithmic Rules}
+
+In this subsection, we illustrate how to derive the algorithmic disjointness
+rules by showing a detailed example for functions. For the ease of discussion,
+first we introduce some notation.
+
+\begin{definition}[Set of common supertypes]
+  For any two types $A$ and $B$, we can denote the \emph{set of their common
+  supertypes} by \[ \commonsuper(A,B) \] In other words, a type $C \in \;
+  \commonsuper(A,B)$ if and only  if $A \subtype C$ and $B \subtype C$.
+\end{definition}
+
+\begin{example}
+  $\commonsuper(\tyint,\tychar)$ is empty, since $\tyint$ and $\tychar$
+  share no common supertype.
+\end{example}
+
+Parellel to the notion of the set of common supertypes is the notion of the set
+of common subtypes.
+
+\begin{definition}[Set of common subtypes]
+  For any two types $A$ and $B$, we can denote the \emph{set of their common
+  subtypes} by \[ \commonsub(A,B) \] In other words, a type $C \in \; \commonsub(A,B)$
+  if and only  if $C \subtype A$ and $C \subtype B$.
+\end{definition}
+
+\begin{example}
+  $\commonsub(\tyint,\tychar)$ is an infinite set which contains $\tyint \inter
+  \tychar$, $\tychar \inter \tyint$, $(\tyint \inter \tybool) \inter \tychar$
+  and so on. But the type $\tybool$ is not inside, since it is not a subtype of
+  $\tyint$ or $\tychar$.
+\end{example}
+
+
+\paragraph{Shorthand notation.} For brevity, we will use \[ \mathcal{A} \to
+\mathcal{B} \] as a shorthand for the \emph{set} of types of the form $A \to B$,
+where $A \in \mathcal{A}$ and $B \in \mathcal{B}$. The same shorthand applies to
+all other constructors of types, in addition to functions, as well. As a simple
+example,  \[ \{ \tyint, \tystring \} \to \{ \tyint, \tychar \} \] is a shorthand for \[ \{
+\tyint \to \tyint, \tyint \to \tychar, \tystring \to \tyint, \tystring \to \tychar \} \]
+
+
+Recall that we say two types $A$ and $B$ are disjoint if they do not share a
+common supertype. Therefore, determining if two types $A$ and $B$ are disjoint
+is the same as determining if $\commonsuper(A,B)$ is empty.
+
+\paragraph{Determining disjointness of functions.} Now let's dive into the case
+where both $A$ and $B$ are functions and consider how to compute
+$\commonsuper(A_1 \to A_2, B_1 \to B_2)$. By the subtyping rules, the supertype
+of a function must also be a function.\george{Nah... only after normalization.
+If not, it can also be $\inter$} Let $C_1 \to C_2$ be a common supertype
+of $A_1 \to A_2$ and $B_1 \to B_2$. Then it must satisfy the following:
+\begin{mathpar}
+  \inferrule
+    {C_1 \subtype A_1 \\ A_2 \subtype C_2}
+    {A_1 \to A_2 \subtype C_1 \to C_2}
+
+  \inferrule
+    {C_1 \subtype B_1 \\ B_2 \subtype C_2}
+    {B_1 \to B_2 \subtype C_1 \to C_2}
+\end{mathpar}
+From which we see that $C_1$ is a common subtype of $A_1$ and $B_1$ and that
+$C_2$ is a common supertype of $A_2$ and $B_2$. Therefore, we can write:
+\[ \commonsuper(A_1 \to A_2, B_1 \to B_2) \ = \ \commonsub(A_1,B_1) \to \commonsuper(A_2,B_2) \]
+By definition, $\commonsub(A_1,B_1) \to \commonsuper(A_2,B_2)$ is not empty if and only if both
+$\commonsub(A_1,B_1)$ and $\commonsuper(A_2,B_2)$ is nonempty. However, note
+that with intersection types, $\commonsub(A_1,B_1)$ is always nonempty because
+$A_1 \inter B_1$ belongs to $\commonsub(A_1,B_1)$. Therefore, the problem of
+determining if $\commonsuper(A_1 \to A_2, B_1 \to B_2)$ is empty reduces to the
+problem of determining if $\commonsuper(B_1 \to B_2)$ is empty, which is, by
+definition, if $B_1$ and $B_2$ are disjoint. Finally, we have derived a rule for
+functions:
+\begin{mathpar}
+  \ruledisfun
+\end{mathpar}
+
+The analysis needed for determining if types with other constructors are
+disjoint is similar. Below are the major results of the recursive definitions for
+$\commonsuper$:
+\begin{align*}
+  \commonsuper(A_1 \to A_2, B_1 \to B_2) &= \commonsub(A_1,B_1) \to \commonsuper(A_2,B_2) \\
+  \commonsuper({A_1 \inter A_2, B})      &= \commonsuper(A_1, B) \cup \commonsuper(A_1,B) \\
+  \commonsuper({A, B_1 \inter B_2})      &= \commonsuper(A, B_1) \cup \commonsuper(A,B_2)
+\end{align*}\george{Missing the forall case. But we're just going to
+  drop the formulae.}
+\end{comment}
+
+\subsection{Algorithmic Rules}
+
+
+\begin{figure*}[h]
+  \begin{mathpar}
+    \formdis \\
+    \ruledisvar \and \ruledissym \and
+    \ruledisfun \and \ruledisforall \and
+    \ruledisinterl \and \ruledisinterr \and \ruledisatomic
+  \end{mathpar}
+
+  \begin{mathpar}
+    \formax \\
+    \ruledisaxbotbot \and \ruleaxbotfun \and \ruleaxbotforall \and \ruleaxfunforall \and \ruleaxsym
+  \end{mathpar}
+
+  \caption{Algorithmic Disjointness.}
+  \label{fig:disjointness}
+\end{figure*}
+
+The rules for the disjointness judgement are shown in
+Figure~\ref{fig:disjointness}, which consists of two judgements.
+
+\paragraph{Main judgement.} The judgement $\jdisimpl \Gamma A B$ says
+two types $A$ and $B$ are disjoint in a context
+$\Gamma$.
+
+\reflabel{\labeldisvar} is the base rule and
+\reflabel{\labeldissym} is its twin rule. Both rules state that a
+type variable is disjoint to some type $A$, if $\Gamma$ contains a
+corresponding disjointness constraint. The \reflabel{\labeldissym}
+rule is needed because disjointness is a symmetric relation.
+
+The rules dealing with intersection types (\reflabel{\labeldisinterl}
+and \reflabel{\labeldisinterr}) are quite intuitive. The intuition is
+that if two types $A$ and $B$ are disjoint to some type $C$, then
+their intersection ($A\&B$) is also clearly disjoint to $C$.  The
+rules capture this intuition by inductively distributing the relation
+itself over the intersection constructor ($\inter$). The rule
+for disjoint quantification (\reflabel{\labeldisforall}) is also
+rather intuitive. It adds the constraint into $\Gamma$ and checks for
+disjointness in the bodies.
+
+The rule for functions (\reflabel{\labeldisfun}) is more interesting. It says that two function
+types are disjoint if and only if their return types are disjoint (regardless of
+their parameter types!). At first this rule may look surprising
+because the parameter types play no role in the definition of
+disjointness. To see the reason for this consider the two function types:
+\[ \tyint \to \tystring \qquad \tybool \to \tystring \]
+Even though their parameter types are disjoint, we are still able to think of a
+type which is a supertype for both of them. For example, $ \tyint \inter \tybool
+\to \tystring $. Therefore, by definition, the two function types with
+the same return type are not
+disjoint. Essentially, due to the contravariance of function types,
+functions of the form $A \to C$ and $B \to C$ always have a common
+supertype (for example $A \& B \to C$).
+The lesson from this example is that the parameter types of two
+function types do not have any influence in determining whether those two function
+types are disjoint or not: only the return types matter.
+
+\begin{comment}
+The rule for disjoint quantification (\reflabel{\labeldisforall}) . Consider the following two types:
+\[ (\forall (\alpha * \tyint).~\tyint \& \alpha) \qquad (\forall (\alpha * \tychar). ~\tychar \& \alpha) \]
+The question is under which conditions are those two types disjoint.
+In the first type $\alpha$ cannot be instantiated with $\tyint$ and in
+the second case $\alpha$ cannot be instantiated with $\tychar$.
+Therefore we can see that for the two bodies to be considered
+disjoint, $\alpha$ cannot be instantiated with either $\tyint$ or
+$\tychar$. The rule for disjoint quantification captures this fact by
+requiring the bodies of disjoint quantification to be checked for
+disjointness under both constraints.
+\end{comment}
+
+Finally, the rule \reflabel{\labeldisax} says two types are considered disjoint if they are
+judged to be disjoint by the axiom rules, which are explained below.
+
+\paragraph{Axioms.} Up till now, the rules of $ \jdisimpl \Gamma A B $ have only
+taken care of two types with the same language constructs. But how can be the fact that
+$\tyint$ and $\tyint \to \tyint$ are disjoint be decided? That is exactly the
+place where the judgement $ A \disjointax B $ comes in handy. It provides the
+axioms for disjointness. What is captured by the set of rules is that $ A
+\disjointax B $ holds for all two types of different constructs unless any of
+them is an intersection type. That is because for example, $ \tyint \inter
+(\tychar \to \tychar) $ and $ \tychar \to \tychar $ use different constructs
+and yet are not disjoint. There are two points worth noting. One is
+that the only type that is disjoint with itself is $\bot$: the type
+which has no values. The other point is that all rules need a dual
+form to ensure symetry. The rule \reflabel{\labelaxsym} takes care of that.
+
+\subsection{Metatheory}
+
+The algorithmic rules for disjointness are sound and complete.
+
+% \begin{lemma}{Symmetry of disjointness} \label{lemma:symmetry-of-disjointness}
+%   If $\jdis \Gamma A B$, then $\jdis \Gamma B A$.
+% \end{lemma}
+%
+% \begin{theorem} \label{lemma:disjoint-intersect}
+%   If $\jdis \Gamma A C$ and $\jdis \Gamma B C$,
+%   then $\jdis \Gamma {A \inter B} {C}$.
+% \end{theorem}
+%
+% \begin{lemma} \label{lemma:common-supertype}
+%   If $A_1 \to A_2 \subtype D$ and $B_1 \to B_2 \subtype D$,
+%   then there exists a $C$ such that $A_2 \subtype C$ and $B_2 \subtype C$.
+% \end{lemma}
+
+\begin{restatable}[Soundness of algorithmic disjointness]{theorem}{algodissoundness}
+  \label{theorem:soundness}
+
+  For any two types $A$ and $B$, $\jdisimpl \Gamma A B$ implies $\jdis \Gamma A B$.
+\end{restatable}
+
+\begin{proof}
+  By induction on the derivation of $\jdisimpl \Gamma A B$.
+\end{proof}
+
+\begin{restatable}[Completeness of algorithmic disjointness]{theorem}{algodiscompleteness}
+  \label{theorem:completeness}
+
+  For any two types $A$, $B$, $\jdis \Gamma A B$ implies $\jdisimpl \Gamma A B$.
+\end{restatable}
+
+\begin{proof}
+  By a case analysis on the shape of $A$ and $B$.
+\end{proof}
