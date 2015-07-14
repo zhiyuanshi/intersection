@@ -5,14 +5,14 @@
 \newcommand{\labeldisvar}{\makelabeldis Var}
 \newcommand{\ruledisvar}{
   \inferrule* [right=\labeldisvar]
-    {\alpha \disjoint A \in \Gamma}
+    {\alpha \disjoint B \in \Gamma \\ B <: A}
     {\jdisimpl \Gamma \alpha A}
 }
 
 \newcommand{\labeldissym}{\makelabeldis Sym}
 \newcommand{\ruledissym}{
   \inferrule* [right=\labeldissym]
-    {\alpha \disjoint A \in \Gamma}
+    {\alpha \disjoint B \in \Gamma \\ B <: A}
     {\jdisimpl \Gamma A \alpha}
 }
 
@@ -40,8 +40,8 @@
 \newcommand{\labeldisforall}{\makelabeldis Forall}
 \newcommand{\ruledisforall}{
   \inferrule* [right=\labeldisforall]
-    {\jdisimpl {\Gamma, \alpha * A} {B} {C}}
-    {\jdisimpl \Gamma {\fordis \alpha {A} {B}} {\fordis \alpha {A} {C}}}
+    {\jdisimpl {\Gamma, \alpha * A, \beta * B} {C} {D}}
+    {\jdisimpl \Gamma {\fordis \alpha {A} {C}} {\fordis \beta {B} {D}}}
 }
 
 \newcommand{\labeldisax}{\makelabeldis Axiom}
