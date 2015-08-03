@@ -100,11 +100,11 @@
     \end{flalign*}
 
     Suppose the contrary. Then by the definition of disjointness, there exists a
-    type $B$ such that $\alpha \subtype B$ and $A \subtype B$. By
-    Lemma~\ref{lemma:subtype-ftv-var}, $\alpha \in \ftv B$. Since $A \subtype
-    B$, we also have $\ftv B \subseteq \ftv A$ due to
-    Lemma~\ref{lemma:subtype-ftv}, and thus $\alpha \in \ftv A$. But by the
-    typing rules, we know $\alpha \not \in \ftv A$. Contradiction. \\
+    type $C$ such that $\alpha \subtype C$ and $A \subtype C$. By
+    Lemma~\ref{lemma:subtype-ftv-var}, $\alpha \in \ftv C$. Since $B \subtype A$ and $A \subtype
+    C$, we also have $\ftv C \subseteq \ftv A \subseteq \ftv B$ due to
+    Lemma~\ref{lemma:subtype-ftv}, and thus $\alpha \in \ftv B$. But by the
+    typing rules, we know $\alpha \not \in \ftv B$. Contradiction. \\
 
     \item Case
     \begin{flalign*}

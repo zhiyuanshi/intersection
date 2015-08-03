@@ -34,7 +34,7 @@
 \newcommand{\rulesubforalldis}{
   \inferrule* [right=\labelsubforall]
     {{B_1} \subtype {B_2} \yields E}
-    {\fordis {\alpha} A {B_1} \subtype \fordis {\alpha} A {B_2}
+    {\fordis {\alpha} {A_1} {B_1} \subtype \fordis {\alpha} {A_2} {B_2}
       \yields
         {\lamty f {\im {\for {\alpha} {B_1}}}
           {\blam \alpha {\app E {(\app f \alpha)}}}}}

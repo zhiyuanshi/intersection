@@ -40,7 +40,7 @@
 \newcommand{\labeldisforall}{\makelabeldis Forall}
 \newcommand{\ruledisforall}{
   \inferrule* [right=\labeldisforall]
-    {\jdisimpl {\Gamma, \alpha * A, \beta * B} {C} {D}}
+    {\jdisimpl \Gamma {C} {D}}
     {\jdisimpl \Gamma {\fordis \alpha {A} {C}} {\fordis \beta {B} {D}}}
 }
 
