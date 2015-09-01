@@ -11,6 +11,11 @@ Definition (Substitution of context).
     [B/α] (Γ, α * A) = [B/α] Γ
     [B/α] (Γ, β * A) = [B/α] Γ, β * [B/α] A
 
+Lemma.
+    If α * B ∈ Γ, then α ∉ ftv(B).
+Proof.
+    By considering how type variables are added to the context.
+
 Definiton (Valid substitution).
     We say [A/α] is a valid substitution in Γ (denoted as Γ ⊢ [A/α]) if one
     of the following is true:
@@ -23,7 +28,11 @@ Definition (Disjointness).
         ∄ C such that A <: C and B <: C
     (2) One of A and B is not closed, and
         [C/α] Γ ⊢ [C/α] A * [C/α] B for all valid [C/α]
-        where α is the first type variable in Γ such that α ∈ ftv(A) ∪ ftv(B)
+        where α ∈ ftv(A) ∪ ftv(B)
+
+Examples.
+    (1) In the context α * Int, β * α, [α/β] is not a valid substitution.
+    (2) In the context α * Int, β * α, [β/α] is not a valid substitution.
 
 Lemma (Valid substitution preserves disjointness).
     If Γ ⊢ A * B and Γ ⊢ [C/α],
@@ -35,7 +44,6 @@ Proof.
 
     Case α ∈ ftv(A) ∪ ftv(B):
         ...
-Q.E.D.
 
 Lemma (Valid substitution preserves well-formedness).
     If Γ ⊢ A and Γ ⊢ [C/α],
@@ -53,7 +61,6 @@ Proof.
         definition of substitution, Γ ⊢ [C/α] A & B.
 
     The other cases are trivial.
-Q.E.D.
 
 Lemma (Typing produces well-formedness types).
     If Γ ⊢ e : A,
@@ -67,4 +74,3 @@ Proof.
         By Lemma (Valid substitution preserves well-formedness), Γ ⊢ [A/α] C.
 
     The other cases are trivial.
-Q.E.D.
