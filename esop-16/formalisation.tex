@@ -1,0 +1,78 @@
+\documentclass[nocopyrightspace,preprint,times,9pt]{sigplanconf}
+
+\input{packages.tex}
+\input{macros.tex}
+
+\input{rules/wf.tex}
+\input{rules/disjoint.tex}
+\input{rules/sub.tex}
+\input{rules/typing.tex}
+\input{rules/target.tex}
+
+\begin{document}
+
+%\special{papersize=8.5in,11in}
+%\setlength{\pdfpageheight}{\paperheight}
+%\setlength{\pdfpagewidth}{\paperwidth}
+
+\conferenceinfo{CONF 'yy}{Month d--d, 20yy, City, ST, Country}
+\copyrightyear{20yy}
+\copyrightdata{978-1-nnnn-nnnn-n/yy/mm}
+\doi{nnnnnnn.nnnnnnn}
+
+\titlebanner{banner above paper title}        % These are ignored unless
+\preprintfooter{\name}                        % 'preprint' option specified.
+
+\title{Disjoint Intersection Types and Disjoint Quantification}
+
+\authorinfo{Name1}
+           {Affiliation1}
+           {Email1}
+\authorinfo{Name2\and Name3}
+           {Affiliation2/3}
+           {Email2/3}
+
+\maketitle
+
+\category{CR-number}{subcategory}{third-level}
+
+\keywords intersection types, polymorphism, type system
+
+\section{Formalisation}
+
+What's the goal? A System $F$-like language with a \emph{merge} operator and coherence.
+
+\george{Int -> a and forall b. a are disjoint but their ftv overlap.}
+
+\begin{equation}
+  A, B \Coloneqq \alpha \mid \bot \mid A \to B \mid \fordis \alpha A B \mid A \inter B
+\end{equation}
+
+\begin{equation}
+  e \Coloneqq x \mid \lamty x A e \mid \app {e_1} {e_2} \mid \blamdis \alpha A e \mid \tapp e A \mid e_1 \mergeop e_2
+\end{equation}
+
+\begin{equation}
+  \Gamma \Coloneqq \cdot
+                   \mid \Gamma, \alpha \disjoint A
+                   \mid \Gamma, x \oftype A
+\end{equation}
+
+\begin{mathpar}
+  \formsub \\
+  \rulesubvar \and \rulesubfun \and \rulesubforalldis \and \rulesubinter \and
+  \rulesubinterl \and \rulesubinterr
+\end{mathpar}
+
+\begin{mathpar}
+  \formwf \\
+  \rulewfvar \and \rulewffun \and \rulewfforall \and \rulewfinter
+\end{mathpar}
+
+\begin{mathpar}
+  \formt \\
+  \ruletvar \and \ruletlam \and \ruletapp \and \ruletblamdis \and \rulettapp \and
+  \ruletmerge
+\end{mathpar}
+
+\end{document}

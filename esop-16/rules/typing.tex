@@ -1,0 +1,75 @@
+\newcommand{\formt}{\framebox{$ \jtype \Gamma e A \yields E $}}
+
+\newcommand{\makelabelt}[1]{F\_Ty\_#1}
+
+\newcommand{\labeltvar}{\makelabelt Var}
+\newcommand{\ruletvar} {
+\inferrule* [right=\labeltvar]
+  {x \oftype A \in \Gamma}
+  {\jtype \Gamma x A \yields x}
+}
+
+\newcommand{\labeltlam}{\makelabelt Lam}
+\newcommand{\ruletlam} {
+\inferrule* [right=\labeltlam]
+  {\jwf \Gamma A \\ \jtype {\Gamma, x \oftype A} e B \yields E}
+  {\jtype \Gamma {\lamty x A e} {A \to B} \yields {\lamty x {\im A} E}}
+}
+
+\newcommand{\labeltapp}{\makelabelt App}
+\newcommand{\ruletapp}{
+\inferrule* [right=\labeltapp]
+  {\jtype \Gamma {e_1} {A_{11} \to A_{12}} \yields {E_1} \\
+   \jtype \Gamma {e_2} {A_{11}} \yields {E_2}}
+  {\jtype \Gamma {\app {e_1} {e_2}} {A_{12}} \yields {\app {E_1} {(\app E E_2)}}}
+}
+
+\newcommand{\labeltblam}{\makelabelt BLam}
+\newcommand{\ruletblam}{
+\inferrule* [right=\labeltblam]
+  {\jtype {\Gamma, \alpha} e A \yields E \\
+   \jwf \Gamma B \\
+   \alpha \not \in \ftv \Gamma}
+  {\jtype \Gamma {\blam {\alpha} e} {\for {\alpha} A} \yields {\blam \alpha E}}
+}
+
+\newcommand{\ruletblamdis}{
+\inferrule* [right=\labeltblam]
+  {\jwf \Gamma A \\
+   \jtype {\Gamma,\alpha \disjoint A} e B \yields E \\
+   \alpha \not \in \ftv \Gamma}
+  {\jtype \Gamma {\blamdis \alpha A e} {\fordis \alpha A B}
+    \yields {\blam \alpha E}}
+}
+
+\newcommand{\labelttapp}{\makelabelt TApp}
+\newcommand{\rulettapp}{
+\inferrule* [right=\labelttapp]
+  {\jtype \Gamma e {\for \alpha B} \yields E \\
+   \jwf \Gamma A}
+  {\jtype \Gamma {\tapp e A} {\subst A \alpha B} \yields {\tapp E {\im A}}}
+}
+
+\newcommand{\rulettappdis}{
+\inferrule* [right=\labelttapp]
+  {\jtype \Gamma e {\for {\alpha \disjoint B} C} \yields E \\
+   \jwf \Gamma A \\
+   \jdis \Gamma A B}
+  {\jtype \Gamma {\tapp e A} {\subst A \alpha C} \yields {\tapp E {\im A}}}
+}
+
+\newcommand{\labeltmerge}{\makelabelt Merge}
+\newcommand{\ruletmerge}{
+\inferrule* [right=\labeltmerge]
+  {\jtype \Gamma {e_1} A \yields {E_1} \\
+   \jtype \Gamma {e_2} B \yields {E_2}}
+  {\jtype \Gamma {e_1 \mergeop e_2} {A \inter B} \yields {\pair {E_1} {E_2}}}
+}
+
+\newcommand{\ruletmergedis}{
+\inferrule* [right=\labeltmerge]
+  {\jtype \Gamma {e_1} A \yields {E_1} \\
+   \jtype \Gamma {e_2} B \yields {E_2} \\
+   \highlight{$\jdis \Gamma A B$}}
+  {\jtype \Gamma {e_1 \mergeop e_2} {A \inter B} \yields {\pair {E_1} {E_2}}}
+}

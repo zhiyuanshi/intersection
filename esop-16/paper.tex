@@ -1,0 +1,69 @@
+\documentclass{llncs}
+\usepackage{llncsdoc}
+\input{packages.tex}
+\input{macros.tex}
+
+\input{rules/wf.tex}
+\input{rules/disjoint.tex}
+\input{rules/sub.tex}
+\input{rules/typing.tex}
+\input{rules/target.tex}
+
+\begin{document}
+\markboth{\LaTeXe{} Class for Lecture Notes in Computer
+Science}{\LaTeXe{} Class for Lecture Notes in Computer Science}
+\thispagestyle{empty}
+\begin{flushleft}
+\LARGE\bfseries Instructions for Authors\\
+Coding with \LaTeX\\[2cm]
+\end{flushleft}
+\rule{\textwidth}{1pt}
+\vspace{2pt}
+\begin{flushright}
+\Huge
+\begin{tabular}{@{}l}
+\LaTeXe{} Class\\
+for Lecture Notes\\
+in Computer Science\\[6pt]
+{\Large Version 2.4}
+\end{tabular}
+\end{flushright}
+\rule{\textwidth}{1pt}
+\vfill
+
+
+%\special{papersize=8.5in,11in}
+%\setlength{\pdfpageheight}{\paperheight}
+%\setlength{\pdfpagewidth}{\paperwidth}
+
+\title{Disjoint Intersection Types and Disjoint Quantification}
+\subtitle{Full Version with Appendix}
+
+\maketitle
+
+\begin{abstract}
+  \input{sections/abstract.tex}
+\end{abstract}
+
+\input{sections/introduction.tex}
+\input{sections/overview.tex}
+\input{sections/application.tex}
+\input{sections/fi.tex}
+\input{sections/disjoint-intersection-types.tex}
+\input{sections/algorithmic-disjointness.tex}
+\input{sections/related-work.tex}
+\input{sections/conclusion.tex}
+
+\newpage
+\bibliographystyle{abbrvnat}
+\bibliography{references}
+
+\clearpage
+\onecolumn
+
+\appendix
+\input{appendix/target-type-system.tex}
+% \input{appendix/proofs.tex}
+
+
+\end{document}
