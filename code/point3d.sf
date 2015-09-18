@@ -1,0 +1,33 @@
+-- Dynamic trait composition
+
+-- interface Enumerable
+
+-- LoggedEnumerable
+let new2[A] (f: (Unit -> A) -> A): A = let rec x : Unit -> A = \(d: Unit) -> f x in x ()
+in
+type Point2D = {x: Unit -> Int, y: Unit -> Int};
+type Z = {z: Unit -> Int};
+type Point3D = Point2D & Z;
+
+let point2d (x0: Int) (y0: Int) (self: Unit -> Point3D): Point2D = {
+  x = \(d: Unit) -> x0,
+  y = \(d: Unit) -> (self ()).z ()
+} in
+
+let pointz (z0: Int) (self: Unit -> Point2D): Z = {
+  --x = (self ()).x,
+  --y = (self ()).y,
+  z = \(d: Unit) -> (self ()).x ()
+} in
+
+-- let compose[A,B] (t1: (Unit -> A&B) -> A) (t2: (Unit -> A&B) -> B) = \(self: Unit -> A&B) -> t1 self,, t2 self in
+
+--let p1 = new2 [Point3D] (compose [Point2D,Z] (point2d 0 1) (pointz 2)) in
+
+let p1 = new2 [Point3D] (\(self : Unit -> Point3D) -> (point2d 100 1 self) ,, (pointz 2 self)) in
+
+-- let p2 = new2 [Point3D] (merge (point2d 0 1) (pointz 2))
+p1.y ()
+
+-- new2 [Point3D] expects (Unit -> Point3D) -> Point3D
+-- point2d 0 1 ,, pointz 2 : ((Unit -> Point2D) -> Point2d) & ((Unit -> Point3D) -> {z: Int})

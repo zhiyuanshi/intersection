@@ -1,0 +1,26 @@
+-- Trait example in an ML-like language extended with intersection types
+
+type Equal = {
+  equals  : () -> Bool,
+  differs : Equal -> Bool
+} in
+
+let equal (self : () -> Equal) = {
+  equals  = undefined,
+  differs = \(x: Equal) -> (self()).equals(x)
+} in
+
+type Order = {
+  smallerThan : (Equal & Order) -> Bool,
+  greaterThan : (Equal & Order) -> Bool,
+  between : (Equal & Order) -> (Equal & Order) -> Bool
+} in
+
+let order (self) =
+  Equal(self) & {
+    smallerThan = undefined,
+    greaterThan = \(other : Equal & Order) ->
+      !(self()).smaller(other) && (self()).differs(other),
+    between = \(min : Equal & Order) (max : Equal & Order) ->
+      min.smaller((self())) && (self()).smaller(max)
+  } in

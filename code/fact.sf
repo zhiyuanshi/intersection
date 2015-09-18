@@ -1,0 +1,4 @@
+let new2[A] (f: (Unit -> A) -> A): A = let rec x : Unit -> A = \(d: Unit) -> f x in x ()
+in
+let fact (self: Unit -> Int -> Int) (n: Int): Int = if n == 1 then 1 else n * (self () (n - 1)) in
+new2[Int->Int]fact 9
