@@ -1,9 +1,10 @@
 \section{Overview} \label{sec:overview}
 
-This section introduces \namedis and its support for intersection types,
-parametric polymorphism and the merge operator. It then discusses
-the issue of coherence and shows how the notion of disjoint
-intersection types and disjoint quantification achieve a coherent semantics.
+This section introduces \namedis and its support for intersection types and the
+merge operator. It then discusses the issue of coherence and shows how the
+notion of disjoint intersection types and disjoint quantification achieve a
+coherent semantics.
+
 %Finally we illustrate the expressive power of \namedis by encoding
 %extensible type-theoretic encodings of datatypes.
 
@@ -130,10 +131,6 @@ value matching the type in the merge. Either way, the meaning
 of a program will depend on a biased implementation choice,
 which is clearly unsatisfying from the theoretical point of view
 (although perhaps acceptable in practice).
-Moreover, even if we accept a particular biased choice as
-being good enough, the approach cannot be easily
-extended to systems with parametric polymorphism, as we illustrate
-in Section~\ref{subsec:polymorphism}.
 
 \subsection{Restoring Coherence: Disjoint Intersection Types}\label{sec:restoring}
 Coherence is a desirable property for a semantics. A semantics is said
@@ -221,12 +218,10 @@ the interaction between parametric polymorphism and intersection types.
 %The key challenge is to have a type
 %system that still ensures coherence, but at the same time is not too
 %restrictive in the programs that can be accepted.
-\begin{comment}
-Dunfield~\cite{} provides a
-good illustrative example of the issues that arise when combining
-disjoint intersection types and parametric polymorphism:
-\[\lambda x. {\bf let}~y = 0 \mergeop x~{\bf in}~x\]
-\end{comment}
+% Dunfield~\cite{} provides a
+% good illustrative example of the issues that arise when combining
+% disjoint intersection types and parametric polymorphism:
+% \[\lambda x. {\bf let}~y = 0 \mergeop x~{\bf in}~x\]
 Consider the attempt to write
 the following polymorphic function in \namedis (we use
 uppercase Latin letters to denote type variables):
@@ -305,200 +300,238 @@ types, then the merge will not lead to ambiguity.
 In summary, it seems hard to have parametric polymorphism, intersection
 types and coherence without being overly conservative.
 
-
-\begin{comment}
-\subsection{Intersection Types in Existing Languages}
-
-What is an intersection type? The intersection of types $A$ and $B$
-contains exactly those values which can be used as either of type $A$
-or of type $B$.  Just as not all intersection of sets are nonempty,
-not all intersections of types are inhabited.  For example, the
-intersection of a base type $\tyint$ and a function type
-$\tyint \to \tyint$ is not inhabited.\bruno{put this text somewhere?}
-
-Since then various researchers have
-studied intersection types, and some languages have adopted in one
-form or another. However, while intersection types are already used
-in various languages, the lack of a merge operator removes
-considerable expressiveness.
-
-
-A number of OO languages, such as
-Java, C\#, Scala, and Ceylon\footnote{\url{http://ceylon-lang.org/}},
-already support intersection types to different degrees. Intersection
-types are particularly relevant for OOP as they can be used to model
-multiple interface inheritance. In Java, for example,
+We have built a source language that is desugared into \namedis.
 
 \begin{lstlisting}
-interface AwithB extends A, B {}
+trait Point2D(self: Point3D, x0: Int, y0: Int)
+    def x()
+        x0
+
+    def y()
+        self.z()
+
+trait Z(self: Point2D)
+    def z()
+        self.x()
+
+type Point3D = Point2D & Z
+
+def main():
+    let p1 = new [Point3D] (\(self : Unit -> Point3D) -> (Point2d self 100 1 ) ,, (Z self 2))
+    p1.y ()
 \end{lstlisting}
 
-\noindent introduces a new interface \lstinline{AwithB} that satisfies the interfaces of
-both \lstinline{A} and \lstinline{B}. Arguably such type can be considered as a nominal
-intersection type. Scala takes one step further by eliminating the
-need of a nominal type. For example, given two concrete traits, it is possible to
-use \emph{mixin composition} to create an object that implements both
-traits. Such an object has a (structural) intersection type:
+When the two traits are composed, conceptually it is as if that a new class were
+being created on the fly by copying all the definitions inside those two traits.
+If there is any unresolved conflicts, the problem will be rejected by the type
+system. But one difference with the trait approach and the class approach is
+that in our language we are able to compose traits \emph{dynamically} and then
+instantiate them, which is impossible in traditional OO languages such as Java
+since classes being instantiated must be known statically.
 
 \begin{lstlisting}
-trait A
-trait B
+class Point3D(self: Point3D, x0: Int, y0: Int)
+    def x()
+        x0
 
-val newAB : A with B = new A with B
+    def y()
+        self.z()
+
+    def z()
+        self.x()
 \end{lstlisting}
 
-\noindent Scala also allows intersection of type parameters. For example:
-\begin{lstlisting}
-def merge[A,B] (x: A) (y: B) : A with B = ...
-\end{lstlisting}
-uses the anonymous intersection of two type parameters \lstinline{A} and
-\lstinline{B}. However, in Scala it is not possible to dynamically
-compose two objects. For example, the following code:
 
-\begin{lstlisting}
-// Invalid Scala code:
-def merge[A,B] (x: A) (y: B) : A with B = x with y
-\end{lstlisting}
+% \subsection{Intersection Types in Existing Languages}
+%
+% What is an intersection type? The intersection of types $A$ and $B$
+% contains exactly those values which can be used as either of type $A$
+% or of type $B$.  Just as not all intersection of sets are nonempty,
+% not all intersections of types are inhabited.  For example, the
+% intersection of a base type $\tyint$ and a function type
+% $\tyint \to \tyint$ is not inhabited.\bruno{put this text somewhere?}
+%
+% Since then various researchers have
+% studied intersection types, and some languages have adopted in one
+% form or another. However, while intersection types are already used
+% in various languages, the lack of a merge operator removes
+% considerable expressiveness.
+%
+%
+% A number of OO languages, such as
+% Java, C\#, Scala, and Ceylon\footnote{\url{http://ceylon-lang.org/}},
+% already support intersection types to different degrees. Intersection
+% types are particularly relevant for OOP as they can be used to model
+% multiple interface inheritance. In Java, for example,
+%
+% \begin{lstlisting}
+% interface AwithB extends A, B {}
+% \end{lstlisting}
+%
+% \noindent introduces a new interface \lstinline{AwithB} that satisfies the interfaces of
+% both \lstinline{A} and \lstinline{B}. Arguably such type can be considered as a nominal
+% intersection type. Scala takes one step further by eliminating the
+% need of a nominal type. For example, given two concrete traits, it is possible to
+% use \emph{mixin composition} to create an object that implements both
+% traits. Such an object has a (structural) intersection type:
+%
+% \begin{lstlisting}
+% trait A
+% trait B
+%
+% val newAB : A with B = new A with B
+% \end{lstlisting}
+%
+% \noindent Scala also allows intersection of type parameters. For example:
+% \begin{lstlisting}
+% def merge[A,B] (x: A) (y: B) : A with B = ...
+% \end{lstlisting}
+% uses the anonymous intersection of two type parameters \lstinline{A} and
+% \lstinline{B}. However, in Scala it is not possible to dynamically
+% compose two objects. For example, the following code:
+%
+% \begin{lstlisting}
+% // Invalid Scala code:
+% def merge[A,B] (x: A) (y: B) : A with B = x with y
+% \end{lstlisting}
+%
+% \noindent is rejected by the Scala compiler. The problem is that the
+% \lstinline{with} construct for Scala expressions can only be used to
+% mixin traits or classes, and not arbitrary objects. Note that in the
+% definition \lstinline{newAB} both \lstinline{A} and \lstinline{B} are
+% \emph{traits}, whereas in the definition of \lstinline{merge} the variables
+% \lstinline{x} and \lstinline{y} denote \emph{objects}.
+%
+% This limitation essentially put intersection types in Scala in a second-class
+% status. Although \lstinline{merge} returns an intersection type, it is
+% hard to actually build values with such types. In essence an
+% object-level introduction construct for intersection types is missing.
+% As it turns out using low-level type-unsafe programming features such
+% as dynamic proxies, reflection or other meta-programming techniques,
+% it is possible to implement such an introduction
+% construct in Scala~\cite{oliveira2013feature,rendel14attributes}. However, this
+% is clearly a hack and it would be better to provide proper language
+% support for such a feature.
+%
+%
+%
+%
+% \paragraph{Parametric polymorphism and intersection types.}
+% Both universal quantification and intersection types provide a kind of
+% polymorphism. While the former provides parametric polymorphism, the latter
+% provides ad-hoc polymorphism. In some systems, parametric polymorphism is
+% considered the infinite analog of intersection polymorphism. But in our system
+% we do not consider this relationship. \george{Need to argue that why their
+% coexistence might be a good thing.} \george{May use the merge example}
+% \bruno{Some more examples in following subsections?}
+%
+%
+% To address the limitations of intersection types in languages like
+% Scala, \namedis allows intersecting any two terms at run time using a
+% \emph{merge} operator (denoted by $ \mergeop $)~\cite{dunfield2014elaborating}.  With the merge
+% operator it is trivial to implement the \lstinline{merge} function in \namedis:
+%
+% \begin{lstlisting}
+% let merge[A, B * A] (x : A) (y : B) : A & B = x ,, y in (*$ \ldots $*)
+% \end{lstlisting}
+%
+% \noindent In contrast to Scala's term-level \lstinline{with}
+% construct, the operator \lstinline{,,} allows two arbitrary values \lstinline{x}
+% and \lstinline{y} to be merged. The resulting type is a \emph{disjoint}
+% intersection of the types of  \lstinline{x}
+% and \lstinline{y} (\lstinline{A & B} in this case).
+%
+% \paragraph{Incoherence and parametric Polymorphism}
+% We can define a \code{fst} function that extracts the first item of a merged value:
+% \[
+% \code{fst} \ \alpha \ \beta \ (x : \alpha \inter \beta) = \app {(\lam y \alpha y)} x
+% \]
+% What should be the result of this program?
+% \begin{lstlisting}
+% fst Int Int (1,,2)
+% \end{lstlisting}
+%
+% Then we have the following equational reasoning:
+% \begin{lstlisting}
+% fst Int Int (1,,2) => (\(y : Int). y) (1,,2)
+% \end{lstlisting}
+% If we favor the second item, the program seems to evaluate to $2$. But in
+% reality, the result is $2$. No matter we favor the first or the second item,
+% we can always construct a program such that for that program, equational
+% reasoning is broken.
+%
+% Therefore, we require that the two types of an intersection must be not
+% overlapping, or \emph{disjoint}, and add this requirement to the well-formedness of types.
+%
+% A well-formed type is such that given any query type,
+% it is always clear which subpart the query is referring to.
+% In terms of rules, this notion of well-formedness is almost the same as the one in System $F$
+% except for intersection types we require the two components to be disjoint.
+%
+% With parametric polymorphism, disjointness is harder to determine due to type variables.
+% Consider this program:
+% \[
+% \blam \alpha {\lam x {\alpha \inter \tyint} x}
+% \]
+% $x$ in the body is of type $\alpha \inter \tyint$ and if $\alpha$ and $\tyint$ are
+% disjoint depends on the instantiation of $\alpha$.
 
-\noindent is rejected by the Scala compiler. The problem is that the
-\lstinline{with} construct for Scala expressions can only be used to
-mixin traits or classes, and not arbitrary objects. Note that in the
-definition \lstinline{newAB} both \lstinline{A} and \lstinline{B} are
-\emph{traits}, whereas in the definition of \lstinline{merge} the variables
-\lstinline{x} and \lstinline{y} denote \emph{objects}.
+% \subsection{Disjoint Quantification}
+% To avoid being overly conservative, while still retaining coherence in the
+% presence of parametric polymorphism and intersection types, \namedis uses
+% an extension to universal quantification called \emph{disjoint quantification}.
+% Inspired by
+% bounded quantification~\cite{Cardelli:1994},
+% where a type variable is constrained by a type
+% bound, disjoint quantification allows a type variable to be
+% constrained so that it is disjoint with a
+% given type. With disjoint quantification a variant of the program $fst$, which
+% is accepted by \namedis, would be written as:
+% \begin{lstlisting}
+% let fst A ((*$ \highlight {B *~A} $*)) (x: A & B) = (fun (z: A) (*$ \to $*) z) x
+% in (*$ \ldots $*)
+% \end{lstlisting}
+% The small change is in the declaration of the type parameter $B$. The notation
+% $B*A$ means that in this program the type variable $B$ is constrained so that
+% it can only be instantiated with any type disjoint to $A$.
+% This ensures that the
+% merge denoted by $x$ is disjoint for all valid instantiations of $A$ and $B$.
+%
+% The nice thing about this solution is that many uses of \lstinline$fst$ are
+% accepted. For example, the following use of \lstinline$fst$:
+% \begin{lstlisting}
+% fst Int Char (1,,'c')
+% \end{lstlisting}
+%
+% is accepted since \lstinline$Int$ and \lstinline$Char$ are disjoint, thus satisfying the constraint
+% on the second type parameter of \lstinline$fst$.
+% However, problematic uses of \lstinline$fst$ are rejected. For example:
+% \begin{lstlisting}
+% fst Int Int (1,,2)
+% \end{lstlisting}
+%
+% is rejected because \lstinline$Int$ is not disjoint with \lstinline$Int$, thus
+% failing to satisfy the disjointness constraint on the second type parameter of
+% \lstinline$fst$.
 
-This limitation essentially put intersection types in Scala in a second-class
-status. Although \lstinline{merge} returns an intersection type, it is
-hard to actually build values with such types. In essence an
-object-level introduction construct for intersection types is missing.
-As it turns out using low-level type-unsafe programming features such
-as dynamic proxies, reflection or other meta-programming techniques,
-it is possible to implement such an introduction
-construct in Scala~\cite{oliveira2013feature,rendel14attributes}. However, this
-is clearly a hack and it would be better to provide proper language
-support for such a feature.
-
-
-
-
-\paragraph{Parametric polymorphism and intersection types.}
-Both universal quantification and intersection types provide a kind of
-polymorphism. While the former provides parametric polymorphism, the latter
-provides ad-hoc polymorphism. In some systems, parametric polymorphism is
-considered the infinite analog of intersection polymorphism. But in our system
-we do not consider this relationship. \george{Need to argue that why their
-coexistence might be a good thing.} \george{May use the merge example}
-\bruno{Some more examples in following subsections?}
-
-
-To address the limitations of intersection types in languages like
-Scala, \namedis allows intersecting any two terms at run time using a
-\emph{merge} operator (denoted by $ \mergeop $)~\cite{dunfield2014elaborating}.  With the merge
-operator it is trivial to implement the \lstinline{merge} function in \namedis:
-
-\begin{lstlisting}
-let merge[A, B * A] (x : A) (y : B) : A & B = x ,, y in (*$ \ldots $*)
-\end{lstlisting}
-
-\noindent In contrast to Scala's term-level \lstinline{with}
-construct, the operator \lstinline{,,} allows two arbitrary values \lstinline{x}
-and \lstinline{y} to be merged. The resulting type is a \emph{disjoint}
-intersection of the types of  \lstinline{x}
-and \lstinline{y} (\lstinline{A & B} in this case).
-
-\paragraph{Incoherence and parametric Polymorphism}
-We can define a \code{fst} function that extracts the first item of a merged value:
-\[
-\code{fst} \ \alpha \ \beta \ (x : \alpha \inter \beta) = \app {(\lam y \alpha y)} x
-\]
-What should be the result of this program?
-\begin{lstlisting}
-fst Int Int (1,,2)
-\end{lstlisting}
-
-Then we have the following equational reasoning:
-\begin{lstlisting}
-fst Int Int (1,,2) => (\(y : Int). y) (1,,2)
-\end{lstlisting}
-If we favor the second item, the program seems to evaluate to $2$. But in
-reality, the result is $2$. No matter we favor the first or the second item,
-we can always construct a program such that for that program, equational
-reasoning is broken.
-
-Therefore, we require that the two types of an intersection must be not
-overlapping, or \emph{disjoint}, and add this requirement to the well-formedness of types.
-
-A well-formed type is such that given any query type,
-it is always clear which subpart the query is referring to.
-In terms of rules, this notion of well-formedness is almost the same as the one in System $F$
-except for intersection types we require the two components to be disjoint.
-
-With parametric polymorphism, disjointness is harder to determine due to type variables.
-Consider this program:
-\[
-\blam \alpha {\lam x {\alpha \inter \tyint} x}
-\]
-$x$ in the body is of type $\alpha \inter \tyint$ and if $\alpha$ and $\tyint$ are
-disjoint depends on the instantiation of $\alpha$.
-\end{comment}
-
-\subsection{Disjoint Quantification}
-To avoid being overly conservative, while still retaining coherence in the
-presence of parametric polymorphism and intersection types, \namedis uses
-an extension to universal quantification called \emph{disjoint quantification}.
-Inspired by
-bounded quantification~\cite{Cardelli:1994},
-where a type variable is constrained by a type
-bound, disjoint quantification allows a type variable to be
-constrained so that it is disjoint with a
-given type. With disjoint quantification a variant of the program $fst$, which
-is accepted by \namedis, would be written as:
-\begin{lstlisting}
-let fst A ((*$ \highlight {B *~A} $*)) (x: A & B) = (fun (z: A) (*$ \to $*) z) x
-in (*$ \ldots $*)
-\end{lstlisting}
-The small change is in the declaration of the type parameter $B$. The notation
-$B*A$ means that in this program the type variable $B$ is constrained so that
-it can only be instantiated with any type disjoint to $A$.
-This ensures that the
-merge denoted by $x$ is disjoint for all valid instantiations of $A$ and $B$.
-
-The nice thing about this solution is that many uses of \lstinline$fst$ are accepted.
-For example, the following use of \lstinline$fst$:
-\begin{lstlisting}
-fst Int Char (1,,'c')
-\end{lstlisting}
-is accepted since \lstinline$Int$ and \lstinline$Char$ are disjoint, thus satisfying the constraint
-on the second type parameter of \lstinline$fst$.
-However, problematic uses of \lstinline$fst$ are rejected. For example:
-\begin{lstlisting}
-fst Int Int (1,,2)
-\end{lstlisting}
-is rejected because \lstinline$Int$ is not disjoint with \lstinline$Int$, thus failing to satisfy the
-disjointness constraint on the second type parameter of \lstinline$fst$.
-
-\begin{comment}
-Note that there is a nice symmetry between bounded quantification and disjoint quantification.
-In systems with bounded quantification,
-the usual unconstrained quantifier $\for {\alpha} \ldots$
-is a syntactic sugar for $\for {\alpha \subtype \top} \ldots$, and
-$\blam \alpha \ldots$ for $\blam {\alpha \subtype \top} \ldots$.
-In parellel, in our system with disjoint quantification,
-the usual unconstrained quantifier $\for {\alpha} \ldots$
-is a syntactic sugar for $\for {\alpha \disjoint \bot} \ldots$, and
-$\blam \alpha \ldots$ for $\blam {\alpha \disjoint \top} \ldots$.
-The intuition is that since the bottom type is akin to the empty set,
-no other type overlaps with it.\george{Format this paragraph better.}
-\end{comment}
+% Note that there is a nice symmetry between bounded quantification and disjoint quantification.
+% In systems with bounded quantification,
+% the usual unconstrained quantifier $\for {\alpha} \ldots$
+% is a syntactic sugar for $\for {\alpha \subtype \top} \ldots$, and
+% $\blam \alpha \ldots$ for $\blam {\alpha \subtype \top} \ldots$.
+% In parellel, in our system with disjoint quantification,
+% the usual unconstrained quantifier $\for {\alpha} \ldots$
+% is a syntactic sugar for $\for {\alpha \disjoint \bot} \ldots$, and
+% $\blam \alpha \ldots$ for $\blam {\alpha \disjoint \top} \ldots$.
+% The intuition is that since the bottom type is akin to the empty set,
+% no other type overlaps with it.\george{Format this paragraph better.}
 
 
-\begin{comment}
-With this tool in hand, we can rewrite the program above to:
-\[
-\blam {\alpha \disjoint \tyint} {\lam x {\alpha \inter \tyint} x}
-\]
-
-This program typechecks because while $x$ is of type $\alpha \inter \tyint$,
-and $\alpha$ is disjoint with $\tyint$. Similarly, in the new system,
-the original program no longer typechecks, thus preventing overlapping types.
-\end{comment}
+% With this tool in hand, we can rewrite the program above to:
+% \[
+% \blam {\alpha \disjoint \tyint} {\lam x {\alpha \inter \tyint} x}
+% \]
+%
+% This program typechecks because while $x$ is of type $\alpha \inter \tyint$,
+% and $\alpha$ is disjoint with $\tyint$. Similarly, in the new system,
+% the original program no longer typechecks, thus preventing overlapping types.
