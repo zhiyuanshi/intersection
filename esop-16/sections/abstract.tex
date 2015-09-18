@@ -9,20 +9,10 @@ the semantics of the programming language becomes implementation
 dependent. Moreover his calculus did not account for parametric polymorphism.
 
 This paper presents \namedis: a core calculus with a variant of
-\emph{intersection types}, \emph{parametric polymorphism} and a
+\emph{intersection types} and a
 \emph{merge operator}. The semantics \namedis is both type-safe and
 coherent. Coherence is achieved by ensuring that intersection types
 are \emph{disjoint}. Formally two types are disjoint if they do not
 share a common supertype. We present a type system that prevents
 intersection types that are not disjoint, as well as an algorithmic
-specification to determine whether two types are disjoint. Moreover we
-show that this approach extends to systems with parametric
-polymorphism. Parametric polymorphism makes the problem of coherence
-significantly harder. When a type variable occurs in an intersection
-type, it is not statically known whether the instantiated type will
-share a common supertype with other components of the intersection.
-To address this problem we propose \emph{disjoint quantification}: a
-constrained form of parametric polymorphism, that allows programmers
-to specify disjointness constraints for type variables. With disjoint
-quantification the calculus remains very flexible in terms of programs
-that can be written with intersection types, while retaining coherence.
+specification to determine whether two types are disjoint. ...
