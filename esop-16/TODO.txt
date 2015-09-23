@@ -1,6 +1,0 @@
-Sep 7  Port to ESOP format
-Sep 14 Write examples and revise rules if needed
-Sep 21 Writing (excluding Introduction)
-Sep 28 Writing
-Oct 9  Abstract due
-Oct 16 Paper due

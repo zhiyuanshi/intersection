@@ -295,14 +295,14 @@ creation is dynamic, which means it can be contained inside a function.
 \subsection{Traits}
 %*******************************************************************************
 
-Trait is an alternative to inheritance as a mechanism of code reuse in
-object-oriented programming. A trait is a collection of related methods that
-characterizes only a specific aspect of the features of a class. Therefore,
-programs using traits usually have a number of small traits instead of fewer but
-larger classes in OO programs that use inheritance. Code reuse with traits is
-easier with traits than with classes, since traits are usually shorter and
-traits can be \emph{composed}. In fact, trait composition offers a variety of
-possibilities: two traits can be ``added'' together (which is an symmetric
+Trait~\cite{scharli2003traits} is an alternative to inheritance as a mechanism
+of code reuse in object-oriented programming. A trait is a collection of related
+methods that characterizes only a specific aspect of the features of a class.
+Therefore, programs using traits usually have a number of small traits instead
+of fewer but larger classes in OO programs that use inheritance. Code reuse with
+traits is easier with traits than with classes, since traits are usually shorter
+and traits can be \emph{composed}. In fact, trait composition offers a variety
+of possibilities: two traits can be ``added'' together (which is an symmetric
 operation); methods can be removed from a trait; and traits provide conflict
 detection, etc.
 
@@ -432,25 +432,36 @@ class Point3D(x: Int, y: Int) { self: Point3D (*$ \to $*)
 }
 \end{lstlisting}
 
-\paragraph{Desugaring.} A trait in the source language is translated into
-nothing but a normal term in \name. For example,
+%*******************************************************************************
+\subsection{Desugaring}
+%*******************************************************************************
+
+This subsection introduces how the source language is desugared into \name. A
+more formal description can be found in the appendix. A trait in the source
+language is translated into nothing but a normal term in \name. For example,
 
 \begin{lstlisting}
-trait Point(x: Int, y: Int) { self: Point3D (*$ \to $*)
+trait Point(x: Int, y: Int) { self: Point (*$ \to $*)
   x() = x
   y() = self.z()
 }
 (* \ldots *)
 \end{lstlisting}
 
-will become
+becomes
 
 \begin{lstlisting}
-let Point (x: Int) (y: Int) (self: () (*$ \to $*) Point3D) = {
-  x = \(_: ()) (*$ \to $*) x,
-  y = \(_: ()) (*$ \to $*) (self ()).z()
+let Point (x: Int) (y: Int) (self: () (*$ \to $*) Point) = {
+  x = (*$ \lambda $*)(_: ()) (*$ \to $*) x,
+  y = (*$ \lambda $*)(_: ()) (*$ \to $*) (self ()).z()
 } in
 \end{lstlisting}
+
+One difference is that the self reference becomes a thunk and all occurrences of
+it have been replaced by \lstinline$self ()$ and the position of the self
+reference in the parameter list is adjusted. In fact, \lstinline$self$ is not a
+special keyword. It can be named as \lstinline$s$ but \lstinline$self$ is a
+convention.
 
 The body of the trait becomes a record whose labels are the method names.
 \lstinline$Point$ has type:
@@ -464,16 +475,34 @@ application in \name. And note that \lstinline$Point(3,4)$ is of type
 \begin{lstlisting}
 (() (*$ \to $*) Point) (*$ \to $*) Point
 \end{lstlisting}
+
 Therefore it is an open term. \lstinline$new$ instantiates a trait by taking the
-fixpoint of its corresponding open term. Although \lstinline$new$ is defined as
+fixpoint of its corresponding open term. In fact, \lstinline$new$ is just a function defined as
+
+\begin{lstlisting}
+let new[A] (f: (() (*$ \to $*) A) (*$ \to $*) A): A
+  = let rec x : () (*$ \to $*) A = (*$ \lambda $*)(_: ()) (*$ \to $*) f x in x ()
+in (* \ldots *)
+\end{lstlisting}
+
+Although \lstinline$new$ is defined as
 a polymorphic function for convenience, we can always define specialized version
 of it since \name does not support polymorphism.
 
-Another difference is that the self reference becomes a thunk and all
-occurrences of it have been replaced by \lstinline$self ()$ and the position of
-the self reference in the parameter list is adjusted. In fact, \lstinline$self$
-is not a special keyword. It can be named as \lstinline$s$ but \lstinline$self$
-is a convention.
+The composition of traits in the source language is desugared using the merge
+operator. The reason that traits built on \name have conflict detection for free
+is that the merge operator is enforcing that the two terms being merged are
+disjoint. For example,
+
+\begin{lstlisting}
+new[Point3D](Point(3,4) & Z(5))
+\end{lstlisting}
+
+is turned into
+
+\begin{lstlisting}
+new [Point3D] ((\self: Point3D) (*$ \to $*) ((Point 3 4 self) ,, (Z 5 self)))
+\end{lstlisting}
 
 % \subsection{Intersection Types in Existing Languages}
 %
