@@ -1,6 +1,6 @@
 fix = (f) ->
   x = () ->
-    f x
+    f(x)
   x()
 
 compose = (trait1, trait2) ->
@@ -10,15 +10,15 @@ compose = (trait1, trait2) ->
 Point = (x, y) ->
   (self) ->
     { x: () ->
-          x
+        x
       y: () ->
-          self().z()
+        y
     }
 
-Z = (z) ->
+EuclideanNorm = () ->
   (self) ->
-    { z: () ->
-          self().x()
+    { norm: () ->
+        Math.sqrt(self.x() * self.x() + self.y() * self.y())
     }
 
-res = fix(compose(Point(100, 10), Z(1)))
+res = fix(compose(Point(3,4), EuclideanNorm())).norm()
