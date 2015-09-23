@@ -3,7 +3,7 @@
 
 Although the system shown in the Section~\ref{sec:fi} is type-safe, it is not
 coherent. This section shows how to modify \name so that it guarantees coherence
-as well as type soundness. The result is a calculus named \namedis. The keys
+as well as type soundness. The result is a calculus named \name. The keys
 aspects are the notion of disjoint intersections, and disjoint quantification
 for polymorphic types.
 
@@ -25,7 +25,7 @@ for polymorphic types.
 
 \subsection{Disjointness} Throughout the paper we already presented an intuitive
 definition for disjoiness. Here such definition is made a bit more precise, and
-well-suited to \namedis.
+well-suited to \name.
 
 \begin{definition}[Disjoint types]
 
@@ -219,7 +219,7 @@ An important
 problem with the subtyping rules in Figure~\ref{fig:fi-type} is that the all three rules
 dealing with intersection types
 (\reflabel{\labelsubinterl} and \reflabel{\labelsubinterr} and \reflabel{\labelsubinter})
-overlap. Unfortunatelly,
+overlap. Unfortunately,
 this means that different coercions may be given when checking the subtyping
 between two types, depending on which derivation is chosen. This is ultimately the reason
 for incoherence.
@@ -251,7 +251,7 @@ at the same time. More formally, with disjoint intersections, we have the follow
   \end{enumerate}
 \end{lemma}
 
-Unfortunatelly, disjoint intersections alone are insufficient to deal with problem 2).
+Unfortunately, disjoint intersections alone are insufficient to deal with problem 2).
 In order to deal with problem 2), we introduce a distinction between types, and atomic types.
 
 \paragraph{Atomic types.} Atomic types are just those which are not intersection

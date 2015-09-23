@@ -1,31 +1,23 @@
 \section{Overview} \label{sec:overview}
 
-This section introduces \namedis and its support for intersection types and the
+This section introduces \name and its support for intersection types and the
 merge operator. It then discusses the issue of coherence and shows how the
-notion of disjoint intersection types and disjoint quantification achieve a
-coherent semantics.
-
-%Finally we illustrate the expressive power of \namedis by encoding
-%extensible type-theoretic encodings of datatypes.
+notion of disjoint intersection types achieve a coherent semantics.
 
 Note that this section uses some syntactic sugar, as well as standard
 programming language features, to illustrate the various concepts in
-\namedis. Although the minimal core language that we formalize in
+\name. Although the minimal core language that we formalize in
 Section~\ref{sec:fi} does not present all such features, our implementation
 supports them.
 
-%\bruno{Need to type-check the programs!}
-
-\begin{comment}
-It then shows that,
-with unrestricted intersection types, the system
-lacks \emph{coherence}. This motivates the introduction of
-disjoint intersection types and extending universal quantification to
-disjoint quantification, which is enough to ensure coherence.
-\end{comment}
+% It then shows that,
+% with unrestricted intersection types, the system
+% lacks \emph{coherence}. This motivates the introduction of
+% disjoint intersection types and extending universal quantification to
+% disjoint quantification, which is enough to ensure coherence.
 
 \subsection{Intersection Types and the Merge Operator}
-%%\subsection{Intersection Types, Merge and Polymorphism in \namedis}
+%%\subsection{Intersection Types, Merge and Polymorphism in \name}
 
 Intersection types date back as early as Coppo et
 al.'s work~\cite{coppo1981functional}. Since then various researchers have
@@ -37,9 +29,9 @@ form or another.
 
 \paragraph{Intersection types.}
 The intersection of type $A$ and $B$ (denoted as \lstinline{A & B} in
-\namedis) contains exactly those values
+\name) contains exactly those values
 which can be used as either values of type $A$ or of type $B$. For instance,
-consider the following program in \namedis:
+consider the following program in \name:
 
 \begin{lstlisting}
 let x : Int & Char = (*$ \ldots $*) in -- definition omitted
@@ -59,20 +51,20 @@ Passing \lstinline{x} as an argument to either one (or both) of the
 functions is valid.
 
 \paragraph{Merge operator.}
-In the previous program we deliberately did not show how to introduce values of an
-intersection type. There are many variants of intersection types
-in the literature. Our work follows a particular formulation, where
-intersection types are introduced by a \emph{merge operator}.
-As Dunfield~\cite{dunfield2014elaborating} has argued a merge operator adds considerable
-expressiveness to a calculus. The merge operator allows
-two values to be merged in a single intersection type. For example, an
-implementation of \lstinline{x} is constructed in \namedis as follows:
+In the previous program we deliberately did not show how to introduce values of
+an intersection type. There are many variants of intersection types in the
+literature. Our work follows a particular formulation, where intersection types
+are introduced by a \emph{merge operator}. As
+Dunfield~\cite{dunfield2014elaborating} has argued a merge operator adds
+considerable expressiveness to a calculus. The merge operator allows two values
+to be merged in a single intersection type. For example, an implementation of
+\lstinline{x} is constructed in \name as follows:
 
 \begin{lstlisting}
 let x : Int & Char = 1,,'c' in (*$ \ldots $*)
 \end{lstlisting}
 
-\noindent In \namedis (following Dunfield's notation), the
+\noindent In \name (following Dunfield's notation), the
 merge of two values $v_1$ and $v_2$ is denoted as $v_1 ,, v_2$.
 
 \paragraph{Merge operator and pairs.}
@@ -102,7 +94,7 @@ of type \lstinline{Int & Char} is found, the compiler uses the
 type system to extract the corresponding value.
 
 \subsection{Incoherence}\label{subsec:incoherence}
-Unfortunatelly the implicit nature of elimination for intersection
+Unfortunately the implicit nature of elimination for intersection
 types built with a merge operator can lead to incoherence.
 The merge operator combines two terms, of type $A$ and $B$
 respectively, to form a term of type $A \inter B$. For example,
@@ -117,10 +109,10 @@ a merge of two integers:
 \end{lstlisting}
 Should the result be \lstinline$1$ or \lstinline$2$?
 
-If both results are accepted, we say that the semantics is
-\emph{incoherent}: there are multiple possible meanings for the same
-valid program. Dunfield's calculus~\cite{dunfield2014elaborating} is incoherent and accepts the
-program above.
+If both results are accepted, we say that the semantics is \emph{incoherent}:
+there are multiple possible meanings for the same valid program. Dunfield's
+calculus~\cite{dunfield2014elaborating} is incoherent and accepts the program
+above.
 
 \paragraph{Getting around incoherence: biased choice.}
 In a real implementation of Dunfield calculus a choice has to be made
@@ -149,7 +141,7 @@ which leads to multiple meanings of a term.
 Thus a natural option is to try to forbid such overlapping
 values of the same type in a merge.
 
-This is precisely the approach taken in \namedis. \namedis requires that the
+This is precisely the approach taken in \name. \name requires that the
 two types of in intersection must be \emph{disjoint}.  However,
 although disjointness seems a natural restriction to impose on
 intersection types, it is not obvious to formalize it. Indeed Dunfield
@@ -188,7 +180,7 @@ components of the merge are not subtypes of each other, they share
 some types in common.
 
 \paragraph{A proper definition of disjointness.} In order for two types
-to be trully disjoint, they must not have any subcomponents sharing
+to be truly disjoint, they must not have any subcomponents sharing
 the same type. In a system with intersection types this can be ensured
 by requiring the two types do not share a common supertype. The
 following definition captures this idea more formally.
@@ -204,14 +196,14 @@ following definition captures this idea more formally.
 merge. Since $Int$ is a common supertype of both $Int \& Char$ and
 $Int \& Bool$, those two types are not disjoint.
 
-\namedis's type system only accepts programs that use disjoint
-intersection types. As shown in Section~\ref{sec:disjoint} disjoint intersection
-types will play a crutial rule in guaranteeing that the semantics is coherent.
+\name's type system only accepts programs that use disjoint intersection
+types. As shown in Section~\ref{sec:disjoint} disjoint intersection types will
+play a crucial rule in guaranteeing that the semantics is coherent.
 
-\subsection{Parametric Polymorphism and Intersection Types}\label{subsec:polymorphism}
-Before we show how \namedis extends the idea of disjointness to parametric
-polymorphism, we discuss some non-trivial issues that arize from
-the interaction between parametric polymorphism and intersection types.
+% \subsection{Parametric Polymorphism and Intersection Types}\label{subsec:polymorphism}
+% Before we show how \name extends the idea of disjointness to parametric
+% polymorphism, we discuss some non-trivial issues that arise from
+% the interaction between parametric polymorphism and intersection types.
 %The interaction between parametric polymorphism and
 %intersection types when coherence is a goal is non-trivial.
 %In particular biased choice .
@@ -222,68 +214,68 @@ the interaction between parametric polymorphism and intersection types.
 % good illustrative example of the issues that arise when combining
 % disjoint intersection types and parametric polymorphism:
 % \[\lambda x. {\bf let}~y = 0 \mergeop x~{\bf in}~x\]
-Consider the attempt to write
-the following polymorphic function in \namedis (we use
-uppercase Latin letters to denote type variables):
-\begin{lstlisting}
-let fst A B (x: A & B) = (fun (z:A) (*$ \to $*) z) x in (*$ \ldots $*)
-\end{lstlisting}
-The
-\code{fst} function is supposed to extract a value of type
-(\lstinline{A}) from the merge value $x$ (of type \lstinline{A&B}). However
-this function is problematic.  The reason is that when
-\lstinline{A} and \lstinline{B} are instantiated to non-disjoint
-types, then uses of \lstinline{fst} may lead to incoherence.
-For example, consider the following use of \lstinline{fst}:
-\begin{lstlisting}
-fst Int Int (1,,2)
-\end{lstlisting}
-\noindent This program is clearly incoherent as both
-$1$ and $2$ can be extracted from the merge and still match the type
-of the first argument of \lstinline{fst}.
+% Consider the attempt to write
+% the following polymorphic function in \name (we use
+% uppercase Latin letters to denote type variables):
+% \begin{lstlisting}
+% let fst A B (x: A & B) = (fun (z:A) (*$ \to $*) z) x in (*$ \ldots $*)
+% \end{lstlisting}
+% The
+% \code{fst} function is supposed to extract a value of type
+% (\lstinline{A}) from the merge value $x$ (of type \lstinline{A&B}). However
+% this function is problematic.  The reason is that when
+% \lstinline{A} and \lstinline{B} are instantiated to non-disjoint
+% types, then uses of \lstinline{fst} may lead to incoherence.
+% For example, consider the following use of \lstinline{fst}:
+% \begin{lstlisting}
+% fst Int Int (1,,2)
+% \end{lstlisting}
+% \noindent This program is clearly incoherent as both
+% $1$ and $2$ can be extracted from the merge and still match the type
+% of the first argument of \lstinline{fst}.
 
-\paragraph{Biased choice breaks equational reasoning.} At first sight, one option
-to workaround the issue incoherence would be to bias the type-based merge lookup
-to the left or to the right (as discussed in
-Section~\ref{subsec:incoherence}). Unfortunately, biased choice is
-very problematic when parametric polymorphism is present in the language.
-To see the issue, suppose we chose to always pick the
-rightmost value in a merge when multiple values of same type exist.
-Intuitively, it would appear that the result of the use of
-\lstinline{fst} above is $2$. Indeed simple equational reasoning
-seems to validate such result:
-\begin{lstlisting}
-   fst Int Int (1,,2)
-(*$ \rightsquigarrow $*) (fun (z: Int) (*$ \to $*) z) (1,,2) -- (* \textnormal{By the definition of \code{fst}} *)
-(*$ \rightsquigarrow $*) (fun (z: Int) (*$ \to $*) z) 2      -- (* \textnormal{Right-biased coercion} *)
-(*$ \rightsquigarrow $*) 2                          -- (* \textnormal{By $\beta$-reduction} *)
-\end{lstlisting}
-
-However (assumming a straightforward implementation of right-biased
-choice) the result of the program would be 1! The reason for this has
-todo with \emph{when} the type-based lookup on the merge happens. In
-the case of \lstinline{fst}, lookup is triggered by a coercion
-function inserted in the definition of \lstinline{fst} at
-compile-time.
-In the definition of \lstinline$fst$ all it is known is that a
-value of type $A$ should be returned from a merge with an intersection
-type $A\&B$.  Clearly the only type-safe choice to coerce the value of
-type $A\&B$ into $A$ is to
-take the left component of the merge. This works perfectly for merges
-such as \lstinline$(1,,'c')$, where the types of the first and second components
-of the merge are disjoint. For the merge \lstinline$(1,,'c')$, if a integer lookup
-is needed, then \lstinline$1$ is the rightmost integer, which is consistent with the
-biased choice. Unfortunately, when given the merge \lstinline$(1,,2)$ the
-left-component (\lstinline$1$) is also picked up, even though in this case \lstinline$2$
-is the rightmost integer in the merge. Clearly this is inconsistent
-with the biased choice!
-
-Unfortunately this subtle interaction of polymorphism and type-based lookup
- means that equational reasoning is broken!
-In the equational reasoning steps above, doing apparently correct
-substitutions lead us to a wrong result. This is a major problem for
-biased choice and a reason to dismiss it as a possible implementation
-choice for \namedis.
+% \paragraph{Biased choice breaks equational reasoning.} At first sight, one option
+% to workaround the issue incoherence would be to bias the type-based merge lookup
+% to the left or to the right (as discussed in
+% Section~\ref{subsec:incoherence}). Unfortunately, biased choice is
+% very problematic when parametric polymorphism is present in the language.
+% To see the issue, suppose we chose to always pick the
+% rightmost value in a merge when multiple values of same type exist.
+% Intuitively, it would appear that the result of the use of
+% \lstinline{fst} above is $2$. Indeed simple equational reasoning
+% seems to validate such result:
+% \begin{lstlisting}
+%    fst Int Int (1,,2)
+% (*$ \rightsquigarrow $*) (fun (z: Int) (*$ \to $*) z) (1,,2) -- (* \textnormal{By the definition of \code{fst}} *)
+% (*$ \rightsquigarrow $*) (fun (z: Int) (*$ \to $*) z) 2      -- (* \textnormal{Right-biased coercion} *)
+% (*$ \rightsquigarrow $*) 2                          -- (* \textnormal{By $\beta$-reduction} *)
+% \end{lstlisting}
+%
+% However (assumming a straightforward implementation of right-biased
+% choice) the result of the program would be 1! The reason for this has
+% todo with \emph{when} the type-based lookup on the merge happens. In
+% the case of \lstinline{fst}, lookup is triggered by a coercion
+% function inserted in the definition of \lstinline{fst} at
+% compile-time.
+% In the definition of \lstinline$fst$ all it is known is that a
+% value of type $A$ should be returned from a merge with an intersection
+% type $A\&B$.  Clearly the only type-safe choice to coerce the value of
+% type $A\&B$ into $A$ is to
+% take the left component of the merge. This works perfectly for merges
+% such as \lstinline$(1,,'c')$, where the types of the first and second components
+% of the merge are disjoint. For the merge \lstinline$(1,,'c')$, if a integer lookup
+% is needed, then \lstinline$1$ is the rightmost integer, which is consistent with the
+% biased choice. Unfortunately, when given the merge \lstinline$(1,,2)$ the
+% left-component (\lstinline$1$) is also picked up, even though in this case \lstinline$2$
+% is the rightmost integer in the merge. Clearly this is inconsistent
+% with the biased choice!
+%
+% Unfortunately this subtle interaction of polymorphism and type-based lookup
+%  means that equational reasoning is broken!
+% In the equational reasoning steps above, doing apparently correct
+% substitutions lead us to a wrong result. This is a major problem for
+% biased choice and a reason to dismiss it as a possible implementation
+% choice for \name.
 
 \paragraph{Conservatively rejecting intersections.}
 To avoid incoherence, and the issues of biased choice, another option
@@ -292,54 +284,196 @@ instantiations of type variables may lead to incoherent programs.
 In this case the definition of \lstinline$fst$ would be rejected, since there
 are indeed some cases that may lead to incoherent programs.
 Unfortunately this is too restrictive and prevents many useful
-programs using both parametric polymorphism and intersection types.
-In particular, in the case of \lstinline{fst}, if the two type
-parameters are used with two disjoint intersection
-types, then the merge will not lead to ambiguity.
+programs.
 
-In summary, it seems hard to have parametric polymorphism, intersection
-types and coherence without being overly conservative.
+We have built a source language that is desugared into \name. The most
+central feature is the trait declaration. Trait can take several parameters,
+which is then in scope in the body of the trait definition. In fact, trait
+creation is dynamic, which means it can be contained inside a function.
 
-We have built a source language that is desugared into \namedis.
+%*******************************************************************************
+\subsection{Traits}
+%*******************************************************************************
+
+Trait is an alternative to inheritance as a mechanism of code reuse in
+object-oriented programming. A trait is a collection of related methods that
+characterizes only a specific aspect of the features of a class. Therefore,
+programs using traits usually have a number of small traits instead of fewer but
+larger classes in OO programs that use inheritance. Code reuse with traits is
+easier with traits than with classes, since traits are usually shorter and
+traits can be \emph{composed}. In fact, trait composition offers a variety of
+possibilities: two traits can be ``added'' together (which is an symmetric
+operation); methods can be removed from a trait; and traits provide conflict
+detection, etc.
+
+Although trait or similar feature is widely implemented in many programming
+languages, there have not been a foundational calculus that models traits.
+However, we are going to show that \name is able to model all the important
+features of trait.
+
+The simplest use case of traits is extracting a feature out from a model class.
+The norm of a point is a generalized notion of distance of that point to the
+origin. In the following example, we provide two definitions of norm via two
+traits. Later we compose the definition of point and norm so that the norm have
+different meanings. Composition of traits is anonymous in the sense that there
+is no need to explicitly give a name to the composition.
 
 \begin{lstlisting}
-trait Point2D(self: Point3D, x0: Int, y0: Int)
-    def x()
-        x0
+type Point = {x: () (*$ \to $*) Int, y: () (*$ \to $*) Int} in
+trait Point(x: Int, y: Int) { self: Point (*$ \to $*)
+  x() = x
+  y() = y
+} in
+trait EuclideanNorm() { self: Point (*$ \to $*)
+  norm() = Math.sqrt(self.x() * self.x() + self.y() * self.y())
+} in
+trait ManhattanNorm() { self: Point (*$ \to $*)
+  norm() = Math.abs(self.x()) + Math.abs(self.y())
+} in
+console.log(new (Point(3,4) & EuclideanNorm()).norm()) -- This prints 5
+console.log(new (Point(3,4) & ManhattanNorm()).norm()) -- This prints 7
+\end{lstlisting}
 
-    def y()
-        self.z()
+The following example shows a counter object and how we could extend its
+behavior so that it supports reset. First we define a \lstinline$Counter$ as a
+type synonym for a record that contains a \lstinline$val$ method, which returns
+the current counter value. Next we define a trait \lstinline$Counter$ that
+contains two methods. The \lstinline$val$ method just returns the value that is
+bound at the parameter of the trait, and \lstinline$incr$ returns a new counter.
 
-trait Z(self: Point2D)
-    def z()
-        self.x()
+\begin{lstlisting}
+type Counter = { val: () (*$ \to $*) Int } in
+trait Counter(val: Int) { self: Counter (*$ \to $*)
+  val() = val
+  incr() = new Counter(val + 1)
+} in
+trait Reset() { self: Counter (*$ \to $*)
+  reset() = new Counter(0)
+} in
+let counter = new (Counter(0) & Reset())
+in counter.incr()
+\end{lstlisting}
 
-type Point3D = Point2D & Z
+In the above code, even though \lstinline$counter$ has a reset method, after we
+call the \lstinline$incr$ method, the resulting object no longer has that.
+Therefore, naturally we would like to override the \lstinline$incr$ method
+inside \lstinline$Reset$.
 
-def main():
-    let p1 = new [Point3D] (\(self : Unit -> Point3D) -> (Point2d self 100 1 ) ,, (Z self 2))
-    p1.y ()
+\begin{lstlisting}
+type Counter = { val: () (*$ \to $*) Int } in
+trait Counter(val: Int) { self: Counter (*$ \to $*)
+  val() = val
+  incr() = new Counter(val + 1)
+} in
+trait Reset() { self: Counter (*$ \to $*)
+  incr() = new (Counter(val + 1) & Reset())
+  reset() = new Counter(0)
+} in
+let counter = new (Counter(0) & Reset())
+in counter.incr()
+\end{lstlisting}
+
+However the modified code should not typecheck according to the specification of
+traits, since both \lstinline$Counter$ and \lstinline$Reset$ contains a
+conflicting \lstinline$incr$ method. The code also does not typecheck since it
+violates the typing rule of \name. The programmer can resolve the conflict by
+excluding the \lstinline$incr$ being overridden using the record exclusion
+operator.
+
+\begin{lstlisting}
+(* \ldots *)
+let counter = new (Counter(0) \ incr & Reset())
+in counter.incr()
+\end{lstlisting}
+
+The next example, although a little bit contrived, illustrates that when two
+traits are composed, any two methods in those two traits can refer to each
+other via the self reference, just as if they were inside the same class.
+
+\begin{lstlisting}
+type EvenOdd = {
+  even: Int (*$ \to $*) Bool,
+  odd:  Int (*$ \to $*) Bool
+} in
+trait Even() { self: EvenOdd (*$ \to $*)
+  even(n: Int) = if n == 0 then True else self.odd(n - 1)
+} in
+trait Odd() { self: EvenOdd (*$ \to $*)
+  odd(n: Int) = if n == 0 then False else self.even(n - 1)
+} in
+new (Even() & Odd()).odd(42)
+\end{lstlisting}
+
+As a comparison, in Scala we would write
+
+\begin{lstlisting}
+trait Even { self: Even with Odd =>
+  def even(n: Int): Boolean = if (n == 0) true else self.odd(n - 1)
+}
+
+trait Odd { self: Even with Odd =>
+  def odd(n: Int): Boolean = if (n == 0) false else self.even(n - 1)
+}
 \end{lstlisting}
 
 When the two traits are composed, conceptually it is as if that a new class were
 being created on the fly by copying all the definitions inside those two traits.
-If there is any unresolved conflicts, the problem will be rejected by the type
+If there is any unresolved conflict, the program will be rejected by the type
 system. But one difference with the trait approach and the class approach is
 that in our language we are able to compose traits \emph{dynamically} and then
 instantiate them, which is impossible in traditional OO languages such as Java
 since classes being instantiated must be known statically.
 
 \begin{lstlisting}
-class Point3D(self: Point3D, x0: Int, y0: Int)
-    def x()
-        x0
-
-    def y()
-        self.z()
-
-    def z()
-        self.x()
+class Point3D(x: Int, y: Int) { self: Point3D (*$ \to $*)
+  x() = x
+  y() = self.z()
+  z() = self.x()
+}
 \end{lstlisting}
+
+\paragraph{Desugaring.} A trait in the source language is translated into
+nothing but a normal term in \name. For example,
+
+\begin{lstlisting}
+trait Point(x: Int, y: Int) { self: Point3D (*$ \to $*)
+  x() = x
+  y() = self.z()
+}
+(* \ldots *)
+\end{lstlisting}
+
+will become
+
+\begin{lstlisting}
+let Point (x: Int) (y: Int) (self: () (*$ \to $*) Point3D) = {
+  x = \(_: ()) (*$ \to $*) x,
+  y = \(_: ()) (*$ \to $*) (self ()).z()
+} in
+\end{lstlisting}
+
+The body of the trait becomes a record whose labels are the method names.
+\lstinline$Point$ has type:
+
+\begin{lstlisting}
+Int (*$ \to $*) Int (*$ \to $*) (() (*$ \to $*) Point) (*$ \to $*) Point
+\end{lstlisting}
+
+The syntax for construction such as \lstinline$Point(3,4)$ is just function
+application in \name. And note that \lstinline$Point(3,4)$ is of type
+\begin{lstlisting}
+(() (*$ \to $*) Point) (*$ \to $*) Point
+\end{lstlisting}
+Therefore it is an open term. \lstinline$new$ instantiates a trait by taking the
+fixpoint of its corresponding open term. Although \lstinline$new$ is defined as
+a polymorphic function for convenience, we can always define specialized version
+of it since \name does not support polymorphism.
+
+Another difference is that the self reference becomes a thunk and all
+occurrences of it have been replaced by \lstinline$self ()$ and the position of
+the self reference in the parameter list is adjusted. In fact, \lstinline$self$
+is not a special keyword. It can be named as \lstinline$s$ but \lstinline$self$
+is a convention.
 
 % \subsection{Intersection Types in Existing Languages}
 %
@@ -412,23 +546,10 @@ class Point3D(self: Point3D, x0: Int, y0: Int)
 % is clearly a hack and it would be better to provide proper language
 % support for such a feature.
 %
-%
-%
-%
-% \paragraph{Parametric polymorphism and intersection types.}
-% Both universal quantification and intersection types provide a kind of
-% polymorphism. While the former provides parametric polymorphism, the latter
-% provides ad-hoc polymorphism. In some systems, parametric polymorphism is
-% considered the infinite analog of intersection polymorphism. But in our system
-% we do not consider this relationship. \george{Need to argue that why their
-% coexistence might be a good thing.} \george{May use the merge example}
-% \bruno{Some more examples in following subsections?}
-%
-%
 % To address the limitations of intersection types in languages like
-% Scala, \namedis allows intersecting any two terms at run time using a
+% Scala, \name allows intersecting any two terms at run time using a
 % \emph{merge} operator (denoted by $ \mergeop $)~\cite{dunfield2014elaborating}.  With the merge
-% operator it is trivial to implement the \lstinline{merge} function in \namedis:
+% operator it is trivial to implement the \lstinline{merge} function in \name:
 %
 % \begin{lstlisting}
 % let merge[A, B * A] (x : A) (y : B) : A & B = x ,, y in (*$ \ldots $*)
@@ -440,97 +561,8 @@ class Point3D(self: Point3D, x0: Int, y0: Int)
 % intersection of the types of  \lstinline{x}
 % and \lstinline{y} (\lstinline{A & B} in this case).
 %
-% \paragraph{Incoherence and parametric Polymorphism}
-% We can define a \code{fst} function that extracts the first item of a merged value:
-% \[
-% \code{fst} \ \alpha \ \beta \ (x : \alpha \inter \beta) = \app {(\lam y \alpha y)} x
-% \]
-% What should be the result of this program?
-% \begin{lstlisting}
-% fst Int Int (1,,2)
-% \end{lstlisting}
-%
-% Then we have the following equational reasoning:
-% \begin{lstlisting}
-% fst Int Int (1,,2) => (\(y : Int). y) (1,,2)
-% \end{lstlisting}
-% If we favor the second item, the program seems to evaluate to $2$. But in
-% reality, the result is $2$. No matter we favor the first or the second item,
-% we can always construct a program such that for that program, equational
-% reasoning is broken.
-%
-% Therefore, we require that the two types of an intersection must be not
-% overlapping, or \emph{disjoint}, and add this requirement to the well-formedness of types.
-%
 % A well-formed type is such that given any query type,
 % it is always clear which subpart the query is referring to.
 % In terms of rules, this notion of well-formedness is almost the same as the one in System $F$
 % except for intersection types we require the two components to be disjoint.
 %
-% With parametric polymorphism, disjointness is harder to determine due to type variables.
-% Consider this program:
-% \[
-% \blam \alpha {\lam x {\alpha \inter \tyint} x}
-% \]
-% $x$ in the body is of type $\alpha \inter \tyint$ and if $\alpha$ and $\tyint$ are
-% disjoint depends on the instantiation of $\alpha$.
-
-% \subsection{Disjoint Quantification}
-% To avoid being overly conservative, while still retaining coherence in the
-% presence of parametric polymorphism and intersection types, \namedis uses
-% an extension to universal quantification called \emph{disjoint quantification}.
-% Inspired by
-% bounded quantification~\cite{Cardelli:1994},
-% where a type variable is constrained by a type
-% bound, disjoint quantification allows a type variable to be
-% constrained so that it is disjoint with a
-% given type. With disjoint quantification a variant of the program $fst$, which
-% is accepted by \namedis, would be written as:
-% \begin{lstlisting}
-% let fst A ((*$ \highlight {B *~A} $*)) (x: A & B) = (fun (z: A) (*$ \to $*) z) x
-% in (*$ \ldots $*)
-% \end{lstlisting}
-% The small change is in the declaration of the type parameter $B$. The notation
-% $B*A$ means that in this program the type variable $B$ is constrained so that
-% it can only be instantiated with any type disjoint to $A$.
-% This ensures that the
-% merge denoted by $x$ is disjoint for all valid instantiations of $A$ and $B$.
-%
-% The nice thing about this solution is that many uses of \lstinline$fst$ are
-% accepted. For example, the following use of \lstinline$fst$:
-% \begin{lstlisting}
-% fst Int Char (1,,'c')
-% \end{lstlisting}
-%
-% is accepted since \lstinline$Int$ and \lstinline$Char$ are disjoint, thus satisfying the constraint
-% on the second type parameter of \lstinline$fst$.
-% However, problematic uses of \lstinline$fst$ are rejected. For example:
-% \begin{lstlisting}
-% fst Int Int (1,,2)
-% \end{lstlisting}
-%
-% is rejected because \lstinline$Int$ is not disjoint with \lstinline$Int$, thus
-% failing to satisfy the disjointness constraint on the second type parameter of
-% \lstinline$fst$.
-
-% Note that there is a nice symmetry between bounded quantification and disjoint quantification.
-% In systems with bounded quantification,
-% the usual unconstrained quantifier $\for {\alpha} \ldots$
-% is a syntactic sugar for $\for {\alpha \subtype \top} \ldots$, and
-% $\blam \alpha \ldots$ for $\blam {\alpha \subtype \top} \ldots$.
-% In parellel, in our system with disjoint quantification,
-% the usual unconstrained quantifier $\for {\alpha} \ldots$
-% is a syntactic sugar for $\for {\alpha \disjoint \bot} \ldots$, and
-% $\blam \alpha \ldots$ for $\blam {\alpha \disjoint \top} \ldots$.
-% The intuition is that since the bottom type is akin to the empty set,
-% no other type overlaps with it.\george{Format this paragraph better.}
-
-
-% With this tool in hand, we can rewrite the program above to:
-% \[
-% \blam {\alpha \disjoint \tyint} {\lam x {\alpha \inter \tyint} x}
-% \]
-%
-% This program typechecks because while $x$ is of type $\alpha \inter \tyint$,
-% and $\alpha$ is disjoint with $\tyint$. Similarly, in the new system,
-% the original program no longer typechecks, thus preventing overlapping types.

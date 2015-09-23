@@ -14,7 +14,7 @@ of the first and second components are. In some cases the meaning of
 the second component takes precedence (that is, is biased) over the
 first component. The set of rules is restrictive and it forbids, for
 instance, the merge of two functions (even when they a provably
-disjoint). In contrast, disjointness in \namedis has a well-defined
+disjoint). In contrast, disjointness in \name has a well-defined
 specification and it is quite flexible. Secondly, Reynolds calculus
 does not support universal quantification. It is unclear to us whether
 his set of rules would still ensure disjointness in the presence of
@@ -61,7 +61,7 @@ quantification to guarantee coherence in our calculus.
 Our type system combines intersection types and parametric polymorphism. Closest
 to us is Pierce's work~\cite{pierce1991programming1} on a prototype
 compiler for a language with both intersection types, union types, and
-parametric polymorphism. Similarly to \namedis in his system universal
+parametric polymorphism. Similarly to \name in his system universal
 quantifiers do not support bounded quantification. However Pierce did not try to prove any
 meta-theoretical results and his calculus does not have a merge
 operator.  Pierce also studied a system where both intersection
@@ -105,7 +105,7 @@ calculus with intersection types and parametric polymorphism is not
 yet proven. Recently, some form of intersection
 types has been adopted in object-oriented languages such as Scala,
 Ceylon, and Grace. Generally speaking,
-the most significant difference to \namedis is that in all previous systems
+the most significant difference to \name is that in all previous systems
 there is no explicit introduction construct like our merge operator. As shown in
 Section~\ref{subsec:OAs}, this feature is pivotal in supporting modularity
 and extensibility because it allows dynamic composition of values.
@@ -216,7 +216,7 @@ families of classes. Ostermann's \emph{delegation layers}~\cite{Ostermann02dynam
 use delegation for doing dynamic composition in a system
 with virtual classes. This in contrast with most other approaches
 that use class-based composition, but closer to the dynamic
-composition that we use in \namedis.
+composition that we use in \name.
 In contrast to type systems for virtual classes
 and similar mechanisms, the goal of our work is to study the type
 systems and basic language mechanism to better support such design patterns.
@@ -257,7 +257,7 @@ extensibility.
 % row types~\cite{wand1989type} for records. Cardelli and
 % Mitchell~\cite{cardelli1990operations} defined three primitive operations on
 % records that are similar to ours: \emph{selection}, \emph{restriction}, and
-% \emph{extension}. The merge operator in \namedis plays the same role as extension.
+% \emph{extension}. The merge operator in \name plays the same role as extension.
 % Following Cardelli and Mitchell's approach,
 % of restriction and extension. Both Leijen's systems~\cite{leijen2004first,leijen2005extensible}
 % and ours allow records that contain

@@ -69,16 +69,16 @@
   sensitive=true
 }
 
-\lstdefinestyle{fi}{
+\lstdefinestyle{sourcelanguage}{
   tabsize=2, % sets default tabsize to 2 spaces
-  morekeywords={type,forall,let,rec,in,fun},
+  morekeywords={def,trait,type,new,let,rec,in,with},
   otherkeywords={->},
   morecomment=[l]{--},
   morestring=[b]", % 'b' means inside a string delimiters are escaped by a backslash.
   morestring=[b]',
 }
 
-\lstset{style=fi}
+\lstset{style=sourcelanguage}
 
 % Copied from the FCore paper:
 \usepackage[colorlinks=true,allcolors=black,breaklinks,draft=false]{hyperref}   % hyperlinks, including DOIs and URLs in bibliography
