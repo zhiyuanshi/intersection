@@ -1,4 +1,8 @@
 \section{Overview} \label{sec:overview}
+\bruno{Be careful when using the word ``class'': we don't have classes in our system; 
+so talking about classes may simply confuse readers. You can talk about classes simply to say 
+that traits provide an alternative to classes. Often when you write ``class'' in the text, what 
+you mean is ``object``}
 
 This section introduces \name and its support for intersection types and the
 merge operator. It then discusses the issue of coherence and shows how the
@@ -277,6 +281,7 @@ play a crucial rule in guaranteeing that the semantics is coherent.
 % biased choice and a reason to dismiss it as a possible implementation
 % choice for \name.
 
+\begin{comment}
 \paragraph{Conservatively rejecting intersections.}
 To avoid incoherence, and the issues of biased choice, another option
 is simply to reject programs where the
@@ -290,28 +295,46 @@ We have built a source language that is desugared into \name. The most
 central feature is the trait declaration. Trait can take several parameters,
 which is then in scope in the body of the trait definition. In fact, trait
 creation is dynamic, which means it can be contained inside a function.
+\end{comment}
 
 %*******************************************************************************
-\subsection{Traits}
+\section{Dynamically Composable Traits}
 %*******************************************************************************
 
-Trait~\cite{scharli2003traits} is an alternative to inheritance as a mechanism
-of code reuse in object-oriented programming. A trait is a collection of related
-methods that characterizes only a specific aspect of the features of a class.
-Therefore, programs using traits usually have a number of small traits instead
-of fewer but larger classes in OO programs that use inheritance. Code reuse with
-traits is easier with traits than with classes, since traits are usually shorter
-and traits can be \emph{composed}. In fact, trait composition offers a variety
-of possibilities: two traits can be ``added'' together (which is an symmetric
-operation); methods can be removed from a trait; and traits provide conflict
-detection, etc.
+A trait~\cite{scharli2003traits} is an alternative
+mechanism of code reuse in object-oriented programming. 
+\bruno{Something needs to be said about multiple inheritance here:
+we can think of traits as giving us many of the benefits of multiple 
+inheritance, but without many of the problems.}
+A trait is a
+collection of related methods that characterizes only a specific
+aspect of the features of an object.  Therefore, programs using traits
+usually have a number of small traits instead of fewer but larger
+classes in OO programs that use inheritance. Code reuse with traits is
+easier with traits than with classes, since traits are usually shorter
+and traits can be \emph{composed}. In fact, trait composition offers a
+variety of possibilities: two traits can be ``added'' together (which
+is an symmetric operation); methods can be removed from a trait; and
+traits provide conflict detection, etc.
 
 Although trait or similar feature is widely implemented in many programming
-languages, there have not been a foundational calculus that models traits.
+languages, there have not been a foundational calculus that models traits
+\bruno{are you sure about this?? Google for ``trait calculus'' and 
+you will find many results!}.
 However, we are going to show that \name is able to model all the important
 features of trait.
+\bruno{You need to use more structure in the section: use subsections and paragraphs 
+to introduce the topics/ideas of what you are talking about. 
+I have added a few.}
 
 The simplest use case of traits is extracting a feature out from a model class.
+
+\paragraph{Basic Traits} 
+\bruno{Here you should explain the basics of traits and give 
+an example of two traits with no dependencies at all}
+
+\paragraph{Traits with Dependencies}
+\bruno{write a topic sentence: what is this paragraph about?}
 The norm of a point is a generalized notion of distance of that point to the
 origin. In the following example, we provide two definitions of norm via two
 traits. Later we compose the definition of point and norm so that the norm have
@@ -334,6 +357,8 @@ console.log(new (Point(3,4) & EuclideanNorm()).norm()) -- This prints 5
 console.log(new (Point(3,4) & ManhattanNorm()).norm()) -- This prints 7
 \end{lstlisting}
 
+\paragraph{Detecting and Resolving Conflicts in Trait Composition}
+\bruno{write a topic sentence}
 The following example shows a counter object and how we could extend its
 behavior so that it supports reset. First we define a \lstinline$Counter$ as a
 type synonym for a record that contains a \lstinline$val$ method, which returns
@@ -386,6 +411,7 @@ let counter = new (Counter(0) \ incr & Reset())
 in counter.incr()
 \end{lstlisting}
 
+\paragraph{Mutual Dependencies}
 The next example, although a little bit contrived, illustrates that when two
 traits are composed, any two methods in those two traits can refer to each
 other via the self reference, just as if they were inside the same class.
@@ -419,10 +445,17 @@ trait Odd { self: Even with Odd =>
 When the two traits are composed, conceptually it is as if that a new class were
 being created on the fly by copying all the definitions inside those two traits.
 If there is any unresolved conflict, the program will be rejected by the type
-system. But one difference with the trait approach and the class approach is
+system. 
+
+\paragraph{Dynamic Composition}
+\bruno{Don't just briefly mention the advantage! Actually show an example which 
+illustrates something, which is impossible say in Scala.}
+But one difference with the trait approach and the class approach is
 that in our language we are able to compose traits \emph{dynamically} and then
 instantiate them, which is impossible in traditional OO languages such as Java
 since classes being instantiated must be known statically.
+
+
 
 \begin{lstlisting}
 class Point3D(x: Int, y: Int) { self: Point3D (*$ \to $*)
