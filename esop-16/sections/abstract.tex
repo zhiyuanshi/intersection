@@ -6,7 +6,7 @@ different derivations for the same expression can lead to different
 results. The lack of coherence is important disadvantage for adoption
 of his core calculus in implementations of programming languages, as
 the semantics of the programming language becomes implementation
-dependent. Moreover his calculus did not account for parametric polymorphism.
+dependent. 
 
 This paper presents \name: a core calculus with a variant of
 \emph{intersection types} and a
@@ -15,4 +15,7 @@ coherent. Coherence is achieved by ensuring that intersection types
 are \emph{disjoint}. Formally two types are disjoint if they do not
 share a common supertype. We present a type system that prevents
 intersection types that are not disjoint, as well as an algorithmic
-specification to determine whether two types are disjoint. ...
+specification to determine whether two types are disjoint. Moreover 
+we show the applicability of this calculus to express a powerful 
+form of dynamically composable traits, paving the way for new 
+designs for object-oriented programming languages.\bruno{polish better} 
