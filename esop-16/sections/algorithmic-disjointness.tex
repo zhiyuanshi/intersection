@@ -1,8 +1,8 @@
 \section{Algorithmic Disjointness} \label{sec:alg-dis}
 
 Section~\ref{sec:disjoint} presented a type system with disjoint
-intersection types and disjoint quantification that is both type-safe
-and coherent. Unfortunatelly the type system is not algorithmic
+intersection types that is both type-safe
+and coherent. Unfortunately the type system is not algorithmic
 because the specification of disjointness does not lend itself to an
 implementation directly. This is a problem, because we need an
 algorithm for checking whether two types are disjoint or not in order
@@ -123,7 +123,6 @@ $\commonsuper$:
 \begin{figure}[h]
   \begin{mathpar}
     \formdis \\
-    \ruledisvar \and \ruledissym \and
     \ruledisfun \and
     \ruledisinterl \and \ruledisinterr \and \ruledisatomic
   \end{mathpar}
@@ -143,12 +142,6 @@ Figure~\ref{fig:disjointness}, which consists of two judgements.
 \paragraph{Main judgement.} The judgement $\jdisimpl \Gamma A B$ says
 two types $A$ and $B$ are disjoint in a context
 $\Gamma$.
-
-\reflabel{\labeldisvar} is the base rule and
-\reflabel{\labeldissym} is its twin rule. Both rules state that a
-type variable is disjoint to some type $A$, if $\Gamma$ contains a
-corresponding disjointness constraint. The \reflabel{\labeldissym}
-rule is needed because disjointness is a symmetric relation.
 
 The rules dealing with intersection types (\reflabel{\labeldisinterl}
 and \reflabel{\labeldisinterr}) are quite intuitive. The intuition is

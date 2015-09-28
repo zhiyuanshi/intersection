@@ -57,10 +57,7 @@ Those two types are not disjoint since $\tyint \to \tyint$ is their common super
     \begin{array}{l}
       \begin{array}{llrll}
         \text{Types}
-        & A, B & \Coloneqq & \alpha                  & \\
-        &      & \mid & \highlight {$\bot$}          & \\
-        &      & \mid & A \to B                      & \\
-        &      & \mid & \for {(\alpha \highlight {$\disjoint A$})} B  & \\
+        & A, B & \Coloneqq & A \to B                 & \\
         &      & \mid & A \inter B                   & \\
 
         \\
@@ -68,18 +65,12 @@ Those two types are not disjoint since $\tyint \to \tyint$ is their common super
         & e & \Coloneqq & x                        & \\
         &   & \mid & \lam {(x \oftype A)} e          & \\
         &   & \mid & \app {e_1} {e_2}              & \\
-        &   & \mid & \blam {(\alpha \highlight {$\disjoint A$})} e  & \\
-        &   & \mid & \tapp e A                     & \\
         &   & \mid & e_1 \mergeop e_2              & \\
 
         \\
         \text{Contexts}
         & \Gamma & \Coloneqq & \cdot
-                   \mid \Gamma, \alpha \highlight {$\disjoint A$}
                    \mid \Gamma, x \oftype A  & \\
-
-        \text{Syntactic sugar} & \blam \alpha e & \equiv & \blamdis \alpha \bot e & \\
-                               & \forall \alpha.~A & \equiv & \forall (\alpha * \bot)~.~A & \\
       \end{array}
     \end{array}
   \]
@@ -111,18 +102,18 @@ Those two types are not disjoint since $\tyint \to \tyint$ is their common super
 Figure~\ref{fig:fi-syntax-dis} shows the updated syntax with the
 changes highlighted and Figure~\ref{fig:additional-type-and-context-translation}
 shows type and context translations for the new constructs.
-Note how similar the changes are to those needed
-to extend System $F$ with bounded quantification. First, type
-variables are now always associated with their disjointness
-constraints (like $\alpha \disjoint A$) in types, terms, and
-contexts. Second, the bottom type ($\bot$) is introduced so that
-universal quantification becomes a special case of disjoint
-quantification: $\blam \alpha e$ is really a syntactic sugar for
-$\blamdis \alpha \bot e$. The underlying idea is that any type is
-disjoint with the bottom type.  Note the analogy with bounded
-quantification, where the top type is the trivial upper bound in
-bounded quantification, while the bottom type is the trivial
-disjointness constraint in disjoint quantification.
+
+% First, type
+% variables are now always associated with their disjointness
+% constraints (like $\alpha \disjoint A$) in types, terms, and
+% contexts. Second, the bottom type ($\bot$) is introduced so that
+% universal quantification becomes a special case of disjoint
+% quantification: $\blam \alpha e$ is really a syntactic sugar for
+% $\blamdis \alpha \bot e$. The underlying idea is that any type is
+% disjoint with the bottom type.  Note the analogy with bounded
+% quantification, where the top type is the trivial upper bound in
+% bounded quantification, while the bottom type is the trivial
+% disjointness constraint in disjoint quantification.
 
 %Indeed, \bruno{unfinidhed sentence}\george{Mabe show a diagram here to contrast
 %with bounded polymorphism.}
@@ -181,23 +172,23 @@ it is easy to see that type preservation and type-safety still holds.
 Additionally, we can show that typing always produces a well-formed type by
 proving the following results.
 
-\begin{restatable}[Instantiation]{lemma}{instantiation}
-  \label{lemma:instantiation}
-
-  If $\jwf {\Gamma, \alpha \disjoint B} C$, $\jwf \Gamma A$, $\jdis \Gamma A B$
-  then $\jwf \Gamma {\subst A \alpha C}$.
-\end{restatable}
-
-\begin{restatable}[Well-formed typing]{lemma}{wellformedtyping}
-  \label{lemma:wellformed-typing}
-
-  If $\jtype \Gamma e A$, then $\jwf \Gamma A$.
-\end{restatable}
-
-\begin{proof}
-  By induction on the derivation that leads to $\jtype \Gamma e A$ and applying
-  Lemma~\ref{lemma:instantiation} in the case of \reflabel{\labelttapp}.
-\end{proof}
+% \begin{restatable}[Instantiation]{lemma}{instantiation}
+%   \label{lemma:instantiation}
+% 
+%   If $\jwf {\Gamma, \alpha \disjoint B} C$, $\jwf \Gamma A$, $\jdis \Gamma A B$
+%   then $\jwf \Gamma {\subst A \alpha C}$.
+% \end{restatable}
+%
+% \begin{restatable}[Well-formed typing]{lemma}{wellformedtyping}
+%   \label{lemma:wellformed-typing}
+%
+%   If $\jtype \Gamma e A$, then $\jwf \Gamma A$.
+% \end{restatable}
+%
+% \begin{proof}
+%   By induction on the derivation that leads to $\jtype \Gamma e A$ and applying
+%   Lemma~\ref{lemma:instantiation} in the case of \reflabel{\labelttapp}.
+% \end{proof}
 
 With our new definition of well-formed types, this result is nontrivial.
 In general, disjointness judgements are not invariant with respect to

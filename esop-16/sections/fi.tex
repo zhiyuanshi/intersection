@@ -2,14 +2,14 @@
 \label{sec:fi}
 
 This section presents the syntax, subtyping, typing, as well as the
-(incoherent) semantics of \name: a calculus with intersection types,
-parametric polymorphism and a merge
+(incoherent) semantics of \name: a calculus with intersection types
+and a merge
 operator. This calculus borrows key ideas from Dunfield's
-calculus~\cite{dunfield2014elaborating}, but is extended with parametric polymorphism. Like Dunfield calculus
+calculus~\cite{dunfield2014elaborating}. Like Dunfield calculus
 \name is type-safe, but it has an incoherent semantics.
 Section~\ref{sec:disjoint} introduces \name, which shows the necessary changes
-for supporting disjoint intersection types and disjoint
-quantification and ensuring coherence.
+for supporting disjoint intersection types and
+ensuring coherence.
 
 \subsection{Syntax}
 
@@ -46,8 +46,7 @@ type-level and the ``merges'' $e_1 \mergeop e_2$ at the term level.
 \end{figure}
 
 \paragraph{Types.} Metavariables $A$, $B$ range over types. Types include
-standard constructs in System $F$: type variables $\alpha$; function types $A
-\to B$; and type abstraction $\for \alpha A$. $A \inter B$ denotes the
+function types $A \to B$. $A \inter B$ denotes the
 intersection of types $A$ and $B$.
 
 \paragraph{Terms.} Metavariables $e$ range over terms.  Terms include standard
@@ -87,20 +86,20 @@ standard ways and we are using them in discussions and examples.
 \begin{figure}
   \begin{mathpar}
     \formsub \\
-    \rulesubvar \and \rulesubfun \and \rulesubforall \and \rulesubinter \and
+    \rulesubvar \and \rulesubfun \and \rulesubinter \and
     \rulesubinterl \and \rulesubinterr
   \end{mathpar}
 
   \begin{mathpar}
     \formwf \\
-    \rulewfvar \and \rulewffun \and \rulewfforall \and \rulewfinter
+    \rulewfvar \and \rulewffun \and \rulewfinter
   \end{mathpar}
 
   \footnote{miss a rule for $\bot$?}
 
   \begin{mathpar}
     \formt \\
-    \ruletvar \and \ruletlam \and \ruletapp \and \ruletblam \and \rulettapp \and
+    \ruletlam \and \ruletapp \and
     \ruletmerge
   \end{mathpar}
 
@@ -131,8 +130,7 @@ The subtyping rules of the form $A \subtype B$ are shown in the top part of
 Figure~\ref{fig:fi-type}. At the moment, the reader is advised to ignore the
 gray-shaded part in the rules, which will be explained later. The rule
 \reflabel{\labelsubfun} says that a function is contravariant in its parameter
-type and covariant in its return type. In \reflabel{\labelsubforall} a universal
-quantifier ($\forall$) is covariant in its body. The three rules dealing with
+type and covariant in its return type. The three rules dealing with
 intersection types are just what one would expect when interpreting types as
 sets. Under this interpretation, for example, the rule \reflabel{\labelsubinter}
 says that if $A_1$ is both the subset of $A_2$ and the subset of $A_3$, then
@@ -162,14 +160,9 @@ the bottom part of the figure. Again, the reader is advised to ignore the
 gray-shaded part here, as these parts will be explained later. The typing judgement is
 of the form: \[ \jtype \Gamma e A \] It reads: ``in the typing context $\Gamma$,
 the term $e$ is of type $A$''. The rules that are the same as in System $F$ are
-rules for variables \reflabel{\labeltvar}, lambda abstractions
-\reflabel{\labeltlam}, and type applications \reflabel{\labelttapp}. For the
-ease of discussion, in \reflabel{\labeltblam}, we require the type variable
-introduced by the quantifier to be fresh. For programs with type variable
-shadowing, this requirement can be met straighforwardly by variable renaming.
-The rule \reflabel{\labeltapp} needs special attention as we add a subtyping
-requirement: the type of the argument ($A_3$) is a subtype of the type of the
-parameter ($A_1$). \reflabel{\labeltmerge} means that a merge $e_1 \mergeop e_2$,
+rules for variables \reflabel{\labeltvar} and lambda abstractions
+\reflabel{\labeltlam}.
+\reflabel{\labeltmerge} means that a merge $e_1 \mergeop e_2$,
 is assigned an intersection type composed of the resulting types of
 $e_1$ and $e_2$.
 
@@ -207,16 +200,12 @@ the function expects a $\tystring$ but the translated argument is of type $\pair
 \begin{figure}[h]
   \[
     \begin{array}{llrl}
-      \text{Types}    & T & \Coloneqq & \alpha \\
-                      &   & \mid      & \highlight {$ () $} \\
+      \text{Types}    & T & \Coloneqq & \highlight {$ () $} \\
                       &   & \mid      & {T_1} \to {T_2} \\
-                      &   & \mid      & \for \alpha T \\
                       &   & \mid      & \highlight {$ \pair {T_1} {T_2} $} \\
       \text{Terms}    & E & \Coloneqq & x \\
                       &   & \mid      & \lamty x T E \\
                       &   & \mid      & \app {E_1} {E_2} \\
-                      &   & \mid      & \blam \alpha E \\
-                      &   & \mid      & \tapp E T \\
                       &   & \mid      & \highlight {$ \pair {E_1} {E_2} $} \\
                       &   & \mid      & \highlight {$ \proj k E $} \quad k \in \{ 1, 2 \} \\
       \text{Contexts} & G & \Coloneqq & \cdot \mid G, \alpha \mid G, x \oftype T \\
@@ -275,7 +264,7 @@ $ \im {A_1} \to \im {A_2} $ (by Lemma~\ref{lemma:sub}). For example,
 \]
 generates a coercion function with type: $\tyint \inter \tybool \to \tybool$.
 
-In rules \reflabel{\labelsubvar}, \reflabel{\labelsubforall}, coercions are just
+In rules \reflabel{\labelsubvar}, coercions are just
 identity functions. In \reflabel{\labelsubfun}, we elaborate the subtyping of
 parameter and return types by $\eta$-expanding $f$ to $\lamty x {\im {A_3}}
 {\app f x}$, applying $E_1$ to the argument and $E_2$ to the result. Rules
