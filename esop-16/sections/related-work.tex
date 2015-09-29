@@ -1,7 +1,10 @@
 \section{Related Work}
 \label{sec:related-work}
 
+%*******************************************************************************
 \paragraph{Coherence}
+%*******************************************************************************
+
 Reynolds invented Forsythe~\cite{reynolds1997design} in the 1980s. Our
 merge operator is analogous to his operator $p_1, p_2 $. Forsythe has
 a coherent semantics. The result was proved formally by
@@ -126,8 +129,10 @@ let merge [A, B] (f: ExpAlg A) (g: ExpAlg B) = {
 \end{lstlisting}
 \end{comment}
 
-
+%*******************************************************************************
 \paragraph{Other type systems with intersection types.}
+%*******************************************************************************
+
 % Although similar in spirit,
 % our elaboration typing is simpler: we require subtyping in the case of
 % applications, thus avoiding the subsumption rule. Besides, our treatment
@@ -161,7 +166,10 @@ subtyping seems to have important advantages over syntactic subtyping. One
 worthy avenue for future work is to study languages with intersection types
 and merge operator in a semantic subtyping setting.
 
-\paragraph{Extensibility.} One of our motivations to study systems
+%*******************************************************************************
+\paragraph{Extensibility.}
+%*******************************************************************************
+One of our motivations to study systems
 with intersections types is to better understand the
 type system requirements needed to address extensibility problems.
 A well-known problem in programming languages is the Expression
@@ -292,3 +300,15 @@ extensibility.
 % Dunfield~\cite{dunfield2014elaborating}.
 %
 % R{\'e}my~\cite{remy1989type}
+
+%*******************************************************************************
+\paragraph{Trait calculi.}
+%*******************************************************************************
+Fisher and Reppy~\cite{fisher2004typed} provided a dedicated statically typed
+calculus for modeling traits. \name is not dedicated to traits; but rather, it
+supports a source language that models traits. Compared to Fisher and Reppy's
+calculus, \name is more lightweight. For example, self reference is not in the
+language of \name. One reason for the difference is that Fisher and Reppy's
+calculus supports \emph{classes} in addition to traits, and considers the
+interaction between them, whereas our object oriented source language is
+\emph{prototype}-based---the mechanism for code reuse is purely trait.
