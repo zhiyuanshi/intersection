@@ -1,5 +1,7 @@
 \section{Disjointness and Coherence}
 \label{sec:disjoint}
+\bruno{This section still needs to be cleaned up to remove stuff
+  related to polymorphism.}
 
 Although the system shown in the Section~\ref{sec:fi} is type-safe, it is not
 coherent. This section shows how to modify \name so that it guarantees coherence
@@ -27,6 +29,8 @@ for polymorphic types.
 definition for disjoiness. Here such definition is made a bit more precise, and
 well-suited to \name.
 
+\bruno{This definition is wrong and too complicated. Since there is no
+polymorphism, we do not need $\Gamma$.}
 \begin{definition}[Disjoint types]
 
   Given a context $\Gamma$, two types $A$ and $B$ are said to be disjoint
@@ -50,6 +54,9 @@ type may not be. Consider:
 \[ \tyint \to \tyint \quad \text{and} \quad (\tyint \to \tyint) \inter (\tystring \to \tystring) \]
 Those two types are not disjoint since $\tyint \to \tyint$ is their common supertype.
 
+\bruno{There are no changes in syntax, right? So the whole section
+  (and figure) can be dropped! Also, without polymorphism, we don't
+  need a bottom type.}
 \subsection{Syntax}
 
 \begin{figure}

@@ -2,6 +2,11 @@
 \section{Dynamically Composable Traits} \label{sec:trait}
 %*******************************************************************************
 
+\bruno{This section suffers from having examples which are different
+  to illustrate the various concepts. A better approach would be to 
+use related examples (say various things todo with points), to
+illustrate the approach.}
+
 Traits~\cite{scharli2003traits} provide an alternative mechanism of code reuse
 in object-oriented programming.
 \bruno{Something needs to be said about multiple inheritance here:
@@ -19,6 +24,7 @@ possibilities: two traits can be ``added'' together (which is an symmetric
 operation); methods can be removed from a trait; and trait systems provide
 conflict detection, etc.
 
+\bruno{The place for related work discussions is in related work, not here.}
 Since the seminal paper by Schärli~\emph{et al.} documented an implementation of
 the trait mechanism in dynamically typed Smalltalk without providing a type
 system, Fisher and Reppy~\cite{fisher2004typed} presented a statically typed
@@ -30,9 +36,8 @@ translation from that language to \name. \george{Need to note the difference
 between class-based and prototype-based somewhere.}
 
 \paragraph{Basic Traits}
-
-\bruno{Here you should explain the basics of traits and give
-an example of two traits with no dependencies at all}
+\bruno{For the paper I don't like the ``in'' syntax. I think ``;''
+  looks much better.}
 
 The first example shows basic trait composition. Many social networking sites
 allow users to ``upvote'' a comment and the number of upvotes that comment has
@@ -58,6 +63,9 @@ let comment = new (Comment("Have fun!"), Up(4))
 in console.log(comment.content(), comment.upvotes())
 -- Output: "Have fun!" 4
 \end{lstlisting}
+\bruno{Consider mixing explanation with the source code. Instead of
+  presenting the full source and then explaining. Alternatively, make 
+this a figure.}
 
 At this point the reader may wonder why there are duplicate declarations related
 to \lstinline$Comment$ and \lstinline$Up$. In mainstream OO languages such as
@@ -87,6 +95,7 @@ preceding parameter list, and becomes in scope after the arrow. We could have
 named it \lstinline$this$ or even \lstinline$s$, but that is generally
 discouraged.
 
+\bruno{Our traits have constructors; regular traits do not.}
 Creating an object is via the \lstinline$new$ keyword, similar to many OO
 languages, except for one crucial novelty: we can create an object from multiple
 traits! More precisely, the object is created from the \emph{composition} of
@@ -233,6 +242,8 @@ class Point3D(x: Int, y: Int) { self: Point3D (*$ \to $*)
 Of course, this whole section will lose its point if the source language cannot
 be translated to \name and checked against the type system of \name. A more
 formal description can be found in the appendix.
+\bruno{Mention that the idea of trait translation is to follow the
+  functional semantics of mixins by Cook.}
 
 \paragraph{Trait Declarations} A trait in the source language is translated into
 nothing but a normal term in \name. For example,
@@ -278,6 +289,8 @@ Therefore it is an open term.
 \paragraph{``new'' Keyword} \lstinline$new$ instantiates a trait by taking the
 fixpoint of its corresponding open term. In fact, \lstinline$new$ is just a
 function defined as
+\bruno{There's no need to mention polymorphism at all, since
+  desugaring could simply inline the definition of new.}
 
 \begin{lstlisting}
 let new[A] (f: (() (*$ \to $*) A) (*$ \to $*) A): A

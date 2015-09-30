@@ -15,6 +15,7 @@ semantics to the calculus by a type-directed translation to a simply
 typed lambda calculus extended with pairs. The type-directed
 translation is simple, elegant, and type-safe.
 
+\bruno{the following paragraph no longer makes sense for this paper.}
 Intersection types and the merge operator are also useful in the
 context of software \emph{extensibility}. In recent years there has
 been a wide interest in presenting solutions to the \emph{expression
@@ -45,6 +46,8 @@ essence of various solutions to extensibility problems.
 %foundational core calculus that can capture the key ideas behind the
 %various solutions.
 
+\bruno{Probably we can reuse some parts of the text here, but this
+  also needs to change}
 Dunfield calculus seems to provide a good basis for a foundational
 calculus for studying extensibility.  However, his calculus is still
 insufficient for studying extensibility for two different reasons.  Firstly it does not
@@ -86,6 +89,7 @@ types are disjoint. Moreover, this algorithmic specification is shown to be
 sound and complete with respect to the formal definition of
 disjointness.
 
+\bruno{no parametric polymorphism}
 Disjoint intersection types can be extended to
 support parametric polymorphism. However, parametric polymorphism makes the
 problem of coherence significantly harder. When a type variable occurs
@@ -118,9 +122,9 @@ In summary, the contributions of this paper are:
   algorithmic specification of disjointness (with respect to the
   corresponding formal definition) is presented.
 
-\item {\bf Disjoint Quantification:} A novel form of universal
-quantification where type variables can have disjointness
-constraints.
+%\item {\bf Disjoint Quantification:} A novel form of universal
+%quantification where type variables can have disjointness
+%constraints.
 
 \item {\bf Formalization of System \name and Proof of Coherence:} An
   elaboration semantics of System \name into System F is

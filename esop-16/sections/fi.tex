@@ -17,7 +17,7 @@ Figure~\ref{fig:fi-syntax} shows the syntax of \name. The differences to
 System $F$, highlighted in gray, are intersection types $A \inter B$ at the
 type-level and the ``merges'' $e_1 \mergeop e_2$ at the term level.
 
-\begin{figure}
+\begin{figure}[t]
   \[
     \begin{array}{l}
       \begin{array}{llrll}
@@ -43,7 +43,7 @@ type-level and the ``merges'' $e_1 \mergeop e_2$ at the term level.
 
   \caption{\name syntax.}
   \label{fig:fi-syntax}
-\end{figure}
+\end{figure}\bruno{put figures on top.}
 
 \paragraph{Types.} Metavariables $A$, $B$ range over types. Types include
 function types $A \to B$. $A \inter B$ denotes the
@@ -135,6 +135,8 @@ intersection types are just what one would expect when interpreting types as
 sets. Under this interpretation, for example, the rule \reflabel{\labelsubinter}
 says that if $A_1$ is both the subset of $A_2$ and the subset of $A_3$, then
 $A_1$ is also the subset of the intersection of $A_2$ and $A_3$.
+\bruno{The underscores in the names of the rules look quite ugly. Why
+  not drop them?}
 
 \paragraph{Metatheory.} As other sane subtyping relations, we can show that
 subtyping defined by $\subtype$ is also reflexive and transitive.
@@ -181,7 +183,8 @@ a type-directed translation to an extension of System $F$ with pairs~\footnote{
 The syntax and typing of our target language is unsurprising. The syntax of the
 target language is shown in Figure~\ref{fig:f-syntax}. The highlighted part
 shows its difference with the standard System $F$. The typing rules can be found
-in the appendix.
+in the appendix.\bruno{Does the target language does need unit? Any
+  rules generating units? I don't think so, so it can be dropped.}
 
 \paragraph{Key idea of the translation.}
 This translation turns merges into usual pairs, similar to Dunfield's
