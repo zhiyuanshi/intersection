@@ -1,0 +1,34 @@
+Syntax
+  e ::= i | λx. e | e1 e2 | (e1,,e2)
+
+Sugars
+  let x = e1 in e2 ≡ (λx. e2) e1
+
+Value judgements
+
+  ------ (lit-val)
+  i  val
+
+  ---------- (lam-val)
+  λx. e  val
+
+  ------------- (merge-val)
+  (e1,,e2)  val
+
+Small-step operational semantics
+
+  e val
+  ------------------------
+  (λx. e1) e ⇒ [v2 / x] e
+
+  e val
+  ---------------------------------------------------------
+  ((λx1. e1) ,, (λx2. e2)) e ⇒ ([e / x2] e1 ,, [e / x1] e2)
+
+  e val    e2 val    e2 not-lambda
+  ------------------------------------
+  ((λx1. e1) ,, e2) e ⇒ ([e / x2] e1)
+
+  e val    e1 val    e1 not-lambda
+  ------------------------------------
+  (e1 ,, (λx2. e2)) e ⇒ ([e / x1] e2)
