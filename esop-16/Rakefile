@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 task :default => :paper
 
-def latexmk_cmd(target, options = nil)
+def latexmk_cmd(target)
   # "Since minted makes calls to the outside world (i.e. Pygments), you need to
   # tell the LaTeX processor about this by passing it the -shell-escape option
   # or it won’t allow such calls."
@@ -18,13 +18,21 @@ def latexmk_cmd(target, options = nil)
 end
 
 desc "Generate the PDF of the paper"
-task(:paper => :clean) { system(latexmk_cmd("paper")) }
+task(:paper => :clean) do
+  system(latexmk_cmd("paper"))
+end
 
 desc "Generate the PDF of the formalisation"
-task(:formalisation => :clean) { system(latexmk_cmd("formalisation")) }
+task(:formalisation => :clean) do
+  system(latexmk_cmd("formalisation"))
+end
 
 desc "Clean"
-task(:clean => :git_clean) { system("latexmk -c") }
+task(:clean => :git_clean) do
+  system("latexmk -c")
+end
 
 # Remove only files ignored by Git (not including untracked file)
-task(:git_clean) { system("git clean -Xf") }
+task(:git_clean) do
+  system("git clean -Xf")
+end
