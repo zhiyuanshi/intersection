@@ -161,100 +161,6 @@ worthy avenue for future work is to study languages with intersection types
 and merge operator in a semantic subtyping setting.
 
 %*******************************************************************************
-\paragraph{Extensibility.}
-%*******************************************************************************
-One of our motivations to study systems
-with intersections types is to better understand the
-type system requirements needed to address extensibility problems.
-A well-known problem in programming languages is the Expression
-Problem~\cite{wadler1998expression}. In recent years there have been
-various solutions to the Expression Problem in the literature. Mostly
-the solutions are presented in a specific language, using the language
-constructs of that language. For example, in Haskell, type classes~\cite{WadlerB89}
-can be used to implement type-theoretic encodings of
-datatypes~\cite{Hinze:2006}. It has been shown~\cite{finally-tagless}
-that, when encodings of datatypes are modeled with type classes,
-the subclassing mechanism of type classes can be used to achieve
-extensibility and reuse of operations. Using such techniques provides
-a solution to the Expression Problem. Similarly, in OO languages with
-generics, it is possible to use generic interfaces and classes to
-implement type-theoretic encodings of datatypes. Conventional
-subtyping allows the interfaces and classes to be extended, which can
-also be used to provide extensibility and reuse of operations. Using
-such techniques, it is also possible to solve the Expression Problem
-in OO languages~\cite{oliveira09modular,oliveira2012extensibility}.
-It is even possible to solve the Expression Problem in theorem provers
-like Coq, by exploiting Coq's type class mechanism~\cite{DelawareOS13}.
-Nevertheless, although there is a clear connection between all those
-techniques and type-theoretic encodings of datatypes, as far as we
-know, no one has studied the expression problem from a more
-type-theoretic point of view.
-
-% As shown in Section~\ref{subsec:OAs}, a system
-% with intersection types, parametric polymorphism, the merge operator
-% and disjoint quantification can be used to explain type-theoretic
-% encodings with subtyping and extensibility.
-
-% Intersection types have been shown to be useful in designing languages that
-% support modularity.~\cite{nystrom2006j}
-
-% \paragraph{Extensible records.}
-
-%\george{Record field deletion is also possible.}
-
-% http://elm-lang.org/learn/Records.elm
-
-% Encoding records using intersection types appeared in
-% Reynolds~\cite{reynolds1997design} and Castagna et
-% al.~\cite{castagna1995calculus}. Although Dunfield also discussed this idea in
-% his paper \cite{dunfield2014elaborating}, he only provided an implementation but
-% not a formalization. Very similar to our treatment of elaborating records is
-% Cardelli's work~\cite{cardelli1992extensible} on translating a calculus, named
-% $ F_{\subtype \rho}$, with extensible records to a simpler calculus that without
-% records primitives (in which case is $ F_{\subtype} $). But he did not consider
-% encoding multi-field records as intersections; hence his translation is more
-% heavyweight. Crary~\cite{crary1998simple} used intersection types and
-% existential types to address the problem that arises when interpreting method
-% dispatch as self-application. But in his paper, intersection types are not used
-% to encode multi-field records.
-
-% Wand~\cite{wand1987complete} started the work on extensible records and proposed
-% row types~\cite{wand1989type} for records. Cardelli and
-% Mitchell~\cite{cardelli1990operations} defined three primitive operations on
-% records that are similar to ours: \emph{selection}, \emph{restriction}, and
-% \emph{extension}. The merge operator in \name plays the same role as extension.
-% Following Cardelli and Mitchell's approach,
-% of restriction and extension. Both Leijen's systems~\cite{leijen2004first,leijen2005extensible}
-% and ours allow records that contain
-% duplicate labels. Leijen's system is more sophisticated. For example, it supports
-% passing record labels as arguments to functions. He also showed an encoding of
-% intersection types using first-class labels.
-
-% Chlipala's
-% \texttt{Ur}~\cite{chlipala2010ur} explains record as type level
-% constructs.\bruno{What is the point of citing Chlipala's paper?}
-
-% Our system can be adapted to simulate systems that support extensible
-% records but not intersection of ordinary types like \texttt{Int} and
-% \texttt{Float} by allowing only intersection of record types.
-%
-% $ \turnsrec A $ states that $ A $ is a record type, or the intersection of
-% record types, and so forth.
-%
-% \inferrule [RecBase] {} {\turnsrec \recordType l A}
-%
-% \inferrule [RecStep]
-% {\turnsrec A_1 \andalso \turnsrec A_2}
-% {\turnsrec A_1 \inter A_2}
-%
-% \inferrule [Merge']
-% {\Gamma \turns e_1 : A_1 \yields {E_1} \andalso \turnsrec A_1 \\
-%  \Gamma \turns e_2 : A_2 \yields {E_2} \andalso \turnsrec A_2}
-% {\Gamma \turns e_1 \mergeop e_2 : A_1 \inter A_2 \yields {\pair {E_1} {E_2}}}
-%
-% R{\'e}my~\cite{remy1989type}
-
-%*******************************************************************************
 \paragraph{Trait calculi.}
 %*******************************************************************************
 Fisher and Reppy~\cite{fisher2004typed} provided a dedicated statically typed
@@ -266,9 +172,10 @@ calculus supports \emph{classes} in addition to traits, and considers the
 interaction between them, whereas our object oriented source language is
 \emph{prototype}-based---the mechanism for code reuse is purely trait.
 
-Bettini~\textit{et al.}'s language, SWRTJ~\cite{bettini2010prototypical}
-distinguishes, in their terminology, ``records'' and ``traits''---the former
-contain fields and the latter contain methods. Since we try to model a pure
-object-oriented language, we have excluded fields, which provide state reuse. In
-SWRTJ, traits themselves are not meant to be the generator of instances.
-Instead, another construct, called ``classes'' are, and make use of traits.
+Bettini~\textit{et al.}'s prototype language,
+SWRTJ~\cite{bettini2010prototypical} distinguishes, in their terminology,
+``records'' and ``traits''---the former contain fields and the latter contain
+methods. Since we try to model a pure object-oriented language, we have excluded
+fields, which provide state reuse. In SWRTJ, traits themselves are not meant to
+be the generator of instances. Instead, another construct, called ``classes''
+are, and make use of traits.

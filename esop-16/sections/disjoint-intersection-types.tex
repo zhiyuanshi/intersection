@@ -26,18 +26,17 @@ for polymorphic types.
 %relation, resulting in two possible coercions.
 
 \subsection{Disjointness} Throughout the paper we already presented an intuitive
-definition for disjoiness. Here such definition is made a bit more precise, and
+definition for disjoitness. Here such definition is made a bit more precise, and
 well-suited to \name.
 
 \bruno{This definition is wrong and too complicated. Since there is no
 polymorphism, we do not need $\Gamma$.}
 \begin{definition}[Disjoint types]
 
-  Given a context $\Gamma$, two types $A$ and $B$ are said to be disjoint
+  Two types $A$ and $B$ are said to be disjoint
   (written $\jdis \Gamma A B$) if they do not share a common supertype. That is,
   there does not exist a type $C$ such that $A \subtype C$ and that $B \subtype
-  C$. Note that we assume that all free type variables in $A$,
-    $B$ and $C$ are bound in $\Gamma$.
+  C$.
 
   \[\jdis \Gamma A B \equiv \not \exists C.~A \subtype C \wedge B \subtype C\]
 
@@ -88,11 +87,6 @@ Those two types are not disjoint since $\tyint \to \tyint$ is their common super
 
 \begin{figure}
   \framebox{$\im A = T$}
-
-  \begin{align*}
-    \im \bot                  &= () \\
-    \im {\fordis \alpha A B}  &= \for \alpha \im B \\
-  \end{align*}
 
   \framebox{$\im \Gamma = G$}
 
@@ -181,7 +175,7 @@ proving the following results.
 
 % \begin{restatable}[Instantiation]{lemma}{instantiation}
 %   \label{lemma:instantiation}
-% 
+%
 %   If $\jwf {\Gamma, \alpha \disjoint B} C$, $\jwf \Gamma A$, $\jdis \Gamma A B$
 %   then $\jwf \Gamma {\subst A \alpha C}$.
 % \end{restatable}

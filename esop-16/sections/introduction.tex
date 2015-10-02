@@ -89,19 +89,6 @@ types are disjoint. Moreover, this algorithmic specification is shown to be
 sound and complete with respect to the formal definition of
 disjointness.
 
-\bruno{no parametric polymorphism}
-Disjoint intersection types can be extended to
-support parametric polymorphism. However, parametric polymorphism makes the
-problem of coherence significantly harder. When a type variable occurs
-in an intersection type, it is not statically known whether the
-instantiated type will share a common supertype with other components
-of the intersection. To address this problem we propose
-\emph{disjoint quantification}: a constrained form of parametric
-polymorphism, that allows programmers to specify disjointness
-constraints for type variables. With disjoint quantification the
-calculus remains very flexible in terms of programs that can be
-written with intersection types, while retaining coherence.
-
 We also investigate how to do type-theoretic encodings of datatypes in
 \name. In particular it is shown that extensions of datatype
 encodings have subtyping relations with the datatype they

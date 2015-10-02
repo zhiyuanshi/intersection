@@ -3,7 +3,7 @@
 %*******************************************************************************
 
 \bruno{This section suffers from having examples which are different
-  to illustrate the various concepts. A better approach would be to 
+  to illustrate the various concepts. A better approach would be to
 use related examples (say various things todo with points), to
 illustrate the approach.}
 
@@ -64,7 +64,7 @@ in console.log(comment.content(), comment.upvotes())
 -- Output: "Have fun!" 4
 \end{lstlisting}
 \bruno{Consider mixing explanation with the source code. Instead of
-  presenting the full source and then explaining. Alternatively, make 
+  presenting the full source and then explaining. Alternatively, make
 this a figure.}
 
 At this point the reader may wonder why there are duplicate declarations related
@@ -225,16 +225,6 @@ that in our language we are able to compose traits \emph{dynamically} and then
 instantiate them, which is impossible in traditional OO languages such as Java
 since classes being instantiated must be known statically.
 
-
-
-\begin{lstlisting}
-class Point3D(x: Int, y: Int) { self: Point3D (*$ \to $*)
-  x() = x
-  y() = self.z()
-  z() = self.x()
-}
-\end{lstlisting}
-
 %*******************************************************************************
 \subsection{Desugaring}
 %*******************************************************************************
@@ -293,8 +283,7 @@ function defined as
   desugaring could simply inline the definition of new.}
 
 \begin{lstlisting}
-let new[A] (f: (() (*$ \to $*) A) (*$ \to $*) A): A
-  = let rec x : () (*$ \to $*) A = (*$ \lambda $*)(_: ()) (*$ \to $*) f x in x ()
+  = let rec x : () (*$ \to $*) Point = (*$ \lambda $*)(_: ()) (*$ \to $*) f x in x ()
 in (* \ldots *)
 \end{lstlisting}
 
