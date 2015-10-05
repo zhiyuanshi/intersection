@@ -18,8 +18,7 @@ number of other features, including records, mutually recursive
 first-class modules that are encoded using \code{letrec} and records.
 
 For the future, we intend to improve our source language
-and show the power of disjoint intersection types and disjoint
-quantification in large case studies.
+and show the power of disjoint intersection types in large case studies.
 We are also interested in extending our work
 to systems with a $\top$ type. This will also require an adjustment
 to the notion of disjoint types. A suitable notion of
@@ -31,72 +30,70 @@ notion of disjointness, since with union types there always exists
 a type $A \union B$, which is the common supertype of two
 types $A$ and $B$.
 
-\begin{comment}
-Some immediate topics for
-further improvement of the results in this paper are discussed next.
-
-\paragraph{Union types.}
-
-If a type system ever contains union types (the counterpart of intersection
-types), with the following standard subtyping rules,
-\begin{mathpar}
-  \inferrule* [right=Sub\_Union\_1]
-    { }
-    {A \subtype A \union B}
-
-  \inferrule* [right=Sub\_Union\_2]
-    { }
-    {B \subtype A \union B}
-\end{mathpar}
-then no two types $A$ and $B$ can ever be disjoint, since there always exists
-the type $A \union B$, which is their common supertype. So it is reasonable to
-conjecture that such system cannot be coherent.
-\bruno{I wouldn't say this is a motivation: it sounds like we caould
-  not support union types, when I think this is not true. For example
-we could say something like: there does not exist an \emph{atomic} C ...}
-
-
-\paragraph{Implementation.}
-
-We implemented the core functionalities of the \name as part of a JVM-based
-compiler. Based on the type system of \name, we built an ML-like
-source language compiler that offers interoperability with Java (such as object
-creation and method calls). The source language is loosely based on the more
-general System $F_{\omega}$ and supports a
-number of other features, including records, mutually recursive
-\code{let} bindings, type aliases, algebraic data types, pattern matching, and
-first-class modules that are encoded using \code{letrec} and records.
-
-Relevant to this paper are the three phases in the compiler, which
-collectively turn source programs into System $F$:
-
-\begin{enumerate}
-\item A \emph{typechecking} phase that checks the usage of \name features and
-  other source language features against an abstract syntax tree that follows
-  the source syntax.
-
-\item A \emph{desugaring} phase that translates well-typed source terms into
-  \name terms. Source-level features such as multi-field records, type aliases
-  are removed at this phase. The resulting program is just an \name term
-  extended with some other constructs necessary for code generation.
-
-\item A \emph{translation} phase that turns well-typed \name terms into System
-  $F$ ones.
-\end{enumerate}
-
-Phase 3 is what we have formalized in this paper.
-
-
-\paragraph{Reduce the number of coercions.}
-
-Our translation inserts a coercion (many of them are identity functions)
-whenever subtyping occurs during a function application, which could mean
-notable run-time overhead. In the current implementation, we introduced a
-partial evaluator with three simple rewriting rules to eliminate the redundant
-identity functions as another compiler phase after the translation. In another
-version of our implementation, partial evaluation is weaved into the process of
-translation so that the unwanted identity functions are not introduced during
-the translation. Besides, since the order of the two types in a binary
-intersection does not matter, we may normalize them to avoid unnecessary
-coercions.
-\end{comment}
+% Some immediate topics for
+% further improvement of the results in this paper are discussed next.
+%
+% \paragraph{Union types.}
+%
+% If a type system ever contains union types (the counterpart of intersection
+% types), with the following standard subtyping rules,
+% \begin{mathpar}
+%   \inferrule* [right=Sub\_Union\_1]
+%     { }
+%     {A \subtype A \union B}
+%
+%   \inferrule* [right=Sub\_Union\_2]
+%     { }
+%     {B \subtype A \union B}
+% \end{mathpar}
+% then no two types $A$ and $B$ can ever be disjoint, since there always exists
+% the type $A \union B$, which is their common supertype. So it is reasonable to
+% conjecture that such system cannot be coherent.
+% \bruno{I wouldn't say this is a motivation: it sounds like we caould
+%   not support union types, when I think this is not true. For example
+% we could say something like: there does not exist an \emph{atomic} C ...}
+%
+%
+% \paragraph{Implementation.}
+%
+% We implemented the core functionalities of the \name as part of a JVM-based
+% compiler. Based on the type system of \name, we built an ML-like
+% source language compiler that offers interoperability with Java (such as object
+% creation and method calls). The source language is loosely based on the more
+% general System $F_{\omega}$ and supports a
+% number of other features, including records, mutually recursive
+% \code{let} bindings, type aliases, algebraic data types, pattern matching, and
+% first-class modules that are encoded using \code{letrec} and records.
+%
+% Relevant to this paper are the three phases in the compiler, which
+% collectively turn source programs into System $F$:
+%
+% \begin{enumerate}
+% \item A \emph{typechecking} phase that checks the usage of \name features and
+%   other source language features against an abstract syntax tree that follows
+%   the source syntax.
+%
+% \item A \emph{desugaring} phase that translates well-typed source terms into
+%   \name terms. Source-level features such as multi-field records, type aliases
+%   are removed at this phase. The resulting program is just an \name term
+%   extended with some other constructs necessary for code generation.
+%
+% \item A \emph{translation} phase that turns well-typed \name terms into System
+%   $F$ ones.
+% \end{enumerate}
+%
+% Phase 3 is what we have formalized in this paper.
+%
+%
+% \paragraph{Reduce the number of coercions.}
+%
+% Our translation inserts a coercion (many of them are identity functions)
+% whenever subtyping occurs during a function application, which could mean
+% notable run-time overhead. In the current implementation, we introduced a
+% partial evaluator with three simple rewriting rules to eliminate the redundant
+% identity functions as another compiler phase after the translation. In another
+% version of our implementation, partial evaluation is weaved into the process of
+% translation so that the unwanted identity functions are not introduced during
+% the translation. Besides, since the order of the two types in a binary
+% intersection does not matter, we may normalize them to avoid unnecessary
+% coercions.

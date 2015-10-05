@@ -1,6 +1,6 @@
 \newcommand{\formsub}{\framebox{$ A \subtype B \yields E $}}
 
-\newcommand{\makelabelsub}[1]{Sub\_#1}
+\newcommand{\makelabelsub}[1]{Sub-#1}
 
 \newcommand{\labelsubvar}{\makelabelsub Var}
 \newcommand{\rulesubvar}{
@@ -51,7 +51,7 @@
           {\pair {\app {E_1} x} {\app {E_2} x}}}}
 }
 
-\newcommand{\labelsubinterl}{\makelabelsub {Inter\_1}}
+\newcommand{\labelsubinterl}{\makelabelsub {Inter-1}}
 \newcommand{\rulesubinterl}{
   \inferrule* [right=\labelsubinterl]
     {{A_1} \subtype {A_3} \yields E}
@@ -70,7 +70,7 @@
           {\app E {(\proj 1 x)}}}}
 }
 
-\newcommand{\labelsubinterr}{\makelabelsub {Inter\_2}}
+\newcommand{\labelsubinterr}{\makelabelsub {Inter-2}}
 \newcommand{\rulesubinterr}{
   \inferrule* [right=\labelsubinterr]
     {{A_2} \subtype {A_3} \yields E}

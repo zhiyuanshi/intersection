@@ -17,12 +17,6 @@ programming language features, to illustrate the various concepts in
 Section~\ref{sec:fi} does not present all such features, our implementation
 supports them.
 
-% It then shows that,
-% with unrestricted intersection types, the system
-% lacks \emph{coherence}. This motivates the introduction of
-% disjoint intersection types and extending universal quantification to
-% disjoint quantification, which is enough to ensure coherence.
-
 \subsection{Intersection Types and the Merge Operator}
 %%\subsection{Intersection Types, Merge and Polymorphism in \name}
 
@@ -171,8 +165,8 @@ the following merge:
 \end{lstlisting}
 
 \noindent This merge has two components which are also intersection
-types. The first component (\lstinline{(1,,'c')}) has type $\tyint \inter
-\tychar$, whereas the second component (\lstinline{(2 ,, True)}) has type
+types. The first component \lstinline{(1,,'c')} has type $\tyint \inter
+\tychar$, whereas the second component \lstinline{(2 ,, True)} has type
 $\tyint \inter \tybool$. Clearly,
 \[ \tyint \inter \tychar \not \subtype \tyint \inter \tybool \wedge \tyint \inter \tybool \not \subtype \tyint \inter \tychar \]
 Nevertheless the following program still leads to

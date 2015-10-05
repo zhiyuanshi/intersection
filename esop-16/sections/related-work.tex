@@ -2,27 +2,21 @@
 \label{sec:related-work}
 
 %*******************************************************************************
-\paragraph{Coherence}
+\paragraph{Coherence.}
 %*******************************************************************************
 
-Reynolds invented Forsythe~\cite{reynolds1997design} in the 1980s. Our
-merge operator is analogous to his operator $p_1, p_2 $. Forsythe has
-a coherent semantics. The result was proved formally by
-Reynolds~\cite{reynolds1991coherence} in a lambda calculus with
-intersection types and a merge operator. However there are two key
-differences to our work. Firstly the way coherence is ensured is
-rather ad-hoc. He has four different typing rules for the merge
-operator, each accounting for various possibilities of what the types
-of the first and second components are. In some cases the meaning of
-the second component takes precedence (that is, is biased) over the
-first component. The set of rules is restrictive and it forbids, for
-instance, the merge of two functions (even when they a provably
-disjoint). In contrast, disjointness in \name has a well-defined
-specification and it is quite flexible. Secondly, Reynolds calculus
-does not support universal quantification. It is unclear to us whether
-his set of rules would still ensure disjointness in the presence of
-universal quantification. Since some biased choice is allowed in
-Reynold's calculus the issues illustrated in Section~\ref{subsec:polymorphism} could be a problem.
+Reynolds invented Forsythe~\cite{reynolds1997design} in the 1980s. Our merge
+operator is analogous to his operator $p_1, p_2 $. Forsythe has a coherent
+semantics. The result was proved formally by
+Reynolds~\cite{reynolds1991coherence} in a lambda calculus with intersection
+types and a merge operator. However  the way coherence is ensured is not general
+enough. He has four different typing rules for the merge operator, each
+accounting for various possibilities of what the types of the first and second
+components are. In some cases the meaning of the second component takes
+precedence (that is, is biased) over the first component. The set of rules is
+restrictive and it forbids, for instance, the merge of two functions (even when
+they a provably disjoint). In contrast, disjointness in \name has a well-defined
+specification and it is quite flexible.
 
 Pierce~\cite{pierce1991programming2} made a comprehensive review
 of coherence, especially on Curien and Ghelli~\cite{curienl1990coherence} and
@@ -39,9 +33,7 @@ acknowledged by Dunfield, his calculus lacks of coherence. He discusses the
 issue of coherence throughout his paper, mentioning biased choice as an option
 (albeit a rather unsatisfying one). He also mentioned that the notion of
 disjoint intersection could be a good way to address the problem, but he did not
-pursue this option in his work. In contrast to his work, we developed a type
-system with disjoint intersection types and proposed disjoint quantification to
-guarantee coherence in our calculus.
+pursue this option in his work.
 
 % \url{http://homepages.inf.ed.ac.uk/gdp/publications/Sub_Par.pdf}
 
@@ -75,20 +67,15 @@ same kind $ K $. Davies and Pfenning
 \cite{davies2000intersection} studied the interactions between
 intersection types and effects in call-by-value languages. And they
 proposed a ``value restriction'' for intersection types, similar to
-value restriction on parametric polymorphism. Although they proposed a system with
-parametric polymorphism, their subtyping rules are significantly different from ours,
-since they consider parametric polymorphism
-as the ``infinit analog'' of intersection polymorphism.
+value restriction on parametric polymorphism.
 
-Recently,
-Castagna et al.~\cite{Castagna:2014} studied an very expressive calculus that
-has polymorphism and set-theoretic type connectives (such as intersections,
-unions, and negations). As a result, in their calculus one is also able to
-express a type variable that can be instantiated to any type other than
-$\code{Int}$ as $\alpha \setminus \code{Int}$, which is syntactic sugar for
-$\alpha \wedge \neg \code{Int}$. As a comparison, such a type will need a
-disjoint quantifier, like $\fordis \alpha {\code{Int}} \alpha$, in our system.
-Unfortunately their calculus does not include a merge operator like ours.
+Recently, Castagna et al.~\cite{Castagna:2014} studied an very expressive
+calculus that has polymorphism and set-theoretic type connectives (such as
+intersections, unions, and negations). As a result, in their calculus one is
+also able to express a type variable that can be instantiated to any type other
+than $\code{Int}$ as $\alpha \setminus \code{Int}$, which is syntactic sugar for
+$\alpha \wedge \neg \code{Int}$. Unfortunately their calculus does not include a
+merge operator like ours.
 
 There have been attempts to provide a foundational calculus
 for Scala that incorporates intersection
@@ -103,9 +90,7 @@ yet proven. Recently, some form of intersection
 types has been adopted in object-oriented languages such as Scala,
 Ceylon, and Grace. Generally speaking,
 the most significant difference to \name is that in all previous systems
-there is no explicit introduction construct like our merge operator. As shown in
-Section~\ref{subsec:OAs}, this feature is pivotal in supporting modularity
-and extensibility because it allows dynamic composition of values.
+there is no explicit introduction construct like our merge operator.
 
 \begin{comment}
 only allow intersections of concrete types (classes),
@@ -124,7 +109,7 @@ let merge [A, B] (f: ExpAlg A) (g: ExpAlg B) = {
 \end{comment}
 
 %*******************************************************************************
-\paragraph{Other type systems with intersection types.}
+\paragraph{Other Type Systems with Intersection Types.}
 %*******************************************************************************
 
 % Although similar in spirit,
@@ -161,10 +146,13 @@ worthy avenue for future work is to study languages with intersection types
 and merge operator in a semantic subtyping setting.
 
 %*******************************************************************************
-\paragraph{Trait calculi.}
+\paragraph{Trait Calculi.}
 %*******************************************************************************
-Fisher and Reppy~\cite{fisher2004typed} provided a dedicated statically typed
-calculus for modeling traits. \name is not dedicated to traits; but rather, it
+
+Since the seminal paper by Schärli~\emph{et al.} documented an implementation of
+the trait mechanism in dynamically typed Smalltalk without providing a type
+system, Fisher and Reppy~\cite{fisher2004typed} presented a statically typed
+calculus that models traits. \name is not dedicated to traits; but rather, it
 supports a source language that models traits. Compared to Fisher and Reppy's
 calculus, \name is more lightweight. For example, self reference is not in the
 language of \name. One reason for the difference is that Fisher and Reppy's

@@ -15,31 +15,31 @@ semantics to the calculus by a type-directed translation to a simply
 typed lambda calculus extended with pairs. The type-directed
 translation is simple, elegant, and type-safe.
 
-\bruno{the following paragraph no longer makes sense for this paper.}
-Intersection types and the merge operator are also useful in the
-context of software \emph{extensibility}. In recent years there has
-been a wide interest in presenting solutions to the \emph{expression
-  problem}~\cite{wadler1998expression} in various
-communities. Currently there are various solutions in functional
-programming languages~\cite{swierstra:la-carte,emgm}, object-oriented
-programming
-languages~\cite{togersen:2004,Zenger-Odersky2005,oliveira09modular,oliveira2012extensibility}
-and theorem provers~\cite{DelawareOS13,SchwaabS13}.
-Many of the proposed solutions for extensibility are closely related
-to type-theoretic encodings of datatypes~\cite{BoehmBerarducci},
-except that some form of subtyping is also involved.  Various
-language-specific mechanisms are used to combine ideas from
-type-theoretic encodings of datatypes with subtyping, but the essence
-of the solutions is hidden behind the peculiarities of particular
-programming languages.  Calculi with intersection types have a natural
-subtyping relation that is helpful to model problems related to
-extensibility.  Moreover, intersection types and an \emph{encoding} of
-a merge operator have been shown to be useful to solve additional
-challenges related to extensibility~\cite{oliveira2013feature}.
-Therefore it is natural to wonder if a
-core calculus supporting parametric polymorphism,
-intersection types and a merge operator, can be used to capture the
-essence of various solutions to extensibility problems.
+% \bruno{the following paragraph no longer makes sense for this paper.}
+% Intersection types and the merge operator are also useful in the
+% context of software \emph{extensibility}. In recent years there has
+% been a wide interest in presenting solutions to the \emph{expression
+%   problem}~\cite{wadler1998expression} in various
+% communities. Currently there are various solutions in functional
+% programming languages~\cite{swierstra:la-carte,emgm}, object-oriented
+% programming
+% languages~\cite{togersen:2004,Zenger-Odersky2005,oliveira09modular,oliveira2012extensibility}
+% and theorem provers~\cite{DelawareOS13,SchwaabS13}.
+% Many of the proposed solutions for extensibility are closely related
+% to type-theoretic encodings of datatypes~\cite{BoehmBerarducci},
+% except that some form of subtyping is also involved.  Various
+% language-specific mechanisms are used to combine ideas from
+% type-theoretic encodings of datatypes with subtyping, but the essence
+% of the solutions is hidden behind the peculiarities of particular
+% programming languages.  Calculi with intersection types have a natural
+% subtyping relation that is helpful to model problems related to
+% extensibility.  Moreover, intersection types and an \emph{encoding} of
+% a merge operator have been shown to be useful to solve additional
+% challenges related to extensibility~\cite{oliveira2013feature}.
+% Therefore it is natural to wonder if a
+% core calculus supporting parametric polymorphism,
+% intersection types and a merge operator, can be used to capture the
+% essence of various solutions to extensibility problems.
 
 %Clearly this seems to indicate that a more
 %foundational approach is lacking. What is currently missing is a
@@ -49,11 +49,15 @@ essence of various solutions to extensibility problems.
 \bruno{Probably we can reuse some parts of the text here, but this
   also needs to change}
 Dunfield calculus seems to provide a good basis for a foundational
-calculus for studying extensibility.  However, his calculus is still
-insufficient for studying extensibility for two different reasons.  Firstly it does not
-support parametric polymorphism. This is a pressing limitation because
-type-theoretic encodings of datatypes fundamentally rely on parametric
-polymorphism.  Secondly, and more importantly, while Dunfield calculus
+calculus for studying extensibility. However, his calculus is still
+insufficient for studying extensibility.
+
+% Firstly it does not
+% support parametric polymorphism. This is a pressing limitation because
+% type-theoretic encodings of datatypes fundamentally rely on parametric
+% polymorphism.  Secondly, and more importantly,
+
+While Dunfield's calculus
 is type-safe, it lacks the property of \emph{coherence}: different
 derivations for the same expression can lead to different results. The
 lack of coherence is an important disadvantage for adoption of his core
@@ -65,11 +69,9 @@ goal is to precisely capture the essence of solutions to
 extensibility.
 
 This paper presents \name: a core calculus with a variant of
-\emph{intersection types}, \emph{parametric polymorphism} and a
-\emph{merge operator}. The semantics \name is both type-safe and
-coherent. Thus \name addresses the two limitations of Dunfield
-calculus and can be used to express the key ideas of extensible
-type-theoretic encodings of datatypes.
+\emph{intersection types} and a
+\emph{merge operator} whose semantics \name is both type-safe and
+coherent.
 
 Coherence is achieved by ensuring that intersection types are
 \emph{disjoint}. Given two types $A$ and $B$, two types are disjoint
@@ -89,39 +91,29 @@ types are disjoint. Moreover, this algorithmic specification is shown to be
 sound and complete with respect to the formal definition of
 disjointness.
 
-We also investigate how to do type-theoretic encodings of datatypes in
-\name. In particular it is shown that extensions of datatype
-encodings have subtyping relations with the datatype they
-extend. Moreover, it is possible to reuse code from the operations on
-the original datatype and consequently solve the Expression Problem.
-Finally, it is shown how \emph{all the features} of \name
-(intersection types, the merge operator, parametric polymorphism and
-disjoint quantification) are needed to properly encode one important
-combinator~\cite{oliveira2013feature} used to compose multiple
-operations over datatypes.
-
 In summary, the contributions of this paper are:
 
 \begin{itemize*}
 
-\item {\bf Disjoint Intersection Types:} A new form of intersection
-  type where only disjoint types are allowed. A sound and complete
-  algorithmic specification of disjointness (with respect to the
-  corresponding formal definition) is presented.
+\item \textbf{Disjoint Intersection Types:} A new form of intersection type
+where only disjoint types are allowed. A sound and complete algorithmic
+specification of disjointness (with respect to the corresponding formal
+definition) is presented.
+
+\item \textbf{Trait:} As an application of this work, we show how to build a
+trait-based object-oriented language by leveraging the type system of \name.
+\george{More words}
 
 %\item {\bf Disjoint Quantification:} A novel form of universal
 %quantification where type variables can have disjointness
 %constraints.
 
-\item {\bf Formalization of System \name and Proof of Coherence:} An
-  elaboration semantics of System \name into System F is
-  given. Type-soundness and coherence are proved.
+% \item {\bf Formalization of \name and Proof of Coherence:} An
+%   elaboration semantics of \name into $\lambda$-calculus is
+%   given. Type-soundness and coherence are proved.
 
-\item {\bf Extensible Type-Theoretic Encodings:} We show that in \name
- type-theoretic encodings can be combined with subtyping to provide extensibility.
-
-\item {\bf Implementation:} An implementation of an
-  extension of System \name, as well as the examples presented in the
+\item \textbf{Implementation:} An implementation of an
+  extension of \name, as well as the examples presented in the
   paper, are publicly available\footnote{{\bf Note to reviewers:} Due
     to the anonymous submission process, the code (and some machine
     checked proofs) is submitted as supplementary material.}.
@@ -195,62 +187,58 @@ languages. In particular there are three pressing limitations:
   type-annotations, combined with the lack of understanding of these
   features, usually deters programmers from using such designs.
 
-This paper presents System \name (pronounced \emph{f-and}): an extension of System F~\cite{Reynolds74f}
-with intersection types and a merge operator~\cite{dunfield2014elaborating}.  The goal of
-System \name is to study the \emph{minimal} foundational language
-constructs that are needed to support various extensible designs,
-while at the same time addressing the limitations of existing OOP
-languages. To address the lack of good object-level composition
-mechanisms, System \name uses the merge operator for dynamic
-composition of values/objects. Moreover, in System \name (type-level)
-extension is independent of subtyping, and it is possible for an
-extension to be a supertype of a base object type. Furthermore,
-intersection types and conventional subtyping can be used in many
-cases instead of advanced features of generics. Indeed this paper
-shows many previous designs in the literature can be encoded
-without such advanced features of generics.
+This paper presents \name (pronounced \emph{f-and}): an extension of
+$\lambda$-calculus~\cite{Reynolds74f} with intersection types and a merge
+operator~\cite{dunfield2014elaborating}.  The goal of \name is to study the
+\emph{minimal} foundational language constructs that are needed to support
+various extensible designs, while at the same time addressing the limitations of
+existing OOP languages. To address the lack of good object-level composition
+mechanisms, \name uses the merge operator for dynamic composition of
+values/objects. Moreover, in \name (type-level) extension is independent of
+subtyping, and it is possible for an extension to be a supertype of a base
+object type. Furthermore, intersection types and conventional subtyping can be
+used in many cases instead of advanced features of generics. Indeed this paper
+shows many previous designs in the literature can be encoded without such
+advanced features of generics.
 
 
-Technically speaking System \name is mainly inspired by the work of
-Dunfield~\cite{dunfield2014elaborating}.  Dunfield showed how to model a simply typed
+Technically speaking \name is mainly inspired by the work of
+Dunfield~\cite{dunfield2014elaborating}. Dunfield showed how to model a simply typed
 calculus with intersection types and a merge operator. The presence of
 a merge operator adds significant expressiveness to the language,
 allowing encodings for many other language constructs as syntactic
-sugar. System \name differs from Dunfield's work in a few
-ways. Firstly, it adds parametric polymorphism and formalizes an
-extension for records to support a basic form of objects. Secondly,
-the elaboration semantics into System F is done directly from the
+sugar. \name differs from Dunfield's work in a few
+as
+the elaboration semantics into $\lambda$-calculus is done directly from the
 source calculus with subtyping.
 % In contrast, Dunfield has an additional step which eliminates subtyping.
-Finally, a non-technical difference
-is that System \name is aimed at studying issues of OOP languages and
-extensibility, whereas Dunfield's work was aimed at Functional
-Programming and he did not consider application to extensibility.
-Like many other foundational formal models for OOP (for
-example $F_{<:}$~\cite{CMMS}), System \name is purely functional and it uses
-structural typing.
+% Secondly, a non-technical difference
+% is that \name is aimed at studying issues of OOP languages and
+% extensibility, whereas Dunfield's work was aimed at Functional
+% Programming and he did not consider application to extensibility.
+% Like many other foundational formal models for OOP (for
+% example $F_{<:}$~\cite{CMMS}), \name is purely functional and it uses
+% structural typing.
 
-%%System \name is
+%%\name is
 %%formalized and implemented. Furthermore the paper illustrates how
-%%various extensible designs can be encoded in System \name.
-
+%%various extensible designs can be encoded in \name.
 
 In summary, the contributions of this paper are:
-
 
 \begin{itemize*}
 
 \item {\bf A Minimal Core Language for Extensibility:} This paper
-  identifies a minimal core language, System \name, capable of
+  identifies a minimal core language, \name, capable of
   expressing various extensibility designs in the literature.
-  System \name also addresses limitations of existing OOP
+  \name also addresses limitations of existing OOP
   languages that complicate extensible designs.
 
-\item {\bf Formalization of System \name:} An elaboration semantics of
-  System \name into System F is given, and type-soundness is proved.
+\item {\bf Formalization of \name:} An elaboration semantics of
+  \name into $\lambda$-calculus is given, and type-soundness is proved.
 
 \item {\bf Encodings of Extensible Designs:} Various encodings of
-  extensible designs into System \name, including \emph{Object
+  extensible designs into \name, including \emph{Object
     Algebras} and \emph{Modular Visitors}.
 
 \item {\bf A Practical Example where ``Inheritance is not Subtyping''
@@ -261,7 +249,7 @@ In summary, the contributions of this paper are:
 %% \emph{supertype}, not a subtype. \bruno{extension with accept method}
 
 \item {\bf Implementation:} An implementation of an
-  extension of System \name, as well as the examples presented in the
+  extension of \name, as well as the examples presented in the
   paper, are publicly available\footnote{{\bf Note to reviewers:} Due
     to the anonymous submission process, the code (and some machine
     checked proofs) is submitted as supplementary material.}.

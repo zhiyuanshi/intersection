@@ -5,9 +5,9 @@
 
 Although the system shown in the Section~\ref{sec:fi} is type-safe, it is not
 coherent. This section shows how to modify \name so that it guarantees coherence
-as well as type soundness. The result is a calculus named \name. The keys
-aspects are the notion of disjoint intersections, and disjoint quantification
-for polymorphic types.
+as well as type soundness. The result is a calculus named \name. \george{Using
+the same name is confusing.} The keys aspects are the notion of disjoint
+intersections.
 
 %From the theoretical point-of-view, the end goal of this section is to show that the resulting system has
 %a coherent (or unique) elaboration semantics:
@@ -26,7 +26,7 @@ for polymorphic types.
 %relation, resulting in two possible coercions.
 
 \subsection{Disjointness} Throughout the paper we already presented an intuitive
-definition for disjoitness. Here such definition is made a bit more precise, and
+definition for disjointness. Here such definition is made a bit more precise, and
 well-suited to \name.
 
 \bruno{This definition is wrong and too complicated. Since there is no
@@ -47,62 +47,48 @@ because there is
 no type that is a supertype of the both. On the other hand, $\tyint$ is not
 disjoint with itself, because $\tyint \subtype \tyint$. This implies that
 disjointness is not reflexive as subtyping is. Two types with different shapes
-are always disjoint, unless one of them is an intersection type. For example, a function
-type and a universally quantified type must be disjoint. But a function type and an intersection
+are always disjoint, unless one of them is an intersection type.
+But a function type and an intersection
 type may not be. Consider:
 \[ \tyint \to \tyint \quad \text{and} \quad (\tyint \to \tyint) \inter (\tystring \to \tystring) \]
 Those two types are not disjoint since $\tyint \to \tyint$ is their common supertype.
 
-\bruno{There are no changes in syntax, right? So the whole section
-  (and figure) can be dropped! Also, without polymorphism, we don't
-  need a bottom type.}
-\subsection{Syntax}
-
-\begin{figure}
-  \[
-    \begin{array}{l}
-      \begin{array}{llrll}
-        \text{Types}
-        & A, B & \Coloneqq & A \to B                 & \\
-        &      & \mid & A \inter B                   & \\
-
-        \\
-        \text{Terms}
-        & e & \Coloneqq & x                        & \\
-        &   & \mid & \lam {(x \oftype A)} e          & \\
-        &   & \mid & \app {e_1} {e_2}              & \\
-        &   & \mid & e_1 \mergeop e_2              & \\
-
-        \\
-        \text{Contexts}
-        & \Gamma & \Coloneqq & \cdot
-                   \mid \Gamma, x \oftype A  & \\
-      \end{array}
-    \end{array}
-  \]
-
-  \caption{Amendments of the rules.}
-  \label{fig:fi-syntax-dis}
-\end{figure}
-
-\begin{figure}
-  \framebox{$\im A = T$}
-
-  \framebox{$\im \Gamma = G$}
-
-  \begin{align*}
-    \im {\Gamma, \alpha \disjoint A} &= \im \Gamma, \alpha \\
-  \end{align*}
-
-  \caption{Additional type and context translation.}
-  \label{fig:additional-type-and-context-translation}
-\end{figure}
+% \bruno{There are no changes in syntax, right? So the whole section
+%   (and figure) can be dropped! Also, without polymorphism, we don't
+%   need a bottom type.}
+% \subsection{Syntax}
+%
+% \begin{figure}
+%   \[
+%     \begin{array}{l}
+%       \begin{array}{llrll}
+%         \text{Types}
+%         & A, B & \Coloneqq & A \to B                 & \\
+%         &      & \mid & A \inter B                   & \\
+%
+%         \\
+%         \text{Terms}
+%         & e & \Coloneqq & x                        & \\
+%         &   & \mid & \lam {(x \oftype A)} e          & \\
+%         &   & \mid & \app {e_1} {e_2}              & \\
+%         &   & \mid & e_1 \mergeop e_2              & \\
+%
+%         \\
+%         \text{Contexts}
+%         & \Gamma & \Coloneqq & \cdot
+%                    \mid \Gamma, x \oftype A  & \\
+%       \end{array}
+%     \end{array}
+%   \]
+%
+%   \caption{Amendments of the rules.}
+%   \label{fig:fi-syntax-dis}
+% \end{figure}
 
 % \george{May also note on the scoping of type variables inside contexts.}
 
-Figure~\ref{fig:fi-syntax-dis} shows the updated syntax with the
-changes highlighted and Figure~\ref{fig:additional-type-and-context-translation}
-shows type and context translations for the new constructs.
+% Figure~\ref{fig:fi-syntax-dis} shows the updated syntax with the
+% changes highlighted.
 
 % First, type
 % variables are now always associated with their disjointness
@@ -120,19 +106,16 @@ shows type and context translations for the new constructs.
 %with bounded polymorphism.}
 
 \subsection{Typing}
-Figure~\ref{fig:fi-type-patch} shows modifications to Figure~\ref{fig:fi-type} in
-order to support disjoint intersection types and disjoint
-quantification. Only new rules or rules that different are shown.
-Importantly, the disjointness judgement appears in the well-formedness rule for intersection
-types and the typing rule for merges.
+
+Figure~\ref{fig:fi-type-patch} shows modifications to Figure~\ref{fig:fi-type}
+in order to support disjoint intersection types.
+Only new rules or rules that different are shown. Importantly, the disjointness
+judgment appears in the well-formedness rule for intersection types and the
+typing rule for merges.
 
 \begin{figure}
   \begin{mathpar}
     \framebox{$\jatomic A$} \\
-
-    \inferrule*
-    {}
-    {\jatomic \bot}
 
     \inferrule*
     {}
@@ -162,12 +145,10 @@ types and the typing rule for merges.
 
 \paragraph{Well-formedness.}
 We require that the two types of an intersection must be disjoint in their
-context, and that the disjointness constraint in a universal type is well-formed.
-Under the new rules, intersection types such as $\tyint \inter \tyint$ are no
-longer well-formed because the two types are not disjoint.
+context. Under the new rules, intersection types such as $\tyint \inter \tyint$
+are no longer well-formed because the two types are not disjoint.
 
 \paragraph{Metatheory.}
-
 Since in this section we only restrict the type system in the previous section,
 it is easy to see that type preservation and type-safety still holds.
 Additionally, we can show that typing always produces a well-formed type by
@@ -191,46 +172,46 @@ proving the following results.
 %   Lemma~\ref{lemma:instantiation} in the case of \reflabel{\labelttapp}.
 % \end{proof}
 
-With our new definition of well-formed types, this result is nontrivial.
-In general, disjointness judgements are not invariant with respect to
-free-variable substitution. In other words, a careless substitution can violate
-the disjoint constraint in the context. For example, in the context $\alpha
-\disjoint \tyint$, $\alpha$ and $\tyint$ are disjoint:
-\[ \jdis {\alpha \disjoint \tyint} \alpha \tyint \]
-But after the substitution of $\tyint$ for $\alpha$ on the two types, the sentence
-\[ \jdis {\alpha \disjoint \tyint} \tyint \tyint \]
-is longer true since $\tyint$ is clearly not disjoint with itself.
+% With our new definition of well-formed types, this result is nontrivial.
+% In general, disjointness judgments are not invariant with respect to
+% free-variable substitution. In other words, a careless substitution can violate
+% the disjoint constraint in the context. For example, in the context $\alpha
+% \disjoint \tyint$, $\alpha$ and $\tyint$ are disjoint:
+% \[ \jdis {\alpha \disjoint \tyint} \alpha \tyint \]
+% But after the substitution of $\tyint$ for $\alpha$ on the two types, the sentence
+% \[ \jdis {\alpha \disjoint \tyint} \tyint \tyint \]
+% is longer true since $\tyint$ is clearly not disjoint with itself.
 
 \subsection{Subtyping}
 
 % \george{Explain \reflabel{\labelsubforall} and distinction of kernel and all version.}
 
-The subtyping rules need some adjustment.
-Note that the $\bot$ type does not participate in subtyping since it holds no value.
-An important
-problem with the subtyping rules in Figure~\ref{fig:fi-type} is that the all three rules
-dealing with intersection types
-(\reflabel{\labelsubinterl} and \reflabel{\labelsubinterr} and \reflabel{\labelsubinter})
-overlap. Unfortunately,
-this means that different coercions may be given when checking the subtyping
-between two types, depending on which derivation is chosen. This is ultimately the reason
-for incoherence.
-There are two important types of overlap:
+The subtyping rules need some adjustment. An important problem with the
+subtyping rules in Figure~\ref{fig:fi-type} is that the all three rules dealing
+with intersection types (\reflabel{\labelsubinterl} and
+\reflabel{\labelsubinterr} and \reflabel{\labelsubinter}) overlap.
+Unfortunately, this means that different coercions may be given when checking
+the subtyping between two types, depending on which derivation is chosen. This
+is ultimately the reason for incoherence. There are two important types of
+overlap:
 
 \begin{enumerate}
 
-\item The left decomposition rules for intersections (\reflabel{\labelsubinterl} and \reflabel{\labelsubinterr}) overlap with each other.
+\item The left decomposition rules for intersections (\reflabel{\labelsubinterl}
+and \reflabel{\labelsubinterr}) overlap with each other.
 
-\item The left decomposition rules for intersections (\reflabel{\labelsubinterl} and \reflabel{\labelsubinterr})
-overlap with the right decomposition rules for intersections (\reflabel{\labelsubinter}).
+\item The left decomposition rules for intersections (\reflabel{\labelsubinterl}
+and \reflabel{\labelsubinterr}) overlap with the right decomposition rules for
+intersections \reflabel{\labelsubinter}.
 
 \end{enumerate}
 
-\noindent Fortunately, disjoint intersections (which are enforced by well-formedness)
-deal with problem 1): only one of the two left decomposition rules
-can be chosen for a disjoint intersection type. Since the two types in the intersection
-are disjoint it is impossible that both of the preconditions of the left decompositions are satisfied
-at the same time. More formally, with disjoint intersections, we have the following theorem:
+\noindent Fortunately, disjoint intersections (which are enforced by
+well-formedness) deal with problem 1): only one of the two left decomposition
+rules can be chosen for a disjoint intersection type. Since the two types in the
+intersection are disjoint it is impossible that both of the preconditions of the
+left decompositions are satisfied at the same time. More formally, with disjoint
+intersections, we have the following theorem:
 
 \begin{lemma}[Unique subtype contributor]
   \label{lemma:unique-subtype-contributor}
@@ -243,19 +224,20 @@ at the same time. More formally, with disjoint intersections, we have the follow
   \end{enumerate}
 \end{lemma}
 
-Unfortunately, disjoint intersections alone are insufficient to deal with problem 2).
-In order to deal with problem 2), we introduce a distinction between types, and atomic types.
+Unfortunately, disjoint intersections alone are insufficient to deal with
+problem 2). In order to deal with problem 2), we introduce a distinction between
+types, and atomic types.
 
-\paragraph{Atomic types.} Atomic types are just those which are not intersection
-types, and are asserted by the judgement \[ \jatomic A \]
+\paragraph{Atomic Types.} Atomic types are just those which are not intersection
+types, and are asserted by the judgment \[ \jatomic A \]
 
-In the left decomposition rules for intersections we introduce a requirement that
-$A_3$ is atomic. The consequence of this requirement is that when $A_3$ is an intersection type, then
-the only rule that can be applied is \reflabel{\labelsubinter}.
-With the atomic constraint, one can guarantee that at any moment during the
-derivation of a subtyping relation, at most one rule can be used.
-Consequently, the coercion of a subtyping relation $A \subtype B$ is uniquely determined.
-This fact is captured by the following lemma:
+In the left decomposition rules for intersections we introduce a requirement
+that $A_3$ is atomic. The consequence of this requirement is that when $A_3$ is
+an intersection type, then the only rule that can be applied is
+\reflabel{\labelsubinter}. With the atomic constraint, one can guarantee that at
+any moment during the derivation of a subtyping relation, at most one rule can
+be used. Consequently, the coercion of a subtyping relation $A \subtype B$ is
+uniquely determined. This fact is captured by the following lemma:
 
 \begin{restatable}[Unique coercion]{lemma}{uniquecoercion}
   \label{lemma:unique-coercion}
@@ -279,29 +261,27 @@ strict by the atomic condition, we can still derive the every subtyping relation
 in the unrestricted system.
 % \george{Explain why the proof shows this.}
 
-\begin{comment}
-Note that $A$ \emph{exclusive} or $B$ is true if and only if their truth value
-differ. Next, we are going to investigate the minimal requirement (necessary and
-sufficient conditions) such that the theorem holds.
-
-If $A_1$ and $A_2$ in this setting are the same, for example,
-$\tyint \inter \tyint \subtype \tyint$, obviously the theorem will
-not hold since both the left $\tyint$ and the right $\tyint$ are a
-subtype of $\tyint$.
-
-We can try to rule out such possibilities by making the requirement of
-well-formedness stronger. This suggests that the two types on the sides of
-$\inter$ should not ``overlap''. In other words, they should be ``disjoint''. It
-is easy to determine if two base types are disjoint. For example, $\tyint$
-and $\tyint$ are not disjoint. Neither do $\tyint$ and $\code{Nat}$.
-Also, types built with different constructors are disjoint. For example,
-$\tyint$ and $\tyint \to \tyint$. For function types, disjointness
-is harder to visualize. But bear in the mind that disjointness can defined by
-the very requirement that the theorem holds.
-
-
-This result is captured more formally by the following lemma:
-\end{comment}
+% Note that $A$ \emph{exclusive} or $B$ is true if and only if their truth value
+% differ. Next, we are going to investigate the minimal requirement (necessary and
+% sufficient conditions) such that the theorem holds.
+%
+% If $A_1$ and $A_2$ in this setting are the same, for example,
+% $\tyint \inter \tyint \subtype \tyint$, obviously the theorem will
+% not hold since both the left $\tyint$ and the right $\tyint$ are a
+% subtype of $\tyint$.
+%
+% We can try to rule out such possibilities by making the requirement of
+% well-formedness stronger. This suggests that the two types on the sides of
+% $\inter$ should not ``overlap''. In other words, they should be ``disjoint''. It
+% is easy to determine if two base types are disjoint. For example, $\tyint$
+% and $\tyint$ are not disjoint. Neither do $\tyint$ and $\code{Nat}$.
+% Also, types built with different constructors are disjoint. For example,
+% $\tyint$ and $\tyint \to \tyint$. For function types, disjointness
+% is harder to visualize. But bear in the mind that disjointness can defined by
+% the very requirement that the theorem holds.
+%
+%
+% This result is captured more formally by the following lemma:
 
 % \george{Note that $\bot$ does not participate in subtyping and why (because the
 % empty set intersecting the empty set is still empty).}
@@ -331,8 +311,8 @@ Combining the previous results, we are able to show the central theorem:
   \begin{mathpar}
     \ruletapp
   \end{mathpar}
-  Luckily, by Lemma~\ref{lemma:wellformed-typing}, we know that typing
-  judgements give well-formed types, and thus $\jwf \Gamma {A_1}$ and $\jwf
+  Luckily we know that typing
+  judgments give well-formed types, and thus $\jwf \Gamma {A_1}$ and $\jwf
   \Gamma {A_3}$. Therefore we are able to apply
   Lemma~\ref{lemma:unique-coercion} and conclude that $E$ is unique.
 

@@ -25,17 +25,14 @@ operation); methods can be removed from a trait; and trait systems provide
 conflict detection, etc.
 
 \bruno{The place for related work discussions is in related work, not here.}
-Since the seminal paper by Schärli~\emph{et al.} documented an implementation of
-the trait mechanism in dynamically typed Smalltalk without providing a type
-system, Fisher and Reppy~\cite{fisher2004typed} presented a statically typed
-calculus that models traits. While the main goal of \name is not to model
+While the main goal of \name is not to model
 traits, it is nevertheless interesting to do so as an example of the
 applications of \name. To this end, we are going to demonstrate various trait
 features in a hypothetical OO language, and then show a straightforward
 translation from that language to \name. \george{Need to note the difference
 between class-based and prototype-based somewhere.}
 
-\paragraph{Basic Traits}
+\paragraph{Basic Traits.}
 \bruno{For the paper I don't like the ``in'' syntax. I think ``;''
   looks much better.}
 
@@ -102,10 +99,10 @@ traits! More precisely, the object is created from the \emph{composition} of
 those traits. Therefore, we are able to call methods from different traits on a
 single object.
 
-\paragraph{Traits with Dependencies}
-\bruno{write a topic sentence: what is this paragraph about?}
-The norm of a point is a generalized notion of distance of that point to the
-origin. In the following example, we provide two definitions of norm via two
+\paragraph{Traits with Dependencies.} \bruno{write a topic sentence: what is this
+paragraph about?} The following example shows that a trait can depend on another
+trait. The norm of a point is a generalized notion of distance of that point to
+the origin. In the following example, we provide two definitions of norm via two
 traits. Later we compose the definition of point and norm so that the norm have
 different meanings. Composition of traits is anonymous in the sense that there
 is no need to explicitly give a name to the composition.
@@ -126,15 +123,17 @@ console.log(new (Point(3,4) & EuclideanNorm()).norm()) -- This prints 5
 console.log(new (Point(3,4) & ManhattanNorm()).norm()) -- This prints 7
 \end{lstlisting}
 
-\paragraph{Detecting and Resolving Conflicts in Trait Composition}
+\paragraph{Detecting and Resolving Conflicts in Trait Composition.}
 \bruno{write a topic sentence}
+Trait usually supports explicit conflict detection and resolution.
+We show how the mechanism can be modeled in \name.
 The following example shows a counter object and how we could extend its
 behavior so that it supports reset. First we define a \lstinline$Counter$ as a
 type synonym for a record that contains a \lstinline$val$ method, which returns
 the current counter value. Next we define a trait \lstinline$Counter$ that
 contains two methods. The \lstinline$val$ method just returns the value that is
 bound at the parameter of the trait, and \lstinline$incr$ returns a new counter.
-
+\george{Simpler example should do}
 \begin{lstlisting}
 type Counter = { val: () (*$ \to $*) Int } in
 trait Counter(val: Int) { self: Counter (*$ \to $*)
@@ -180,7 +179,7 @@ let counter = new (Counter(0) \ incr & Reset())
 in counter.incr()
 \end{lstlisting}
 
-\paragraph{Mutual Dependencies}
+\paragraph{Mutual Dependencies.}
 The next example, although a little bit contrived, illustrates that when two
 traits are composed, any two methods in those two traits can refer to each
 other via the self reference, just as if they were inside the same class.
@@ -216,14 +215,18 @@ being created on the fly by copying all the definitions inside those two traits.
 If there is any unresolved conflict, the program will be rejected by the type
 system.
 
-\paragraph{Dynamic Composition}
+\paragraph{Dynamic Composition.}
 \bruno{Don't just briefly mention the advantage! Actually show an example which
 illustrates something, which is impossible say in Scala.}
-\george{Actually we can also define a trait inside a function, which is impossible in Scala.}
-But one difference with the trait approach and the class approach is
-that in our language we are able to compose traits \emph{dynamically} and then
-instantiate them, which is impossible in traditional OO languages such as Java
-since classes being instantiated must be known statically.
+
+Actually, since traits are just terms, traits can be defined inside a function,
+passed around or returned just as normal terms. \george{Example: A function that
+takes a trait with unknown implementation and instantiate it. But need to think
+what the ``type'' of the trait should be in this case.} But one difference with
+the trait approach and the class approach is that in our language we are able to
+compose traits \emph{dynamically} and then instantiate them, which is impossible
+in traditional OO languages such as Java since classes being instantiated must
+be known statically.
 
 %*******************************************************************************
 \subsection{Desugaring}
@@ -235,7 +238,7 @@ formal description can be found in the appendix.
 \bruno{Mention that the idea of trait translation is to follow the
   functional semantics of mixins by Cook.}
 
-\paragraph{Trait Declarations} A trait in the source language is translated into
+\paragraph{Trait Declarations.} A trait in the source language is translated into
 nothing but a normal term in \name. For example,
 
 \begin{lstlisting}
@@ -276,20 +279,22 @@ application in \name. And note that \lstinline$Point(3,4)$ is of type
 
 Therefore it is an open term.
 
-\paragraph{``new'' Keyword} \lstinline$new$ instantiates a trait by taking the
-fixpoint of its corresponding open term. In fact, \lstinline$new$ is just a
-function defined as
 \bruno{There's no need to mention polymorphism at all, since
   desugaring could simply inline the definition of new.}
 
+\paragraph{The ``new'' Keyword.} \lstinline$new$ instantiates a trait by taking the
+fixpoint of its corresponding open term. In fact, \lstinline$new$ is translated as
+a inlined fixpoint. For example,
+
 \begin{lstlisting}
-  = let rec x : () (*$ \to $*) Point = (*$ \lambda $*)(_: ()) (*$ \to $*) f x in x ()
-in (* \ldots *)
+new Point(3,4)
 \end{lstlisting}
 
-Although \lstinline$new$ is defined as
-a polymorphic function for convenience, we can always define specialized version
-of it since \name does not support polymorphism.
+becomes
+
+\begin{lstlisting}
+let rec x : () (*$ \to $*) Point = (*$ \lambda $*)(_: ()) (*$ \to $*) f x in x () 3 4
+\end{lstlisting}
 
 The composition of traits in the source language is desugared using the merge
 operator. The reason that traits built on \name have conflict detection for free
@@ -297,13 +302,13 @@ is that the merge operator is enforcing that the two terms being merged are
 disjoint. For example,
 
 \begin{lstlisting}
-new[Point3D](Point(3,4) & Z(5))
+new (Point(3,4) & Z(5))
 \end{lstlisting}
 
 is turned into
 
 \begin{lstlisting}
-new [Point3D] ((\self: Point3D) (*$ \to $*) ((Point 3 4 self) ,, (Z 5 self)))
+new ((\self: Point3D) (*$ \to $*) ((Point 3 4 self) ,, (Z 5 self)))
 \end{lstlisting}
 
 % \subsection{Intersection Types in Existing Languages}
