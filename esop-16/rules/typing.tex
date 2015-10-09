@@ -19,9 +19,9 @@
 \newcommand{\labeltapp}{\makelabelt App}
 \newcommand{\ruletapp}{
 \inferrule* [right=\labeltapp]
-  {\jtype \Gamma {e_1} {A_{11} \to A_{12}} \yields {E_1} \\
-   \jtype \Gamma {e_2} {A_{11}} \yields {E_2}}
-  {\jtype \Gamma {\app {e_1} {e_2}} {A_{12}} \yields {\app {E_1} {(\app E E_2)}}}
+  {\jtype \Gamma {e_1} {A_{1} \to A_{2}} \yields {E_1} \\
+   \jtype \Gamma {e_2} {A_{3}} \yields {E_2}}
+  {\jtype \Gamma {\app {e_1} {e_2}} {A_{2}} \yields {\app {E_1} {(\app E E_2)}}}
 }
 
 \newcommand{\labeltblam}{\makelabelt BLam}
