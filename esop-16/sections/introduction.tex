@@ -46,39 +46,44 @@ translation is simple, elegant, and type-safe.
 %foundational core calculus that can capture the key ideas behind the
 %various solutions.
 
+\begin{comment}
 \bruno{Probably we can reuse some parts of the text here, but this
   also needs to change}
 Dunfield calculus seems to provide a good basis for a foundational
 calculus for studying extensibility. However, his calculus is still
 insufficient for studying extensibility.
+\end{comment}
 
 % Firstly it does not
 % support parametric polymorphism. This is a pressing limitation because
 % type-theoretic encodings of datatypes fundamentally rely on parametric
 % polymorphism.  Secondly, and more importantly,
 
-While Dunfield's calculus
-is type-safe, it lacks the property of \emph{coherence}: different
-derivations for the same expression can lead to different results. The
-lack of coherence is an important disadvantage for adoption of his core
-calculus in implementations of programming languages, as the semantics
-of the programming language becomes implementation dependent.
+While Dunfield's calculus is type-safe, it lacks the property of
+\emph{coherence}: different derivations for the same expression can
+lead to different results. The lack of coherence is an important
+disadvantage for adoption of his core calculus in implementations of
+programming languages, as the semantics of the programming language
+becomes implementation dependent.
+\bruno{This needs more text here.}
+
+\begin{comment}
 Moreover, from the theoretic point-of-view, the ambiguity that arises
 from the lack of coherence makes the calculus unsatisfying when the
 goal is to precisely capture the essence of solutions to
 extensibility.
+\end{comment}
 
 This paper presents \name: a core calculus with a variant of
 \emph{intersection types} and a
 \emph{merge operator} whose semantics \name is both type-safe and
 coherent.
-
 Coherence is achieved by ensuring that intersection types are
 \emph{disjoint}. Given two types $A$ and $B$, two types are disjoint
 ($A * B$)
-%\footnote{The notation $A * B$ is inspired by the
-%  \emph{separating conjunction} construct in separation
-%  logic~\cite{}.}
+\footnote{The notation $A * B$ is inspired by the
+  \emph{separating conjunction} construct in separation
+  logic~\cite{}.}
 if there is no type $C$ such that both $A$ and $B$ are
 subtypes of $C$. Formally this definition is captured as follows:
 \[A * B \equiv \not\exists C.~A <: C \wedge B <: C\]
@@ -89,7 +94,9 @@ not lend itself directly to an algorithmic implementation. Therefore,
 we also present an algorithmic specification to determine whether two
 types are disjoint. Moreover, this algorithmic specification is shown to be
 sound and complete with respect to the formal definition of
-disjointness.
+disjointness. \bruno{Say something about Coq formalization.}
+
+\bruno{A paragraph is missing here about traits.}
 
 In summary, the contributions of this paper are:
 
@@ -108,15 +115,15 @@ trait-based object-oriented language by leveraging the type system of \name.
 %quantification where type variables can have disjointness
 %constraints.
 
-% \item {\bf Formalization of \name and Proof of Coherence:} An
-%   elaboration semantics of \name into $\lambda$-calculus is
-%   given. Type-soundness and coherence are proved.
+\item {\bf Formalization of \name and Proof of Coherence:} An
+   elaboration semantics of \name into $\lambda$-calculus is
+   given. Type-soundness and coherence are proved and formalized using
+   the Coq theorem prover.
 
 \item \textbf{Implementation:} An implementation of an
   extension of \name, as well as the examples presented in the
-  paper, are publicly available\footnote{{\bf Note to reviewers:} Due
-    to the anonymous submission process, the code (and some machine
-    checked proofs) is submitted as supplementary material.}.
+  paper, are publicly available\footnote{Examples are available on:
+    \bruno{url missing here}}.
 
 \end{itemize*}
 

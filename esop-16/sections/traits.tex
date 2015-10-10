@@ -7,17 +7,23 @@
 use related examples (say various things todo with points), to
 illustrate the approach.}
 
-Traits~\cite{scharli2003traits} provide an alternative mechanism of code reuse
-in object-oriented programming. While the main goal of \name is not to model
-traits, it is nevertheless interesting to do so as an example of the
-applications of \name. To this end, we are going to demonstrate various trait
-features in a hypothetical OO language, and then show a straightforward
+As an application of disjoint intersection types, we show how to model a
+simple, yet expressive form of dynamically composable
+traits~\cite{scharli2003traits} in \name. Traits provide a
+mechanism of code reuse in object-oriented programming, that
+can be used as an alternative to multiple inheritance. 
+The interesting aspect about traits is the way conflicts that
+typically arize in multiple-inheritance~\cite{} are dealt with. 
+Instead of trying to automatically resolve conflicts, traits 
+detect those conflicts and require programmers to explicitly resolve
+them. This is where the relation to disjoint intersection types comes
+in: the mechanism to detect incoherence of disjoint intersection types
+provides us with the mechanism to detect conflicts in traits. 
+
+We demonstrate various trait
+features in a simple OO language, and then show a straightforward
 translation from that language to \name. \george{Need to note the difference
 between class-based and prototype-based somewhere.}
-
-\bruno{Something needs to be said about multiple inheritance here:
-we can think of traits as giving us many of the benefits of multiple
-inheritance, but without many of the problems.}
 
 \paragraph{Basic Traits.}
 
@@ -30,7 +36,9 @@ with traits than with classes, since traits are usually shorter and traits can
 be \emph{composed}. In fact, trait composition offers a variety of
 possibilities: two traits can be ``added'' together (which is an symmetric
 operation); methods can be removed from a trait; and trait systems provide
-conflict detection, etc.
+conflict detection, etc.\bruno{I still feel that having an example in
+  text and another in code its probably redundant. Do we really need
+  to talk about rectangles here?}
 
 The first example shows basic trait composition. Many social networking sites
 allow users to ``upvote'' a comment and the number of upvotes that comment has
@@ -298,7 +306,7 @@ becomes
 
 \begin{lstlisting}
 let rec x : () (*$ \to $*) Point = (*$ \lambda $*)(_: ()) (*$ \to $*) f x in x 3 4 ()
-\end{lstlisting}
+\end{lstlisting}\bruno{Wrong! we discussed this in the meeting}
 
 The composition of traits in the source language is desugared using the merge
 operator. The reason that traits built on \name have conflict detection for free
