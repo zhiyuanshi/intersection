@@ -11,14 +11,14 @@ As an application of disjoint intersection types, we show how to model a
 simple, yet expressive form of dynamically composable
 traits~\cite{scharli2003traits} in \name. Traits provide a
 mechanism of code reuse in object-oriented programming, that
-can be used as an alternative to multiple inheritance. 
+can be used as an alternative to multiple inheritance.
 The interesting aspect about traits is the way conflicts that
-typically arize in multiple-inheritance~\cite{} are dealt with. 
-Instead of trying to automatically resolve conflicts, traits 
+typically arise in multiple-inheritance~\cite{} are dealt with.
+Instead of trying to automatically resolve conflicts, traits
 detect those conflicts and require programmers to explicitly resolve
 them. This is where the relation to disjoint intersection types comes
 in: the mechanism to detect incoherence of disjoint intersection types
-provides us with the mechanism to detect conflicts in traits. 
+provides us with the mechanism to detect conflicts in traits.
 
 We demonstrate various trait
 features in a simple OO language, and then show a straightforward
@@ -28,17 +28,18 @@ between class-based and prototype-based somewhere.}
 \paragraph{Basic Traits.}
 
 A trait is a collection of related methods that characterizes only a specific
-perspective of the features of an object. For example: a button being
-``clickable'', or a button being ``rectangular''. Therefore, compared with
+perspective of the features of an object. Therefore, compared with
 programs uses inheritance, programs using traits usually have a number of small
 traits rather than fewer but larger classes. Code reuse with traits is easier
 with traits than with classes, since traits are usually shorter and traits can
 be \emph{composed}. In fact, trait composition offers a variety of
 possibilities: two traits can be ``added'' together (which is an symmetric
 operation); methods can be removed from a trait; and trait systems provide
-conflict detection, etc.\bruno{I still feel that having an example in
-  text and another in code its probably redundant. Do we really need
-  to talk about rectangles here?}
+conflict detection, etc.
+
+% \bruno{I still feel that having an example in
+%   text and another in code its probably redundant. Do we really need
+%   to talk about rectangles here?}
 
 The first example shows basic trait composition. Many social networking sites
 allow users to ``upvote'' a comment and the number of upvotes that comment has
@@ -131,6 +132,8 @@ console.log(new (Point(3,4) & ManhattanNorm()).norm()) -- This prints 7
 
 \paragraph{Detecting and Resolving Conflicts in Trait Composition.}
 Trait usually supports explicit conflict detection and resolution.
+In inheritance, one pattern is for the subclass to override methods defined in the parent.
+The trait-based approach analog is excluding a method from a trait.
 We show how the mechanism can be modeled in \name.
 The following example shows a counter object and how we could extend its
 behavior so that it supports reset. First we define a \lstinline$Counter$ as a
@@ -138,7 +141,6 @@ type synonym for a record that contains a \lstinline$val$ method, which returns
 the current counter value. Next we define a trait \lstinline$Counter$ that
 contains two methods. The \lstinline$val$ method just returns the value that is
 bound at the parameter of the trait, and \lstinline$incr$ returns a new counter.
-\george{Simpler example should do}
 \begin{lstlisting}
 type Counter = { val: () (*$ \to $*) Int } in
 trait Counter(val: Int) { self: Counter (*$ \to $*)
@@ -221,24 +223,19 @@ If there is any unresolved conflict, the program will be rejected by the type
 system.
 
 \paragraph{Dynamic Composition.}
-\bruno{Don't just briefly mention the advantage! Actually show an example which
-illustrates something, which is impossible say in Scala.}
 
-Actually, since traits are just terms, traits are first-class values and can be
-defined inside a function, passed around or returned just as normal terms.
-\george{Example: A function that takes a trait with unknown implementation and
-instantiate it. But need to think what the ``type'' of the trait should be in
-this case.}
+One difference with the trait approach and the class approach is that in our
+language we are able to compose traits \emph{dynamically} and then instantiate
+them, which is impossible in traditional OO languages such as Java since classes
+being instantiated must be known statically. Actually, since traits are just
+terms, traits are first-class values and can be defined inside a function,
+passed around or returned just as normal terms. The following function takes a
+trait, \lstinline$pt$, with unknown implementation and instantiate it.
 
 \begin{lstlisting}
--- code here
+let f (pt: (Int, Int) (*$ \to $*) (() (*$ \to $*) Point) (*$ \to $*) Point) = new [Point] (pt (3,4))
+in (* \ldots *)
 \end{lstlisting}
-
-But one difference with
-the trait approach and the class approach is that in our language we are able to
-compose traits \emph{dynamically} and then instantiate them, which is impossible
-in traditional OO languages such as Java since classes being instantiated must
-be known statically.
 
 %*******************************************************************************
 \subsection{Desugaring}
@@ -246,9 +243,8 @@ be known statically.
 
 Of course, this whole section will lose its point if the source language cannot
 be translated to \name and checked against the type system of \name. A more
-formal description can be found in the appendix.
-\bruno{Mention that the idea of trait translation is to follow the
-  functional semantics of mixins by Cook.}
+formal description can be found in the appendix. The idea of trait translation
+is due to Cook~\cite{cook1989denotational}.
 
 \paragraph{Trait Declarations.} A trait in the source language is translated into
 nothing but a normal term in \name. For example,
@@ -291,9 +287,6 @@ application in \name. And note that \lstinline$Point(3,4)$ is of type
 
 Therefore it is an open term.
 
-\bruno{There's no need to mention polymorphism at all, since
-  desugaring could simply inline the definition of new.}
-
 \paragraph{The ``new'' Keyword.} \lstinline$new$ instantiates a trait by taking the
 fixpoint of its corresponding open term. In fact, \lstinline$new$ is translated as
 a inlined fixpoint. For example,
@@ -305,8 +298,8 @@ new Point(3,4)
 becomes
 
 \begin{lstlisting}
-let rec x : () (*$ \to $*) Point = (*$ \lambda $*)(_: ()) (*$ \to $*) f x in x 3 4 ()
-\end{lstlisting}\bruno{Wrong! we discussed this in the meeting}
+let rec x : () (*$ \to $*) Point = (*$ \lambda $*)(_: ()) (*$ \to $*) Point 3 4 x in x ()
+\end{lstlisting}
 
 The composition of traits in the source language is desugared using the merge
 operator. The reason that traits built on \name have conflict detection for free

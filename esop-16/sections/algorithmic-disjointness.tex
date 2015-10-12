@@ -183,21 +183,9 @@ types are disjoint or not: only the return types matter.
 
 \subsection{Metatheory}
 
-The algorithmic rules for disjointness are sound and complete.
-
-% \begin{lemma}{Symmetry of disjointness} \label{lemma:symmetry-of-disjointness}
-%   If $\jdis \Gamma A B$, then $\jdis \Gamma B A$.
-% \end{lemma}
-%
-% \begin{theorem} \label{lemma:disjoint-intersect}
-%   If $\jdis \Gamma A C$ and $\jdis \Gamma B C$,
-%   then $\jdis \Gamma {A \inter B} {C}$.
-% \end{theorem}
-%
-% \begin{lemma} \label{lemma:common-supertype}
-%   If $A_1 \to A_2 \subtype D$ and $B_1 \to B_2 \subtype D$,
-%   then there exists a $C$ such that $A_2 \subtype C$ and $B_2 \subtype C$.
-% \end{lemma}
+The following two theorems together say that the algorithmic disjointness
+judgment and the definition of disjointness are ``equivalent''. For detailed
+proofs, we refer to the Coq code in our repository.
 
 \begin{restatable}[Soundness of algorithmic disjointness]{theorem}{algodissoundness}
   \label{theorem:soundness}

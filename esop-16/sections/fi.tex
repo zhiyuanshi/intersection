@@ -1,8 +1,6 @@
 \section{The \name Calculus}
 \label{sec:fi}
 
-\george{Since this becomes closer to Dunfield's, say something about that and
-make this section shorter perhaps.}
 \bruno{It may be worthwhile to discuss the issue with function
   application. I think the way we deal with function application is
   not as convenient, but it doesn't remove expressive power: we can
@@ -13,19 +11,17 @@ make this section shorter perhaps.}
 \bruno{Don't forget to make sure that we formalize the same thing here
 and in Coq!}
 
-This section presents the syntax, subtyping, typing, as well as the
-(incoherent) semantics of \name: a calculus with intersection types
-and a merge
-operator. This calculus borrows key ideas from Dunfield's
-calculus~\cite{dunfield2014elaborating}. Like Dunfield calculus
-\name is type-safe, but it has an incoherent semantics.
+This section presents the syntax, subtyping, typing, as well as the (incoherent)
+semantics of \name: a calculus with intersection types and a merge operator.
+This calculus is similar to Dunfield's calculus~\cite{dunfield2014elaborating}.
+The differences are that the coercions are target language terms and that a term
+of intersection type may be used as a function directly.
 Section~\ref{sec:disjoint} introduces \name, which shows the necessary changes
-for supporting disjoint intersection types and
-ensuring coherence.
+for supporting disjoint intersection types and ensuring coherence.
 
 \subsection{Syntax}
 
-Figure~\ref{fig:fi-syntax} shows the syntax of \name. The differences to
+Figure~\ref{fig:fi-syntax} shows the syntax. The differences to
 $\lambda$-calculus, highlighted in gray, are intersection types $A \inter B$ at the
 type-level and the ``merges'' $e_1 \mergeop e_2$ at the term level.
 
@@ -144,8 +140,6 @@ intersection types are just what one would expect when interpreting types as
 sets. Under this interpretation, for example, the rule \reflabel{\labelsubinter}
 says that if $A_1$ is both the subset of $A_2$ and the subset of $A_3$, then
 $A_1$ is also the subset of the intersection of $A_2$ and $A_3$.
-\bruno{The underscores in the names of the rules look quite ugly. Why
-  not drop them?}
 
 \paragraph{Metatheory.} As other sane subtyping relations, we can show that
 subtyping defined by $\subtype$ is also reflexive and transitive.
@@ -190,8 +184,10 @@ a type-directed translation to an extension of $\lambda$-calculus with pairs.
 The syntax and typing of our target language is unsurprising. The syntax of the
 target language is shown in Figure~\ref{fig:f-syntax}. The highlighted part
 shows its difference with $\lambda$-calculus. The typing rules can be found
-in the appendix.\bruno{Does the target language does need unit? Any
-  rules generating units? I don't think so, so it can be dropped.}
+in the appendix.
+
+% \bruno{Does the target language does need unit? Any rules generating units? I
+% don't think so, so it can be dropped.}
 
 \paragraph{Key Idea of the Translation.}
 This translation turns merges into usual pairs, similar to Dunfield's

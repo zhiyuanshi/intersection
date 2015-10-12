@@ -1,19 +1,18 @@
 \section{Introduction}
 \label{sec:intro}
 
-Previous work by Dunfield~\cite{dunfield2014elaborating} has shown the power of intersection
-types and a merge operator. The presence of a merge operator in a core
-calculus provides significant expressiveness, allowing encodings for many
-other language constructs as syntactic sugar. For example single-field
-records are easily encoded as types with a label, and multi-field
-records are encoded as the concatenation of single-field
-records. Concatenation of records is expressed using intersection
-types at the type-level and the corresponding merge operator at the
-term level. Dunfield formalized a simply typed lambda calculus with
-intersection types and a merge operator. He showed how to give a
-semantics to the calculus by a type-directed translation to a simply
-typed lambda calculus extended with pairs. The type-directed
-translation is simple, elegant, and type-safe.
+Previous work by Dunfield~\cite{dunfield2014elaborating} has shown the
+usefulness of type systems with a merge operator. The presence of a merge
+operator in a core calculus provides significant expressiveness, allowing
+encodings for many other language constructs as syntactic sugar. For example
+single-field records are easily encoded as types with a label, and multi-field
+records are encoded as the concatenation of single-field records. Concatenation
+of records is expressed using intersection types at the type-level and the
+corresponding merge operator at the term level. Dunfield formalized a simply
+typed lambda calculus with intersection types and a merge operator. He showed
+how to give a semantics to the calculus by a type-directed translation to a
+simply typed lambda calculus extended with pairs. The type-directed translation
+is elegant and type-safe.
 
 % \bruno{the following paragraph no longer makes sense for this paper.}
 % Intersection types and the merge operator are also useful in the
@@ -54,18 +53,13 @@ calculus for studying extensibility. However, his calculus is still
 insufficient for studying extensibility.
 \end{comment}
 
-% Firstly it does not
-% support parametric polymorphism. This is a pressing limitation because
-% type-theoretic encodings of datatypes fundamentally rely on parametric
-% polymorphism.  Secondly, and more importantly,
-
 While Dunfield's calculus is type-safe, it lacks the property of
-\emph{coherence}: different derivations for the same expression can
-lead to different results. The lack of coherence is an important
-disadvantage for adoption of his core calculus in implementations of
-programming languages, as the semantics of the programming language
-becomes implementation dependent.
-\bruno{This needs more text here.}
+\emph{coherence}: different derivations for the same expression can lead to
+different results. The lack of coherence is an important disadvantage for
+adoption of his core calculus in implementations of programming languages, as
+the semantics of the programming language becomes implementation dependent.
+Moreover, Dunfield illustrated that having a coherent semantics is highly
+nontrivial.
 
 \begin{comment}
 Moreover, from the theoretic point-of-view, the ambiguity that arises
@@ -82,19 +76,19 @@ Coherence is achieved by ensuring that intersection types are
 \emph{disjoint}. Given two types $A$ and $B$, two types are disjoint
 ($A * B$)
 \footnote{The notation $A * B$ is inspired by the
-  \emph{separating conjunction} construct in separation
-  logic~\cite{}.}
+  \emph{separating conjunction} construct in Reynolds' separation
+  logic~\cite{reynolds2002separation}.}
 if there is no type $C$ such that both $A$ and $B$ are
 subtypes of $C$. Formally this definition is captured as follows:
 \[A * B \equiv \not\exists C.~A <: C \wedge B <: C\]
 With this definition of disjointness we present a formal specification
 of a type system that prevents intersection types that are not
-disjoint.  However, the formal definition of disjointness does
+disjoint. However, the formal definition of disjointness does
 not lend itself directly to an algorithmic implementation. Therefore,
 we also present an algorithmic specification to determine whether two
 types are disjoint. Moreover, this algorithmic specification is shown to be
 sound and complete with respect to the formal definition of
-disjointness. \bruno{Say something about Coq formalization.}
+disjointness. We have formalized the system and the proofs in Coq.
 
 \bruno{A paragraph is missing here about traits.}
 
@@ -108,12 +102,9 @@ specification of disjointness (with respect to the corresponding formal
 definition) is presented.
 
 \item \textbf{Trait:} As an application of this work, we show how to build a
-trait-based object-oriented language by leveraging the type system of \name.
-\george{More words}
-
-%\item {\bf Disjoint Quantification:} A novel form of universal
-%quantification where type variables can have disjointness
-%constraints.
+trait-based object-oriented language by leveraging the type system of \name. The
+resulting source language enjoys many features described in the original trait
+paper for free.
 
 \item {\bf Formalization of \name and Proof of Coherence:} An
    elaboration semantics of \name into $\lambda$-calculus is
@@ -123,7 +114,7 @@ trait-based object-oriented language by leveraging the type system of \name.
 \item \textbf{Implementation:} An implementation of an
   extension of \name, as well as the examples presented in the
   paper, are publicly available\footnote{Examples are available on:
-    \bruno{url missing here}}.
+    \url{https://github.com/zhiyuanshi/intersection}}.
 
 \end{itemize*}
 
@@ -132,7 +123,7 @@ trait-based object-oriented language by leveraging the type system of \name.
 There has been a remarkable number of works aimed at improving support
 for extensibility in programming languages. The motivation behind this
 line of work is simple, and it is captured quite elegantly by the
-infamous \emph{Expression Problem~}\cite{wadler1998expression}: there
+infamous \emph{Expression Problem}~\cite{wadler1998expression}: there
 are \emph{two} common and desirable forms of extensibility, but most
 mainstream languages can only support one form well. Unfortunately
 the lack of support in the other form has significant

@@ -1,13 +1,12 @@
 \section{Disjointness and Coherence}
 \label{sec:disjoint}
-\bruno{This section still needs to be cleaned up to remove stuff
-  related to polymorphism.}
-
-Although the system shown in the Section~\ref{sec:fi} is type-safe, it is not
-coherent. This section shows how to modify \name so that it guarantees coherence
-as well as type soundness. The result is a calculus named \name. \george{Using
-the same name is confusing.} The keys aspects are the notion of disjoint
-intersections.
+% \bruno{This section still needs to be cleaned up to remove stuff
+%   related to polymorphism.}
+Although the system shown in the previous section is type-safe, it is not
+coherent, in the sense that one source program can be elaborated into two
+different target programs. This section shows how to modify it so that it
+guarantees coherence as well as type soundness. The result is a calculus named
+\name. The key aspect is the notion of disjoint intersection.
 
 %From the theoretical point-of-view, the end goal of this section is to show that the resulting system has
 %a coherent (or unique) elaboration semantics:
@@ -29,8 +28,8 @@ intersections.
 definition for disjointness. Here such definition is made a bit more precise, and
 well-suited to \name.
 
-\bruno{This definition is wrong and too complicated. Since there is no
-polymorphism, we do not need $\Gamma$.}
+% \bruno{This definition is wrong and too complicated. Since there is no
+% polymorphism, we do not need $\Gamma$.}
 \begin{definition}[Disjoint types]
 
   Two types $A$ and $B$ are said to be disjoint
@@ -42,14 +41,14 @@ polymorphism, we do not need $\Gamma$.}
 
 \end{definition}
 
-To see this definition in action, $\tyint$ and $\tychar$ are disjoint,
-because there is
-no type that is a supertype of the both. On the other hand, $\tyint$ is not
+For example, $\tyint$ and $\tychar$ are disjoint,
+if there is
+no type that is a supertype of the both (unless a top type is included). On the other hand, $\tyint$ is not
 disjoint with itself, because $\tyint \subtype \tyint$. This implies that
-disjointness is not reflexive as subtyping is. Two types with different shapes
+disjointness is not reflexive as subtyping is. Two types with different ``shapes''
 are always disjoint, unless one of them is an intersection type.
-But a function type and an intersection
-type may not be. Consider:
+For example, a function type and an intersection
+type may not be disjoint. Consider:
 \[ \tyint \to \tyint \quad \text{and} \quad (\tyint \to \tyint) \inter (\tystring \to \tystring) \]
 Those two types are not disjoint since $\tyint \to \tyint$ is their common supertype.
 
@@ -149,10 +148,10 @@ context. Under the new rules, intersection types such as $\tyint \inter \tyint$
 are no longer well-formed because the two types are not disjoint.
 
 \paragraph{Metatheory.}
-Since in this section we only restrict the type system in the previous section,
-it is easy to see that type preservation and type-safety still holds.
-Additionally, we can show that typing always produces a well-formed type by
-proving the following results.
+Since in this section we only restrict the type system
+in the previous section, it is easy to see that type preservation and
+type-safety still holds. Additionally, we can see that typing always produces a
+well-formed type.
 
 % \begin{restatable}[Instantiation]{lemma}{instantiation}
 %   \label{lemma:instantiation}
@@ -192,7 +191,7 @@ with intersection types (\reflabel{\labelsubinterl} and
 \reflabel{\labelsubinterr} and \reflabel{\labelsubinter}) overlap.
 Unfortunately, this means that different coercions may be given when checking
 the subtyping between two types, depending on which derivation is chosen. This
-is ultimately the reason for incoherence. There are two important types of
+is the ultimately reason for incoherence. There are two important types of
 overlap:
 
 \begin{enumerate}
@@ -209,9 +208,9 @@ intersections \reflabel{\labelsubinter}.
 \noindent Fortunately, disjoint intersections (which are enforced by
 well-formedness) deal with problem 1): only one of the two left decomposition
 rules can be chosen for a disjoint intersection type. Since the two types in the
-intersection are disjoint it is impossible that both of the preconditions of the
-left decompositions are satisfied at the same time. More formally, with disjoint
-intersections, we have the following theorem:
+intersection are disjoint, it is impossible that both of the preconditions of
+the left decompositions are satisfied at the same time. More formally, with
+disjoint intersections, we have the following theorem:
 
 \begin{lemma}[Unique subtype contributor]
   \label{lemma:unique-subtype-contributor}
@@ -231,6 +230,8 @@ types, and atomic types.
 \paragraph{Atomic Types.} Atomic types are just those which are not intersection
 types, and are asserted by the judgment \[ \jatomic A \]
 
+Since types in \name are simple, the only atomic type is the function type.
+But in richer systems, it can also include, for example, the record type.
 In the left decomposition rules for intersections we introduce a requirement
 that $A_3$ is atomic. The consequence of this requirement is that when $A_3$ is
 an intersection type, then the only rule that can be applied is
@@ -246,8 +247,8 @@ uniquely determined. This fact is captured by the following lemma:
   and $B$ are well-formed types, then $E_1 \equiv E_2$.
 \end{restatable}
 
-\paragraph{Expressiveness.}
-Remarkably, our restrictions on subtyping do not sacrifice the expressiveness of
+\paragraph{No Loss of Expressiveness.}
+Interestingly, our restrictions on subtyping do not sacrifice the expressiveness of
 subtyping since we have the following two theorems:
 \begin{theorem}
   If $A_1 \subtype A_3$, then $A_1 \inter A_2 \subtype A_3$.
@@ -256,10 +257,9 @@ subtyping since we have the following two theorems:
 If $A_2 \subtype A_3$, then $A_1 \inter A_2 \subtype A_3$.
 \end{theorem}
 
-The interpretation of the theorem is that: even though the premise is made more
-strict by the atomic condition, we can still derive the every subtyping relation
-in the unrestricted system.
-% \george{Explain why the proof shows this.}
+\noindent The interpretation of the two theorems is that: even though the
+premise is made stricter by the atomic condition, we can still derive the every
+subtyping relation which is valid in the unrestricted system.
 
 % Note that $A$ \emph{exclusive} or $B$ is true if and only if their truth value
 % differ. Next, we are going to investigate the minimal requirement (necessary and
