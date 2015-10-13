@@ -58,8 +58,10 @@ While Dunfield's calculus is type-safe, it lacks the property of
 different results. The lack of coherence is an important disadvantage for
 adoption of his core calculus in implementations of programming languages, as
 the semantics of the programming language becomes implementation dependent.
-Moreover, Dunfield illustrated that having a coherent semantics is highly
-nontrivial.
+Although Dunfield discussed the possibility of extending the type system to 
+allow only disjoint intersection types, he did not pursue this approach and 
+due to its non-triviality.
+
 
 \begin{comment}
 Moreover, from the theoretic point-of-view, the ambiguity that arises
@@ -74,8 +76,7 @@ This paper presents \name: a core calculus with a variant of
 coherent.
 Coherence is achieved by ensuring that intersection types are
 \emph{disjoint}. Given two types $A$ and $B$, two types are disjoint
-($A * B$)
-\footnote{The notation $A * B$ is inspired by the
+($A * B$)\footnote{The notation $A * B$ is inspired by the
   \emph{separating conjunction} construct in Reynolds' separation
   logic~\cite{reynolds2002separation}.}
 if there is no type $C$ such that both $A$ and $B$ are
@@ -89,6 +90,7 @@ we also present an algorithmic specification to determine whether two
 types are disjoint. Moreover, this algorithmic specification is shown to be
 sound and complete with respect to the formal definition of
 disjointness. We have formalized the system and the proofs in Coq.
+\bruno{type-safety and the final coherence theorem are not in the Coq file.}
 
 \bruno{A paragraph is missing here about traits.}
 
@@ -101,22 +103,25 @@ where only disjoint types are allowed. A sound and complete algorithmic
 specification of disjointness (with respect to the corresponding formal
 definition) is presented.
 
-\item \textbf{Trait:} As an application of this work, we show how to build a
+\item \textbf{Dynamically Composable Traits:} As an application of this work, we show how to build a
 trait-based object-oriented language by leveraging the type system of \name. The
-resulting source language enjoys many features described in the original trait
-paper for free.
+resulting source language enjoys many features described in the original traits
+paper for free\bruno{Do we compare enough with the traits paper to claim this?}.
 
 \item {\bf Formalization of \name and Proof of Coherence:} An
    elaboration semantics of \name into $\lambda$-calculus is
-   given. Type-soundness and coherence are proved and formalized using
-   the Coq theorem prover.
+   given. Type-soundness and coherence are proved and formalized. The key theorems 
+   are mechanically formalized using the Coq theorem prover.
 
 \item \textbf{Implementation:} An implementation of an
   extension of \name, as well as the examples presented in the
-  paper, are publicly available\footnote{Examples are available on:
-    \url{https://github.com/zhiyuanshi/intersection}}.
+  paper, are publicly available online\footnote{
+    \url{https://github.com/zhiyuanshi/intersection}\bruno{That's not the correct url, is it? We need the implementation of fcore plus examples?}}.
 
 \end{itemize*}
+
+\bruno{Records and record operations missing in the appendix.}
+\bruno{Proof of type-safety missing from appendix.}
 
 \begin{comment}
 

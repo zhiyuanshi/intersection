@@ -81,8 +81,8 @@ the same time:
 
 \noindent In contrast, trait declarations in this source language only does the
 former. Back to our example, the purpose of declaring two types is just to use
-them for type annotations of the self reference.  In trait literatures, a trait
-usually ``requires'' some methods and based on that,  ``provides'' another set
+them for type annotations of the self reference.  In traits literature, a trait
+usually ``requires'' some methods and, based on that,  ``provides'' another set
 of methods. In our examples, the type of \lstinline$self$ actually denotes what
 methods are required.
 
@@ -131,7 +131,7 @@ console.log(new (Point(3,4) & ManhattanNorm()).norm()) -- This prints 7
 \end{lstlisting}
 
 \paragraph{Detecting and Resolving Conflicts in Trait Composition.}
-Trait usually supports explicit conflict detection and resolution.
+Traits usually supports explicit conflict detection and resolution.
 In inheritance, one pattern is for the subclass to override methods defined in the parent.
 The trait-based approach analog is excluding a method from a trait.
 We show how the mechanism can be modeled in \name.
@@ -205,7 +205,8 @@ trait Odd() { self: EvenOdd (*$ \to $*)
 new (Even() & Odd()).odd(42)
 \end{lstlisting}
 
-As a comparison, in Scala we would write
+As a comparison, in Scala we would write\bruno{Scala code comes out of the blue here. 
+Consider having this code in related work, when comparing to Scala.}
 
 \begin{lstlisting}
 trait Even { self: Even with Odd =>
@@ -230,7 +231,7 @@ them, which is impossible in traditional OO languages such as Java since classes
 being instantiated must be known statically. Actually, since traits are just
 terms, traits are first-class values and can be defined inside a function,
 passed around or returned just as normal terms. The following function takes a
-trait, \lstinline$pt$, with unknown implementation and instantiate it.
+trait, \lstinline$pt$, with unknown implementation and instantiate it.\bruno{Bad as it exposes the encoding.}
 
 \begin{lstlisting}
 let f (pt: (Int, Int) (*$ \to $*) (() (*$ \to $*) Point) (*$ \to $*) Point) = new [Point] (pt (3,4))
@@ -244,7 +245,10 @@ in (* \ldots *)
 Of course, this whole section will lose its point if the source language cannot
 be translated to \name and checked against the type system of \name. A more
 formal description can be found in the appendix. The idea of trait translation
-is due to Cook~\cite{cook1989denotational}.
+is inspired by the functional mixin semantics~\cite{cook1989denotational}, which was 
+proposed by Cook in an untyped setting. However, our translation is done context of a 
+statically-typed programming language, which is what provides the ability to statically 
+detect conflicts in traits.
 
 \paragraph{Trait Declarations.} A trait in the source language is translated into
 nothing but a normal term in \name. For example,
@@ -269,7 +273,7 @@ let Point (x: Int) (y: Int) (self: () (*$ \to $*) Point) = {
 One difference is that the self reference becomes a thunk and all occurrences of
 it have been replaced by \lstinline$self ()$ and the position of the self
 reference in the parameter list is adjusted. In fact, \lstinline$self$ is not a
-special keyword. It can be named as \lstinline$s$ but \lstinline$self$ is a
+special keyword. It can have any name, but \lstinline$self$ is a
 convention.
 
 The body of the trait becomes a record whose labels are the method names.
@@ -285,11 +289,11 @@ application in \name. And note that \lstinline$Point(3,4)$ is of type
 (() (*$ \to $*) Point) (*$ \to $*) Point
 \end{lstlisting}
 
-Therefore it is an open term.
+Therefore it is an open recursive term: the recursive call is passed as an argument.
 
 \paragraph{The ``new'' Keyword.} \lstinline$new$ instantiates a trait by taking the
 fixpoint of its corresponding open term. In fact, \lstinline$new$ is translated as
-a inlined fixpoint. For example,
+an inlined fixpoint. For example,
 
 \begin{lstlisting}
 new Point(3,4)
