@@ -41,26 +41,35 @@ The first example shows basic trait composition. Many social networking sites
 allow users to ``upvote'' a comment and the number of upvotes that comment has
 received is also displayed. We would like to separate the logic for upvotes from
 comments so that it can be reused in other entities such as posts and sharings.
-At a high level, the code below defines a trait, \lstinline$Comment$, which
-contains a single method \lstinline$content$ and another trait, \lstinline$Up$,
-for tracking the number of upvotes. In the end, we create a single object from
-those two traits and test its functionalities.
+The code below defines a trait, \lstinline$Comment$, which
+contains a single method \lstinline$content$.
 
 \begin{lstlisting}
 type Comment = { content: () (*$ \to $*) String } in
 trait Comment(content: String) { self: Comment (*$ \to $*)
   content() = content
 } in
+\end{lstlisting}
 
+\noindent Next, we create another trait, \lstinline$Up$, for tracking the number
+of upvotes.
+
+\begin{lstlisting}
 type Up = { upvotes: () (*$ \to $*) Int } in
 trait Up(upvotes: Int) { self: Up (*$ \to $*)
   upvotes() = upvotes
 } in
+\end{lstlisting}
 
+\noindent Finally, we create a single object from those two traits and test its
+functionalities.
+
+\begin{lstlisting}
 let comment = new (Comment("Have fun!"), Up(4))
 in console.log(comment.content(), comment.upvotes())
 -- Output: "Have fun!" 4
 \end{lstlisting}
+
 \bruno{Consider mixing explanation with the source code. Instead of
   presenting the full source and then explaining. Alternatively, make
 this a figure.}
@@ -214,10 +223,12 @@ them, which is impossible in traditional OO languages such as Java since classes
 being instantiated must be known statically. Actually, since traits are just
 terms, traits are first-class values and can be defined inside a function,
 passed around or returned just as normal terms. The following function takes a
-trait, \lstinline$pt$, with unknown implementation and instantiate it.\bruno{Bad as it exposes the encoding.}
+trait, \lstinline$log$, with unknown implementation and instantiate it.\bruno{Bad
+as it exposes the encoding.}
 
 \begin{lstlisting}
-let f (pt: (Int, Int) (*$ \to $*) (() (*$ \to $*) Point) (*$ \to $*) Point) = new [Point] (pt (3,4))
+type Trait[A] = (() (*$ \to $*) A) (*$ \to $*) A in
+let f (log: Trait[Log]) = new [Log] log
 in (* \ldots *)
 \end{lstlisting}
 

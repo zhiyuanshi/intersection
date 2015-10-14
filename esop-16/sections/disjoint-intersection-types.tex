@@ -34,10 +34,9 @@ definition for disjointness. We recall the definition here
 % polymorphism, we do not need $\Gamma$.}
 \begin{definition}[Disjoint types]
 
-  Two types $A$ and $B$ are said to be disjoint
-  (written $\jdis \Gamma A B$)\bruno{remove entails symbol as it is not needed!} if they do not share a common supertype. That is,
-  there does not exist a type $C$ such that $A \subtype C$ and that $B \subtype
-  C$.
+  Two types $A$ and $B$ are said to be disjoint (written $\jdis \Gamma A B$) if
+  they do not share a common supertype. That is, there does not exist a type $C$
+  such that $A \subtype C$ and that $B \subtype C$.
 
   \[\jdis \Gamma A B \equiv \not \exists C.~A \subtype C \wedge B \subtype C\]
 
@@ -121,6 +120,10 @@ typing rule for merges.
     \inferrule*
     {}
     {\jatomic {A \to B}}
+
+    \inferrule*
+    {}
+    {\jatomic {\code{Int}}}
   \end{mathpar}
 
   \begin{mathpar}
