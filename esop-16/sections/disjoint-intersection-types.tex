@@ -42,16 +42,16 @@ definition for disjointness. We recall the definition here
 
 \end{definition}
 
-For example, $\tyint$ and $\tychar$ are disjoint,
+For example, $\code{Int}$ and $\code{Char}$ are disjoint,
 if there is
-no type that is a supertype of the both (unless a top type is included). On the other hand, $\tyint$ is not
-disjoint with itself, because $\tyint \subtype \tyint$. This implies that
+no type that is a supertype of the both (unless a top type is included). On the other hand, $\code{Int}$ is not
+disjoint with itself, because $\code{Int} \subtype \code{Int}$. This implies that
 disjointness is not reflexive as subtyping is. Two types with different ``shapes''
 are always disjoint, unless one of them is an intersection type.
 For example, a function type and an intersection
 type may not be disjoint. Consider:
-\[ \tyint \to \tyint \quad \text{and} \quad (\tyint \to \tyint) \inter (\tystring \to \tystring) \]
-Those two types are not disjoint since $\tyint \to \tyint$ is their common supertype.
+\[ \code{Int} \to \code{Int} \quad \text{and} \quad (\code{Int} \to \code{Int}) \inter (\tystring \to \tystring) \]
+Those two types are not disjoint since $\code{Int} \to \code{Int}$ is their common supertype.
 
 % \bruno{There are no changes in syntax, right? So the whole section
 %   (and figure) can be dropped! Also, without polymorphism, we don't
@@ -149,7 +149,7 @@ typing rule for merges.
 
 \paragraph{Well-formedness.}
 We require that the two types of an intersection must be disjoint in their
-context. Under the new rules, intersection types such as $\tyint \inter \tyint$
+context. Under the new rules, intersection types such as $\code{Int} \inter \code{Int}$
 are no longer well-formed because the two types are not disjoint.
 
 \paragraph{Metatheory.}
@@ -188,11 +188,11 @@ type-safety still holds.
 % In general, disjointness judgments are not invariant with respect to
 % free-variable substitution. In other words, a careless substitution can violate
 % the disjoint constraint in the context. For example, in the context $\alpha
-% \disjoint \tyint$, $\alpha$ and $\tyint$ are disjoint:
-% \[ \jdis {\alpha \disjoint \tyint} \alpha \tyint \]
-% But after the substitution of $\tyint$ for $\alpha$ on the two types, the sentence
-% \[ \jdis {\alpha \disjoint \tyint} \tyint \tyint \]
-% is longer true since $\tyint$ is clearly not disjoint with itself.
+% \disjoint \code{Int}$, $\alpha$ and $\code{Int}$ are disjoint:
+% \[ \jdis {\alpha \disjoint \code{Int}} \alpha \code{Int} \]
+% But after the substitution of $\code{Int}$ for $\alpha$ on the two types, the sentence
+% \[ \jdis {\alpha \disjoint \code{Int}} \code{Int} \code{Int} \]
+% is longer true since $\code{Int}$ is clearly not disjoint with itself.
 
 \subsection{Subtyping}
 
@@ -279,17 +279,17 @@ subtyping relation which is valid in the unrestricted system.
 % sufficient conditions) such that the theorem holds.
 %
 % If $A_1$ and $A_2$ in this setting are the same, for example,
-% $\tyint \inter \tyint \subtype \tyint$, obviously the theorem will
-% not hold since both the left $\tyint$ and the right $\tyint$ are a
-% subtype of $\tyint$.
+% $\code{Int} \inter \code{Int} \subtype \code{Int}$, obviously the theorem will
+% not hold since both the left $\code{Int}$ and the right $\code{Int}$ are a
+% subtype of $\code{Int}$.
 %
 % We can try to rule out such possibilities by making the requirement of
 % well-formedness stronger. This suggests that the two types on the sides of
 % $\inter$ should not ``overlap''. In other words, they should be ``disjoint''. It
-% is easy to determine if two base types are disjoint. For example, $\tyint$
-% and $\tyint$ are not disjoint. Neither do $\tyint$ and $\code{Nat}$.
+% is easy to determine if two base types are disjoint. For example, $\code{Int}$
+% and $\code{Int}$ are not disjoint. Neither do $\code{Int}$ and $\code{Nat}$.
 % Also, types built with different constructors are disjoint. For example,
-% $\tyint$ and $\tyint \to \tyint$. For function types, disjointness
+% $\code{Int}$ and $\code{Int} \to \code{Int}$. For function types, disjointness
 % is harder to visualize. But bear in the mind that disjointness can defined by
 % the very requirement that the theorem holds.
 %

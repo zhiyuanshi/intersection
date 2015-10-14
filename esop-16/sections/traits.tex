@@ -146,6 +146,7 @@ type synonym for a record that contains a \lstinline$val$ method, which returns
 the current counter value. Next we define a trait \lstinline$Counter$ that
 contains two methods. The \lstinline$val$ method just returns the value that is
 bound at the parameter of the trait, and \lstinline$incr$ returns a new counter.
+
 \begin{lstlisting}
 type Counter = { val: () (*$ \to $*) Int } in
 trait Counter(val: Int) { self: Counter (*$ \to $*)
@@ -227,8 +228,7 @@ trait, \lstinline$log$, with unknown implementation and instantiate it.\bruno{Ba
 as it exposes the encoding.}
 
 \begin{lstlisting}
-type Trait[A] = (() (*$ \to $*) A) (*$ \to $*) A in
-let f (log: Trait[Log]) = new [Log] log
+let f (log: trait[Log]) = new [Log] log
 in (* \ldots *)
 \end{lstlisting}
 
@@ -320,8 +320,8 @@ new ((\self: Point3D) (*$ \to $*) ((Point 3 4 self) ,, (Z 5 self)))
 % contains exactly those values which can be used as either of type $A$
 % or of type $B$.  Just as not all intersection of sets are nonempty,
 % not all intersections of types are inhabited.  For example, the
-% intersection of a base type $\tyint$ and a function type
-% $\tyint \to \tyint$ is not inhabited.\bruno{put this text somewhere?}
+% intersection of a base type $\code{Int}$ and a function type
+% $\code{Int} \to \code{Int}$ is not inhabited.\bruno{put this text somewhere?}
 %
 % Since then various researchers have
 % studied intersection types, and some languages have adopted in one

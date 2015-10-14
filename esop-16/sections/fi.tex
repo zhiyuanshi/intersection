@@ -118,8 +118,8 @@ is in the appendix. TODO for george.}
 \end{figure}
 
 % Intersection types introduce natural subtyping relations among types. For
-% example, $ \tyint \inter \tybool $ should be a subtype of $ \tyint $, since the former
-% can be viewed as either $ \tyint $ or $ \tybool $. To summarize, the subtyping rules
+% example, $ \code{Int} \inter \tybool $ should be a subtype of $ \code{Int} $, since the former
+% can be viewed as either $ \code{Int} $ or $ \tybool $. To summarize, the subtyping rules
 % are standard except for three points listed below:
 % \begin{enumerate}
 % \item $ A_1 \inter A_2 $ is a subtype of $ A_3 $, if \emph{either} $ A_1 $ or
@@ -200,11 +200,11 @@ For example, \[ 1 \mergeop \code{"one"} \] becomes \pair 1
 {\code{"one"}}. In usage, the pair will be coerced according to type
 information. For example, consider the function application: \[ \app {(\lamty x
 \tystring x)} {(1 \mergeop \code{"one"})} \] This expression will be translated to \[ \app
-{(\lamty x \tystring x)} {(\app {(\lamty x {\pair \tyint \tystring} {\proj 2 x})}
+{(\lamty x \tystring x)} {(\app {(\lamty x {\pair \code{Int} \tystring} {\proj 2 x})}
 {\pair 1 {\code{"one"}}})} \] The coercion in this case is $(\lamty x {\pair
-\tyint \tystring} {\proj 2 x})$. It extracts the second item from the pair, since
+\code{Int} \tystring} {\proj 2 x})$. It extracts the second item from the pair, since
 the function expects a $\tystring$ but the translated argument is of type $\pair
-\tyint \tystring$.
+\code{Int} \tystring$.
 
 
 \begin{figure}[h]
@@ -265,9 +265,9 @@ on the right hand side of $ \yields {} $. A coercion $ E $ is just an term
 in the target language and is ensured to have type
 $ \im {A_1} \to \im {A_2} $ (by Lemma~\ref{lemma:sub}). For example,
 \[
-\tyint \inter \tybool \subtype \tybool \yields {\lamty x {\im {\tyint \inter \tybool}} {\proj 2 x}}
+\code{Int} \inter \tybool \subtype \tybool \yields {\lamty x {\im {\code{Int} \inter \tybool}} {\proj 2 x}}
 \]
-generates a coercion function with type: $\tyint \inter \tybool \to \tybool$.
+generates a coercion function with type: $\code{Int} \inter \tybool \to \tybool$.
 
 In \reflabel{\labelsubfun}, we elaborate the subtyping of
 parameter and return types by $\eta$-expanding $f$ to $\lamty x {\im {A_3}}
