@@ -37,10 +37,6 @@ possibilities: two traits can be ``added'' together (which is an symmetric
 operation); methods can be removed from a trait; and trait systems provide
 conflict detection, etc.
 
-% \bruno{I still feel that having an example in
-%   text and another in code its probably redundant. Do we really need
-%   to talk about rectangles here?}
-
 The first example shows basic trait composition. Many social networking sites
 allow users to ``upvote'' a comment and the number of upvotes that comment has
 received is also displayed. We would like to separate the logic for upvotes from
@@ -205,19 +201,6 @@ trait Odd() { self: EvenOdd (*$ \to $*)
 new (Even() & Odd()).odd(42)
 \end{lstlisting}
 
-As a comparison, in Scala we would write\bruno{Scala code comes out of the blue here. 
-Consider having this code in related work, when comparing to Scala.}
-
-\begin{lstlisting}
-trait Even { self: Even with Odd =>
-  def even(n: Int): Boolean = if (n == 0) true else self.odd(n - 1)
-}
-
-trait Odd { self: Even with Odd =>
-  def odd(n: Int): Boolean = if (n == 0) false else self.even(n - 1)
-}
-\end{lstlisting}
-
 When the two traits are composed, conceptually it is as if that a new class were
 being created on the fly by copying all the definitions inside those two traits.
 If there is any unresolved conflict, the program will be rejected by the type
@@ -245,9 +228,9 @@ in (* \ldots *)
 Of course, this whole section will lose its point if the source language cannot
 be translated to \name and checked against the type system of \name. A more
 formal description can be found in the appendix. The idea of trait translation
-is inspired by the functional mixin semantics~\cite{cook1989denotational}, which was 
-proposed by Cook in an untyped setting. However, our translation is done context of a 
-statically-typed programming language, which is what provides the ability to statically 
+is inspired by the functional mixin semantics~\cite{cook1989denotational}, which was
+proposed by Cook in an untyped setting. However, our translation is done context of a
+statically-typed programming language, which is what provides the ability to statically
 detect conflicts in traits.
 
 \paragraph{Trait Declarations.} A trait in the source language is translated into

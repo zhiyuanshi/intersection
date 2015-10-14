@@ -15,7 +15,7 @@ This section presents the syntax, subtyping, typing, as well as the (incoherent)
 semantics of \name: a calculus with intersection types and a merge operator.
 This calculus is similar to Dunfield's calculus~\cite{dunfield2014elaborating}.
 The minor differences are that the coercions are target language terms and that a term
-of intersection type may be used as a function directly.\bruno{George, you need to explain this to me. 
+of intersection type may be used as a function directly.\bruno{George, you need to explain this to me.
 I am not entirely sure that I understand what you mean.}
 Section~\ref{sec:disjoint} introduces \name, which shows the necessary changes
 for supporting disjoint intersection types and ensuring coherence.
@@ -23,20 +23,22 @@ for supporting disjoint intersection types and ensuring coherence.
 \subsection{Syntax}
 
 Figure~\ref{fig:fi-syntax} shows the syntax. The differences to
-$\lambda$-calculus, highlighted in gray, are intersection types $A \inter B$ at the
-type-level and the ``merges'' $e_1 \mergeop e_2$ at the term level.
+$\lambda$-calculus, highlighted in gray, are intersection types $A \inter B$ at
+the type-level and the ``merges'' $e_1 \mergeop e_2$ at the term level.
 
 \begin{figure}[t]
   \[
     \begin{array}{l}
       \begin{array}{llrll}
         \text{Types}
-        & A, B, C & \Coloneqq & A \to B        & \\
-        &      & \mid & \highlight{$A \inter B$}  & \\
+        & A, B, C & \Coloneqq & \code{Int} & \\
+        &         & \mid      & A \to B    & \\
+        &         & \mid      & \highlight{$A \inter B$}  & \\
 
         \\
         \text{Terms}
-        & e & \Coloneqq & x            & \\
+        & e & \Coloneqq & i            & \\
+        &   & \mid & x                 & \\
         &   & \mid & \lamty x A e      & \\
         &   & \mid & \app {e_1} {e_2}  & \\
         &   & \mid & \highlight{$e_1 \mergeop e_2$}  & \\
@@ -54,17 +56,15 @@ type-level and the ``merges'' $e_1 \mergeop e_2$ at the term level.
 \end{figure}\bruno{Figures should be on top!}
 
 \paragraph{Types.} Metavariables $A$, $B$ range over types. Types include
-function types $A \to B$. $A \inter B$ denotes the
-intersection of types $A$ and $B$.
+function types $A \to B$. $A \inter B$ denotes the intersection of types $A$ and
+$B$. We also include integer types $\code{Int}$.
 
 \paragraph{Terms.} Metavariables $e$ range over terms.  Terms include standard
-constructs: variables $x$; abstraction of terms over variables of
-a given type $\lamty x A e$; and application of terms $e_1$ to terms $e_2$, written
-$\app {e_1} {e_2}$. The expression $e_1 \mergeop e_2$ is the
-\emph{merge} of two terms $e_1$ and $e_2$.
-%If one regards $e_1$ and $e_2$ as objects, their merge will respond to
-%every method that one or both of them have.
-Merges of terms correspond to intersections of types $A \inter B$.
+constructs: variables $x$; abstraction of terms over variables of a given type
+$\lamty x A e$; and application of terms $e_1$ to terms $e_2$, written $\app
+{e_1} {e_2}$. The expression $e_1 \mergeop e_2$ is the \emph{merge} of two terms
+$e_1$ and $e_2$. Merges of terms correspond to intersections of types $A \inter
+B$. In addition, we also include integer literals $i$.
 
 \paragraph{Contexts.} Typing contexts $ \Gamma $ track bound variables $x$ with their type $A$.
 
@@ -76,8 +76,8 @@ In order to focus on the key features that make this language interesting, we do
 not include other forms such as type constants
 and fixpoints here. However they can be included in the formalization in
 standard ways and we are using them in discussions and examples.
-We also omit records and corresponding record operations, since the semantics 
-is standard (see for example~\cite{}).\bruno{Mention that a basic formalization 
+We also omit records and corresponding record operations, since the semantics
+is standard (see for example~\cite{}).\bruno{Mention that a basic formalization
 is in the appendix. TODO for george.}
 
 % \paragraph{Discussion.} A natural question the reader might ask is that why we
@@ -166,14 +166,13 @@ The well-formedness rules are shown in the middle part of
 Figure~\ref{fig:fi-type}. In addition to the standard rules,
 \reflabel{\labelwfinter} is also not surprising. The typing rules are shown in
 the bottom part of the figure. Again, the reader is advised to ignore the
-gray-shaded part here, as these parts will be explained later. The typing judgment is
-of the form: \[ \jtype \Gamma e A \]\bruno{$\Gamma$ is not showing up!} It reads: ``in the typing context $\Gamma$,
-the term $e$ is of type $A$''. The standard rules are
-those for variables \reflabel{\labeltvar} and lambda abstractions
-\reflabel{\labeltlam}.
-\reflabel{\labeltmerge} means that a merge $e_1 \mergeop e_2$,
-is assigned an intersection type composed of the resulting types of
-$e_1$ and $e_2$.
+gray-shaded part here, as these parts will be explained later. The typing
+judgment is of the form: \[ \jtype \Gamma e A \] It reads: ``in the typing
+context $\Gamma$, the term $e$ is of type $A$''. The standard rules are those
+for variables \reflabel{\labeltvar} and lambda abstractions
+\reflabel{\labeltlam}. \reflabel{\labeltmerge} means that a merge $e_1 \mergeop
+e_2$, is assigned an intersection type composed of the resulting types of $e_1$
+and $e_2$.
 
 \subsection{Semantics}
 

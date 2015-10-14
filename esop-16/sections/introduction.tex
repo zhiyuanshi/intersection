@@ -45,21 +45,13 @@ is elegant and type-safe.
 %foundational core calculus that can capture the key ideas behind the
 %various solutions.
 
-\begin{comment}
-\bruno{Probably we can reuse some parts of the text here, but this
-  also needs to change}
-Dunfield calculus seems to provide a good basis for a foundational
-calculus for studying extensibility. However, his calculus is still
-insufficient for studying extensibility.
-\end{comment}
-
 While Dunfield's calculus is type-safe, it lacks the property of
 \emph{coherence}: different derivations for the same expression can lead to
 different results. The lack of coherence is an important disadvantage for
 adoption of his core calculus in implementations of programming languages, as
 the semantics of the programming language becomes implementation dependent.
-Although Dunfield discussed the possibility of extending the type system to 
-allow only disjoint intersection types, he did not pursue this approach and 
+Although Dunfield discussed the possibility of extending the type system to
+allow only disjoint intersection types, he did not pursue this approach and
 due to its non-triviality.
 
 
@@ -70,29 +62,33 @@ goal is to precisely capture the essence of solutions to
 extensibility.
 \end{comment}
 
-This paper presents \name: a core calculus with a variant of
-\emph{intersection types} and a
-\emph{merge operator} whose semantics \name is both type-safe and
-coherent.
-Coherence is achieved by ensuring that intersection types are
-\emph{disjoint}. Given two types $A$ and $B$, two types are disjoint
-($A * B$)\footnote{The notation $A * B$ is inspired by the
-  \emph{separating conjunction} construct in Reynolds' separation
-  logic~\cite{reynolds2002separation}.}
-if there is no type $C$ such that both $A$ and $B$ are
-subtypes of $C$. Formally this definition is captured as follows:
-\[A * B \equiv \not\exists C.~A <: C \wedge B <: C\]
-With this definition of disjointness we present a formal specification
-of a type system that prevents intersection types that are not
-disjoint. However, the formal definition of disjointness does
-not lend itself directly to an algorithmic implementation. Therefore,
-we also present an algorithmic specification to determine whether two
+This paper presents \name: a core calculus with a variant of \emph{intersection
+types} and a \emph{merge operator} whose semantics \name is both type-safe and
+coherent. Coherence is achieved by ensuring that intersection types are
+\emph{disjoint}. Given two types $A$ and $B$, two types are disjoint ($A *
+B$)\footnote{The notation $A * B$ is inspired by the \emph{separating
+conjunction} construct in Reynolds' separation
+logic~\cite{reynolds2002separation}.} if there is no type $C$ such that both $A$
+and $B$ are subtypes of $C$. Formally this definition is captured as follows:
+\[A * B \equiv \not\exists C.~A <: C \wedge B <: C\] With this definition of
+disjointness we present a formal specification of a type system that prevents
+intersection types that are not disjoint. However, the formal definition of
+disjointness does not lend itself directly to an algorithmic implementation.
+Therefore, we also present an algorithmic specification to determine whether two
 types are disjoint. Moreover, this algorithmic specification is shown to be
-sound and complete with respect to the formal definition of
-disjointness. We have formalized the system and the proofs in Coq.
-\bruno{type-safety and the final coherence theorem are not in the Coq file.}
+sound and complete with respect to the formal definition of disjointness. We
+have mechanized the proof of major metatheoretical results using the Coq proof
+assistant. \bruno{type-safety and the final coherence theorem are not in the Coq
+file.}
 
 \bruno{A paragraph is missing here about traits.}
+
+As an application of \name, we have discovered that the simplicity of \name does
+not prevent it from serving as the foundation of a trait-based object-oriented
+language. Due to the type system of \name, the language supports common features
+of traits such as commutative composition, explicit conflict detection and
+resolution. In addition, our language also supports composing of traits
+dynamically, which cannot be achieved in many existing languages.
 
 In summary, the contributions of this paper are:
 
@@ -108,15 +104,17 @@ trait-based object-oriented language by leveraging the type system of \name. The
 resulting source language enjoys many features described in the original traits
 paper for free\bruno{Do we compare enough with the traits paper to claim this?}.
 
-\item {\bf Formalization of \name and Proof of Coherence:} An
+\item \textbf{Formalization of \name and Proof of Coherence:} An
    elaboration semantics of \name into $\lambda$-calculus is
-   given. Type-soundness and coherence are proved and formalized. The key theorems 
+   given. Type-soundness and coherence are proved and formalized. The key theorems
    are mechanically formalized using the Coq theorem prover.
 
-\item \textbf{Implementation:} An implementation of an
-  extension of \name, as well as the examples presented in the
-  paper, are publicly available online\footnote{
-    \url{https://github.com/zhiyuanshi/intersection}\bruno{That's not the correct url, is it? We need the implementation of fcore plus examples?}}.
+\item \textbf{Implementation:} An implementation of an extension of \name, as
+well as the examples presented in the paper, are publicly available
+online\footnote{
+\url{https://github.com/zhiyuanshi/intersection/tree/master/esop-16/examples}\bruno{That's
+not the correct url, is it? We need the implementation of fcore plus
+examples?}}.
 
 \end{itemize*}
 
@@ -259,21 +257,6 @@ In summary, the contributions of this paper are:
 
 \end{itemize*}
 
-\end{comment}
-
-\begin{comment}
-\subsection{Other Notes}
-
-finitary overloading: yes
-but have other merits of intersection been explored?
-
--- Compare Scala:
--- merge[A,B] = new A with B
-
--- type IEval  = { eval :  Int }
--- type IPrint = { print : String }
-
--- F[\_]
 \end{comment}
 
 % \section{Introduction}

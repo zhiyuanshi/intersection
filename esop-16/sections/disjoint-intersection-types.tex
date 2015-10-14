@@ -152,8 +152,10 @@ are no longer well-formed because the two types are not disjoint.
 \paragraph{Metatheory.}
 Since in this section we only restrict the type system
 in the previous section, it is easy to see that type preservation and
-type-safety still holds. Additionally, we can see that typing always produces a
-well-formed type. \bruno{Revise text below, as I uncommented it.}
+type-safety still holds.
+
+% Additionally, we can see that typing always produces a
+% well-formed type. \bruno{Revise text below, as I uncommented it.}
 
 %%\begin{restatable}[Instantiation]{lemma}{instantiation}
 %%  \label{lemma:instantiation}
@@ -162,34 +164,32 @@ well-formed type. \bruno{Revise text below, as I uncommented it.}
 %%   then $\jwf \Gamma {\subst A \alpha C}$.
 %% \end{restatable}
 
-\begin{restatable}[Well-formed typing]{lemma}{wellformedtyping}
-   \label{lemma:wellformed-typing}
+% \begin{restatable}[Well-formed typing]{lemma}{wellformedtyping}
+%    \label{lemma:wellformed-typing}
+%
+%    If $\jtype \Gamma e A$, then $\jwf \Gamma A$.
+% \end{restatable}
 
-   If $\jtype \Gamma e A$, then $\jwf \Gamma A$.
-\end{restatable}
+% \begin{proof}
+%   By induction on the derivation that leads to $\jtype \Gamma e A$ and applying
+%   Lemma~\ref{lemma:instantiation} in the case of \reflabel{\labelttapp}.
+% \end{proof}
 
-\begin{proof}
-  By induction on the derivation that leads to $\jtype \Gamma e A$ and applying
-  Lemma~\ref{lemma:instantiation} in the case of \reflabel{\labelttapp}.
-\end{proof}
+% This lemma will play an important role in the proof of coherence.
+%
+% \bruno{Tell the reader why the typing produces a well-formed type is important.
+% Probably you want to say something like: ``it will be important to prove coherence''.}
 
-This lemma will play an important role in the proof of coherence.
+% With our new definition of well-formed types, this result is nontrivial.
 
-\bruno{Tell the reader why the typing produces a well-formed type is important. 
-Probably you want to say something like: ``it will be important to prove coherence''.}
-
-\begin{comment}
-With our new definition of well-formed types, this result is nontrivial.
-
-In general, disjointness judgments are not invariant with respect to
-free-variable substitution. In other words, a careless substitution can violate
-the disjoint constraint in the context. For example, in the context $\alpha
-\disjoint \tyint$, $\alpha$ and $\tyint$ are disjoint:
-\[ \jdis {\alpha \disjoint \tyint} \alpha \tyint \]
-But after the substitution of $\tyint$ for $\alpha$ on the two types, the sentence
-\[ \jdis {\alpha \disjoint \tyint} \tyint \tyint \]
-is longer true since $\tyint$ is clearly not disjoint with itself.
-\end{comment}
+% In general, disjointness judgments are not invariant with respect to
+% free-variable substitution. In other words, a careless substitution can violate
+% the disjoint constraint in the context. For example, in the context $\alpha
+% \disjoint \tyint$, $\alpha$ and $\tyint$ are disjoint:
+% \[ \jdis {\alpha \disjoint \tyint} \alpha \tyint \]
+% But after the substitution of $\tyint$ for $\alpha$ on the two types, the sentence
+% \[ \jdis {\alpha \disjoint \tyint} \tyint \tyint \]
+% is longer true since $\tyint$ is clearly not disjoint with itself.
 
 \subsection{Subtyping}
 
