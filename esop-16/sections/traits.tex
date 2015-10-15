@@ -2,11 +2,6 @@
 \section{Dynamically Composable Traits} \label{sec:trait}
 %*******************************************************************************
 
-\bruno{This section suffers from having examples which are different
-  to illustrate the various concepts. A better approach would be to
-use related examples (say various things todo with points), to
-illustrate the approach.}
-
 \george{after the new keyword, types should be specified.}
 
 As an application of disjoint intersection types, we show how to model a
@@ -21,17 +16,18 @@ detect those conflicts and require programmers to explicitly resolve
 them. This is where the relation to disjoint intersection types comes
 in: the mechanism to detect incoherence of disjoint intersection types
 provides us with the mechanism to detect conflicts in traits.
-
 We demonstrate various trait
-features in a simple OO language, and then show a straightforward
-translation from that language to \name. \george{Need to note the difference
+features in a simple OO language, and then sketch a straightforward
+translation from that language to \name as a basic form of
+syntactic sugar. \george{Need to note the difference
 between class-based and prototype-based somewhere.}
 
-\paragraph{Basic Traits.}
+\subsection{Basic Traits}
 
 A trait is a collection of related methods that characterizes only a specific
 perspective of the features of an object. Therefore, compared with
-programs uses inheritance, programs using traits usually have a number of small
+programs using inheritance, programs using traits usually have a
+larger number of small
 traits rather than fewer but larger classes. Code reuse with traits is easier
 with traits than with classes, since traits are usually shorter and traits can
 be \emph{composed}. In fact, trait composition offers a variety of
@@ -63,15 +59,6 @@ trait Up(upvotes: Int) { self: Up (*$ \to $*)
 } in
 \end{lstlisting}
 
-\noindent Finally, we create a single object from those two traits and test its
-functionalities.
-
-\begin{lstlisting}
-let comment = new[Comment&Up] (Comment("Have fun!"), Up(4))
-in println(comment.content(), comment.upvotes())
--- Output: "Have fun!" 4
-\end{lstlisting}
-
 \bruno{Consider mixing explanation with the source code. Instead of
   presenting the full source and then explaining. Alternatively, make
 this a figure.}
@@ -96,8 +83,9 @@ methods are required.
 A trait can expect parameters, which become in scope in the entire trait body.
 For example, the \lstinline$Comment$ trait is parametrized by
 \lstinline$content$, and the \lstinline$content$ method does nothing more than
-returning the eponymous variable. In comparison, traits in Scala do not allow
-taking parameters.
+returning the eponymous variable. 
+%In comparison, traits in Scala do not allow
+%taking parameters.
 
 The origin of self references is always explicit. The \lstinline$Comment$ trait
 requires that \lstinline$self$ be of type \lstinline$Comment$, which is defined
@@ -111,9 +99,18 @@ Creating an object is via the \lstinline$new$ keyword, similar to many OO
 languages, except for one crucial novelty: we can create an object from multiple
 traits. More precisely, the object is created from the \emph{composition} of
 those traits. Therefore, we are able to call methods from different traits on a
-single object.
+single object. For example, we can create a single object from
+\lstinline$Comment$  and \lstinline$Up$ traits and test its
+functionality as follows:
 
-\paragraph{Traits with Dependencies.} The following example shows that a trait
+\begin{lstlisting}
+let comment = new[Comment&Up] (Comment("Have fun!"), Up(4))
+in println(comment.content(), comment.upvotes())
+-- Output: "Have fun!" 4
+\end{lstlisting}
+
+\subsection{Traits with Dependencies} 
+The following example shows that a trait
 can depend on another trait. First we define the type of a point and a trait for
 a standard point.
 
@@ -139,16 +136,51 @@ trait ManhattanNorm() { self: Point (*$ \to $*)
 } in
 \end{lstlisting}
 
-Later we compose the definition of point and norm so that the norm have
-different meanings. Composition of traits is anonymous in the sense that there
-is no need to explicitly give a name to the composition.
+Note how in \lstinline$EuclideanNorm$ and \lstinline$ManhattanNorm$
+the type of the self-reference is \lstinline$Point$! This is in
+contrast to a typical object-oriented language, such as Java, where
+the self-reference must always be of the same type as the class being
+defined. It is this functionality that allow us to express
+dependencies between traits. When the traits \lstinline$EuclideanNorm$
+and \lstinline$ManhattanNorm$ are instantiated and composed with some
+other traits, they must be composed with an implementation of
+\lstinline$Point$. 
+%Thus, ater compose the definition of point and norm we can have
+%different meanings. Composition of traits is anonymous in the sense that there
+%is no need to explicitly give a name to the composition.
 
 \begin{lstlisting}
-println(new[Point&Norm] (Point(3,4) & EuclideanNorm()).norm()) -- This prints 5
-println(new[Point&Norm] (Point(3,4) & ManhattanNorm()).norm()) -- This prints 7
+println(new[Point&Norm] (Point(3,4) & EuclideanNorm()).norm()) --Prints 5
+println(new[Point&Norm] (Point(3,4) & ManhattanNorm()).norm()) --Prints 7
 \end{lstlisting}
 
-\paragraph{Detecting and Resolving Conflicts in Trait Composition.}
+\subsection{Mutual Dependencies}
+
+The next example, although a little bit contrived, illustrates that when two
+traits are composed, any two methods in those two traits can refer to each
+other via the self reference, just as if they were inside the same class.
+
+\begin{lstlisting}
+type EvenOdd = {
+  even: Int (*$ \to $*) Bool,
+  odd:  Int (*$ \to $*) Bool
+} in
+trait Even() { self: EvenOdd (*$ \to $*)
+  even(n: Int) = if n == 0 then True else self.odd(n - 1)
+} in
+trait Odd() { self: EvenOdd (*$ \to $*)
+  odd(n: Int) = if n == 0 then False else self.even(n - 1)
+} in
+new (Even() & Odd()).odd(42)
+\end{lstlisting}
+
+When the two traits are composed, conceptually it is as if that a new object were
+being created on the fly by copying all the definitions inside those two traits.
+If there is any unresolved conflict, the program will be rejected by the type
+system.
+
+\subsection{Detecting and Resolving Conflicts in Trait Composition}
+
 Traits usually supports explicit conflict detection and resolution.
 In inheritance, one pattern is for the subclass to override methods defined in the parent.
 The trait-based approach analog is excluding a method from a trait.
@@ -196,7 +228,7 @@ in counter.incr()
 However the modified code should not typecheck according to the specification of
 traits, since both \lstinline$Counter$ and \lstinline$Reset$ contains a
 conflicting \lstinline$incr$ method. The code also does not typecheck since it
-violates the typing rule of \name. The programmer can resolve the conflict by
+violates the disjoint intersection typing rules of \name. The programmer needs to resolve the conflict by
 excluding the \lstinline$incr$ being overridden using the record exclusion
 operator.
 
@@ -206,35 +238,11 @@ let counter = new (Counter(0) \ incr & Reset())
 in counter.incr()
 \end{lstlisting}
 
-\paragraph{Mutual Dependencies.}
-The next example, although a little bit contrived, illustrates that when two
-traits are composed, any two methods in those two traits can refer to each
-other via the self reference, just as if they were inside the same class.
+\subsection{Dynamic Instantiation}
 
-\begin{lstlisting}
-type EvenOdd = {
-  even: Int (*$ \to $*) Bool,
-  odd:  Int (*$ \to $*) Bool
-} in
-trait Even() { self: EvenOdd (*$ \to $*)
-  even(n: Int) = if n == 0 then True else self.odd(n - 1)
-} in
-trait Odd() { self: EvenOdd (*$ \to $*)
-  odd(n: Int) = if n == 0 then False else self.even(n - 1)
-} in
-new (Even() & Odd()).odd(42)
-\end{lstlisting}
-
-When the two traits are composed, conceptually it is as if that a new class were
-being created on the fly by copying all the definitions inside those two traits.
-If there is any unresolved conflict, the program will be rejected by the type
-system.
-
-\paragraph{Dynamic Composition.}
-
-One difference with the trait approach and the class approach is that in our
+One difference with traditional traits or classes is that in our
 language we are able to compose traits \emph{dynamically} and then instantiate
-them, which is impossible in traditional OO languages such as Java since classes
+them. This is impossible in traditional OO languages such as Java since classes
 being instantiated must be known statically. Actually, since traits are just
 terms, traits are first-class values and can be defined inside a function,
 passed around or returned just as normal terms. The following function takes a
@@ -243,7 +251,9 @@ trait, \lstinline$log$, with unknown implementation and instantiate it.
 \begin{lstlisting}
 let f (log: trait[Log]) = new [Log] log
 in (* \ldots *)
-\end{lstlisting}
+\end{lstlisting}\bruno{example does not make sense (and uses no composition).}
+
+\bruno{Explain the trait[Log]}
 
 %*******************************************************************************
 \subsection{Desugaring}
@@ -252,9 +262,10 @@ in (* \ldots *)
 Of course, this whole section will lose its point if the source language cannot
 be translated to \name and checked against the type system of \name. A more
 formal description can be found in the appendix. The idea of trait translation
-is inspired by the functional mixin semantics~\cite{cook1989denotational}, which was
+is inspired by the functional mixin
+semantics~\cite{cook1989denotational} using open recursion, which was
 proposed by Cook in an untyped setting. However, our translation is done context of a
-statically-typed programming language, which is what provides the ability to statically
+statically-typed programming language, which is what provides the ability to \emph{statically}
 detect conflicts in traits.
 
 \paragraph{Trait Declarations.} A trait in the source language is translated into
@@ -275,7 +286,9 @@ let Point (x: Int) (y: Int) (self: () (*$ \to $*) Point) = {
   x = (*$ \lambda $*)(_: ()) (*$ \to $*) x,
   y = (*$ \lambda $*)(_: ()) (*$ \to $*) (self ()).z()
 } in
-\end{lstlisting}
+\end{lstlisting}\bruno{shouldn't the first two arguments be a pair
+  rather than curried arguments? You don't allow partial application
+  of constructors, do you?}
 
 One difference is that the self reference becomes a thunk and all occurrences of
 it have been replaced by \lstinline$self ()$ and the position of the self
@@ -328,18 +341,22 @@ is turned into
 new ((\self: Point3D) (*$ \to $*) ((Point 3 4 self) ,, (Z 5 self)))
 \end{lstlisting}
 
-\paragraph{The ``trait'' Keyword.} The \lstinline$trait$ keyword expect a type
+\paragraph{The ``trait'' Keyword.} The \lstinline$trait$ keyword expects a type
 and is translated into an open type with that type. For example,
 
 \begin{lstlisting}
 trait[Point]
 \end{lstlisting}
 
-becomes
+\noindent becomes
 
 \begin{lstlisting}
 (() (*$ \to $*) Point) (*$ \to $*) Point
 \end{lstlisting}
+
+\bruno{There are two uses of the ``trait'' keyword in the source
+  language: one is to denote the type of traits; the other is to
+  declare traits. Perhaps you want to use ``Trait'' instead for the former?}
 
 % \subsection{Intersection Types in Existing Languages}
 %

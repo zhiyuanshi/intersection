@@ -1,29 +1,35 @@
 \section{The \name Calculus}
 \label{sec:fi}
 
-\bruno{It may be worthwhile to discuss the issue with function
+\bruno{TODO: Show example illustrating the issue with function application.
+It may be worthwhile to discuss the issue with function
   application. I think the way we deal with function application is
   not as convenient, but it doesn't remove expressive power: we can
   always extract, by hand, the right function before using it in a
   function application. However this way we don't have ambiguity
   problems that arize from having a more ``clever'' function
   application.}
-\bruno{Don't forget to make sure that we formalize the same thing here
-and in Coq!}
+\bruno{TODO: There are missing parts of the formalization regarding
+  integers
+(for example, subtyping, and typing). Formalization needs to be
+double-check carefully!}
 
-This section presents the syntax, subtyping, typing, as well as the (incoherent)
-semantics of \name: a calculus with intersection types and a merge operator.
-This calculus is similar to Dunfield's calculus~\cite{dunfield2014elaborating}.
-The minor differences are that the coercions are target language terms and that
-a term of intersection type may be used as a function directly.\bruno{George,
-you need to explain this to me. I am not entirely sure that I understand what
-you mean.} Section~\ref{sec:disjoint} introduces \name, which shows the
-necessary changes for supporting disjoint intersection types and ensuring
-coherence.
+This section presents the syntax, subtyping, typing, as well as the
+(incoherent) semantics of \name: a calculus with intersection types
+and a merge operator.  This calculus is similar to Dunfield's
+calculus~\cite{dunfield2014elaborating}.  The minor differences are
+that, in Dunfield's language, the coercions are source language terms
+and that function application allows the expression denoting the
+function to have an intersection type. In contrast, in \name coercions
+are target language terms and function applications do not allow the
+expression denoting the applied function to have an intersection type.
+
+In Section~\ref{sec:disjoint} we will show the necessary changes for supporting
+disjoint intersection types and ensuring coherence.
 
 \subsection{Syntax}
 
-Figure~\ref{fig:fi-syntax} shows the syntax. The differences to
+Figure~\ref{fig:fi-syntax} shows the syntax. The differences to the
 $\lambda$-calculus, highlighted in gray, are intersection types $A \inter B$ at
 the type-level and the ``merges'' $e_1 \mergeop e_2$ at the term level.
 
@@ -54,7 +60,7 @@ the type-level and the ``merges'' $e_1 \mergeop e_2$ at the term level.
 
   \caption{\name syntax.}
   \label{fig:fi-syntax}
-\end{figure}\bruno{Figures should be on top!}
+\end{figure}
 
 \paragraph{Types.} Metavariables $A$, $B$ range over types. Types include
 function types $A \to B$. $A \inter B$ denotes the intersection of types $A$ and
@@ -113,7 +119,10 @@ records and record operations can be found in the appendix.
 
   \caption{The type system of \name.}
   \label{fig:fi-type}
-\end{figure}
+\end{figure}\bruno{Aren't we missing the uses of well-formedness
+  rules. They are not being used anywhere at the moment! We are also
+  missing the typing rules for integers and variables; as well as the
+  subtyping rule for integers}
 
 % Intersection types introduce natural subtyping relations among types. For
 % example, $ \code{Int} \inter \code{Bool} $ should be a subtype of $ \code{Int} $, since the former
@@ -182,7 +191,7 @@ a type-directed translation to an extension of $\lambda$-calculus with pairs.
 %gray.
 
 
-\paragraph{Target Language.}
+\paragraph{Target Language.}\bruno{misses integers}
 The syntax and typing of our target language is unsurprising. The syntax of the
 target language is shown in Figure~\ref{fig:f-syntax}. The highlighted part
 shows its difference with $\lambda$-calculus. The typing rules can be found
