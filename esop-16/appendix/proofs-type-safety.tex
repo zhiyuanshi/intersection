@@ -28,13 +28,6 @@ We show the type safety of the version of \name without coherence.
 
   \item \textbf{Case}
     \begin{flalign*}
-      & \rulesubvar &
-    \end{flalign*}
-
-    By \reflabel{\labeltgtvar} and \reflabel{\labeltgtlam}, $ \jtype {\cdot} {\lamty x {\im \alpha} x} {\alpha \to \alpha} $.
-
-  \item \textbf{Case}
-    \begin{flalign*}
       & \rulesubfun &
     \end{flalign*}
 
@@ -56,33 +49,6 @@ We show the type safety of the version of \name without coherence.
       definition of $\im \cdot$, $ \jtype \cdot {\lamty f {\im {A_1 \to A_2}}
       {\lamty x {\im {A_3}} {\app {E_2} {(\app f {(\app {E_1} x)})}}}} {\im {A_1
       \to A_2} \to \im {A_3 \to A_4}} $ \\
-
-  \item \textbf{Case}
-    \begin{flalign*}
-      & \rulesubforall &
-    \end{flalign*}
-
-      By induction hypothesis, $ \jtype \cdot E {\im {A_1} \to {\im {\subst {\alpha_1}
-      {\alpha_2} A_2}}} $. \\ By \reflabel{\labeltgtvar}, $ \jtype {\cdot, f
-      \oftype {\im {\for {\alpha_1} {A_1}}}} f {\im {\for {\alpha_1} {A_1}}} $.
-      \\ By the definition of $ \im \cdot $, $ \jtype {\cdot, f \oftype {\im {\for
-      {\alpha_1} {A_1}}}} f {\for {\alpha_1} {\im {A_1}}} $. \\ By
-      \reflabel{\labeltgtvar} and \reflabel{\labeltgttapp}, $ \jtype {\cdot, f
-      \oftype {\im {\for {\alpha_1} {A_1}}}, \alpha} {\tapp f \alpha} {\subst
-      \alpha {\alpha_1} {\im {A_1}}} $. \\ By \reflabel{\labeltgtapp}, $ \jtype
-      {\cdot, f \oftype {\im {\for {\alpha_1} {A_1}}}, \alpha} {\app C {(\tapp f
-      \alpha)}} {\subst \alpha {\alpha_1} {\im {\subst {\alpha_1} {\alpha_2}
-      {A_2}}}} $. \\
-      By \reflabel{\labeltgtblam} and substitution,
-      % \george{Substitution is problematic}
-      $ \jtype {\cdot, f \oftype {\im
-      {\for {\alpha_1} {A_1}}}} {\blam \alpha {\app E {(\tapp f \alpha)}}} {\for
-      {\alpha_2} {\im {A_2}}} $. \\ By \reflabel{\labeltgtlam}, $ \jtype \cdot
-      {\lamty f {\im {\for {\alpha_1} {A_1}}} {\blam \alpha {\app E {(\tapp f
-      \alpha)}}}} {\im {\for {\alpha_1} {A_1}} \to \for {\alpha_2} {\im {A_2}}} $.
-      \\ By the definition of $\im \cdot$, $ \jtype \cdot {\lamty f {\im {\for
-      {\alpha_1} {A_1}}} {\blam \alpha {\app E {(\tapp f \alpha)}}}} {\im {\for
-      {\alpha_1} {A_1}} \to \im {\for {\alpha_2} {A_2}}} $. \\
 
   \item \textbf{Case}
     \begin{flalign*}
@@ -129,26 +95,6 @@ We show the type safety of the version of \name without coherence.
 
 \end{proof}
 
-\begin{lemma}[Preservation of well-formedness]
-  \label{lemma:preserve-wf}
-
-  If $ \jwf \Gamma A $, then $ \jwf {\im \Gamma} {\im A} $.
-\end{lemma}
-
-\begin{proof}
-  By structural induction of the derivation. \reflabel{\labeltgtwffv} is the only case.
-
-  \begin{itemize}
-
-  \item \textbf{Case}
-    \begin{flalign*}
-      & \ruletgtwffv &
-    \end{flalign*}
-
-    By premise, $ \ftv A \in \Gamma $. By the definition of $ \im \cdot $, $ \ftv {\im A} \in \im \Gamma $. By \reflabel{\labeltgtwffv}, $ \jwf {\im \Gamma} {\im A} $.
-  \end{itemize}
-\end{proof}
-
 \typepreservation*
 
 \begin{proof}
@@ -169,25 +115,6 @@ We show the type safety of the version of \name without coherence.
     \end{flalign*}
 
     By premise, $ \jtype {\Gamma, x \oftype A} e {A_1} \yields E $. By induction hypothesis, $ \jtype {\im {\Gamma, x \oftype A}} E {\im {A_1}} $. By the definition of $ \im \cdot $, $ \jtype {\im \Gamma, x \oftype \im A} E {\im {A_1}} $. By \reflabel{\labeltgtlam}, $ \jtype {\im \Gamma} {\lamty x {\im A} E} {\im A \to \im {A_1}}$. By the definition of $ \im \cdot $, $ \jtype {\im \Gamma} {\lamty x {\im A} E} {\im {A \to A_1}} $. \\
-
-  \item \textbf{Case}
-    \begin{flalign*}
-      & \rulettapp &
-    \end{flalign*}
-
-    By premise, $ \jtype \Gamma {e_1} {A_1 \to A_2} \yields {E_1} $. By induction hypothesis, $ \jtype {\im \Gamma} {E_1} {\im {A_1 \to A_2}} $. By premise, $ \jtype \Gamma {e_2} {A_3} \yields {E_2} $. By induction hypothesis, $ \jtype {\im \Gamma} {E_2} {\im {A_3}} $. By premise, $ A_3 \subtype A_1 \yields C $. By Lemma~\ref{lemma:sub}, $ \jtype \cdot C {\im {A_3} \to \im {A_1}} $. By \reflabel{\labeltgtapp} and the definition of $ \im \cdot $, $ \jtype {\im \Gamma} {\app {E_1} {(\app C E_2)}} {\im {A_2}} $. \\
-
-  \item \textbf{Case}
-    \begin{flalign*}
-      & \ruletblam &
-    \end{flalign*}
-
-    By premise, $ \jtype {\Gamma, \alpha} e A \yields E $. By induction hypothesis, $ \jtype
-    {\im {\Gamma, \alpha}} E {\im A} $. By the definition of $\im \cdot $, $
-    \jtype {\im \Gamma, \alpha} E {\im A} $. By \reflabel{\labeltgtblam}, $
-    \jtype {\im \Gamma} {\blam \alpha E} {\for \alpha {\im A}} $. By the
-    definition of $ \im \cdot $, $ \jtype {\im \Gamma} {\blam \alpha E} {\im
-    {\for \alpha A}} $.  \\
 
   \item \textbf{Case}
     \begin{flalign*}
