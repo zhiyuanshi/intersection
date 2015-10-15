@@ -176,21 +176,25 @@ are, and make use of traits.
 Scala also has the notion of ``traits''. However, it is more similar to
 mixins~\cite{bracha1990mixin} than traits, whereas our traits are intended to
 model the original trait idea closely. Aside from that, Scala's traits and our
-source language's traits have two additional differences.
+source language's traits have three major differences.
 
 \begin{enumerate}
 
   \item Scala's trait cannot be instantiated but only mixed in to a class (which
   can be anonymous), whereas traits in our language can be instantiated.
 
-  \item Scala's trait cannot take parameters whereas ours can. As in the point
-  example, our trait is itself a constructor and takes the x- and y-coördinates.
+  \item Scala's trait cannot take constructor parameters whereas ours can. As in
+  the point example, our trait is itself a constructor and takes the x- and
+  y-coördinates.
 
-\begin{lstlisting}
-trait Point(x: Int, y: Int) { self: Point (*$ \to $*)
-  x() = x
-  y() = y
-} in (* \ldots *)
-\end{lstlisting}
+  \begin{lstlisting}
+  trait Point(x: Int, y: Int) { self: Point (*$ \to $*)
+    x() = x
+    y() = y
+  } in (* \ldots *)
+  \end{lstlisting}
+
+  \item Scala allows traits to contain methods whose body is not implemented but
+  our current language does not support this feature.
 
 \end{enumerate}

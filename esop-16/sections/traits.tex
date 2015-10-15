@@ -7,6 +7,8 @@
 use related examples (say various things todo with points), to
 illustrate the approach.}
 
+\george{after the new keyword, types should be specified.}
+
 As an application of disjoint intersection types, we show how to model a
 simple, yet expressive form of dynamically composable
 traits~\cite{scharli2003traits} in \name. Traits provide a
@@ -65,8 +67,8 @@ trait Up(upvotes: Int) { self: Up (*$ \to $*)
 functionalities.
 
 \begin{lstlisting}
-let comment = new (Comment("Have fun!"), Up(4))
-in console.log(comment.content(), comment.upvotes())
+let comment = new[Comment&Up] (Comment("Have fun!"), Up(4))
+in println(comment.content(), comment.upvotes())
 -- Output: "Have fun!" 4
 \end{lstlisting}
 
@@ -112,12 +114,8 @@ those traits. Therefore, we are able to call methods from different traits on a
 single object.
 
 \paragraph{Traits with Dependencies.} The following example shows that a trait
-can depend on another trait. The norm of a point is a generalized notion of
-distance of that point to the origin. In the following example, we provide two
-definitions of norm via two traits. Later we compose the definition of point and
-norm so that the norm have different meanings. Composition of traits is
-anonymous in the sense that there is no need to explicitly give a name to the
-composition.
+can depend on another trait. First we define the type of a point and a trait for
+a standard point.
 
 \begin{lstlisting}
 type Point = {x: () (*$ \to $*) Int, y: () (*$ \to $*) Int} in
@@ -125,14 +123,29 @@ trait Point(x: Int, y: Int) { self: Point (*$ \to $*)
   x() = x
   y() = y
 } in
+\end{lstlisting}
+
+The norm of a point can be defined as its distance to the origin. We provide two
+definitions of norm via two traits.
+
+\begin{lstlisting}
+type Norm = { norm: () (*$ \to $*) Double } in
 trait EuclideanNorm() { self: Point (*$ \to $*)
   norm() = Math.sqrt(self.x() * self.x() + self.y() * self.y())
 } in
+
 trait ManhattanNorm() { self: Point (*$ \to $*)
   norm() = Math.abs(self.x()) + Math.abs(self.y())
 } in
-console.log(new (Point(3,4) & EuclideanNorm()).norm()) -- This prints 5
-console.log(new (Point(3,4) & ManhattanNorm()).norm()) -- This prints 7
+\end{lstlisting}
+
+Later we compose the definition of point and norm so that the norm have
+different meanings. Composition of traits is anonymous in the sense that there
+is no need to explicitly give a name to the composition.
+
+\begin{lstlisting}
+println(new[Point&Norm] (Point(3,4) & EuclideanNorm()).norm()) -- This prints 5
+println(new[Point&Norm] (Point(3,4) & ManhattanNorm()).norm()) -- This prints 7
 \end{lstlisting}
 
 \paragraph{Detecting and Resolving Conflicts in Trait Composition.}
@@ -151,12 +164,13 @@ bound at the parameter of the trait, and \lstinline$incr$ returns a new counter.
 type Counter = { val: () (*$ \to $*) Int } in
 trait Counter(val: Int) { self: Counter (*$ \to $*)
   val() = val
-  incr() = new Counter(val + 1)
+  incr() = new[Counter] Counter(val + 1)
 } in
+type Reset = { reset: () (*$ \to $*) Counter } in
 trait Reset() { self: Counter (*$ \to $*)
-  reset() = new Counter(0)
+  reset() = new[Counter] Counter(0)
 } in
-let counter = new (Counter(0) & Reset())
+let counter = new[Counter&Reset] (Counter(0) & Reset())
 in counter.incr()
 \end{lstlisting}
 
@@ -224,8 +238,7 @@ them, which is impossible in traditional OO languages such as Java since classes
 being instantiated must be known statically. Actually, since traits are just
 terms, traits are first-class values and can be defined inside a function,
 passed around or returned just as normal terms. The following function takes a
-trait, \lstinline$log$, with unknown implementation and instantiate it.\bruno{Bad
-as it exposes the encoding.}
+trait, \lstinline$log$, with unknown implementation and instantiate it.
 
 \begin{lstlisting}
 let f (log: trait[Log]) = new [Log] log
@@ -290,7 +303,7 @@ fixpoint of its corresponding open term. In fact, \lstinline$new$ is translated 
 an inlined fixpoint. For example,
 
 \begin{lstlisting}
-new Point(3,4)
+new[Point] Point(3,4)
 \end{lstlisting}
 
 becomes
@@ -305,13 +318,27 @@ is that the merge operator is enforcing that the two terms being merged are
 disjoint. For example,
 
 \begin{lstlisting}
-new (Point(3,4) & Z(5))
+new[Point3D] (Point(3,4) & Z(5))
 \end{lstlisting}
 
 is turned into
 
+\george{Not correct}
 \begin{lstlisting}
 new ((\self: Point3D) (*$ \to $*) ((Point 3 4 self) ,, (Z 5 self)))
+\end{lstlisting}
+
+\paragraph{The ``trait'' Keyword.} The \lstinline$trait$ keyword expect a type
+and is translated into an open type with that type. For example,
+
+\begin{lstlisting}
+trait[Point]
+\end{lstlisting}
+
+becomes
+
+\begin{lstlisting}
+(() (*$ \to $*) Point) (*$ \to $*) Point
 \end{lstlisting}
 
 % \subsection{Intersection Types in Existing Languages}
