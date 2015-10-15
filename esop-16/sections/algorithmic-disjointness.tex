@@ -12,8 +12,8 @@ to implement the type-system.
 % involves an existence problem. How can we implement it? One possibility is
 % bidirectional subtyping, that is, we say two types, $A$ and $B$, are disjoint if
 % neither $A \subtype B$ nor $B \subtype A$. However, this implementation is
-% wrong. For example, $\code{Int} \inter \tystring$ and $\tystring \inter \code{Char}$ are
-% not disjoint by specification since $\tystring$ is their common supertype. Yet
+% wrong. For example, $\code{Int} \inter \code{String}$ and $\code{String} \inter \code{Char}$ are
+% not disjoint by specification since $\code{String}$ is their common supertype. Yet
 % by the implementation they are, since neither of them is a subtype of
 % the other. \bruno{You need a concrete code example to make this point.}
 % Hence the algorithmic rules are more nuanced. For now, it is enough to treat the
@@ -58,8 +58,8 @@ Section~\ref{sec:disjoint}.
 %
 % \begin{example}
 %   $\commonsub(\code{Int},\code{Char})$ is an infinite set which contains $\code{Int} \inter
-%   \code{Char}$, $\code{Char} \inter \code{Int}$, $(\code{Int} \inter \tybool) \inter \code{Char}$
-%   and so on. But the type $\tybool$ is not inside, since it is not a subtype of
+%   \code{Char}$, $\code{Char} \inter \code{Int}$, $(\code{Int} \inter \code{Bool}) \inter \code{Char}$
+%   and so on. But the type $\code{Bool}$ is not inside, since it is not a subtype of
 %   $\code{Int}$ or $\code{Char}$.
 % \end{example}
 %
@@ -68,8 +68,8 @@ Section~\ref{sec:disjoint}.
 % \mathcal{B} \] as a shorthand for the \emph{set} of types of the form $A \to B$,
 % where $A \in \mathcal{A}$ and $B \in \mathcal{B}$. The same shorthand applies to
 % all other constructors of types, in addition to functions, as well. As a simple
-% example,  \[ \{ \code{Int}, \tystring \} \to \{ \code{Int}, \code{Char} \} \] is a shorthand for \[ \{
-% \code{Int} \to \code{Int}, \code{Int} \to \code{Char}, \tystring \to \code{Int}, \tystring \to \code{Char} \} \]
+% example,  \[ \{ \code{Int}, \code{String} \} \to \{ \code{Int}, \code{Char} \} \] is a shorthand for \[ \{
+% \code{Int} \to \code{Int}, \code{Int} \to \code{Char}, \code{String} \to \code{Int}, \code{String} \to \code{Char} \} \]
 %
 %
 % Recall that we say two types $A$ and $B$ are disjoint if they do not share a
@@ -153,10 +153,10 @@ types are disjoint if and only if their return types are disjoint (regardless of
 their parameter types!). At first this rule may look surprising
 because the parameter types play no role in the definition of
 disjointness. To see the reason for this consider the two function types:
-\[ \code{Int} \to \tystring \qquad \tybool \to \tystring \]
+\[ \code{Int} \to \code{String} \qquad \code{Bool} \to \code{String} \]
 Even though their parameter types are disjoint, we are still able to think of a
-type which is a supertype for both of them. For example, $ \code{Int} \inter \tybool
-\to \tystring $. Therefore, by definition, the two function types with
+type which is a supertype for both of them. For example, $ \code{Int} \inter \code{Bool}
+\to \code{String} $. Therefore, by definition, the two function types with
 the same return type are not
 disjoint. Essentially, due to the contravariance of function types,
 functions of the form $A \to C$ and $B \to C$ always have a common

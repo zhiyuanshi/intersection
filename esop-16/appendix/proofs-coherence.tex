@@ -94,7 +94,7 @@ The set of rules for generating coercions is syntax-directed except for the thre
   \item \textbf{Case} $A = A_1 \inter A_2$ and $B \neq B_1 \inter B_2$: Only two rules can apply, \reflabel{\labelsubinterl} and \reflabel{\labelsubinterr}. Further, by Lemma~\ref{lemma:unique-subtype-contributor}, it is not possible that $A_1 \subtype B$ and that $A_2 \subtype B$. Thus we are certain that at most one rule of \reflabel{\labelsubinterl} and \reflabel{\labelsubinterr} will apply.
 
   \item \textbf{Case} $A = A_1 \inter A_2$ and $B = B_1 \inter B_2$\footnote{An example of this case is:
-    \[ (\code{Int} \inter \tybool) \inter \code{Char} \subtype \tybool \inter \code{Char} \]}: Since $B$ is not atomic, only \reflabel{\labelsubinter} apply.
+    \[ (\code{Int} \inter \code{Bool}) \inter \code{Char} \subtype \code{Bool} \inter \code{Char} \]}: Since $B$ is not atomic, only \reflabel{\labelsubinter} apply.
 
   %   Suppose the contrary, that is, more than one of the three rules apply. Since it is not possible that both \reflabel{subinter1} and \reflabel{subinter2} apply by the unique subtype contributor lemma, only one of \reflabel{subinter1} and \reflabel{subinter2} apply. Therefore \reflabel{subinter} has to hold. Without the loss of generality, assume \reflabel{subinter1} apply. Then we have:
   % \[ A_1 \subtype B_1 \inter B_2 \]

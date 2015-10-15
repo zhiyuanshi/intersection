@@ -167,8 +167,8 @@ the following merge:
 \noindent This merge has two components which are also intersection
 types. The first component \lstinline{(1,,'c')} has type $\code{Int} \inter
 \code{Char}$, whereas the second component \lstinline{(2 ,, True)} has type
-$\code{Int} \inter \tybool$. Clearly,
-\[ \code{Int} \inter \code{Char} \not \subtype \code{Int} \inter \tybool \wedge \code{Int} \inter \tybool \not \subtype \code{Int} \inter \code{Char} \]
+$\code{Int} \inter \code{Bool}$. Clearly,
+\[ \code{Int} \inter \code{Char} \not \subtype \code{Int} \inter \code{Bool} \wedge \code{Int} \inter \code{Bool} \not \subtype \code{Int} \inter \code{Char} \]
 Nevertheless the following program still leads to
 incoherence:
 \begin{lstlisting}
@@ -195,7 +195,7 @@ following definition captures this idea more formally.
 
 \noindent This definition of disjointness prevents the problematic
 merge. Since $\code{Int}$ is a common supertype of both $\code{Int} \& \code{Char}$ and
-$\code{Int} \& \tybool$, those two types are not disjoint.
+$\code{Int} \& \code{Bool}$, those two types are not disjoint.
 
 \name's type system only accepts programs that use disjoint intersection
 types. As shown in Section~\ref{sec:disjoint} disjoint intersection types will

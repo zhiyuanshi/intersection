@@ -50,7 +50,7 @@ disjointness is not reflexive as subtyping is. Two types with different ``shapes
 are always disjoint, unless one of them is an intersection type.
 For example, a function type and an intersection
 type may not be disjoint. Consider:
-\[ \code{Int} \to \code{Int} \quad \text{and} \quad (\code{Int} \to \code{Int}) \inter (\tystring \to \tystring) \]
+\[ \code{Int} \to \code{Int} \quad \text{and} \quad (\code{Int} \to \code{Int}) \inter (\code{String} \to \code{String}) \]
 Those two types are not disjoint since $\code{Int} \to \code{Int}$ is their common supertype.
 
 % \bruno{There are no changes in syntax, right? So the whole section
