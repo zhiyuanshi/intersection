@@ -168,7 +168,7 @@ trait Even() { self: EvenOdd (*$ \to $*)
 trait Odd() { self: EvenOdd (*$ \to $*)
   odd(n: Int) = if n == 0 then False else self.even(n - 1)
 } in
-new (Even() & Odd()).odd(42)
+new[EvenOdd] (Even() & Odd()).odd(42)
 \end{lstlisting}
 
 When the two traits are composed, conceptually it is as if that a new object were
@@ -212,13 +212,13 @@ inside \lstinline$Reset$.
 type Counter = { val: () (*$ \to $*) Int } in
 trait Counter(val: Int) { self: Counter (*$ \to $*)
   val() = val
-  incr() = new Counter(val + 1)
+  incr() = new[Counter] Counter(val + 1)
 } in
 trait Reset() { self: Counter (*$ \to $*)
-  incr() = new (Counter(val + 1) & Reset())
-  reset() = new Counter(0)
+  incr() = new[Counter&Reset] (Counter(val + 1) & Reset())
+  reset() = new[Counter] Counter(0)
 } in
-let counter = new (Counter(0) & Reset())
+let counter = new[Counter&Reset] (Counter(0) & Reset())
 in counter.incr()
 \end{lstlisting}
 
