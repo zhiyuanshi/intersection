@@ -7,22 +7,30 @@ It may be worthwhile to discuss the issue with function
   not as convenient, but it doesn't remove expressive power: we can
   always extract, by hand, the right function before using it in a
   function application. However this way we don't have ambiguity
-  problems that arize from having a more ``clever'' function
+  problems that arise from having a more ``clever'' function
   application.}
 \bruno{TODO: There are missing parts of the formalization regarding
   integers
 (for example, subtyping, and typing). Formalization needs to be
 double-check carefully!}
 
-This section presents the syntax, subtyping, typing, as well as the
-(incoherent) semantics of \name: a calculus with intersection types
-and a merge operator.  This calculus is similar to Dunfield's
-calculus~\cite{dunfield2014elaborating}.  The minor differences are
-that, in Dunfield's language, the coercions are source language terms
-and that function application allows the expression denoting the
-function to have an intersection type. In contrast, in \name coercions
-are target language terms and function applications do not allow the
-expression denoting the applied function to have an intersection type.
+This section presents the syntax, subtyping, typing, as well as the (incoherent)
+semantics of \name: a calculus with intersection types and a merge operator.
+This calculus is similar to Dunfield's calculus~\cite{dunfield2014elaborating}.
+The minor differences are that, in Dunfield's language, the coercions are source
+language terms and that function application allows the expression denoting the
+function to have an intersection type. In contrast, in \name coercions are
+target language terms and function applications do not allow the expression
+denoting the applied function to have an intersection type. For example, In
+Dunfield's calculus, if \lstinline$f$ and \lstinline$g$ are both functions
+expecting an integer, the following program typechecks:
+
+\begin{lstlisting}
+(f ,, g) 1
+\end{lstlisting}
+
+\noindent In our calculus, however, one needs manually extract the desired
+function by passing \lstinline$f ,, g$ to a function.
 
 In Section~\ref{sec:disjoint} we will show the necessary changes for supporting
 disjoint intersection types and ensuring coherence.
@@ -102,17 +110,13 @@ records and record operations can be found in the appendix.
 \begin{figure}
   \begin{mathpar}
     \formsub \\
-    \rulesubvar \and \rulesubfun \and \rulesubinter \and
+    \rulesubvar \and \rulesubint \and \rulesubfun \and \rulesubinter \and
     \rulesubinterl \and \rulesubinterr
   \end{mathpar}
 
   \begin{mathpar}
-    \formwf \\
-    \rulewffun \and \rulewfinter
-  \end{mathpar}
-
-  \begin{mathpar}
     \formt \\
+    \ruletvar \and \ruletint \and
     \ruletlam \and \ruletapp \and
     \ruletmerge
   \end{mathpar}
@@ -206,20 +210,22 @@ elaboration approach~\cite{dunfield2014elaborating}.
 For example, \[ 1 \mergeop \code{"one"} \] becomes \pair 1
 {\code{"one"}}. In usage, the pair will be coerced according to type
 information. For example, consider the function application: \[ \app {(\lamty x
-\code{String} x)} {(1 \mergeop \code{"one"})} \] This expression will be translated to \[ \app
-{(\lamty x \code{String} x)} {(\app {(\lamty x {\pair \code{Int} \code{String}} {\proj 2 x})}
+{\code{String}} x)} {(1 \mergeop \code{"one"})} \] This expression will be translated to \[ \app
+{(\lamty x {\code{String}} x)} {(\app {(\lamty x {\pair {\code{Int}} {\code{String}}} {\proj 2 x})}
 {\pair 1 {\code{"one"}}})} \] The coercion in this case is $(\lamty x {\pair
 \code{Int} \code{String}} {\proj 2 x})$. It extracts the second item from the pair, since
 the function expects a $\code{String}$ but the translated argument is of type $\pair
-\code{Int} \code{String}$.
+{\code{Int}} {\code{String}}$.
 
 
 \begin{figure}[h]
   \[
     \begin{array}{llrl}
-      \text{Types}    & T & \Coloneqq & {T_1} \to {T_2} \\
+      \text{Types}    & T & \Coloneqq & \code{Int} \\
+                      &   & \mid      & {T_1} \to {T_2} \\
                       &   & \mid      & \highlight {$ \pair {T_1} {T_2} $} \\
       \text{Terms}    & E & \Coloneqq & x \\
+                      &   & \mid      & i \\
                       &   & \mid      & \lamty x T E \\
                       &   & \mid      & \app {E_1} {E_2} \\
                       &   & \mid      & \highlight {$ \pair {E_1} {E_2} $} \\
@@ -242,6 +248,7 @@ contexts $\Gamma$ to target language contexts $G$.
   \framebox{$\im A = T$}
 
   \begin{align*}
+    \im {\code{Int}}     &= \code{Int} \\
     \im {A_1 \to A_2}    &= \im {A_1} \to \im {A_2} \\
     \im {A_1 \inter A_2} &= \pair {\im {A_1}} {\im {A_2}} \\
   \end{align*}

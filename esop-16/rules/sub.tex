@@ -9,6 +9,13 @@
     {\alpha \subtype \alpha \yields {\lamty x {\im \alpha} x}}
 }
 
+\newcommand{\labelsubint}{\makelabelsub Int}
+\newcommand{\rulesubint}{
+  \inferrule* [right=\labelsubint]
+    { }
+    {\code{Int} \subtype \code{Int} \yields {\lamty x {\im {\code{Int}}} x}}
+}
+
 \newcommand{\labelsubfun}{\makelabelsub Fun}
 \newcommand{\rulesubfun}{
   \inferrule* [right=\labelsubfun]

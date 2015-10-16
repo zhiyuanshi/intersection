@@ -89,7 +89,7 @@ when a value of type \lstinline{Int} is needed, but an intersection
 of type \lstinline{Int & Char} is found, the compiler uses the
 type system to extract the corresponding value.
 
-\subsection{Incoherence}\label{subsec:incoherence}
+\subsection{Incoherence} \label{subsec:incoherence}
 Unfortunately the implicit nature of elimination for intersection
 types built with a merge operator can lead to incoherence.
 The merge operator combines two terms, of type $A$ and $B$
@@ -117,8 +117,7 @@ always take the left-most value matching the type in the
 merge. Similarly, one could always take the right-most
 value matching the type in the merge. Either way, the meaning
 of a program will depend on a biased implementation choice,
-which is clearly unsatisfying from the theoretical point of view
-(although perhaps acceptable in practice).
+which is clearly unsatisfying from the theoretical point of view.
 
 \subsection{Restoring Coherence: Disjoint Intersection Types}\label{sec:restoring}
 Coherence is a desirable property for a semantics. A semantics is said
@@ -272,19 +271,3 @@ play a crucial rule in guaranteeing that the semantics is coherent.
 % substitutions lead us to a wrong result. This is a major problem for
 % biased choice and a reason to dismiss it as a possible implementation
 % choice for \name.
-
-\begin{comment}
-\paragraph{Conservatively rejecting intersections.}
-To avoid incoherence, and the issues of biased choice, another option
-is simply to reject programs where the
-instantiations of type variables may lead to incoherent programs.
-In this case the definition of \lstinline$fst$ would be rejected, since there
-are indeed some cases that may lead to incoherent programs.
-Unfortunately this is too restrictive and prevents many useful
-programs.
-
-We have built a source language that is desugared into \name. The most
-central feature is the trait declaration. Trait can take several parameters,
-which is then in scope in the body of the trait definition. In fact, trait
-creation is dynamic, which means it can be contained inside a function.
-\end{comment}

@@ -185,8 +185,8 @@ traits and our source language's traits have three major differences:
   directly.
 
   \item Scala's trait cannot take constructor parameters whereas ours can. As in
-  the point example, our trait is itself a constructor and takes the x- and
-  y-coördinates.
+  the point example below, our trait is itself a constructor and takes the x- and
+  y-coördinates as parameters:
 
   \begin{lstlisting}
   trait Point(x: Int, y: Int) { self: Point (*$ \to $*)

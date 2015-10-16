@@ -75,11 +75,11 @@ disjointness we present a formal specification of a type system that prevents
 intersection types that are not disjoint. However, the formal definition of
 disjointness does not lend itself directly to an algorithmic implementation.
 Therefore, we also present an algorithmic specification to determine whether two
-types are disjoint. Moreover, this algorithmic specification is shown to be
-sound and complete with respect to the formal definition of disjointness. We
-have mechanized the proof of major metatheoretical results using the Coq proof
-assistant. \bruno{type-safety and the final coherence theorem are not in the Coq
-file.}
+types are disjoint. Moreover, this specification is shown to be sound and
+complete with respect to the formal definition of disjointness. We have
+mechanized the interesting metatheoretical results using the Coq proof
+assistant, while the proof of type-safety and the coherence theorem can be found
+in the appendix.
 
 As an application of \name, we show that \name can serve as a
 foundation of for a trait-based~\cite{scharli2003traits} object-oriented

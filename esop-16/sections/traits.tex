@@ -39,8 +39,9 @@ The first example shows basic trait composition. Many social networking sites
 allow users to ``upvote'' a comment and the number of upvotes that comment has
 received is also displayed. We would like to separate the logic for upvotes from
 comments so that it can be reused in other entities such as posts and sharings.
-The code below defines a trait, \lstinline$Comment$, which
-contains a single method \lstinline$content$.
+The code below defines a trait, \lstinline$Comment$, which contains a single
+method \lstinline$content$.\footnote{Our source language assumes regular record
+type, record operations as well the unit type and unit literals.}
 
 \begin{lstlisting}
 type Comment = { content: () (*$ \to $*) String } in
@@ -58,10 +59,6 @@ trait Up(upvotes: Int) { self: Up (*$ \to $*)
   upvotes() = upvotes
 } in
 \end{lstlisting}
-
-\bruno{Consider mixing explanation with the source code. Instead of
-  presenting the full source and then explaining. Alternatively, make
-this a figure.}
 
 At this point the reader may wonder why there are duplicate declarations related
 to \lstinline$Comment$ and \lstinline$Up$. In mainstream OO languages such as
@@ -83,7 +80,7 @@ methods are required.
 A trait can expect parameters, which become in scope in the entire trait body.
 For example, the \lstinline$Comment$ trait is parametrized by
 \lstinline$content$, and the \lstinline$content$ method does nothing more than
-returning the eponymous variable. 
+returning the eponymous variable.
 %In comparison, traits in Scala do not allow
 %taking parameters.
 
@@ -109,7 +106,7 @@ in println(comment.content(), comment.upvotes())
 -- Output: "Have fun!" 4
 \end{lstlisting}
 
-\subsection{Traits with Dependencies} 
+\subsection{Traits with Dependencies}
 The following example shows that a trait
 can depend on another trait. First we define the type of a point and a trait for
 a standard point.
@@ -144,7 +141,7 @@ defined. It is this functionality that allow us to express
 dependencies between traits. When the traits \lstinline$EuclideanNorm$
 and \lstinline$ManhattanNorm$ are instantiated and composed with some
 other traits, they must be composed with an implementation of
-\lstinline$Point$. 
+\lstinline$Point$.
 %Thus, ater compose the definition of point and norm we can have
 %different meanings. Composition of traits is anonymous in the sense that there
 %is no need to explicitly give a name to the composition.
@@ -249,7 +246,7 @@ passed around or returned just as normal terms. The following function takes a
 trait, \lstinline$log$, with unknown implementation and instantiate it.
 
 \begin{lstlisting}
-let f (log: trait[Log]) = new [Log] log
+let f (log: Trait[Log]) = new [Log] log
 in (* \ldots *)
 \end{lstlisting}\bruno{example does not make sense (and uses no composition).}
 
@@ -282,7 +279,7 @@ trait Point(x: Int, y: Int) { self: Point (*$ \to $*)
 becomes
 
 \begin{lstlisting}
-let Point (x: Int) (y: Int) (self: () (*$ \to $*) Point) = {
+let Point (x: Int, y: Int) (self: () (*$ \to $*) Point) = {
   x = (*$ \lambda $*)(_: ()) (*$ \to $*) x,
   y = (*$ \lambda $*)(_: ()) (*$ \to $*) (self ()).z()
 } in
@@ -322,7 +319,8 @@ new[Point] Point(3,4)
 becomes
 
 \begin{lstlisting}
-let rec x : () (*$ \to $*) Point = (*$ \lambda $*)(_: ()) (*$ \to $*) Point 3 4 x in x ()
+let rec self : () (*$ \to $*) Point = (*$ \lambda $*)(_: ()) (*$ \to $*) Point (3, 4) self
+in self ()
 \end{lstlisting}
 
 The composition of traits in the source language is desugared using the merge
@@ -336,16 +334,16 @@ new[Point3D] (Point(3,4) & Z(5))
 
 is turned into
 
-\george{Not correct}
 \begin{lstlisting}
-new ((\self: Point3D) (*$ \to $*) ((Point 3 4 self) ,, (Z 5 self)))
+let rec self : () (*$ \to $*) Point3D = (*$ \lambda $*)(_: ()) (*$ \to $*) (Point (3, 4) self) ,, (Z 5 self)
+in self ()
 \end{lstlisting}
 
-\paragraph{The ``trait'' Keyword.} The \lstinline$trait$ keyword expects a type
-and is translated into an open type with that type. For example,
+\paragraph{The ``Trait'' Keyword.} The capitalized \lstinline$Trait$ keyword
+expects a type and is translated into an open type. For example,
 
 \begin{lstlisting}
-trait[Point]
+Trait[Point]
 \end{lstlisting}
 
 \noindent becomes

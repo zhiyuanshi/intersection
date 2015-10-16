@@ -16,14 +16,14 @@
     {\jdisimpl \Gamma A \alpha}
 }
 
-\newcommand{\labeldisinterl}{\makelabeldis {Inter\_1}}
+\newcommand{\labeldisinterl}{\makelabeldis {Inter-1}}
 \newcommand{\ruledisinterl}{
   \inferrule* [right=\labeldisinterl]
     {\jdisimpl \Gamma {A_1} B \\ \jdisimpl \Gamma {A_2} B}
     {\jdisimpl \Gamma {A_1 \inter A_2} {B}}
 }
 
-\newcommand{\labeldisinterr}{\makelabeldis {Inter\_2}}
+\newcommand{\labeldisinterr}{\makelabeldis {Inter-2}}
 \newcommand{\ruledisinterr}{
   \inferrule* [right=\labeldisinterr]
     {\jdisimpl \Gamma A {B_1} \\ \jdisimpl \Gamma A {B_2}}

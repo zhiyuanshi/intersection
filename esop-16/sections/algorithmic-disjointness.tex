@@ -28,8 +28,6 @@ set of rules for disjointness is proved to be sound and complete with
 respect to the definition of disjointness in
 Section~\ref{sec:disjoint}.
 
-\george{Justify ``algorithmic''.}
-
 % \subsection{Derivation of the Algorithmic Rules}
 %
 % In this subsection, we illustrate how to derive the algorithmic disjointness
@@ -140,12 +138,14 @@ Figure~\ref{fig:disjointness}, which consists of two judgments.
 two types $A$ and $B$ are disjoint in a context
 $\Gamma$.
 
-The rules dealing with intersection types (\reflabel{\labeldisinterl}
-and \reflabel{\labeldisinterr}) are quite intuitive. The intuition is
-that if two types $A$ and $B$ are disjoint to some type $C$, then
-their intersection ($A\&B$) is also clearly disjoint to $C$.  The
-rules capture this intuition by inductively distributing the relation
-itself over the intersection constructor ($\inter$).
+The rules dealing with intersection types (\reflabel{\labeldisinterl} and
+\reflabel{\labeldisinterr}) are quite intuitive. The intuition is that if two
+types $A$ and $B$ are disjoint to some type $C$, then their intersection
+($A\&B$) is also clearly disjoint to $C$.  The rules capture this intuition by
+inductively distributing the relation itself over the intersection constructor
+($\inter$). Although those two rules overlap, the order of applying them in an
+implementation does not matter as applying either of them will eventually leads
+to the same conclusion, that is, if two types are disjoint or not.
 
 The rule for functions \reflabel{\labeldisfun} is more interesting. It says that two function
 types are disjoint if and only if their return types are disjoint (regardless of

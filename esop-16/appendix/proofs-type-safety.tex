@@ -28,6 +28,13 @@ We show the type safety of the version of \name without coherence.
 
   \item \textbf{Case}
     \begin{flalign*}
+      & \rulesubint &
+    \end{flalign*}
+
+    Trivial.\\
+
+  \item \textbf{Case}
+    \begin{flalign*}
       & \rulesubfun &
     \end{flalign*}
 
@@ -89,7 +96,7 @@ We show the type safety of the version of \name without coherence.
       & \rulesubinterr &
     \end{flalign*}
 
-    By symmetry with the above case. \\
+    By symmetry with the above case.\\
 
   \end{itemize}
 
@@ -111,10 +118,30 @@ We show the type safety of the version of \name without coherence.
 
   \item \textbf{Case}
     \begin{flalign*}
+      & \ruletint &
+    \end{flalign*}
+
+    Trivial.\\
+
+  \item \textbf{Case}
+    \begin{flalign*}
       & \ruletlam &
     \end{flalign*}
 
     By premise, $ \jtype {\Gamma, x \oftype A} e {A_1} \yields E $. By induction hypothesis, $ \jtype {\im {\Gamma, x \oftype A}} E {\im {A_1}} $. By the definition of $ \im \cdot $, $ \jtype {\im \Gamma, x \oftype \im A} E {\im {A_1}} $. By \reflabel{\labeltgtlam}, $ \jtype {\im \Gamma} {\lamty x {\im A} E} {\im A \to \im {A_1}}$. By the definition of $ \im \cdot $, $ \jtype {\im \Gamma} {\lamty x {\im A} E} {\im {A \to A_1}} $. \\
+
+  \item \textbf{Case}
+    \begin{flalign*}
+      & \ruletapp &
+    \end{flalign*}
+
+    By premise, $ \jtype \Gamma {e_1} {A_1 \to A_2} \yields {E_1} $. By
+    induction hypothesis, $ \jtype {\im \Gamma} {E_1} {\im {A_1 \to A_2}} $. By
+    premise, $ \jtype \Gamma {e_2} {A_3} \yields {E_2} $. By induction
+    hypothesis, $ \jtype {\im \Gamma} {E_2} {\im {A_3}} $. By premise, $ A_3
+    \subtype A_1 \yields C $. By Lemma~\ref{lemma:sub}, $ \jtype \cdot C {\im
+    {A_3} \to \im {A_1}} $. By \reflabel{\labeltgtapp} and the definition of $
+    \im \cdot $, $ \jtype {\im \Gamma} {\app {E_1} {(\app C E_2)}} {\im {A_2}} $. \\
 
   \item \textbf{Case}
     \begin{flalign*}

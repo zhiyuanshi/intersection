@@ -9,10 +9,17 @@
   {\jtype \Gamma x A \yields x}
 }
 
+\newcommand{\labeltint}{\makelabelt Int}
+\newcommand{\ruletint} {
+\inferrule* [right=\labeltint]
+  { }
+  {\jtype \Gamma i {\code{Int}}}
+}
+
 \newcommand{\labeltlam}{\makelabelt Lam}
 \newcommand{\ruletlam} {
 \inferrule* [right=\labeltlam]
-  {\jwf \Gamma A \\ \jtype {\Gamma, x \oftype A} e B \yields E}
+  {\jtype {\Gamma, x \oftype A} e B \yields E}
   {\jtype \Gamma {\lamty x A e} {A \to B} \yields {\lamty x {\im A} E}}
 }
 
@@ -20,7 +27,8 @@
 \newcommand{\ruletapp}{
 \inferrule* [right=\labeltapp]
   {\jtype \Gamma {e_1} {A_{1} \to A_{2}} \yields {E_1} \\
-   \jtype \Gamma {e_2} {A_{3}} \yields {E_2}}
+   \jtype \Gamma {e_2} {A_{3}} \yields {E_2} \\
+   {A_3} \subtype {A_1} \yields {E}}
   {\jtype \Gamma {\app {e_1} {e_2}} {A_{2}} \yields {\app {E_1} {(\app E E_2)}}}
 }
 
