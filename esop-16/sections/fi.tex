@@ -17,20 +17,11 @@ double-check carefully!}
 This section presents the syntax, subtyping, typing, as well as the (incoherent)
 semantics of \name: a calculus with intersection types and a merge operator.
 This calculus is similar to Dunfield's calculus~\cite{dunfield2014elaborating}.
-The minor differences are that, in Dunfield's language, the coercions are source
+The differences are that, in Dunfield's language, the coercions are source
 language terms and that function application allows the expression denoting the
 function to have an intersection type. In contrast, in \name coercions are
 target language terms and function applications do not allow the expression
-denoting the applied function to have an intersection type. For example, In
-Dunfield's calculus, if \lstinline$f$ and \lstinline$g$ are both functions
-expecting an integer, the following program typechecks:
-
-\begin{lstlisting}
-(f ,, g) 1
-\end{lstlisting}
-
-\noindent In our calculus, however, one needs manually extract the desired
-function by passing \lstinline$f ,, g$ to a function.
+denoting the applied function to have an intersection type. 
 
 In Section~\ref{sec:disjoint} we will show the necessary changes for supporting
 disjoint intersection types and ensuring coherence.
@@ -174,15 +165,48 @@ supplementary materials submitted with the paper.
 
 \subsection{Typing}
 
-The typing rules are shown in
-the bottom part of the figure. Again, the reader is advised to ignore the
-gray-shaded part here, as these parts will be explained later. The typing
-judgment is of the form: \[ \jtype \Gamma e A \] It reads: ``in the typing
-context $\Gamma$, the term $e$ is of type $A$''. The standard rules are those
-for variables \reflabel{\labeltvar} and lambda abstractions
-\reflabel{\labeltlam}. \reflabel{\labeltmerge} means that a merge $e_1 \mergeop
-e_2$, is assigned an intersection type composed of the resulting types of $e_1$
-and $e_2$.
+The typing rules are shown in the bottom part of the figure. Again,
+the reader is advised to ignore the gray-shaded part here, as these
+parts will be explained later. The typing judgment is of the form:
+\[ \jtype \Gamma e A \]
+It reads: ``in the typing context $\Gamma$, the term $e$ is of type
+$A$''. The standard rules are those for variables
+\reflabel{\labeltvar} and lambda abstractions
+\reflabel{\labeltlam}. \reflabel{\labeltmerge} means that a merge
+$e_1 \mergeop e_2$, is assigned an intersection type composed of the
+resulting types of $e_1$ and $e_2$.
+
+\paragraph{Typing Applications} The more important difference bettwen
+\name and Dunfield calculus is in the treatment of the
+application rule. In Dunfield's calculus, if \lstinline$f$ and \lstinline$g$ are both
+functions expecting an integer, the following program typechecks:
+
+\begin{lstlisting}
+(f ,, g) 1
+\end{lstlisting}
+
+\noindent In our calculus, however, one needs manually extract the desired
+function by passing \lstinline$f ,, g$ to a function. For example, if
+\lstinline$f : Int -> Bool$ and \lstinline$g : Int -> Char$, we could select  \lstinline$f$
+from the intersection as follows:
+
+\begin{lstlisting}
+((fun (h : Int (*$\to$*) Bool) (*$\to$*) h) (f ,, g)) 1
+\end{lstlisting}
+
+The reason for this design choice is that otherwise we could have
+another source of semantic ambiguity. Consider the following program:
+
+\begin{lstlisting} 
+(idInt ,, idChar) (1,,'c')
+\end{lstlisting}
+
+\noindent where idInt : Int -> Int and idChar : Char -> Char are,
+respectively, identity functions on integers and on characters. Clearly both
+merges in the program (\lstinline$(f ,, g)$ and \lstinline$(1,,'c')$)
+are disjoint. Yet there are two possible outcomes for this program: 
+\lstinline$1$ or \lstinline$'c'$. Thus application requires a
+different treatment, if we wish to have coherence.\bruno{work in progress}  
 
 \subsection{Semantics}
 
