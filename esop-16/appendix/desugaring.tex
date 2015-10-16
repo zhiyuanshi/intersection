@@ -28,7 +28,8 @@ let T = (*$ \lambda $*)(x1: A1, ..., xn: An) (s: () (*$ \to $*) A0) (*$ \to $*) 
 } in ...
 \end{lstlisting}
 
-\paragraph{Instantiation.} Instantiation of one or more traits becomes an
+\paragraph{Instantiation of Traits.} Our source language allows creating a
+single object from one or more traits becomes an
 inlined fixpoint, where \lstinline$(E1,...,En)$ are trait names with their
 required constructor parameters fully supplied. The self reference is passed to
 \lstinline$E1 & ... & En$, as each of them is an open term in the target
@@ -44,4 +45,18 @@ new[T] (E1 & ... & En)
 
 let rec self : () (*$ \to $*) T = (*$ \lambda $*)(_: ()) (*$ \to $*) ((E1 self) ,, ... ,, (En self))
 in self ()
+\end{lstlisting}
+
+\paragraph{The Type for Traits.} \lstinline$Trait[T]$ denotes the type for those
+traits which provide an interface described by the type \lstinline$T$. In fact,
+it is just like a type constructor except for the fact that it is built-in in
+the language. In this way, the encoding is not exposed to the user of the source
+language.
+
+\begin{lstlisting}
+Trait[T]
+
+(*$\hookrightarrow$*)
+
+(() (*$ \to $*) T) (*$ \to $*) T
 \end{lstlisting}
