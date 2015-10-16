@@ -46,13 +46,14 @@ is elegant and type-safe.
 %various solutions.
 
 While Dunfield's calculus is type-safe, it lacks the property of
-\emph{coherence}: different derivations for the same expression can lead to
-different results. The lack of coherence is an important disadvantage for
-adoption of his core calculus in implementations of programming languages, as
-the semantics of the programming language becomes implementation dependent.
-Although Dunfield discussed the possibility of extending the type system to
-allow only disjoint intersection types, he did not pursue this approach
-due to its non-triviality.
+\emph{coherence}: different derivations for the same expression can
+lead to different results. The lack of coherence is an important
+disadvantage for adoption of his core calculus in implementations of
+programming languages, as the semantics of the programming language
+becomes implementation dependent. Although Dunfield mentioned the
+possibility of extending the type system to allow only disjoint
+intersection types, he did not formalize or further pursue this
+approach.
 
 
 \begin{comment}
@@ -77,16 +78,17 @@ disjointness does not lend itself directly to an algorithmic implementation.
 Therefore, we also present an algorithmic specification to determine whether two
 types are disjoint. Moreover, this specification is shown to be sound and
 complete with respect to the formal definition of disjointness. We have
-mechanized the interesting metatheoretical results using the Coq proof
+mechanized the many of the interesting metatheoretical results using the Coq proof
 assistant, while the proof of type-safety and the coherence theorem can be found
 in the appendix.
 
 As an application of \name, we show that \name can serve as a
-foundation of for a trait-based~\cite{scharli2003traits} object-oriented
-language. Due to the type system of \name, the language supports common features
-of traits such as commutative composition, explicit conflict detection and
-resolution. In addition, our language also supports composing of traits
-dynamically, which cannot be achieved in many existing object-oriented
+foundation for a trait-based~\cite{scharli2003traits} object-oriented
+language. Due to the type system of \name, the language supports
+common features of traits such as commutative composition, explicit
+conflict detection and resolution. In addition, our language also
+supports instantiating and composing traits dynamically, which cannot
+be achieved in many existing statically typed object-oriented
 languages.
 
 In summary, the contributions of this paper are:
@@ -111,13 +113,11 @@ proposal for free.
 \item \textbf{Implementation:} An implementation of an extension of \name, as
 well as encodings of the examples presented in the paper, are publicly available
 online\footnote{
-\url{https://github.com/hkuplg/fcore/tree/develop/examples/traits}\bruno{What
-we need here is a link to fcore! Otherwise, how do we run the examples?}}.
+\url{https://github.com/hkuplg/fcore/tree/develop/examples/traits}}.
 
 \end{itemize*}
 
 \bruno{Records and record operations missing in the appendix.}
-\bruno{Proof of type-safety missing from appendix.}
 
 \begin{comment}
 
