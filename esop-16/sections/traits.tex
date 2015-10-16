@@ -10,7 +10,7 @@ traits~\cite{scharli2003traits} in \name. Traits provide a
 mechanism of code reuse in object-oriented programming, that
 can be used as an alternative to multiple inheritance.
 The interesting aspect about traits is the way conflicts that
-typically arise in multiple-inheritance~\cite{} are dealt with.
+typically arise in multiple-inheritance are dealt with.
 Instead of trying to automatically resolve conflicts, traits
 detect those conflicts and require programmers to explicitly resolve
 them. This is where the relation to disjoint intersection types comes
@@ -29,7 +29,7 @@ perspective of the features of an object. Therefore, compared with
 programs using inheritance, programs using traits usually have a
 larger number of small
 traits rather than fewer but larger classes. Code reuse with traits is easier
-with traits than with classes, since traits are usually shorter and traits can
+than with classes, since traits are usually shorter and can
 be \emph{composed}. In fact, trait composition offers a variety of
 possibilities: two traits can be ``added'' together (which is an symmetric
 operation); methods can be removed from a trait; and trait systems provide
@@ -70,9 +70,9 @@ the same time:
 \item Declaring a new \emph{type}.
 \end{itemize}
 
-\noindent In contrast, trait declarations in this source language only does the
+\noindent In contrast, trait declarations in this source language only do the
 former. Back to our example, the purpose of declaring two types is just to use
-them for type annotations of the self reference.  In traits literature, a trait
+them for type annotations of the self reference.  In the traits literature, a trait
 usually ``requires'' some methods and, based on that,  ``provides'' another set
 of methods. In our examples, the type of \lstinline$self$ actually denotes what
 methods are required.
@@ -89,8 +89,7 @@ requires that \lstinline$self$ be of type \lstinline$Comment$, which is defined
 as a type synonym for a record in the first line. But the name ``self'' is
 nothing special. In fact, \lstinline$self$ is just another parameter after the
 preceding parameter list, and becomes in scope after the arrow. We could have
-named it \lstinline$this$ or even \lstinline$s$, but that is generally
-discouraged.
+named it \lstinline$this$ or even \lstinline$s$.
 
 Creating an object is via the \lstinline$new$ keyword, similar to many OO
 languages, except for one crucial novelty: we can create an object from multiple
@@ -179,7 +178,7 @@ system.
 \subsection{Detecting and Resolving Conflicts in Trait Composition}
 
 Traits usually supports explicit conflict detection and resolution.
-In inheritance, one pattern is for the subclass to override methods defined in the parent.
+In inheritance, one pattern to resolve conflicts is for the subclass to override methods defined in the parent.
 The trait-based approach analog is excluding a method from a trait.
 We show how the mechanism can be modeled in \name.
 The following example shows a counter object and how we could extend its
@@ -276,16 +275,14 @@ trait Point(x: Int, y: Int) { self: Point (*$ \to $*)
 (* \ldots *)
 \end{lstlisting}
 
-becomes
+\noindent becomes
 
 \begin{lstlisting}
 let Point (x: Int, y: Int) (self: () (*$ \to $*) Point) = {
   x = (*$ \lambda $*)(_: ()) (*$ \to $*) x,
   y = (*$ \lambda $*)(_: ()) (*$ \to $*) (self ()).z()
 } in
-\end{lstlisting}\bruno{shouldn't the first two arguments be a pair
-  rather than curried arguments? You don't allow partial application
-  of constructors, do you?}
+\end{lstlisting}
 
 One difference is that the self reference becomes a thunk and all occurrences of
 it have been replaced by \lstinline$self ()$ and the position of the self
@@ -297,7 +294,7 @@ The body of the trait becomes a record whose labels are the method names.
 \lstinline$Point$ has type:
 
 \begin{lstlisting}
-Int (*$ \to $*) Int (*$ \to $*) (() (*$ \to $*) Point) (*$ \to $*) Point
+(Int, Int) (*$ \to $*) (() (*$ \to $*) Point) (*$ \to $*) Point
 \end{lstlisting}
 
 The syntax for construction such as \lstinline$Point(3,4)$ is just function
@@ -316,7 +313,7 @@ an inlined fixpoint. For example,
 new[Point] Point(3,4)
 \end{lstlisting}
 
-becomes
+\noindent becomes
 
 \begin{lstlisting}
 let rec self : () (*$ \to $*) Point = (*$ \lambda $*)(_: ()) (*$ \to $*) Point (3, 4) self
@@ -332,7 +329,7 @@ disjoint. For example,
 new[Point3D] (Point(3,4) & Z(5))
 \end{lstlisting}
 
-is turned into
+\noindent is turned into
 
 \begin{lstlisting}
 let rec self : () (*$ \to $*) Point3D = (*$ \lambda $*)(_: ()) (*$ \to $*) (Point (3, 4) self) ,, (Z 5 self)
@@ -351,10 +348,6 @@ Trait[Point]
 \begin{lstlisting}
 (() (*$ \to $*) Point) (*$ \to $*) Point
 \end{lstlisting}
-
-\bruno{There are two uses of the ``trait'' keyword in the source
-  language: one is to denote the type of traits; the other is to
-  declare traits. Perhaps you want to use ``Trait'' instead for the former?}
 
 % \subsection{Intersection Types in Existing Languages}
 %
