@@ -224,9 +224,11 @@ in counter.incr()
 However the modified code should not typecheck according to the specification of
 traits, since both \lstinline$Counter$ and \lstinline$Reset$ contains a
 conflicting \lstinline$incr$ method. The code also does not typecheck since it
-violates the disjoint intersection typing rules of \name. The programmer needs to resolve the conflict by
-excluding the \lstinline$incr$ being overridden using the record exclusion
-operator.
+violates the disjoint intersection typing rules of \name. The programmer needs
+to resolve the conflict by excluding the \lstinline$incr$ being overridden using
+the record exclusion operator\footnote{We use \lstinline$e\\l$ to denote the
+term where the field \lstinline$l$ is removed. For example, \lstinline$\{x = 1,
+y = 2\} \\ x$ gives \lstinline$\{x = 1\}$.}.
 
 \begin{lstlisting}
 (* \ldots *)
