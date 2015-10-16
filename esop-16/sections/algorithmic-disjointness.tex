@@ -125,9 +125,8 @@ Section~\ref{sec:disjoint}.
   \end{mathpar}
 
   \begin{mathpar}
-    \formdis \\
-    \ruledisfun \and
-    \ruledisinterl \and \ruledisinterr \and \ruledisatomic
+    \formax \\
+    \ruledisaxintfun \and \ruleaxsym
   \end{mathpar}
 
   \caption{Algorithmic Disjointness.}
@@ -182,9 +181,7 @@ fact that $\code{Int}$ and $\code{Int} \to \code{Int}$ are disjoint be decided?
 That is exactly the place where the judgment $ A \disjointax B $ comes in handy.
 It provides the axioms for disjointness. What is captured by the set of rules is
 that $ A \disjointax B $ holds for all two types of different constructs unless
-any of them is an intersection type. That is because for example, $ \code{Int}
-\inter (\code{Char} \to \code{Char}) $ and $ \code{Char} \to \code{Char} $ use different
-constructs and yet are not disjoint.\george{Recover axiom rules.}
+any of them is an intersection type.
 
 \subsection{Metatheory}
 

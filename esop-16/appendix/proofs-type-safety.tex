@@ -118,19 +118,6 @@ We show the type safety of the version of \name without coherence.
 
   \item \textbf{Case}
     \begin{flalign*}
-      & \rulettapp &
-    \end{flalign*}
-
-     By premise, $ \jtype \Gamma e {\for \alpha A_1} \yields E $. By induction hypothesis, $
-     \jtype {\im \Gamma} E {\im {\for \alpha A_1}} $. By the definition of $ \im
-     \cdot $, $ \jtype {\im \Gamma} E {\for \alpha \im {A_1}} $. By premise, $
-     \jwf \Gamma A $. By Lemma~\ref{lemma:preserve-wf}, $ \jwf {\im \Gamma} {\im
-     A} $. By \reflabel{\labeltgttapp}, $ \jtype \Gamma {\tapp E {\im A}}
-     {\subst {\im A} \alpha {\im {A_1}}} $. By substitution lemma, $ \jtype
-     \Gamma {\tapp E {\im A}} {\im {\subst A \alpha {A_1}}} $. \\
-
-  \item \textbf{Case}
-    \begin{flalign*}
       & \ruletmerge &
     \end{flalign*}
 

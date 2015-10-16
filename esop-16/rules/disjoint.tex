@@ -54,7 +54,14 @@
 
 \newcommand{\formax}{\framebox{$ A \disjointax B$}}
 
-\newcommand{\makelabelax}[1]{DisAx\_#1}
+\newcommand{\makelabelax}[1]{DisAx-#1}
+
+\newcommand{\labeldisaxintfun}{\makelabelax Int-Fun}
+\newcommand{\ruledisaxintfun}{
+  \inferrule* [right=\labeldisaxintfun]
+    {}
+    {\code{Int} \disjointax A \to B}
+}
 
 \newcommand{\labeldisaxbotbot}{\makelabelax Bot\_Bot}
 \newcommand{\ruledisaxbotbot}{
