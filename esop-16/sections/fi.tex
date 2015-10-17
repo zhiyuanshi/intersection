@@ -1,19 +1,6 @@
 \section{The \name Calculus}
 \label{sec:fi}
 
-\bruno{TODO: Show example illustrating the issue with function application.
-It may be worthwhile to discuss the issue with function
-  application. I think the way we deal with function application is
-  not as convenient, but it doesn't remove expressive power: we can
-  always extract, by hand, the right function before using it in a
-  function application. However this way we don't have ambiguity
-  problems that arise from having a more ``clever'' function
-  application.}
-\bruno{TODO: There are missing parts of the formalization regarding
-  integers
-(for example, subtyping, and typing). Formalization needs to be
-double-check carefully!}
-
 This section presents the syntax, subtyping, typing, as well as the (incoherent)
 semantics of \name: a calculus with intersection types and a merge operator.
 This calculus is similar to Dunfield's calculus~\cite{dunfield2014elaborating}.
@@ -21,9 +8,10 @@ The differences are that, in Dunfield's language, the coercions are source
 language terms and that function application allows the expression denoting the
 function to have an intersection type. In contrast, in \name coercions are
 target language terms and function applications do not allow the expression
-denoting the applied function to have an intersection type. 
-
-In Section~\ref{sec:disjoint} we will show the necessary changes for supporting
+denoting the applied function to have an intersection type. The later
+difference will play an important role later in achieving coherence.
+Sections~\ref{sec:disjoint} and \ref{sec:alg-dis} will present the more fundamental contributions of this
+paper by showing other necessary changes for supporting
 disjoint intersection types and ensuring coherence.
 
 \subsection{Syntax}
@@ -114,10 +102,9 @@ records and record operations can be found in the appendix.
 
   \caption{The type system of \name.}
   \label{fig:fi-type}
-\end{figure}\bruno{Aren't we missing the uses of well-formedness
-  rules. They are not being used anywhere at the moment! We are also
-  missing the typing rules for integers and variables; as well as the
-  subtyping rule for integers}
+\end{figure}\bruno{MAJOR PROBLEM: We are missing the well-formedness
+  rules as well as their uses in Figure 2. These need to be added so
+  that we can talk about coherence later!}
 
 % Intersection types introduce natural subtyping relations among types. For
 % example, $ \code{Int} \inter \code{Bool} $ should be a subtype of $ \code{Int} $, since the former
@@ -176,10 +163,12 @@ $A$''. The standard rules are those for variables
 $e_1 \mergeop e_2$, is assigned an intersection type composed of the
 resulting types of $e_1$ and $e_2$.
 
-\paragraph{Typing Applications} The more important difference bettwen
-\name and Dunfield calculus is in the treatment of the
-application rule. In Dunfield's calculus, if \lstinline$f$ and \lstinline$g$ are both
-functions expecting an integer, the following program typechecks:
+\paragraph{Typing Applications} 
+The rule that deserves more attention is the application rule
+\reflabel{\labeltapp}.  This is where the most important difference between
+\name and Dunfield calculus is. In Dunfield's calculus, if
+\lstinline$f$ and \lstinline$g$ are both functions expecting an
+integer, the following program typechecks:
 
 \begin{lstlisting}
 (f ,, g) 1
@@ -187,7 +176,7 @@ functions expecting an integer, the following program typechecks:
 
 \noindent In our calculus, however, one needs manually extract the desired
 function by passing \lstinline$f ,, g$ to a function. For example, if
-\lstinline$f : Int -> Bool$ and \lstinline$g : Int -> Char$, we could select  \lstinline$f$
+\lstinline$f : Int$ $\to$  \lstinline$Bool$ and \lstinline$g : Int$ $\to$ \lstinline$Char$, we could select  \lstinline$f$
 from the intersection as follows:
 
 \begin{lstlisting}
@@ -201,12 +190,22 @@ another source of semantic ambiguity. Consider the following program:
 (idInt ,, idChar) (1,,'c')
 \end{lstlisting}
 
-\noindent where idInt : Int -> Int and idChar : Char -> Char are,
+\noindent where \lstinline$idInt$ and \lstinline$idChar$ are,
 respectively, identity functions on integers and on characters. Clearly both
 merges in the program (\lstinline$(f ,, g)$ and \lstinline$(1,,'c')$)
 are disjoint. Yet there are two possible outcomes for this program: 
 \lstinline$1$ or \lstinline$'c'$. Thus application requires a
-different treatment, if we wish to have coherence.\bruno{work in progress}  
+different treatment, if we wish to have coherence.
+Our design choice is simply to require the type 
+of the first expression in the application to be syntactically a
+function type. It should be possible to design a ``smarter''
+application rule, that still avoids the ambiguity problems that would
+be present in Dunfield's calculus, while at the same time avoiding 
+explicitly extracting functions from intersections. However such rule 
+would necessarely be complicated, and rather ad-hoc. 
+So we opted for simplicity. In any case there is no expressiveness
+loss (only loss of convinience), as it is always possibly to extract the function component from
+a merge and then apply it.
 
 \subsection{Semantics}
 
