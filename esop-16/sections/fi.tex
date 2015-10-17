@@ -9,7 +9,7 @@ language terms and that function application allows the expression denoting the
 function to have an intersection type. In contrast, in \name coercions are
 target language terms and function applications do not allow the expression
 denoting the applied function to have an intersection type. The later
-difference will play an important role later in achieving coherence.
+difference will play an important role in achieving coherence.
 Sections~\ref{sec:disjoint} and \ref{sec:alg-dis} will present the more fundamental contributions of this
 paper by showing other necessary changes for supporting
 disjoint intersection types and ensuring coherence.
@@ -94,6 +94,11 @@ records and record operations can be found in the appendix.
   \end{mathpar}
 
   \begin{mathpar}
+    \formwf \\
+    \rulewfint \and \rulewffun \and \rulewfinter
+  \end{mathpar}
+
+  \begin{mathpar}
     \formt \\
     \ruletvar \and \ruletint \and
     \ruletlam \and \ruletapp \and
@@ -152,9 +157,10 @@ supplementary materials submitted with the paper.
 
 \subsection{Typing}
 
-The typing rules are shown in the bottom part of the figure. Again,
-the reader is advised to ignore the gray-shaded part here, as these
-parts will be explained later. The typing judgment is of the form:
+The well-formedness rules are shown in the middle part of
+Figure~\ref{fig:fi-type}. In addition to the standard rules,
+\reflabel{\labelwfinter} is also not surprising. The typing rules are shown in
+the bottom part of the figure. The typing judgment is of the form:
 \[ \jtype \Gamma e A \]
 It reads: ``in the typing context $\Gamma$, the term $e$ is of type
 $A$''. The standard rules are those for variables
@@ -186,14 +192,14 @@ from the intersection as follows:
 The reason for this design choice is that otherwise we could have
 another source of semantic ambiguity. Consider the following program:
 
-\begin{lstlisting} 
+\begin{lstlisting}
 (idInt ,, idChar) (1,,'c')
 \end{lstlisting}
 
 \noindent where \lstinline$idInt$ and \lstinline$idChar$ are,
 respectively, identity functions on integers and on characters. Clearly both
 merges in the program (\lstinline$(f ,, g)$ and \lstinline$(1,,'c')$)
-are disjoint. Yet there are two possible outcomes for this program: 
+are disjoint. Yet there are two possible outcomes for this program:
 \lstinline$1$ or \lstinline$'c'$. Thus application requires a
 different treatment, if we wish to have coherence.
 Our design choice is simply to require the type 
