@@ -6,19 +6,22 @@ intersection types and a merge operator.
 The language is proved to be type-safe and coherent.
 To ensure coherence the type system accepts only
 disjoint intersections. We believe that disjoint intersection types are
-intuitive, and at the same time expressive.
+intuitive, and at the same time expressive. We have shown the
+applicability of disjoint intersection types to model a simple form of traits.
 
 We implemented the core functionalities of the \name as part of a JVM-based
 compiler. Based on the type system of \name, we have built an ML-like
 source language compiler that offers interoperability with Java (such as object
 creation and method calls). The source language is loosely based on the more
 general System $F_{\omega}$ and supports a
-number of other features, including records, mutually recursive
+number of other features, including records, polymorphism, mutually recursive
 \code{let} bindings, type aliases, algebraic data types, pattern matching, and
 first-class modules that are encoded using \code{letrec} and records.
 
 For the future, we intend to improve our source language
-and show the power of disjoint intersection types in large case studies.
+and show the power of disjoint intersection types in large case
+studies. One pressing challenge is to address the intersction between 
+disjoint intersection types and polymorphism.
 We are also interested in extending our work
 to systems with a $\top$ type. This will also require an adjustment
 to the notion of disjoint types. A suitable notion of

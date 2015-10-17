@@ -15,7 +15,8 @@ accounting for various possibilities of what the types of the first and second
 components are. In some cases the meaning of the second component takes
 precedence (that is, is biased) over the first component. The set of rules is
 restrictive and it forbids, for instance, the merge of two functions (even when
-they a provably disjoint). In contrast, disjointness in \name has a well-defined
+they a provably disjoint). Therefore, Forsythe treatment of coherence
+is rather ad-hoc. In contrast, disjointness in \name has a simple, well-defined
 specification and it is quite flexible.
 
 Pierce~\cite{pierce1991programming2} made a comprehensive review
@@ -28,7 +29,7 @@ system users can ``glue'' two arbitrary values, which can lead to incoherence.
 Our work is largely inspired by Dunfield~\cite{dunfield2014elaborating}. He
 described a similar approach to ours: compiling a system with intersection types
 and a merge operator into ordinary $ \lambda $-calculus terms with pairs. One
-major difference is that our system does not include unions. However, as
+major difference is that our system does not include unions. As
 acknowledged by Dunfield, his calculus lacks of coherence. He discusses the
 issue of coherence throughout his paper, mentioning biased choice as an option
 (albeit a rather unsatisfying one). He also mentioned that the notion of
@@ -58,6 +59,16 @@ pursue this option in his work.
 % dissertation~\cite{pierce1991programming2} and a 1997
 % report~\cite{pierce1997intersection}.
 
+Recently, Castagna et al.~\cite{Castagna:2014} studied an very interesting
+and coherent calculus that has polymorphism and set-theoretic type connectives (such as
+intersections, unions, and negations). Unfortunately their calculus
+does not include a merge operator like ours, which is our major source
+of difficulty for achieving coherence.
+%As a result, in their calculus one is
+%also able to express a type variable that can be instantiated to any type other
+%than $\code{Int}$ as $\alpha \setminus \code{Int}$, which is syntactic sugar for
+%$\alpha \wedge \neg \code{Int}$. 
+
 Going in the direction of higher
 kinds, Compagnoni and Pierce~\cite{compagnoni1996higher} added
 intersection types to System $ F_{\omega} $ and used the new calculus,
@@ -67,24 +78,18 @@ same kind $ K $. Davies and Pfenning
 \cite{davies2000intersection} studied the interactions between
 intersection types and effects in call-by-value languages. And they
 proposed a ``value restriction'' for intersection types, similar to
-value restriction on parametric polymorphism.
-
-Recently, Castagna et al.~\cite{Castagna:2014} studied an very expressive
-calculus that has polymorphism and set-theoretic type connectives (such as
-intersections, unions, and negations). As a result, in their calculus one is
-also able to express a type variable that can be instantiated to any type other
-than $\code{Int}$ as $\alpha \setminus \code{Int}$, which is syntactic sugar for
-$\alpha \wedge \neg \code{Int}$. Unfortunately their calculus does not include a
-merge operator like ours.
+value restriction on parametric polymorphism. None of those calculi 
+include a merge operator.
 
 There have been attempts to provide a foundational calculus
 for Scala that incorporates intersection
 types~\cite{amin2014foundations,amin2012dependent}.
-Although the minimal Scala-like calculus does not natively support
-parametric polymorphism, it is possible to encode parametric
-polymorphism with abstract type members. Thus it can be argued that
-this calculus also supports intersection types and parametric
-polymorphism. However, the type-soundness of a minimal Scala-like
+%Although the minimal Scala-like calculus does not natively support
+%parametric polymorphism, it is possible to encode parametric
+%polymorphism with abstract type members. Thus it can be argued that
+%this calculus also supports intersection types and parametric
+%polymorphism. 
+However, the type-soundness of a minimal Scala-like
 calculus with intersection types and parametric polymorphism is not
 yet proven. Recently, some form of intersection
 types has been adopted in object-oriented languages such as Scala,
@@ -149,19 +154,21 @@ and merge operator in a semantic subtyping setting.
 \paragraph{Traits and Trait Calculi.}
 %*******************************************************************************
 
-Since the seminal paper by Schärli~\emph{et al.} documented an implementation of
-the trait mechanism in dynamically typed Smalltalk without providing a type
-system, Fisher and Reppy~\cite{fisher2004typed} presented a statically typed
+The seminal paper by Schärli et al. introduced the ideas behind
+traits. In their original paper, they documented an implementation of
+the trait mechanism in a dynamically typed version of Smalltalk. 
+Fisher and Reppy~\cite{fisher2004typed} presented a statically typed
 calculus that models traits. \name is not dedicated to traits; but rather, it
 supports a source language that models traits. Compared to Fisher and Reppy's
-calculus, \name is more lightweight. For example, self reference is not in the
-language of \name. One reason for the difference is that Fisher and Reppy's
+calculus, \name is more lightweight. For example, self references (as
+well as other OO-specific constructs) are
+not built-in \name. One reason for the difference is that Fisher and Reppy's
 calculus supports \emph{classes} in addition to traits, and considers the
 interaction between them, whereas our object oriented source language is
-\emph{prototype}-based---the mechanism for code reuse is purely trait. Of
-course, there have been many formalization of traits, such
+\emph{prototype} (or delegation) based---the mechanism for code reuse is purely traits. Of
+course, there have been many other formalizations of traits, such
 as~\cite{scharli2003traitsformal}. But most of them are heavyweight and specific
-to modeling traits, and therefore differ from our approach.
+to modeling traits and typical class-based models of OOP, and therefore differ from our approach.
 
 Bettini~\textit{et al.}'s prototype language,
 SWRTJ~\cite{bettini2010prototypical} distinguishes, in their terminology,
@@ -171,20 +178,23 @@ fields, which provide state reuse. In SWRTJ, traits themselves are not meant to
 be the generator of instances. Instead, another construct, called ``classes''
 are, and make use of traits.
 
-\bruno{Our traits vs Scala traits?}
-
-Scala also has the notion of ``traits''. However, unlike what its name suggests,
-it is more similar to mixins~\cite{bracha1990mixin}, whereas our traits are
-intended to model the original trait idea closely. Aside from that, Scala's
-traits and our source language's traits have three major differences:
+Scala also has a notion of ``traits''. However, unlike what its name suggests,
+the semantics of trait composition in Scala is more similar to
+mixins~\cite{bracha1990mixin}. That is, like traditional mixin
+semantics, when two traits are composed, Scala attempts to do 
+\emph{implicit resolution of conflicts}. The traits modelled in \name are
+intended to model the original trait idea closely, and conflicts must
+be resolved explicitly. Schärli et al. document well the trade-offs
+between mixins and traits. Aside from that, Scala's
+traits and our source language's traits have four major differences:
 
 \begin{enumerate}
 
-  \item Scala's trait cannot be instantiated but only mixed in to a class (which
+  \item Scala's traits cannot be instantiated but only mixed into a class (which
   can be anonymous), whereas traits in our language can be instantiated
   directly.
 
-  \item Scala's trait cannot take constructor parameters whereas ours can. As in
+  \item Scala's traits cannot take constructor parameters whereas ours can. As in
   the point example below, our trait is itself a constructor and takes the x- and
   y-coördinates as parameters:
 
@@ -195,7 +205,14 @@ traits and our source language's traits have three major differences:
   } in (* \ldots *)
   \end{lstlisting}
 
-  \item Scala allows traits to contain methods whose body is not implemented.
-  But our current language does not support this feature.
+%  \item Scala allows traits to contain methods whose body is not implemented.
+%  But our current language does not support this feature.
+
+   \item Dynamic instantiation is supported in \name, but not in
+     Scala. In Scala instantiating an object from a class or traits
+     requires that all classes or traits are statically know. 
+
+   \item Our model of traits is purely functional, but Scala's traits
+     also support fields, mutable state and abstract types. 
 
 \end{enumerate}
