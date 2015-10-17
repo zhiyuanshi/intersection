@@ -85,7 +85,7 @@ returning the eponymous variable.
 %taking parameters.
 
 The origin of self references is always explicit. The \lstinline$Comment$ trait
-requires that \lstinline$self$ be of type \lstinline$Comment$, which is defined
+requires \lstinline$self$ to be of type \lstinline$Comment$, which is defined
 as a type synonym for a record in the first line. But the name ``self'' is
 nothing special. In fact, \lstinline$self$ is just another parameter after the
 preceding parameter list, and becomes in scope after the arrow. We could have
@@ -100,7 +100,7 @@ single object. For example, we can create a single object from
 functionality as follows:
 
 \begin{lstlisting}
-let comment = new[Comment&Up] (Comment("Have fun!"), Up(4))
+let comment = new[Comment&Up] (Comment("Have fun!") & Up(4))
 in println(comment.content(), comment.upvotes())
 -- Output: "Have fun!" 4
 \end{lstlisting}
@@ -221,14 +221,18 @@ let counter = new[Counter&Reset] (Counter(0) & Reset())
 in counter.incr()
 \end{lstlisting}
 
-However the modified code should not typecheck according to the specification of
-traits, since both \lstinline$Counter$ and \lstinline$Reset$ contains a
-conflicting \lstinline$incr$ method. The code also does not typecheck since it
-violates the disjoint intersection typing rules of \name. The programmer needs
-to resolve the conflict by excluding the \lstinline$incr$ being overridden using
-the record exclusion operator\footnote{We use \lstinline$e\\l$ to denote the
-term where the field \lstinline$l$ is removed. For example, \lstinline$\{x = 1,
-y = 2\} \\ x$ gives \lstinline$\{x = 1\}$.}.
+However the modified code should not typecheck according to the
+specification of traits, since both \lstinline$Counter$ and
+\lstinline$Reset$ contains a conflicting \lstinline$incr$ method. The
+code also does not typecheck since it violates the disjoint
+intersection typing rules of \name. The problem is that both
+\lstinline$Counter(0)$ and \lstinline$Reset()$ provide an
+implementation of \lstinline$incr$. The programmer needs to resolve
+the conflict by excluding the \lstinline$incr$ being overridden using
+the record exclusion operator\footnote{We use \lstinline$e\\l$ to
+  denote the term where the field \lstinline$l$ is removed. For
+  example, \lstinline$\{x = 1, y = 2\} \\ x$ gives \lstinline$\{x =
+  1\}$.}.
 
 \begin{lstlisting}
 (* \ldots *)
@@ -287,7 +291,7 @@ let Point (x: Int, y: Int) (self: () (*$ \to $*) Point) = {
 \end{lstlisting}
 
 One difference is that the self reference becomes a thunk and all occurrences of
-it have been replaced by \lstinline$self ()$ and the position of the self
+it have been replaced by \lstinline$self ()$. Moreopver the position of the self
 reference in the parameter list is adjusted. In fact, \lstinline$self$ is not a
 special keyword. It can have any name, but \lstinline$self$ is a
 convention.
@@ -305,7 +309,8 @@ application in \name. And note that \lstinline$Point(3,4)$ is of type
 (() (*$ \to $*) Point) (*$ \to $*) Point
 \end{lstlisting}
 
-Therefore it is an open recursive term: the recursive call is passed as an argument.
+Therefore it is an open recursive term: the recursive call is passed
+as an argument to the definition of \lstinline$Point$ itself.
 
 \paragraph{The ``new'' Keyword.} \lstinline$new$ instantiates a trait by taking the
 fixpoint of its corresponding open term. In fact, \lstinline$new$ is translated as
