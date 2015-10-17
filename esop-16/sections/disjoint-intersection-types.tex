@@ -113,7 +113,7 @@ Only new rules or rules that different are shown. Importantly, the disjointness
 judgment appears in the well-formedness rule for intersection types and the
 typing rule for merges.
 
-\begin{figure}
+\begin{figure}[t]
   \begin{mathpar}
     \framebox{$\jatomic A$} \\
 
@@ -198,7 +198,7 @@ type-safety still holds.
 % \george{Explain \reflabel{\labelsubforall} and distinction of kernel and all version.}
 
 The subtyping rules need some adjustment. An important problem with the
-subtyping rules in Figure~\ref{fig:fi-type} is that the all three rules dealing
+subtyping rules in Figure~\ref{fig:fi-type} is that all three rules dealing
 with intersection types (\reflabel{\labelsubinterl} and
 \reflabel{\labelsubinterr} and \reflabel{\labelsubinter}) overlap.
 Unfortunately, this means that different coercions may be given when checking
@@ -242,8 +242,9 @@ types, and atomic types.
 \paragraph{Atomic Types.} Atomic types are just those which are not intersection
 types, and are asserted by the judgment \[ \jatomic A \]
 
-Since types in \name are simple, the only atomic type is the function type.
-But in richer systems, it can also include, for example, the record type.
+Since types in \name are simple, the only atomic types are the
+function type and integers.
+But in richer systems, it can also include, for example, record types.
 In the left decomposition rules for intersections we introduce a requirement
 that $A_3$ is atomic. The consequence of this requirement is that when $A_3$ is
 an intersection type, then the only rule that can be applied is
@@ -270,7 +271,7 @@ If $A_2 \subtype A_3$, then $A_1 \inter A_2 \subtype A_3$.
 \end{theorem}
 
 \noindent The interpretation of the two theorems is that: even though the
-premise is made stricter by the atomic condition, we can still derive the every
+premise is made stricter by the atomic condition, we can still derive every
 subtyping relation which is valid in the unrestricted system.
 
 % Note that $A$ \emph{exclusive} or $B$ is true if and only if their truth value

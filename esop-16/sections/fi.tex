@@ -225,8 +225,8 @@ a type-directed translation to an extension of $\lambda$-calculus with pairs.
 \paragraph{Target Language.}
 The syntax and typing of our target language is unsurprising. The syntax of the
 target language is shown in Figure~\ref{fig:f-syntax}. The highlighted part
-shows its difference with $\lambda$-calculus. The typing rules can be found
-in the appendix.
+shows its difference with the $\lambda$-calculus. The typing rules can be found
+in the extended version of the paper.
 
 % \bruno{Does the target language does need unit? Any rules generating units? I
 % don't think so, so it can be dropped.}
@@ -245,7 +245,7 @@ the function expects a $\code{String}$ but the translated argument is of type $\
 {\code{Int}} {\code{String}}$.
 
 
-\begin{figure}[h]
+\begin{figure}[t]
   \[
     \begin{array}{llrl}
       \text{Types}    & T & \Coloneqq & \code{Int} \\
@@ -271,7 +271,7 @@ function $\im \cdot$ from \name types $A$ to target language types $T$. The
 notation $\im \cdot$ is also overloaded for context translation from \name
 contexts $\Gamma$ to target language contexts $G$.
 
-\begin{figure}[h]
+\begin{figure}[t]
   \framebox{$\im A = T$}
 
   \begin{align*}
