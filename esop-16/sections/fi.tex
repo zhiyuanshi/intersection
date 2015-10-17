@@ -202,9 +202,9 @@ merges in the program (\lstinline$(f ,, g)$ and \lstinline$(1,,'c')$)
 are disjoint. Yet there are two possible outcomes for this program:
 \lstinline$1$ or \lstinline$'c'$. Thus application requires a
 different treatment, if we wish to have coherence.
-Our design choice is simply to require the type 
-of the first expression in the application to be syntactically a
-function type. It should be possible to design a ``smarter''
+Our design choice is simply to only employ subtyping in the argument
+of the application, but not on the expression being applied.
+It should be possible to design a ``smarter''
 application rule, that still avoids the ambiguity problems that would
 be present in Dunfield's calculus, while at the same time avoiding 
 explicitly extracting functions from intersections. However such rule 
@@ -222,7 +222,7 @@ a type-directed translation to an extension of $\lambda$-calculus with pairs.
 %gray.
 
 
-\paragraph{Target Language.}\bruno{misses integers}
+\paragraph{Target Language.}
 The syntax and typing of our target language is unsurprising. The syntax of the
 target language is shown in Figure~\ref{fig:f-syntax}. The highlighted part
 shows its difference with $\lambda$-calculus. The typing rules can be found
