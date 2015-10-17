@@ -22,6 +22,10 @@ task(:paper => :clean) do
   system(latexmk_cmd("paper"))
 end
 
+task(:paper_full => :clean) do
+  system(latexmk_cmd("paper-full"))
+end
+
 desc "Generate the PDF of the formalisation"
 task(:formalisation => :clean) do
   system(latexmk_cmd("formalisation"))
