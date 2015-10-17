@@ -169,7 +169,7 @@ $A$''. The standard rules are those for variables
 $e_1 \mergeop e_2$, is assigned an intersection type composed of the
 resulting types of $e_1$ and $e_2$.
 
-\paragraph{Typing Applications} 
+\paragraph{Typing Applications}
 The rule that deserves more attention is the application rule
 \reflabel{\labeltapp}.  This is where the most important difference between
 \name and Dunfield calculus is. In Dunfield's calculus, if
@@ -206,9 +206,9 @@ Our design choice is simply to only employ subtyping in the argument
 of the application, but not on the expression being applied.
 It should be possible to design a ``smarter''
 application rule, that still avoids the ambiguity problems that would
-be present in Dunfield's calculus, while at the same time avoiding 
-explicitly extracting functions from intersections. However such rule 
-would necessarely be complicated, and rather ad-hoc. 
+be present in Dunfield's calculus, while at the same time avoiding
+explicitly extracting functions from intersections. However such rule
+would necessarely be complicated, and rather ad-hoc.
 So we opted for simplicity. In any case there is no expressiveness
 loss (only loss of convinience), as it is always possibly to extract the function component from
 a merge and then apply it.
@@ -240,7 +240,7 @@ information. For example, consider the function application: \[ \app {(\lamty x
 {\code{String}} x)} {(1 \mergeop \code{"one"})} \] This expression will be translated to \[ \app
 {(\lamty x {\code{String}} x)} {(\app {(\lamty x {\pair {\code{Int}} {\code{String}}} {\proj 2 x})}
 {\pair 1 {\code{"one"}}})} \] The coercion in this case is $(\lamty x {\pair
-\code{Int} \code{String}} {\proj 2 x})$\bruno{typesetting problem}. It extracts the second item from the pair, since
+{\code{Int}} {\code{String}}} {\proj 2 x})$. It extracts the second item from the pair, since
 the function expects a $\code{String}$ but the translated argument is of type $\pair
 {\code{Int}} {\code{String}}$.
 
