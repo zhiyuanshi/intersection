@@ -19,7 +19,7 @@
 \newcommand{\labeltlam}{\makelabelt Lam}
 \newcommand{\ruletlam} {
 \inferrule* [right=\labeltlam]
-  {\jtype {\Gamma, x \oftype A} e B \yields E}
+  {\jwf \Gamma A \\ \jtype {\Gamma, x \oftype A} e B \yields E}
   {\jtype \Gamma {\lamty x A e} {A \to B} \yields {\lamty x {\im A} E}}
 }
 

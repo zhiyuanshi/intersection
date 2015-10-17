@@ -9,6 +9,13 @@
     {\jwf \Gamma \alpha}
 }
 
+\newcommand{\labelwfint}{\makelabelwf Int}
+\newcommand{\rulewfint}{
+  \inferrule* [right=\labelwfint]
+    { }
+    {\jwf \Gamma {\code{Int}}}
+}
+
 \newcommand{\labelwfbot}{\makelabelwf Bot}
 \newcommand{\rulewfbot}{
   \inferrule* [right=\labelwfbot]
