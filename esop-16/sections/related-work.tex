@@ -59,7 +59,7 @@ pursue this option in his work.
 % dissertation~\cite{pierce1991programming2} and a 1997
 % report~\cite{pierce1997intersection}.
 
-Recently, Castagna et al.~\cite{Castagna:2014} studied an very interesting
+Recently, Castagna~\textit{et al.}~\cite{Castagna:2014} studied an very interesting
 and coherent calculus that has polymorphism and set-theoretic type connectives (such as
 intersections, unions, and negations). Unfortunately their calculus
 does not include a merge operator like ours, which is our major source
@@ -145,7 +145,7 @@ is the more conservative approach of adopting intersection types. It increases
 only the expressiveness of types but not terms. But without a term-level
 construct like ``merge'', it is not possible to encode various language
 features. As an alternative to syntactic subtyping described in this paper,
-Frisch et al.~\cite{frisch2008semantic} studied semantic subtyping. Semantic
+Frisch~\textit{et al.}~\cite{frisch2008semantic} studied semantic subtyping. Semantic
 subtyping seems to have important advantages over syntactic subtyping. One
 worthy avenue for future work is to study languages with intersection types
 and merge operator in a semantic subtyping setting.
@@ -154,7 +154,7 @@ and merge operator in a semantic subtyping setting.
 \paragraph{Traits and Trait Calculi.}
 %*******************************************************************************
 
-The seminal paper by Schärli et al. introduced the ideas behind
+The seminal paper by Schärli~\textit{et al.} introduced the ideas behind
 traits. In their original paper, they documented an implementation of
 the trait mechanism in a dynamically typed version of Smalltalk.
 Fisher and Reppy~\cite{fisher2004typed} presented a statically typed
@@ -178,13 +178,15 @@ fields, which provide state reuse. In SWRTJ, traits themselves are not meant to
 be the generator of instances. Instead, another construct, called ``classes''
 are, and make use of traits.
 
-Scala also has a notion of ``traits''. However, unlike what its name suggests,
+The Scala language also has a notion of ``traits''. However, unlike what its
+name suggests,
 the semantics of trait composition in Scala is more similar to
 mixins~\cite{bracha1990mixin}. That is, like traditional mixin
 semantics, when two traits are composed, Scala attempts to do
-\emph{implicit resolution of conflicts}. The traits modeled in \name are
+\emph{implicit resolution of conflicts}. In comparison, the traits modeled in
+\name are
 intended to model the original trait idea closely, and conflicts must
-be resolved explicitly. Schärli et al. document well the trade-offs
+be resolved explicitly. Schärli~\textit{et al.} document well the trade-offs
 between mixins and traits. Aside from that, Scala's
 traits and our source language's traits have four major differences:
 
