@@ -242,16 +242,19 @@ in counter.incr()
 
 \subsection{Dynamic Instantiation}
 
-One difference with traditional traits or classes is that in our
-language we are able to compose traits \emph{dynamically} and then instantiate
-them. This is impossible in traditional OO languages such as Java since classes
-being instantiated must be known statically. Actually, since traits are just
-terms, traits are first-class values and can be defined inside a function,
-passed around or returned just as normal terms. The following function takes a
-trait, \lstinline$log$, with unknown implementation and instantiate it.
+One difference with traditional traits or classes is that in our language we are
+able to compose traits \emph{dynamically} and then instantiate them. This is
+impossible in traditional OO languages such as Java since classes being
+instantiated must be known statically. Actually, since traits are just terms,
+traits are first-class values and can be defined inside a function, passed
+around or returned just as normal terms. For example, the following function
+takes a trait, \lstinline$norm$, with unknown implementation, compose it with
+the statically known \lstinline$Point$ trait, and then instantiate it.
+\lstinline$Trait$ is a built-in keyword and \lstinline$Trait[Norm]$ is the type
+for traits that conform to the \lstinline$Norm$ type.
 
 \begin{lstlisting}
-let f (log: Trait[Log]) = new [Log] log
+let makePoint (norm: Trait[Norm]) = new[Point & Norm] (Point & norm)
 in (* \ldots *)
 \end{lstlisting}\bruno{example does not make sense (and uses no composition).}
 
