@@ -254,7 +254,7 @@ the statically known \lstinline$Point$ trait, and then instantiate it.
 for traits that conform to the \lstinline$Norm$ type.
 
 \begin{lstlisting}
-let makePoint (norm: Trait[Norm]) = new[Point & Norm] (Point & norm)
+let makePoint (norm: Trait[Norm]) = new[Point & Norm] (Point(3,4) & norm)
 in (* \ldots *)
 \end{lstlisting}\bruno{example does not make sense (and uses no composition).}
 
