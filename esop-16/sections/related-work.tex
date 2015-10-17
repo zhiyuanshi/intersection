@@ -67,7 +67,7 @@ of difficulty for achieving coherence.
 %As a result, in their calculus one is
 %also able to express a type variable that can be instantiated to any type other
 %than $\code{Int}$ as $\alpha \setminus \code{Int}$, which is syntactic sugar for
-%$\alpha \wedge \neg \code{Int}$. 
+%$\alpha \wedge \neg \code{Int}$.
 
 Going in the direction of higher
 kinds, Compagnoni and Pierce~\cite{compagnoni1996higher} added
@@ -78,7 +78,7 @@ same kind $ K $. Davies and Pfenning
 \cite{davies2000intersection} studied the interactions between
 intersection types and effects in call-by-value languages. And they
 proposed a ``value restriction'' for intersection types, similar to
-value restriction on parametric polymorphism. None of those calculi 
+value restriction on parametric polymorphism. None of those calculi
 include a merge operator.
 
 There have been attempts to provide a foundational calculus
@@ -88,7 +88,7 @@ types~\cite{amin2014foundations,amin2012dependent}.
 %parametric polymorphism, it is possible to encode parametric
 %polymorphism with abstract type members. Thus it can be argued that
 %this calculus also supports intersection types and parametric
-%polymorphism. 
+%polymorphism.
 However, the type-soundness of a minimal Scala-like
 calculus with intersection types and parametric polymorphism is not
 yet proven. Recently, some form of intersection
@@ -156,7 +156,7 @@ and merge operator in a semantic subtyping setting.
 
 The seminal paper by Schärli et al. introduced the ideas behind
 traits. In their original paper, they documented an implementation of
-the trait mechanism in a dynamically typed version of Smalltalk. 
+the trait mechanism in a dynamically typed version of Smalltalk.
 Fisher and Reppy~\cite{fisher2004typed} presented a statically typed
 calculus that models traits. \name is not dedicated to traits; but rather, it
 supports a source language that models traits. Compared to Fisher and Reppy's
@@ -181,8 +181,8 @@ are, and make use of traits.
 Scala also has a notion of ``traits''. However, unlike what its name suggests,
 the semantics of trait composition in Scala is more similar to
 mixins~\cite{bracha1990mixin}. That is, like traditional mixin
-semantics, when two traits are composed, Scala attempts to do 
-\emph{implicit resolution of conflicts}. The traits modelled in \name are
+semantics, when two traits are composed, Scala attempts to do
+\emph{implicit resolution of conflicts}. The traits modeled in \name are
 intended to model the original trait idea closely, and conflicts must
 be resolved explicitly. Schärli et al. document well the trade-offs
 between mixins and traits. Aside from that, Scala's
@@ -210,9 +210,9 @@ traits and our source language's traits have four major differences:
 
    \item Dynamic instantiation is supported in \name, but not in
      Scala. In Scala instantiating an object from a class or traits
-     requires that all classes or traits are statically know. 
+     requires that all classes or traits are statically known.
 
    \item Our model of traits is purely functional, but Scala's traits
-     also support fields, mutable state and abstract types. 
+     also support fields, mutable state and abstract types.
 
 \end{enumerate}
