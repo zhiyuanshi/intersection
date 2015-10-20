@@ -1,0 +1,82 @@
+\subsection{Record System}
+
+This section describes the record system used in the examples of this paper. We
+first describe the basic operations along with the novelty in our system and
+then discuss the extension of disjointness to record types.
+
+\paragraph{Operations.}
+
+We define three operations with records: \emph{construction},
+\emph{selection}, and \emph{exclusion}. The construction operation builds a record literal such as
+
+\begin{lstlisting}
+{x = 3, y = 4, z = 12}
+\end{lstlisting}
+
+\noindent The selection operation allows retrieving a specific field (which must
+be present) from a record, such as
+
+\begin{lstlisting}
+point.x
+\end{lstlisting}
+
+\noindent The exclusion operation, denoted by a backslash, removes a field from
+a record. For example, the following code
+
+\begin{lstlisting}
+{x = 3, y = 4, z = 12} \ z
+\end{lstlisting}
+
+\noindent shows how to remove the $z$-coordinate from a three-dimensional point. More formally, the syntax is
+
+\[
+e \setminus l
+\]
+
+\noindent where $l$ denotes a field name. Since the type of $e$ is statically
+known and $l$ is just a name, errors can be detected during typechecking. A type
+error is reported unless $e$ is of a record type where field $l$ is present.
+
+One interesting aspect of our system is that two records can be merged using
+our merge operator to form a bigger record. For example, we identify
+
+\begin{lstlisting}
+{x = 3} ,, {y = 4}
+\end{lstlisting}
+
+\noindent with
+
+\begin{lstlisting}
+{x = 3, y = 4}
+\end{lstlisting}
+
+In fact, in the intermediate representation of our implementation, multi-field
+records are regarded just as merges of single-field records. Similarly, we
+regard multi-field record types as intersections of single-field record types.
+For example,
+
+\begin{lstlisting}
+{x: Int, y: Int}
+\end{lstlisting}
+
+\noindent is just
+
+\begin{lstlisting}
+{x: Int} & {y: Int}
+\end{lstlisting}
+
+\paragraph{Disjointness.}
+
+Of course, such merge and intersection is not arbitrary: the two parts must be
+``disjoint'' in some sense. Otherwise, nondeterministic behavior can still
+occur. For instance, we are reluctant to merge \lstinline${x = 3}$ and
+\lstinline${x = 4}$ to form \lstinline${x = 3, x = 4}$, since it is not very
+clear what \lstinline${x = 3, x = 4}.x$ should evaluate to.
+
+We define two record types to be disjoint if the intersection of the field names
+is empty. This is actually a stronger condition than what is derived from our
+specification of disjointness, but it removes the ambiguity of field selection.
+For example, \lstinline${x: Int}$ and \lstinline${x: String}$ are disjoint
+according to the specification since we cannot find a type that is a supertype
+of both. But still, we would like to reject a merge of terms with those two
+types because the resulting term will contain duplicate fields.
