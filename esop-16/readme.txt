@@ -1,30 +1,15 @@
-Dear LLNCS user,
+The proofs for the ESOP paper can be found in the Proofs subdirectory.
 
-The files in this directory belong to the LaTeX2e package for
-Lecture Notes in Computer Science (LNCS) of Springer-Verlag.
+The Proofs directory contains the Coq Proofs in the paper. The proofs are in
+two files:
 
-It consists of the following files:
+- ReflexTrans.v (Lemmas 1 and 2)
+- Coherence.v   (Lemmas 4 5; Theorems 3, 4, 6 and 7)
 
-  readme.txt         this file
-
-  history.txt        the version history of the package
-
-  llncs.cls          the LaTeX2e document class
-
-  llncs.dem          the sample input file
-
-  llncs.doc          the documentation of the class (LaTeX source)
-  llncsdoc.pdf       the documentation of the class (PDF version)
-  llncsdoc.sty       the modification of the class for the documentation
-  llncs.ind          an external (faked) author index file
-  subjidx.ind        subject index demo from the Springer book package
-  llncs.dvi          the resultig DVI file (remember to use binary transfer!)
-
-  sprmindx.sty       supplementary style file for MakeIndex
-                     (usage: makeindex -s sprmindx.sty <yourfile.idx>)
-
-  splncs03.bst       current LNCS BibTeX style with aphabetic sorting
-
-  aliascnt.sty       part of the Oberdiek bundle; allows more control over
-                     the counters associated to any numbered item
-  remreset.sty       by David Carlisle
+The reason for the two files is that the reflexivity and transitivity
+proofs are done in the raw subtyping relation (unannotated with
+translated terms). The transitivity proof is a little involved and the
+additional noise of the translated terms in the subtyping relation
+would make the proof longer and more complex. Since translated terms
+do not change the subtyping relation, we have instead done it in the
+raw relation.
