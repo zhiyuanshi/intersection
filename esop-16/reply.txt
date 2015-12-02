@@ -1,0 +1,26 @@
+* no top type (reviewer 1 & 2)
+
+Having a top type requires a minor modification to the specification:
+
+A * B = not exists C. A <: C and B <: C and C /= top
+
+This is mentioned in the conclusion. We do not foresee major
+complications arizing from having a top type. Top would make the
+metatheory more messy (managing all the side-conditions for C /=top),
+but would not add fundamental difficulties.
+
+So, a justification for the system in the paper is that it is 
+the simplest system that already illustrates the key difficult 
+issues of disjointness.
+
+Admitedly union types may require some more thought, and we think 
+integrating union types could pose new challenges. 
+
+We will make this clearer in early on in the paper, and 
+announce that there's some coupling between the approach and 
+type system.
+
+#reviewer 2
+
+QUESTION:
+Do the authors know if this approach works for recursively defined objects?  For example, can we usefully employ traits to describe a LinkedList class that contains a "next" pointer to another LinkedList?
