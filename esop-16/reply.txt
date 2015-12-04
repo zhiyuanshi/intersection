@@ -24,8 +24,10 @@ would still share some common supertypes (e.g., for things like
 "toString" methods). Hence I don't believe that the "solution"
 suggested in Sec. 8 will work very well."
 
-I think there is some confusion here. Our system (or the extensions
-mentioned in Section 8) does not prevent the relevant use-case of
+I think there is some confusion here. It is true that the merge
+operator does not allow merging objects with common supertypes; 
+however this does not mean that our system (or the extensions
+mentioned in Section 8) prevent the relevant use-case of
 "multiple-inheritance" of two objects with a common supertype. At the
 end of section 3.4 there is one example (counter), where we want to
 inherit from two objects that share a common supertype:
@@ -38,9 +40,8 @@ in the resulting object composed with the merge operator.
 
 Note also, that most OO languages also only support *single
 inheritance*, where the only thing that is done is to override or add
-new methods: so the situation of inheriting two implementations of
-toString can never happen then! Single inheritance uses of the merge
-operator would be no less convinient than in most OO languages.
+new methods. Single inheritance uses of the merge operator would be no
+less convinient than in most OO languages.
 
 #reviewer 2
 
