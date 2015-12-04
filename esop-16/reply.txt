@@ -1,16 +1,24 @@
 * no top type; or refinement types (reviewer 1 & 2)  
 
-Having a top type requires a minor modification to the specification:   A * B
-= not exists C. A <: C and B <: C and C /= top   This is mentioned in the
-conclusion. We do not foresee major complications arising from having a top
-type. Top would make the metatheory more messy (managing all the side-
-conditions for C /=top), but would not add fundamental difficulties.   So, a
-justification for the system in the paper is that it is the simplest system
-that already illustrates the key difficult issues of disjointness.
-Admittedly refinement types seem more challenging. We have thought about them
-and it was unclear how to deal with them.   We will make this clearer in early
-on in the paper, and announce that there's some coupling between the approach
-and type system.
+Having a top type requires a minor modification to the specification:  
+
+A * B = not exists C. A <: C and B <: C and C /= top  
+
+This result is mentioned in the conclusion. We do not foresee major
+complications arising from having a top type. Top would make the metatheory
+more messy (managing all the side-conditions for C /=top), but would not add
+fundamental difficulties. Our intention is to present a simple system that
+already illustrates the key issue of disjointness. Admittedly, deadling with
+refinement types such as even_integer and odd_integer seems more challenging.
+We have thought about them and it was unclear how to deal with them. We will
+make this clearer in early on in the paper, and announce that there's some
+coupling between the approach and type system.
+
+Merging two objects containing a `toString` method:
+
+Such practice is forbidden since it would be otherwise unclear which
+implementation to choose. However, as long as the user explicitly "exclude"
+one implementation using the record exclusion operator, the merge is accepted.
 
 #reviewer 1
 reply to concern about supertypes.  
@@ -23,12 +31,14 @@ For example, can we usefully employ traits to describe a LinkedList class that
 contains a "next" pointer to another LinkedList?
 
 Such LinkedList in this traditional style will require recursive types. And
-extending the notion of disjointness to recursive types needs further
-research. However, we can still define LinkedList in the “case class” style.
+extending the notion of disjointness to recursive types such as µA. A&B needs further
+research.
+
+However, we can still define LinkedList in the “case class” style.
 For example, the following LinkedList supports construction and membership
 test.
 
-type LinkedList = { member: () -> Bool }
+type LinkedList = { member: Int -> Bool }
 
 trait Nil { self: LinkedList ->
   member(y: Int) = False
@@ -50,36 +60,39 @@ specifically, in our system, non-function terms such as 1 and ‘c’ can be
 merged. Although lambda& can encode records, it is unclear how to encode
 arbitrary merges. One way to encode arbitrary merges in lambda& is to consider
 a record with multiple labels of the same trivial name. For example, encoding
-1,,’c’ as {res = 1, res = ‘c’}. However, {res = 1, res = ‘c’} is ill-typed in
-lambda& since the type of the first `res` is obviously a subtype of the second
-`res`, Condition 3.2(b) in the lambda& paper requires that the type of 1 to be
-a subtype of the type of ‘c’, which is unfortunately not the case.
-Furthermore, that condition will require the types of the two fields to be a
-subtype of each other.
+1,,’c’
+as
+{res = 1, res = ‘c’}
 
-As another example, lambda& forbids:
+However, that will be ill-typed in lambda& since the type of the first `res`
+is obviously a subtype of the second `res`, Condition 3.2(b) in the lambda&
+paper thus requires that the type of 1 to be a subtype of the type of ‘c’,
+which is not the case. Furthermore, that condition will require the types of
+the two fields to be a subtype of each other.
+
+As another example, lambda& forbids the such intersection of two function
+types:
 
 {Int -> Char, Int -> Bool}
 
-which are considered disjoint in our system. So clearly their conditions (even
-for the special case of functions) do not subsume disjoint intersections.
+which is considered disjoint and is accepted in our system. So clearly their
+conditions (even for the special case of functions) do not subsume disjoint
+intersections.
 
-- The way of providing semantics are different: Lamdba& uses types at run-time
-to select the most specific function to be applied, while our work uses an
-elaboration approach.
+- The way of providing semantics are different: lamdba& uses types at run-time
+to select the most specific function in an intersection to be applied, while
+our work uses an elaboration approach.
 
-* Traits:
- 
-Our point is not to argue that traits can be encoded with records;
-rather we show that, in the same way that Dunfield calculus can be viewed
-as a foundational calculus that can encode various language features
-(including records);
-our calculus can be viewed as a foundational calculus that generalizes
-records with non-overlapping fields, and as such can model constructs
-such as traits, that rely on such non-overlapping conditions.
- 
-Dunfield calculus alone would not be able to encode traits (it
-misses the checks for conflicts). So, if the goal is to use
-a system with intersection types and a merge operator to model
-traits, some additional work is needed: that's what our system does.
+* Traits:  
+
+Our point is not to argue that traits can be encoded with records; rather we
+show that, in the same way that Dunfield calculus can be viewed as a
+foundational calculus that can encode various language features (including
+records); our calculus can be viewed as a foundational calculus that
+generalizes records with non-overlapping fields, and as such can model
+constructs such as traits, that rely on such non-overlapping conditions.
+Dunfield's calculus alone would not be able to encode traits (it misses the
+checks for conflicts). So, if the goal is to use a system with intersection
+types and a merge operator to model traits, some additional work is needed:
+that's what our system does.
 
