@@ -11,7 +11,7 @@ simple system that already illustrates the key issues of disjointness.
 
 Admittedly, dealing with refinement types such as even_integer and
 odd_integer seems more challenging.  We have thought about refinement
-types and it was unclear how to deal with them.
+types before and it was unclear how to deal with them.
 
 #reviewer 1
 
