@@ -1,106 +1,93 @@
-* no top type; or refinement types (reviewers 1 & 2)
+* no top type; or refinement types (reviewers 1&2)
 
 As mentioned in the conclusion, having a top type requires a 
 minor modification to the specification: 
 
-A * B = not exists C. A <: C and B <: C and C /= top 
+A*B=not exists C. A<:C and B<:C and C/=top 
 
-Top would make the metatheory more messy (managing all the
-side-conditions for C /=top), but would not add fundamental
-difficulties. Our intention is to present a simple system that already
-illustrates the key issues of disjointness.
+Top would make the metatheory more messy, but would not add
+fundamental difficulties. Our intention in the paper was to present a
+simple system that already illustrates the key issues of disjointness.
 
 Admittedly, dealing with refinement types such as even_integer and
-odd_integer seems more challenging.  We have thought about them and it
-was unclear how to deal with them. 
-
-We will make this clearer early in the paper.
+odd_integer seems more challenging.  We have thought about refinement
+types and it was unclear how to deal with them.
 
 #reviewer 1
 
-"In most OO languages, _all_ types have a common supertype (Object,
-Top or whatever it is called). I'd imagine that in practice most types
-would still share some common supertypes (e.g., for things like
-"toString" methods). Hence I don't believe that the "solution"
-suggested in Sec. 8 will work very well."
+"In most OO languages, _all_ types have a common supertype...I'd
+imagine that in practice most types would still share some common
+supertypes...Hence I don't believe that the "solution" suggested in
+Sec. 8 will work very well."
 
-We think there is some confusion here. It is true that the merge
-operator does not allow merging objects with common supertypes; 
-however this does not mean that our system (or the extensions
-mentioned in Section 8) prevent the relevant use-case of
-"multiple-inheritance" of two objects with a common supertype. At the
-end of section 3.4 there is one example (counter), where we want to
-inherit from two objects that share a common supertype:
+There is some confusion here. It is true that the merge operator does
+not allow merging objects with common supertypes.  **However** this
+does not mean that our system (or extensions in Section 8) prevents
+"multiple-inheritance" of two objects sharing a common supertype. See
+end of section 3.4, where an example (counter) of multiple inheritance with
+a common supertype:
 
 {incr: () -> Counter}
 
-what needs to be done (following the trait model!) is that the user
-needs to choose one implementation of the incr method to be used 
-in the resulting object composed with the merge operator. 
-
-Note also, that most OO languages also only support *single
-inheritance*, where the only thing that is done is to override or add
-new methods. Single inheritance uses of the merge operator would be no
-less convinient than in most OO languages.
+is presented. In this case (following the trait model!) we need to
+choose the implementation of incr for the resulting object composed
+with the merge operator.
 
 #reviewer 2
 
-QUESTION:
-Do the authors know if this approach works for recursively defined objects?
-For example, can we usefully employ traits to describe a LinkedList class that
-contains a "next" pointer to another LinkedList?
+"Do the authors know if this approach works for recursively defined objects?"
 
-Such LinkedList in this traditional style will require recursive types. And
-extending the notion of disjointness to recursive types needs further
-research.
+Defining LinkedList in the traditional OO style requires recursive
+types. Extending the notion of disjointness to recursive types needs
+further research.
 
-However, we can still define LinkedList in a more functional style.
-For example, the following LinkedList supports construction and membership
-test.
+We can define LinkedList in a style similar to case classes in
+Scala. For example, the following LinkedList supports construction and
+membership test.
 
-type LinkedList = { member: Int -> Bool }
+type LinkedList={member:Int -> Bool}
 
-trait Nil { self: LinkedList ->
-  member(y: Int) = False
+trait Nil {self:LinkedList->
+  member(y:Int)=False
 }
 
-trait Cons(x:Int, xs: LinkedList) { self: LinkedList ->
-  member(y: Int) = x == y || xs.member(y)
+trait Cons(x:Int, next: LinkedList) {self:LinkedList->
+  member(y:Int)= x==y||next.member(y)
 }
 
 #reviewer 3
 
-* lambda&
+*lambda&
 
-- Besides the different motivation of lambda& and our work, the
-problems that are solved are also different and the techniques used in
-lambda& cannot be applied to Dunfield's calculus. Lambda& addresses
-the overloading problem for functions and focuses on the “merge” (in
-our sense) of functions, while our work considers a system with
-arbitrary intersections/merges and tries to present a coherent subset
-of that. More specifically, in our system, non-function terms such as
-1 and ‘c’ can be merged. Although lambda& can encode records, it is
-unclear how to encode arbitrary merges. One failed attempt to encode arbitrary
-merges in lambda& is to consider a record with multiple labels of the
-same trivial name. For example, encoding 1,,’c’ as 
+"the solution seems much more powerful than simply forbidding
+non-overlapping intersections"
 
-{Res -> 1, Res ->‘c’}
-
-(where Res is an atomic type). However this is rejected in lambda& as
-it violates the well-formedness conditions in Section 3.2.
-
-As another example, lambda& forbids the intersection of function
-types which are accepted in our system:
+No it is not! lambda& rejects intersections that are accepted 
+in our system:
 
 {Int -> Char, Int -> Bool}
 
-So clearly the conditions imposed by lambda& (even for the special
-case of functions) do not subsume disjoint intersections. 
+This example violates the well-formdeness conditions (see Section 3.2)
+of lambda&.  So clearly the conditions imposed by lambda& (even for
+the special case of functions) does not subsume disjoint
+intersections.
 
-- The semantics are different: lamdba& uses types at run-time
-to select the most specific function in an intersection to be applied, while
-our work (and Dunfield's work) uses an elaboration approach that
-inserts coercions at compile-time.
+"The problem of coherence with intersection types was studied in the 90's
+by Castagna in the language lambda-&"
+
+No it wasn't! Castagna work on lambda& studied the overloading problem
+for functions and focused only on the “merge” (in our sense) of
+functions. Our work considers a system with arbitrary
+intersections/merges and tries to present a coherent subset of
+that. Although lambda& can encode records, it is unclear how to encode
+arbitrary merges. One failed attempt to encode arbitrary merges in
+lambda& is to consider a record with multiple labels of the same
+trivial name. For example, encoding 1,,’c’ as
+
+{Res -> 1, Res ->‘c’}
+
+(where Res is an atomic type). However this is also rejected in
+lambda&, since it violates the well-formedness conditions.
 
 * Traits: 
 
@@ -108,7 +95,7 @@ Our point is not to argue that traits can be encoded with records; rather we
 show that, in the same way that Dunfield calculus can be viewed as a
 foundational calculus that can encode various language features (including
 records); our calculus can be viewed as a foundational calculus that
-generalizes records with non-overlapping fields, and as such can model
+generalizes records with non-overlapping fields. As such it can model
 constructs such as traits, that rely on such non-overlapping conditions.
 Dunfield's calculus alone would not be able to encode traits (it misses the
 checks for conflicts). So, if the goal is to use a system with intersection
