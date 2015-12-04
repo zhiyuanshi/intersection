@@ -78,19 +78,23 @@ by Castagna in the language lambda-&"
 
 No it wasn't! Castagna studied the overloading problem for functions
 and focused only on the “merge” (in our sense) of functions. Our work
-considers a system with **arbitrary** intersections/merges and tries to
-present a coherent subset of that. Although lambda& can encode
-records, **it is unclear how to encode arbitrary merges**. One failed
-attempt to encode arbitrary merges in lambda& is to consider a record
-with multiple labels of the same trivial name. For example, encoding
-1,,’c’ as
+considers a system with **arbitrary** intersections/merges and tries
+to present a coherent subset of that. The well-formdeness conditions
+presented in Section 3.2 of the lambda& paper cannot be ported to a
+system with arbitrary intersections, since they assume function types
+only.
+
+Moreover, although lambda& can encode records, **it is unclear how to
+encode arbitrary merges**. One failed attempt to encode arbitrary
+merges in lambda& is to consider a record with multiple labels of the
+same trivial name. For example, encoding 1,,’c’ as
 
 {Res -> 1, Res ->‘c’}
 
 (where Res is an atomic type). However this is also rejected in
 lambda&, since it violates the well-formedness conditions.
 
-Nevertheless the lambda& is related work and should be discussed. 
+Nevertheless lambda& is related work and should be discussed. 
 We'll add a discussion in the paper.
 
 * Traits: 
