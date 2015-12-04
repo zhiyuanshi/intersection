@@ -1,57 +1,63 @@
-* no top type; or refinement types (reviewer 1 & 2)
+* no top type; or refinement types (reviewer 1 & 2)   Having a top type
+requires a minor modification to the specification:   A * B = not exists C. A
+<: C and B <: C and C /= top   This is mentioned in the conclusion. We do not
+foresee major complications arising from having a top type. Top would make the
+metatheory more messy (managing all the side-conditions for C /=top), but
+would not add fundamental difficulties.   So, a justification for the system
+in the paper is that it is the simplest system that already illustrates the
+key difficult issues of disjointness.   Admittedly refinement types seem more
+challenging. We have thought about them and it was unclear how to deal with
+them.   We will make this clearer in early on in the paper, and announce that
+there's some coupling between the approach and type system.   #reviewer 1
+reply to concern about supertypes.   #reviewer 2   QUESTION: Do the authors
+know if this approach works for recursively defined objects?  For example, can
+we usefully employ traits to describe a LinkedList class that contains a
+"next" pointer to another LinkedList?
 
-Having a top type requires a minor modification to the specification:
+Such LinkedList in this traditional style will require recursive types. And
+extending the notion of disjointness to recursive types needs further
+research. However, we can still define LinkedList in the “case class” style.
+For example, the following LinkedList supports construction and membership
+test.
 
-A * B = not exists C. A <: C and B <: C and C /= top 
+type LinkedList = { member: () -> Bool }
 
-This is mentioned in the conclusion. We do not foresee major
-complications arizing from having a top type. Top would make the
-metatheory more messy (managing all the side-conditions for C /=top),
-but would not add fundamental difficulties.
+trait Nil { self: LinkedList ->
+  member(y: Int) = False
+}
 
-So, a justification for the system in the paper is that it is 
-the simplest system that already illustrates the key difficult 
-issues of disjointness.
-
-Admitedly refinement types seem more challenging. We have thought 
-about them and it was unclear how to deal with them. 
-
-We will make this clearer in early on in the paper, and 
-announce that there's some coupling between the approach and 
-type system.
-
-#reviewer 1
-
-reply to concern about supertypes.
-
-#reviewer 2
-
-QUESTION:
-Do the authors know if this approach works for recursively defined objects?  For example, can we usefully employ traits to describe a LinkedList class that contains a "next" pointer to another LinkedList?
-
-#reviewer 3
-
-* Lambda&
-
-- Lambda& focuses on the overloading problem for functions; seems 
-more related to the problem of application.
-- uses types at run-time to select the most specific function 
-to be applied; no elaboration
-- although it can encode records, it is unclear hot to encode 
-arbitrary intersections.
+trait Cons(x:Int, xs: LinkedList) { self: LinkedList ->   member(y: Int) = x
+== y || xs.member(y) }   #reviewer 3   * Lambda&   - The motivation of Lambda&
+and our work are different: Lambda& addresses the overloading problem for
+functions and focuses on the “merge” (in our sense) of functions, while our
+work considers a system with arbitrary intersections/merges and tries to
+present a coherent subset of that. More specifically, in our system, non-
+function terms such as 1 and ‘c’ can be merged. Although Lambda& can encode
+records, it is unclear how to encode arbitrary merges. One way to encode
+arbitrary merges in Lambda& is to consider a record with multiple labels of
+the same trivial name. For example, encoding 1,,’c’ as {res = 1, res = ‘c’}.
+However, {res = 1, res = ‘c’} is ill-typed in Lambda& since the type of the
+first `res` is obviously a subtype of the second `res`, Condition 3.2(b) in
+the Lambda& paper requires that the type of 1 to be a subtype of the type of
+‘c’, which is unfortunately not the case. Furthermore, that condition will
+require the types of the two fields to be a subtype of each other. - The way
+of providing semantics are different: Lamdba& uses types at run-time to select
+the most specific function to be applied, while our work uses an elaboration
+approach.
 
 * traits:
-
-our point is not to argue that traits can be encoded with records; 
-
+ 
+our point is not to argue that traits can be encoded with records;
+ 
 rather we show that, in the same way that Dunfield calculus can be viewed
-as a foundational calculus that can encode various language features 
-(including records); 
-our calculus can be viewed as a foundational calculus that generalizes 
-records with non-overlapping fields, and as such can model constructs 
+as a foundational calculus that can encode various language features
+(including records);
+our calculus can be viewed as a foundational calculus that generalizes
+records with non-overlapping fields, and as such can model constructs
 such as traits, that rely on such non-overlapping conditions.
-
-Dunfield calculus alone would not be able to encode traits (it 
-misses the checks for conflicts). So, if the goal is to use 
-a system with intersection types and a merge operator to model 
+ 
+Dunfield calculus alone would not be able to encode traits (it
+misses the checks for conflicts). So, if the goal is to use
+a system with intersection types and a merge operator to model
 traits, some additional work is needed: that's what our system does.
+
