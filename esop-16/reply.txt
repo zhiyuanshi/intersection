@@ -24,7 +24,7 @@ would still share some common supertypes (e.g., for things like
 "toString" methods). Hence I don't believe that the "solution"
 suggested in Sec. 8 will work very well."
 
-I think there is some confusion here. It is true that the merge
+We think there is some confusion here. It is true that the merge
 operator does not allow merging objects with common supertypes; 
 however this does not mean that our system (or the extensions
 mentioned in Section 8) prevent the relevant use-case of
