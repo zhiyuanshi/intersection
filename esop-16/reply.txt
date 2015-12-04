@@ -18,21 +18,29 @@ We will make this clearer early in the paper.
 
 #reviewer 1
 
-" I'd imagine that in practice most types would still share some
-common supertypes (e.g., for things like "toString" methods). Hence I
-don't believe that the "solution" suggested in Sec. 8 will work very
-well."
+"In most OO languages, _all_ types have a common supertype (Object,
+Top or whatever it is called). I'd imagine that in practice most types
+would still share some common supertypes (e.g., for things like
+"toString" methods). Hence I don't believe that the "solution"
+suggested in Sec. 8 will work very well."
 
-Well, most OO languages also only support *single inheritance*, where
-the only thing that is done is to override or add new methods.  Such
-uses of the merge operator would be no less convinient than in most OO
-languages. In the multiple-inheritance case (for example merging 2
-objects implementing toString()), users would indeed be required to
-chose one implementation, but this is the trait model! Moreover it is
-also how Java 8 default methods work in the presence of multiple
-inheritance (for well-justified reasons from the Java 8 design team).
-So, at least Java (perhaps the most widely used OO language) uses such
-"rather impractical" approach in practice.
+I think there is some confusion here. Our system (or the extensions
+mentioned in Section 8) does not prevent the relevant use-case of
+"multiple-inheritance" of two objects with a common supertype. At the
+end of section 3.4 there is one example (counter), where we want to
+inherit from two objects that share a common supertype:
+
+{incr: () -> Counter}
+
+what needs to be done (following the trait model!) is that the user
+needs to choose one implementation of the incr method to be used 
+in the resulting object composed with the merge operator. 
+
+Note also, that most OO languages also only support *single
+inheritance*, where the only thing that is done is to override or add
+new methods: so the situation of inheriting two implementations of
+toString can never happen then! Single inheritance uses of the merge
+operator would be no less convinient than in most OO languages.
 
 #reviewer 2
 
