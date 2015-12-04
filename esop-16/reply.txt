@@ -67,37 +67,42 @@ in our system:
 
 {Int -> Char, Int -> Bool}
 
-This example violates the well-formdeness conditions (see Section 3.2)
+This example violates the well-formdeness conditions (see Section 3.2
+of "A Calculus for Overloaded Functions with Subtyping" (1995))
 of lambda&.  So clearly the conditions imposed by lambda& (even for
-the special case of functions) does not subsume disjoint
+the special case of functions) do not subsume disjoint
 intersections.
 
 "The problem of coherence with intersection types was studied in the 90's
 by Castagna in the language lambda-&"
 
-No it wasn't! Castagna work on lambda& studied the overloading problem
-for functions and focused only on the “merge” (in our sense) of
-functions. Our work considers a system with arbitrary
-intersections/merges and tries to present a coherent subset of
-that. Although lambda& can encode records, it is unclear how to encode
-arbitrary merges. One failed attempt to encode arbitrary merges in
-lambda& is to consider a record with multiple labels of the same
-trivial name. For example, encoding 1,,’c’ as
+No it wasn't! Castagna studied the overloading problem for functions
+and focused only on the “merge” (in our sense) of functions. Our work
+considers a system with **arbitrary** intersections/merges and tries to
+present a coherent subset of that. Although lambda& can encode
+records, **it is unclear how to encode arbitrary merges**. One failed
+attempt to encode arbitrary merges in lambda& is to consider a record
+with multiple labels of the same trivial name. For example, encoding
+1,,’c’ as
 
 {Res -> 1, Res ->‘c’}
 
 (where Res is an atomic type). However this is also rejected in
 lambda&, since it violates the well-formedness conditions.
 
+Nevertheless the lambda& is related work and should be discussed. 
+We'll add a discussion in the paper.
+
 * Traits: 
 
-Our point is not to argue that traits can be encoded with records; rather we
-show that, in the same way that Dunfield calculus can be viewed as a
-foundational calculus that can encode various language features (including
-records); our calculus can be viewed as a foundational calculus that
-generalizes records with non-overlapping fields. As such it can model
-constructs such as traits, that rely on such non-overlapping conditions.
-Dunfield's calculus alone would not be able to encode traits (it misses the
-checks for conflicts). So, if the goal is to use a system with intersection
-types and a merge operator to model traits, some additional work is needed:
-that's what our system does.
+Our point is not to argue that traits can be encoded with records;
+rather we show that, in the same way that Dunfield calculus can be
+viewed as a foundational calculus that can encode various language
+features (including records); our calculus can be viewed as a
+foundational calculus that generalizes records with non-overlapping
+fields. As such it can model constructs such as traits, that rely on
+such non-overlapping conditions.  Dunfield's calculus alone would not
+be able to encode traits (it misses the non-overlapping conditions for
+detecting conflicts). So, if the goal is to use a system with
+intersection types and a merge operator to model traits, some
+additional work is needed: that's what our system does.
