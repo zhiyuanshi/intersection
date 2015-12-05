@@ -1,17 +1,17 @@
-*no top type;or refinement types (reviewers 1&2)
+*no top type; or refinement types (reviewers 1&2)
 
 As mentioned in the conclusion, having a top type requires a
 minor modification to the disjointness specification:
 
 A*B=not exists C.A<:C and B<:C and C/=top
 
-Top would make the metatheory more messy, but we do not think it 
+Top would make the metatheory more messy, but we do not think it
 adds fundamental difficulties. Our intention in the paper was to
 present a simple system that already illustrates the key issues of
 disjointness.
 
 Admittedly, dealing with refinement types such as even_integer and
-odd_integer seems more challenging.  We have thought about refinement
+odd_integer seems more challenging. We have thought about refinement
 types before and it was unclear how to deal with them.
 
 #reviewer 1
@@ -70,7 +70,7 @@ in our system:
 
 {Int->Char,Int->Bool}
 
-This example violates the well-formdeness conditions of lambda& (see Section
+This example violates the well-formedness conditions of lambda& (see Section
 3.2 of "A Calculus for Overloaded Functions with Subtyping" (1995)). So
 clearly the conditions imposed by lambda& (even for the special case of
 functions) do not subsume disjoint intersections.
@@ -93,8 +93,8 @@ encoding 1,,’c’ as
 
 {l=1,l=‘c’}
 
-(where label l are of an isolated atomic type L, see Section 4 of the lambda&
-paper). However this is also rejected in lambda&, since it violates the well-
+(where label l is of an isolated atomic type L, see Section 4 of the lambda&
+paper). However, this is also rejected in lambda&, since it violates the well-
 formedness conditions.
 
 Nevertheless lambda& is related work and should be discussed.
@@ -102,7 +102,7 @@ Nevertheless lambda& is related work and should be discussed.
 * Traits:
 
 Our point is not to argue that traits can be encoded with records.
-Rather, in the same way that Dunfield calculus is foundational
+Rather, in the same way that Dunfield's calculus is foundational
 calculus for encoding various language features (including records),
 our calculus is a foundational calculus supports records with
 non-overlapping fields. As such it can model constructs such as
