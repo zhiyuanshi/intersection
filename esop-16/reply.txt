@@ -5,9 +5,10 @@ minor modification to the specification:
 
 A*B=not exists C. A<:C and B<:C and C/=top 
 
-Top would make the metatheory more messy, but would not add
-fundamental difficulties. Our intention in the paper was to present a
-simple system that already illustrates the key issues of disjointness.
+Top would make the metatheory more messy, but we do not think it would
+add fundamental difficulties. Our intention in the paper was to
+present a simple system that already illustrates the key issues of
+disjointness.
 
 Admittedly, dealing with refinement types such as even_integer and
 odd_integer seems more challenging.  We have thought about refinement
@@ -23,7 +24,7 @@ Sec. 8 will work very well."
 There is some confusion here. It is true that the merge operator does
 not allow merging objects with common supertypes.  **However** this
 does not mean that our system (or extensions in Section 8) prevents
-"multiple-inheritance" of two objects sharing a common supertype. See
+"multiple-inheritance" of objects sharing a common supertype. See
 end of section 3.4, where an example (counter) of multiple inheritance with
 a common supertype:
 
@@ -67,7 +68,7 @@ in our system:
 
 {Int -> Char, Int -> Bool}
 
-This example violates the well-formdeness conditions (see Section 3.2
+This example violates the well-formedness conditions (see Section 3.2
 of "A Calculus for Overloaded Functions with Subtyping" (1995))
 of lambda&.  So clearly the conditions imposed by lambda& (even for
 the special case of functions) do not subsume disjoint
@@ -79,7 +80,7 @@ by Castagna in the language lambda-&"
 No it wasn't! Castagna studied the overloading problem for functions
 and focused only on the “merge” (in our sense) of functions. Our work
 considers a system with **arbitrary** intersections/merges and tries
-to present a coherent subset of that. The well-formdeness conditions
+to present a coherent subset of that. The well-formedness conditions
 presented in Section 3.2 of the lambda& paper cannot be ported to a
 system with arbitrary intersections, since they assume function types
 only.
