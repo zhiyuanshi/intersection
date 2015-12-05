@@ -1,12 +1,12 @@
-* no top type; or refinement types (reviewers 1&2)
+*no top type;or refinement types (reviewers 1&2)
 
-As mentioned in the conclusion, having a top type requires a 
-minor modification to the specification: 
+As mentioned in the conclusion, having a top type requires a
+minor modification to the disjointness specification:
 
-A*B=not exists C. A<:C and B<:C and C/=top 
+A*B=not exists C.A<:C and B<:C and C/=top
 
-Top would make the metatheory more messy, but we do not think it would
-add fundamental difficulties. Our intention in the paper was to
+Top would make the metatheory more messy, but we do not think it 
+adds fundamental difficulties. Our intention in the paper was to
 present a simple system that already illustrates the key issues of
 disjointness.
 
@@ -16,43 +16,45 @@ types before and it was unclear how to deal with them.
 
 #reviewer 1
 
-"In most OO languages, _all_ types have a common supertype...I'd
-imagine that in practice most types would still share some common
-supertypes...Hence I don't believe that the "solution" suggested in
-Sec. 8 will work very well."
+"I don't believe that the "solution" suggested in Sec. 8 will work
+very well."
 
 There is some confusion here. It is true that the merge operator does
 not allow merging objects with common supertypes.  **However** this
 does not mean that our system (or extensions in Section 8) prevents
 "multiple-inheritance" of objects sharing a common supertype. See
-end of section 3.4, where an example (counter) of multiple inheritance with
+end of section 3.4, for an example (counter) of multiple inheritance with
 a common supertype:
 
-{incr: () -> Counter}
+{incr:()->Counter}
 
-is presented. In this case (following the trait model!) we need to
-choose the implementation of incr for the resulting object composed
-with the merge operator.
+In this case (following the trait model!) we need to choose the
+implementation of incr for the resulting object composed with the
+merge operator.
+
+Note also that uses of single inheritance (which is what most OO
+languages actually support), where only *new* methods (or method
+overrides) are done, can be done as conveniently in our language.
 
 #reviewer 2
 
 "Do the authors know if this approach works for recursively defined objects?"
 
 Defining LinkedList in the traditional OO style requires recursive
-types. Extending the notion of disjointness to recursive types needs
+types. Extending the notion of disjointness to recursive types requires
 further research.
 
 We can define LinkedList in a style similar to case classes in
 Scala. For example, the following LinkedList supports construction and
 membership test.
 
-type LinkedList={member:Int -> Bool}
+type LinkedList={member:Int->Bool}
 
-trait Nil {self:LinkedList->
+trait Nil{self:LinkedList->
   member(y:Int)=False
 }
 
-trait Cons(x:Int, next: LinkedList) {self:LinkedList->
+trait Cons(x:Int,next:LinkedList){self:LinkedList->
   member(y:Int)= x==y||next.member(y)
 }
 
@@ -63,16 +65,15 @@ trait Cons(x:Int, next: LinkedList) {self:LinkedList->
 "the solution seems much more powerful than simply forbidding
 non-overlapping intersections"
 
-No it is not! lambda& rejects intersections that are accepted 
+No it is not! lambda& rejects intersections that are accepted
 in our system:
 
-{Int -> Char, Int -> Bool}
+{Int->Char,Int->Bool}
 
-This example violates the well-formedness conditions (see Section 3.2
-of "A Calculus for Overloaded Functions with Subtyping" (1995))
-of lambda&.  So clearly the conditions imposed by lambda& (even for
-the special case of functions) do not subsume disjoint
-intersections.
+This example violates the well-formdeness conditions of lambda& (see Section
+3.2 of "A Calculus for Overloaded Functions with Subtyping" (1995)). So
+clearly the conditions imposed by lambda& (even for the special case of
+functions) do not subsume disjoint intersections.
 
 "The problem of coherence with intersection types was studied in the 90's
 by Castagna in the language lambda-&"
@@ -85,29 +86,37 @@ presented in Section 3.2 of the lambda& paper cannot be ported to a
 system with arbitrary intersections, since they assume function types
 only.
 
-Moreover, although lambda& can encode records, **it is unclear how to
-encode arbitrary merges**. One failed attempt to encode arbitrary
-merges in lambda& is to consider a record with multiple labels of the
-same trivial name. For example, encoding 1,,’c’ as
+Moreover, although lambda& can encode records, **it is unclear how to encode
+arbitrary merges**. One failed attempt to encode arbitrary merges in lambda&
+is to consider a record with multiple labels of the same name. For example,
+encoding 1,,’c’ as
 
-{Res -> 1, Res ->‘c’}
+{l=1,l=‘c’}
 
-(where Res is an atomic type). However this is also rejected in
-lambda&, since it violates the well-formedness conditions.
+(where label l are of an isolated atomic type L, see Section 4 of the lambda&
+paper). However this is also rejected in lambda&, since it violates the well-
+formedness conditions.
 
-Nevertheless lambda& is related work and should be discussed. 
-We'll add a discussion in the paper.
+Nevertheless lambda& is related work and should be discussed.
 
-* Traits: 
+* Traits:
 
-Our point is not to argue that traits can be encoded with records;
-rather we show that, in the same way that Dunfield calculus can be
-viewed as a foundational calculus that can encode various language
-features (including records); our calculus can be viewed as a
-foundational calculus that generalizes records with non-overlapping
-fields. As such it can model constructs such as traits, that rely on
-such non-overlapping conditions.  Dunfield's calculus alone would not
-be able to encode traits (it misses the non-overlapping conditions for
-detecting conflicts). So, if the goal is to use a system with
-intersection types and a merge operator to model traits, some
-additional work is needed: that's what our system does.
+Our point is not to argue that traits can be encoded with records.
+Rather, in the same way that Dunfield calculus is foundational
+calculus for encoding various language features (including records),
+our calculus is a foundational calculus supports records with
+non-overlapping fields. As such it can model constructs such as
+traits, that rely on such non-overlapping conditions. Dunfield's
+calculus alone would not be able to encode traits (it misses the
+non-overlapping conditions for detecting conflicts). So, if the goal
+is to use a system with intersection types and a merge operator to
+model traits, some additional work is needed: that's what our system
+does.
+
+Regarding new features of traits, we refer to Section 3.5. The point
+is that we have first-class traits, where trait implementations are
+not statically known in trait composition (only types are known). If
+the reviewer knows work on traits that supports such feature,
+perhaps he could provide us with a reference (we couldn't find any)?
+(Note that the type "Trait[T]" does not simply denote a record type
+T).
