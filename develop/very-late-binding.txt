@@ -14,8 +14,9 @@ b          Literals of base types
 
 Remarks.
 
-1. Singleton types and terms are regarded as sets (order is therefore
-irrelevant). For example, t_1 -> t_2 is regarded as /\{ t_1 -> t_2 }.
+1. Singleton types and terms are regarded as unary-intersection of sets (order
+is therefore irrelevant). For example, t_1 -> t_2 is regarded as /\{ t_1 ->
+t_2 }.
 
 2. Sets of sets, sets of sets of sets, ad infinitum, are regarded as
 "flattened" "level-1" sets. For example, /\{{ Int }, Nat } is equivalent to
@@ -66,7 +67,7 @@ Definition (proper subtyping). s <:/= t if s <: t but not t <: s.
 
 Remark.
 1. Conformance describes the functions that can accept the argument v.
-2. Minimality describes the functions that can accept the argument v and has the most "precise" parameter type.
+2. Minimality describes the functions that can accept the argument v and has the most "precise" parameter types.
 3. Reduction gets stuck if J is empty.
 
 Lemma. I is nonempty if and only if J is.
@@ -74,7 +75,30 @@ Lemma. I is nonempty if and only if J is.
 
 
 "Filter":
-,,{ e_1 : t_1, ..., e_n : t_n } `filter` t = { e_i | t_i <: t }
+,,{ e_1 : t_1, ..., e_n : t_n } `filter` t = { e_i : t_i | t_i <: t }
+
+
+
+Metatheory:
+
+Theorem (economy). If e is a program that is accepted both in a conventional
+overloading calculus (such as Castagna's lambda&) and in this calculus, then
+each time the (beta) rule is applied, no more than one function is actually
+invoked.
+
+Proof sketch.
+We illustrate by considering the case of binary merges.
+
+Assume
+  f : s_1 -> s_2
+  g : t_1 -> t_2
+and consider the program p
+p = (f ,, g) (e : u)
+
+If both f and g are invoked in the (beta) rule, then J = { 1, 2 }.
+Furthermore, I = J = { 1, 2 } since I is a superset of J. By the definition of
+I (conformance), u <: s_1 and u <: t_1, which violates lambda&'s well-
+formedness condition of types. Therefore, p is not accepted in lambda&.
 
 
 
@@ -91,3 +115,17 @@ Examples of the dynamics.
 ,,{ \x. 1 : Int -> Int, \x. 2 : Bool -> Int } (0 : Int)
 -->
 1
+
+(3)
+
+,,{ \x. 1 : Int -> Int, \x. 2 : Nat -> Int } (0 : Nat)
+-->
+2
+
+Explanation:
+/\{ Int -> Int, Nat -> Int }
+Let us order the two types from left to right by 1 and 2.
+Then in terms of the (beta) rule,
+I = { 1, 2 }
+J = { 2 }
+Note that 1 is not in J since Nat <:/= Int.
