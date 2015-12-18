@@ -1,0 +1,93 @@
+A Calculus with Very Late Binding
+
+
+
+Syntax:
+
+Types s, t, u ::= B | t_1 -> t_2 | /\{ t }
+Terms e, f, g ::= b | x | \x. e | e_1 e_2 | ,,{ e }
+Values v      ::= b | \x. e | ,,{ v }
+
+B          Base types
+b          Literals of base types
+[e/x] f    Capture-avoiding substitution of e for x in f
+
+Remarks.
+
+1. Singleton types and terms are regarded as sets (order is therefore
+irrelevant). For example, t_1 -> t_2 is regarded as /\{ t_1 -> t_2 }.
+
+2. Sets of sets, sets of sets of sets, ad infinitum, are regarded as
+"flattened" "level-1" sets. For example, /\{{ Int }, Nat } is equivalent to
+/\{ Int, Nat }.
+
+
+
+Subtyping: t_1 <: t_2
+
+(arr)
+s_2 <: s_1    t_1 <: t_2
+------------------------
+s_1 -> t_1 <: s_2 -> t_2
+
+(set)
+forall t in { t_1, ..., t_n }.
+  there exists s in { s_1, ..., s_m }.
+  s <: t
+------------------------------------------
+/\{ s_1, ..., s_m } <: /\{ t_1, ..., t_n }
+
+Examples:
+In the following let us assume Nat <: Int.
+
+(1) /\{ Int } <: /\{ Int } true
+(2) (adding types on the *right* may break subtying)
+    /\{ Int } <: /\{ Int, Nat } false
+(3) (adding types on the *left* always preserves subtyping)
+    /\{ Int, Nat } <: /\{ Int } true
+
+Lemma. If s <: t, then for any type u, /\{ s, u } <: t.
+
+
+
+Dynamics (call-by-value): e_1 --> e_2
+
+Before we proceed, let us define the <:/= relation which will be used in the following.
+
+Definition (proper subtyping). s <:/= t if s <: t but not t <: s.
+
+(beta)
+,,{ \x. e_1 : s_1 -> t_1, ..., \x. e_n : s_n -> t_n, ... (non-function values) ... } (v : t)
+-->
+,,{ [v `filter` s_j/x] e_j : t_j | j in J }
+  where
+    (conformance) I = { i | t <: t_i }
+    (minimality)  J = { j | not (there exists i. i, j in I and i /= j and t_i <:/= t_j) }
+
+Remark.
+1. Conformance describes the functions that can accept the argument v.
+2. Minimality describes the functions that can accept the argument v and has the most "precise" parameter type.
+3. Reduction gets stuck if J is empty.
+
+Lemma. I is nonempty if and only if J is.
+
+
+
+"Filter":
+,,{ e_1 : t_1, ..., e_n : t_n } `filter` t = { e_i | t_i <: t }
+
+
+
+Examples of the dynamics.
+
+(1)
+
+,,{ \x. 1 : Int -> Int, \x. True : Int -> Bool } (0 : Int)
+-->
+,,{ 1, True }
+
+(2)
+
+,,{ \x. 1 : Int -> Int, \x. 2 : Bool -> Int } (0 : Int)
+-->
+1
