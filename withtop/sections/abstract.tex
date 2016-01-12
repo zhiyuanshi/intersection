@@ -1,0 +1,17 @@
+Dunfield has shown that a simply typed core calculus with intersection types and
+a merge operator is able to capture various programming language features. While
+his calculus is type-safe, it is known that it is not \emph{coherent}:
+different derivations for the same expression can lead to different results. The
+lack of coherence is an important disadvantage for adoption of his core calculus
+in implementations of programming languages, as the semantics of the programming
+language becomes implementation-dependent.
+
+This paper presents \name: a core calculus with a variant of \emph{intersection
+types} and a \emph{merge operator}. The semantics \name is both type-safe and
+coherent. Coherence is achieved by ensuring that intersection types are
+\emph{disjoint}. Formally, two types are disjoint if they do not share a common
+supertype. We present a type system that prevents intersection types that are
+not disjoint, as well as an algorithmic specification to determine whether two
+types are disjoint. Moreover, we show the applicability of this calculus to
+express a simple, yet powerful form of dynamically composable traits, paving the way for new
+designs of object-oriented programming languages.

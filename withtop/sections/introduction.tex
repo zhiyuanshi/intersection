@@ -1,0 +1,410 @@
+\section{Introduction}
+\label{sec:intro}
+
+Previous work by Dunfield~\cite{dunfield2014elaborating} has shown the
+usefulness of type systems with intersection types and a merge operator. The presence of a merge
+operator in a core calculus provides significant expressiveness, allowing
+encodings for many other language constructs as syntactic sugar. For example
+single-field records are easily encoded as types with a label, and multi-field
+records are encoded as the concatenation of single-field records. Concatenation
+of records is expressed using intersection types at the type-level and the
+corresponding merge operator at the term level. Dunfield formalized a simply
+typed lambda calculus with intersection types and a merge operator. He showed
+how to give a semantics to the calculus by a type-directed translation to a
+simply typed lambda calculus extended with pairs. The type-directed translation
+is elegant and type-safe.
+
+% \bruno{the following paragraph no longer makes sense for this paper.}
+% Intersection types and the merge operator are also useful in the
+% context of software \emph{extensibility}. In recent years there has
+% been a wide interest in presenting solutions to the \emph{expression
+%   problem}~\cite{wadler1998expression} in various
+% communities. Currently there are various solutions in functional
+% programming languages~\cite{swierstra:la-carte,emgm}, object-oriented
+% programming
+% languages~\cite{togersen:2004,Zenger-Odersky2005,oliveira09modular,oliveira2012extensibility}
+% and theorem provers~\cite{DelawareOS13,SchwaabS13}.
+% Many of the proposed solutions for extensibility are closely related
+% to type-theoretic encodings of datatypes~\cite{BoehmBerarducci},
+% except that some form of subtyping is also involved.  Various
+% language-specific mechanisms are used to combine ideas from
+% type-theoretic encodings of datatypes with subtyping, but the essence
+% of the solutions is hidden behind the peculiarities of particular
+% programming languages.  Calculi with intersection types have a natural
+% subtyping relation that is helpful to model problems related to
+% extensibility.  Moreover, intersection types and an \emph{encoding} of
+% a merge operator have been shown to be useful to solve additional
+% challenges related to extensibility~\cite{oliveira2013feature}.
+% Therefore it is natural to wonder if a
+% core calculus supporting parametric polymorphism,
+% intersection types and a merge operator, can be used to capture the
+% essence of various solutions to extensibility problems.
+
+%Clearly this seems to indicate that a more
+%foundational approach is lacking. What is currently missing is a
+%foundational core calculus that can capture the key ideas behind the
+%various solutions.
+
+While Dunfield's calculus is type-safe, it lacks the property of
+\emph{coherence}: different derivations for the same expression can
+lead to different results. The lack of coherence is an important
+disadvantage for adoption of his core calculus in implementations of
+programming languages, as the semantics of the programming language
+becomes implementation dependent. Although Dunfield mentioned the
+possibility of extending the type system to allow only disjoint
+intersection types, he did not formalize or further pursue this
+approach.
+
+
+\begin{comment}
+Moreover, from the theoretic point-of-view, the ambiguity that arises
+from the lack of coherence makes the calculus unsatisfying when the
+goal is to precisely capture the essence of solutions to
+extensibility.
+\end{comment}
+
+This paper presents \name: a core calculus with a variant of \emph{intersection
+types} and a \emph{merge operator}. The semantics of \name is both type-safe and
+coherent. Coherence is achieved by ensuring that intersection types are
+\emph{disjoint}. Given two types $A$ and $B$, two types are disjoint ($A *
+B$)\footnote{The notation $A * B$ is inspired by the \emph{separating
+conjunction} construct in Reynolds' separation
+logic~\cite{reynolds2002separation}.} if there is no type $C$ such that both $A$
+and $B$ are subtypes of $C$. Formally this definition is captured as follows:
+\[A * B \equiv \not\exists C.~A <: C \wedge B <: C\] With this definition of
+disjointness we present a formal specification of a type system that prevents
+intersection types that are not disjoint. However, the formal definition of
+disjointness does not lend itself directly to an algorithmic implementation.
+Therefore, we also present an algorithmic specification to determine whether two
+types are disjoint. Moreover, this specification is shown to be sound and
+complete with respect to the formal definition of disjointness. We have
+mechanized the many of the interesting metatheoretical results using the Coq proof
+assistant, and the main proof of type-safety and the coherence theorem can be found
+in the full version of the paper\footnote{\url{https://github.com/zhiyuanshi/intersection/blob/master/esop-16/paper-full.pdf}}.
+
+As an application of \name, we show that \name can serve as a
+foundation for a trait-based~\cite{scharli2003traits} object-oriented
+language. Due to the type system of \name, the language supports
+common features of traits such as commutative composition, explicit
+conflict detection and resolution. In addition, our language also
+supports instantiating and composing traits dynamically, which cannot
+be achieved in many existing statically typed object-oriented
+languages.
+
+In summary, the contributions of this paper are:
+
+\begin{itemize*}
+
+\item \textbf{Disjoint Intersection Types:} A new form of intersection type
+where only disjoint types are allowed. A sound and complete algorithmic
+specification of disjointness (with respect to the corresponding formal
+definition) is presented.
+
+\item \textbf{Dynamically Composable Traits:} As an application of this work, we show how to build a
+trait-based object-oriented language by leveraging the type system of \name. The
+resulting source language enjoys many features described in the original traits
+proposal for free.
+
+\item \textbf{Formalization of \name and Proof of Coherence:} An
+   elaboration semantics of \name into $\lambda$-calculus is
+   given. Type-soundness and coherence are proved and formalized. Several key theorems
+   are mechanically formalized using the Coq theorem prover.
+
+\item \textbf{Implementation:} An implementation of an extension of \name, as
+well as encodings of the examples presented in the paper, are publicly available
+online\footnote{
+\url{https://github.com/hkuplg/fcore/tree/develop/examples/traits}}.
+
+\end{itemize*}
+
+\bruno{Records and record operations missing in the appendix.}
+
+\begin{comment}
+
+There has been a remarkable number of works aimed at improving support
+for extensibility in programming languages. The motivation behind this
+line of work is simple, and it is captured quite elegantly by the
+infamous \emph{Expression Problem}~\cite{wadler1998expression}: there
+are \emph{two} common and desirable forms of extensibility, but most
+mainstream languages can only support one form well. Unfortunately
+the lack of support in the other form has significant
+consequences in terms of code maintenance and software evolution.  As a
+result researchers proposed various approaches to address the problem,
+including: visions of new programming
+models~\cite{Prehofer97,Tarr99ndegrees,Harrison93subject}; new
+programming languages or language
+extensions~\cite{McDirmid01Jiazzi,Aracic06CaesarJ,Smaragdakis98mixin,nystrom2006j},
+and \emph{design patterns} that can be used with existing mainstream
+languages~\cite{togersen:2004,Zenger-Odersky2005,oliveira09modular,oliveira2012extensibility}.
+
+Some of the more recent work on extensibility is focused on design
+patterns. Examples include \emph{Object
+  Algebras}~\cite{oliveira2012extensibility}, \emph{Modular Visitors}~\cite{oliveira09modular,togersen:2004} or
+Torgersen's~\cite{togersen:2004} four design patterns using generics. In those
+approaches the idea is to use some advanced (but already available)
+features, such as \emph{generics}~\cite{Bracha98making}, in combination with conventional
+OOP features to model more extensible designs.  Those designs work in
+modern OOP languages such as Java, C\#, or Scala.
+
+Although such design patterns give practical benefits in terms of
+extensibility, they also expose limitations in existing mainstream OOP
+languages. In particular there are three pressing limitations:
+1) lack of good mechanisms for
+  \emph{object-level} composition; 2) \emph{conflation of
+    (type) inheritance with subtyping}; 3) \emph{heavy reliance on generics}.
+
+  The first limitation shows up, for example, in encodings of Feature-Oriented
+  Programming~\cite{Prehofer97} or Attribute Grammars~\cite{Knuth1968} using Object
+  Algebras~\cite{oliveira2013feature,rendel14attributes}. These programs are best
+  expressed using a form of \emph{type-safe}, \emph{dynamic},
+  \emph{delegation}-based composition. Although such form of
+  composition can be encoded in languages like Scala, it requires the
+  use of low-level reflection techniques, such as dynamic proxies,
+  reflection or other forms of meta-programming. It is clear
+  that better language support would be desirable.
+
+  The second limitation shows up in designs for modelling
+  modular or extensible visitors~\cite{togersen:2004,oliveira09modular}.  The vast majority of modern
+  OOP languages combines type inheritance and subtyping.
+  That is, a type extension induces a subtype. However
+  as Cook et al.~\cite{cook1989inheritance} famously argued there are programs where
+  ``\emph{subtyping is not inheritance}''. Interestingly
+  not many programs have been previously reported in the literature
+  where the distinction between subtyping and inheritance is
+  relevant in practice. However, as shown in this paper, it turns out that this
+  difference does show up in practice when designing modular
+  (extensible) visitors.  We believe that modular visitors provide a
+  compelling example where inheritance and subtyping should
+  not be conflated!
+
+  Finally, the third limitation is prevalent in many extensible
+  designs~\cite{togersen:2004,Zenger-Odersky2005,oliveira09modular,oliveira2013feature,rendel14attributes}.
+  Such designs rely on advanced features of generics,
+  such as \emph{F-bounded polymorphism}~\cite{Canning89f-bounded}, \emph{variance
+    annotations}~\cite{Igarashi06variant}, \emph{wildcards}~\cite{Torgersen04wildcards} and/or \emph{higher-kinded
+    types}~\cite{Moors08generics} to achieve type-safety. Sadly, the amount of
+  type-annotations, combined with the lack of understanding of these
+  features, usually deters programmers from using such designs.
+
+This paper presents \name (pronounced \emph{f-and}): an extension of
+$\lambda$-calculus~\cite{Reynolds74f} with intersection types and a merge
+operator~\cite{dunfield2014elaborating}.  The goal of \name is to study the
+\emph{minimal} foundational language constructs that are needed to support
+various extensible designs, while at the same time addressing the limitations of
+existing OOP languages. To address the lack of good object-level composition
+mechanisms, \name uses the merge operator for dynamic composition of
+values/objects. Moreover, in \name (type-level) extension is independent of
+subtyping, and it is possible for an extension to be a supertype of a base
+object type. Furthermore, intersection types and conventional subtyping can be
+used in many cases instead of advanced features of generics. Indeed this paper
+shows many previous designs in the literature can be encoded without such
+advanced features of generics.
+
+
+Technically speaking \name is mainly inspired by the work of
+Dunfield~\cite{dunfield2014elaborating}. Dunfield showed how to model a simply typed
+calculus with intersection types and a merge operator. The presence of
+a merge operator adds significant expressiveness to the language,
+allowing encodings for many other language constructs as syntactic
+sugar. \name differs from Dunfield's work in a few
+as
+the elaboration semantics into $\lambda$-calculus is done directly from the
+source calculus with subtyping.
+% In contrast, Dunfield has an additional step which eliminates subtyping.
+% Secondly, a non-technical difference
+% is that \name is aimed at studying issues of OOP languages and
+% extensibility, whereas Dunfield's work was aimed at Functional
+% Programming and he did not consider application to extensibility.
+% Like many other foundational formal models for OOP (for
+% example $F_{<:}$~\cite{CMMS}), \name is purely functional and it uses
+% structural typing.
+
+%%\name is
+%%formalized and implemented. Furthermore the paper illustrates how
+%%various extensible designs can be encoded in \name.
+
+In summary, the contributions of this paper are:
+
+\begin{itemize*}
+
+\item {\bf A Minimal Core Language for Extensibility:} This paper
+  identifies a minimal core language, \name, capable of
+  expressing various extensibility designs in the literature.
+  \name also addresses limitations of existing OOP
+  languages that complicate extensible designs.
+
+\item {\bf Formalization of \name:} An elaboration semantics of
+  \name into $\lambda$-calculus is given, and type-soundness is proved.
+
+\item {\bf Encodings of Extensible Designs:} Various encodings of
+  extensible designs into \name, including \emph{Object
+    Algebras} and \emph{Modular Visitors}.
+
+\item {\bf A Practical Example where ``Inheritance is not Subtyping''
+    Matters:} This paper shows that modular/extensible visitors
+  suffer from the ``inheritance is not subtyping problem''.
+%% Moreover
+%% with extensible visitors the extension should become a
+%% \emph{supertype}, not a subtype. \bruno{extension with accept method}
+
+\item {\bf Implementation:} An implementation of an
+  extension of \name, as well as the examples presented in the
+  paper, are publicly available\footnote{{\bf Note to reviewers:} The code (and some machine
+    checked proofs) can be found in the repository.}.
+
+\end{itemize*}
+
+\end{comment}
+
+% \section{Introduction}
+
+% Dunfield's work showed how many language features can be encoded in terms
+% of intersection types with a merge operator. However two important
+% questions were left open by Dunfield:
+
+% \begin{enumerate}
+% \item How to allow coherent programs only?
+
+% \item If a restriction that allows coherent programs is in place, can
+%   all coherent programs conform to the restriction?
+% \end{enumerate}
+
+% In other words question 1) asks whether we can find sufficient
+% conditions to guarantee coherency; whereas question 2) asks
+% whether those conditions are also necessary. In terms of technical
+% lemmas that would correspond to:
+
+% \begin{enumerate}
+
+% \item Coherency theorem: $\Gamma \turns e : A \leadsto E_1 \wedge
+%   \Gamma \turns e : A \leadsto E_2~\to~E_1 = E_2$.
+
+% \item Completness of Coherency: ($\Gamma \turns_{old} e : A \leadsto E_1 \wedge
+%   \Gamma \turns_{old} e : A \leadsto E_2~\to~E_1 = E_2) \to \Gamma
+%   \turns e : A$.
+
+% \end{enumerate}
+
+% For these theorems we assume two type systems. On liberal type system
+% that ensures type-safety, but not coherence ($\Gamma \turns_{old} e :
+% A$); and another one that is both type-safe and coherent  ($\Gamma \turns e :
+% A$). What needs to be shown for completness is that if a coherent
+% program type-checks in the liberal type system, then it also
+% type-checks in the restricted system.
+
+
+% \special{papersize=8.5in,11in}
+% \setlength{\pdfpageheight}{\paperheight}
+% \setlength{\pdfpagewidth}{\paperwidth}
+
+% \title{\name}
+
+% \subsection{``Testsuite'' of examples}
+
+% \begin{enumerate}
+
+% \item $\lambda (x : Int * Int). (\lambda (z : Int) . z)~x$: This
+%   example should not type-check because it leads to an ambigous choice
+%   in the body of the lambda. In the current system the well-formedness
+%   checks forbid such example.
+
+% \item $\Lambda A.\Lambda B.\lambda (x:A).\lambda (y:B). (\lambda (z:A)
+%   . z) (x,,y)$: This example should not type-check because it is not
+%   guaranteed that the instantiation of A and B produces a well-formed
+%   type. The TyMerge rule forbids it with the disjointness check.
+
+% \item $\Lambda A.\Lambda B * A.\lambda (x:A).\lambda (y:B). (\lambda
+%   (z:A) . z) (x,,y)$: This example should type-check because B is
+%   guaranteed to be disjoint with A. Therefore instantiation should
+%   produce a well-formed type.
+
+% \item $(\lambda (z:Int) . z) ((1,,'c'),,(2,False))$: This example
+%   should not type-check, since it leads to an ambigous lookup of
+%   integers (can either be 1 or 2). The definition of disjointness is
+%   crutial to prevent this example from type-checking. When
+%   type-checking the large merge, the disjointness predicate will
+%   detect that more than one integer exists in the merge.
+
+% \item $(\lambda (f: Int \to Int \& Bool) . \lambda (g : Int \to Char \& Bool) . ((f,,g) : Int \to Bool)$:
+%   This example
+%   should not type-check, since it leads to an ambigous lookup of
+%   functions. It shows that in order to check disjointness
+%   of functions we must also check disjointness of the subcomponents.
+
+% \item $(\lambda (f: Int \to Int) . \lambda (g : Bool \to Int) . ((f,,g) : Bool \& Int \to Int)$:
+%   This example shows that whenever the return types overlap, so does the function type:
+%   we can always find a common subtype for the argument types.
+% \end{enumerate}
+
+% \subsection{Achieving coherence}
+
+% The crutial challenge lies in the generation of coercions, which can lead
+% to different results due to multiple possible choices in the rules that
+% can be used. In particular the rules subinter1 and subinter2 overlap and
+% can result in coercions that are not equivalent. A simple example is:
+
+% $(\lambda (x:Int) . x) (1,,2)$
+
+% The result of this program can be either 1 or 2 depending on whether
+% we chose subinter1 or subinter2.
+
+% Therefore the challenge of coherence lies in ensuring that, for any given
+% types A and B, the result of $A <: B$ always leads to the same (or semantically
+% equivalent) coercions.
+
+% It is clear that, in general, the following does not hold:
+
+% $if~A <: B \leadsto C1~and~A <: B \leadsto C2~then~C1 = C2$
+
+% We can see this with the example above. There are two possible coercions:\\
+
+% \noindent $(Int\&Int) <: Int \leadsto \lambda (x,y). x$\\
+% $(Int\&Int) <: Int \leadsto \lambda (x,y). y$\\
+
+% However $\lambda (x,y). x$ and $\lambda (x,y). y$ are not semantically equivalent.
+
+% One simple observation is that the use of the subtyping relation on the
+% example uses an ill-formed type ($Int\&Int$). Since the type system can prevent
+% such bad uses of ill-formed types, it could be that if we only allow well-formed
+% types then the uses of the subtyping relation do produce equivalent coercions.
+% Therefore the we postulate the following conjecture:
+
+% $if~A <: B \leadsto C1~and~A <: B \leadsto C2~and~A, B~well~formed~then~C1 = C2$
+
+% If the following conjecture does hold then it should be easy to prove that
+% the translation is coherent.
+
+% % \begin{mathpar}
+% %   \inferrule
+% %   {}
+% %   {\jtype \epsilon {1 \mergeop 2} {\constraints {\code{Int} \disjoint \code{Int}} \code{Int} \inter \code{Int}}}
+% % \end{mathpar}
+
+% % \begin{definition}{(Disjointness)}
+% % Two sets $S$ and $T$ are \emph{disjoint} if there does not exist an element $x$, such that $x \in S$ and $x \in T$.
+% % \end{definition}
+
+% % \begin{definition}{(Disjointness)}
+% % Two types $A$ and $B$ are \emph{disjoint} if there does not exist an term $e$, which is not a merge, such that $\jtype \epsilon e A'$, $\jtype \epsilon e B'$, $A' \subtype A$, and $B' \subtype B$.
+% % \end{definition}
+
+% \section{Introduction}
+
+% The benefit of a merge, compared to a pair, is that you don't need to explicitly extract an item out. For example, \lstinline@fst (1,'c')@
+
+% \begin{definition}{Determinism}
+% If $e : A_1 \hookrightarrow E_1$ and $e : A_2 \hookrightarrow E_2$,
+% then $A_1 = A_2$ and $E_1 = E_2$.
+% \end{definition}
+
+% \emph{Coherence} is a property about the relation between syntax and semantics. We say a semantics is \emph{coherent} if the syntax of a term uniquely determines its semantics.
+
+% \begin{definition}{Coherence}
+% If $e_1 : A_1 \hookrightarrow E_1$ and $e_2 : A_2 \hookrightarrow E_2$,
+% $E_1 \Downarrow v_1$ and $E_2 \Downarrow v_2$,
+% then $v_1 = v_2$.
+% \end{definition}
+
+% \begin{definition}{Disjointness}
+% Two types $A$ and $B$ are \emph{disjoint} (written as ``$\disjoint A B$'') if there does not exist a type $C$ such that $C \subtype A$ and $C \subtype B$ and $C \subtype A \inter B$.
+% \end{definition}

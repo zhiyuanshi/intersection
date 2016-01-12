@@ -1,0 +1,59 @@
+\newcommand{\formwf}{\framebox{$ \jwf \Gamma A $}}
+
+\newcommand{\makelabelwf}[1]{F-WF-#1}
+
+\newcommand{\labelwfvar}{\makelabelwf Var}
+\newcommand{\rulewfvar}{
+  \inferrule* [right=\labelwfvar]
+    {\alpha \in \Gamma}
+    {\jwf \Gamma \alpha}
+}
+
+\newcommand{\labelwfint}{\makelabelwf Int}
+\newcommand{\rulewfint}{
+  \inferrule* [right=\labelwfint]
+    { }
+    {\jwf \Gamma {\code{Int}}}
+}
+
+\newcommand{\labelwfbot}{\makelabelwf Bot}
+\newcommand{\rulewfbot}{
+  \inferrule* [right=\labelwfbot]
+    { }
+    {\jwf \Gamma \bot}
+}
+
+\newcommand{\labelwffun}{\makelabelwf Fun}
+\newcommand{\rulewffun}{
+  \inferrule* [right=\labelwffun]
+    {\jwf \Gamma A \\ \jwf \Gamma B}
+    {\jwf \Gamma {A \to B}}
+}
+
+\newcommand{\labelwfforall}{\makelabelwf Forall}
+\newcommand{\rulewfforall}{
+  \inferrule* [right=\labelwfforall]
+    {\jwf {\Gamma, \alpha} A}
+    {\jwf \Gamma {\for \alpha A}}
+}
+
+\newcommand{\rulewfforalldis}{
+  \inferrule* [right=\labelwfforall]
+    {\jwf \Gamma A \\ \jwf {\Gamma, \alpha \disjoint A} B}
+    {\jwf \Gamma {\fordis \alpha A B}}
+}
+
+\newcommand{\labelwfinter}{\makelabelwf Inter}
+\newcommand{\rulewfinter}{
+  \inferrule* [right=\labelwfinter]
+    {\jwf \Gamma A \\ \jwf \Gamma B}
+    {\jwf \Gamma {A \inter B}}
+}
+
+\newcommand{\rulewfinterdis}{
+  \inferrule* [right=\labelwfinter]
+    {\jwf \Gamma A \\
+     \jwf \Gamma B \\
+     \highlight{$\jdis \Gamma A B$}}
+    {\jwf \Gamma {A \inter B}}
+}

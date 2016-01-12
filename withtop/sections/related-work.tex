@@ -1,0 +1,220 @@
+\section{Related Work}
+\label{sec:related-work}
+
+%*******************************************************************************
+\paragraph{Coherence.}
+%*******************************************************************************
+
+Reynolds invented Forsythe~\cite{reynolds1997design} in the 1980s. Our merge
+operator is analogous to his operator $p_1, p_2 $. Forsythe has a coherent
+semantics. The result was proved formally by
+Reynolds~\cite{reynolds1991coherence} in a lambda calculus with intersection
+types and a merge operator. However  the way coherence is ensured is not general
+enough. He has four different typing rules for the merge operator, each
+accounting for various possibilities of what the types of the first and second
+components are. In some cases the meaning of the second component takes
+precedence (that is, is biased) over the first component. The set of rules is
+restrictive and it forbids, for instance, the merge of two functions (even when
+they a provably disjoint). Therefore, Forsythe treatment of coherence
+is rather ad-hoc. In contrast, disjointness in \name has a simple, well-defined
+specification and it is quite flexible.
+
+Pierce~\cite{pierce1991programming2} made a comprehensive review
+of coherence, especially on Curien and Ghelli~\cite{curienl1990coherence} and
+Reynolds' methods of proving coherence; but he was not able to prove coherence
+for his $F_\wedge$ calculus. He introduced a primitive $\code{glue}$ function as
+a language extension which corresponds to our merge operator. However, in his
+system users can ``glue'' two arbitrary values, which can lead to incoherence.
+
+Our work is largely inspired by Dunfield~\cite{dunfield2014elaborating}. He
+described a similar approach to ours: compiling a system with intersection types
+and a merge operator into ordinary $ \lambda $-calculus terms with pairs. One
+major difference is that our system does not include unions. As
+acknowledged by Dunfield, his calculus lacks of coherence. He discusses the
+issue of coherence throughout his paper, mentioning biased choice as an option
+(albeit a rather unsatisfying one). He also mentioned that the notion of
+disjoint intersection could be a good way to address the problem, but he did not
+pursue this option in his work.
+
+% \url{http://homepages.inf.ed.ac.uk/gdp/publications/Sub_Par.pdf}
+
+% \cite{plotkin1994subtyping}
+
+% Also discussed intersection types!~\cite{malayeri2008integrating}.
+
+% Pierce Ph.D thesis: F<: + /|
+%        technical report: F + /|, closer to ours
+
+% \cite{barbanera1995intersection}
+%
+% \paragraph{Intersection types with polymorphism.}
+% Our type system combines intersection types and parametric polymorphism. Closest
+% to us is Pierce's work~\cite{pierce1991programming1} on a prototype
+% compiler for a language with both intersection types, union types, and
+% parametric polymorphism. Similarly to \name in his system universal
+% quantifiers do not support bounded quantification. However Pierce did not try to prove any
+% meta-theoretical results and his calculus does not have a merge
+% operator.  Pierce also studied a system where both intersection
+% types and bounded polymorphism are present in his Ph.D.
+% dissertation~\cite{pierce1991programming2} and a 1997
+% report~\cite{pierce1997intersection}.
+
+Recently, Castagna~\textit{et al.}~\cite{Castagna:2014} studied an very interesting
+and coherent calculus that has polymorphism and set-theoretic type connectives (such as
+intersections, unions, and negations). Unfortunately their calculus
+does not include a merge operator like ours, which is our major source
+of difficulty for achieving coherence.
+%As a result, in their calculus one is
+%also able to express a type variable that can be instantiated to any type other
+%than $\code{Int}$ as $\alpha \setminus \code{Int}$, which is syntactic sugar for
+%$\alpha \wedge \neg \code{Int}$.
+
+Going in the direction of higher
+kinds, Compagnoni and Pierce~\cite{compagnoni1996higher} added
+intersection types to System $ F_{\omega} $ and used the new calculus,
+$ F^{\omega}_{\wedge} $, to model multiple inheritance. In their
+system, types include the construct of intersection of types of the
+same kind $ K $. Davies and Pfenning
+\cite{davies2000intersection} studied the interactions between
+intersection types and effects in call-by-value languages. And they
+proposed a ``value restriction'' for intersection types, similar to
+value restriction on parametric polymorphism. None of those calculi
+include a merge operator.
+
+There have been attempts to provide a foundational calculus
+for Scala that incorporates intersection
+types~\cite{amin2014foundations,amin2012dependent}.
+%Although the minimal Scala-like calculus does not natively support
+%parametric polymorphism, it is possible to encode parametric
+%polymorphism with abstract type members. Thus it can be argued that
+%this calculus also supports intersection types and parametric
+%polymorphism.
+However, the type-soundness of a minimal Scala-like
+calculus with intersection types and parametric polymorphism is not
+yet proven. Recently, some form of intersection
+types has been adopted in object-oriented languages such as Scala,
+Ceylon, and Grace. Generally speaking,
+the most significant difference to \name is that in all previous systems
+there is no explicit introduction construct like our merge operator.
+
+\begin{comment}
+only allow intersections of concrete types (classes),
+whereas our language allows intersections of type variables, such as
+\texttt{A \& B}. Without that vehicle, we would not be able to define
+the generic \texttt{merge} function (below) for all interpretations of
+a given algebra, and would incur boilerplate code:
+
+\begin{lstlisting}
+let merge [A, B] (f: ExpAlg A) (g: ExpAlg B) = {
+  lit (x : Int) = f.lit x ,, g.lit x,
+  add (x : A & B) (y : A & B) =
+    f.add x y ,, g.add x y
+}
+\end{lstlisting}
+\end{comment}
+
+%*******************************************************************************
+\paragraph{Other Type Systems with Intersection Types.}
+%*******************************************************************************
+
+% Although similar in spirit,
+% our elaboration typing is simpler: we require subtyping in the case of
+% applications, thus avoiding the subsumption rule. Besides, our treatment
+% combines the merge rules ($ k $ ranges over $ \{1, 2\} $)
+% \inferrule
+% {\Gamma \turns e_k : A}
+% {\Gamma \turns e_1 \mergeop e_2 : A}
+% and the standard intersection-introduction rule
+% \inferrule
+% {\Gamma \turns e : A_1 \andalso \Gamma \turns e : A_2}
+% {\Gamma \turns e : A_1 \inter A_2}
+% into one rule:
+% \inferrule [Merge]
+% {\Gamma \turns e_1 : A_1 \andalso \Gamma \turns e_2 : A_2}
+% {\Gamma \turns e_1 \mergeop e_2 : A_1 \inter A_2}
+%Castagna, and Dunfield describe
+%elaborating multi-fields records into merge of single-field records.
+% Reynolds and Castagna do not consider elaboration and Dunfield do not
+% formalize elaborating records.
+% Both Pierce and Dunfield's system include a subsumption rule, which states that
+% if an term has been inferred of type $ A $, then it is also of any
+% supertype of $ A $. Our system does not have this rule.
+Refinement
+intersection~\cite{dunfield2007refined,davies2005practical,freeman1991refinement}
+is the more conservative approach of adopting intersection types. It increases
+only the expressiveness of types but not terms. But without a term-level
+construct like ``merge'', it is not possible to encode various language
+features. As an alternative to syntactic subtyping described in this paper,
+Frisch~\textit{et al.}~\cite{frisch2008semantic} studied semantic subtyping. Semantic
+subtyping seems to have important advantages over syntactic subtyping. One
+worthy avenue for future work is to study languages with intersection types
+and merge operator in a semantic subtyping setting.
+
+%*******************************************************************************
+\paragraph{Traits and Trait Calculi.}
+%*******************************************************************************
+
+The seminal paper by Schärli~\textit{et al.} introduced the ideas behind
+traits. In their original paper, they documented an implementation of
+the trait mechanism in a dynamically typed version of Smalltalk.
+Fisher and Reppy~\cite{fisher2004typed} presented a statically typed
+calculus that models traits. \name is not dedicated to traits; but rather, it
+supports a source language that models traits. Compared to Fisher and Reppy's
+calculus, \name is more lightweight. For example, self references (as
+well as other OO-specific constructs) are
+not built-in \name. One reason for the difference is that Fisher and Reppy's
+calculus supports \emph{classes} in addition to traits, and considers the
+interaction between them, whereas our object oriented source language is
+\emph{prototype} (or delegation) based---the mechanism for code reuse is purely traits. Of
+course, there have been many other formalizations of traits, such
+as~\cite{scharli2003traitsformal}. But most of them are heavyweight and specific
+to modeling traits and typical class-based models of OOP, and therefore differ from our approach.
+
+Bettini~\textit{et al.}'s prototype language,
+SWRTJ~\cite{bettini2010prototypical} distinguishes, in their terminology,
+``records'' and ``traits''---the former contain fields and the latter contain
+methods. Since we try to model a pure object-oriented language, we have excluded
+fields, which provide state reuse. In SWRTJ, traits themselves are not meant to
+be the generator of instances. Instead, another construct, called ``classes''
+are, and make use of traits.
+
+The Scala language also has a notion of ``traits''. However, unlike what its
+name suggests,
+the semantics of trait composition in Scala is more similar to
+mixins~\cite{bracha1990mixin}. That is, like traditional mixin
+semantics, when two traits are composed, Scala attempts to do
+\emph{implicit resolution of conflicts}. In comparison, the traits modeled in
+\name are
+intended to model the original trait idea closely, and conflicts must
+be resolved explicitly. Schärli~\textit{et al.} document well the trade-offs
+between mixins and traits. Aside from that, Scala's
+traits and our source language's traits have four major differences:
+
+\begin{enumerate}
+
+  \item Scala's traits cannot be instantiated but only mixed into a class (which
+  can be anonymous), whereas traits in our language can be instantiated
+  directly.
+
+  \item Scala's traits cannot take constructor parameters whereas ours can. As in
+  the point example below, our trait is itself a constructor and takes the x- and
+  y-coördinates as parameters:
+
+  \begin{lstlisting}
+  trait Point(x: Int, y: Int) { self: Point (*$ \to $*)
+    x() = x
+    y() = y
+  } in (* \ldots *)
+  \end{lstlisting}
+
+%  \item Scala allows traits to contain methods whose body is not implemented.
+%  But our current language does not support this feature.
+
+   \item Dynamic instantiation is supported in \name, but not in
+     Scala. In Scala instantiating an object from a class or traits
+     requires that all classes or traits are statically known.
+
+   \item Our model of traits is purely functional, but Scala's traits
+     also support fields, mutable state and abstract types.
+
+\end{enumerate}

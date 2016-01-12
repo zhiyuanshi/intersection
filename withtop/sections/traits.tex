@@ -1,0 +1,453 @@
+%*******************************************************************************
+\section{Dynamically Composable Traits} \label{sec:trait}
+%*******************************************************************************
+
+\george{after the new keyword, types should be specified.}
+
+As an application of disjoint intersection types, we show how to model a
+simple, yet expressive form of dynamically composable
+traits~\cite{scharli2003traits} in \name. Traits provide a
+mechanism of code reuse in object-oriented programming, that
+can be used as an alternative to multiple inheritance.
+The interesting aspect about traits is the way conflicts that
+typically arise in multiple-inheritance are dealt with.
+Instead of trying to automatically resolve conflicts, traits
+detect those conflicts and require programmers to explicitly resolve
+them. This is where the relation to disjoint intersection types comes
+in: the mechanism to detect incoherence of disjoint intersection types
+provides us with the mechanism to detect conflicts in traits.
+We demonstrate various trait
+features in a simple OO language, and then sketch a straightforward
+translation from that language to \name as a basic form of
+syntactic sugar. \george{Need to note the difference
+between class-based and prototype-based somewhere.}
+
+\subsection{Basic Traits}
+
+A trait is a collection of related methods that characterizes only a specific
+perspective of the features of an object. Therefore, compared with
+programs using inheritance, programs using traits usually have a
+larger number of small
+traits rather than fewer but larger classes. Code reuse with traits is easier
+than with classes, since traits are usually shorter and can
+be \emph{composed}. In fact, trait composition offers a variety of
+possibilities: two traits can be ``added'' together (which is an symmetric
+operation); methods can be removed from a trait; and trait systems provide
+conflict detection, etc.
+
+The first example shows basic trait composition. Many social networking sites
+allow users to ``upvote'' a comment and the number of upvotes that comment has
+received is also displayed. We would like to separate the logic for upvotes from
+comments so that it can be reused in other entities such as posts and sharings.
+The code below defines a trait, \lstinline$Comment$, which contains a single
+method \lstinline$content$.\footnote{Our source language assumes regular record
+type, record operations as well the unit type and unit literals.}
+
+\begin{lstlisting}
+type Comment = { content: () (*$ \to $*) String } in
+trait Comment(content: String) { self: Comment (*$ \to $*)
+  content() = content
+} in
+\end{lstlisting}
+
+\noindent Next, we create another trait, \lstinline$Up$, for tracking the number
+of upvotes.
+
+\begin{lstlisting}
+type Up = { upvotes: () (*$ \to $*) Int } in
+trait Up(upvotes: Int) { self: Up (*$ \to $*)
+  upvotes() = upvotes
+} in
+\end{lstlisting}
+
+At this point the reader may wonder why there are duplicate declarations related
+to \lstinline$Comment$ and \lstinline$Up$. In mainstream OO languages such as
+Java, a class declaration such as \lstinline$class C { ... }$ does two things at
+the same time:
+
+\begin{itemize}
+\item Declaring a \emph{template} for creating objects;
+\item Declaring a new \emph{type}.
+\end{itemize}
+
+\noindent In contrast, trait declarations in this source language only do the
+former. Back to our example, the purpose of declaring two types is just to use
+them for type annotations of the self reference.  In the traits literature, a trait
+usually ``requires'' some methods and, based on that,  ``provides'' another set
+of methods. In our examples, the type of \lstinline$self$ actually denotes what
+methods are required.
+
+A trait can expect parameters, which become in scope in the entire trait body.
+For example, the \lstinline$Comment$ trait is parametrized by
+\lstinline$content$, and the \lstinline$content$ method does nothing more than
+returning the eponymous variable.
+%In comparison, traits in Scala do not allow
+%taking parameters.
+
+The origin of self references is always explicit. The \lstinline$Comment$ trait
+requires \lstinline$self$ to be of type \lstinline$Comment$, which is defined
+as a type synonym for a record in the first line. But the name ``self'' is
+nothing special. In fact, \lstinline$self$ is just another parameter after the
+preceding parameter list, and becomes in scope after the arrow. We could have
+named it \lstinline$this$ or even \lstinline$s$.
+
+Creating an object is via the \lstinline$new$ keyword, similar to many OO
+languages, except for one crucial novelty: we can create an object from multiple
+traits. More precisely, the object is created from the \emph{composition} of
+those traits. Therefore, we are able to call methods from different traits on a
+single object. For example, we can create a single object from
+\lstinline$Comment$  and \lstinline$Up$ traits and test its
+functionality as follows:
+
+\begin{lstlisting}
+let comment = new[Comment&Up] (Comment("Have fun!") & Up(4))
+in println(comment.content(), comment.upvotes())
+-- Output: "Have fun!" 4
+\end{lstlisting}
+
+\subsection{Traits with Dependencies}
+The following example shows that a trait
+can depend on another trait. First we define the type of a point and a trait for
+a standard point.
+
+\begin{lstlisting}
+type Point = {x: () (*$ \to $*) Int, y: () (*$ \to $*) Int} in
+trait Point(x: Int, y: Int) { self: Point (*$ \to $*)
+  x() = x
+  y() = y
+} in
+\end{lstlisting}
+
+The norm of a point can be defined as its distance to the origin. We provide two
+definitions of norm via two traits.
+
+\begin{lstlisting}
+type Norm = { norm: () (*$ \to $*) Double } in
+trait EuclideanNorm() { self: Point (*$ \to $*)
+  norm() = Math.sqrt(self.x() * self.x() + self.y() * self.y())
+} in
+
+trait ManhattanNorm() { self: Point (*$ \to $*)
+  norm() = Math.abs(self.x()) + Math.abs(self.y())
+} in
+\end{lstlisting}
+
+Note how in \lstinline$EuclideanNorm$ and \lstinline$ManhattanNorm$
+the type of the self-reference is \lstinline$Point$! This is in
+contrast to a typical object-oriented language, such as Java, where
+the self-reference must always be of the same type as the class being
+defined. It is this functionality that allow us to express
+dependencies between traits. When the traits \lstinline$EuclideanNorm$
+and \lstinline$ManhattanNorm$ are instantiated and composed with some
+other traits, they must be composed with an implementation of
+\lstinline$Point$.
+%Thus, ater compose the definition of point and norm we can have
+%different meanings. Composition of traits is anonymous in the sense that there
+%is no need to explicitly give a name to the composition.
+
+\begin{lstlisting}
+println(new[Point&Norm] (Point(3,4) & EuclideanNorm()).norm()) --Prints 5
+println(new[Point&Norm] (Point(3,4) & ManhattanNorm()).norm()) --Prints 7
+\end{lstlisting}
+
+\subsection{Mutual Dependencies}
+
+The next example, although a little bit contrived, illustrates that when two
+traits are composed, any two methods in those two traits can refer to each
+other via the self reference, just as if they were inside the same class.
+
+\begin{lstlisting}
+type EvenOdd = {
+  even: Int (*$ \to $*) Bool,
+  odd:  Int (*$ \to $*) Bool
+} in
+trait Even() { self: EvenOdd (*$ \to $*)
+  even(n: Int) = if n == 0 then True else self.odd(n - 1)
+} in
+trait Odd() { self: EvenOdd (*$ \to $*)
+  odd(n: Int) = if n == 0 then False else self.even(n - 1)
+} in
+new[EvenOdd] (Even() & Odd()).odd(42)
+\end{lstlisting}
+
+When the two traits are composed, conceptually it is as if that a new object were
+being created on the fly by copying all the definitions inside those two traits.
+If there is any unresolved conflict, the program will be rejected by the type
+system.
+
+\subsection{Detecting and Resolving Conflicts in Trait Composition}
+
+Traits usually supports explicit conflict detection and resolution.
+In inheritance, one pattern to resolve conflicts is for the subclass to override methods defined in the parent.
+The trait-based approach analog is excluding a method from a trait.
+We show how the mechanism can be modeled in \name.
+The following example shows a counter object and how we could extend its
+behavior so that it supports reset. First we define a \lstinline$Counter$ as a
+type synonym for a record that contains a \lstinline$val$ method, which returns
+the current counter value. Next we define a trait \lstinline$Counter$ that
+contains two methods. The \lstinline$val$ method just returns the value that is
+bound at the parameter of the trait, and \lstinline$incr$ returns a new counter.
+
+\begin{lstlisting}
+type Counter = { val: () (*$ \to $*) Int } in
+trait Counter(val: Int) { self: Counter (*$ \to $*)
+  val() = val
+  incr() = new[Counter] Counter(val + 1)
+} in
+type Reset = { reset: () (*$ \to $*) Counter } in
+trait Reset() { self: Counter (*$ \to $*)
+  reset() = new[Counter] Counter(0)
+} in
+let counter = new[Counter&Reset] (Counter(0) & Reset())
+in counter.incr()
+\end{lstlisting}
+
+In the above code, even though \lstinline$counter$ has a reset method, after we
+call the \lstinline$incr$ method, the resulting object no longer has that.
+Therefore, naturally we would like to override the \lstinline$incr$ method
+inside \lstinline$Reset$.
+
+\begin{lstlisting}
+type Counter = { val: () (*$ \to $*) Int } in
+trait Counter(val: Int) { self: Counter (*$ \to $*)
+  val() = val
+  incr() = new[Counter] Counter(val + 1)
+} in
+trait Reset() { self: Counter (*$ \to $*)
+  incr() = new[Counter&Reset] (Counter(val + 1) & Reset())
+  reset() = new[Counter] Counter(0)
+} in
+let counter = new[Counter&Reset] (Counter(0) & Reset())
+in counter.incr()
+\end{lstlisting}
+
+However the modified code should not typecheck according to the
+specification of traits, since both \lstinline$Counter$ and
+\lstinline$Reset$ contains a conflicting \lstinline$incr$ method. The
+code also does not typecheck since it violates the disjoint
+intersection typing rules of \name. The problem is that both
+\lstinline$Counter(0)$ and \lstinline$Reset()$ provide an
+implementation of \lstinline$incr$. The programmer needs to resolve
+the conflict by excluding the \lstinline$incr$ being overridden using
+the record exclusion operator\footnote{We use \lstinline$e\\l$ to
+  denote the term where the field \lstinline$l$ is removed. For
+  example, \lstinline$\{x = 1, y = 2\} \\ x$ gives \lstinline$\{x =
+  1\}$.}.
+
+\begin{lstlisting}
+(* \ldots *)
+let counter = new (Counter(0) \ incr & Reset())
+in counter.incr()
+\end{lstlisting}
+
+\subsection{Dynamic Instantiation}
+
+One difference with traditional traits or classes is that in our language we are
+able to compose traits \emph{dynamically} and then instantiate them. This is
+impossible in traditional OO languages such as Java since classes being
+instantiated must be known statically. Actually, since traits are just terms,
+traits are first-class values and can be defined inside a function, passed
+around or returned just as normal terms. For example, the following function
+takes a trait, \lstinline$norm$, with unknown implementation, compose it with
+the statically known \lstinline$Point$ trait, and then instantiate it.
+\lstinline$Trait$ is a built-in keyword and \lstinline$Trait[Norm]$ is the type
+for traits that conform to the \lstinline$Norm$ type.
+
+\begin{lstlisting}
+let makePoint (norm: Trait[Norm]) = new[Point & Norm] (Point(3,4) & norm)
+in (* \ldots *)
+\end{lstlisting}\bruno{example does not make sense (and uses no composition).}
+
+\bruno{Explain the trait[Log]}
+
+%*******************************************************************************
+\subsection{Desugaring}
+%*******************************************************************************
+
+Of course, this whole section will lose its point if the source language cannot
+be translated to \name and checked against the type system of \name. A more
+formal description can be found in the full version of the paper. The
+idea of trait translation
+is inspired by the functional mixin
+semantics~\cite{cook1989denotational} using open recursion, which was
+proposed by Cook in an untyped setting. However, our translation is done context of a
+statically-typed programming language, which is what provides the ability to \emph{statically}
+detect conflicts in traits.
+
+\paragraph{Trait Declarations.} A trait in the source language is translated into
+nothing but a normal term in \name. For example,
+
+\begin{lstlisting}
+trait Point(x: Int, y: Int) { self: Point (*$ \to $*)
+  x() = x
+  y() = self.z()
+}
+(* \ldots *)
+\end{lstlisting}
+
+\noindent becomes
+
+\begin{lstlisting}
+let Point (x: Int, y: Int) (self: () (*$ \to $*) Point) = {
+  x = (*$ \lambda $*)(_: ()) (*$ \to $*) x,
+  y = (*$ \lambda $*)(_: ()) (*$ \to $*) (self ()).z()
+} in
+\end{lstlisting}
+
+One difference is that the self reference becomes a thunk and all occurrences of
+it have been replaced by \lstinline$self ()$. Moreover the position of the self
+reference in the parameter list is adjusted. In fact, \lstinline$self$ is not a
+special keyword. It can have any name, but \lstinline$self$ is a
+convention.
+
+The body of the trait becomes a record whose labels are the method names.
+\lstinline$Point$ has type:
+
+\begin{lstlisting}
+(Int, Int) (*$ \to $*) (() (*$ \to $*) Point) (*$ \to $*) Point
+\end{lstlisting}
+
+The syntax for construction such as \lstinline$Point(3,4)$ is just function
+application in \name. And note that \lstinline$Point(3,4)$ is of type
+\begin{lstlisting}
+(() (*$ \to $*) Point) (*$ \to $*) Point
+\end{lstlisting}
+
+Therefore it is an open recursive term: the recursive call is passed
+as an argument to the definition of \lstinline$Point$ itself.
+
+\paragraph{The ``new'' Keyword.} \lstinline$new$ instantiates a trait by taking the
+fixpoint of its corresponding open term. In fact, \lstinline$new$ is translated as
+an inlined fixpoint. For example,
+
+\begin{lstlisting}
+new[Point] Point(3,4)
+\end{lstlisting}
+
+\noindent becomes
+
+\begin{lstlisting}
+let rec self : () (*$ \to $*) Point = (*$ \lambda $*)(_: ()) (*$ \to $*) Point (3, 4) self
+in self ()
+\end{lstlisting}
+
+The composition of traits in the source language is desugared using the merge
+operator. The reason that traits built on \name have conflict detection for free
+is that the merge operator is enforcing that the two terms being merged are
+disjoint. For example,
+
+\begin{lstlisting}
+new[Point3D] (Point(3,4) & Z(5))
+\end{lstlisting}
+
+\noindent is turned into
+
+\begin{lstlisting}
+let rec self : () (*$ \to $*) Point3D = (*$ \lambda $*)(_: ()) (*$ \to $*) (Point (3, 4) self) ,, (Z 5 self)
+in self ()
+\end{lstlisting}
+
+\paragraph{The ``Trait'' Keyword.} The capitalized \lstinline$Trait$ keyword
+expects a type and is translated into an open type. For example,
+
+\begin{lstlisting}
+Trait[Point]
+\end{lstlisting}
+
+\noindent becomes
+
+\begin{lstlisting}
+(() (*$ \to $*) Point) (*$ \to $*) Point
+\end{lstlisting}
+
+% \subsection{Intersection Types in Existing Languages}
+%
+% What is an intersection type? The intersection of types $A$ and $B$
+% contains exactly those values which can be used as either of type $A$
+% or of type $B$.  Just as not all intersection of sets are nonempty,
+% not all intersections of types are inhabited.  For example, the
+% intersection of a base type $\code{Int}$ and a function type
+% $\code{Int} \to \code{Int}$ is not inhabited.\bruno{put this text somewhere?}
+%
+% Since then various researchers have
+% studied intersection types, and some languages have adopted in one
+% form or another. However, while intersection types are already used
+% in various languages, the lack of a merge operator removes
+% considerable expressiveness.
+%
+%
+% A number of OO languages, such as
+% Java, C\#, Scala, and Ceylon\footnote{\url{http://ceylon-lang.org/}},
+% already support intersection types to different degrees. Intersection
+% types are particularly relevant for OOP as they can be used to model
+% multiple interface inheritance. In Java, for example,
+%
+% \begin{lstlisting}
+% interface AwithB extends A, B {}
+% \end{lstlisting}
+%
+% \noindent introduces a new interface \lstinline{AwithB} that satisfies the interfaces of
+% both \lstinline{A} and \lstinline{B}. Arguably such type can be considered as a nominal
+% intersection type. Scala takes one step further by eliminating the
+% need of a nominal type. For example, given two concrete traits, it is possible to
+% use \emph{mixin composition} to create an object that implements both
+% traits. Such an object has a (structural) intersection type:
+%
+% \begin{lstlisting}
+% trait A
+% trait B
+%
+% val newAB : A with B = new A with B
+% \end{lstlisting}
+%
+% \noindent Scala also allows intersection of type parameters. For example:
+% \begin{lstlisting}
+% def merge[A,B] (x: A) (y: B) : A with B = ...
+% \end{lstlisting}
+% uses the anonymous intersection of two type parameters \lstinline{A} and
+% \lstinline{B}. However, in Scala it is not possible to dynamically
+% compose two objects. For example, the following code:
+%
+% \begin{lstlisting}
+% // Invalid Scala code:
+% def merge[A,B] (x: A) (y: B) : A with B = x with y
+% \end{lstlisting}
+%
+% \noindent is rejected by the Scala compiler. The problem is that the
+% \lstinline{with} construct for Scala expressions can only be used to
+% mixin traits or classes, and not arbitrary objects. Note that in the
+% definition \lstinline{newAB} both \lstinline{A} and \lstinline{B} are
+% \emph{traits}, whereas in the definition of \lstinline{merge} the variables
+% \lstinline{x} and \lstinline{y} denote \emph{objects}.
+%
+% This limitation essentially put intersection types in Scala in a second-class
+% status. Although \lstinline{merge} returns an intersection type, it is
+% hard to actually build values with such types. In essence an
+% object-level introduction construct for intersection types is missing.
+% As it turns out using low-level type-unsafe programming features such
+% as dynamic proxies, reflection or other meta-programming techniques,
+% it is possible to implement such an introduction
+% construct in Scala~\cite{oliveira2013feature,rendel14attributes}. However, this
+% is clearly a hack and it would be better to provide proper language
+% support for such a feature.
+%
+% To address the limitations of intersection types in languages like
+% Scala, \name allows intersecting any two terms at run time using a
+% \emph{merge} operator (denoted by $ \mergeop $)~\cite{dunfield2014elaborating}.  With the merge
+% operator it is trivial to implement the \lstinline{merge} function in \name:
+%
+% \begin{lstlisting}
+% let merge[A, B * A] (x : A) (y : B) : A & B = x ,, y in (*$ \ldots $*)
+% \end{lstlisting}
+%
+% \noindent In contrast to Scala's term-level \lstinline{with}
+% construct, the operator \lstinline{,,} allows two arbitrary values \lstinline{x}
+% and \lstinline{y} to be merged. The resulting type is a \emph{disjoint}
+% intersection of the types of  \lstinline{x}
+% and \lstinline{y} (\lstinline{A & B} in this case).
+%
+% A well-formed type is such that given any query type,
+% it is always clear which subpart the query is referring to.
+% In terms of rules, this notion of well-formedness is almost the same as the one in System $F$
+% except for intersection types we require the two components to be disjoint.
+%
