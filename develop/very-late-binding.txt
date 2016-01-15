@@ -209,3 +209,40 @@ e |- e_2 : Int&Bool
 G |- e_1 : /\i s_i -> t_i
 -------------------------
 G |- e_1 e_2 :
+
+
+Static types as the supremum of run-time types:
+
+
+G |- e1 : Bool
+G |- e2 : A2
+G |- e3 : A3
+sup{A2, A3} = A
+------------------------------
+G |- if e1 then e2 else e3 : A
+
+
+> x = if rand() <= 0.5 then 1,,True else True,,"hello"
+x : Top >= Int&Bool, Bool&String
+
+> assume f : (Int -> String) & (String -> String)
+f : (Int -> String) & (String -> String)
+
+> :t f x
+f x : String
+
+
+
+> x = if rand() <= 0.5 then 1,,True else True,,"hello"
+x : Top <Int&Bool&String>
+
+> assume f : (Int -> String) & (String -> String)
+
+
+If e => v,
+then there exists G and A pair such that
+G |- e : A
+
+
+If G |- e : A and e => e0
+then G |- e0 : A.
