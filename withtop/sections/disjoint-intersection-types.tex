@@ -35,16 +35,16 @@ definition for disjointness. We recall the definition here
 \begin{definition}[Disjoint types]
 
   Two types $A$ and $B$ are said to be disjoint (written $\jdis \Gamma A B$) if
-  they do not share a common supertype. That is, there does not exist a type $C$
-  such that $A \subtype C$ and that $B \subtype C$.
+  they do not share a common supertype (excluding top). 
+  That is, there does not exist a type $C$
+  such that $A \subtype C$, $B \subtype C$ and $C \neq \top$.
 
-  \[\jdis \Gamma A B \equiv \not \exists C.~A \subtype C \wedge B \subtype C\]
+  \[\jdis \Gamma A B \equiv \not \exists C.~A \subtype C \wedge B \subtype C \wedge C \neq \top\]
 
 \end{definition}
 
 For example, $\code{Int}$ and $\code{Char}$ are disjoint,
-if there is
-no type that is a supertype of the both (unless a top type is included). On the other hand, $\code{Int}$ is not
+if their only common supertype is $\top$. On the other hand, $\code{Int}$ is not
 disjoint with itself, because $\code{Int} \subtype \code{Int}$. This implies that
 disjointness is not reflexive as subtyping is. Two types with different ``shapes''
 are always disjoint, unless one of them is an intersection type.
@@ -124,6 +124,10 @@ typing rule for merges.
     \inferrule*
     {}
     {\jatomic {\code{Int}}}
+
+    \inferrule*
+    {}
+    {\jatomic \top}
   \end{mathpar}
 
   \begin{mathpar}

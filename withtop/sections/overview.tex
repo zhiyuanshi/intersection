@@ -177,14 +177,14 @@ some types in common.
 \paragraph{A Proper Definition of Disjointness.} In order for two types
 to be truly disjoint, they must not have any subcomponents sharing
 the same type. In a system with intersection types this can be ensured
-by requiring the two types not to share a common supertype. The
-following definition captures this idea more formally.
+by requiring the two types not to share a common supertype (excluding $\top$). 
+The following definition captures this idea more formally.
 
 \begin{definition}[Disjointness]
   Given two types $A$ and $B$, two types are disjoint
   (written $A \disjoint B$) if there is no type $C$ such that both $A$ and $B$ are
   subtypes of $C$:
-  \[A \disjoint B \equiv \not\exists C.~A \subtype C \wedge B \subtype C\]
+  \[A \disjoint B \equiv \not\exists C.~A \subtype C \wedge B \subtype C \wedge C \neq \top\]
 \end{definition}
 
 \noindent This definition of disjointness prevents the problematic

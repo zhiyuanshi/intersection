@@ -95,3 +95,10 @@
         {\lamty x {\im {A_1 \inter A_2}}
           {\app E {(\proj 2 x)}}}}
 }
+
+\newcommand{\labelsubtop}{\makelabelsub Top}
+\newcommand{\rulesubtop}{
+  \inferrule* [right=\labelsubtop]
+    { }
+    {{A \subtype \top} \yields {\lamty \_ {\im A} \unit}}
+}

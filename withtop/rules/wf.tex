@@ -57,3 +57,10 @@
      \highlight{$\jdis \Gamma A B$}}
     {\jwf \Gamma {A \inter B}}
 }
+
+\newcommand{\labelwftop}{\makelabelwf Top}
+\newcommand{\rulewftop}{
+  \inferrule* [right=\labelwftop]
+    { }
+    {\jwf \Gamma \top}
+}

@@ -81,3 +81,10 @@
    \highlight{$\jdis \Gamma A B$}}
   {\jtype \Gamma {e_1 \mergeop e_2} {A \inter B} \yields {\pair {E_1} {E_2}}}
 }
+
+\newcommand{\labelttop}{\makelabelt Top}
+\newcommand{\rulettop}{
+\inferrule* [right=\labelttop]
+  { }
+  {\jtype \Gamma \top \top \yields \unit}
+}

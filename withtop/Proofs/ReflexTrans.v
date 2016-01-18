@@ -7,7 +7,8 @@ Inductive PTyp A :=
   | PInt : PTyp A
   | Forall : (A -> PTyp A) -> PTyp A
   | Fun : PTyp A -> PTyp A -> PTyp A
-  | And : PTyp A -> PTyp A -> PTyp A.
+  | And : PTyp A -> PTyp A -> PTyp A
+  | Top : PTyp A.
 
 (*
 
@@ -51,11 +52,12 @@ Inductive sub : nat -> PTyp nat -> PTyp nat -> Prop :=
   | SFun : forall i o1 o2 o3 o4, sub i o3 o1 -> sub i o2 o4 -> sub i (Fun nat o1 o2) (Fun nat o3 o4)
   | SAnd1 : forall i t t1 t2, sub i t t1 -> sub i t t2 -> sub i t (And nat t1 t2)
   | SAnd2 : forall i t t1 t2, sub i t1 t -> sub i (And nat t1 t2) t
-  | SAnd3 : forall i t t1 t2, sub i t2 t -> sub i (And nat t1 t2) t.
+  | SAnd3 : forall i t t1 t2, sub i t2 t -> sub i (And nat t1 t2) t
+  | STop : forall i t, sub i t (Top nat).
 
 (* Reflexivity: Lemma 1 in the paper *)
 
-Hint Resolve SVar SInt SForall SFun SAnd1 SAnd2 SAnd3.
+Hint Resolve SVar SInt SForall SFun SAnd1 SAnd2 SAnd3 STop.
 
 Lemma reflex : forall t1 i, sub i t1 t1.
 Proof.
@@ -111,6 +113,8 @@ apply SAnd3.
 exact H5.
 apply SAnd3.
 exact H6.
+(* Case Top *)
+inversion H; auto.
 Defined.
 
 (* Transitivity: Lemma 2 in the paper *)
@@ -168,5 +172,15 @@ apply IHT1; auto.
 apply IHT2; auto.
 apply IHQ1; auto.
 apply IHQ2; auto.
+inversion H0; auto.
+(* Case Top *)
+unfold transitivity_sub; intros t s i H1 H2.
+induction t; try inversion H2.
+subst.
+apply invAndS1 in H2.
+apply IHt1 in H5.
+apply IHt2 in H6.
+apply SAnd1; assumption.
+apply STop.
 Defined.
 

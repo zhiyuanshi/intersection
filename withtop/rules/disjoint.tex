@@ -97,3 +97,19 @@
     {B \disjointax A}
     {A \disjointax B}
 }
+
+% Top
+
+\newcommand{\labeldisaxinttop}{\makelabelax Int-Top}
+\newcommand{\ruledisaxinttop}{
+  \inferrule* [right=\labeldisaxinttop]
+    {}
+    {\code{Int} \disjointax \top}
+}
+
+\newcommand{\labeldisaxtopfun}{\makelabelax Top-Fun}
+\newcommand{\ruledisaxtopfun}{
+  \inferrule* [right=\labeldisaxtopfun]
+    {}
+    {\top \disjointax A \to B}
+}

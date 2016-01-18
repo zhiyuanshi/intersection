@@ -28,6 +28,7 @@ the type-level and the ``merges'' $e_1 \mergeop e_2$ at the term level.
         & A, B, C & \Coloneqq & \code{Int} & \\
         &         & \mid      & A \to B    & \\
         &         & \mid      & \highlight{$A \inter B$}  & \\
+        &         & \mid      & \top  & \\
 
         \\
         \text{Terms}
@@ -36,6 +37,7 @@ the type-level and the ``merges'' $e_1 \mergeop e_2$ at the term level.
         &   & \mid & \lamty x A e      & \\
         &   & \mid & \app {e_1} {e_2}  & \\
         &   & \mid & \highlight{$e_1 \mergeop e_2$}  & \\
+        &   & \mid & \top & \\
 
         \\
         \text{Contexts}
@@ -51,14 +53,16 @@ the type-level and the ``merges'' $e_1 \mergeop e_2$ at the term level.
 
 \paragraph{Types.} Metavariables $A$, $B$ range over types. Types include
 function types $A \to B$. $A \inter B$ denotes the intersection of types $A$ and
-$B$. We also include integer types $\code{Int}$.
+$B$. We also include $\top$ and integer types $\code{Int}$.
 
 \paragraph{Terms.} Metavariables $e$ range over terms.  Terms include standard
 constructs: variables $x$; abstraction of terms over variables of a given type
 $\lamty x A e$; and application of terms $e_1$ to terms $e_2$, written $\app
 {e_1} {e_2}$. The expression $e_1 \mergeop e_2$ is the \emph{merge} of two terms
 $e_1$ and $e_2$. Merges of terms correspond to intersections of types $A \inter
-B$. In addition, we also include integer literals $i$.
+B$. 
+The term $\top$ corresponds to the only inhabitant of the $\top$ type.
+In addition, we also include integer literals $i$.
 
 \paragraph{Contexts.} Typing contexts $ \Gamma $ track bound variables $x$ with their type $A$.
 
@@ -89,20 +93,20 @@ records and record operations can be found in the full version of the paper.
 \begin{figure}
   \begin{mathpar}
     \formsub \\
-    \rulesubvar \and \rulesubint \and \rulesubfun \and \rulesubinter \and
-    \rulesubinterl \and \rulesubinterr
+    \rulesubvar \and \rulesubint \and \rulesubfun \and \rulesubinter 
+    \and \rulesubinterl \and \rulesubinterr \and \rulesubtop 
   \end{mathpar}
 
   \begin{mathpar}
     \formwf \\
-    \rulewfint \and \rulewffun \and \rulewfinter
+    \rulewfint \and \rulewffun \and \rulewfinter \and \rulewftop
   \end{mathpar}
 
   \begin{mathpar}
     \formt \\
     \ruletvar \and \ruletint \and
     \ruletlam \and \ruletapp \and
-    \ruletmerge
+    \ruletmerge \and \rulettop
   \end{mathpar}
 
   \caption{The type system of \name.}
@@ -249,10 +253,12 @@ the function expects a $\code{String}$ but the translated argument is of type $\
   \[
     \begin{array}{llrl}
       \text{Types}    & T & \Coloneqq & \code{Int} \\
+                      &   & \mid      & \unit \\
                       &   & \mid      & {T_1} \to {T_2} \\
                       &   & \mid      & \highlight {$ \pair {T_1} {T_2} $} \\
       \text{Terms}    & E & \Coloneqq & x \\
                       &   & \mid      & i \\
+                      &   & \mid      & \unit \\
                       &   & \mid      & \lamty x T E \\
                       &   & \mid      & \app {E_1} {E_2} \\
                       &   & \mid      & \highlight {$ \pair {E_1} {E_2} $} \\
@@ -278,6 +284,7 @@ contexts $\Gamma$ to target language contexts $G$.
     \im {\code{Int}}     &= \code{Int} \\
     \im {A_1 \to A_2}    &= \im {A_1} \to \im {A_2} \\
     \im {A_1 \inter A_2} &= \pair {\im {A_1}} {\im {A_2}} \\
+    \im \top             &= \unit \\
   \end{align*}
 
   \framebox{$\im \Gamma = G$}
