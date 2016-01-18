@@ -15,15 +15,15 @@ supports them.
 \subsection{Intersection Types and the Merge Operator}
 %%\subsection{Intersection Types, Merge and Polymorphism in \name}
 
-Intersection types date back as early as Coppo et
-al.'s work~\cite{coppo1981functional}. Since then various researchers have
+Intersection types date back as early as Coppo~\textit{et
+al.}'s work~\cite{coppo1981functional}. Since then various researchers have
 studied intersection types, and some languages have adopted them in one
 form or another.
 %However, as we shall see in
 %Section~\ref{subsec:incoherence}, it also introduces difficulties. In what follows
 %intersection types and the merge operator are informally introduced.
 
-\paragraph{Intersection types.}
+\paragraph{Intersection Types.}
 The intersection of type $A$ and $B$ (denoted as \lstinline{A & B} in
 \name) contains exactly those values
 which can be used as either values of type $A$ or of type $B$. For instance,
@@ -46,7 +46,7 @@ identity functions on integers and characters, respectively.
 Passing \lstinline{x} as an argument to either one (or both) of the
 functions is valid.
 
-\paragraph{Merge operator.}
+\paragraph{Merge Operator.}
 In the previous program we deliberately did not show how to introduce values of
 an intersection type. There are many variants of intersection types in the
 literature. Our work follows a particular formulation, where intersection types
@@ -63,7 +63,7 @@ let x : Int & Char = 1,,'c' in (*$ \ldots $*)
 \noindent In \name (following Dunfield's notation), the
 merge of two values $v_1$ and $v_2$ is denoted as $v_1 ,, v_2$.
 
-\paragraph{Merge operator and pairs.}
+\paragraph{Merge Operator and Pairs.}
 The merge operator is similar to the introduction construct on pairs.
 An analogous implementation of \lstinline{x} with pairs would be:
 
@@ -110,7 +110,7 @@ there are multiple possible meanings for the same valid program. Dunfield's
 calculus~\cite{dunfield2014elaborating} is incoherent and accepts the program
 above.
 
-\paragraph{Getting around incoherence: biased choice.}
+\paragraph{Getting Around Incoherence: Biased Choice.}
 In a real implementation of Dunfield calculus a choice has to be made
 on which value to compute. For example, one potential option is to
 always take the left-most value matching the type in the
@@ -143,7 +143,7 @@ intersection types, it is not obvious to formalize it. Indeed Dunfield
 has mentioned disjointness as an option to restore coherence, but he
 left it for future work due to the non-triviality of the approach.
 
-\paragraph{Searching for a definition of disjointness.}
+\paragraph{Searching for a Definition of Disjointness.}
 The first step towards disjoint intersection types is to come up
 with a definition of disjointness. A first attempt at such definition would
 be to require that, given two types $A$ and $B$, both types are not
@@ -174,7 +174,7 @@ it did bring us some additional insight: although the types of the two
 components of the merge are not subtypes of each other, they share
 some types in common.
 
-\paragraph{A proper definition of disjointness.} In order for two types
+\paragraph{A Proper Definition of Disjointness.} In order for two types
 to be truly disjoint, they must not have any subcomponents sharing
 the same type. In a system with intersection types this can be ensured
 by requiring the two types not to share a common supertype. The

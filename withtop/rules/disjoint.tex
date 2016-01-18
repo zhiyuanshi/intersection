@@ -1,0 +1,115 @@
+\newcommand{\formdis}{\framebox{$ \jdisimpl \Gamma A B $}}
+
+\newcommand{\makelabeldis}[1]{Dis-#1}
+
+\newcommand{\labeldisvar}{\makelabeldis Var}
+\newcommand{\ruledisvar}{
+  \inferrule* [right=\labeldisvar]
+    {\alpha \disjoint B \in \Gamma \\ B <: A}
+    {\jdisimpl \Gamma \alpha A}
+}
+
+\newcommand{\labeldissym}{\makelabeldis Sym}
+\newcommand{\ruledissym}{
+  \inferrule* [right=\labeldissym]
+    {\alpha \disjoint B \in \Gamma \\ B <: A}
+    {\jdisimpl \Gamma A \alpha}
+}
+
+\newcommand{\labeldisinterl}{\makelabeldis {Inter-1}}
+\newcommand{\ruledisinterl}{
+  \inferrule* [right=\labeldisinterl]
+    {\jdisimpl \Gamma {A_1} B \\ \jdisimpl \Gamma {A_2} B}
+    {\jdisimpl \Gamma {A_1 \inter A_2} {B}}
+}
+
+\newcommand{\labeldisinterr}{\makelabeldis {Inter-2}}
+\newcommand{\ruledisinterr}{
+  \inferrule* [right=\labeldisinterr]
+    {\jdisimpl \Gamma A {B_1} \\ \jdisimpl \Gamma A {B_2}}
+    {\jdisimpl \Gamma {A} {B_1 \inter B_2}}
+}
+
+\newcommand{\labeldisfun}{\makelabeldis Fun}
+\newcommand{\ruledisfun}{
+  \inferrule* [right=\labeldisfun]
+    {\jdisimpl \Gamma {A_2} {B_2}}
+    {\jdisimpl \Gamma {A_1 \to A_2} {B_1 \to B_2}}
+}
+
+\newcommand{\labeldisforall}{\makelabeldis Forall}
+\newcommand{\ruledisforall}{
+  \inferrule* [right=\labeldisforall]
+    {\jdisimpl \Gamma {C} {D}}
+    {\jdisimpl \Gamma {\fordis \alpha {A} {C}} {\fordis \beta {B} {D}}}
+}
+
+\newcommand{\labeldisax}{\makelabeldis Axiom}
+\newcommand{\ruledisatomic}{
+  \inferrule* [right=\labeldisax]
+    {A \disjointax B}
+    {\jdisimpl \Gamma A B}
+}
+
+
+\newcommand{\formax}{\framebox{$ A \disjointax B$}}
+
+\newcommand{\makelabelax}[1]{DisAx-#1}
+
+\newcommand{\labeldisaxintfun}{\makelabelax Int-Fun}
+\newcommand{\ruledisaxintfun}{
+  \inferrule* [right=\labeldisaxintfun]
+    {}
+    {\code{Int} \disjointax A \to B}
+}
+
+\newcommand{\labeldisaxbotbot}{\makelabelax Bot\_Bot}
+\newcommand{\ruledisaxbotbot}{
+  \inferrule* [right=\labeldisaxbotbot]
+    {}
+    {\bot \disjointax \bot}
+}
+
+\newcommand{\labelaxbotfun}{\makelabelax Bot\_Fun}
+\newcommand{\ruleaxbotfun}{
+  \inferrule* [right=\labelaxbotfun]
+    {}
+    {\bot \disjointax A \to B}
+}
+
+\newcommand{\labelaxbotforall}{\makelabelax Bot\_Forall}
+\newcommand{\ruleaxbotforall}{
+  \inferrule* [right=\labelaxbotforall]
+    {}
+    {\bot \disjointax \fordis \alpha B A}
+}
+
+\newcommand{\labelaxfunforall}{\makelabelax Fun\_Forall}
+\newcommand{\ruleaxfunforall}{
+  \inferrule* [right=\labelaxfunforall]
+    {}
+    {A_1 \to A_2 \disjointax \fordis \alpha {B_1} {B_2}}
+}
+
+\newcommand{\labelaxsym}{\makelabelax Sym}
+\newcommand{\ruleaxsym}{
+  \inferrule* [right=\labelaxsym]
+    {B \disjointax A}
+    {A \disjointax B}
+}
+
+% Top
+
+\newcommand{\labeldisaxinttop}{\makelabelax Int-Top}
+\newcommand{\ruledisaxinttop}{
+  \inferrule* [right=\labeldisaxinttop]
+    {}
+    {\code{Int} \disjointax \top}
+}
+
+\newcommand{\labeldisaxtopfun}{\makelabelax Top-Fun}
+\newcommand{\ruledisaxtopfun}{
+  \inferrule* [right=\labeldisaxtopfun]
+    {}
+    {\top \disjointax A \to B}
+}

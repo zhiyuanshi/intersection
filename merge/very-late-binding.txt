@@ -1,0 +1,248 @@
+A Calculus with Very Late Binding
+
+A *relation* between two sets X and Y is "isomorphic" to the Cartesian product of
+the two sets X x Y.
+
+Functions encapsulates the idea of determinism.
+
+A function f : X -> Y must satisfy:
+Given the same x, f produces the same y.
+In other words, x1 = x2 in X implies y1 = y2 in Y.
+
+Goal:
+Glue two functions
+  f : X -> Y
+  g : U -> V
+to yield
+  h : X & U -> Y & V
+such that
+x1 = x2 in X & U implies h(x1) = h(x2) in Y & V
+
+We need to define the equality on X & Y, given the equalities on X and Y.
+
+First recall that of products:
+
+x1 = x2 (mod X)    y1 = y2 (mod Y)
+----------------------------------
+(x1,y1) = (x2,y2) (mod X x Y)
+
+
+???
+----------------------------------
+<x1,y1> = <x2,y2> (mod X & Y)
+
+
+
+Syntax:
+
+Types s, t, u ::= B | t_1 -> t_2 | /\{ t }
+Terms e, f, g ::= b | x | \x. e | e_1 e_2 | ,,{ e }
+Values v      ::= b | \x. e | ,,{ v }
+
+B          Base types
+b          Literals of base types
+[e/x] f    Capture-avoiding substitution of e for x in f
+
+Remarks.
+
+1. Singleton types and terms are regarded as unary-intersection of sets (order
+is therefore irrelevant). For example, t_1 -> t_2 is regarded as /\{ t_1 ->
+t_2 }.
+
+2. Sets of sets, sets of sets of sets, ad infinitum, are regarded as
+"flattened" "level-1" sets. For example, /\{{ Int }, Nat } is equivalent to
+/\{ Int, Nat }.
+
+
+
+Subtyping: t_1 <: t_2
+
+(arr)
+s_2 <: s_1    t_1 <: t_2
+------------------------
+s_1 -> t_1 <: s_2 -> t_2
+
+(set)
+forall t in { t_1, ..., t_n }.
+  there exists s in { s_1, ..., s_m }.
+  s <: t
+------------------------------------------
+/\{ s_1, ..., s_m } <: /\{ t_1, ..., t_n }
+
+Examples:
+In the following let us assume Nat <: Int.
+
+(1) /\{ Int } <: /\{ Int } true
+(2) (adding types on the *right* may break subtying)
+    /\{ Int } <: /\{ Int, Nat } false
+(3) (adding types on the *left* always preserves subtyping)
+    /\{ Int, Nat } <: /\{ Int } true
+
+Lemma. If s <: t, then for any type u, /\{ s, u } <: t.
+
+
+
+Dynamics (call-by-value): e_1 --> e_2
+
+Before we proceed, let us define the <:/= relation which will be used in the following.
+
+Definition (equivalence).      s ~~ t   if s <: t and      t <: s.
+Definition (proper subtyping). s <:/= t if s <: t and (not t <: s).
+
+(beta)
+,,{ \x. e_1 : s_1 -> t_1, ..., \x. e_n : s_n -> t_n, ... (non-function values) ... } (v : t)
+-->
+,,{ [v `filter` s_j/x] e_j : t_j | j in J }
+  where
+    (conformance) I = { i | t <: t_i }
+    (minimality)  J = { j | not (there exists i, j in I. i /= j and t_i <:/= t_j) }
+    (coherence)   K = { k | forall i, j in J. i /= j => not (t_i ~~ t_j) }
+
+
+To think: About last condition, accept or reject?
+class C {
+  def m(x: Int): A
+  def m(x: Int): B
+}
+  where B <: A
+
+
+Remark.
+1. Conformance describes the functions that can accept the argument v.
+2. Minimality describes the functions that can accept the argument v and has the most "precise" parameter types.
+3. Reduction gets stuck if J is empty.
+
+Lemma. I is nonempty if and only if J is.
+
+Proof.
+(<=) Obvious since I is a superset of J.
+(=>) Let ...
+
+
+"Filter":
+,,{ e_1 : t_1, ..., e_n : t_n } `filter` t = { e_i : t_i | t_i <: t }
+
+
+
+Metatheory:
+
+Theorem (economy). If e is a program that is accepted both in a conventional
+overloading calculus (such as Castagna's lambda&) and in this calculus, then
+each time the (beta) rule is applied, no more than one function is actually
+invoked.
+
+Proof sketch.
+We illustrate by considering the case of binary merges.
+
+Assume
+  f : s_1 -> s_2
+  g : t_1 -> t_2
+and consider the program p
+p = (f ,, g) (e : u)
+
+Suppose both f and g are invoked in the (beta) rule. Then J = { 1, 2 }.
+Furthermore, I = J = { 1, 2 } since I is a superset of J. By the definition of
+I (conformance), u <: s_1 and u <: t_1, which violates lambda&'s well-
+formedness condition of types. Therefore, p is not accepted in lambda&, which
+contradicts with the hypothesis.
+
+
+
+Examples of the dynamics.
+
+(1)
+
+,,{ \x. 1 : Int -> Int, \x. True : Int -> Bool } (0 : Int)
+-->
+,,{ 1, True }
+
+(2)
+
+,,{ \x. 1 : Int -> Int, \x. 2 : Bool -> Int } (0 : Int)
+-->
+1
+
+(3)
+
+,,{ \x. 1 : Int -> Int, \x. 2 : Nat -> Int } (0 : Nat)
+-->
+2
+
+Explanation:
+/\{ Int -> Int, Nat -> Int }
+Let us order the two types from left to right by 1 and 2.
+Then in terms of the (beta) rule,
+I = { 1, 2 }
+J = { 2 }
+Note that 1 is not in J since Nat <:/= Int.
+
+
+x = if rand() <= 0.5 then 1,,Bool else 1
+> x : Int
+f : (Int -> Int) & (Bool -> Int)
+
+The evaluation gets stuck if x evaluates to 1,,Bool.
+
+Option (1): Restrict that two branches have the exactly the same type
+
+> x = if rand() <= 0.5 then 1,,Bool else 1
+error: the then branch has type Int&Bool, but the else branch has type Int
+
+Option (2): List all possible most precise types
+
+Statics:
+
+The key rule is the application rule.
+
+e |- e_1 : (Int -> Int) & (Bool -> Int)
+e |- e_2 : Int&Bool
+-------------------
+(fail)
+
+e |- e_1 : (Int -> Int) & (Bool -> Bool)
+e |- e_2 : Int&Bool
+-------------------
+(ok)
+
+
+
+G |- e_1 : /\i s_i -> t_i
+-------------------------
+G |- e_1 e_2 :
+
+
+Static types as the supremum of run-time types:
+
+
+G |- e1 : Bool
+G |- e2 : A2
+G |- e3 : A3
+sup{A2, A3} = A
+------------------------------
+G |- if e1 then e2 else e3 : A
+
+
+> x = if rand() <= 0.5 then 1,,True else True,,"hello"
+x : Top >= Int&Bool, Bool&String
+
+> assume f : (Int -> String) & (String -> String)
+f : (Int -> String) & (String -> String)
+
+> :t f x
+f x : String
+
+
+
+> x = if rand() <= 0.5 then 1,,True else True,,"hello"
+x : Top <Int&Bool&String>
+
+> assume f : (Int -> String) & (String -> String)
+
+
+If e => v,
+then there exists G and A pair such that
+G |- e : A
+
+
+If G |- e : A and e => e0
+then G |- e0 : A.

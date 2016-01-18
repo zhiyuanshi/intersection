@@ -135,8 +135,7 @@ The rules for the disjointness judgment are shown in
 Figure~\ref{fig:disjointness}, which consists of two judgments.
 
 \paragraph{Main Judgment.} The judgment $\jdisimpl \Gamma A B$ says
-two types $A$ and $B$ are disjoint in a context
-$\Gamma$.
+two types $A$ and $B$ are disjoint.
 
 The rules dealing with intersection types (\reflabel{\labeldisinterl} and
 \reflabel{\labeldisinterr}) are quite intuitive. The intuition is that if two
@@ -155,7 +154,7 @@ disjointness. To see the reason for this consider the two function types:
 \[ \code{Int} \to \code{String} \qquad \code{Bool} \to \code{String} \]
 Even though their parameter types are disjoint, we are still able to think of a
 type which is a supertype for both of them. For example, $ \code{Int} \inter \code{Bool}
-\to \code{String} $. Therefore, by definition, the two function types with
+\to \code{String} $. Therefore, two function types with
 the same return type are not
 disjoint. Essentially, due to the contravariance of function types,
 functions of the form $A \to C$ and $B \to C$ always have a common

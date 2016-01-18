@@ -1,0 +1,44 @@
+bot/top
+
+0/1
+
+A * B B <: C => A * C
+
+A * B B :> C => A * C
+
+Char * Int  Int :> Int & Char =>
+
+a * B in G  B <: A
+------------------
+G |- a * A
+
+a * A in G
+----------
+G |- a * A
+
+G |- a * A  B <: A
+------------------
+G |- a * B
+
+a * Int  Int&Char <: Int
+-----------------------
+a * (Int&Char)
+
+
+a <: A in G
+-----------
+G |- a <: A
+
+
+f = blam a * (Nat) -> fun (x: a & Int) -> x
+f []
+
+
+f = blam a * Int -> fun (x: a & (Int & Char)) -> x
+
+
+f [Char]
+
+a * b  c <: b => a * c
+
+Int * Char Int&Char <: Int => Int *

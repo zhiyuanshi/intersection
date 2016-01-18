@@ -1,19 +1,6 @@
 \section{The \name Calculus}
 \label{sec:fi}
 
-\bruno{TODO: Show example illustrating the issue with function application.
-It may be worthwhile to discuss the issue with function
-  application. I think the way we deal with function application is
-  not as convenient, but it doesn't remove expressive power: we can
-  always extract, by hand, the right function before using it in a
-  function application. However this way we don't have ambiguity
-  problems that arise from having a more ``clever'' function
-  application.}
-\bruno{TODO: There are missing parts of the formalization regarding
-  integers
-(for example, subtyping, and typing). Formalization needs to be
-double-check carefully!}
-
 This section presents the syntax, subtyping, typing, as well as the (incoherent)
 semantics of \name: a calculus with intersection types and a merge operator.
 This calculus is similar to Dunfield's calculus~\cite{dunfield2014elaborating}.
@@ -21,9 +8,10 @@ The differences are that, in Dunfield's language, the coercions are source
 language terms and that function application allows the expression denoting the
 function to have an intersection type. In contrast, in \name coercions are
 target language terms and function applications do not allow the expression
-denoting the applied function to have an intersection type. 
-
-In Section~\ref{sec:disjoint} we will show the necessary changes for supporting
+denoting the applied function to have an intersection type. The later
+difference will play an important role in achieving coherence.
+Sections~\ref{sec:disjoint} and \ref{sec:alg-dis} will present the more fundamental contributions of this
+paper by showing other necessary changes for supporting
 disjoint intersection types and ensuring coherence.
 
 \subsection{Syntax}
@@ -82,7 +70,7 @@ In order to focus on the key features that make this language interesting, we do
 not include other forms such as type constants and fixpoints here. However they
 can be included in the formalization in standard ways and we are using them in
 discussions and examples. The formalization of nonessential features such as
-records and record operations can be found in the appendix.
+records and record operations can be found in the full version of the paper.
 
 % \paragraph{Discussion.} A natural question the reader might ask is that why we
 % have excluded union types from the language. The answer is we found that
@@ -106,6 +94,11 @@ records and record operations can be found in the appendix.
   \end{mathpar}
 
   \begin{mathpar}
+    \formwf \\
+    \rulewfint \and \rulewffun \and \rulewfinter
+  \end{mathpar}
+
+  \begin{mathpar}
     \formt \\
     \ruletvar \and \ruletint \and
     \ruletlam \and \ruletapp \and
@@ -114,10 +107,9 @@ records and record operations can be found in the appendix.
 
   \caption{The type system of \name.}
   \label{fig:fi-type}
-\end{figure}\bruno{Aren't we missing the uses of well-formedness
-  rules. They are not being used anywhere at the moment! We are also
-  missing the typing rules for integers and variables; as well as the
-  subtyping rule for integers}
+\end{figure}\bruno{MAJOR PROBLEM: We are missing the well-formedness
+  rules as well as their uses in Figure 2. These need to be added so
+  that we can talk about coherence later!}
 
 % Intersection types introduce natural subtyping relations among types. For
 % example, $ \code{Int} \inter \code{Bool} $ should be a subtype of $ \code{Int} $, since the former
@@ -161,13 +153,14 @@ subtyping defined by $\subtype$ is also reflexive and transitive.
 \end{lemma}
 
 For the corresponding mechanized proofs in Coq, we refer the reader to the
-supplementary materials submitted with the paper.
+repository associated with the paper\footnote{\url{https://github.com/zhiyuanshi/intersection/tree/master/esop-16}}.
 
 \subsection{Typing}
 
-The typing rules are shown in the bottom part of the figure. Again,
-the reader is advised to ignore the gray-shaded part here, as these
-parts will be explained later. The typing judgment is of the form:
+The well-formedness rules are shown in the middle part of
+Figure~\ref{fig:fi-type}. In addition to the standard rules,
+\reflabel{\labelwfinter} is also not surprising. The typing rules are shown in
+the bottom part of the figure. The typing judgment is of the form:
 \[ \jtype \Gamma e A \]
 It reads: ``in the typing context $\Gamma$, the term $e$ is of type
 $A$''. The standard rules are those for variables
@@ -176,10 +169,12 @@ $A$''. The standard rules are those for variables
 $e_1 \mergeop e_2$, is assigned an intersection type composed of the
 resulting types of $e_1$ and $e_2$.
 
-\paragraph{Typing Applications} The more important difference bettwen
-\name and Dunfield calculus is in the treatment of the
-application rule. In Dunfield's calculus, if \lstinline$f$ and \lstinline$g$ are both
-functions expecting an integer, the following program typechecks:
+\paragraph{Typing Applications}
+The rule that deserves more attention is the application rule
+\reflabel{\labeltapp}.  This is where the most important difference between
+\name and Dunfield calculus is. In Dunfield's calculus, if
+\lstinline$f$ and \lstinline$g$ are both functions expecting an
+integer, the following program typechecks:
 
 \begin{lstlisting}
 (f ,, g) 1
@@ -187,7 +182,7 @@ functions expecting an integer, the following program typechecks:
 
 \noindent In our calculus, however, one needs manually extract the desired
 function by passing \lstinline$f ,, g$ to a function. For example, if
-\lstinline$f : Int -> Bool$ and \lstinline$g : Int -> Char$, we could select  \lstinline$f$
+\lstinline$f : Int$ $\to$  \lstinline$Bool$ and \lstinline$g : Int$ $\to$ \lstinline$Char$, we could select  \lstinline$f$
 from the intersection as follows:
 
 \begin{lstlisting}
@@ -197,16 +192,26 @@ from the intersection as follows:
 The reason for this design choice is that otherwise we could have
 another source of semantic ambiguity. Consider the following program:
 
-\begin{lstlisting} 
+\begin{lstlisting}
 (idInt ,, idChar) (1,,'c')
 \end{lstlisting}
 
-\noindent where idInt : Int -> Int and idChar : Char -> Char are,
+\noindent where \lstinline$idInt$ and \lstinline$idChar$ are,
 respectively, identity functions on integers and on characters. Clearly both
 merges in the program (\lstinline$(f ,, g)$ and \lstinline$(1,,'c')$)
-are disjoint. Yet there are two possible outcomes for this program: 
+are disjoint. Yet there are two possible outcomes for this program:
 \lstinline$1$ or \lstinline$'c'$. Thus application requires a
-different treatment, if we wish to have coherence.\bruno{work in progress}  
+different treatment, if we wish to have coherence.
+Our design choice is simply to only employ subtyping in the argument
+of the application, but not on the expression being applied.
+It should be possible to design a ``smarter''
+application rule, that still avoids the ambiguity problems that would
+be present in Dunfield's calculus, while at the same time avoiding
+explicitly extracting functions from intersections. However such rule
+would necessarily be complicated, and rather ad-hoc.
+So we opted for simplicity. In any case there is no expressiveness
+loss (only loss of convinience), as it is always possibly to extract the function component from
+a merge and then apply it.
 
 \subsection{Semantics}
 
@@ -217,11 +222,11 @@ a type-directed translation to an extension of $\lambda$-calculus with pairs.
 %gray.
 
 
-\paragraph{Target Language.}\bruno{misses integers}
+\paragraph{Target Language.}
 The syntax and typing of our target language is unsurprising. The syntax of the
 target language is shown in Figure~\ref{fig:f-syntax}. The highlighted part
-shows its difference with $\lambda$-calculus. The typing rules can be found
-in the appendix.
+shows its difference with the $\lambda$-calculus. The typing rules can be found
+in the extended version of the paper.
 
 % \bruno{Does the target language does need unit? Any rules generating units? I
 % don't think so, so it can be dropped.}
@@ -235,12 +240,12 @@ information. For example, consider the function application: \[ \app {(\lamty x
 {\code{String}} x)} {(1 \mergeop \code{"one"})} \] This expression will be translated to \[ \app
 {(\lamty x {\code{String}} x)} {(\app {(\lamty x {\pair {\code{Int}} {\code{String}}} {\proj 2 x})}
 {\pair 1 {\code{"one"}}})} \] The coercion in this case is $(\lamty x {\pair
-\code{Int} \code{String}} {\proj 2 x})$. It extracts the second item from the pair, since
+{\code{Int}} {\code{String}}} {\proj 2 x})$. It extracts the second item from the pair, since
 the function expects a $\code{String}$ but the translated argument is of type $\pair
 {\code{Int}} {\code{String}}$.
 
 
-\begin{figure}[h]
+\begin{figure}[t]
   \[
     \begin{array}{llrl}
       \text{Types}    & T & \Coloneqq & \code{Int} \\
@@ -266,7 +271,7 @@ function $\im \cdot$ from \name types $A$ to target language types $T$. The
 notation $\im \cdot$ is also overloaded for context translation from \name
 contexts $\Gamma$ to target language contexts $G$.
 
-\begin{figure}[h]
+\begin{figure}[t]
   \framebox{$\im A = T$}
 
   \begin{align*}
@@ -331,7 +336,7 @@ is used. Finally, all rules produce type-correct coercions:
 \end{restatable}
 
 \begin{proof}
-  By a straightforward induction on the derivation\footnote{The proofs of major lemmata and theorems can be found in the appendix.\bruno{where??}}.
+  By a straightforward induction on the derivation\footnote{The proofs of major lemmata and theorems can be found in the full version of the paper.\bruno{where??}}.
 \end{proof}
 
 \paragraph{The translation judgment.} The translation judgment $\jtype \Gamma e
@@ -340,7 +345,7 @@ hand side of $\yields {}$. The translation ensures that $E$ has type $\im A$. In
 \name, one may pass more information to a function than what is required; but
 not in ordinary $\lambda$-calculus. To account for this difference, in \reflabel{\labeltapp}, the
 coercion $E$ from the subtyping relation is applied to the argument.
-\reflabel{\labeltmerge} straighforwardly translates merges into pairs.
+\reflabel{\labeltmerge} straightforwardly translates merges into pairs.
 
 The type-directed translation is type-safe. This property is captured
 by the following two theorems.
