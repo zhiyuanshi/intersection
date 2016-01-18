@@ -1,0 +1,661 @@
+----------------------- REVIEW 1 ---------------------
+PAPER: 108
+TITLE: Disjoint Intersection Types
+AUTHORS: Zhiyuan Shi and Bruno C. D. S. Oliveira
+
+OVERALL EVALUATION: 0 (borderline paper)
+REVIEWER'S CONFIDENCE: 4 (high)
+
+----------- REVIEW -----------
+
+The formalization of mixins/traits and related constructs is quite
+important and challenging, and as such I appreciate the direction of
+this paper a lot. The formalization looks quite solid and I
+acknowledge that it was formalized and proved correct in Coq, which is
+a quite nontrivial effort.
+
+I have two objections that make me like the paper less:
+
+1. The work feels rather incremental compared to previous work on
+intersection types, especially (as the authors acknowledge), the work
+by Dunfield. I do understand that coherence is a property one wants
+for a type system, but still: it's only a relatively small puzzle
+piece that was added here.
+
+2. The restriction that is proposed to solve the problem looks rather
+fishy to me, namely the restriction that two types that are to be
+merged cannot have a common supertype. In most OO languages, _all_
+types have a common supertype (Object, Top or whatever it is
+called). Even if one would not have a Top type, I'd imagine that in
+practice most types would still share some common supertypes (e.g.,
+for things like "toString" methods). Hence I don't believe that the
+"solution" suggested in Sec. 8 will work very well. In summary, I
+suspect that the restriction that the authors have choosen is rather
+impractical. Maybe I'm wrong here, but I would have at least expected
+a discussion of the issue.
+
+
+----------------------- REVIEW 2 ---------------------
+PAPER: 108
+TITLE: Disjoint Intersection Types
+AUTHORS: Zhiyuan Shi and Bruno C. D. S. Oliveira
+
+OVERALL EVALUATION: 1 (accept)
+REVIEWER'S CONFIDENCE: 5 (expert)
+
+----------- REVIEW -----------
+*** Summary
+
+The paper develops a calculus with binary intersection & (but not
+0-ary intersection ⊤) and a merge construct ("e1 ,, e2" is typable if
+either e1 or e2 is typable).
+
+The main contribution is that (unlike the system of Dunfield (2014)
+[13] with &, ⊤, and merge) the calculus enjoys coherence: the choice
+of which branch of a merge to use is always consistent, because
+intersection is required to be *disjoint*.  (This is a different
+restriction on the formation of A & B from the _refinement
+restriction_ found in some intersection type systems; the refinement
+restriction says A & B is a well-formed type if A and B are both
+"refinements" of the same simple (unrefined) type.) The paper defines
+disjointness to be the lack of a common supertype, so that (Int &
+Char) is disjoint from (Bool & Float), but (Int & Char) is not
+disjoint from Int (because (Int & Char) <: Int).
+
+The paper applies a language based on the calculus to model
+(prototype-based) OO traits.
+
+
+*** Overall evaluation
+
+I wrote the paper cited as [13] that the authors took as inspiration,
+so I am certainly interested in this line of work.  I am somewhat
+concerned that the approach taken is too limited, particularly in the
+way that adding ⊤ breaks the disjointness test (with ⊤, no types are
+deemed disjoint, because they all have a common supertype ⊤), but on
+balance this seems to be a solid contribution that explores a new part
+of the design space.  Essentially, the authors have found a reasonable
+solution to the incoherence problem for *a* system similar to mine,
+though not a solution to the particular incoherence problem that I
+had.
+
+There are some minor presentation issues, which seem fixable; the
+larger issue is the one I just mentioned.  That is, the system seems
+"tuned" to allow the authors' approach to coherence to work.  I don't
+object to the "tuning" (to a large extent, it's what *all* type system
+designers must do), but to the relative lack of clarity that this was
+the case.  It's flattering to be cited so repeatedly, but it would be
+better to emphasize the changes relative to my system, and their
+attendant limitations, early in the paper; the issue with ⊤ is
+mentioned only in the paper's conclusion.
+
+
+"QUESTION" convention: Questions that I would like the authors to
+address in their response are marked "QUESTION".  The authors are not
+required to respond to any other part of my review (they should, of
+course, correct any of my misunderstandings!).
+
+
+*** Comments on section 2
+
+"If a value x has type Int & Char then x can be used as an integer or
+as a character."
+
+This sentence can be misinterpreted: is it saying that x can either be
+used consistently as an integer, or consistently as a character, but
+not both?  I would say instead "…can be used as an integer, and as a
+character".  The next sentence does the same thing: "…or any
+function"; say "…and any function" instead.
+
+The example is somewhat under-motivated: there is little practical
+value in restricting an identity function to a particular
+type. Instead, you could have the first function add 1 to its
+argument, and the second one call a function "toUppercase" or
+something. This would strengthen the example.
+
+Under "Merge Operator", an example of a merge is given first and, a
+little later, the notation is explained; I would expect the reverse.
+
+The last sentence of 2.1, "…the compiler uses the type system to
+extract the corresponding value": I think this could be made more
+precise, by pointing out that the compiler is generating code that
+contains "fst".  That is, clarify that the extraction happens at run
+time, not at compile time.
+
+In section 2.2, the paper (correctly) argues that a biased choice of
+branch is unsatisfying; however, it doesn't mention another
+alternative I proposed (section 11 of my 2014 JFP paper): "One
+possible solution is to restrict typing of merges so that a merge has
+type A only if exactly one branch has type A."  That is probably not a
+*theoretically* satisfying choice, but I do think it's better than
+favouring the left (or right) value in the merge, and it seems worth
+mentioning at this point.
+
+In 2.2, incoherence is introduced before coherence is defined in 2.3.
+Perhaps it should be the other way around?
+
+In 2.3, the paper uses ∧ as a meta-logical operator meaning "and".  I
+find this notation unfortunate in general, but it is particularly
+confusing in a paper about intersection types, because ∧ is very
+commonly used for intersection (though it isn't being used for
+intersection in this paper).  Using the word "and" would avoid this
+issue.  If the authors dislike "and" for some reason, they could still
+increase clarity by putting parentheses around the slashed subtypings.
+
+
+*** Comments on section 3
+
+In 3.1, the line
+
+ trait Comment(content: String) { self: Comment →
+
+looked odd (I wondered if there was supposed to be a type after the →)
+until I read the explanation (on the following page) that "self" is an
+additional parameter.  Maybe the explanation could be moved up, or the
+paper could use
+
+ trait Comment(content: String) { λ self : Comment.
+
+which is closer to the notation in the rest of the paper.
+
+I liked the example of exclusion (end of 3.4).
+
+In 3.6, typo: "our translation is done +in the+ context"
+
+Also in 3.6: "translated into...a normal term in λ_i": It seems to be
+a lambda so it may be both a normal term (in the sense of a normal
+form) and an ordinary term, but "ordinary term" would be more clear.
+
+QUESTION: Do the authors know if this approach works for recursively
+defined objects?  For example, can we usefully employ traits to
+describe a LinkedList class that contains a "next" pointer to another
+LinkedList?
+
+Footnote 4: Give (at least) example syntax for the operations ("record
+access r.field, …"), rather than just listing them—"record operations"
+is too vague.  "unit literals" is odd: presumably there is only one
+unit literal.
+
+Footnote 5: shouldn't the example be: {x = 1, y = 2} \ x gives {y = 2}, not {x = 1}?
+
+
+*** Comments on section 4
+
+"later difference" → "latter difference"
+
+In listing the differences from my language, the paper should mention
+the lack of a ⊤ type.
+
+The restriction on functions (not of intersection type) seems strange.
+To me, a function of intersection type is the *canonical* use of
+intersection types (as opposed to the use in a merge, which—despite
+having written a paper about it—seems more strange to me).
+
+The use of annotations on the λ binder, rather than a general
+annotation form (e : A), is not what I prefer; I will grant that it is
+probably more popular than (e : A), but in systems with intersection
+types, both formulations enjoy popularity (along with others, such as
+a *list* of possible argument types on the binder).
+
+4.1.: "the 'merges' e1,,e2": It's a little late in the paper to need
+scare-quotes around "merges".
+
+I would simply say "As usual, we can show" rather than "As other sane
+subtyping relations, we can show": IMO, a relation that is not
+reflexive and transitive just shouldn't be called a subtyping
+relation.
+
+Lemma 1: "For all type A" → "For all types A"
+
+In 4.3, the discussion of the restriction that forbids
+
+  (f ,, g) 1
+
+didn't convince me.  Employing subtyping only in the argument of an
+application is a reasonable design choice, but also a rather ad-hoc
+one, so the argument that "a 'smarter' application rule...[that
+avoids] explicitly extracting functions from intersections...would
+necessarily be complicated, and rather ad-hoc" isn't very consistent:
+You don't want to design an ad-hoc rule…so you impose an ad-hoc
+restriction on subtyping.
+
+OTOH, back when I was writing my paper (and its JFP revision), I
+thought about how one might check disjointness, and one of the hurdles
+that caused me to steer clear was: how to deal with functions?  I
+respect that the authors found a solution, even if I don't like some
+aspects of it!
+
+
+*** Comments on section 5
+
+In 5.3, type of overlap 2., "right decomposition rules" → "right
+decomposition rule".
+
+On the "atomic type" distinction: First, the same distinction was made
+by Davies and Pfenning in ICFP 2000, which you already cite elsewhere
+in the paper; that should be mentioned here.  Second, the name
+"atomic" is confusing because it not only includes function types
+(which are not really "atomic": A1 → A2 contains type subexpressions
+A1 and A2) but (as the paper mentions) record types, etc.  Davies and
+Pfenning used "ordinary type" instead of "atomic type".
+
+
+*** Comments on section 6
+
+In Fig. 6, it would be better to have Dis-Inter-1 and -2 on the same
+line.  (You could put Dis-Fun after those rules.  You already discuss
+Dis-Inter-1 and -2 first in the text...)
+
+The explanation of Dis-Fun is very good.  Perhaps you could also
+mention, by contrast, how disjointness for product types would work
+(if you had them): in that case, I believe it would suffice for
+*either* the first components of the product to be disjoint, or the
+second: product subtyping is covariant, so disjointness of either
+component is enough to make it impossible to construct a supertype.
+
+The *_{ax} judgment is fine, but for a larger language it might be
+better to define a "head connective" operator,
+
+  hd(A → B) = →
+  hd(Int) = Int
+
+etc., and then  say
+
+  hd(A) ≠ hd(B)
+
+in the premise of Dis-Axiom.
+
+
+*** Comments on section 7
+
+(about Forsythe): "the way coherence is ensured is not general
+enough."  General enough for what purpose?  The specific point about
+Forsythe forbidding the merge of two functions is good; I don't think
+you need to go beyond that.  For example, whether your disjointness is
+"simple", "well-defined" and "quite flexible" is a subjective
+assessment.
+
+"The seminal paper by Schärli et al. ..." Two papers by Schärli et
+al. are listed in the references.  Which of them are you calling
+"seminal"?  (One of them has no publication information at all, which
+you should fix.)
+
+
+(more comments on this section below)
+
+
+*** Coupling between approach and type system
+
+One concern I have is that the paper's techniques and ideas seem very
+closely tied to particular features of the type system: the paper
+assumes a certain setting, without announcing that these techniques
+are (at minimum) not immediately applicable to other settings.
+
+For example, in 2.3 the paper defines disjointness and says:
+
+ "In a system with intersection types this can be ensured by requiring
+ the two types not to share a common supertype."
+
+The problem here is that it's common for intersection type
+systems—including the one in the paper by Dunfield that is being
+extended (at least in a thematic sense)—to have a "greatest" or
+"universal" type ⊤ (sometimes written ω), such that for all types A,
+
+  A <: ⊤
+
+This type is essentially a 0-ary intersection, so it's not surprising
+that it's common in systems with intersection.  Even intersection type
+systems without subtyping often have a typing rule like
+
+  –––––––––
+  Γ ⊢ e : ω
+
+(or perhaps Γ ⊢ v : ω).  If such a type is present, the proposed
+definition of disjointness is useless: there *always* exists a C,
+namely ⊤, such that A <: C and B <: C.
+
+A kind-of-dual problem comes up in 5.4: "Note that the ⊥ type does not
+participate in subtyping since it holds no value."  This contradicts
+many subtyping systems, including some by Dunfield, where ⊥
+participates in subtyping, with a rule dual to the rule for ⊤:
+
+   ⊥ <: B
+
+At minimum, the paper should justify the choice to exclude this rule.
+Perhaps it's the only way the authors could see to make the system
+work.  If so, OK, but they should say so explicitly.  The real meaning
+of "a system with intersection types" in the sentence quoted above is
+"**this** system with intersection types".
+
+After writing the above, I read Section 8 where the paper mentions ⊤
+and this limitation.  Good, but mentioning it earlier would be better.
+
+More importantly, while ⊤ is a simple and "natural" (given the
+presence of &) example of a type-system feature that "breaks" the
+paper's approach, I believe the same problem also exists for OO-style
+subtyping, which is interesting since Section 8 mentions that the
+system has been implemented in a JVM-targeting compiler: The class
+Integer and the class Cat are presumably disjoint, but also presumably
+inherit from Object.  Or consider some "RedBlackTreeDictionary" and
+some "HashTableDictionary", which usefully inherit from Dictionary,
+but are always disjoint.
+
+In refinement type systems, too, the disjointness test is too
+restrictive: while "even_integer" and "integer" are genuinely not
+disjoint, and have a common supertype ("integer"), "even_integer" and
+"odd_integer" *are* genuinely disjoint but have a common supertype
+("integer").
+
+Unfortunately, these examples also break the "adjustment" suggested in
+Section 8 ("the only common supertype of A and B is ⊤").  "Object" is
+arguably just another name for ⊤, but Dictionary is a common supertype
+(of {RedBlackTree,HashTable}Dictionary) that isn't ⊤.  For
+refinements, "integer" is arguably ⊤ (at least with a strict type/sort
+distinction as followed in some of the refinement types work,
+particularly that of Davies), but refinements also allow deeper/longer
+subtyping relationships—e.g. Davies's example of subsorting for
+red-black trees.
+
+In conclusion, the assertion in Section 8 that "disjoint intersection
+types are intuitive, and at the same time expressive" is a little too
+strong.
+
+
+
+
+••• Semantic subtyping •••
+
+In related work: "Semantic subtyping seems to have important
+advantages over syntactic subtyping."  Either say what you believe
+those advantages are, or drop the sentence (and the following
+sentence; I can't know whether it's a "worthy avenue for future work"
+unless I know those advantages).  If you do get into this, you should
+probably also mention the advantages of syntactic subtyping, such as
+ease of reasoning (and implementation) due to orthogonal rules.
+
+But I doubt the approach will work with semantic subtyping.  The
+bigger a subtyping relation is, the more likely it is that two types
+will have a common supertype, even if the types are actually disjoint
+in the sense of having no merge-free inhabitants.  Semantic subtyping
+seems to be about making *every* sound subtyping derivable,
+i.e. getting the biggest conceivable subtyping relation. Even much
+weaker syntactic approaches can have "too many" common supertypes for
+the approach formulated in the paper (with ⊤, or with refinement
+types); with semantic subtyping this is only aggravated.
+
+
+
+••• Very minor issues •••
+
+Some spelling and grammar errors: "Dunfield calculus" (→ "Dunfield's
+calculus"),"lacks of", "convinience", "rules that different", "Traits
+usually support-s-", "both Counter and Reset contain-s-", etc.
+
+Spelling "coordinate" with a diaeresis (ö) is a little old-fashioned.
+
+The intersection connective '&' never has enough space around it.  I
+would suggest \newcommand{\sectty}{\mathrel{\&}}.
+
+In the figures, some of the judgment boxes are left-aligned and some
+are centered.  I prefer left-aligned, but either way, it should be
+consistent.
+
+The * in Figure 5 has lopsided space; when you shade a box, TeX can't
+figure out that * is a binary operator, so you need to add space
+yourself.
+
+
+••• Bibliography •••
+
+[9]: "Curienl" should be "Curien".
+
+[10]: The institution is wrong!  Davies's dissertation is from Carnegie Mellon.
+
+[19]: No information.  This is a CMU tech report, so say that and give the number.  Please double-check the year; I believe it is 1996, not 1997.
+
+[20]: Title of conference is mangled.
+
+[21]: No information; also, missing ¨ on Schärli.
+
+[3, 12, 15]: Capitalization ("ml", etc.) in titles.
+
+[8]: The journal wasn't called "Mathematical Logic Quarterly" at the
+time of publication; it was "Zeitschrift für mathematische Logik und…"
+something.  Not sure what the best practice here is; maybe give both
+titles?  Since this is a confusing case, it's important to give the
+volume number and pages.
+
+
+----------------------- REVIEW 3 ---------------------
+PAPER: 108
+TITLE: Disjoint Intersection Types
+AUTHORS: Zhiyuan Shi and Bruno C. D. S. Oliveira
+
+OVERALL EVALUATION: -1 (reject)
+REVIEWER'S CONFIDENCE: 4 (high)
+
+----------- REVIEW -----------
+# PAPER SUMMARY
+
+The paper builds on Dunfield's "Elaboration of Intersection and Union
+Types" ICFP/JFP paper [13] to fix the problem of coherence. In [13],
+the merge operator used to build intersection types A & B allows the
+types A and B to have a common supertype C. This is a source of
+incoherence, since the projection of a value of type A & B to a value
+of type C can pick either be the left injection of type A or the right
+one of type B from the intersection.  This is the problem that this
+paper solves. The solution is just restricting the typing rules so
+that intersection types are always disjoint.  The paper does not
+address union types that were present in [13]. The metatheory is
+formalized in Coq, (while that of [13] was formalized in Twelf).  The
+paper also claims as a new contribution the application of
+intersection types to the encoding of traits in OOP.
+
+# OVERALL EVALUATION
+
+The paper is rather easy to read, and is in general well-written, but the
+language presented here is simpler than that of [13] since it does not have
+union types and does not discuss type inference issues. The paper seems
+technically correct.  The paper claims two main contributions: fixing the
+coherence from [13] and the application to traits. The latter is not a real
+contribution, as I will explain last.  The former is a true but a small
+one. While the coherence result is interesting, it was already suggested in
+[13] without much details, but the idea of disjointness up to subtyping as a
+criteria for non ambiguity was already present in some old work of
+Castagna. Then, the technical details do not seem difficult. The main result
+(soundness, coherence proof, coherence checking algorithm) are all in the
+paper, but other issues of the language design, which could have been
+discusses (efficiency, subject reduction, lack of a subtyping rule, etc.),
+are not.  Regarding the application to traits, I did not see new ideas, but
+the combination of known ideas: the application of intersection types for
+typing records with record concatenation has been known for a long time (and
+was already mentioned in [13]) and the use of record contatenation to
+typecheck traits is at least folklore knowledge.
+
+# GENERAL COMMENTS
+
+I first explain in more details why fixing the coherence remains a small
+contribution.  Technically, the paper is mainly a subset of [13] where some
+typing rules have been restricted so as to check for incoherence.  The
+authors claim some difficulties in adjusting the type system so as to ensure
+the coherence, but I did not find any.  Once the idea is there, the
+adaptation of type typing rules seems relatively easy.  I recognize that it
+is often easy to say so a posteriori, once the solution has been found.  But
+in this case, other authors had already studied the problem of coherence
+much earlier.  See for instance the work of Castagna on lambda-& (not cited)
+whose purpose was to detect overlapping overloaded definitions and enforce
+the user to explicitly define the behavior on the overlapping domain.  The
+purpose and definition of lambda-& are different but coherence is
+extensively discussed there and the solution seems much more powerful than
+simply forbidding non-overlapping intersections.  In any case, it is
+related.  Hence, the idea of disjointness to build non-ambiguous
+intersection is not new.  The idea of either restricting the creation of
+intersection types or warning in case of non-disjointness is already
+mentioned in Dunfield's paper.
+
+Since the paper is a restriction of Dunfield's, I don't see the need to redo
+the meta-theoretical study.  Instead, the proof of Dunfield could have been
+reused.  The proof in Coq is also superfluous from a research point of view,
+since the meta-theory of [13] was already mechanically formalized in Twelf.
+
+Besides, while the paper fixes one weakness of [13], coherence, it contains
+some new weaknesses. These seem needed for the solution to work, but they
+are not discuss as weaknesses:
+
+- The system proposed here has a subtyping relation, but no subtyping
+ principle. That is, subtyping can only be applied to the arguments of
+ functions. This was not the case in [13] that had a subtyping rule.
+
+ Here, one cannot use an expression at one of its subtypes---the only place
+ where subtyping can be used is during an application and is wired into the
+ application typing rule. This is less elegant and less intuitive for the
+ user.
+
+- The new proposal does not address the issue of type inference, while [13]
+ did.
+
+- Although the proposed system is sound, there is no subject reduction
+ theorem.   We do not know whether [13] has subject reduction, but it had
+ some simulation theorem (call consistency in [13]) which says that
+ stepping after elaboration can be reproduced by stepping before the
+ elaboration (in a typed preserving manner). This result is not shown
+ here.
+
+ In the current proposal, subject reduction per say should not hold,
+ because of lack of a proper subtyping rule.
+
+ For example, y : B |- (fun (x:A) x) y : A is typable whenever B <= A while
+ y : B |/- y : B is not.
+
+- Another problem with both [13] and this proposal, which is inherent to the
+ approach is that the semantics of intersection types has built-in a
+ significant cost at runtime. This issue could have been discussed.
+
+## Related work on coherence
+
+- The problem of coherence with intersection types was studied in the 90's
+ by Castagna in the language lambda-& (which you do not cite).  lambda-&
+ allowed overriding of clauses but detected this to force the user to
+ provide an explicit definition for the overlapping cases to resolve the
+ ambiguity.  This is something that you should discuss---and say why you do
+ not wish such an approach, which a priori seems better than rejecting
+ overlapping intersections altogether.
+
+## Traits
+
+- Your application to traits is largely independent. It builds on having a
+ type system for strict record contatenation (forbidding overlapping). Any
+ other such system would work as well.  So I see this is an independent
+ small contribution, but one that does not bring much to the main focus of
+ the paper.  Moreover, apart the fact that you have record concatenation
+ (records being encoded as intersection types) which keeps track of
+ overlapping fields, I do not see new ideas in your treatment of traits.
+ Besides, you do not perform type inference for traits, do not have side
+ effect, nor data abstraction.  My impression is that the story about
+ traits is folklore knowledge---given a system for typechecking
+ non-overlapping record concatenation.
+
+DETAILED COMMENTS:
+
+- 2.1, first paragraph: citations would be appreciated here.
+
+In fact, very few languages have adopted intersection types with a merge
+operator. One of the early work is that of Castagna on lambda-&.
+Its runtime cost is certainly for something in its lack of adoption. 
+
+- Top of page 5, line 4 [in<-an] intersection must...
+
+- 3.1, 1st paragraph "[an<-a] symmetric operation
+
+- 3.1 the code for Comment is unclear. Why don't you use lambda-calculus
+ syntax here.  The overloading of "Comment" as both a type and a trait is
+ confusing, especially since you insist later that trait do not declare
+ types.
+
+- 3.1, last example. This is again hard to read. You should explain that
+ types are explicit.
+
+- 3.6 lines 6 "our translation is one [<-in a] context of"
+
+- page 14, last paragraph
+
+ This paragraph is confusing and seems self-contradictory. It says that the
+ example is really a problem but also suggests that another solution than
+ removing the subtyping rule could be found.
+
+ You say that "In anycase, there is not expressiveness loss": well, you
+ still loose something if not expressiveness. You clearly loose a simple
+ intuition of subtyping. You are  loose subject reduction for sure. 
+
+- page 14, one before last line: "conv[i<-e]nience... possibl[y<e]"
+
+- page 16, line 4: [an<-a] term
+
+- section 5, end. You should say a word about the benefits of subject
+ reduction, even if you don't have it.
+
+- section 5.2. Metatheory.  If you had subject reduction, you might have
+ lost it.
+
+- section 5.3 paragraph above lemma 5: you say if you had record types, they
+ could be atomic, but you say earlier that record types can be encoding,
+ thus they would not be atomic.
+
+- page 23: "studied [an<-a] very interesting"
+
+- page 25: the last paragraph seems to be in contradiction with the previous
+ one (starting on the previous page).
+
+ You don't have polymorphism in the development, but you say earlier that
+ you have built an ML-like source language compiler. So I really wonder
+ what your ML-like source language is if it does not have polymorphism
+ (nor references?)
+
+
+-------------------------
+After PC Meeting comments
+-------------------------
+
+Here is some feedback from the discussion at the PC meeting.
+
+The reviewers were equally spread between acceptance and rejection
+before the PC meeting.  The decision was to reject the paper at the PC
+meeting, after discussion between the reviewers.
+
+The main argument in favor of acceptance was that the proposal to require
+disjointness of intersection types to ensure coherence by construction
+is a real contribution and is worth publishing.
+
+However, there were also several arguments against acceptance.  The
+contribution is somewhat small, in particular compared for instance to
+the original proposal [13].  Hence, the PC would have expected a
+thorough treatment of the subject, but found that several points
+should have been discussed and concluded that it would be preferable
+for the community if the paper was revised and resubmitted.
+
+- The proposal is fragile in the sense that it relies on the absence
+ of a top type. This is something that the reader had to guess. In a revision,
+ this point should be clearly stated and the consequences discussed and assessed.
+
+- The absence of a proper subtyping rule also makes reasoning less intuitive
+ for the programmer. Again, this should be discussed in the paper.
+
+- A question raised by one reviewer is why the meta-theoretical properties
+ of [13] could not be reused, since your system is just a restriction of
+ [13]. You may have good reasons to do so, but you should then explain them
+ to the reader.
+
+- Your proposal does not consider polymorphism, which you claim to be an
+ orthogonal issue. Its presence would have strengthened the paper.
+ The absence of a top type may be a problem in connection with subtyping
+ of existential types.
+
+- Regarding \lambda&, even though the work differs and is not reusable, one
+ of the reviewers thought that the idea of disjointness is already present
+ there and that this should have been discussed---but this was not one
+ of the main criteria for rejection.
+
+The PC did not value the contribution to traits, which is an
+orthogonal issue, and thought that if this were an added value, it
+should then be a separate submission to be evaluated as an OO
+contribution.
