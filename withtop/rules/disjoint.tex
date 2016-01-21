@@ -100,16 +100,58 @@
 
 % Top
 
-\newcommand{\labeldisaxinttop}{\makelabelax Int-Top}
-\newcommand{\ruledisaxinttop}{
-  \inferrule* [right=\labeldisaxinttop]
+\newcommand{\labeldisaxtop}{\makelabelax Top}
+\newcommand{\ruledisaxtop}{
+  \inferrule* [right=\labeldisaxtop]
+    {}
+    {\code{A} \disjointax \top}
+}
+
+
+% Impure
+
+\newcommand{\ruledisfunimp}{
+  \inferrule* [right=\labeldisfun]
+    {\jdisimpl \Gamma {A_2} {B_2} \quad {\neg \toplike{A_2}} \quad {\neg \toplike{B_2}}}
+    {\jdisimpl \Gamma {A_1 \to A_2} {B_1 \to B_2}}
+}
+
+\newcommand{\ruledisfunimpr}{
+  \inferrule* [right=\labeldisfun]
+    {\jdisimpl \Gamma {A_2} {B_2} \quad {\toplike{A_2}} \quad {\neg \toplike{B_2}} \quad {A_1 \disjoint B_1}}
+    {\jdisimpl \Gamma {A_1 \to A_2} {B_1 \to B_2}}
+}
+
+\newcommand{\ruledisfunimpl}{
+  \inferrule* [right=\labeldisfun]
+    {\jdisimpl \Gamma {A_2} {B_2} \quad {\neg \toplike{A_2}} \quad {\toplike{B_2}} \quad {A_1 \disjoint B_1}}
+    {\jdisimpl \Gamma {A_1 \to A_2} {B_1 \to B_2}}
+}
+
+\newcommand{\ruledisaxtopfun}{
+  \inferrule* [right=\labeldisaxtop]
+    {}
+    {\code{A} \to \code{B} \disjointax \top}
+
+}
+
+\newcommand{\ruledisaxtopint}{
+  \inferrule* [right=\labeldisaxtop]
     {}
     {\code{Int} \disjointax \top}
 }
 
-\newcommand{\labeldisaxtopfun}{\makelabelax Top-Fun}
-\newcommand{\ruledisaxtopfun}{
-  \inferrule* [right=\labeldisaxtopfun]
-    {}
-    {\top \disjointax A \to B}
-}
+% \newcommand{\labeldisaxinttop}{\makelabelax Int-Top}
+% \newcommand{\ruledisaxinttop}{
+%   \inferrule* [right=\labeldisaxinttop]
+%     {}
+%     {\code{Int} \disjointax \top}
+% }
+
+% \newcommand{\labeldisaxtopfun}{\makelabelax Top-Fun}
+% \newcommand{\ruledisaxtopfun}{
+%   \inferrule* [right=\labeldisaxtopfun]
+%     {}
+%     {\top \disjointax A \to B}
+% }
+% 

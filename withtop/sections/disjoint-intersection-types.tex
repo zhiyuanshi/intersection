@@ -25,21 +25,40 @@ guarantees coherence as well as type soundness. The result is a calculus named
 %relation, resulting in two possible coercions.
 
 \subsection{Disjointness} Throughout the paper we already presented an intuitive
-definition for disjointness. We recall the definition here
+definition for disjointness. 
+Before we discuss that definition, let us introduce first the notion of a top-like type 
 
 %Here such definition is made a bit more precise, and
 %well-suited to \name.
+\begin{figure}[t]
+  \begin{mathpar}
+    \formtoplike \\ %\framebox{$\jatomic A$} \\
 
+    \ruletopltop \and \ruletoplfun \and \ruletoplinterl \and \ruletoplinterr
+
+  \end{mathpar}
+  \caption{Top-like types.}
+  \label{fig:fi-toplike}
+\end{figure}
+
+\begin{definition}[Top-like types]
+  
+  One type $A$ is a top-like type, denoted as $\toplike{A}$, if it has the form $A_k \to \top$, where $k \in {0,1,..}$.
+  That is, any type with arity $k$ can be a top-like type, as long as $\top$ is the result type. 
+
+\end{definition}
+Thus a top-like type is a unary relation at the type level, which can be formalized according to \ref{fig:fi-toplike}.
 % \bruno{This definition is wrong and too complicated. Since there is no
 % polymorphism, we do not need $\Gamma$.}
+Now, we recall the definition of disjoint types
+
 \begin{definition}[Disjoint types]
 
   Two types $A$ and $B$ are said to be disjoint (written $\jdis \Gamma A B$) if
-  they do not share a common supertype (excluding top). 
-  That is, there does not exist a type $C$
-  such that $A \subtype C$, $B \subtype C$ and $C \neq \top$.
+  they do not share a common supertype - excluding top-like types. 
+  That is, for all type $C$ such that $A \subtype C$ and $B \subtype C$, then $\toplike{C}$ must hold.
 
-  \[\jdis \Gamma A B \equiv \not \exists C.~A \subtype C \wedge B \subtype C \wedge C \neq \top\]
+  \[\jdis \Gamma A B \equiv \forall C.~A \subtype C \wedge B \subtype C \Rightarrow \toplike{C}\]
 
 \end{definition}
 
@@ -52,6 +71,21 @@ For example, a function type and an intersection
 type may not be disjoint. Consider:
 \[ \code{Int} \to \code{Int} \quad \text{and} \quad (\code{Int} \to \code{Int}) \inter (\code{String} \to \code{String}) \]
 Those two types are not disjoint since $\code{Int} \to \code{Int}$ is their common supertype.
+Also, $\code{Int} \to \code{Char}$ and $\code{Int} \to \code{String}$ are disjoint, 
+since their supertypes are all types with the form $A \to \top$ 
+(where A \emph{contains} \code{Int}, i.e. $\code{Int}$, $\code{Int} \inter \code{Char}$) and $\top$.
+
+%TODO move this part somewhere else
+\joao{do we want to allow this?
+ f: String $\to$ Int \\ 
+ g: String $\to$ T \\
+ ($\lam$ h : String $\to$ T. h "") (f ,, g) }
+
+At last, take as an example ($\top \inter \top$).
+In a pure language (i.e. no side-effects), this type can be safely allowed since both components of the merge
+will evaluate to the same value. 
+However, in an effectful language, the evaluation of either the right or left component might lead to distinct results. 
+Following the same reasoning, we might want to allow or restrict, for instance $String \to Int \inter String \to \top$,  
 
 % \bruno{There are no changes in syntax, right? So the whole section
 %   (and figure) can be dropped! Also, without polymorphism, we don't

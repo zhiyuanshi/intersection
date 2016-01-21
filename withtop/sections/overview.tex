@@ -177,7 +177,8 @@ some types in common.
 \paragraph{A Proper Definition of Disjointness.} In order for two types
 to be truly disjoint, they must not have any subcomponents sharing
 the same type. In a system with intersection types this can be ensured
-by requiring the two types not to share a common supertype (excluding $\top$). 
+by requiring the two types not to share a common supertype - excluding any type of
+the form ${A_k} \to \top$. 
 The following definition captures this idea more formally.
 
 \begin{definition}[Disjointness]
@@ -193,7 +194,7 @@ $\code{Int} \& \code{Bool}$, those two types are not disjoint.
 
 \name's type system only accepts programs that use disjoint intersection
 types. As shown in Section~\ref{sec:disjoint} disjoint intersection types will
-play a crucial rule in guaranteeing that the semantics is coherent.
+play a crucial rule in guaranteeing that the semantics is coherent. 
 
 % \subsection{Parametric Polymorphism and Intersection Types}\label{subsec:polymorphism}
 % Before we show how \name extends the idea of disjointness to parametric
