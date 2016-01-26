@@ -264,7 +264,7 @@ apply IHt2_2.
 unfold OrthoS. intros. apply H.
 auto. apply sand3. exact H1.
 (* Case t11 -> t12 _|_ T *)
-admit.
+apply OTop1.
 (* Case (t11 & t12) _|_ t2 *) 
 apply OAnd1.
 apply IHt1_1.
@@ -283,7 +283,7 @@ apply sand3.
 exact H0.
 exact H1.
 (* Case T _|_ t2 *)
-admit.
+apply OTop2.
 Defined.
 
 Lemma nosub : forall t1 t2, OrthoS t1 t2 -> not (Sub t1 t2) /\ not (Sub t2 t1).
