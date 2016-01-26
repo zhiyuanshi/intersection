@@ -22,7 +22,8 @@ All lemmas and theorems are complete: there are no uses of admit or Admitted.
 Inductive STyp := 
   | STInt : STyp
   | STFun : STyp -> STyp -> STyp
-  | STTuple : STyp -> STyp -> STyp.
+  | STTuple : STyp -> STyp -> STyp
+  | STUnitT : STyp.
 
 Inductive SExp (A : Type) :=
   | STVar   : A -> SExp A
@@ -31,7 +32,8 @@ Inductive SExp (A : Type) :=
   | STApp   : SExp A -> SExp A -> SExp A
   | STPair  : SExp A -> SExp A -> SExp A
   | STProj1 : SExp A -> SExp A
-  | STProj2 : SExp A -> SExp A.
+  | STProj2 : SExp A -> SExp A
+  | STUnit   : SExp A.
 
 Definition Exp := forall A, SExp A.
 
@@ -42,13 +44,15 @@ Definition Exp := forall A, SExp A.
 Inductive PTyp : Type :=
   | PInt : PTyp
   | Fun : PTyp -> PTyp -> PTyp
-  | And : PTyp -> PTyp -> PTyp.
+  | And : PTyp -> PTyp -> PTyp
+  | TopT : PTyp.
 
 Fixpoint ptyp2styp (t : PTyp) : STyp :=
   match t with
     | PInt => STInt 
     | Fun t1 t2 => STFun (ptyp2styp t1) (ptyp2styp t2)
     | And t1 t2 => STTuple (ptyp2styp t1) (ptyp2styp t2)
+    | TopT => STUnitT
   end.
 
 Require Import Arith.
@@ -73,7 +77,8 @@ Inductive sub : PTyp -> PTyp -> Exp -> Prop :=
        (STApp _ (c A) (STProj1 _ (STVar _ x)))))
   | SAnd3 : forall t t1 t2 c, sub t2 t c -> Atomic t ->
      sub (And  t1 t2) t (fun A => STLam _ (ptyp2styp (And t1 t2)) (fun x => 
-       (STApp _ (c A) (STProj2 _ (STVar _ x))))).
+       (STApp _ (c A) (STProj2 _ (STVar _ x)))))
+  | STop : forall t, sub t TopT (fun A => STUnit _).
 
 Definition Sub (t1 t2 : PTyp) : Prop := exists (e:Exp), sub t1 t2 e.
 
@@ -107,6 +112,7 @@ exists (fun A => STLam _ (ptyp2styp (And t1 t2)) (fun x1 =>
        (STApp _ (x A) (STProj1 _ (STVar _ x1))))).
 apply SAnd2. auto. auto.
 inversion H0.
+admit. (* a top case here *)
 Defined.
 
 (* The No loss of Expressivity Lemmas *)
@@ -132,6 +138,8 @@ exists (fun A => STLam _ (ptyp2styp t1) (fun x =>
 apply SAnd1. auto. auto.
 inversion H1.
 inversion H1.
+(* Case Top *)
+admit. (* a top case here *)
 Defined.
 
 Definition sand3_atomic : forall t t1 t2, Sub t2 t -> Atomic t -> Sub (And  t1 t2) t.
@@ -143,6 +151,7 @@ exists (fun A => STLam _ (ptyp2styp (And t1 t2)) (fun x1 =>
        (STApp _ (x A) (STProj2 _ (STVar _ x1))))).
 apply SAnd3. auto. auto.
 inversion H0.
+admit. (* a top case here *)
 Defined.
 
 (* Theorem 4 *)
@@ -166,6 +175,14 @@ exists (fun A => STLam _ (ptyp2styp t1) (fun x =>
 apply SAnd1. auto. auto.
 inversion H1.
 inversion H1.
+(* Case Top *)
+admit. (* top case *)
+Defined.
+
+Definition stop : forall t, Sub t TopT.
+intros; unfold Sub.
+exists (fun A => STUnit _).
+apply STop.
 Defined.
 
 (* Disjointness: Implementation *)
@@ -175,21 +192,32 @@ Inductive Ortho : PTyp -> PTyp -> Prop :=
   | OAnd2 : forall t1 t2 t3, Ortho t1 t2 -> Ortho t1 t3 -> Ortho t1 (And t2 t3)
   | OFun  : forall t1 t2 t3 t4, Ortho t2 t4 -> Ortho (Fun t1 t2) (Fun t3 t4)
   | OIntFun : forall t1 t2, Ortho PInt (Fun t1 t2)
-  | OFunInt : forall t1 t2, Ortho (Fun t1 t2) PInt.
+  | OFunInt : forall t1 t2, Ortho (Fun t1 t2) PInt
+  | OTop1 : forall t, Ortho t TopT
+  | OTop2 : forall t, Ortho TopT t.
+
+(* Top-Like *)
+
+Inductive TopLike : PTyp -> Prop :=
+  | TLTop : TopLike TopT
+  | TLFun : forall t1 t2, TopLike t2 -> TopLike (Fun t1 t2)
+  | TLAnd1 : forall t1 t2, TopLike t1 -> TopLike (And t1 t2)
+  | TLAnd2 : forall t1 t2, TopLike t2 -> TopLike (And t1 t2).
 
 (* Disjointness: Specification *)
 
-Definition OrthoS (A B : PTyp) := not (exists C, Sub A C /\ Sub B C).
+Definition OrthoS (A B : PTyp) := forall C, Sub A C -> Sub B C -> TopLike C.
 
 (* Well-formed types *)
 
 Inductive WFTyp : PTyp -> Prop := 
   | WFInt : WFTyp PInt
   | WFFun : forall t1 t2, WFTyp t1 -> WFTyp t2 -> WFTyp (Fun t1 t2)
-  | WFAnd : forall t1 t2, WFTyp t1 -> WFTyp t2 -> OrthoS t1 t2 -> WFTyp (And t1 t2).
+  | WFAnd : forall t1 t2, WFTyp t1 -> WFTyp t2 -> OrthoS t1 t2 -> WFTyp (And t1 t2)
+  | WFTop : WFTyp TopT.
 
 (* Reflexivity *)
-Hint Resolve sint sfun sand1 sand2 sand3 SInt SFun SAnd1 SAnd2 SAnd3.
+Hint Resolve sint sfun sand1 sand2 sand3 SInt SFun SAnd1 SAnd2 SAnd3 stop.
 
 Lemma reflex : forall (t1 : PTyp), Sub t1 t1.
 Proof.
@@ -200,67 +228,62 @@ Defined.
 
 Lemma ortho_completness : forall (t1 t2 : PTyp), OrthoS t1 t2 -> Ortho t1 t2.
 Proof.
-induction t1; intros; unfold OrthoS in H.
+induction t1; intros.
 (* Case PInt *)
 induction t2. 
-destruct H. exists PInt. split; apply reflex.
+pose (H PInt sint sint). inversion t.
 apply OIntFun.
 apply OAnd2. 
-apply IHt2_1. unfold not. unfold not in H. intros; apply H.
-destruct H0. destruct H0. 
-exists x. split. exact H0. apply sand2. exact H1.
-apply IHt2_2. unfold not. unfold not in H. intros. apply H.
-destruct H0. destruct H0. exists x.
-split. auto. apply sand3.
-auto.
+apply IHt2_1. unfold OrthoS. intros; apply H.
+exact H0. apply sand2. exact H1.
+apply IHt2_2. unfold OrthoS. intros. apply H.
+auto. apply sand3.
+auto. apply OTop1.
 (* Case Fun t1 t2 *)
 induction t2.
 apply OFunInt. 
 apply OFun.
-apply IHt1_2. unfold OrthoS. unfold not. intros.
-unfold not in H. apply H.
-destruct H0. destruct H0.
-exists (Fun (And t1_1 t2_1) x).
-split.
+apply IHt1_2. unfold OrthoS. intros.
+unfold OrthoS in H.
+assert (TopLike (Fun (And t1_1 t2_1) C)).
+apply H.
 apply sfun.
 apply sand2.
 apply reflex.
 auto.
 apply sfun.
 apply sand3. apply reflex.
-auto.
+auto. inversion H2. auto.
 (* Case t11 -> t12 _|_ t21 & t22 *)
 apply OAnd2.
 apply IHt2_1.
-unfold not. unfold not in H. intros. apply H.
-destruct H0. destruct H0.
-exists x. split. auto. apply sand2. exact H1.
+unfold OrthoS. intros. 
+apply H.
+auto. apply sand2. exact H1.
 apply IHt2_2.
-unfold not. unfold not in H. intros. apply H.
-destruct H0. destruct H0.
-exists x. split. auto. apply sand3. exact H1.
+unfold OrthoS. intros. apply H.
+auto. apply sand3. exact H1.
+(* Case t11 -> t12 _|_ T *)
+admit.
 (* Case (t11 & t12) _|_ t2 *) 
 apply OAnd1.
 apply IHt1_1.
 unfold OrthoS.
-unfold not. unfold not in H.
-intro.
+intros.
 apply H.
-clear H. destruct H0. destruct H.
+(*clear H. destruct H0. destruct H.
 exists x.
-split.
-apply sand2. exact H.
-exact H0.
+split.*)
+apply sand2. exact H0.
+exact H1.
 apply IHt1_2.
-unfold OrthoS; unfold not; intro. unfold not in H.
-apply H. clear H.
-destruct H0.
-destruct H.
-exists x.
-split.
+unfold OrthoS; intros. 
+apply H. 
 apply sand3.
-exact H.
 exact H0.
+exact H1.
+(* Case T _|_ t2 *)
+admit.
 Defined.
 
 Lemma nosub : forall t1 t2, OrthoS t1 t2 -> not (Sub t1 t2) /\ not (Sub t2 t1).
