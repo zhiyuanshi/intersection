@@ -89,6 +89,13 @@ unfold Sub. exists (fun A => STLam _ STInt (fun x => STVar _ x)).
 exact SInt.
 Defined.
 
+
+Definition stop : forall t, Sub t TopT.
+intros; unfold Sub.
+exists (fun A => STUnit _).
+apply STop.
+Defined.
+
 Definition sfun : forall o1 o2 o3 o4, Sub o3 o1 -> Sub o2 o4 -> Sub (Fun o1 o2) (Fun  o3 o4).
 unfold Sub; intros. destruct H. destruct H0.
 exists (fun A => STLam _ (ptyp2styp (Fun o1 o2)) (fun f => 
@@ -112,7 +119,7 @@ exists (fun A => STLam _ (ptyp2styp (And t1 t2)) (fun x1 =>
        (STApp _ (x A) (STProj1 _ (STVar _ x1))))).
 apply SAnd2. auto. auto.
 inversion H0.
-admit. (* a top case here *)
+apply stop. (* a top case here *)
 Defined.
 
 (* The No loss of Expressivity Lemmas *)
@@ -139,7 +146,7 @@ apply SAnd1. auto. auto.
 inversion H1.
 inversion H1.
 (* Case Top *)
-admit. (* a top case here *)
+apply stop. (* a top case here *)
 Defined.
 
 Definition sand3_atomic : forall t t1 t2, Sub t2 t -> Atomic t -> Sub (And  t1 t2) t.
@@ -151,7 +158,7 @@ exists (fun A => STLam _ (ptyp2styp (And t1 t2)) (fun x1 =>
        (STApp _ (x A) (STProj2 _ (STVar _ x1))))).
 apply SAnd3. auto. auto.
 inversion H0.
-admit. (* a top case here *)
+apply stop. (* a top case here *)
 Defined.
 
 (* Theorem 4 *)
@@ -176,14 +183,9 @@ apply SAnd1. auto. auto.
 inversion H1.
 inversion H1.
 (* Case Top *)
-admit. (* top case *)
+apply stop. (* top case *)
 Defined.
 
-Definition stop : forall t, Sub t TopT.
-intros; unfold Sub.
-exists (fun A => STUnit _).
-apply STop.
-Defined.
 
 (* Disjointness: Implementation *)
 
@@ -286,10 +288,11 @@ exact H1.
 apply OTop2.
 Defined.
 
+(*
 Lemma nosub : forall t1 t2, OrthoS t1 t2 -> not (Sub t1 t2) /\ not (Sub t2 t1).
 Proof.
 intros; split; unfold not.
-unfold OrthoS in H. unfold not in H. intros.
+unfold OrthoS in H. intros.
 apply H.
 exists t2.
 split. auto. apply reflex.
@@ -297,7 +300,7 @@ unfold OrthoS in H. unfold not in H. intros.
 apply H.
 exists t1. split. apply reflex. auto.
 Defined.
-
+*)
 
 Lemma invAndS1 : forall t t1 t2, Sub t (And t1 t2) -> Sub t t1 /\ Sub t t2.
 Proof.
@@ -326,43 +329,45 @@ apply sand3.
 auto.
 apply sand3.
 auto.
+(* Top cases *)
+inversion H. inversion H0. split; unfold Sub. exists c1. auto. exists c2. auto.
 Defined.
 
 (* Unique subtype contributor: Lemma 4 *)
 
 Lemma uniquesub : forall A B C, 
-  OrthoS A B -> Sub (And A B) C -> not (Sub A C /\ Sub B C).
+  OrthoS A B -> Sub (And A B) C -> not (TopLike C) -> not (Sub A C /\ Sub B C).
 Proof.
-intros. unfold OrthoS in H. unfold not. intros. apply H. exists C. auto.
+intros. unfold OrthoS in H. unfold not. intros. destruct H2.
+pose (H C H2 H3). contradiction. 
 Defined.
 
 (* Lemmas needed to prove soundness of the disjointness algorithm *)
 
 Lemma ortho_sym : forall A B, OrthoS A B -> OrthoS B A.
 Proof.
-unfold OrthoS. unfold not.
+unfold OrthoS. 
 intros. apply H.
-destruct H0. destruct H0.
-exists x.
-split; auto.
+auto. auto.
 Defined.
 
 Lemma ortho_and : forall A B C, OrthoS A C -> OrthoS B C -> OrthoS (And A B) C.
 Proof.
 intros. unfold OrthoS.
-unfold not. intros.
-destruct H1. destruct H1.
-induction x. 
-inversion H1. inversion H3. unfold OrthoS in H. apply H. exists (PInt). split. 
+intros.
+(*destruct H1. *)
+induction C0. 
+inversion H1. inversion H3. apply H. 
 unfold Sub. exists c. auto. unfold Sub.  unfold Sub in H2. destruct H2. exists x0. auto.
-unfold OrthoS in H0. apply H0. exists (PInt). split. 
+apply H0.  
+unfold Sub. exists c. auto. auto.
+inversion H1. apply H.
+(*exists (Fun x1 x2). split. *)
 unfold Sub. exists c. auto. unfold Sub.  unfold Sub in H2. destruct H2. exists x0. auto.
-inversion H1. inversion H3. unfold OrthoS in H. apply H. exists (Fun x1 x2). split. 
+apply H0.  
 unfold Sub. exists c. auto. unfold Sub.  unfold Sub in H2. destruct H2. exists x0. auto.
-unfold OrthoS in H0. apply H0. exists (Fun x1 x2). split. 
-unfold Sub. exists c. auto. unfold Sub.  unfold Sub in H2. destruct H2. exists x0. auto.
-assert (Sub C x1 /\ Sub C x2). apply invAndS1. auto. destruct H3.
-inversion H1. inversion H5. apply IHx1. 
+assert (Sub C C0_1 /\ Sub C C0_2). apply invAndS1. auto. destruct H3.
+(* inversion H1. inversion H5.*) apply TLAnd1. apply IHC0_1. 
 unfold Sub. exists c1. auto. unfold Sub.  unfold Sub in H3. destruct H3. exists x0. auto.
 unfold OrthoS in H. apply H. exists (And x1 x2). split. 
 unfold Sub. exists c. auto. unfold Sub.  unfold Sub in H2. destruct H2. exists x0. auto.
