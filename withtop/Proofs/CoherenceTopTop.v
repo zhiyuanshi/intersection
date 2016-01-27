@@ -1,5 +1,14 @@
 Require Import String.
 
+(* This system does not work. We cannot derive:
+
+Char & Int -> Top <: Int -> Top
+
+No rule applies in this case! This makes the subtyping relation incomplete!
+
+*)
+
+
 (* Notes:
 
 The syntax is encoded using Chipala's Parametric HOAS:
@@ -64,6 +73,14 @@ Inductive Atomic : PTyp -> Prop :=
   | AInt : Atomic PInt
   | AFun : forall t1 t2, Atomic (Fun t1 t2).
 
+(* Top-Like *)
+
+Inductive TopLike : PTyp -> Prop :=
+  | TLTop : TopLike TopT
+  | TLFun : forall t1 t2, TopLike t2 -> TopLike (Fun t1 t2)
+  | TLAnd1 : forall t1 t2, TopLike t1 -> TopLike (And t1 t2)
+  | TLAnd2 : forall t1 t2, TopLike t2 -> TopLike (And t1 t2).
+
 Inductive sub : PTyp -> PTyp -> Exp -> Prop :=
   | SInt : sub PInt PInt (fun A => STLam _ STInt (fun x => STVar _ x))
   | SFun : forall o1 o2 o3 o4 c1 c2, sub o3 o1 c1 -> sub o2 o4 c2 -> 
@@ -75,7 +92,7 @@ Inductive sub : PTyp -> PTyp -> Exp -> Prop :=
   | SAnd2 : forall t t1 t2 c, sub t1 t c -> Atomic t ->
      sub (And  t1 t2) t (fun A => STLam _ (ptyp2styp (And t1 t2)) (fun x => 
        (STApp _ (c A) (STProj1 _ (STVar _ x)))))
-  | SAnd3 : forall t t1 t2 c, sub t2 t c -> Atomic t ->
+  | SAnd3 : forall t t1 t2 c, sub t2 t c -> Atomic t -> not (TopLike t) ->
      sub (And  t1 t2) t (fun A => STLam _ (ptyp2styp (And t1 t2)) (fun x => 
        (STApp _ (c A) (STProj2 _ (STVar _ x)))))
   | STop : forall t, sub t TopT (fun A => STUnit _).
@@ -149,14 +166,14 @@ inversion H1.
 apply stop. (* a top case here *)
 Defined.
 
-Definition sand3_atomic : forall t t1 t2, Sub t2 t -> Atomic t -> Sub (And  t1 t2) t.
+Definition sand3_atomic : forall t t1 t2, Sub t2 t -> Atomic t -> not (TopLike t) -> Sub (And  t1 t2) t.
 unfold Sub. intros. destruct t. destruct H.
 exists (fun A => STLam _ (ptyp2styp (And t1 t2)) (fun x1 => 
        (STApp _ (x A) (STProj2 _ (STVar _ x1))))).
-apply SAnd3. auto. auto. destruct H.
+apply SAnd3. auto. auto. auto. destruct H.
 exists (fun A => STLam _ (ptyp2styp (And t1 t2)) (fun x1 => 
        (STApp _ (x A) (STProj2 _ (STVar _ x1))))).
-apply SAnd3. auto. auto.
+apply SAnd3. auto. auto. auto.
 inversion H0.
 apply stop. (* a top case here *)
 Defined.
@@ -166,9 +183,12 @@ Defined.
 Definition sand3 : forall t t1 t2, Sub t2 t -> Sub (And  t1 t2) t.
 induction t; intros.
 (* Case PInt *)
-apply sand3_atomic. auto. exact AInt.
+apply sand3_atomic. auto. exact AInt. unfold not; intros. inversion H0.
 (* Case Fun *)
-apply sand3_atomic. auto. apply AFun.
+apply sand3_atomic. auto. apply AFun. 
+inversion H. inversion H0.
+
+unfold not; intros. admit.
 (* Case And *)
 unfold Sub. unfold Sub in H. destruct H. inversion H.
 assert (Sub (And t0 t3) t1). apply IHt1.
@@ -186,22 +206,6 @@ inversion H1.
 apply stop. (* top case *)
 Defined.
 
-(* Top-Like *)
-
-Inductive TopLike : PTyp -> Prop :=
-  | TLTop : TopLike TopT
-  | TLFun : forall t1 t2, TopLike t2 -> TopLike (Fun t1 t2)
-  | TLAnd1 : forall t1 t2, TopLike t1 -> TopLike (And t1 t2)
-  | TLAnd2 : forall t1 t2, TopLike t2 -> TopLike (And t1 t2).
-
-(* Disjointness: Specification *)
-
-Definition OrthoS (A B : PTyp) := 
-  (not (TopLike A) \/ not (TopLike B)) /\ (forall C, Sub A C -> Sub B C -> TopLike C).
-
-Lemma applyOrthoS : forall {A B}, OrthoS A B -> forall C, Sub A C -> Sub B C -> TopLike C.
-intros. destruct H. apply H2; auto.
-Defined.
 
 (* Disjointness: Implementation *)
 
@@ -211,8 +215,12 @@ Inductive Ortho : PTyp -> PTyp -> Prop :=
   | OFun  : forall t1 t2 t3 t4, Ortho t2 t4 -> Ortho (Fun t1 t2) (Fun t3 t4)
   | OIntFun : forall t1 t2, Ortho PInt (Fun t1 t2)
   | OFunInt : forall t1 t2, Ortho (Fun t1 t2) PInt
-  | OTop1 : forall t, not (TopLike t) -> Ortho t TopT
-  | OTop2 : forall t, not (TopLike t) -> Ortho TopT t.
+  | OTop1 : forall t, Ortho t TopT
+  | OTop2 : forall t, Ortho TopT t.
+
+(* Disjointness: Specification *)
+
+Definition OrthoS (A B : PTyp) := forall C, Sub A C -> Sub B C -> TopLike C.
 
 (* Well-formed types *)
 
@@ -230,42 +238,29 @@ Proof.
 induction t1; intros; auto.
 Defined.
 
-Lemma OrthoSNotEq : forall A B, OrthoS A B -> not (A = B). 
-intros. destruct H. destruct H. unfold not; intros. rewrite <- H1 in H0.
-pose (H0 A (reflex _) (reflex _)). contradiction.
-unfold not; intros. rewrite H1 in H0. 
-pose (H0 B (reflex _) (reflex _)). contradiction.
-Defined.
-
 (* Disjointness algorithm is complete: Theorem 7 *)
 
 Lemma ortho_completness : forall (t1 t2 : PTyp), OrthoS t1 t2 -> Ortho t1 t2.
 Proof.
 induction t1; intros.
 (* Case PInt *)
-generalize H. clear H. induction t2; intros.
-pose (applyOrthoS H PInt sint sint). inversion t.
+induction t2. 
+pose (H PInt sint sint). inversion t.
 apply OIntFun.
 apply OAnd2. 
-apply IHt2_1. unfold OrthoS. split.
-left. unfold not; intros. inversion H0.
-intros; apply H.
+apply IHt2_1. unfold OrthoS. intros; apply H.
 exact H0. apply sand2. exact H1.
-apply IHt2_2. unfold OrthoS. split. left. unfold not; intros. inversion H0.
-intros. apply H.
+apply IHt2_2. unfold OrthoS. intros. apply H.
 auto. apply sand3.
-auto. apply OTop1. unfold not; intros. inversion H0.
+auto. apply OTop1.
 (* Case Fun t1 t2 *)
 induction t2.
 apply OFunInt. 
 apply OFun.
-apply IHt1_2. unfold OrthoS. split. 
-destruct H. destruct H. left. unfold not; intros.
-apply H. apply TLFun. auto.
-right. unfold not; intros. apply H. apply TLFun. auto.
-intros.
+apply IHt1_2. unfold OrthoS. intros.
+unfold OrthoS in H.
 assert (TopLike (Fun (And t1_1 t2_1) C)).
-apply (applyOrthoS H).
+apply H.
 apply sfun.
 apply sand2.
 apply reflex.
@@ -276,45 +271,33 @@ auto. inversion H2. auto.
 (* Case t11 -> t12 _|_ t21 & t22 *)
 apply OAnd2.
 apply IHt2_1.
-unfold OrthoS. split. 
-destruct H. destruct H.
-left. auto. right. unfold not; intros. apply H. apply TLAnd1. auto.
-intros. 
+unfold OrthoS. intros. 
 apply H.
 auto. apply sand2. exact H1.
 apply IHt2_2.
-unfold OrthoS. split. 
-destruct H. destruct H. left; auto. 
-right. unfold not; intros. apply H.
-apply TLAnd2. auto.
-intros. apply H.
+unfold OrthoS. intros. apply H.
 auto. apply sand3. exact H1.
 (* Case t11 -> t12 _|_ T *)
-apply OTop1. destruct H.
-destruct H. auto. destruct H. apply TLTop.
+apply OTop1.
 (* Case (t11 & t12) _|_ t2 *) 
 apply OAnd1.
 apply IHt1_1.
-unfold OrthoS. split. 
-destruct H. destruct H. left.
-unfold not; intros. apply H.
-apply TLAnd1. auto. right; auto.
+unfold OrthoS.
 intros.
 apply H.
+(*clear H. destruct H0. destruct H.
+exists x.
+split.*)
 apply sand2. exact H0.
 exact H1.
 apply IHt1_2.
-unfold OrthoS; intros. split. 
-destruct H. destruct H. left. unfold not; intros.
-apply H. apply TLAnd2. auto. right; auto.
-intros.
-apply (applyOrthoS H). 
+unfold OrthoS; intros. 
+apply H. 
 apply sand3.
 exact H0.
 exact H1.
 (* Case T _|_ t2 *)
 apply OTop2.
-destruct H. destruct H. destruct H. apply TLTop. auto.
 Defined.
 
 (*
