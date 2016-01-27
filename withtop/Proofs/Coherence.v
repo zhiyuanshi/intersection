@@ -418,7 +418,11 @@ assert (OrthoS t3 t1). apply ortho_sym. apply IHOrtho2; auto.
 apply ortho_sym.
 apply ortho_and; auto.
 (* Case FunFun *)
-unfold OrthoS. split. admit. intros.
+unfold OrthoS. split.
+destruct IHOrtho. destruct H0. left. unfold not; intros.
+apply H0. inversion H2. auto.
+right. unfold not; intros. apply H0. inversion H2. auto.
+intros.
 generalize H0. generalize H1. clear H0. clear H1.
 induction C; intros. inversion H1. inversion H2.
 apply TLFun. 
@@ -431,7 +435,10 @@ inversion H0. inversion H2. exists c1. auto.
 (* TopT *)
 apply TLTop.
 (* Case IntFun *)
-unfold OrthoS. split. admit. intros.
+unfold OrthoS. split.
+left. unfold not; intros.
+inversion H.
+intros.
 induction C. inversion H0. inversion H1. inversion H. inversion H1.
 apply TLAnd1.
 apply IHC1.
@@ -440,7 +447,10 @@ inversion H0. inversion H1. unfold Sub. exists c1. auto.
 (* TopT *)
 apply TLTop.
 (* Case FunInt *)
-unfold OrthoS. split. admit. intros.
+unfold OrthoS. split.
+right. unfold not; intros.
+inversion H.
+intros.
 induction C. inversion H. inversion H1. inversion H0. inversion H1.
 apply TLAnd1.
 apply IHC1. inversion H. inversion H1. unfold Sub. exists c1. auto.
@@ -448,15 +458,20 @@ inversion H0. inversion H1. unfold Sub. exists c1. auto.
 (* TopT *)
 apply TLTop.
 (* t TopT *)
-unfold OrthoS; intros. split. admit. intros. generalize t H H0 H1. clear t H H0 H1. 
+unfold OrthoS; intros. split.
+left. auto.
+intros. generalize t H H0 H1. clear t H H0 H1. 
 induction C; intros; try (inversion H1; inversion H2). 
 apply TLAnd1. inversion H0. inversion H9.
 apply (IHC1 t H); unfold Sub. exists c0. auto. exists c1. auto. inversion H11. inversion H11.
 apply TLTop.
 (* TopT t *)
-unfold OrthoS; intros. generalize t H H0. clear t H H0. 
-induction C; intros; try (inversion H; inversion H1).
-apply TLAnd1. apply (IHC1 TopT); unfold Sub; exists c1; auto.
+unfold OrthoS; intros. split.
+right. auto.
+intros. generalize t H H0 H1. clear t H H0 H1. 
+induction C; intros; try (inversion H0; inversion H2).
+apply TLAnd1. inversion H1. inversion H9.
+apply (IHC1 t H); unfold Sub. exists c1. auto. exists c0. auto. inversion H11. inversion H11.
 apply TLTop.
 Defined.
 
@@ -493,16 +508,14 @@ rewrite <- H7 in H2. inversion H2.
 assert (c = c0). apply IHsub; auto. rewrite H15.
 reflexivity.
 (* contradiction: not orthogonal! *)
-unfold OrthoS in H14.
+destruct H14. 
+(*
 assert (TopLike t). apply H14. unfold Sub.
 exists c; auto. unfold Sub. exists c0. auto.
 inversion H9. rewrite <- H16 in H15. inversion H15.
 rewrite <- H16 in H3. rewrite <- H8 in H3. clear H8.
 rewrite <- H16 in H6.
-
-inversion H3. rewrite <- H8 in H21. 
-admit.
-
+inversion H3. rewrite <- H8 in H21.*) 
 admit.
 (* top case *)
 rewrite <- H5 in H2. inversion H2.
