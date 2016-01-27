@@ -431,8 +431,8 @@ Defined.
 Lemma sub_coherent : forall A, WFTyp A -> forall B, WFTyp B -> forall C1, sub A B C1 -> forall C2, sub A B C2 -> C1 = C2.
 Proof.
 intro. intro. intro. intro. intro. intro.
-(* Case: Int <: Int *)
 induction H1; intros.
+(* Case: Int <: Int *)
 inversion H1. 
 reflexivity.
 (* Case: Fun t1 t2 <: Fun t3 t4 *)
@@ -452,23 +452,41 @@ inversion H3.
 (* different coercion case*)
 inversion H3.
 (* Case: And t1 t2 <: t (first) *)
-inversion H3; inversion H.
+inversion H3; inversion H. 
 (* different coercion *)
 rewrite <- H7 in H2. inversion H2.
 (* same coercion *)
 assert (c = c0). apply IHsub; auto. rewrite H15.
 reflexivity.
 (* contradiction: not orthogonal! *)
-destruct H14. exists t. unfold Sub.
-split. exists c; auto. exists c0. auto.
+unfold OrthoS in H14.
+assert (TopLike t). apply H14. unfold Sub.
+exists c; auto. unfold Sub. exists c0. auto.
+inversion H9. rewrite <- H16 in H15. inversion H15.
+rewrite <- H16 in H3. rewrite <- H8 in H3. clear H8.
+rewrite <- H16 in H6.
+
+inversion H3. rewrite <- H8 in H21. 
+admit.
+
+admit.
+(* top case *)
+rewrite <- H5 in H2. inversion H2.
 (* Case: And t1 t2 <: t (second) *)
 inversion H3; inversion H.
 rewrite <- H7 in H2. inversion H2.
 (* contradiction: not orthogonal! *)
+admit.
+(*
 destruct H14. exists t. unfold Sub.
-split. exists c0; auto. exists c. auto.
+split. exists c0; auto. exists c. auto.*)
 (* same coercion; no contradiction *)
 assert (c = c0). apply IHsub; auto. rewrite H15.
+reflexivity.
+(* top case *)
+rewrite <- H5 in H2. inversion H2.
+(* last top case *)
+inversion H1. inversion H3. inversion H3.
 reflexivity.
 Defined.
 
