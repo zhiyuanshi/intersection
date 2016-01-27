@@ -355,24 +355,22 @@ Lemma ortho_and : forall A B C, OrthoS A C -> OrthoS B C -> OrthoS (And A B) C.
 Proof.
 intros. unfold OrthoS.
 intros.
-(*destruct H1. *)
 induction C0. 
 inversion H1. inversion H3. apply H. 
 unfold Sub. exists c. auto. unfold Sub.  unfold Sub in H2. destruct H2. exists x0. auto.
 apply H0.  
 unfold Sub. exists c. auto. auto.
-inversion H1. apply H.
-(*exists (Fun x1 x2). split. *)
-unfold Sub. exists c. auto. unfold Sub.  unfold Sub in H2. destruct H2. exists x0. auto.
-apply H0.  
-unfold Sub. exists c. auto. unfold Sub.  unfold Sub in H2. destruct H2. exists x0. auto.
+inversion H1. inversion H3.
+apply H. unfold Sub. exists c. auto. auto.
+apply H0. unfold Sub. exists c. auto. auto.
 assert (Sub C C0_1 /\ Sub C C0_2). apply invAndS1. auto. destruct H3.
-(* inversion H1. inversion H5.*) apply TLAnd1. apply IHC0_1. 
-unfold Sub. exists c1. auto. unfold Sub.  unfold Sub in H3. destruct H3. exists x0. auto.
-unfold OrthoS in H. apply H. exists (And x1 x2). split. 
+inversion H1. inversion H5.  
+apply TLAnd1. apply IHC0_1. 
+unfold Sub.  exists c1. auto. auto.
+apply H. 
 unfold Sub. exists c. auto. unfold Sub.  unfold Sub in H2. destruct H2. exists x0. auto.
-unfold OrthoS in H0. apply H0. exists (And x1 x2). split. 
-unfold Sub. exists c. auto. unfold Sub.  unfold Sub in H2. destruct H2. exists x0. auto.
+apply H0. unfold Sub. exists c. auto. unfold Sub.  unfold Sub in H2. destruct H2. exists x0. auto.
+apply TLTop.
 Defined.
 
 (* Soundness of the disjointness algorithm: Theorem 6 *)
@@ -387,25 +385,45 @@ assert (OrthoS t3 t1). apply ortho_sym. apply IHOrtho2; auto.
 apply ortho_sym.
 apply ortho_and; auto.
 (* Case FunFun *)
-unfold OrthoS. unfold not. intros.
-unfold OrthoS in IHOrtho. apply IHOrtho.
-destruct H0. destruct H0. generalize H0. generalize H1. clear H0. clear H1.
-induction x; intros. inversion H1. inversion H2. exists x2.
-split. inversion H0. inversion H2. unfold Sub. exists c2. auto. unfold Sub. inversion H1. inversion H2. exists c2. auto.
-apply IHx1.
+unfold OrthoS. intros.
+generalize H0. generalize H1. clear H0. clear H1.
+induction C; intros. inversion H1. inversion H2.
+apply TLFun. 
+apply IHOrtho.
+inversion H0. inversion H2. unfold Sub. exists c2. auto. unfold Sub. inversion H1. inversion H2. exists c2. auto.
+apply TLAnd1.
+apply IHC1.
 inversion H1. inversion H2. unfold Sub. exists c1. auto. 
 inversion H0. inversion H2. exists c1. auto.
+(* TopT *)
+apply TLTop.
 (* Case IntFun *)
-unfold OrthoS. unfold not. intros.
-destruct H. destruct H. induction x. inversion H0. inversion H1. inversion H. inversion H1.
-apply IHx1.
+unfold OrthoS. intros.
+induction C. inversion H0. inversion H1. inversion H. inversion H1.
+apply TLAnd1.
+apply IHC1.
 inversion H. inversion H1. unfold Sub. exists c1. auto.
 inversion H0. inversion H1. unfold Sub. exists c1. auto.
+(* TopT *)
+apply TLTop.
 (* Case FunInt *)
-unfold OrthoS. unfold not. intros.
-destruct H. destruct H. induction x. inversion H. inversion H1. inversion H0. inversion H1.
-apply IHx1. inversion H. inversion H1. unfold Sub. exists c1. auto.
+unfold OrthoS. intros.
+induction C. inversion H. inversion H1. inversion H0. inversion H1.
+apply TLAnd1.
+apply IHC1. inversion H. inversion H1. unfold Sub. exists c1. auto.
 inversion H0. inversion H1. unfold Sub. exists c1. auto.
+(* TopT *)
+apply TLTop.
+(* t TopT *)
+unfold OrthoS; intros. generalize t H H0. clear t H H0. 
+induction C; intros; try (inversion H0; inversion H1). 
+apply TLAnd1. apply (IHC1 TopT); unfold Sub; exists c1; auto.
+apply TLTop.
+(* TopT t *)
+unfold OrthoS; intros. generalize t H H0. clear t H H0. 
+induction C; intros; try (inversion H; inversion H1).
+apply TLAnd1. apply (IHC1 TopT); unfold Sub; exists c1; auto.
+apply TLTop.
 Defined.
 
 (* Coercive subtyping is coeherent: Lemma 5 *)
