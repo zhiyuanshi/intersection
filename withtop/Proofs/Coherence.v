@@ -199,6 +199,73 @@ Inductive TopLike : PTyp -> Prop :=
 Definition OrthoS (A B : PTyp) := 
   (not (TopLike A) \/ not (TopLike B)) /\ (forall C, Sub A C -> Sub B C -> TopLike C).
 
+(* Problem: 
+
+(Int -> String) * (Int -> Char)
+
+Those 2 types are disjoint: The common supertypes are TopLike.
+
+However, allowing:
+
+(Int -> String) & (Int -> Char) is problematic, because:  
+
+(Int -> String) & (Int -> Char) <: Int -> Top
+
+can be derived in 2 ways. 
+
+Option 1) Int -> String & Int -> Char would not be disjoint!
+
+Drawback: no functions can appear in a merge!
+
+Int -> String & Bool -> Char <: Int & Bool -> String | Char
+
+If we had union types, then a common super-type would be:
+
+Int -> String | Char
+
+which is not a top-type. Thus the 2 types would not be disjoint!
+
+Option 2: Forbid arrow supertypes, using atomic.
+
+Int -> Char & Int -> String only have Top as the common 
+supertype!
+
+(\f : Int -> Top) (\i -> 'c'),,(\s -> "")
+
+do we still have transitivity?
+
+Int > Char & Int -> String <: Int -> Char
+Int -> Char <: Int -> Top
+
+however:
+
+not (Int -> Char & Int -> String <: Int -> Top)
+
+Drawback: no transitivity!
+
+Option 3: Intersections cannot have TopLike types
+
+The point is that this forbids:
+
+- Char & Int -> Top <: Int -> Top
+
+Option 4: 
+
+- Make atomic types forbid TopLike types;
+- Add one more subtyping rule:
+
+TopLike C
+-----------
+A <: B -> C
+
+or even:
+
+TopLike B ~> c
+--------------
+A <: B ~> c
+
+*)
+
 Lemma applyOrthoS : forall {A B}, OrthoS A B -> forall C, Sub A C -> Sub B C -> TopLike C.
 intros. destruct H. apply H2; auto.
 Defined.
@@ -509,12 +576,16 @@ assert (c = c0). apply IHsub; auto. rewrite H15.
 reflexivity.
 (* contradiction: not orthogonal! *)
 destruct H14. 
-(*
-assert (TopLike t). apply H14. unfold Sub.
+assert (TopLike t). apply H15. unfold Sub.
 exists c; auto. unfold Sub. exists c0. auto.
-inversion H9. rewrite <- H16 in H15. inversion H15.
-rewrite <- H16 in H3. rewrite <- H8 in H3. clear H8.
-rewrite <- H16 in H6.
+inversion H9. rewrite <- H17 in H16. inversion H16.
+destruct H14. destruct H14.
+rewrite <- H17 in H1. rewrite <- H17 in H3.
+
+apply H15. apply reflex. clear H8.
+
+rewrite <- H17 in H3. rewrite <- H8 in H3. clear H8.
+rewrite <- H17 in H6. rewrite <- H17 in H16. inversion H16.
 inversion H3. rewrite <- H8 in H21.*) 
 admit.
 (* top case *)
@@ -536,4 +607,5 @@ rewrite <- H5 in H2. inversion H2.
 inversion H1. inversion H3. inversion H3.
 reflexivity.
 Defined.
+
 
