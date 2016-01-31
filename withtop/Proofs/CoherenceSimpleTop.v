@@ -58,7 +58,24 @@ Fixpoint ptyp2styp (t : PTyp) : STyp :=
 Require Import Arith.
 Require Import Setoid.
 
-(* Subtyping relation *)
+Inductive TopLike : PTyp -> Prop :=
+| TLTop : TopLike TopT
+| TLAnd : forall A B, TopLike A -> TopLike B -> TopLike (And A B).
+
+(* Unrestricted Subtyping *)
+
+Inductive usub : PTyp -> PTyp -> Prop :=
+  | USInt : usub PInt PInt
+  | USFun : forall o1 o2 o3 o4, usub o3 o1 -> usub o2 o4 -> usub (Fun o1 o2) (Fun  o3 o4) 
+  | USAnd1 : forall t t1 t2, usub t t1 -> usub t t2 -> usub t (And  t1 t2) 
+  | USAnd2 : forall t t1 t2 , usub t1 t -> usub (And  t1 t2) t 
+  | USAnd3 : forall t t1 t2, usub t2 t -> usub (And  t1 t2) t 
+  | USTop : forall t, usub t TopT.
+
+(* TODO: Show transitivity of usub here, and easily derive transitivity 
+for sub *)
+
+(* Restricted Subtyping relation *)
 
 Inductive Atomic : PTyp -> Prop :=
   | AInt : Atomic PInt
@@ -88,7 +105,6 @@ Definition sint : Sub PInt PInt.
 unfold Sub. exists (fun A => STLam _ STInt (fun x => STVar _ x)). 
 exact SInt.
 Defined.
-
 
 Definition stop : forall t, Sub t TopT.
 intros; unfold Sub.
@@ -186,14 +202,27 @@ inversion H1.
 apply stop. (* top case *)
 Defined.
 
-(* Top-Like *)
+(* Hints Reflexivity *)
+Hint Resolve sint sfun sand1 sand2 sand3 SInt SFun SAnd1 SAnd2 SAnd3 stop USInt USFun USAnd1 USAnd2 USAnd3 USTop.
+
+(* Restricted subtyping is sound and complete with respect to the unrestricted 
+subtyping relation *)
+
+Lemma sound_sub : forall t1 t2, usub t1 t2 -> Sub t1 t2.
+intros.  
+induction H; try auto.
+Defined.
+
+Lemma complete_sub : forall t1 t2, Sub t1 t2 -> usub t1 t2.
+intros. destruct H. induction H; try auto.
+Defined.  
 
 (* Disjointness: Specification *)
 
 Definition OrthoS (A B : PTyp) := 
-  (not (A = TopT) \/ not (B = TopT)) /\ (forall C, Sub A C -> Sub B C -> C = TopT).
+  (not (TopLike A) /\ not (TopLike B)) /\ (forall C, Sub A C -> Sub B C -> TopLike C).
 
-Lemma applyOrthoS : forall {A B}, OrthoS A B -> forall C, Sub A C -> Sub B C -> C = TopT.
+Lemma applyOrthoS : forall {A B}, OrthoS A B -> forall C, Sub A C -> Sub B C -> TopLike C.
 intros. destruct H. apply H2; auto.
 Defined.
 
@@ -204,9 +233,9 @@ Inductive Ortho : PTyp -> PTyp -> Prop :=
   | OAnd2 : forall t1 t2 t3, Ortho t1 t2 -> Ortho t1 t3 -> Ortho t1 (And t2 t3)
 (*  | OFun  : forall t1 t2 t3 t4, Ortho t2 t4 -> Ortho (Fun t1 t2) (Fun t3 t4) *)
   | OIntFun : forall t1 t2, Ortho PInt (Fun t1 t2)
-  | OFunInt : forall t1 t2, Ortho (Fun t1 t2) PInt
-  | OTop1 : forall t, not (t = TopT) -> Ortho t TopT
-  | OTop2 : forall t, not (t = TopT) -> Ortho TopT t.
+  | OFunInt : forall t1 t2, Ortho (Fun t1 t2) PInt.
+(*  | OTop1 : forall t, not (t = TopT) -> Ortho t TopT
+  | OTop2 : forall t, not (t = TopT) -> Ortho TopT t.*)
 
 (* Well-formed types *)
 
@@ -216,109 +245,27 @@ Inductive WFTyp : PTyp -> Prop :=
   | WFAnd : forall t1 t2, WFTyp t1 -> WFTyp t2 -> OrthoS t1 t2 -> WFTyp (And t1 t2)
   | WFTop : WFTyp TopT.
 
-(* Reflexivity *)
-Hint Resolve sint sfun sand1 sand2 sand3 SInt SFun SAnd1 SAnd2 SAnd3 stop.
-
 Lemma reflex : forall (t1 : PTyp), Sub t1 t1.
 Proof.
 induction t1; intros; auto.
 Defined.
 
 Lemma OrthoSNotEq : forall A B, OrthoS A B -> not (A = B). 
-intros. destruct H. destruct H. unfold not; intros. rewrite <- H1 in H0.
-pose (H0 A (reflex _) (reflex _)). contradiction.
-unfold not; intros. rewrite H1 in H0. 
-pose (H0 B (reflex _) (reflex _)). contradiction.
+intros. destruct H. destruct H. unfold not; intros. rewrite <- H2 in H0.
+assert (TopLike A). apply H0. apply reflex. apply reflex.
+contradiction.
 Defined.
 
-(* Disjointness algorithm is complete: Theorem 7 *)
+(* Lemmas needed to prove soundness of the disjointness algorithm *)
 
-Lemma ortho_completness : forall (t1 t2 : PTyp), OrthoS t1 t2 -> Ortho t1 t2.
+Lemma ortho_sym : forall {A B}, OrthoS A B -> OrthoS B A.
 Proof.
-induction t1; intros.
-(* Case PInt *)
-generalize H. clear H. induction t2; intros.
-pose (applyOrthoS H PInt sint sint). inversion e.
-apply OIntFun.
-apply OAnd2. 
-apply IHt2_1. unfold OrthoS. split.
-left. unfold not; intros. inversion H0.
-intros; apply H.
-exact H0. apply sand2. exact H1.
-apply IHt2_2. unfold OrthoS. split. left. unfold not; intros. inversion H0.
-intros. apply H.
-auto. apply sand3.
-auto. apply OTop1. unfold not; intros. inversion H0.
-(* Case Fun t1 t2 *)
-induction t2.
-apply OFunInt. 
-unfold OrthoS in H. destruct H.
-assert (Fun (And t1_1 t2_1) TopT = TopT).
-apply H0.
-apply sfun. apply sand2. apply reflex. apply stop.
-apply sfun. apply sand3. apply reflex. apply stop.
-inversion H1.
-(* Case t11 -> t12 _|_ t21 & t22 *)
-apply OAnd2.
-destruct H.
-apply IHt2_1.
-unfold OrthoS. split. 
-destruct H. 
-left. auto. right. unfold not; intros. apply (H0 t2_1).  rewrite H1 in IHt2_1. rewrite H1 in H0.
-assert (And t2_1 t2_2 = TopT).
-apply H0.
-apply H. apply TLAnd1. auto.
-intros. 
-apply H.
-auto. apply sand2. exact H1.
-apply IHt2_2.
-unfold OrthoS. split. 
-destruct H. destruct H. left; auto. 
-right. unfold not; intros. apply H.
-apply TLAnd2. auto.
-intros. apply H.
-auto. apply sand3. exact H1.
-(* Case t11 -> t12 _|_ T *)
-apply OTop1. destruct H.
-destruct H. auto. destruct H. apply TLTop.
-(* Case (t11 & t12) _|_ t2 *) 
-apply OAnd1.
-apply IHt1_1.
-unfold OrthoS. split. 
-destruct H. destruct H. left.
-unfold not; intros. apply H.
-apply TLAnd1. auto. right; auto.
+unfold OrthoS. 
+intros. destruct H. split. destruct H. split. auto. auto.
 intros.
-apply H.
-apply sand2. exact H0.
-exact H1.
-apply IHt1_2.
-unfold OrthoS; intros. split. 
-destruct H. destruct H. left. unfold not; intros.
-apply H. apply TLAnd2. auto. right; auto.
-intros.
-apply (applyOrthoS H). 
-apply sand3.
-exact H0.
-exact H1.
-(* Case T _|_ t2 *)
-apply OTop2.
-destruct H. destruct H. destruct H. apply TLTop. auto.
+apply H0.
+auto. auto.
 Defined.
-
-(*
-Lemma nosub : forall t1 t2, OrthoS t1 t2 -> not (Sub t1 t2) /\ not (Sub t2 t1).
-Proof.
-intros; split; unfold not.
-unfold OrthoS in H. intros.
-apply H.
-exists t2.
-split. auto. apply reflex.
-unfold OrthoS in H. unfold not in H. intros.
-apply H.
-exists t1. split. apply reflex. auto.
-Defined.
-*)
 
 Lemma invAndS1 : forall t t1 t2, Sub t (And t1 t2) -> Sub t t1 /\ Sub t t2.
 Proof.
@@ -351,48 +298,115 @@ auto.
 inversion H. inversion H0. split; unfold Sub. exists c1. auto. exists c2. auto.
 Defined.
 
+Lemma ortho_and : forall {A B C}, OrthoS A C -> OrthoS B C -> OrthoS (And A B) C.
+Proof.
+intros. unfold OrthoS. split. 
+destruct H. destruct H0. destruct H. destruct H0. split.
+unfold not; intros. inversion H5. 
+(*apply H. auto. apply H0. auto.*) auto. auto.
+intros. destruct H. destruct H0.
+induction C0. 
+inversion H1. inversion H5. apply H3. 
+unfold Sub. exists c. auto. unfold Sub.  unfold Sub in H2. destruct H2. exists x0. auto.
+apply H4.  
+unfold Sub. exists c. auto. auto.
+inversion H1. inversion H5.
+apply H3. unfold Sub. exists c. auto. auto.
+apply H4. unfold Sub. exists c. auto. auto.
+assert (Sub C C0_1 /\ Sub C C0_2). apply invAndS1. auto. destruct H5.
+assert (Sub (And A B) C0_1 /\ Sub (And A B) C0_2). apply invAndS1. auto.
+destruct H7. pose (IHC0_1 H7 H5). pose (IHC0_2 H8 H6).
+apply TLAnd. auto. auto.
+apply TLTop.
+Defined.
+
+(*
+Lemma ortho_and2 : forall {A B C}, OrthoS (And A B) C -> OrthoS A C /\ OrthoS B C.
+intros. destruct H.
+split.
+unfold OrthoS. split.
+destruct H.
+left.
+unfold not. intros.
+apply H.
+apply H0. apply reflex.
+*)  
+
+(* Disjointness algorithm is complete: Theorem 7 *)
+
+Lemma ortho_completness : forall t1, WFTyp t1 -> forall t2, WFTyp t2 -> OrthoS t1 t2 -> Ortho t1 t2.
+Proof.
+intros t1 wft1.
+induction wft1; intros.
+(* Case PInt *)
+generalize H0. clear H0. induction H; intros.
+destruct H0.
+pose (H0 PInt sint sint). inversion t.
+apply OIntFun. 
+apply OAnd2. 
+apply IHWFTyp1. unfold OrthoS. split.
+destruct H2. destruct H2. destruct H1. destruct H1.
+split; auto.
+intros. apply H2.
+auto. apply sand2.
+auto. apply IHWFTyp2.
+unfold OrthoS. destruct H1. destruct H2. destruct H1. destruct H2.
+split; auto. destruct H0. destruct H. destruct H1. apply TLTop.
+(* Case Fun t1 t2 *)
+induction H.
+apply OFunInt. 
+destruct H0.
+assert (TopLike (Fun (And t1 t0) TopT)).
+apply H2.
+apply sfun. apply sand2. apply reflex. apply stop.
+apply sfun. apply sand3. apply reflex. apply stop.
+inversion H3.
+(* Case t11 -> t12 _|_ t21 & t22 *)
+destruct H2. destruct H0. destruct H2. destruct H0.
+apply OAnd2.
+apply IHWFTyp1. unfold OrthoS. split; auto.
+apply IHWFTyp2. unfold OrthoS. split; auto.
+(* Case t11 -> t12 _|_ T *)
+destruct H0. destruct H. destruct H1. apply TLTop.
+(* Case (t11 & t12) _|_ t2 *)
+destruct H. destruct H. destruct H1. destruct H1.
+apply OAnd1.
+apply IHwft1_1. auto.
+unfold OrthoS. split. split; auto.
+intros.
+apply H4.
+apply sand2; auto. auto.
+apply IHwft1_2. auto.
+unfold OrthoS. split. split; auto.
+unfold OrthoS; intros. apply H4.
+apply sand3. auto. auto.
+(* Case T _|_ t2 *)
+destruct H0. destruct H0. destruct H0. apply TLTop.
+Defined.
+
+(*
+Lemma nosub : forall t1 t2, OrthoS t1 t2 -> not (Sub t1 t2) /\ not (Sub t2 t1).
+Proof.
+intros; split; unfold not.
+unfold OrthoS in H. intros.
+apply H.
+exists t2.
+split. auto. apply reflex.
+unfold OrthoS in H. unfold not in H. intros.
+apply H.
+exists t1. split. apply reflex. auto.
+Defined.
+*)
+
+
 (* Unique subtype contributor: Lemma 4 *)
 
 Lemma uniquesub : forall A B C, 
-  OrthoS A B -> Sub (And A B) C -> not (TopLike C) -> not (Sub A C /\ Sub B C).
+  OrthoS A B -> Sub (And A B) C -> not (TopLike C) ->  not (Sub A C /\ Sub B C).
 Proof.
 intros. unfold OrthoS in H. unfold not. intros. destruct H2.
-pose (applyOrthoS H C H2 H3). contradiction. 
-Defined.
-
-(* Lemmas needed to prove soundness of the disjointness algorithm *)
-
-Lemma ortho_sym : forall A B, OrthoS A B -> OrthoS B A.
-Proof.
-unfold OrthoS. 
-intros. destruct H. split. destruct H. right. auto. 
-left. auto. intros.
-apply H0.
-auto. auto.
-Defined.
-
-Lemma ortho_and : forall A B C, OrthoS A C -> OrthoS B C -> OrthoS (And A B) C.
-Proof.
-intros. unfold OrthoS. split. 
-destruct H. destruct H0. destruct H. destruct H0. left. unfold not; intros. inversion H3. 
-apply H. auto. apply H0. auto. right. auto. auto.
-intros.
-induction C0. 
-inversion H1. inversion H3. apply (applyOrthoS H). 
-unfold Sub. exists c. auto. unfold Sub.  unfold Sub in H2. destruct H2. exists x0. auto.
-apply (applyOrthoS H0).  
-unfold Sub. exists c. auto. auto.
-inversion H1. inversion H3.
-apply (applyOrthoS H). unfold Sub. exists c. auto. auto.
-apply H0. unfold Sub. exists c. auto. auto.
-assert (Sub C C0_1 /\ Sub C C0_2). apply invAndS1. auto. destruct H3.
-inversion H1. inversion H5.  
-apply TLAnd1. apply IHC0_1. 
-unfold Sub.  exists c1. auto. auto.
-apply (applyOrthoS H). 
-unfold Sub. exists c. auto. unfold Sub.  unfold Sub in H2. destruct H2. exists x0. auto.
-apply H0. unfold Sub. exists c. auto. unfold Sub.  unfold Sub in H2. destruct H2. exists x0. auto.
-apply TLTop.
+destruct H. 
+pose (H4 C H2 H3). contradiction. 
 Defined.
 
 (* Soundness of the disjointness algorithm: Theorem 6 *)
@@ -407,60 +421,30 @@ assert (OrthoS t3 t1). apply ortho_sym. apply IHOrtho2; auto.
 apply ortho_sym.
 apply ortho_and; auto.
 (* Case FunFun *)
-unfold OrthoS. split.
-destruct IHOrtho. destruct H0. left. unfold not; intros.
-apply H0. inversion H2. auto.
-right. unfold not; intros. apply H0. inversion H2. auto.
-intros.
-generalize H0. generalize H1. clear H0. clear H1.
-induction C; intros. inversion H1. inversion H2.
-apply TLFun. 
-apply IHOrtho.
-inversion H0. inversion H2. unfold Sub. exists c2. auto. unfold Sub. inversion H1. inversion H2. exists c2. auto.
-apply TLAnd1.
-apply IHC1.
-inversion H1. inversion H2. unfold Sub. exists c1. auto. 
-inversion H0. inversion H2. exists c1. auto.
+unfold OrthoS. split. split; unfold not; intros; inversion H.
+induction C; intros. inversion H0. inversion H1. inversion H. inversion H1.
+inversion H. inversion H1. inversion H0. inversion H8.
+apply TLAnd. apply IHC1. unfold Sub. exists c1. auto.
+unfold Sub. exists c0. auto.
+apply IHC2.
+unfold Sub. exists c2. auto. unfold Sub. exists c3. auto.
 (* TopT *)
 apply TLTop.
 (* Case IntFun *)
 unfold OrthoS. split.
-left. unfold not; intros.
+split.
+unfold not; intros.
 inversion H.
-intros.
-induction C. inversion H0. inversion H1. inversion H. inversion H1.
-apply TLAnd1.
+unfold not. intros. inversion H.
+induction C; intros. inversion H. inversion H1. inversion H0. inversion H1.
+apply TLAnd.
 apply IHC1.
 inversion H. inversion H1. unfold Sub. exists c1. auto.
 inversion H0. inversion H1. unfold Sub. exists c1. auto.
+apply IHC2.
+inversion H. inversion H1. unfold Sub. exists c2. auto.
+inversion H0. inversion H1. unfold Sub. exists c2. auto.
 (* TopT *)
-apply TLTop.
-(* Case FunInt *)
-unfold OrthoS. split.
-right. unfold not; intros.
-inversion H.
-intros.
-induction C. inversion H. inversion H1. inversion H0. inversion H1.
-apply TLAnd1.
-apply IHC1. inversion H. inversion H1. unfold Sub. exists c1. auto.
-inversion H0. inversion H1. unfold Sub. exists c1. auto.
-(* TopT *)
-apply TLTop.
-(* t TopT *)
-unfold OrthoS; intros. split.
-left. auto.
-intros. generalize t H H0 H1. clear t H H0 H1. 
-induction C; intros; try (inversion H1; inversion H2). 
-apply TLAnd1. inversion H0. inversion H9.
-apply (IHC1 t H); unfold Sub. exists c0. auto. exists c1. auto. inversion H11. inversion H11.
-apply TLTop.
-(* TopT t *)
-unfold OrthoS; intros. split.
-right. auto.
-intros. generalize t H H0 H1. clear t H H0 H1. 
-induction C; intros; try (inversion H0; inversion H2).
-apply TLAnd1. inversion H1. inversion H9.
-apply (IHC1 t H); unfold Sub. exists c1. auto. exists c0. auto. inversion H11. inversion H11.
 apply TLTop.
 Defined.
 
@@ -498,24 +482,23 @@ assert (c = c0). apply IHsub; auto. rewrite H15.
 reflexivity.
 (* contradiction: not orthogonal! *)
 destruct H14. 
-(*
-assert (TopLike t). apply H14. unfold Sub.
+assert (TopLike t). apply H15. unfold Sub.
 exists c; auto. unfold Sub. exists c0. auto.
-inversion H9. rewrite <- H16 in H15. inversion H15.
-rewrite <- H16 in H3. rewrite <- H8 in H3. clear H8.
-rewrite <- H16 in H6.
-inversion H3. rewrite <- H8 in H21.*) 
-admit.
+inversion H16. rewrite <- H17 in H2. inversion H2.
+rewrite <- H19 in H2. inversion H2.
 (* top case *)
 rewrite <- H5 in H2. inversion H2.
 (* Case: And t1 t2 <: t (second) *)
 inversion H3; inversion H.
 rewrite <- H7 in H2. inversion H2.
 (* contradiction: not orthogonal! *)
-admit.
-(*
-destruct H14. exists t. unfold Sub.
-split. exists c0; auto. exists c. auto.*)
+destruct H14.
+inversion H14.
+assert (TopLike t). apply H15.
+unfold Sub. exists c0. auto.
+unfold Sub. exists c. auto.
+inversion H18. rewrite <- H19 in H2. inversion H2.
+rewrite <- H21 in H2. inversion H2.
 (* same coercion; no contradiction *)
 assert (c = c0). apply IHsub; auto. rewrite H15.
 reflexivity.
