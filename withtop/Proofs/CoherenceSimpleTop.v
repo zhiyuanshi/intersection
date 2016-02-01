@@ -68,8 +68,8 @@ Inductive usub : PTyp -> PTyp -> Prop :=
   | USInt : usub PInt PInt
   | USFun : forall o1 o2 o3 o4, usub o3 o1 -> usub o2 o4 -> usub (Fun o1 o2) (Fun  o3 o4) 
   | USAnd1 : forall t t1 t2, usub t t1 -> usub t t2 -> usub t (And  t1 t2) 
-  | USAnd2 : forall t t1 t2 , usub t1 t -> usub (And  t1 t2) t 
-  | USAnd3 : forall t t1 t2, usub t2 t -> usub (And  t1 t2) t 
+  | USAnd2 : forall t t1 t2 , usub t1 t -> usub (And t1 t2) t 
+  | USAnd3 : forall t t1 t2, usub t2 t -> usub (And t1 t2) t 
   | USTop : forall t, usub t TopT.
 
 (* TODO: Show transitivity of usub here, and easily derive transitivity 
@@ -216,6 +216,7 @@ Defined.
 Lemma complete_sub : forall t1 t2, Sub t1 t2 -> usub t1 t2.
 intros. destruct H. induction H; try auto.
 Defined.  
+
 
 (* Disjointness: Specification *)
 
@@ -509,3 +510,51 @@ inversion H1. inversion H3. inversion H3.
 reflexivity.
 Defined.
 
+(* Remaining Issues:
+
+(\(x : T) . x) (True,,3) 
+
+e1 : T -> T ~> (\x:().x)    e2 : Bool & Int ~> (True,3)   Bool & Int <: T ~> (\x . ())
+--------------------------------------------------------------
+e1 e2 : T ~> (\x:().x) ((\x.()) (True,3))
+
+Int & Int -> Char <: Int -> T ~> \x. \y . ()
+
+Basically when we have:
+
+A1 & A2 <: A3
+
+if A3 is FTop, then the generated coercion should always be of the form:
+
+\x . \y . ()
+
+TopLike, includes functions that return T.
+
+Int -> T & Int -> Char 
+
+Int -> T <: C and Int -> Char <: C -> FTop C
+
+but the types intersect, clearly 
+
+C = Int -> T
+
+A * B = not (TopLike A
+
+not (A <: B) /\ not (B <: A) /\
+forall C, A <: C and B <: C -> 
+
+forbid TopLike Types in intersections!
+
+allow Int -> String & Int -> Char, even though the types intersect
+
+ *)
+
+(* Looking for some alternative specifications *)
+
+Lemma rest : forall A B, not (Sub A B) /\ not (Sub B A) -> not (TopLike A).
+intros.
+destruct H. 
+unfold not. intros. generalize H H0 B. clear H H0. generalize B. clear B.
+induction H1; intros. apply H0. apply stop.
+assert (not (Sub B0 A) /\ not (Sub B0 B)).
+split. unfold not. intros.
