@@ -28,7 +28,7 @@ Inductive STyp :=
 Inductive SExp (A : Type) :=
   | STVar   : A -> SExp A
   | STLit   : nat -> SExp A
-  | STLam   : STyp -> (A -> SExp A) -> SExp A
+  | STLam   : (A -> SExp A) -> SExp A
   | STApp   : SExp A -> SExp A -> SExp A
   | STPair  : SExp A -> SExp A -> SExp A
   | STProj1 : SExp A -> SExp A
@@ -60,7 +60,8 @@ Require Import Setoid.
 
 Inductive TopLike : PTyp -> Prop :=
 | TLTop : TopLike TopT
-| TLAnd : forall A B, TopLike A -> TopLike B -> TopLike (And A B).
+| TLAnd : forall A B, TopLike A -> TopLike B -> TopLike (And A B)
+| TLFun : forall A B, TopLike B -> TopLike (Fun A B).
 
 (* Unrestricted Subtyping *)
 
@@ -81,20 +82,34 @@ Inductive Atomic : PTyp -> Prop :=
   | AInt : Atomic PInt
   | AFun : forall t1 t2, Atomic (Fun t1 t2).
 
+Fixpoint genCoerce (n : nat) : Exp :=
+  match n with
+    | 0 => fun A => STLam _ (fun x => STUnit _)
+    | S m => fun A => STLam _ (fun x => genCoerce m A)
+  end.
+
+Fixpoint and_coercion (t : PTyp) (e1 : Exp) (n : nat) : Exp :=
+  match t with
+    | PInt => e1
+    | TopT => genCoerce n
+    | Fun A B => and_coercion B e1 (S n)
+    | And A B => e1
+  end.
+
 Inductive sub : PTyp -> PTyp -> Exp -> Prop :=
-  | SInt : sub PInt PInt (fun A => STLam _ STInt (fun x => STVar _ x))
+  | SInt : sub PInt PInt (fun A => STLam _ (fun x => STVar _ x))
   | SFun : forall o1 o2 o3 o4 c1 c2, sub o3 o1 c1 -> sub o2 o4 c2 -> 
-     sub (Fun o1 o2) (Fun  o3 o4) (fun A => STLam _ (ptyp2styp (Fun o1 o2)) (fun f => 
-       STLam _ (ptyp2styp o3) (fun x => STApp _ (c2 A) (STApp _ (STVar _ f) (STApp _ (c1 A) (STVar _ x))))))
+     sub (Fun o1 o2) (Fun  o3 o4) (fun A => STLam _ (fun f => 
+       STLam _ (fun x => STApp _ (c2 A) (STApp _ (STVar _ f) (STApp _ (c1 A) (STVar _ x))))))
   | SAnd1 : forall t t1 t2 c1 c2, sub t t1 c1 -> sub t t2 c2 -> 
-     sub t (And  t1 t2) (fun A => STLam _ (ptyp2styp t1) (fun x => 
+     sub t (And  t1 t2) (fun A => STLam _ (fun x => 
        STPair _ (STApp _ (c1 A) (STVar _ x)) (STApp _ (c2 A) (STVar _ x))))
   | SAnd2 : forall t t1 t2 c, sub t1 t c -> Atomic t ->
-     sub (And  t1 t2) t (fun A => STLam _ (ptyp2styp (And t1 t2)) (fun x => 
-       (STApp _ (c A) (STProj1 _ (STVar _ x)))))
+     sub (And  t1 t2) t (and_coercion t (fun A => STLam _ (fun x => 
+       (STApp _ (c A) (STProj1 _ (STVar _ x))))) 0)
   | SAnd3 : forall t t1 t2 c, sub t2 t c -> Atomic t ->
-     sub (And  t1 t2) t (fun A => STLam _ (ptyp2styp (And t1 t2)) (fun x => 
-       (STApp _ (c A) (STProj2 _ (STVar _ x)))))
+     sub (And  t1 t2) t (and_coercion t (fun A => STLam _ (fun x => 
+       (STApp _ (c A) (STProj2 _ (STVar _ x))))) 0)
   | STop : forall t, sub t TopT (fun A => STUnit _).
 
 Definition Sub (t1 t2 : PTyp) : Prop := exists (e:Exp), sub t1 t2 e.
@@ -102,7 +117,7 @@ Definition Sub (t1 t2 : PTyp) : Prop := exists (e:Exp), sub t1 t2 e.
 (* Smart constructors for Sub *)
 
 Definition sint : Sub PInt PInt.
-unfold Sub. exists (fun A => STLam _ STInt (fun x => STVar _ x)). 
+unfold Sub. exists (fun A => STLam _ (fun x => STVar _ x)). 
 exact SInt.
 Defined.
 
@@ -114,25 +129,25 @@ Defined.
 
 Definition sfun : forall o1 o2 o3 o4, Sub o3 o1 -> Sub o2 o4 -> Sub (Fun o1 o2) (Fun  o3 o4).
 unfold Sub; intros. destruct H. destruct H0.
-exists (fun A => STLam _ (ptyp2styp (Fun o1 o2)) (fun f => 
-       STLam _ (ptyp2styp o3) (fun x1 => STApp _ (x0 A) (STApp _ (STVar _ f) (STApp _ (x A) (STVar _ x1)))))).
+exists (fun A => STLam _ (fun f => 
+       STLam _ (fun x1 => STApp _ (x0 A) (STApp _ (STVar _ f) (STApp _ (x A) (STVar _ x1)))))).
 apply SFun. auto. auto.
 Defined.
 
 Definition sand1 : forall t t1 t2, Sub t t1 -> Sub t t2 -> Sub t (And t1 t2).
 unfold Sub. intros. destruct H. destruct H0.
-exists (fun A => STLam _ (ptyp2styp t1) (fun x1 => 
+exists (fun A => STLam _ (fun x1 => 
        STPair _ (STApp _ (x A) (STVar _ x1)) (STApp _ (x0 A) (STVar _ x1)))).
 apply SAnd1. auto. auto.
 Defined.
 
 Definition sand2_atomic : forall t t1 t2, Sub t1 t -> Atomic t -> Sub (And  t1 t2) t.
 unfold Sub. intros. destruct t. destruct H.
-exists (fun A => STLam _ (ptyp2styp (And t1 t2)) (fun x1 => 
-       (STApp _ (x A) (STProj1 _ (STVar _ x1))))).
+exists (and_coercion PInt (fun A => STLam _ (fun x1 => 
+       (STApp _ (x A) (STProj1 _ (STVar _ x1))))) 0).
 apply SAnd2. auto. auto. destruct H.
-exists (fun A => STLam _ (ptyp2styp (And t1 t2)) (fun x1 => 
-       (STApp _ (x A) (STProj1 _ (STVar _ x1))))).
+exists (and_coercion (Fun t3 t4) (fun A => STLam _ (fun x1 => 
+       (STApp _ (x A) (STProj1 _ (STVar _ x1))))) 0).
 apply SAnd2. auto. auto.
 inversion H0.
 apply stop. (* a top case here *)
@@ -156,7 +171,7 @@ assert (Sub (And t0 t3) t2). apply IHt2.
 unfold Sub. exists c2. auto.
 unfold Sub in H6. destruct H6.
 unfold Sub in H7. destruct H7.
-exists (fun A => STLam _ (ptyp2styp t1) (fun x => 
+exists (fun A => STLam _ (fun x => 
        STPair _ (STApp _ (x0 A) (STVar _ x)) (STApp _ (x1 A) (STVar _ x)))).
 apply SAnd1. auto. auto.
 inversion H1.
@@ -167,11 +182,11 @@ Defined.
 
 Definition sand3_atomic : forall t t1 t2, Sub t2 t -> Atomic t -> Sub (And  t1 t2) t.
 unfold Sub. intros. destruct t. destruct H.
-exists (fun A => STLam _ (ptyp2styp (And t1 t2)) (fun x1 => 
-       (STApp _ (x A) (STProj2 _ (STVar _ x1))))).
+exists (and_coercion PInt (fun A => STLam _ (fun x1 => 
+       (STApp _ (x A) (STProj2 _ (STVar _ x1))))) 0).
 apply SAnd3. auto. auto. destruct H.
-exists (fun A => STLam _ (ptyp2styp (And t1 t2)) (fun x1 => 
-       (STApp _ (x A) (STProj2 _ (STVar _ x1))))).
+exists (and_coercion (Fun t3 t4) (fun A => STLam _ (fun x1 => 
+       (STApp _ (x A) (STProj2 _ (STVar _ x1))))) 0).
 apply SAnd3. auto. auto.
 inversion H0.
 apply stop. (* a top case here *)
@@ -193,7 +208,7 @@ assert (Sub (And t0 t3) t2). apply IHt2.
 unfold Sub. exists c2. auto.
 unfold Sub in H6. destruct H6.
 unfold Sub in H7. destruct H7.
-exists (fun A => STLam _ (ptyp2styp t1) (fun x => 
+exists (fun A => STLam _ (fun x => 
        STPair _ (STApp _ (x0 A) (STVar _ x)) (STApp _ (x1 A) (STVar _ x)))).
 apply SAnd1. auto. auto.
 inversion H1.
@@ -231,11 +246,9 @@ Defined.
 Inductive Ortho : PTyp -> PTyp -> Prop :=
   | OAnd1 : forall t1 t2 t3, Ortho t1 t3 -> Ortho t2 t3 -> Ortho (And t1 t2) t3
   | OAnd2 : forall t1 t2 t3, Ortho t1 t2 -> Ortho t1 t3 -> Ortho t1 (And t2 t3)
-(*  | OFun  : forall t1 t2 t3 t4, Ortho t2 t4 -> Ortho (Fun t1 t2) (Fun t3 t4) *)
-  | OIntFun : forall t1 t2, Ortho PInt (Fun t1 t2)
-  | OFunInt : forall t1 t2, Ortho (Fun t1 t2) PInt.
-(*  | OTop1 : forall t, not (t = TopT) -> Ortho t TopT
-  | OTop2 : forall t, not (t = TopT) -> Ortho TopT t.*)
+  | OIntFun : forall t1 t2, not (TopLike t2) -> Ortho PInt (Fun t1 t2)
+  | OFunInt : forall t1 t2, not (TopLike t2) -> Ortho (Fun t1 t2) PInt
+  | OFun  : forall t1 t2 t3 t4, Ortho t2 t4 -> Ortho (Fun t1 t2) (Fun t3 t4).
 
 (* Well-formed types *)
 
@@ -342,7 +355,8 @@ induction wft1; intros.
 generalize H0. clear H0. induction H; intros.
 destruct H0.
 pose (H0 PInt sint sint). inversion t.
-apply OIntFun. 
+apply OIntFun.
+destruct H1. destruct H1. unfold not. intros. apply H3. apply TLFun. auto.
 apply OAnd2. 
 apply IHWFTyp1. unfold OrthoS. split.
 destruct H2. destruct H2. destruct H1. destruct H1.
@@ -354,20 +368,39 @@ unfold OrthoS. destruct H1. destruct H2. destruct H1. destruct H2.
 split; auto. destruct H0. destruct H. destruct H1. apply TLTop.
 (* Case Fun t1 t2 *)
 induction H.
-apply OFunInt. 
-destruct H0.
-assert (TopLike (Fun (And t1 t0) TopT)).
-apply H2.
-apply sfun. apply sand2. apply reflex. apply stop.
-apply sfun. apply sand3. apply reflex. apply stop.
-inversion H3.
+apply OFunInt. destruct H0.
+destruct H. unfold not. intros. apply H. apply TLFun. auto.
+apply OFun. apply IHwft1_2. auto.
+unfold OrthoS. split. destruct H0.
+destruct H0. split. unfold not; intros.
+apply H0. apply TLFun. auto.
+unfold not; intros. apply H3.
+apply TLFun. auto.
+intros. destruct H0. destruct H0.
+assert (TopLike (Fun (And t1 t0) C)).
+apply H4. apply sfun. apply sand2. apply reflex.
+auto. apply sfun. apply sand3. apply reflex. auto.
+inversion H6. auto.
 (* Case t11 -> t12 _|_ t21 & t22 *)
-destruct H2. destruct H0. destruct H2. destruct H0.
-apply OAnd2.
-apply IHWFTyp1. unfold OrthoS. split; auto.
-apply IHWFTyp2. unfold OrthoS. split; auto.
+apply OAnd2. apply IHWFTyp1.
+destruct H2. destruct H2.
+destruct H0. destruct H0.
+unfold OrthoS. split.
+split. auto. auto.
+intros.
+apply H5. auto.
+apply sand2. auto.
+apply IHWFTyp2.
+destruct H2. destruct H2.
+destruct H0. destruct H0.
+unfold OrthoS. split.
+split. auto. auto.
+intros.
+apply H5. auto.
+apply sand3. auto.
+destruct H0. destruct H.
 (* Case t11 -> t12 _|_ T *)
-destruct H0. destruct H. destruct H1. apply TLTop.
+destruct H1. apply TLTop.
 (* Case (t11 & t12) _|_ t2 *)
 destruct H. destruct H. destruct H1. destruct H1.
 apply OAnd1.
@@ -420,10 +453,11 @@ assert (OrthoS t2 t1). apply ortho_sym. apply IHOrtho1; auto.
 assert (OrthoS t3 t1). apply ortho_sym. apply IHOrtho2; auto.
 apply ortho_sym.
 apply ortho_and; auto.
-(* Case FunFun *)
-unfold OrthoS. split. split; unfold not; intros; inversion H.
-induction C; intros. inversion H0. inversion H1. inversion H. inversion H1.
-inversion H. inversion H1. inversion H0. inversion H8.
+(* Case IntFun *)
+unfold OrthoS. split. split. unfold not; intros. inversion H0.
+unfold not. intros. apply H. inversion H0. auto.
+induction C; intros. inversion H1. inversion H2. inversion H0. inversion H2.
+inversion H0. inversion H2. inversion H1. inversion H9.
 apply TLAnd. apply IHC1. unfold Sub. exists c1. auto.
 unfold Sub. exists c0. auto.
 apply IHC2.
@@ -434,18 +468,52 @@ apply TLTop.
 unfold OrthoS. split.
 split.
 unfold not; intros.
-inversion H.
-unfold not. intros. inversion H.
-induction C; intros. inversion H. inversion H1. inversion H0. inversion H1.
+apply H. inversion H0. auto.
+unfold not. intros. inversion H0.
+induction C; intros. inversion H0. inversion H2. inversion H1. inversion H2.
 apply TLAnd.
 apply IHC1.
-inversion H. inversion H1. unfold Sub. exists c1. auto.
-inversion H0. inversion H1. unfold Sub. exists c1. auto.
+inversion H0. inversion H2. unfold Sub. exists c1. auto.
+inversion H1. inversion H2. unfold Sub. exists c1. auto.
 apply IHC2.
-inversion H. inversion H1. unfold Sub. exists c2. auto.
-inversion H0. inversion H1. unfold Sub. exists c2. auto.
+inversion H0. inversion H2. unfold Sub. exists c2. auto.
+inversion H1. inversion H2. unfold Sub. exists c2. auto.
 (* TopT *)
 apply TLTop.
+(* FunFun *)
+destruct IHOrtho. destruct H0. 
+unfold OrthoS. split. split. unfold not. intros.
+apply H0. inversion H3. auto.
+unfold not; intros. apply H2. inversion H3. auto.
+intros.
+induction C. inversion H3. inversion H5.
+apply TLFun. apply H1. inversion H3. inversion H5.
+unfold Sub. exists c2. auto.
+inversion H4. inversion H5. unfold Sub. exists c2. auto.
+apply TLAnd. apply IHC1. inversion H3. inversion H5.
+unfold Sub. exists c1. auto.
+inversion H4. inversion H5.
+unfold Sub. exists c1. auto.
+apply IHC2. inversion H3. inversion H5.
+unfold Sub. exists c2. auto.
+inversion H4. inversion H5.
+unfold Sub. exists c2. auto. 
+apply TLTop.
+Defined.
+
+Lemma same_coercion : forall B, TopLike B -> WFTyp B -> forall A e1 e2 n, and_coercion (Fun A B) e1 n = and_coercion (Fun A B) e2 n.
+intro. intro.
+induction H; intros.
+(* Case TopT *)
+simpl. reflexivity.
+(* Case And *)
+simpl in IHTopLike1.
+simpl in IHTopLike2.
+simpl. inversion H1. destruct H6. destruct H6. contradiction.
+(* Case Fun *)
+simpl in IHTopLike.
+simpl. inversion H0.
+apply IHTopLike. auto. apply A0.
 Defined.
 
 (* Coercive subtyping is coeherent: Lemma 5 *)
@@ -486,6 +554,7 @@ assert (TopLike t). apply H15. unfold Sub.
 exists c; auto. unfold Sub. exists c0. auto.
 inversion H16. rewrite <- H17 in H2. inversion H2.
 rewrite <- H19 in H2. inversion H2.
+apply same_coercion. auto. rewrite <- H18 in H0. inversion H0. auto.
 (* top case *)
 rewrite <- H5 in H2. inversion H2.
 (* Case: And t1 t2 <: t (second) *)
@@ -499,6 +568,7 @@ unfold Sub. exists c0. auto.
 unfold Sub. exists c. auto.
 inversion H18. rewrite <- H19 in H2. inversion H2.
 rewrite <- H21 in H2. inversion H2.
+apply same_coercion. auto. rewrite <- H20 in H0. inversion H0. auto.
 (* same coercion; no contradiction *)
 assert (c = c0). apply IHsub; auto. rewrite H15.
 reflexivity.
@@ -508,6 +578,7 @@ rewrite <- H5 in H2. inversion H2.
 inversion H1. inversion H3. inversion H3.
 reflexivity.
 Defined.
+
 
 (* Remaining Issues:
 
