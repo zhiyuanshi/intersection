@@ -426,3 +426,61 @@ assert (c = c0). apply IHsub; auto. rewrite H15.
 reflexivity.
 Defined.
 
+(* typing rules of lambda i *)
+
+Require Import Coq.Structures.Equalities.
+
+Module TypingRules
+       (Import IdTyp : BooleanDecidableType').
+  
+Definition Var : Type := IdTyp.t.
+
+(*
+Definition A : Type := nat.
+ *)
+
+Definition context (type : Set) := Var -> (option type).
+Definition empty : forall a, context a := (fun _ _ => None). 
+Definition extend (type : Set) (Gamma : context type) (x:Var) (T : type) : Var -> option type :=
+  fun x' => if x =? x' then Some T else Gamma x'.
+
+Inductive PExp :=
+  | PFVar  : Var -> PExp
+  | PBVar  : nat -> PExp                   
+  | PLit   : nat -> PExp
+  | PLam   : PTyp -> PExp -> PExp
+  | PApp   : PExp -> PExp -> PExp
+  | PMerge : PExp -> PExp -> PExp.
+
+Notation "'|' t '|'" := (ptyp2styp t) (at level 60).
+
+Definition conv_context (env : context PTyp) : context STyp := fun x =>
+  match env x with
+    | Some a => Some (|a|)
+    | None => None
+  end.
+
+Notation "'∥' t '∥'" := (conv_context t) (at level 60).
+
+(*
+Reserved Notation "Gamma '|-' t ':' T" (at level 40).
+*)
+
+Inductive has_type_source : (context PTyp) -> PExp -> PTyp -> (SExp Var) -> Prop :=
+  | TyVar : forall Gamma x ty, Gamma x = Some ty -> has_type_source Gamma (PFVar x) ty (STFVar _ x).
+(* TODO add rest of the rules *)
+
+Inductive has_type_st : (context STyp) -> (SExp Var) -> STyp -> Prop :=
+  | STTyLit : forall Gamma x, has_type_st Gamma (STLit _ x) STInt
+  | STTyVar : forall Gamma x ty, Gamma x = Some ty -> has_type_st Gamma (STFVar _ x) ty
+  | STTyApp : forall Gamma A B t1 t2, has_type_st Gamma t1 (STFun A B) -> has_type_st Gamma t2 A -> has_type_st Gamma (STApp _ t1 t2) B
+  | STTyPair : forall Gamma A B t1 t2, has_type_st Gamma t1 A -> has_type_st Gamma t2 B -> has_type_st Gamma (STPair _ t1 t2) (STTuple A B)
+  | STTyProj1 : forall Gamma t A B, has_type_st Gamma t (STTuple A B) -> has_type_st Gamma (STProj1 _ t) A
+  | STTyProj2 : forall Gamma t A B, has_type_st Gamma t (STTuple A B) -> has_type_st Gamma (STProj2 _ t) B.
+(* TODO add STTyLam similar to STLC_Tutorial (i.e. cofinite quant.) *)
+
+
+(* Type preservation: Theorem 1 *)
+Lemma has_type : forall x ty E (Gamma : context PTyp) (x : has_type_source Gamma x ty E),
+  has_type_st (∥ Gamma ∥) E (|ty|).
+Admitted.
