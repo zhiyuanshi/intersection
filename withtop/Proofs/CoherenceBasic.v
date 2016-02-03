@@ -36,6 +36,7 @@ Inductive SExp (A : Type) :=
 
 Definition Exp := forall A, SExp A.
 
+
 (* Our calculus: *)
 
 (* Types *)
@@ -51,6 +52,7 @@ Fixpoint ptyp2styp (t : PTyp) : STyp :=
     | Fun t1 t2 => STFun (ptyp2styp t1) (ptyp2styp t2)
     | And t1 t2 => STTuple (ptyp2styp t1) (ptyp2styp t2)
   end.
+
 
 Require Import Arith.
 Require Import Setoid.
@@ -426,61 +428,257 @@ assert (c = c0). apply IHsub; auto. rewrite H15.
 reflexivity.
 Defined.
 
+
 (* typing rules of lambda i *)
 
 Require Import Coq.Structures.Equalities.
+Require Import Coq.Lists.List.
+Require Import Coq.MSets.MSetInterface.
+Require Import Coq.MSets.MSetWeakList.
+
+Print MSetInterface.
+Print MSetWeakList.
 
 Module TypingRules
-       (Import IdTyp : BooleanDecidableType').
+       (Import VarTyp : BooleanDecidableType')
+       (Import set : MSetInterface.S).
+
+Definition var : Type := VarTyp.t.
   
-Definition Var : Type := IdTyp.t.
+Module M := MSetWeakList.Make(VarTyp).
+Export M.
 
-(*
-Definition A : Type := nat.
- *)
+Definition vars := M.t.
 
-Definition context (type : Set) := Var -> (option type).
-Definition empty : forall a, context a := (fun _ _ => None). 
-Definition extend (type : Set) (Gamma : context type) (x:Var) (T : type) : Var -> option type :=
-  fun x' => if x =? x' then Some T else Gamma x'.
+(* Definitions borrowed from STLC_Tutorial *)
 
+Definition context (A : Type) := list (var * A). 
+
+Definition extend {A} (x : var) (a : A) (c : context A) : context A := (x,a) :: c.
+
+Definition dom {A} (c : context A) : vars :=
+  fold_left (fun r el => add (fst el) r) c empty.
+
+(* Our source language *)
 Inductive PExp :=
-  | PFVar  : Var -> PExp
+  | PFVar  : var -> PExp
   | PBVar  : nat -> PExp                   
   | PLit   : nat -> PExp
   | PLam   : PTyp -> PExp -> PExp
   | PApp   : PExp -> PExp -> PExp
   | PMerge : PExp -> PExp -> PExp.
 
-Notation "'|' t '|'" := (ptyp2styp t) (at level 60).
+(* Free variables *)
 
-Definition conv_context (env : context PTyp) : context STyp := fun x =>
-  match env x with
-    | Some a => Some (|a|)
-    | None => None
+(** Source language **)
+Fixpoint fv_source (pExp : PExp) : vars :=
+  match pExp with
+    | PFVar v => singleton v
+    | PBVar _ => empty
+    | PLit _ => empty
+    | PLam _ t => fv_source t
+    | PApp t1 t2 => union (fv_source t1) (fv_source t2)
+    | PMerge t1 t2 => union (fv_source t1) (fv_source t2)
   end.
 
+(** Target language **)
+Fixpoint fv (sExp : SExp var) : vars :=
+  match sExp with
+    | STFVar _ v => singleton v
+    | STBVar _ _ => empty
+    | STLit _ _ => empty
+    | STLam _ _ t => fv t
+    | STApp _ t1 t2 => union (fv t1) (fv t2)
+    | STPair _ t1 t2 => union (fv t1) (fv t2)
+    | STProj1 _ t => fv t
+    | STProj2 _ t => fv t
+  end.
+
+(* Tactics dealing with fresh variables, taken from STLC_Tutorial *)
+
+Ltac gather_vars_with F :=
+  let rec gather V :=
+   (match goal with
+    | H:?S
+      |- _ =>
+          let FH := constr:(F H) in
+          match V with
+          | empty => gather FH
+          | context [FH] => fail 1
+          | _ => gather (union FH V)
+          end
+    | _ => V
+    end)
+  in
+  let L := gather (empty : vars) in
+  eval simpl in L.
+
+Ltac gather_vars :=
+  let A := gather_vars_with (fun x : vars => x) in
+  let B := gather_vars_with (fun x : var => singleton x) in
+  let C := gather_vars_with (fun x : context => dom x) in
+  let D := gather_vars_with (fun x : PExp => fv x) in
+  let F := gather_vars_with (fun x : SExp => fv_source x) in
+  constr:(union A (B union (C union (D union F)))).
+
+Ltac beautify_fset V :=
+  let rec go Acc E :=
+   (match E with
+    | union ?E1 ?E2 => let Acc1 := go Acc E1 in
+                    go Acc1 E2
+    | empty => Acc
+    | ?E1 => match Acc with
+             | empty => E1
+             | _ => constr:(union Acc E1)
+             end
+    end)
+  in
+  go (empty : vars) V.
+
+Definition var_fresh (L : vars) := {x : var | not (In x L) }.
+
+Ltac pick_fresh_gen L Y :=
+  let Fr := fresh "Fr" in
+  let L := beautify_fset L in
+  destruct (var_fresh L) as (Y, Fr).
+
+Ltac apply_fresh_base_simple lemma gather :=
+  let L0 := gather in
+  let L := beautify_fset L0 in
+  first
+  [ apply (lemma L) | eapply (lemma L) ].
+
+Ltac intros_fresh x :=
+  first
+  [ let Fr := fresh "Fr" x in
+    intros x Fr
+  | let x2 :=
+     (match goal with
+      | |- ?T -> _ =>
+            match T with
+            | var => fresh "y"
+            | vars => fresh "ys"
+            | list var => fresh "ys"
+            | _ => fresh "y"
+            end
+      end)
+    in
+    let Fr := fresh "Fr" x2 in
+    intros x2 Fr ]. 
+
+(* TODO is this necessary? if so uncomment also in apply_fresh_base
+Fixpoint fresh (L : vars) (n : nat) (xs : list var) : Prop :=
+  match xs with
+  | nil => match n with
+           | 0 => True
+           | S _ => False
+           end
+  | (x :: xs') =>
+      match n with
+      | 0 => False
+      | S n' => not (In x L) /\ fresh (union L (singleton x)) n' xs'
+      end
+  end.
+ *)
+
+Ltac apply_fresh_base lemma gather var_name :=
+  apply_fresh_base_simple lemma gather;
+   try
+    match goal with
+    | |- _ -> not (In _ _) -> _ => intros_fresh var_name
+    (* | |- _ -> fresh _ _ _ -> _ => intros_fresh var_name *)
+    end.
+
+Tactic Notation "apply_fresh" constr(T) "as" ident(x) :=
+  apply_fresh_base T gather_vars x.
+
+(* Opening a term "u" with term "t" *)
+
+(** Source language **)
+Fixpoint open_rec_source (k : nat) (u : PExp) (t : PExp) {struct t} : PExp  :=
+  match t with
+  | PBVar i    => if Nat.eqb k i then u else (PBVar i)
+  | PFVar x    => PFVar x
+  | PLit x     => PLit x                     
+  | PLam ty t1 => PLam ty (open_rec_source (S k) u t1)
+  | PApp t1 t2 => PApp (open_rec_source k u t1) (open_rec_source k u t2)
+  | PMerge t1 t2 => PMerge (open_rec_source k u t1) (open_rec_source k u t2)
+  end.
+
+Definition open_source t u := open_rec_source 0 u t.
+
+(*
+Notation "{ k ~> u } t" := (open_rec_source k u t) (at level 67).
+Notation "t ^^ u" := (open_source t u) (at level 67).
+Notation "t ^ x" := (open_source t (PFVar x)).
+ *)
+
+(** Target language **)
+Fixpoint open_rec {a} (k : nat) (u : SExp a) (t : SExp a) : SExp a :=
+  match t with
+  | STBVar _ i => if Nat.eqb k i then u else (STBVar _ i)
+  | STFVar _ x => STFVar _ x
+  | STLit _ x => STLit _ x
+  | STLam _ ty t1 => STLam _ ty (open_rec (S k) u t1)
+  | STApp _ t1 t2 => STApp _ (open_rec k u t1) (open_rec k u t2)
+  | STPair _ t1 t2 => STPair _ (open_rec k u t1) (open_rec k u t2)
+  | STProj1 _ t => STProj1 _ (open_rec k u t)
+  | STProj2 _ t => STProj2 _ (open_rec k u t)
+  end.
+
+Definition open {a} (t : SExp a) u := open_rec 0 u t.
+
+(* Functions on contexts *)
+Definition mapctx {A B} (f : A -> B) (c : context A) : context B :=
+  map (fun p => (fst p, (f (snd p)))) c. 
+
+Definition conv_context (env : context PTyp) : context STyp :=
+  mapctx ptyp2styp env.
+
+Notation "'|' t '|'" := (ptyp2styp t) (at level 60).
 Notation "'∥' t '∥'" := (conv_context t) (at level 60).
 
 (*
 Reserved Notation "Gamma '|-' t ':' T" (at level 40).
 *)
 
-Inductive has_type_source : (context PTyp) -> PExp -> PTyp -> (SExp Var) -> Prop :=
-  | TyVar : forall Gamma x ty, Gamma x = Some ty -> has_type_source Gamma (PFVar x) ty (STFVar _ x).
-(* TODO add rest of the rules *)
+(* Typing rules of source language: Figure 2 *)
+Inductive has_type_source : (context PTyp) -> PExp -> PTyp -> (SExp var) -> Prop :=
+  | TyVar : forall Gamma x ty, List.Exists (fun a => (fst a) = x) Gamma ->
+                      has_type_source Gamma (PFVar x) ty (STFVar _ x)
+  | TyLit : forall Gamma x, has_type_source Gamma (PLit x) PInt (STLit _ x)
+  | TyLam : forall Gamma t A B L E, (forall x, not (In x L) -> 
+                                 has_type_source (extend x A Gamma) (open_source t (PFVar x)) B E) ->
+                           has_type_source Gamma (PLam A t) (Fun A B) (STLam _ (|A|) E) 
+  | TyApp : forall Gamma A B t1 t2 E1 E2,
+              has_type_source Gamma t1 (Fun A B) E1 ->
+              has_type_source Gamma t2 A E2 ->
+              has_type_source Gamma (PApp t1 t2) B (STApp _ E1 E2)
+  | TyMerge : forall Gamma A B t1 t2 E1 E2,
+                has_type_source Gamma t1 A E1 ->
+                has_type_source Gamma t2 B E2 ->
+                has_type_source Gamma (PMerge t1 t2) (And A B) (STPair _ E1 E2).
 
-Inductive has_type_st : (context STyp) -> (SExp Var) -> STyp -> Prop :=
-  | STTyLit : forall Gamma x, has_type_st Gamma (STLit _ x) STInt
-  | STTyVar : forall Gamma x ty, Gamma x = Some ty -> has_type_st Gamma (STFVar _ x) ty
-  | STTyApp : forall Gamma A B t1 t2, has_type_st Gamma t1 (STFun A B) -> has_type_st Gamma t2 A -> has_type_st Gamma (STApp _ t1 t2) B
-  | STTyPair : forall Gamma A B t1 t2, has_type_st Gamma t1 A -> has_type_st Gamma t2 B -> has_type_st Gamma (STPair _ t1 t2) (STTuple A B)
-  | STTyProj1 : forall Gamma t A B, has_type_st Gamma t (STTuple A B) -> has_type_st Gamma (STProj1 _ t) A
-  | STTyProj2 : forall Gamma t A B, has_type_st Gamma t (STTuple A B) -> has_type_st Gamma (STProj2 _ t) B.
-(* TODO add STTyLam similar to STLC_Tutorial (i.e. cofinite quant.) *)
+(* Typing rules of STLC, inspired by STLC_Tutorial *)
+Inductive has_type_st : (context STyp) -> (SExp var) -> STyp -> Prop :=
+  | STTyVar : forall Gamma x ty, List.Exists (fun a => (fst a) = x) Gamma ->
+                        has_type_st Gamma (STFVar _ x) ty
+  | STTyLit : forall Gamma x, has_type_st Gamma (STLit _ x) STInt       
+  | STTyLam : forall Gamma t A B L, (forall x, not (In x L) -> 
+                                 has_type_st (extend x A Gamma) (open t (STFVar _ x)) B) ->
+                           has_type_st Gamma (STLam _ A t) (STFun A B)
+  | STTyApp : forall Gamma A B t1 t2, has_type_st Gamma t1 (STFun A B) ->
+                             has_type_st Gamma t2 A -> has_type_st Gamma (STApp _ t1 t2) B
+  | STTyPair : forall Gamma A B t1 t2, has_type_st Gamma t1 A ->
+                              has_type_st Gamma t2 B ->
+                              has_type_st Gamma (STPair _ t1 t2) (STTuple A B)
+  | STTyProj1 : forall Gamma t A B, has_type_st Gamma t (STTuple A B) ->
+                           has_type_st Gamma (STProj1 _ t) A
+  | STTyProj2 : forall Gamma t A B, has_type_st Gamma t (STTuple A B) ->
+                           has_type_st Gamma (STProj2 _ t) B.
 
 
 (* Type preservation: Theorem 1 *)
-Lemma has_type : forall x ty E (Gamma : context PTyp) (x : has_type_source Gamma x ty E),
+Lemma type_preservation : forall x ty E (Gamma : context PTyp) (x : has_type_source Gamma x ty E),
   has_type_st (∥ Gamma ∥) E (|ty|).
 Admitted.
