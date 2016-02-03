@@ -516,10 +516,10 @@ Ltac gather_vars_with F :=
 Ltac gather_vars :=
   let A := gather_vars_with (fun x : vars => x) in
   let B := gather_vars_with (fun x : var => singleton x) in
-  let C := gather_vars_with (fun x : context => dom x) in
+  let C := gather_vars_with (fun (a : Type) (x : context a) => dom x) in
   let D := gather_vars_with (fun x : PExp => fv x) in
-  let F := gather_vars_with (fun x : SExp => fv_source x) in
-  constr:(union A (B union (C union (D union F)))).
+  (*let D := gather_vars_with (fun (a : Type) (x : SExp a) => fv_source x) in *)
+  constr:(union A (B union (C union D))).
 
 Ltac beautify_fset V :=
   let rec go Acc E :=
@@ -678,7 +678,40 @@ Inductive has_type_st : (context STyp) -> (SExp var) -> STyp -> Prop :=
                            has_type_st Gamma (STProj2 _ t) B.
 
 
+Lemma exists_persists : forall l v, List.Exists (fun a : var * PTyp => fst a = v) l -> List.Exists (fun a : var * STyp => fst a = v) (∥ l ∥).
+Proof.
+  intros.
+  induction H.
+  simpl.
+  now apply Exists_cons_hd.
+
+  unfold conv_context in *.
+  simpl.
+  apply Exists_cons.
+  auto.
+Defined.  
+  
 (* Type preservation: Theorem 1 *)
-Lemma type_preservation : forall x ty E (Gamma : context PTyp) (x : has_type_source Gamma x ty E),
+Lemma type_preservation : forall x ty E (Gamma : context PTyp) (H : has_type_source Gamma x ty E),
   has_type_st (∥ Gamma ∥) E (|ty|).
+Proof.
+  intros.
+  induction H; subst.
+
+  apply STTyVar.
+  now apply exists_persists.
+
+  apply STTyLit.
+
+  Focus 2.
+  apply STTyApp with (A := |A|); assumption.
+  
+  Focus 2.
+  simpl.
+  apply STTyPair; assumption.
+
+  simpl.
+  apply STTyLam with (L := L).
+  intros.
+  apply H in H1.
 Admitted.
