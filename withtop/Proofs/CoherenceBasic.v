@@ -17,6 +17,22 @@ All lemmas and theorems are complete: there are no uses of admit or Admitted.
 
 *)
 
+(* typing rules of lambda i *)
+
+Require Import Coq.Structures.Equalities.
+Require Import Coq.Lists.List.
+Require Import Coq.MSets.MSetInterface.
+Require Import Coq.MSets.MSetWeakList.
+
+Print MSetInterface.
+Print MSetWeakList.
+
+Module TypingRules
+       (Import VarTyp : BooleanDecidableType')
+       (Import set : MSetInterface.S).
+
+Definition var : Type := VarTyp.t.
+
 (* Target language: Simply typed lambda calculus with pairs *)
 
 Inductive STyp := 
@@ -34,8 +50,9 @@ Inductive SExp (A : Type) :=
   | STProj1 : SExp A -> SExp A
   | STProj2 : SExp A -> SExp A.
 
-Definition Exp := forall A, SExp A.
+(* Definition Exp := forall A, SExp A. *)
 
+Definition Exp := SExp var.
 
 (* Our calculus: *)
 
@@ -64,49 +81,49 @@ Inductive Atomic : PTyp -> Prop :=
   | AFun : forall t1 t2, Atomic (Fun t1 t2).
 
 Inductive sub : PTyp -> PTyp -> Exp -> Prop :=
-  | SInt : sub PInt PInt (fun A => STLam _ STInt (STBVar _ 0))
+  | SInt : sub PInt PInt (STLam _ STInt (STBVar _ 0))
   | SFun : forall o1 o2 o3 o4 c1 c2, sub o3 o1 c1 -> sub o2 o4 c2 -> 
-     sub (Fun o1 o2) (Fun o3 o4) (fun A => STLam _ (ptyp2styp (Fun o1 o2)) (STLam _ (ptyp2styp o3) (STApp _ (c2 A) (STApp _ (STBVar _ 1) (STApp _ (c1 A) (STBVar _ 0))))))
+     sub (Fun o1 o2) (Fun o3 o4) (STLam _ (ptyp2styp (Fun o1 o2)) (STLam _ (ptyp2styp o3) (STApp _ (c2) (STApp _ (STBVar _ 1) (STApp _ (c1) (STBVar _ 0))))))
   | SAnd1 : forall t t1 t2 c1 c2, sub t t1 c1 -> sub t t2 c2 -> 
-     sub t (And  t1 t2) (fun A => STLam _ (ptyp2styp t1)
-       (STPair _ (STApp _ (c1 A) (STBVar _ 0)) (STApp _ (c2 A) (STBVar _ 0))))
+     sub t (And  t1 t2) (STLam _ (ptyp2styp t1)
+       (STPair _ (STApp _ (c1) (STBVar _ 0)) (STApp _ (c2) (STBVar _ 0))))
   | SAnd2 : forall t t1 t2 c, sub t1 t c -> Atomic t ->
-     sub (And  t1 t2) t (fun A => STLam _ (ptyp2styp (And t1 t2)) 
-       ((STApp _ (c A) (STProj1 _ (STBVar _ 0)))))
+     sub (And  t1 t2) t (STLam _ (ptyp2styp (And t1 t2)) 
+       ((STApp _ (c) (STProj1 _ (STBVar _ 0)))))
   | SAnd3 : forall t t1 t2 c, sub t2 t c -> Atomic t ->
-     sub (And  t1 t2) t (fun A => STLam _ (ptyp2styp (And t1 t2)) 
-       ((STApp _ (c A) (STProj2 _ (STBVar _ 0))))).
+     sub (And  t1 t2) t (STLam _ (ptyp2styp (And t1 t2)) 
+       ((STApp _ (c) (STProj2 _ (STBVar _ 0))))).
 
 Definition Sub (t1 t2 : PTyp) : Prop := exists (e:Exp), sub t1 t2 e.
 
 (* Smart constructors for Sub *)
 
 Definition sint : Sub PInt PInt.
-unfold Sub. exists (fun A => STLam _ STInt (STBVar _ 0)). 
+unfold Sub. exists (STLam _ STInt (STBVar _ 0)). 
 exact SInt.
 Defined.
 
 Definition sfun : forall o1 o2 o3 o4, Sub o3 o1 -> Sub o2 o4 -> Sub (Fun o1 o2) (Fun  o3 o4).
 unfold Sub; intros. destruct H. destruct H0.
-exists (fun A => STLam _ (ptyp2styp (Fun o1 o2)) ( 
-       STLam _ (ptyp2styp o3) (STApp _ (x0 A) (STApp _ (STBVar _ 1) (STApp _ (x A) (STBVar _ 0)))))).
+exists (STLam _ (ptyp2styp (Fun o1 o2)) ( 
+       STLam _ (ptyp2styp o3) (STApp _ (x0) (STApp _ (STBVar _ 1) (STApp _ (x) (STBVar _ 0)))))).
 apply SFun. auto. auto.
 Defined.
 
 Definition sand1 : forall t t1 t2, Sub t t1 -> Sub t t2 -> Sub t (And t1 t2).
 unfold Sub. intros. destruct H. destruct H0.
-exists (fun A => STLam _ (ptyp2styp t1) (
-       STPair _ (STApp _ (x A) (STBVar _ 0)) (STApp _ (x0 A) (STBVar _ 0)))).
+exists (STLam _ (ptyp2styp t1) (
+       STPair _ (STApp _ (x) (STBVar _ 0)) (STApp _ (x0) (STBVar _ 0)))).
 apply SAnd1. auto. auto.
 Defined.
 
 Definition sand2_atomic : forall t t1 t2, Sub t1 t -> Atomic t -> Sub (And  t1 t2) t.
-unfold Sub. intros. destruct t. destruct H.
-exists (fun A => STLam _ (ptyp2styp (And t1 t2)) ( 
-       (STApp _ (x A) (STProj1 _ (STBVar _ 0))))).
+unfold Sub. intros. destruct t0. destruct H.
+exists (STLam _ (ptyp2styp (And t1 t2)) ( 
+       (STApp _ (x) (STProj1 _ (STBVar _ 0))))).
 apply SAnd2. auto. auto. destruct H.
-exists (fun A => STLam _ (ptyp2styp (And t1 t2)) (
-       (STApp _ (x A) (STProj1 _ (STBVar _ 0))))).
+exists (STLam _ (ptyp2styp (And t1 t2)) (
+       (STApp _ (x) (STProj1 _ (STBVar _ 0))))).
 apply SAnd2. auto. auto.
 inversion H0.
 Defined.
@@ -116,6 +133,7 @@ Defined.
 (* Theorem 3 *)
 
 Definition sand2 : forall t t1 t2, Sub t1 t -> Sub (And t1 t2) t.
+intro t.
 induction t; intros.
 (* Case PInt *)
 apply sand2_atomic. auto. exact AInt.
@@ -129,20 +147,20 @@ assert (Sub (And t0 t3) t2). apply IHt2.
 unfold Sub. exists c2. auto.
 unfold Sub in H6. destruct H6.
 unfold Sub in H7. destruct H7.
-exists (fun A => STLam _ (ptyp2styp t1) (
-       STPair _ (STApp _ (x0 A) (STBVar _ 0)) (STApp _ (x1 A) (STBVar _ 0)))).
+exists (STLam _ (ptyp2styp t1) (
+       STPair _ (STApp _ (x0) (STBVar _ 0)) (STApp _ (x1) (STBVar _ 0)))).
 apply SAnd1. auto. auto.
 inversion H1.
 inversion H1.
 Defined.
 
 Definition sand3_atomic : forall t t1 t2, Sub t2 t -> Atomic t -> Sub (And t1 t2) t.
-unfold Sub. intros. destruct t. destruct H.
-exists (fun A => STLam _ (ptyp2styp (And t1 t2)) ( 
-       (STApp _ (x A) (STProj2 _ (STBVar _ 0))))).
+unfold Sub. intros t t1 t2 H H0. destruct t. destruct H.
+exists (STLam _ (ptyp2styp (And t1 t2)) ( 
+       (STApp _ (x) (STProj2 _ (STBVar _ 0))))).
 apply SAnd3. auto. auto. destruct H.
-exists (fun A => STLam _ (ptyp2styp (And t1 t2)) ( 
-       (STApp _ (x A) (STProj2 _ (STBVar _ 0))))).
+exists (STLam _ (ptyp2styp (And t1 t2)) ( 
+       (STApp _ (x) (STProj2 _ (STBVar _ 0))))).
 apply SAnd3. auto. auto.
 inversion H0.
 Defined.
@@ -150,6 +168,7 @@ Defined.
 (* Theorem 4 *)
 
 Definition sand3 : forall t t1 t2, Sub t2 t -> Sub (And t1 t2) t.
+intro t.
 induction t; intros.
 (* Case PInt *)
 apply sand3_atomic. auto. exact AInt.
@@ -163,8 +182,8 @@ assert (Sub (And t0 t3) t2). apply IHt2.
 unfold Sub. exists c2. auto.
 unfold Sub in H6. destruct H6.
 unfold Sub in H7. destruct H7.
-exists (fun A => STLam _ (ptyp2styp t1) (
-       STPair _ (STApp _ (x0 A) (STBVar _ 0)) (STApp _ (x1 A) (STBVar _ 0)))).
+exists (STLam _ (ptyp2styp t1) (
+       STPair _ (STApp _ (x0) (STBVar _ 0)) (STApp _ (x1) (STBVar _ 0)))).
 apply SAnd1. auto. auto.
 inversion H1.
 inversion H1.
@@ -280,6 +299,7 @@ Defined.
 
 Lemma invAndS1 : forall t t1 t2, Sub t (And t1 t2) -> Sub t t1 /\ Sub t t2.
 Proof.
+intro t.
 induction t; intros.
 (* Case Int *)
 inversion H. inversion H0. split; unfold Sub. exists c1. auto. exists c2. auto.
@@ -415,13 +435,13 @@ rewrite <- H7 in H2. inversion H2.
 assert (c = c0). apply IHsub; auto. rewrite H15.
 reflexivity.
 (* contradiction: not orthogonal! *)
-destruct H14. exists t. unfold Sub.
+destruct H14. exists t0. unfold Sub.
 split. exists c; auto. exists c0. auto.
 (* Case: And t1 t2 <: t (second) *)
 inversion H3; inversion H.
 rewrite <- H7 in H2. inversion H2.
 (* contradiction: not orthogonal! *)
-destruct H14. exists t. unfold Sub.
+destruct H14. exists t0. unfold Sub.
 split. exists c0; auto. exists c. auto.
 (* same coercion; no contradiction *)
 assert (c = c0). apply IHsub; auto. rewrite H15.
@@ -431,20 +451,18 @@ Defined.
 
 (* typing rules of lambda i *)
 
+(*
 Require Import Coq.Structures.Equalities.
 Require Import Coq.Lists.List.
 Require Import Coq.MSets.MSetInterface.
 Require Import Coq.MSets.MSetWeakList.
-
-Print MSetInterface.
-Print MSetWeakList.
 
 Module TypingRules
        (Import VarTyp : BooleanDecidableType')
        (Import set : MSetInterface.S).
 
 Definition var : Type := VarTyp.t.
-  
+*)  
 Module M := MSetWeakList.Make(VarTyp).
 Export M.
 
@@ -640,20 +658,22 @@ Notation "'∥' t '∥'" := (conv_context t) (at level 60).
 
 (*
 Reserved Notation "Gamma '|-' t ':' T" (at level 40).
-*)
+ *)
+
 
 (* Typing rules of source language: Figure 2 *)
 Inductive has_type_source : (context PTyp) -> PExp -> PTyp -> (SExp var) -> Prop :=
-  | TyVar : forall Gamma x ty, List.Exists (fun a => (fst a) = x) Gamma ->
+  | TyVar : forall Gamma x ty, List.Exists (fun a => fst a = x /\ snd a = ty) Gamma -> 
                       has_type_source Gamma (PFVar x) ty (STFVar _ x)
   | TyLit : forall Gamma x, has_type_source Gamma (PLit x) PInt (STLit _ x)
   | TyLam : forall Gamma t A B L E, (forall x, not (In x L) -> 
                                  has_type_source (extend x A Gamma) (open_source t (PFVar x)) B E) ->
                            has_type_source Gamma (PLam A t) (Fun A B) (STLam _ (|A|) E) 
-  | TyApp : forall Gamma A B t1 t2 E1 E2,
+  | TyApp : forall Gamma A B C t1 t2 E E1 E2,
               has_type_source Gamma t1 (Fun A B) E1 ->
-              has_type_source Gamma t2 A E2 ->
-              has_type_source Gamma (PApp t1 t2) B (STApp _ E1 E2)
+              has_type_source Gamma t2 C E2 ->
+              sub C A E -> 
+              has_type_source Gamma (PApp t1 t2) B (STApp _ E1 (STApp _ E E2))
   | TyMerge : forall Gamma A B t1 t2 E1 E2,
                 has_type_source Gamma t1 A E1 ->
                 has_type_source Gamma t2 B E2 ->
@@ -661,7 +681,7 @@ Inductive has_type_source : (context PTyp) -> PExp -> PTyp -> (SExp var) -> Prop
 
 (* Typing rules of STLC, inspired by STLC_Tutorial *)
 Inductive has_type_st : (context STyp) -> (SExp var) -> STyp -> Prop :=
-  | STTyVar : forall Gamma x ty, List.Exists (fun a => (fst a) = x) Gamma ->
+  | STTyVar : forall Gamma x ty, List.Exists (fun a => (fst a) = x /\ snd a = ty) Gamma ->
                         has_type_st Gamma (STFVar _ x) ty
   | STTyLit : forall Gamma x, has_type_st Gamma (STLit _ x) STInt       
   | STTyLam : forall Gamma t A B L, (forall x, not (In x L) -> 
@@ -677,39 +697,64 @@ Inductive has_type_st : (context STyp) -> (SExp var) -> STyp -> Prop :=
   | STTyProj2 : forall Gamma t A B, has_type_st Gamma t (STTuple A B) ->
                            has_type_st Gamma (STProj2 _ t) B.
 
-
-Lemma exists_persists : forall l v, List.Exists (fun a : var * PTyp => fst a = v) l -> List.Exists (fun a : var * STyp => fst a = v) (∥ l ∥).
+Lemma ptyp2styp_function : forall x y, x = y -> |x| = |y|.
+Proof.                                                     
+  induction x; intros.
+  - inversion H; reflexivity.
+  - rewrite <- H; reflexivity.
+  - rewrite <- H; reflexivity.
+Defined.  
+  
+Lemma exists_persists : forall l x v,
+  List.Exists (fun p : var * PTyp => (fst p) = x /\ (snd p) = v) l ->
+  List.Exists (fun p : var * STyp => (fst p) = x /\ (snd p) = (|v|)) (∥ l ∥).
 Proof.
   intros.
   induction H.
   simpl.
-  now apply Exists_cons_hd.
-
+  apply Exists_cons_hd.
+  simpl; destruct H as [H1 H2]; split; [ | apply ptyp2styp_function ]; assumption.
+  
   unfold conv_context in *.
   simpl.
   apply Exists_cons.
   auto.
 Defined.  
-  
+
+(* Subtyping rules produce type-correct coercions: Lemma 3 *)
+Lemma type_correct_coercions :
+  forall Gamma A B E, sub A B E ->
+             has_type_st Gamma E (STFun (|A|) (|B|)) .
+Proof.
+  induction E; intros.
+  - inversion H.
+  - inversion H.
+  - inversion H.
+  - Admitted.   
+    
 (* Type preservation: Theorem 1 *)
 Lemma type_preservation : forall x ty E (Gamma : context PTyp) (H : has_type_source Gamma x ty E),
   has_type_st (∥ Gamma ∥) E (|ty|).
 Proof.
   intros.
   induction H; subst.
-
+  (* TyVar *)
   apply STTyVar.
   now apply exists_persists.
-
+  (* TyLit *)
   apply STTyLit.
-
-  Focus 2.
-  apply STTyApp with (A := |A|); assumption.
-  
-  Focus 2.
+  (* TyPair *)
+  Focus 3.
   simpl.
   apply STTyPair; assumption.
-
+  (* TyApp *)
+  Focus 2.
+  simpl in *.
+  apply STTyApp with (A := |A|).
+  assumption.
+  apply type_correct_coercions with (Gamma := ∥ Gamma ∥) in H1.
+  apply STTyApp with (A := |C|); assumption.
+  (* TyLam *)
   simpl.
   apply STTyLam with (L := L).
   intros.
