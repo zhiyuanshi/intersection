@@ -534,10 +534,10 @@ Ltac gather_vars_with F :=
 Ltac gather_vars :=
   let A := gather_vars_with (fun x : vars => x) in
   let B := gather_vars_with (fun x : var => singleton x) in
-  let C := gather_vars_with (fun (a : Type) (x : context a) => dom x) in
-  let D := gather_vars_with (fun x : PExp => fv x) in
-  (*let D := gather_vars_with (fun (a : Type) (x : SExp a) => fv_source x) in *)
-  constr:(union A (B union (C union D))).
+  let C := gather_vars_with (fun (x : context STyp) => dom x) in
+  (*let D := gather_vars_with (fun x : PExp => fv_source x) in*)
+  let E := gather_vars_with (fun (x : SExp var) => fv x) in
+  constr:(union A (union B (union C E))).
 
 Ltac beautify_fset V :=
   let rec go Acc E :=
@@ -559,6 +559,9 @@ Ltac pick_fresh_gen L Y :=
   let Fr := fresh "Fr" in
   let L := beautify_fset L in
   destruct (var_fresh L) as (Y, Fr).
+
+Ltac pick_fresh x :=
+  let L := gather_vars in (pick_fresh_gen L x).
 
 Ltac apply_fresh_base_simple lemma gather :=
   let L0 := gather in
@@ -584,7 +587,7 @@ Ltac intros_fresh x :=
     let Fr := fresh "Fr" x2 in
     intros x2 Fr ]. 
 
-(* TODO is this necessary? if so uncomment also in apply_fresh_base
+(* TODO is this necessary? if so uncomment also in apply_fresh_base*)
 Fixpoint fresh (L : vars) (n : nat) (xs : list var) : Prop :=
   match xs with
   | nil => match n with
@@ -597,14 +600,13 @@ Fixpoint fresh (L : vars) (n : nat) (xs : list var) : Prop :=
       | S n' => not (In x L) /\ fresh (union L (singleton x)) n' xs'
       end
   end.
- *)
 
 Ltac apply_fresh_base lemma gather var_name :=
   apply_fresh_base_simple lemma gather;
    try
     match goal with
     | |- _ -> not (In _ _) -> _ => intros_fresh var_name
-    (* | |- _ -> fresh _ _ _ -> _ => intros_fresh var_name *)
+    | |- _ -> fresh _ _ _ -> _ => intros_fresh var_name
     end.
 
 Tactic Notation "apply_fresh" constr(T) "as" ident(x) :=
@@ -684,7 +686,7 @@ Inductive has_type_st : (context STyp) -> (SExp var) -> STyp -> Prop :=
   | STTyVar : forall Gamma x ty, List.Exists (fun a => (fst a) = x /\ snd a = ty) Gamma ->
                         has_type_st Gamma (STFVar _ x) ty
   | STTyLit : forall Gamma x, has_type_st Gamma (STLit _ x) STInt       
-  | STTyLam : forall Gamma t A B L, (forall x, not (In x L) -> 
+  | STTyLam : forall L Gamma t A B, (forall x, not (In x L) -> 
                                  has_type_st (extend x A Gamma) (open t (STFVar _ x)) B) ->
                            has_type_st Gamma (STLam _ A t) (STFun A B)
   | STTyApp : forall Gamma A B t1 t2, has_type_st Gamma t1 (STFun A B) ->
@@ -720,18 +722,31 @@ Proof.
   apply Exists_cons.
   auto.
 Defined.  
-
+  
+  
 (* Subtyping rules produce type-correct coercions: Lemma 3 *)
 Lemma type_correct_coercions :
   forall Gamma A B E, sub A B E ->
              has_type_st Gamma E (STFun (|A|) (|B|)) .
 Proof.
-  induction E; intros.
-  - inversion H.
-  - inversion H.
-  - inversion H.
-  - Admitted.   
-    
+  intros.
+  Print sub.
+  induction H.
+  (* Case SInt *)
+  simpl.
+  apply_fresh STTyLam as x.
+  simpl; apply STTyVar.
+  apply Exists_cons_hd; auto.
+
+  
+  (* Case SFun *)
+  apply_fresh STTyLam as x.
+  unfold open; simpl.
+  apply_fresh STTyLam as y.
+  unfold open; simpl.
+  apply STTyApp with (A := (| o2 |)). 
+Admitted.
+  
 (* Type preservation: Theorem 1 *)
 Lemma type_preservation : forall x ty E (Gamma : context PTyp) (H : has_type_source Gamma x ty E),
   has_type_st (∥ Gamma ∥) E (|ty|).
