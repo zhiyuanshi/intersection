@@ -384,7 +384,7 @@ Defined.
 
 (* Coercive subtyping is coeherent: Lemma 5 *)
 
-Lemma sub_coherent : forall A, WFTyp A -> forall B, WFTyp B -> forall C1, sub A B C1 -> forall C2, sub A B C2 -> C1 = C2.
+Lemma sub_coherent : forall {A}, WFTyp A -> forall {B}, WFTyp B -> forall {C1}, sub A B C1 -> forall {C2}, sub A B C2 -> C1 = C2.
 Proof.
 intro. intro. intro. intro. intro. intro.
 (* Case: Int <: Int *)
@@ -688,7 +688,7 @@ Inductive has_type_source_alg : context PTyp -> PExp -> Dir -> PTyp -> (SExp var
 Definition almost_unique (A B : PTyp) (d : Dir) : Prop := 
   match d with
     | Inf => A = B
-    | Chk => exists C, Sub C A /\ Sub C B (* Is this result useful for checking? Otherwise just return True*)
+    | Chk => True (* Is this result useful for checking: exists C, Sub C A /\ Sub C B*)
   end.
 
 Lemma typ_unique : forall Gamma e d t1 E1, has_type_source_alg Gamma e d t1 E1 -> forall t2 E2, has_type_source_alg Gamma e d t2 E2 -> almost_unique t1 t2 d.
@@ -712,6 +712,8 @@ rewrite H5. rewrite H6. auto.
 (* Case Ann *)
 inversion H0. auto.
 (* Case Lam *)
+auto. auto.
+(*
 inversion H1.
 admit. inversion H2.
 (* Case Sub *)
@@ -720,7 +722,7 @@ simpl in IHhas_type_source_alg.
 apply IHhas_type_source_alg in H2.
 rewrite <- H2 in H3. exists A.
 split. unfold Sub. exists C. auto.
-unfold Sub. exists C0. auto.
+unfold Sub. exists C0. auto.*)
 Admitted.
 
 Lemma typ_inf_unique : forall {Gamma e t1 E1}, has_type_source_alg Gamma e Inf t1 E1 -> forall {t2 E2}, has_type_source_alg Gamma e Inf t2 E2 -> t1 = t2.
@@ -758,6 +760,15 @@ inversion H2.
 (* ATySub *)
 inversion H1.
 admit.
+assert (A = A0).
+apply (typ_inf_unique H H2).
+rewrite <- H6 in H2.
+apply IHhas_type_source_alg in H2. rewrite H2.
+rewrite <- H6 in H3. 
+assert (WFTyp A). admit. assert (WFTyp B). admit.
+assert (C = C0).
+apply (sub_coherent H9 H10 H0 H3). rewrite H11. 
+auto.
 Admitted.
 
 (*
