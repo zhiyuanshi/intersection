@@ -655,7 +655,7 @@ Reserved Notation "Gamma '|-' t ':' T" (at level 40).
 Inductive has_type_source : (context PTyp) -> PExp -> PTyp -> (SExp var) -> Prop :=
   | TyVar : forall Gamma x ty,
             ok Gamma -> List.In (x,ty) Gamma -> has_type_source Gamma (PFVar x) ty (STFVar _ x)
-  | TyLit : forall Gamma x, has_type_source Gamma (PLit x) PInt (STLit _ x)
+  | TyLit : forall Gamma x, ok Gamma -> has_type_source Gamma (PLit x) PInt (STLit _ x)
   | TyLam : forall L Gamma t A B E, (forall x, not (In x L) -> 
                                  has_type_source (Gamma ++ ((x,A) :: nil)) (open_source t (PFVar x)) B E) ->
                            has_type_source Gamma (PLam A t) (Fun A B) (STLam _ (|A|) E) 
@@ -673,7 +673,7 @@ Inductive has_type_source : (context PTyp) -> PExp -> PTyp -> (SExp var) -> Prop
 Inductive has_type_st : (context STyp) -> (SExp var) -> STyp -> Prop :=
 | STTyVar : forall (Gamma : context STyp) x ty,
               ok Gamma -> List.In (x,ty) Gamma -> has_type_st Gamma (STFVar _ x) ty
-  | STTyLit : forall Gamma x, has_type_st Gamma (STLit _ x) STInt       
+  | STTyLit : forall Gamma x, ok Gamma -> has_type_st Gamma (STLit _ x) STInt       
   | STTyLam : forall L Gamma t A B,
                 (forall x, not (In x L) -> 
                       has_type_st (Gamma ++ ((x,A) :: nil)) (open t (STFVar _ x)) B) ->
@@ -1174,6 +1174,7 @@ Proof.
   apply in_or_app; right; apply in_or_app; right; assumption.
   apply STTyLit.
   subst.
+  assumption.
   apply_fresh STTyLam as x.
   unfold open in *; simpl in *.
   unfold extend in *.
@@ -1181,8 +1182,8 @@ Proof.
   rewrite <- app_assoc.
   apply H0.
   unfold not; intros; apply Frx.
-  do 4 rewrite M.union_spec.
-  repeat left; assumption.
+  do 5 rewrite M.union_spec; auto 10.
+  rewrite HeqH'.
   rewrite app_assoc.
   reflexivity.
   rewrite app_assoc.
@@ -1195,9 +1196,9 @@ Proof.
   rewrite dom_union.
   rewrite M.union_spec.
   unfold not; intro; apply Frx.
-  do 4 rewrite M.union_spec.
-  destruct H2; auto.
-  destruct H2; auto. (* ok rules stop *)
+  do 5 rewrite M.union_spec.
+  destruct H2; auto 10.
+  destruct H2; auto 10. (* ok rules stop *)
   eapply STTyApp.
   apply IHhas_type_st1; assumption.
   apply IHhas_type_st2; assumption.
@@ -1300,7 +1301,6 @@ Defined.
 Lemma type_correct_envs : forall x Gamma E ty, has_type_source Gamma x ty E -> ok Gamma.
 Proof.
   intros; induction H; auto.
-  admit. (* TyLit case *)
   pick_fresh x.
   assert (Ha : not (M.In x L)).
   unfold not; intro; apply Fr; rewrite M.union_spec; auto.
@@ -1311,7 +1311,7 @@ Proof.
   exfalso; apply HaF; assumption.
   apply app_inv_singleton in H1.
   now subst.
-Admitted.
+Defined.
 
 Lemma list_impl_m : forall {A} Gamma x (v : A), List.In (x, v) Gamma -> M.In x (dom Gamma).
 Proof.
@@ -1345,6 +1345,7 @@ Proof.
   apply in_cons. 
   assumption.
   apply STTyLit.
+  apply ok_push_l; assumption.
   apply_fresh STTyLam as x.
   unfold open in *; simpl in *.
   apply H1.
@@ -1721,6 +1722,7 @@ Proof.
   now apply in_persists.
   (* TyLit *)
   apply STTyLit.
+  apply (ok_map Gamma H).
   (* TyLam *)
   simpl.
   apply_fresh STTyLam as x.
