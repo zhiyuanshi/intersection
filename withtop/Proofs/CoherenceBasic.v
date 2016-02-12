@@ -25,9 +25,11 @@ Require Import Coq.MSets.MSetInterface.
 Require Import Coq.MSets.MSetWeakList.
 
 Module TypingRules
-       (Import VarTyp : BooleanDecidableType')
+       (Import VarTyp : BooleanDecidableType') 
+       (Import SourceTyp : DecidableType)
+       (Import TargetTyp : DecidableType)
        (Import set : MSetInterface.S).
-
+  
 Definition var : Type := VarTyp.t.
 
 (* Target language: Simply typed lambda calculus with pairs *)
@@ -448,18 +450,6 @@ Defined.
 
 (* typing rules of lambda i *)
 
-(*
-Require Import Coq.Structures.Equalities.
-Require Import Coq.Lists.List.
-Require Import Coq.MSets.MSetInterface.
-Require Import Coq.MSets.MSetWeakList.
-
-Module TypingRules
-       (Import VarTyp : BooleanDecidableType')
-       (Import set : MSetInterface.S).
-
-Definition var : Type := VarTyp.t.
-*)  
 Module M := MSetWeakList.Make(VarTyp).
 Export M.
 
@@ -471,10 +461,10 @@ Definition vars := M.t.
 
 Definition context (A : Type) := list (var * A). 
 
-Definition extend {A} (x : var) (a : A) (c : context A) : context A := (x,a) :: c.
+Definition extend {A} (x : var) (a : A) (c : context A) : context A := c ++ ((x,a) :: nil).
 
 Definition dom {A} (c : context A) : vars :=
-  fold_left (fun r el => add (fst el) r) c empty.
+  fold_right (fun el r => add (fst el) r) empty c.
 
 (* Our source language *)
 Inductive PExp :=
@@ -651,16 +641,21 @@ Definition conv_context (env : context PTyp) : context STyp :=
 Notation "'|' t '|'" := (ptyp2styp t) (at level 60).
 Notation "'∥' t '∥'" := (conv_context t) (at level 60).
 
+Inductive ok {A} : context A -> Prop :=
+  | Ok_nil : ok nil
+  | Ok_push : forall (E : context A) (v : var) (ty : A),
+                ok E -> not (In v (dom E)) -> ok (E ++ ((v,ty) :: nil)).        
+
+Hint Constructors ok.
+
 (*
 Reserved Notation "Gamma '|-' t ':' T" (at level 40).
  *)
 
-
 (* Typing rules of source language: Figure 2 *)
 Inductive has_type_source : (context PTyp) -> PExp -> PTyp -> (SExp var) -> Prop :=
-| TyVar : forall Gamma x ty,
-            (* List.Exists (fun a => fst a = x /\ snd a = ty) Gamma -> *)
-            List.In (x,ty) Gamma -> has_type_source Gamma (PFVar x) ty (STFVar _ x)
+  | TyVar : forall Gamma x ty,
+            ok Gamma -> List.In (x,ty) Gamma -> has_type_source Gamma (PFVar x) ty (STFVar _ x)
   | TyLit : forall Gamma x, has_type_source Gamma (PLit x) PInt (STLit _ x)
   | TyLam : forall L Gamma t A B E, (forall x, not (In x L) -> 
                                  has_type_source (Gamma ++ ((x,A) :: nil)) (open_source t (PFVar x)) B E) ->
@@ -678,9 +673,7 @@ Inductive has_type_source : (context PTyp) -> PExp -> PTyp -> (SExp var) -> Prop
 (* Typing rules of STLC, inspired by STLC_Tutorial *)
 Inductive has_type_st : (context STyp) -> (SExp var) -> STyp -> Prop :=
 | STTyVar : forall (Gamma : context STyp) x ty,
-              (*List.Exists (fun a => (fst a) = x /\ snd a = ty) Gamma ->*)
-              List.In (x,ty) Gamma -> 
-                        has_type_st Gamma (STFVar _ x) ty
+              ok Gamma -> List.In (x,ty) Gamma -> has_type_st Gamma (STFVar _ x) ty
   | STTyLit : forall Gamma x, has_type_st Gamma (STLit _ x) STInt       
   | STTyLam : forall L Gamma t A B,
                 (forall x, not (In x L) -> 
@@ -1106,12 +1099,61 @@ Proof.
     rewrite <- open_rec_term; try auto.
 Defined.
 
-Inductive ok {A} : context A -> Prop :=
-  | Ok_nil : ok nil
-  | Ok_push : forall (E : context A) (v : var) (ty : A),
-                ok E -> not (In v (dom E)) -> ok (E ++ ((v,ty) :: nil)).        
 
 Require Import Coq.Program.Equality.
+
+
+Module MEnv := MSetWeakList.Make(SourceTyp).
+Export MEnv.
+
+Require Import MSetProperties.
+Module MSetProperties := WPropertiesOn(VarTyp)(M).
+
+Lemma dom_union : forall (A : Type) (E G : context A) x,
+  M.In x (dom (E ++ G)) <-> M.In x (M.union (dom E) (dom G)).
+Proof.
+  intros. generalize dependent G.
+  induction E; intros.
+  unfold dom at 2; simpl.
+  unfold "<->".
+  split; intros.
+  apply MSetProperties.Dec.F.union_3.
+  assumption.
+  apply MSetProperties.Dec.F.union_1 in H.
+  inversion H.
+  inversion H0.
+  assumption.
+  simpl.
+  destruct a.
+  split; intros.
+  simpl in *.
+  assert (Ha : sumbool (VarTyp.eq v x) (not( VarTyp.eq v x))) by apply VarTyp.eq_dec.
+  destruct Ha.
+  apply MSetProperties.Dec.F.union_2.
+  apply MSetProperties.Dec.F.add_iff.
+  auto.
+  rewrite (MSetProperties.Dec.F.add_neq_iff _ n) in H.
+  assert (Ha : M.Equal (M.union (M.add v (dom E)) (dom G)) (M.add v (M.union (dom E) (dom G)))) by apply MSetProperties.union_add.
+  apply Ha.
+  apply IHE in H.
+  unfold not in n.
+  apply MSetProperties.Dec.F.add_2.
+  assumption.
+  simpl in *.
+  apply MSetProperties.Dec.F.union_1 in H.
+  destruct H.
+  assert (Ha : sumbool (VarTyp.eq v x) (not( VarTyp.eq v x))) by apply VarTyp.eq_dec.
+  destruct Ha.
+  apply MSetProperties.Dec.F.add_iff; auto.
+  rewrite (MSetProperties.Dec.F.add_neq_iff _ n) in H.
+  apply MSetProperties.Dec.F.add_neq_iff; auto.
+  apply IHE.
+  apply MSetProperties.Dec.F.union_2; assumption.
+  apply MSetProperties.Dec.F.add_iff.
+  right.
+  apply IHE.
+  apply MSetProperties.Dec.F.union_3; assumption.
+Defined.
 
 Lemma typing_weaken : forall G E F t T,
    has_type_st (E ++ G) t T -> 
@@ -1126,8 +1168,9 @@ Proof.
   dependent induction H; intros.
   subst.
   apply STTyVar.
-  apply in_app_or in H.
-  inversion H.
+  assumption.
+  apply in_app_or in H0.
+  inversion H0.
   apply in_or_app; left; assumption.
   apply in_or_app; right; apply in_or_app; right; assumption.
   apply STTyLit.
@@ -1139,11 +1182,23 @@ Proof.
   rewrite <- app_assoc.
   apply H0.
   unfold not; intros; apply Frx.
-  rewrite union_spec; rewrite union_spec; rewrite union_spec; rewrite union_spec.
+  do 4 rewrite M.union_spec.
   repeat left; assumption.
   rewrite app_assoc.
   reflexivity.
-  admit. (* TODO ok rules here *)
+  rewrite app_assoc.
+  rewrite app_assoc.
+  apply Ok_push.
+  rewrite <- app_assoc.
+  assumption.
+  rewrite dom_union. (* ok rules start *)
+  rewrite M.union_spec.
+  rewrite dom_union.
+  rewrite M.union_spec.
+  unfold not; intro; apply Frx.
+  do 4 rewrite M.union_spec.
+  destruct H2; auto.
+  destruct H2; auto. (* ok rules stop *)
   eapply STTyApp.
   apply IHhas_type_st1; assumption.
   apply IHhas_type_st2; assumption.
@@ -1154,11 +1209,265 @@ Proof.
   apply IHhas_type_st; assumption.
   eapply STTyProj2.
   apply IHhas_type_st; assumption.
+Defined.
+
+Lemma not_in_app_l :
+  forall A (a : A) l1 l2, not (List.In a (l1 ++ l2)) -> not (List.In a l1).
+Proof.
+  intros A a l1.
+  induction l1.
+  intros l2 H; unfold not.
+  intros H1; inversion H1.
+  intros.
+  unfold not; intros; apply H.
+  apply in_or_app; auto.
+Defined.  
+
+Lemma not_in_app_r :
+  forall A (a : A) l1 l2, not (List.In a (l1 ++ l2)) -> not (List.In a l2).
+Proof.
+  intros A a l1.
+  induction l1.
+  intros l2 H; unfold not.
+  apply H.
+  intros.
+  unfold not; intros; apply H; apply in_or_app; auto.  
+Defined.  
+
+Lemma not_in_cons :
+  forall (A B : Type) (v v' : A) (ty ty' : B) l, not (List.In (v,ty) ((v', ty') :: l)) ->
+  not (List.In v (v' :: nil)).
+Proof.
+  intros.
+  remember (v,ty) as p.
+  remember (v',ty') as p'.
+Admitted.  
+
+Require Import Coq.Classes.RelationClasses.
+
+Instance VarTypEq : Equivalence VarTyp.eq := VarTyp.eq_equiv.
+
+Lemma VarTyp_eq_iff_Logic_eq : forall (v v' : var), VarTyp.eq v v' <-> v = v'.
+Proof.
+  intros.
+  split; intros.
+  admit.
+  rewrite H.
+  reflexivity.
+Admitted.
+
+  
+Lemma not_in_eq : forall v v' l, not (List.In v (v' :: l)) -> not (VarTyp.eq v v').
+Proof.
+  intros.
+  unfold not; intros; apply H.
+  simpl.
+  left.
+  apply VarTyp_eq_iff_Logic_eq.
+  symmetry.
+  assumption.
+Defined.
+  
+Lemma ok_push_l : forall A (Gamma : context A) p,
+  not (List.In p Gamma) -> ok Gamma -> ok (p :: Gamma).
+Proof.
+  intros.
+  generalize dependent H.
+  generalize dependent p.
+  dependent induction H0.
+  intros.
+  rewrite <- app_nil_l.
+  destruct p.
+  apply Ok_push.
+  apply Ok_nil.
+  unfold not; intros; inversion H0.
+  intros.
+  assert (H2 : ~ List.In p (E ++ (v, ty) :: nil)) by apply H1.
+  apply not_in_app_l in H1.
+  apply not_in_app_r in H2.
+  rewrite app_comm_cons.
+  apply Ok_push.
+  apply IHok.
+  assumption.
+  destruct p.
+  apply not_in_cons in H2.
+  simpl.
+  apply not_in_eq with (v := v0) (v' := v) (l := nil) in H2.
+  unfold not; intros.
+  apply (MSetProperties.Dec.F.add_3 H2) in H3.
+  apply H.
+  assumption.
+Defined.
+
+Lemma app_inv : forall (A : Type) (l1 : list A) l2 l3 l4, l1 ++ l2 = l3 ++ l4 -> l1 = l3 /\ l2 = l4.
+Proof.
+Admitted.  
+
+Lemma type_correct_envs : forall Gamma E x ty, has_type_source Gamma x ty E -> ok Gamma.
+Proof.
+  intros; induction H; auto.
+  admit. (* TyLit case *)
+  pick_fresh x.
+  assert (Ha : not (M.In x L)).
+  unfold not; intro; apply Fr; rewrite M.union_spec; auto.
+  apply H0 in Ha.
+  inversion Ha.
+  assert (HaF : not (nil = Gamma ++ (x, A) :: nil)).
+  apply app_cons_not_nil.
+  exfalso; apply HaF; assumption.
+  apply app_inv in H1.
+  destruct H1 as [HGamma HPair].
+  subst.
+  assumption.
+Admitted.
+
+Lemma typing_weaken_extend : forall t T x v Gamma,
+   has_type_st Gamma t T ->
+   not (List.In (x,v) Gamma) ->                            
+   has_type_st ((x,v) :: Gamma) t T.
+Proof.
+  intros.
+  induction H.
+  apply STTyVar.
+  apply ok_push_l.
+  assumption.
+  assumption.
+  apply List.in_cons; assumption.
+  apply STTyLit.
+  apply_fresh STTyLam as x.
+  unfold open in *; simpl in *.
+  apply H1.
+  unfold not; intro; apply Fry; do 3 rewrite M.union_spec; auto.
+  unfold not; intro; apply List.in_app_or in H2.
+  destruct H2.
+  apply H0.
+  assumption.
+  apply in_inv in H2.
+  destruct H2.
+  apply Fry; do 3 rewrite M.union_spec.
+  left; left; right.
+  apply MSetProperties.Dec.F.singleton_2.
+  apply VarTyp_eq_iff_Logic_eq.
+  admit.
+  inversion H2.
+  eapply STTyApp; auto.
+  apply STTyPair; auto.
+  eapply STTyProj1; auto.
+  eapply STTyProj2; auto.
+Admitted.
+  
+(* Subtyping rules produce type-correct coercions: Lemma 3 *)
+Lemma type_correct_coercions' :
+  forall A B E, sub A B E ->
+           has_type_st nil E (STFun (|A|) (|B|)) .
+Proof.
+  intros.
+  induction H.
+  (* Case SInt *)
+  - simpl.
+    apply_fresh STTyLam as x.
+    simpl; apply STTyVar.
+    rewrite <- app_nil_l.
+    apply Ok_push.
+    apply Ok_nil.
+    auto.
+    simpl.
+    auto.
+  (* Case SFun *)
+  - apply_fresh STTyLam as x.
+    unfold open; simpl.
+    apply_fresh STTyLam as y.
+    unfold open; simpl.
+    apply STTyApp with (A := (| o2 |)).
+    rewrite <- open_rec_term.
+    rewrite <- open_rec_term.
+    repeat apply typing_weaken_extend; try assumption.
+    unfold not; intro HInv; inversion HInv.
+    unfold not; intros; apply Fry; do 2 rewrite M.union_spec. 
+    left;left.
+    apply in_inv in H1.
+    inversion H1.
+    apply MSetProperties.Dec.F.singleton_2.
+    apply VarTyp_eq_iff_Logic_eq.
+    admit.
+    inversion H2.
+    eapply coercions_produce_terms.
+    apply H0.
+    rewrite <- open_rec_term; eapply coercions_produce_terms; apply H0.
+    eapply STTyApp.
+    apply STTyVar.
+    admit.
+    apply in_eq.  
+    apply STTyApp with (A := (| o3 |)).
+    rewrite <- open_rec_term.
+    rewrite <- open_rec_term.
+    repeat apply typing_weaken_extend; try assumption.
+    admit.
+    admit.
+    eapply coercions_produce_terms; apply H.    
+    rewrite <- open_rec_term; eapply coercions_produce_terms; apply H.
+    apply STTyVar.
+    admit.
+    apply in_cons.
+    apply in_eq.
+  (* Case SAnd1 *)
+  - apply_fresh STTyLam as x.
+    unfold open; simpl.
+    apply STTyPair.
+    eapply STTyApp.
+    rewrite <- open_rec_term.
+    apply typing_weaken_extend.
+    apply IHsub1.
+    admit.
+    admit.
+    apply coercions_produce_terms in H.
+    apply STTyVar.
+    admit.
+    apply in_eq.
+    rewrite <- open_rec_term.
+    eapply STTyApp.
+    apply typing_weaken_extend.
+    apply IHsub2.
+    admit.
+    apply STTyVar.
+    admit.
+    apply in_eq.
+    apply coercions_produce_terms in H0.
+    assumption.
+  (* Case SAnd2 *)
+  - apply_fresh STTyLam as x.
+    unfold open; simpl.
+    eapply STTyApp.
+    rewrite <- open_rec_term.
+    apply typing_weaken_extend.
+    apply IHsub.
+    admit.
+    apply coercions_produce_terms in H.
+    assumption.
+    eapply STTyProj1.
+    apply STTyVar.
+    admit.
+    apply in_eq.
+  (* SAnd3 *)
+  - apply_fresh STTyLam as x.
+    unfold open; simpl.
+    eapply STTyApp.
+    rewrite <- open_rec_term.
+    apply typing_weaken_extend.
+    apply IHsub.
+    admit.
+    apply coercions_produce_terms in H.
+    assumption.
+    eapply STTyProj2.
+    apply STTyVar.
+    admit.
+    apply in_eq.
 Admitted.
 
 (* Subtyping rules produce type-correct coercions: Lemma 3 *)
 Lemma type_correct_coercions :
   forall Gamma A B E, sub A B E ->
+             ok Gamma -> 
              has_type_st Gamma E (STFun (|A|) (|B|)) .
 Proof.
   intros.
@@ -1167,6 +1476,7 @@ Proof.
   - simpl.
     apply_fresh STTyLam as x.
     simpl; apply STTyVar.
+    apply Ok_push; auto.
     apply in_or_app.
     right; simpl; auto.
   (* Case SFun *)
@@ -1183,13 +1493,25 @@ Proof.
     apply typing_weaken.
     rewrite app_nil_r.
     assumption.
-    admit. (* TODO ok rules here *)
-    admit. (* TODO ok rules here *)
+    rewrite app_nil_r.
+    apply Ok_push.
+    assumption.
+    unfold not; intro; apply Fry; do 3 rewrite M.union_spec; auto.
+    rewrite app_assoc.
+    apply Ok_push.
+    apply Ok_push.
+    assumption.
+    unfold not; intro; apply Frx; do 2 rewrite M.union_spec; auto.
+    rewrite dom_union.
+    rewrite M.union_spec.
+    unfold not; intros.
+    inversion H2; apply Fry; do 3 rewrite M.union_spec; auto.
     eapply coercions_produce_terms.
-    apply H0.
-    rewrite <- open_rec_term; eapply coercions_produce_terms; apply H0.
+    apply H1.
+    rewrite <- open_rec_term; eapply coercions_produce_terms; apply H1.
     eapply STTyApp.
     apply STTyVar.
+    admit.
     apply in_or_app; left; apply in_or_app; right.
     simpl; auto.    
     apply STTyApp with (A := (| o3 |)).
@@ -1200,11 +1522,21 @@ Proof.
     rewrite <- app_nil_r with (l := (y, | o3 |) :: nil).
     apply typing_weaken.
     rewrite app_nil_r; assumption.
-    admit. (* TODO ok rules here *)
-    admit. (* TODO ok rules here *)
+    rewrite app_nil_r.
+    apply Ok_push.
+    assumption.
+    unfold not; intros; apply Fry; do 3 rewrite M.union_spec; auto.
+    rewrite app_assoc.
+    apply Ok_push.
+    apply Ok_push.
+    assumption.
+    unfold not; intro; apply Frx; do 2 rewrite M.union_spec; auto.
+    rewrite dom_union; rewrite M.union_spec.
+    unfold not; intro H2; inversion H2; apply Fry; do 3 rewrite M.union_spec; auto.
     eapply coercions_produce_terms; apply H.    
     rewrite <- open_rec_term; eapply coercions_produce_terms; apply H.
     apply STTyVar.
+    admit.
     apply in_or_app; right; simpl; auto.
   (* Case SAnd1 *)
   - apply_fresh STTyLam as x.
@@ -1216,10 +1548,13 @@ Proof.
     apply typing_weaken.
     rewrite app_nil_r.
     apply IHsub1.
-    admit. (* TODO ok rules here *)
+    apply Ok_push.
+    assumption.
+    unfold not; intro; apply Frx; do 2 rewrite M.union_spec; auto.
     apply coercions_produce_terms in H.
     assumption.
     apply STTyVar.
+    admit.
     apply in_or_app; right; simpl; auto.
     simpl; auto.
     rewrite <- open_rec_term.
@@ -1228,10 +1563,14 @@ Proof.
     apply typing_weaken.
     rewrite app_nil_r.
     apply IHsub2.
-    admit. (* TODO ok rules here *)
+    rewrite app_nil_r.
+    apply Ok_push.
+    assumption.
+    unfold not; intro; apply Frx; do 2 rewrite M.union_spec; auto.
     apply STTyVar.
+    admit.
     apply in_or_app; right; simpl; auto.
-    apply coercions_produce_terms in H0.
+    apply coercions_produce_terms in H1.
     assumption.
   (* Case SAnd2 *)
   - apply_fresh STTyLam as x.
@@ -1242,11 +1581,15 @@ Proof.
     apply typing_weaken.
     rewrite app_nil_r.
     apply IHsub.
-    admit. (* TODO ok rules here *)
+    rewrite app_nil_r.
+    apply Ok_push.
+    assumption.
+    unfold not; intro; apply Frx; rewrite M.union_spec; auto.
     apply coercions_produce_terms in H.
     assumption.
     eapply STTyProj1.
     apply STTyVar.
+    admit.
     apply in_or_app; right; simpl; auto.
   (* SAnd3 *)
   - apply_fresh STTyLam as x.
@@ -1257,11 +1600,15 @@ Proof.
     apply typing_weaken.
     rewrite app_nil_r.
     apply IHsub.
-    admit. (* TODO ok rules here *)
+    rewrite app_nil_r.
+    apply Ok_push.
+    assumption.
+    unfold not; intro; apply Frx; rewrite M.union_spec; auto.
     apply coercions_produce_terms in H.
     assumption.
     eapply STTyProj2.
     apply STTyVar.
+    admit.
     apply in_or_app; right; simpl; auto.
 Admitted.
 
@@ -1273,12 +1620,13 @@ Proof.
   apply STTerm_Lit.
   apply_fresh STTerm_Lam as x.
   apply H0.
-  unfold not; intros; apply Frx; rewrite union_spec; rewrite union_spec; left; left; auto.
+  unfold not; intros; apply Frx; do 2 rewrite M.union_spec; auto.
   apply STTerm_App; auto.
   apply STTerm_Pair; auto.
   apply STTerm_Proj1; auto.
   apply STTerm_Proj2; auto.
 Defined.
+
   
 (* Type preservation: Theorem 1 *)
 Lemma type_preservation : forall x ty E (Gamma : context PTyp) (H : has_type_source Gamma x ty E),
@@ -1288,6 +1636,7 @@ Proof.
   induction H; subst.
   (* TyVar *)
   apply STTyVar.
+  admit.
   now apply in_persists.
   (* TyLit *)
   apply STTyLit.
@@ -1295,8 +1644,8 @@ Proof.
   simpl.
   apply_fresh STTyLam as x.
   unfold open; simpl.
-  assert (Ha : not (In x L)).
-  unfold not; intros; apply Frx; rewrite union_spec; left; assumption.
+  assert (Ha : not (M.In x L)).
+  unfold not; intros; apply Frx; rewrite M.union_spec; left; assumption.
   apply H0 in Ha.
   unfold conv_context in Ha.
   simpl in Ha; unfold mapctx in Ha.
@@ -1311,7 +1660,8 @@ Proof.
   assumption.
   apply type_correct_coercions with (Gamma := (∥ Gamma ∥)) in H1.
   apply STTyApp with (A := |C|); assumption.
+  admit.
   (* TyPair *)
   simpl.
   apply STTyPair; assumption.
-Defined.
+Admitted.
