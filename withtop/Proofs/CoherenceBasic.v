@@ -655,10 +655,11 @@ Reserved Notation "Gamma '|-' t ':' T" (at level 40).
 (* Typing rules of source language: Figure 2 *)
 Inductive has_type_source : (context PTyp) -> PExp -> PTyp -> (SExp var) -> Prop :=
   | TyVar : forall Gamma x ty,
-            ok Gamma -> List.In (x,ty) Gamma -> has_type_source Gamma (PFVar x) ty (STFVar _ x)
+              ok Gamma -> List.In (x,ty) Gamma ->
+              WFTyp ty -> has_type_source Gamma (PFVar x) ty (STFVar _ x)
   | TyLit : forall Gamma x, ok Gamma -> has_type_source Gamma (PLit x) PInt (STLit _ x)
   | TyLam : forall L Gamma t A B E, (forall x, not (In x L) -> 
-                                 has_type_source (Gamma ++ ((x,A) :: nil)) (open_source t (PFVar x)) B E) ->
+                                 has_type_source (Gamma ++ ((x,A) :: nil)) (open_source t (PFVar x)) B E) -> WFTyp A -> 
                            has_type_source Gamma (PLam A t) (Fun A B) (STLam _ (|A|) E) 
   | TyApp : forall Gamma A B C t1 t2 E E1 E2,
               has_type_source Gamma t1 (Fun A B) E1 ->
@@ -668,6 +669,7 @@ Inductive has_type_source : (context PTyp) -> PExp -> PTyp -> (SExp var) -> Prop
   | TyMerge : forall Gamma A B t1 t2 E1 E2,
                 has_type_source Gamma t1 A E1 ->
                 has_type_source Gamma t2 B E2 ->
+                OrthoS A B -> 
                 has_type_source Gamma (PMerge t1 t2) (And A B) (STPair _ E1 E2).
 
 (* Typing rules of STLC, inspired by STLC_Tutorial *)
@@ -1336,7 +1338,7 @@ Proof.
   assert (HaF : not (nil = Gamma ++ (x, A) :: nil)).
   apply app_cons_not_nil.
   exfalso; apply HaF; assumption.
-  apply app_inv_singleton in H1.
+  apply app_inv_singleton in H2.
   now subst.
 Defined.
 
@@ -1712,6 +1714,157 @@ Proof.
   apply STTyPair; assumption.
 Defined.
 
+
+Lemma decidability_types :
+  forall (A B : PTyp), sumbool (A = B) (not (A = B)).
+Proof.
+  intros A.
+  induction A.
+  destruct B; auto; apply right; unfold not; intros H; inversion H.
+
+  destruct B.
+  right; unfold not; intros HInv; inversion HInv.
+  assert (HA1: sumbool (A1 = B1) (A1 <> B1)) by (apply IHA1).
+  assert (HA2: sumbool (A2 = B2) (A2 <> B2)) by (apply IHA2).  
+  inversion HA1; subst; inversion HA2; subst.
+  apply left; reflexivity.
+  apply right; unfold not; intros HInv; inversion HInv; subst.
+  apply H; reflexivity.
+  apply right; unfold not; intros HInv; inversion HInv; subst.
+  apply H; reflexivity.
+  apply right; unfold not; intros HInv; inversion HInv; subst.
+  apply H; reflexivity.
+  apply right; unfold not; intros HInv; inversion HInv.
+  
+  destruct B.
+  right; unfold not; intros HInv; inversion HInv.
+  apply right; unfold not; intros HInv; inversion HInv.
+  assert (HA1: sumbool (A1 = B1) (A1 <> B1)) by (apply IHA1).
+  assert (HA2: sumbool (A2 = B2) (A2 <> B2)) by (apply IHA2).  
+  inversion HA1; subst; inversion HA2; subst.
+  apply left; reflexivity.
+  apply right; unfold not; intros HInv; inversion HInv; subst.
+  apply H; reflexivity.
+  apply right; unfold not; intros HInv; inversion HInv; subst.
+  apply H; reflexivity.
+  apply right; unfold not; intros HInv; inversion HInv; subst.
+  apply H; reflexivity.
+Defined.
+
+
+Print Module DecidableType.
+Print Module Type DecidableType.
+Print Module Type EqualityType.
+
+Module PTypDecidable <: DecidableType.
+
+  Definition t := PTyp.
+
+  Definition eq (x : PTyp) y := (x = y).
+      
+  Definition eq_refl : forall x : t, eq x x.
+    Proof. destruct x; reflexivity. Defined.
+    
+  Definition eq_sym : forall x y : t, eq x y -> eq y x.
+    Proof. destruct x; destruct y; intros; auto; symmetry; assumption. Defined.
+  
+  Definition eq_trans : forall x y z : t, eq x y -> eq y z -> eq x z.
+    Proof. intros; rewrite H; assumption. Defined.
+
+  Definition eq_equiv : Equivalence eq :=
+    Build_Equivalence _ eq_refl eq_sym eq_trans.
+    
+  Definition eq_dec : forall x y, sumbool (eq x y) (not (eq x y)).
+    Proof. apply decidability_types. Defined.
+  
+End PTypDecidable.
+
+Import PTypDecidable.
+Require Import Coq.Structures.DecidableTypeEx.
+
+Module VarTypDecidable <: DecidableType.
+
+  Definition t := VarTyp.t.
+
+  Definition eq (x : VarTyp.t) y := (VarTyp.eq x y).
+
+  Definition eq_equiv : Equivalence eq.
+    Proof. apply VarTyp.eq_equiv. Defined.
+    
+  Definition eq_refl : forall x : t, eq x x.
+    Proof. apply reflexivity. Defined.
+    
+  Definition eq_sym : forall x y : t, eq x y -> eq y x.
+    Proof. intros; symmetry; assumption. Defined.
+  
+  Definition eq_trans : forall x y z : t, eq x y -> eq y z -> eq x z.
+    Proof. intros; rewrite H; assumption. Defined.
+
+  Definition eq_dec : forall x y, sumbool (eq x y) (not (eq x y)).
+    Proof. apply VarTyp.eq_dec. Defined.
+  
+End VarTypDecidable.
+
+Module MDec := PairDecidableType(VarTypDecidable)(PTypDecidable).
+
+Lemma ok_unique_type : forall (Gamma: context PTyp) x A B,
+  ok Gamma ->
+  List.In (x, A) Gamma /\ List.In (x, B) Gamma ->
+  A = B.
+Proof.
+  intros.
+  
+  induction H.
+  inversion H0.
+  inversion H.
+  
+  assert (HaA : sumbool (MDec.eq (x,A) (v, ty)) (not (MDec.eq (x,A) (v, ty)))).
+  apply MDec.eq_dec.
+
+  assert (HaB : sumbool (MDec.eq (x,B) (v, ty)) (not (MDec.eq (x,B) (v, ty)))).
+  apply MDec.eq_dec.
+
+  inversion HaA; inversion HaB.
+  inversion H2; inversion H3; simpl in *.
+  subst.
+  reflexivity.
+  
+  inversion H2.
+  simpl in *; subst.
+  inversion H0.
+  apply in_app_or in H5.
+  apply in_app_or in H6.
+  inversion H5; inversion H6.
+  apply list_impl_m in H7; apply (MSetProperties.Dec.F.In_1 H4) in H7; contradiction.
+  apply list_impl_m in H7; apply (MSetProperties.Dec.F.In_1 H4) in H7; contradiction.
+  apply list_impl_m in H8; apply (MSetProperties.Dec.F.In_1 H4) in H8; contradiction.
+  inversion H7.
+  inversion H9.
+  subst.
+  inversion H8.
+  inversion H10; subst; reflexivity.
+  inversion H10.
+  inversion H9.
+
+  inversion H3.
+  simpl in *; subst.
+  inversion H0.
+  apply in_app_or in H5.
+  apply in_app_or in H6.
+  inversion H5; inversion H6.  
+  apply list_impl_m in H7; apply (MSetProperties.Dec.F.In_1 H4) in H7; contradiction.
+  apply list_impl_m in H7; apply (MSetProperties.Dec.F.In_1 H4) in H7; contradiction.
+  apply list_impl_m in H8; apply (MSetProperties.Dec.F.In_1 H4) in H8; contradiction.
+  inversion H7.
+  inversion H9; subst; reflexivity.
+  inversion H9.
+    
+  apply IHok.
+  inversion H0; clear H0.
+  split; [ (apply in_app_or in H4; inversion H4) | (apply in_app_or in H5; inversion H5) ]; try assumption; inversion H0; inversion H6; simpl in *; subst;
+  exfalso; [ apply H2 | apply H3 ]; reflexivity.
+Defined.
+  
 Theorem unique_type :
   forall t Gamma A1 A2 E1 E2, has_type_source Gamma t A1 E1 ->
                      has_type_source Gamma t A2 E2 ->
@@ -1725,49 +1878,9 @@ Proof.
   - inversion H2. subst.
     assert (HIn : List.In (x, ty) Gamma /\ List.In (x, A2) Gamma) by (split; assumption).
     clear H0; clear H5.
-    induction H3; intros.
+    induction H4; intros.
     inversion HIn; inversion H0.
-    assert (Ha : sumbool ((x,ty) = (v, ty0)) (not ((x,ty) = (v, ty0)))).
-    admit.
-    inversion Ha.
-    (* Case (x, ty) = (v, ty0) *)
-    inversion H1.
-    subst.
-    inversion HIn.
-    apply in_app_or in H5.
-    inversion H5.
-    apply list_impl_m in H6.
-    contradiction.
-    inversion H6.
-    apply f_equal with (f := snd) in H7; now simpl in H7.
-    inversion H7.
-    (* Case (x, ty) ≠ (v, ty0) *)
-    apply IHok.
-    assumption.
-    assert (Ha2 : (x, ty) <> (v, ty0) ->  has_type_source (E ++ (v, ty0) :: nil) (PFVar x) A2 (STFVar var x) -> has_type_source E (PFVar x) A2 (STFVar var x)).
-    admit.
-    apply Ha2; assumption.
-    inversion HIn.
-    apply in_app_or in H4.
-    apply in_app_or in H5.
-    inversion H4.
-    inversion H5.
-    auto.
-    inversion H7.
-    split.
-    inversion H8.
-    subst.
-    apply list_impl_m in H6.
-    contradiction.
-    inversion H8.
-    subst.
-    apply list_impl_m in H6.
-    contradiction.
-    inversion H8.
-    inversion H6.
-    exfalso; apply H1.
-    now symmetry.
-    inversion H7.
+    apply ok_unique_type in HIn; auto.
   (* TyLit *)  
   - inversion H2; reflexivity.
   (* TyFun *)
@@ -1776,7 +1889,7 @@ Proof.
     pick_fresh x.
     eapply H0 with (x := x).
     not_in_L2 x.
-    apply H7.
+    apply H6.
     not_in_L2 x.
   (* TyApp *)
   - inversion H2; subst.
@@ -1787,57 +1900,26 @@ Proof.
   (* TyMerge *)
   - inversion H2; subst.
     apply IHhas_type_source1 in H3.
-    apply IHhas_type_source2 in H6.
+    apply IHhas_type_source2 in H5.
     subst; reflexivity.
-Admitted.
+Defined.
 
-   
-Lemma typing : forall A B E, sub A B E -> (WFTyp B <-> WFTyp A).
-Proof.
-  intros; induction H.
-  split; intros; auto.
-  split; intros.
-  inversion H1; subst.
-  apply WFFun.
-  apply IHsub1; assumption.
-  apply IHsub2; assumption.
-  inversion H1; subst.
-  apply WFFun.
-  apply IHsub1; assumption.
-  apply IHsub2; assumption.
-  split; intros.
-  inversion H1; subst.
-  apply IHsub1; assumption.
-  apply WFAnd.
-  apply IHsub1; assumption.
-  apply IHsub2; assumption.
-  admit.
-  split; intros.
-  apply WFAnd.
-  apply IHsub; assumption.
-  admit.
-  admit.
-  inversion H1.
-  apply IHsub; assumption.
-  split.
-  intros.
-Admitted.
-  
+
 Lemma typing_wf : forall Gamma t T E, has_type_source Gamma t T E -> WFTyp T.
 Proof.
-  intros Gamma t T E H; induction H.
-  admit. (* ok predicate should ensure WF types? *)
+  intros Gamma t T E H.
+  induction H.
+  assumption.
   apply WFInt.
   pick_fresh x.
   assert (Ha : not (M.In x L)) by (not_in_L2 x).
   apply WFFun.
   apply H in Ha.
-  admit. (* A must be WF because its in the environment of Gamma at Ha *)
+  assumption.
   apply H0 with (x := x); assumption.
   inversion IHhas_type_source1; assumption.
   apply WFAnd; try assumption.
-  admit.
-Admitted.
+Defined.
   
 (* Theorem 5 *)
 Theorem unique_colaboration :
@@ -1847,18 +1929,18 @@ Theorem unique_colaboration :
 Proof.  
   intros; generalize dependent E2; generalize dependent A2; induction H; intros.
   (* STFVar *)
-  - inversion H1; reflexivity.
+  - inversion H2; reflexivity.
   (* STInt *)
   - inversion H0; reflexivity.
   (* STLam *)
-  - inversion H1; subst.    
+  - inversion H2; subst.    
     pick_fresh x.
     assert (Ha1: not (M.In x L0)) by (not_in_L2 x).
     erewrite H0.
     reflexivity.
     assert (Ha4: not (M.In x L)) by (not_in_L2 x).
     exact Ha4.
-    apply H7 in Ha1.
+    apply H6 in Ha1.
     apply Ha1.
   (* STApp *)
   - inversion H2; subst.
@@ -1873,7 +1955,7 @@ Proof.
     subst.
     apply IHhas_type_source2 in H7.
     subst.
-    apply typing_wf in H. Check sub_coherent.
+    apply typing_wf in H.
     erewrite sub_coherent with (C1 := E) (C2 := E3) (A := C) (B := A).
     reflexivity.
     apply typing_wf in H0; assumption.
@@ -1881,8 +1963,8 @@ Proof.
     assumption.
     assumption.
   (* STPair *)
-  - inversion H1; subst.
+  - inversion H2; subst.
     apply IHhas_type_source1 in H5.
-    apply IHhas_type_source2 in H8.
+    apply IHhas_type_source2 in H7.
     subst; reflexivity.
 Defined.
