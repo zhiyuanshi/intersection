@@ -518,10 +518,10 @@ Ltac gather_vars_with F :=
 Ltac gather_vars :=
   let A := gather_vars_with (fun x : vars => x) in
   let B := gather_vars_with (fun x : var => singleton x) in
-  let C := gather_vars_with (fun x : context => dom x) in
-  let D := gather_vars_with (fun x : PExp => fv x) in
-  let F := gather_vars_with (fun x : SExp => fv_source x) in
-  constr:(union A (B union (C union (D union F)))).
+  let C := gather_vars_with (fun (x : context STyp) => dom x) in
+  (*let D := gather_vars_with (fun x : PExp => fv_source x) in*)
+  let E := gather_vars_with (fun (x : SExp var) => fv x) in
+  constr:(union A (union B (union C E))).
 
 Ltac beautify_fset V :=
   let rec go Acc E :=
@@ -537,12 +537,16 @@ Ltac beautify_fset V :=
   in
   go (empty : vars) V.
 
-Definition var_fresh (L : vars) := {x : var | not (In x L) }.
-
+Definition var_fresh : forall L : vars, {x : var | not (In x L) }.
+Admitted.
+  
 Ltac pick_fresh_gen L Y :=
   let Fr := fresh "Fr" in
   let L := beautify_fset L in
   destruct (var_fresh L) as (Y, Fr).
+
+Ltac pick_fresh x :=
+  let L := gather_vars in (pick_fresh_gen L x).
 
 Ltac apply_fresh_base_simple lemma gather :=
   let L0 := gather in
@@ -568,27 +572,25 @@ Ltac intros_fresh x :=
     let Fr := fresh "Fr" x2 in
     intros x2 Fr ]. 
 
-(* TODO is this necessary? if so uncomment also in apply_fresh_base
 Fixpoint fresh (L : vars) (n : nat) (xs : list var) : Prop :=
   match xs with
   | nil => match n with
            | 0 => True
            | S _ => False
            end
-  | (x :: xs') =>
+  | (x :: xs')%list =>
       match n with
       | 0 => False
-      | S n' => not (In x L) /\ fresh (union L (singleton x)) n' xs'
+      | S n' => (not (In x L)) /\ fresh (union L (singleton x)) n' xs'
       end
   end.
- *)
 
 Ltac apply_fresh_base lemma gather var_name :=
   apply_fresh_base_simple lemma gather;
    try
     match goal with
     | |- _ -> not (In _ _) -> _ => intros_fresh var_name
-    (* | |- _ -> fresh _ _ _ -> _ => intros_fresh var_name *)
+    | |- _ -> fresh _ _ _ -> _ => intros_fresh var_name
     end.
 
 Tactic Notation "apply_fresh" constr(T) "as" ident(x) :=
@@ -645,29 +647,67 @@ Notation "'∥' t '∥'" := (conv_context t) (at level 60).
 Reserved Notation "Gamma '|-' t ':' T" (at level 40).
 *)
 
-(* Typing rules of source language: Figure 2 *)
-Inductive has_type_source : context PTyp -> PExp -> PTyp -> Prop :=
-  | TyVar : forall Gamma x ty, List.Exists (fun a => (fst a) = x) Gamma ->
-                      has_type_source Gamma (PFVar x) ty (* is this right? *)
-  | TyLit : forall Gamma x, has_type_source Gamma (PLit x) PInt 
-  | TyLam : forall Gamma t A B L, (forall x, not (In x L) -> 
-                                 has_type_source (extend x A Gamma) (open_source t (PFVar x)) B) ->
-                           has_type_source Gamma (PLam t) (Fun A B) 
-  | TyApp : forall Gamma A B t1 t2,
-              has_type_source Gamma t1 (Fun A B) ->
-              has_type_source Gamma t2 A ->
-              has_type_source Gamma (PApp t1 t2) B (* wrong: no subtyping? *)
-  | TyMerge : forall Gamma A B t1 t2,
-                has_type_source Gamma t1 A ->
-                has_type_source Gamma t2 B ->
-                has_type_source Gamma (PMerge t1 t2) (And A B)
-  | TySub : forall Gamma t A B, has_type_source Gamma t A -> Sub A B -> has_type_source Gamma t B.
+(* Typing rules of source language: Figure 2 
+Note that we generate an Annotated expression, which serves as evidence for bi-directional
+type-checking completness proof.
+ *)
+
+Inductive has_type_source : context PTyp -> PExp -> PTyp -> PExp -> Prop :=
+  | TyVar : forall Gamma x ty, List.Exists (fun a => (fst a) = x /\ snd a = ty) Gamma ->
+                      has_type_source Gamma (PFVar x) ty (PFVar x) (* is this right? *)
+  | TyLit : forall Gamma x, has_type_source Gamma (PLit x) PInt (PLit x)
+  | TyLam : forall Gamma t t1 A B L, (forall x, not (In x L) -> 
+                                 has_type_source (extend x A Gamma) (open_source t (PFVar x)) B (open_source t1 (PFVar x))) ->
+                           has_type_source Gamma (PLam t) (Fun A B) (PAnn (PLam t1) (Fun A B)) 
+  | TyApp : forall Gamma A B t1 t1' t2 t2' ,
+              has_type_source Gamma t1 (Fun A B) t1' ->
+              has_type_source Gamma t2 A t2' ->
+              has_type_source Gamma (PApp t1 t2) B (PApp t1' t2') (* wrong: no subtyping? *)
+  | TyMerge : forall Gamma A B t1 t1' t2 t2' ,
+                has_type_source Gamma t1 A t1' ->
+                has_type_source Gamma t2 B t2' ->
+                has_type_source Gamma (PMerge t1 t2) (And A B) (PMerge t1' t2')
+  | TySub : forall Gamma t t' A B, has_type_source Gamma t A t' -> Sub A B -> has_type_source Gamma t B (PAnn t' B).
+
+(* Smart constructors *)
+
+Definition has_type Gamma e t := exists s, has_type_source Gamma e t s.
+
+Definition tvar : forall Gamma x ty, List.Exists (fun a => (fst a) = x /\ snd a = ty) Gamma ->
+                                     has_type Gamma (PFVar x) ty.
+intros.  unfold has_type. exists (PFVar x). apply TyVar. auto.
+Defined.
+
+Definition tlit : forall Gamma x, has_type Gamma (PLit x) PInt.
+intros. unfold has_type. exists (PLit x). apply TyLit.
+Defined.
+
+Definition tlam : forall Gamma t A B L, (forall x, not (In x L) -> 
+                                 has_type (extend x A Gamma) (open_source t (PFVar x)) B) ->
+                                        has_type Gamma (PLam t) (Fun A B).
+intros.
+unfold has_type.
+unfold has_type in H.
+pick_fresh y.
+pose (H y Fr).
+destruct e.
+exists (PAnn (PLam x) (Fun A B)).
+apply (TyLam _ _ _ _ _ L). intros.
+assert (forall {y z}, not (In y L) -> not (In z L ) -> has_type_source (extend y A Gamma) (open_source t0 (PFVar y)) B x = has_type_source (extend z A Gamma) (open_source t0 (PFVar z)) B x).
+(* so, if y0 and z are both fresh
+admit.
+pose (H2 _ _ Fr H1). rewrite e in H0. clear e. clear H2.
+unfold open_source.
+assert (open_rec_source 0 (PFVar x0) x = x). (* should be true if x0 not in the fv(x) *)
+admit.
+rewrite H2. auto.
+Admitted.
 
 Inductive Dir := Inf | Chk.
 
 Inductive has_type_source_alg : context PTyp -> PExp -> Dir -> PTyp -> (SExp var) -> Prop :=
   (* Inference rules *)
-  | ATyVar : forall Gamma x ty, List.Exists (fun a => (fst a) = x) Gamma ->
+  | ATyVar : forall Gamma x ty, List.Exists (fun a => (fst a) = x /\ snd a = ty) Gamma ->
                       has_type_source_alg Gamma (PFVar x) Inf ty (STFVar _ x) (* is this right? *)
   | ATyLit : forall Gamma x, has_type_source_alg Gamma (PLit x) Inf PInt (STLit _ x)
   | ATyApp : forall Gamma A B t1 t2 E1 E2,
@@ -685,18 +725,115 @@ Inductive has_type_source_alg : context PTyp -> PExp -> Dir -> PTyp -> (SExp var
                            has_type_source_alg Gamma (PLam t) Chk (Fun A B) (STLam _ E)
   | ATySub : forall Gamma t A B C E, has_type_source_alg Gamma t Inf A E -> sub A B C -> has_type_source_alg Gamma t Chk B (STApp _ (C var) E).
 
+(* Ignoring the generated expressions + smart constructors *)
+
+Definition has_ty Gamma e d t := exists E, has_type_source_alg Gamma e d t E.
+
+Definition tyvar : forall Gamma x ty, List.Exists (fun a => (fst a) = x /\ snd a = ty) Gamma ->
+                                      has_ty Gamma (PFVar x) Inf ty.
+intros.
+unfold has_ty. exists (STFVar _ x). apply ATyVar. auto.
+Defined.
+
+Definition tylit : forall Gamma x, has_ty Gamma (PLit x) Inf PInt.
+intros. unfold has_ty.
+exists (STLit _ x).
+apply ATyLit.
+Defined.
+
+Definition tyapp : forall Gamma A B t1 t2,
+              has_ty Gamma t1 Inf (Fun A B) ->
+              has_ty Gamma t2 Chk A ->
+              has_ty Gamma (PApp t1 t2) Inf B.
+intros. unfold has_ty.
+inversion H. inversion H0.
+exists (STApp _ x x0).
+apply (ATyApp _ A). auto. auto.
+Defined.
+
+Definition tymerge : forall Gamma A B t1 t2,
+                has_ty Gamma t1 Inf A ->
+                has_ty Gamma t2 Inf B ->
+                has_ty Gamma (PMerge t1 t2) Inf (And A B).
+intros.
+inversion H. inversion H0.
+unfold has_ty. exists (STPair _ x x0). apply ATyMerge. auto. auto.
+Defined.
+
+Definition tyann : forall Gamma t1 A, has_ty Gamma t1 Chk A -> has_ty Gamma (PAnn t1 A) Inf A.
+intros. inversion H. unfold has_ty. exists x. apply ATyAnn. auto.
+Defined.
+
+Definition tylam : forall {Gamma t A B} L, (forall x, not (In x L) -> 
+                                 has_ty (extend x A Gamma) (open_source t (PFVar x)) Chk B) ->
+                                         has_ty Gamma (PLam t) Chk (Fun A B).
+intros.
+unfold has_ty.  
+unfold has_ty in H.
+pick_fresh y. 
+pose (H y Fr). destruct e. exists (STLam _ x).
+apply (ATyLam _ _ _ _ L). intros.
+Admitted.
+
+Lemma tysub : forall Gamma t A B, has_ty Gamma t Inf A -> Sub A B -> has_ty Gamma t Chk B.
+intros.
+unfold has_ty.
+inversion H. inversion H0.
+exists ((STApp _ (x0 var) x)).
+apply  (ATySub _ _ A). auto. auto.
+Defined.
+
+Fixpoint erase (e : PExp) : PExp :=
+  match e with
+    | PFVar x => PFVar x
+    | PBVar x => PBVar x
+    | PLit x => PLit x
+    | PLam e => PLam (erase e)
+    | PApp e1 e2 => PApp (erase e1) (erase e2)
+    | PMerge e1 e2 => PMerge (erase e1) (erase e2)
+    | PAnn e t => erase e
+  end.
+
+(* Uniqueness *)
+
 Definition almost_unique (A B : PTyp) (d : Dir) : Prop := 
   match d with
     | Inf => A = B
     | Chk => True (* Is this result useful for checking: exists C, Sub C A /\ Sub C B*)
   end.
 
+(*
+Lemma typ_unique : forall Gamma e t1 E1, has_type_source_alg Gamma e Inf t1 E1 -> forall t2 E2, has_type_source_alg Gamma e Inf t2 E2 -> t1 = t2.
+intros Gamma e t1 E1 H.
+induction H; intros; unfold almost_unique.
+(* case Var *)
+inversion H0. 
+admit. (* TODO *)
+(* Case Lit *)
+inversion H. auto.
+(* case App *)
+inversion H1.
+apply IHhas_type_source_alg1 in H5. simpl in H5.
+apply IHhas_type_source_alg2 in H6.
+injection H5. intros. auto.
+(* Case Merge *)
+inversion H1.
+apply IHhas_type_source_alg1 in H5.
+apply IHhas_type_source_alg2 in H6.
+rewrite H5. rewrite H6. auto.
+(* Case Ann *)
+inversion H0. auto.
+(* Case Lam *)
+inversion H1.
+auto. auto.
+*)
+
 Lemma typ_unique : forall Gamma e d t1 E1, has_type_source_alg Gamma e d t1 E1 -> forall t2 E2, has_type_source_alg Gamma e d t2 E2 -> almost_unique t1 t2 d.
 intros Gamma e d t1 E1 H.
 induction H; intros; unfold almost_unique.
 (* case Var *)
-inversion H0.
-admit. (* var case is wrong *)
+inversion H0. 
+admit. (* TODO *)
 (* case Lit *)
 inversion H. auto.
 (* case App *)
@@ -713,22 +850,501 @@ rewrite H5. rewrite H6. auto.
 inversion H0. auto.
 (* Case Lam *)
 auto. auto.
-(*
-inversion H1.
-admit. inversion H2.
-(* Case Sub *)
-inversion H1. admit.
-simpl in IHhas_type_source_alg.
-apply IHhas_type_source_alg in H2.
-rewrite <- H2 in H3. exists A.
-split. unfold Sub. exists C. auto.
-unfold Sub. exists C0. auto.*)
 Admitted.
 
 Lemma typ_inf_unique : forall {Gamma e t1 E1}, has_type_source_alg Gamma e Inf t1 E1 -> forall {t2 E2}, has_type_source_alg Gamma e Inf t2 E2 -> t1 = t2.
 intros.
 pose (@typ_unique _ _ _ _ _ H _ _ H0). simpl in a. auto.
 Defined.
+
+(* erasure typing *)
+
+Lemma erasure_typing :
+  forall {e Gamma t}, has_type_source Gamma (erase e) t e -> has_ty Gamma e Inf t.
+induction e; intros.
+(* case var *)  
+apply tyvar.
+inversion H. auto.
+(* case bvar *)
+simpl in H.
+inversion H.
+(* case lit *)
+inversion H.
+apply tylit.
+(* case lam *)
+inversion H.
+(* Case App *)
+inversion H.
+apply IHe1 in H5.
+apply IHe2 in H7.
+apply (tyapp _ A). auto.
+apply (tysub _ _ A). auto. apply reflex.
+(* Case Merge *)
+inversion H.
+apply IHe1 in H5.
+apply IHe2 in H7.
+apply (tymerge). auto. auto.
+(* Case Ann *)
+inversion H.
+apply tyann. apply (tylam L).
+intros. pose (H4 x H6).
+destruct e; inversion H2. simpl in H0. injection H0. intros. injection H2. intros.
+rewrite H7 in h. rewrite H9 in h. simpl in IHe.
+(* need some kind of substitution lemmas here to apply IHe ? *)
+assert (has_type_source (extend x A Gamma) (open_source (erase e) (PFVar x)) B
+                        (open_source e (PFVar x)) = has_type_source Gamma (PLam (erase e)) B (PLam e)).
+admit.
+rewrite H10 in h. apply IHe in h.
+assert (has_ty Gamma (PLam e) Inf B = has_ty (extend x A Gamma) (open_source e (PFVar x)) Inf B).
+admit.
+rewrite H11 in h.
+apply (tysub _ _ B). auto. apply reflex.
+apply tyann.
+simpl in H5.
+apply IHe in H5.
+apply (tysub _ _ A). auto. auto.
+Admitted.
+
+(* Completeness *)
+
+(*
+Lemma typ_complete : forall Gamma e t e',
+  has_type_source Gamma e t e' -> (has_ty Gamma e' Inf t) /\ erase e' = e.
+intros Gamma e t e' H.
+induction H; intros; split; try (simpl; auto).
+(* Case TyVar *)
+apply tyvar. auto.
+(* Case TyLit *)
+apply tylit.
+(* Case TyLam *)
+apply tyann. apply (tylam L). intros.
+pose (H0 x H1). destruct a. (*destruct H2. destruct x0.*)
+apply (tysub _ _ B). auto. apply reflex. 
+(* erasure of Lam *)
+pick_fresh y. pose (H0 y Fr). pose (H y Fr). destruct a.
+simpl in H2. inversion H1. rewrite <- H2 in h.
+pose (erasure_typing h). inversion h0. inversion H4. clear H H0 H1.
+unfold open_source in H5.
+destruct t1; simpl in H5; inversion H5. simpl.
+simpl in H2. unfold open_source in H2.
+destruct t0; simpl in H2; inversion H2. auto.
+destruct n. admit. inversion H1. destruct n. simpl.
+destruct t0; simpl in H2; inversion H2. admit.
+unfold open_source in H1. simpl in H1. destruct n. auto.
+inversion H1. simpl. inversion H0.
+destruct t1; unfold open_source in H7; inversion H7. destruct n; inversion H10.
+simpl. simpl in H7. simpl in H2.
+destruct t0; unfold open_source in h; inversion H2. unfold open_source in H11. simpl in H11.
+destruct n; inversion H11. destruct n0; inversion H12. destruct n0; inversion H12. auto.
+destruct t1; unfold open_source in H5; inversion H5.
+destruct n; inversion H12. simpl.
+unfold open_source in H2. simpl in H2. simpl in H5.
+destruct t0; unfold open_source in H2; inversion H2.
+destruct n; inversion H14. simpl in H2.
+(* probably an auxialiary lemma here *)
+admit. admit. admit.
+(* Case App *)
+destruct IHhas_type_source1. destruct IHhas_type_source2.
+destruct H1. destruct H3. eapply ex_intro. apply (tyapp _ A).
+destruct x. 
+inversion H1.
+unfold has_ty. exists x. auto.
+inversion H. apply tyvar. auto. apply tyann.
+rewrite <- H8 in H1.
+inversion H1. inversion H11. inversion H12.
+unfold has_ty. exists E. auto.
+rewrite <- H10 in H1.
+rewrite <- H2 in H. rewrite <- H10 in H2. simpl in H2. rewrite <- H10 in H.
+apply (erasure_typing H).
+rewrite <- H2 in H.
+pose (erasure_typing H).
+rewrite <- H10 in h. auto.
+destruct x0.
+apply (tysub _ _ A). auto. apply reflex. auto.
+(* erasure of App *)
+destruct IHhas_type_source1. destruct IHhas_type_source2.
+rewrite H2. rewrite H4. auto.
+(* Case Merge *)
+destruct IHhas_type_source1.
+destruct IHhas_type_source2.
+exists Inf. destruct H1. destruct H3.
+apply tymerge.
+destruct x. auto.
+inversion H1. inversion H5.
+rewrite <- H8 in H. rewrite <- H10 in H. inversion H.
+rewrite <- H2 in H.
+apply (erasure_typing H).
+destruct x0. auto. destruct H3. inversion H3.
+rewrite <- H7 in H0. rewrite <- H9 in H0. inversion H0.
+rewrite <- H4 in H0.
+apply (erasure_typing H0).
+(* erasure of Merge *)
+destruct IHhas_type_source1. destruct IHhas_type_source2.
+rewrite H2. rewrite H4. auto.
+(* Case Ann *)
+exists Inf.
+destruct IHhas_type_source.
+destruct H1. destruct x.
+apply tyann. apply (tysub _ _ A). auto. auto.
+apply tyann. apply (tysub _ _ A). rewrite <- H2 in H.
+apply (erasure_typing H). auto.
+destruct IHhas_type_source.
+auto.*)
+
+
+Lemma typ_complete : forall {Gamma e t e'},
+  has_type_source Gamma e t e' -> (exists d, has_ty Gamma e' d t) /\ erase e' = e.
+intros Gamma e t e' H.
+induction H; intros; split; try (simpl; auto).
+(* Case TyVar *)
+exists Inf. apply tyvar. auto.
+(* Case TyLit *)
+exists Inf. apply tylit.
+(* Case TyLam *)
+exists Inf. apply tyann. apply (tylam L). intros.
+pose (H0 x H1). destruct a. destruct H2. destruct x0.
+apply (tysub _ _ B). auto. apply reflex. auto.
+(* erasure of Lam *)
+pick_fresh y. pose (H0 y Fr). pose (H y Fr). destruct a.
+simpl in H2. inversion H1. rewrite <- H2 in h.
+pose (erasure_typing h). inversion h0. inversion H4. clear H H0 H1.
+unfold open_source in H5.
+destruct t1; simpl in H5; inversion H5. simpl.
+simpl in H2. unfold open_source in H2.
+destruct t0; simpl in H2; inversion H2. auto.
+destruct n. admit. inversion H1. destruct n. simpl.
+destruct t0; simpl in H2; inversion H2. admit.
+unfold open_source in H1. simpl in H1. destruct n. auto.
+inversion H1. simpl. inversion H0.
+destruct t1; unfold open_source in H7; inversion H7. destruct n; inversion H10.
+simpl. simpl in H7. simpl in H2.
+destruct t0; unfold open_source in h; inversion H2. unfold open_source in H11. simpl in H11.
+destruct n; inversion H11. destruct n0; inversion H12. destruct n0; inversion H12. auto.
+destruct t1; unfold open_source in H5; inversion H5.
+destruct n; inversion H12. simpl.
+unfold open_source in H2. simpl in H2. simpl in H5.
+destruct t0; unfold open_source in H2; inversion H2.
+destruct n; inversion H14. simpl in H2.
+(* probably an auxialiary lemma here *)
+admit. admit. admit.
+(* Case App *)
+destruct IHhas_type_source1. destruct IHhas_type_source2.
+destruct H1. destruct H3. eapply ex_intro. apply (tyapp _ A).
+destruct x. 
+inversion H1.
+unfold has_ty. exists x. auto.
+inversion H. apply tyvar. auto. apply tyann.
+rewrite <- H8 in H1.
+inversion H1. inversion H11. inversion H12.
+unfold has_ty. exists E. auto.
+rewrite <- H10 in H1.
+rewrite <- H2 in H. rewrite <- H10 in H2. simpl in H2. rewrite <- H10 in H.
+apply (erasure_typing H).
+rewrite <- H2 in H.
+pose (erasure_typing H).
+rewrite <- H10 in h. auto.
+destruct x0.
+apply (tysub _ _ A). auto. apply reflex. auto.
+(* erasure of App *)
+destruct IHhas_type_source1. destruct IHhas_type_source2.
+rewrite H2. rewrite H4. auto.
+(* Case Merge *)
+destruct IHhas_type_source1.
+destruct IHhas_type_source2.
+exists Inf. destruct H1. destruct H3.
+apply tymerge.
+destruct x. auto.
+inversion H1. inversion H5.
+rewrite <- H8 in H. rewrite <- H10 in H. inversion H.
+rewrite <- H2 in H.
+apply (erasure_typing H).
+destruct x0. auto. destruct H3. inversion H3.
+rewrite <- H7 in H0. rewrite <- H9 in H0. inversion H0.
+rewrite <- H4 in H0.
+apply (erasure_typing H0).
+(* erasure of Merge *)
+destruct IHhas_type_source1. destruct IHhas_type_source2.
+rewrite H2. rewrite H4. auto.
+(* Case Ann *)
+exists Inf.
+destruct IHhas_type_source.
+destruct H1. destruct x.
+apply tyann. apply (tysub _ _ A). auto. auto.
+apply tyann. apply (tysub _ _ A). rewrite <- H2 in H.
+apply (erasure_typing H). auto.
+destruct IHhas_type_source.
+auto.
+Admitted.
+
+(*
+Lemma typ_sub : forall e t0 A Gamma, has_type_source Gamma e A t0 -> forall B, Sub A B ->
+                                                                               has_type_source Gamma e B t0.
+intros e t0 A Gamma H. induction H; intros.
+(* Var *)
+apply TyVar.
+destruct H. simpl.
+simpl. *)
+
+Require Import Program.Equality.
+
+(*
+Lemma typ_sound : forall e d A Gamma, has_ty Gamma e d A -> has_type_source Gamma (erase e) A e.
+intros.
+inversion H. clear H.
+induction H0; simpl.
+(* PFVar *)
+apply TyVar. auto.
+(* PFLit *)
+apply TyLit.
+(* App *)
+apply (TyApp _ A). auto. auto.
+(* Merge *)
+apply TyMerge. auto. auto.
+(* Ann *)
+apply (TySub _ _ _ A). auto. apply reflex.
+(* Lam *)
+pick_fresh y. assert (not (In y L)). admit.
+pose (H y H1). pose (H0 y H1). admit.
+(* Sub *)
+admit.*)
+
+(*
+Inductive EForm e t : PExp -> Prop  :=
+| EBase : EForm e t e
+| EStep : forall e', EForm e t e' -> EForm e t (PAnn e' t).
+
+Lemma typ_erase : forall e Gamma t e', has_type_source Gamma (erase e) t e' -> e = e'.
+induction e; intros; simpl in H.
+(* Case PFVar *)
+inversion H. auto.
+destruct e; simpl in x; inversion x. apply EBase.
+auto. destruct e; simpl in x; inversion x. simpl in H1.
+ *)
+
+Lemma typ_erasures : forall Gamma e t e1, has_type_source Gamma e t e1 -> forall e2, has_type_source Gamma e t e2 -> erase e1 = erase e2.
+intros.
+pose (typ_complete H). pose (typ_complete H0). destruct a. destruct a0. rewrite H2. rewrite H4.
+reflexivity.
+Defined.
+
+(* Inductive Erasable : PExp -> PExp *)
+
+Lemma typ_erasures2 : forall Gamma e d t e2, has_ty Gamma e2 d t
+       -> forall e1, has_type_source Gamma e t e1 -> 
+                                          erase e1 = erase e2 -> has_type_source Gamma e t e2.    intros Gamma e d t e2 H.
+inversion H.  
+induction H0; intros.
+simpl in H2.
+destruct H1; simpl in H2; inversion H2.
+apply TyVar. auto.
+destruct H3.
+destruct t'; simpl in H5; inversion H5.
+simpl. rewrite H6 in H1. inversion H1.
+apply TyVar. auto. simpl.
+
+simpl. simpl in H2.
+destruct t'; simpl in H2; inversion H2.
+inversion H1. simpl. rewrite <- H8 in H13.
+rewrite H7 in H12.
+inversion H1. simpl. rewrite H7 in H12.
+
+Lemma typ_sound : forall e d t Gamma, has_ty Gamma e d t -> exists e', has_type_source Gamma (erase e) t e' /\ (erase e = erase e').
+intros.
+inversion H. clear H.
+induction H0; simpl.
+(* PFVar *)
+eapply ex_intro. split. apply TyVar. auto. simpl. auto.
+(* PFLit *)
+eapply ex_intro. split. apply TyLit. auto.
+(* App *)
+destruct IHhas_type_source_alg1. destruct H. destruct IHhas_type_source_alg2. destruct H1.
+eapply ex_intro. split.
+apply (TyApp _ A).  exact H. exact H1.
+simpl. rewrite H0. rewrite H2. auto.
+(* Merge *)
+destruct IHhas_type_source_alg1. destruct H. destruct IHhas_type_source_alg2. destruct H1.
+eapply ex_intro. split.
+apply TyMerge. exact H. exact H1.
+simpl. rewrite H0. rewrite H2. auto.
+(* Ann *)
+destruct IHhas_type_source_alg. destruct H.
+exists x. auto.
+(* Lam *)
+(*
+pick_fresh y. assert (not (In y L)). admit.
+pose (H y H1). pose (H0 y H1). destruct e. destruct H2.
+inversion h. (*rewrite <- H4 in H3. simpl in H3. rewrite H4 in H2.*)
+destruct t0; unfold open_source in H4; simpl in H4; inversion H4.
+destruct n; inversion H10. simpl in H3. unfold open_source in H2. simpl in H2.
+destruct x; simpl in H3; inversion H3. inversion H2. simpl.
+clear H11.
+exists (PAnn (PAnn x p) (Fun A (Fun A0 B0))). split.
+apply (TyLam _ _ _ _ _ L). intros. rewrite <- H8 in H2.*)
+exists (PAnn (PLam t0) (Fun A B)). split.
+apply (TyLam _ _ _ _ _ L). intros.
+pose (H x H1). pose (H0 x H1). destruct e. destruct H2.
+inversion h. rewrite <- H4 in H3. simpl in H3. rewrite <- H4 in H2. simpl in H2.
+destruct t0; unfold open_source in H4; simpl in H4; inversion H4.
+destruct n; inversion H10. unfold open_source. simpl.
+destruct x0; simpl in H3; inversion H3. inversion H2.
+pose (typ_complete H2). destruct a. 
+rewrite H10 in H11.
+admit.
+admit. (* some inductive property? *)
+(*destruct x0; unfold open_source in H3; simpl in H3; inversion H3.*) 
+simpl. auto.
+(* Sub *)
+destruct IHhas_type_source_alg. destruct H1.
+exists (PAnn x B). split.
+apply (TySub _ _ _ A). auto.
+unfold Sub. exists C. auto.
+simpl. auto.
+Admitted.
+
+Inductive soundness Gamma : PExp -> PTyp -> Dir -> Prop :=
+| SInf : forall e t, has_type_source Gamma (erase e) t e -> soundness Gamma e t Inf
+| SChk : forall d e t, soundness Gamma e t d -> soundness Gamma (PAnn e t) t Chk
+| SChkInf : forall e t, soundness Gamma e t Inf -> soundness Gamma e t Chk.
+
+(*
+Definition soundness Gamma e t  (d : Dir) : Prop := 
+  match d with
+    | Inf => has_type_source Gamma (erase e) t e
+    | Chk => has_type_source Gamma (erase e) t (PAnn e t) (* Something needed here? *)
+  end.
+
+
+Definition soundness Gamma e t  (d : Dir) : Prop := 
+  match d with
+    | Inf => has_type_source Gamma (erase e) t e
+    | Chk => exists e', has_type_source Gamma (erase e) t e' (* Something needed here? *)
+  end.
+*)
+
+Lemma soundness_aux : forall {Gamma e A d}, soundness Gamma e A d -> has_type_source Gamma (erase e) A (PAnn e A).
+intros.
+induction H.
+apply (TySub _ _ _ t0). auto. apply reflex.
+simpl. apply (TySub _ _ _ t0). auto. apply reflex.
+auto.
+Defined.
+
+Lemma typ_sound : forall e d t Gamma, has_ty Gamma e d t -> soundness Gamma e t d.
+intros.
+inversion H. clear H.
+induction H0; simpl.
+(* PFVar *)
+apply SInf. apply TyVar. auto.
+(* PFLit *)
+apply SInf. apply TyLit.
+(* App *)
+apply SInf. simpl.
+apply (TyApp _ A).
+inversion IHhas_type_source_alg1. auto.
+inversion IHhas_type_source_alg2. simpl.
+apply (soundness_aux H).
+inversion H. auto.
+(* Merge *)
+apply SInf. simpl.
+inversion IHhas_type_source_alg1. inversion IHhas_type_source_alg2.
+apply TyMerge. exact H. exact H2.
+(* Ann *)
+apply SInf. simpl.
+inversion IHhas_type_source_alg. simpl. apply (TySub _ _ _ A).
+apply (soundness_aux H). apply reflex.
+inversion H. apply (TySub _ _ _ A). auto. apply reflex.
+(* Lam *)
+apply SChkInf. apply SInf. simpl.
+pick_fresh y. assert (not (In y L)). admit.
+pose (H0 y H1). pose (H y H1). admit.
+inversion h. admit. rewrite <- H2 in h. admit.
+(*
+inversion h. destruct t0; unfold open_source in H2; inversion H2. destruct n; inversion H12.
+simpl.*)
+admit.
+
+admit.
+(* Sub *)
+(* auxiliary lemma ? *)
+generalize H0 IHhas_type_source_alg. generalize Gamma t0 E. clear Gamma H0 IHhas_type_source_alg t0 E.
+induction H; intros; inversion IHhas_type_source_alg.
+apply SChkInf. apply SInf. auto.
+
+inversion H0. rewrite <- H5 in H. simpl in H.
+(* exists (PAnn x B). *)
+apply (TySub _ _ _ A). auto.
+unfold Sub. exists C. auto.
+
+Lemma typ_sound : forall e d t Gamma, has_ty Gamma e d t -> exists e', has_type_source Gamma (erase e) t e'.
+intros.
+inversion H. clear H.
+induction H0; simpl.
+(* PFVar *)
+eapply ex_intro. apply TyVar. auto.
+(* PFLit *)
+eapply ex_intro. apply TyLit.
+(* App *)
+destruct IHhas_type_source_alg1. destruct IHhas_type_source_alg2.
+eapply ex_intro.
+apply (TyApp _ A).  exact H. exact H0.
+(* Merge *)
+destruct IHhas_type_source_alg1. destruct IHhas_type_source_alg2.
+eapply ex_intro.
+apply TyMerge. exact H. exact H0.
+(* Ann *)
+destruct IHhas_type_source_alg.
+exists x. auto.
+(* Lam *)
+pick_fresh y. assert (not (In y L)). admit.
+(*apply (TyLam _ _ _ _ _ L). intros.*)
+pose (H y H1). pose (H0 y H1).
+destruct e.
+exists (PAnn (PLam x) (Fun A B)).
+apply (TyLam _ _ _ _ _ L). intros.
+inversion h.
+unfold open_source in H4. destruct t0; simpl in H4; inversion H4.
+destruct n; inversion H10. simpl.
+
+simpl.
+apply (TySub _ _ _ (Fun A B)).
+admit.
+(*
+eapply ex_intro.
+pick_fresh y. assert (not (In y L)). admit.
+pose (H y H1). pose (H0 y H1).
+destruct e.
+inversion H2.
+destruct t0; unfold open_source in H3; simpl in H3; inversion H3.
+simpl in H2.
+admit.
+
+exists (PAnn (PLam t0) (Fun A B)).
+apply (TyLam _ _ _ _ _ L). intros.
+pose (H x H1). pose (H0 x H1).
+destruct e.
+*)
+(*
+unfold open_source in H2. unfold open_source in h. unfold open_source.
+destruct t0; simpl; simpl in H2; simpl in h. inversion H2.
+rewrite <- H7 in H2. auto. admit. destruct n.
+
+inversion H2; unfold open_source; simpl; unfold open_source in H2; simpl in H2.
+destruct t0; unfold open_source in H3; simpl in H3; inversion H3. simpl. simpl in H2.
+rewrite H9 in H7. rewrite <- H7 in H2. auto.
+destruct n; inversion H9. simpl in H2. simpl. rewrite H10 in H7. rewrite <- H7 in H2. auto.
+simpl. simpl in H2.
+
+unfold open_source. simpl.
+rewrite <- H7 in H2. destruct t0; simpl in H9. simpl. simpl in H2.
+admit.*)
+(* Sub *)
+destruct IHhas_type_source_alg.
+exists (PAnn x B).
+apply (TySub _ _ _ A). auto.
+unfold Sub. exists C. auto.
+Admitted.
+
+
 
 Lemma typ_coherence : forall Gamma e d t E1, has_type_source_alg Gamma e d t E1 -> forall E2, has_type_source_alg Gamma e d t E2 -> E1 = E2.
 intros Gamma e d t E1 H.
