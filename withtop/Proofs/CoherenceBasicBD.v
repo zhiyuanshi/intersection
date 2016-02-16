@@ -467,7 +467,7 @@ Inductive PExp :=
   | PLam   : PExp -> PExp
   | PApp   : PExp -> PExp -> PExp
   | PMerge : PExp -> PExp -> PExp
-  | PAnn   : PExp -> PTyp -> PExp.
+  | PAnn   : PExp -> PTyp -> PExp. (* only for the algorithmic version *) 
 
 (* Free variables *)
 
@@ -652,6 +652,8 @@ Note that we generate an Annotated expression, which serves as evidence for bi-d
 type-checking completness proof.
  *)
 
+(* Declarative type system *)
+
 Inductive has_type_source : context PTyp -> PExp -> PTyp -> PExp -> Prop :=
   | TyVar : forall Gamma x ty, List.Exists (fun a => (fst a) = x /\ snd a = ty) Gamma ->
                       has_type_source Gamma (PFVar x) ty (PFVar x) (* is this right? *)
@@ -662,7 +664,7 @@ Inductive has_type_source : context PTyp -> PExp -> PTyp -> PExp -> Prop :=
   | TyApp : forall Gamma A B t1 t1' t2 t2' ,
               has_type_source Gamma t1 (Fun A B) t1' ->
               has_type_source Gamma t2 A t2' ->
-              has_type_source Gamma (PApp t1 t2) B (PApp t1' t2') (* wrong: no subtyping? *)
+              has_type_source Gamma (PApp t1 t2) B (PApp t1' t2')
   | TyMerge : forall Gamma A B t1 t1' t2 t2' ,
                 has_type_source Gamma t1 A t1' ->
                 has_type_source Gamma t2 B t2' ->
@@ -694,7 +696,7 @@ destruct e.
 exists (PAnn (PLam x) (Fun A B)).
 apply (TyLam _ _ _ _ _ L). intros.
 assert (forall {y z}, not (In y L) -> not (In z L ) -> has_type_source (extend y A Gamma) (open_source t0 (PFVar y)) B x = has_type_source (extend z A Gamma) (open_source t0 (PFVar z)) B x).
-(* so, if y0 and z are both fresh
+(* so, if y0 and z are both fresh *)
 admit.
 pose (H2 _ _ Fr H1). rewrite e in H0. clear e. clear H2.
 unfold open_source.
@@ -704,6 +706,17 @@ rewrite H2. auto.
 Admitted.
 
 Inductive Dir := Inf | Chk.
+
+(* bidirection type-system (algorithmic): 
+
+T |- e => t ~> E     (inference mode: infers the type of e producing target E) (use Inf)
+T |- e <= t ~> E     (checking mode: checks the type of e producing target E) (use Chk)
+
+Inspiration for the rules:
+
+https://www.andres-loeh.de/LambdaPi/LambdaPi.pdf
+
+*)
 
 Inductive has_type_source_alg : context PTyp -> PExp -> Dir -> PTyp -> (SExp var) -> Prop :=
   (* Inference rules *)
@@ -852,6 +865,8 @@ inversion H0. auto.
 auto. auto.
 Admitted.
 
+(* type inference always gives unique types *)
+
 Lemma typ_inf_unique : forall {Gamma e t1 E1}, has_type_source_alg Gamma e Inf t1 E1 -> forall {t2 E2}, has_type_source_alg Gamma e Inf t2 E2 -> t1 = t2.
 intros.
 pose (@typ_unique _ _ _ _ _ H _ _ H0). simpl in a. auto.
@@ -904,6 +919,92 @@ simpl in H5.
 apply IHe in H5.
 apply (tysub _ _ A). auto. auto.
 Admitted.
+
+Lemma typ_coherence : forall Gamma e d t E1, has_type_source_alg Gamma e d t E1 -> forall E2, has_type_source_alg Gamma e d t E2 -> E1 = E2.
+intros Gamma e d t E1 H.
+induction H; intros.
+(* case PFVar *)
+inversion H0. rewrite H6. auto.
+(* case STLit *)
+inversion H. rewrite H4. auto.
+(* Case App *)
+inversion H1.
+assert (Fun A B = Fun A0 B).
+apply (typ_inf_unique H H5). injection H9. intros.
+rewrite <- H9 in H5. rewrite <- H10 in H6.
+apply IHhas_type_source_alg1 in H5. 
+apply IHhas_type_source_alg2 in H6.
+rewrite H5. rewrite H6. auto.
+(* Case Merge *)
+inversion H1.
+apply IHhas_type_source_alg1 in H7.
+apply IHhas_type_source_alg2 in H9.
+rewrite H7. rewrite H9. auto.
+(* Case Ann *)
+inversion H0.
+apply IHhas_type_source_alg in H3. auto.
+(* Case Lam *)
+inversion H1.
+admit.
+inversion H2.
+(* ATySub *)
+inversion H1.
+admit.
+assert (A = A0).
+apply (typ_inf_unique H H2).
+rewrite <- H6 in H2.
+apply IHhas_type_source_alg in H2. rewrite H2.
+rewrite <- H6 in H3. 
+assert (WFTyp A). admit. assert (WFTyp B). admit.
+assert (C = C0).
+apply (sub_coherent H9 H10 H0 H3). rewrite H11. 
+auto.
+Admitted.
+
+(*
+Lemma has_type_completeness : forall Gamma e t, has_type_source Gamma e t -> has_type_source_alg Gamma (PAnn e t) Inf t.
+Proof.
+intros.
+induction H.
+(* Var *)
+apply ATyAnn. apply (ATySub _ _ ty _). apply ATyVar. auto. apply reflex.
+(* Lit *)
+apply ATyAnn. apply (ATySub _ _ PInt _). apply ATyLit. apply reflex.
+(* Lam *)
+apply ATyAnn. apply (ATyLam _ _ _ _ L). intros. 
+pose (H0 x H1). inversion h. auto.
+(* App *)
+apply ATyAnn. apply (ATySub _ _ B _). 
+apply (ATyApp _ A). inversion IHhas_type_source1.
+inversion H1. rewrite <- H5 in H.
+auto.
+*)
+
+(* Typing rules of STLC, inspired by STLC_Tutorial *)
+Inductive has_type_st : (context STyp) -> (SExp var) -> STyp -> Prop :=
+  | STTyVar : forall Gamma x ty, List.Exists (fun a => (fst a) = x) Gamma ->
+                        has_type_st Gamma (STFVar _ x) ty
+  | STTyLit : forall Gamma x, has_type_st Gamma (STLit _ x) STInt       
+  | STTyLam : forall Gamma t A B L, (forall x, not (In x L) -> 
+                                 has_type_st (extend x A Gamma) (open t (STFVar _ x)) B) ->
+                           has_type_st Gamma (STLam _ t) (STFun A B)
+  | STTyApp : forall Gamma A B t1 t2, has_type_st Gamma t1 (STFun A B) ->
+                             has_type_st Gamma t2 A -> has_type_st Gamma (STApp _ t1 t2) B
+  | STTyPair : forall Gamma A B t1 t2, has_type_st Gamma t1 A ->
+                              has_type_st Gamma t2 B ->
+                              has_type_st Gamma (STPair _ t1 t2) (STTuple A B)
+  | STTyProj1 : forall Gamma t A B, has_type_st Gamma t (STTuple A B) ->
+                           has_type_st Gamma (STProj1 _ t) A
+  | STTyProj2 : forall Gamma t A B, has_type_st Gamma t (STTuple A B) ->
+                           has_type_st Gamma (STProj2 _ t) B.
+
+
+(* Type preservation: Theorem 1 *)
+Lemma type_preservation : forall x ty E (Gamma : context PTyp) (x : has_type_source Gamma x ty E),
+  has_type_st (∥ Gamma ∥) E (|ty|).
+Admitted.
+
+
 
 (* Completeness *)
 
@@ -1146,7 +1247,8 @@ simpl. simpl in H2.
 destruct t'; simpl in H2; inversion H2.
 inversion H1. simpl. rewrite <- H8 in H13.
 rewrite H7 in H12.
-inversion H1. simpl. rewrite H7 in H12.
+inversion H1. simpl.
+
 
 Lemma typ_sound : forall e d t Gamma, has_ty Gamma e d t -> exists e', has_type_source Gamma (erase e) t e' /\ (erase e = erase e').
 intros.
@@ -1346,86 +1448,3 @@ Admitted.
 
 
 
-Lemma typ_coherence : forall Gamma e d t E1, has_type_source_alg Gamma e d t E1 -> forall E2, has_type_source_alg Gamma e d t E2 -> E1 = E2.
-intros Gamma e d t E1 H.
-induction H; intros.
-(* case PFVar *)
-inversion H0. rewrite H6. auto.
-(* case STLit *)
-inversion H. rewrite H4. auto.
-(* Case App *)
-inversion H1.
-assert (Fun A B = Fun A0 B).
-apply (typ_inf_unique H H5). injection H9. intros.
-rewrite <- H9 in H5. rewrite <- H10 in H6.
-apply IHhas_type_source_alg1 in H5. 
-apply IHhas_type_source_alg2 in H6.
-rewrite H5. rewrite H6. auto.
-(* Case Merge *)
-inversion H1.
-apply IHhas_type_source_alg1 in H7.
-apply IHhas_type_source_alg2 in H9.
-rewrite H7. rewrite H9. auto.
-(* Case Ann *)
-inversion H0.
-apply IHhas_type_source_alg in H3. auto.
-(* Case Lam *)
-inversion H1.
-admit.
-inversion H2.
-(* ATySub *)
-inversion H1.
-admit.
-assert (A = A0).
-apply (typ_inf_unique H H2).
-rewrite <- H6 in H2.
-apply IHhas_type_source_alg in H2. rewrite H2.
-rewrite <- H6 in H3. 
-assert (WFTyp A). admit. assert (WFTyp B). admit.
-assert (C = C0).
-apply (sub_coherent H9 H10 H0 H3). rewrite H11. 
-auto.
-Admitted.
-
-(*
-Lemma has_type_completeness : forall Gamma e t, has_type_source Gamma e t -> has_type_source_alg Gamma (PAnn e t) Inf t.
-Proof.
-intros.
-induction H.
-(* Var *)
-apply ATyAnn. apply (ATySub _ _ ty _). apply ATyVar. auto. apply reflex.
-(* Lit *)
-apply ATyAnn. apply (ATySub _ _ PInt _). apply ATyLit. apply reflex.
-(* Lam *)
-apply ATyAnn. apply (ATyLam _ _ _ _ L). intros. 
-pose (H0 x H1). inversion h. auto.
-(* App *)
-apply ATyAnn. apply (ATySub _ _ B _). 
-apply (ATyApp _ A). inversion IHhas_type_source1.
-inversion H1. rewrite <- H5 in H.
-auto.
-*)
-
-(* Typing rules of STLC, inspired by STLC_Tutorial *)
-Inductive has_type_st : (context STyp) -> (SExp var) -> STyp -> Prop :=
-  | STTyVar : forall Gamma x ty, List.Exists (fun a => (fst a) = x) Gamma ->
-                        has_type_st Gamma (STFVar _ x) ty
-  | STTyLit : forall Gamma x, has_type_st Gamma (STLit _ x) STInt       
-  | STTyLam : forall Gamma t A B L, (forall x, not (In x L) -> 
-                                 has_type_st (extend x A Gamma) (open t (STFVar _ x)) B) ->
-                           has_type_st Gamma (STLam _ t) (STFun A B)
-  | STTyApp : forall Gamma A B t1 t2, has_type_st Gamma t1 (STFun A B) ->
-                             has_type_st Gamma t2 A -> has_type_st Gamma (STApp _ t1 t2) B
-  | STTyPair : forall Gamma A B t1 t2, has_type_st Gamma t1 A ->
-                              has_type_st Gamma t2 B ->
-                              has_type_st Gamma (STPair _ t1 t2) (STTuple A B)
-  | STTyProj1 : forall Gamma t A B, has_type_st Gamma t (STTuple A B) ->
-                           has_type_st Gamma (STProj1 _ t) A
-  | STTyProj2 : forall Gamma t A B, has_type_st Gamma t (STTuple A B) ->
-                           has_type_st Gamma (STProj2 _ t) B.
-
-
-(* Type preservation: Theorem 1 *)
-Lemma type_preservation : forall x ty E (Gamma : context PTyp) (x : has_type_source Gamma x ty E),
-  has_type_st (∥ Gamma ∥) E (|ty|).
-Admitted.
