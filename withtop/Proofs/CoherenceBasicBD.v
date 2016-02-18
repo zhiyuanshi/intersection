@@ -1498,7 +1498,41 @@ Proof.
   destruct H1.
   unfold not; intros HInv; inversion HInv; contradiction.
 Defined.
-  
+
+Lemma fv_open_distr :
+  forall t1 t2 x n, In x (fv_source (open_rec_source n t2 t1)) ->
+               In x (union (fv_source t1) (fv_source t2)).
+Proof.
+  intros.
+  generalize dependent t2.
+  generalize dependent n.
+  induction t1; intros; simpl in *; rewrite union_spec in *; auto.
+  - destruct (Nat.eqb n0 n); auto. 
+  - rewrite <- union_spec.
+    eapply IHt1.
+    apply H.
+  - rewrite union_spec.
+    inversion H.
+    rewrite or_comm at 1.
+    rewrite <- or_assoc.
+    left; rewrite or_comm; rewrite <- union_spec.
+    eapply IHt1_1; apply H0.
+    rewrite or_assoc.
+    right; rewrite <- union_spec.
+    eapply IHt1_2; apply H0.
+  - rewrite union_spec.
+    inversion H.
+    rewrite or_comm at 1.
+    rewrite <- or_assoc.
+    left; rewrite or_comm; rewrite <- union_spec.
+    eapply IHt1_1; apply H0.
+    rewrite or_assoc.
+    right; rewrite <- union_spec.
+    eapply IHt1_2; apply H0.
+  - rewrite <- union_spec.
+    eapply IHt1; apply H.
+Defined.
+    
 Lemma typing_strengthen_alg : forall z U E F t dir T d,
   not (In z (fv_source t)) ->
   has_type_source_alg (E ++ ((z,U) :: nil) ++ F) t dir T d ->
@@ -1642,19 +1676,38 @@ Definition tylam : forall {Gamma t A B} L,
   (forall x, not (In x L) -> 
         has_ty (extend x A Gamma) (open_source t (PFVar x)) Chk B) ->
   has_ty Gamma (PLam t) Chk (Fun A B).
-intros.
-unfold has_ty.  
-unfold has_ty in H.
-pick_fresh y. 
-rewrite union_spec in Fr.
-apply not_or_and in Fr.
-destruct Fr.
-rewrite union_spec in H0.
-apply not_or_and in H0.
-destruct H0.
-pose (H y H0). destruct e. exists (STLam _ (STLam var x)).
-apply_fresh ATyLam as x.
-
+Proof.
+  intros.
+  unfold has_ty.  
+  unfold has_ty in H.
+  pick_fresh y. 
+  rewrite union_spec in Fr.
+  apply not_or_and in Fr.
+  destruct Fr.
+  rewrite union_spec in H0.
+  apply not_or_and in H0.
+  destruct H0.
+  pose (H y H0). destruct e. exists (STLam _ x).
+  apply_fresh ATyLam as x.
+  unfold open_source.
+  erewrite <- open_rec_source_term.
+  unfold open_source in H3.
+  rewrite <- open_rec_source_term in H3.
+  eapply typing_strengthen_alg with (z := y) (U := A).
+  assumption.
+  unfold extend in H3.
+  rewrite <- app_nil_l with (l := ((y, A) :: nil) ++ Gamma) in H3.
+  apply typing_weaken_alg with (F := (y0, A) :: nil) in H3.
+  rewrite app_nil_l in H3.
+  apply H3.
+  rewrite app_nil_l in *.
+  apply Ok_push.
+  admit. (* provable via H3 *)
+  not_in_L y0.
+  now rewrite MSetProperties.FM.singleton_iff in H9.
+  admit. (* provable via H3 *)
+  admit. (* provable via H3 *)
+  admit. (* provable via H3 *)
 Admitted.
 
 Lemma tysub : forall Gamma t A B, has_ty Gamma t Inf A -> Sub A B -> has_ty Gamma t Chk B.
@@ -1823,6 +1876,7 @@ induction H; intros.
   apply IHhas_type_source_alg in H3. auto.
 (* Case Lam *)
 - inversion H1.
+  subst.
   admit.
   inversion H2.
   admit.
