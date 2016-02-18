@@ -456,7 +456,8 @@ Module EqFacts := BoolEqualityFacts(VarTyp).
 
 Definition context (A : Type) := list (var * A). 
 
-Definition extend {A} (x : var) (a : A) (c : context A) : context A := c ++ ((x,a) :: nil).
+Definition extend {A} (x : var) (a : A) (c : context A) : context A :=
+  ((x,a) :: nil) ++ c.
 
 Definition dom {A} (c : context A) : vars :=
   fold_right (fun el r => add (fst el) r) empty c.
@@ -642,7 +643,7 @@ Notation "'∥' t '∥'" := (conv_context t) (at level 60).
 Inductive ok {A} : context A -> Prop :=
   | Ok_nil : ok nil
   | Ok_push : forall (E : context A) (v : var) (ty : A),
-                ok E -> not (In v (dom E)) -> ok (E ++ ((v,ty) :: nil)).        
+                ok E -> not (In v (dom E)) -> ok (extend v ty E).        
 
 Hint Constructors ok.
 
@@ -812,19 +813,31 @@ Proof.
 Defined.
 
 
-Fixpoint subst (z : var) (u : PExp) (t : PExp) {struct t} : PExp :=
+Fixpoint subst_source (z : var) (u : PExp) (t : PExp) {struct t} : PExp :=
   match t with
     | PBVar i     => PBVar i
     | PFVar x     => if VarTyp.eqb x z then u else (PFVar x)
     | PLit i      => PLit i
-    | PLam t1     => PLam (subst z u t1)
-    | PApp t1 t2  => PApp (subst z u t1) (subst z u t2)
-    | PMerge t1 t2 => PMerge (subst z u t1) (subst z u t2)
-    | PAnn t1 t2  => PAnn (subst z u t1) t2 
+    | PLam t1     => PLam (subst_source z u t1)
+    | PApp t1 t2  => PApp (subst_source z u t1) (subst_source z u t2)
+    | PMerge t1 t2 => PMerge (subst_source z u t1) (subst_source z u t2)
+    | PAnn t1 t2  => PAnn (subst_source z u t1) t2 
   end.
 
-Lemma subst_fresh : forall t x u, 
-  not (In x (fv_source t)) -> subst x u t = t.
+Fixpoint subst (z : var) (u : SExp var) (t : SExp var) {struct t} : SExp var :=
+  match t with
+    | STBVar _ i     => STBVar _ i
+    | STFVar _ x     => if VarTyp.eqb x z then u else (STFVar _ x)
+    | STLit _ i      => STLit _ i
+    | STLam _ t1   => STLam _ (subst z u t1)
+    | STApp _ t1 t2  => STApp _ (subst z u t1) (subst z u t2)
+    | STPair _ t1 t2 => STPair _ (subst z u t1) (subst z u t2)
+    | STProj1 _ t    => STProj1 _ (subst z u t)
+    | STProj2 _ t    => STProj2 _ (subst z u t)
+  end.
+
+Lemma subst_source_fresh : forall t x u, 
+  not (In x (fv_source t)) -> subst_source x u t = t.
 Proof.
   intro t.
   induction t; intros; auto.
@@ -854,8 +867,8 @@ Defined.
 
 (** Substitution distributes on the open operation. *)
 
-Lemma subst_open : forall x u t1 t2, PTerm u -> 
-  subst x u (open_source t1 t2) = open_source (subst x u t1) (subst x u t2).
+Lemma subst_source_open : forall x u t1 t2, PTerm u -> 
+  subst_source x u (open_source t1 t2) = open_source (subst_source x u t1) (subst_source x u t2).
 Proof.
   intros. unfold open_source. generalize 0.
   induction t1; intros; simpl.
@@ -879,10 +892,10 @@ Defined.
 
 (** Substitution and open_var for distinct names commute. *)
 
-Lemma subst_open_var : forall (x y : var) u t, not (x == y) -> PTerm u ->
-  open_source (subst x u t) (PFVar y) = subst x u (open_source t (PFVar y)).
+Lemma subst_source_open_var : forall (x y : var) u t, not (x == y) -> PTerm u ->
+  open_source (subst_source x u t) (PFVar y) = subst_source x u (open_source t (PFVar y)).
 Proof.
-  intros. rewrite subst_open. simpl.
+  intros. rewrite subst_source_open. simpl.
   case_eq (eqb y x); intros.
   apply eqb_eq in H1.
   exfalso; apply H; symmetry. assumption.
@@ -893,13 +906,13 @@ Defined.
 (** Opening up an abstraction of body [t] with a term [u] is the same as opening
   up the abstraction with a fresh name [x] and then substituting [u] for [x]. *)
 
-Lemma subst_intro : forall x t u, 
+Lemma subst_source_intro : forall x t u, 
   not (In x (fv_source t)) -> PTerm u ->
-  open_source t u = subst x u (open_source t (PFVar x)).
+  open_source t u = subst_source x u (open_source t (PFVar x)).
 Proof.
   intros.
-  rewrite subst_open; [ | assumption ].
-  rewrite subst_fresh; [ | assumption ].
+  rewrite subst_source_open; [ | assumption ].
+  rewrite subst_source_fresh; [ | assumption ].
   simpl.
   case_eq (eqb x x); intros.
   reflexivity.
@@ -917,19 +930,19 @@ Defined.
     predicate capturing that a term [t] is the body of a locally
     closed abstraction. *)
 
-Definition body t :=
+Definition body_source t :=
   exists L, forall x, not (In x L) -> PTerm (open_source t (PFVar x)).
 
 (** We then show how to introduce and eliminate [body t]. *)
 
-Lemma term_abs_to_body : forall t1, 
-  PTerm (PLam t1) -> body t1.
+Lemma term_abs_to_body_source : forall t1, 
+  PTerm (PLam t1) -> body_source t1.
 Proof.
-  intros; unfold body; inversion H; subst; exists L; assumption.
+  intros; unfold body_source; inversion H; subst; exists L; assumption.
 Defined.
 
-Lemma body_to_term_abs : forall t1, 
-  body t1 -> PTerm (PLam t1).
+Lemma body_source_to_term_abs : forall t1, 
+  body_source t1 -> PTerm (PLam t1).
 Proof. intros. inversion H. apply_fresh PTerm_Lam as x. apply H0.
        unfold not in *. intros; apply Fry; apply union_spec; auto.
 Defined.
@@ -938,8 +951,8 @@ Defined.
 
 (** We prove that terms are stable by substitution *)
 
-Lemma subst_term : forall t z u,
-  PTerm u -> PTerm t -> PTerm (subst z u t).
+Lemma subst_source_term : forall t z u,
+  PTerm u -> PTerm t -> PTerm (subst_source z u t).
 Proof.
   induction 2; simpl; auto.
   destruct (eqb x z).
@@ -948,7 +961,7 @@ Proof.
   - apply PTerm_Var.
   (* Lam *)
   - apply_fresh PTerm_Lam as x.
-    rewrite subst_open_var.
+    rewrite subst_source_open_var.
     apply H1. unfold not in *.
     intros; apply Frx.
     apply union_spec; left.
@@ -964,7 +977,7 @@ Proof.
     assumption.
 Defined.
 
-Hint Resolve subst_term.
+Hint Resolve subst_source_term.
 
 Lemma type_correct_source_terms : forall Gamma E ty e, has_type_source Gamma E ty e -> PTerm E.
 Proof.
@@ -974,7 +987,15 @@ Proof.
   apply H0; not_in_L x.
 Defined.
 
-Lemma typing_weaken : forall G E F t T d,
+Lemma type_correct_source_terms' : forall Gamma E ty e, has_type_source Gamma E ty e -> PTerm E.
+Proof.
+  intros.
+  induction H; auto.
+  apply_fresh PTerm_Lam as x; auto.
+  apply H0; not_in_L x.
+Defined.
+  
+Lemma typing_weaken_source : forall G E F t T d,
    has_type_source (E ++ G) t T d -> 
    ok (E ++ F ++ G) ->
    has_type_source (E ++ F ++ G) t T d.
@@ -983,7 +1004,7 @@ Proof.
   generalize dependent H0.
   remember (E ++ G) as H'.
   generalize dependent HeqH'.
-  generalize dependent G.
+  generalize dependent E.
   dependent induction H; intros; eauto.
   (* STTyVar *)
   - subst.
@@ -997,16 +1018,15 @@ Proof.
   - unfold extend in *.
     apply_fresh TyLam as x.
     unfold open in *; simpl in *.
-    unfold extend; do 2 rewrite <- app_assoc.
+    unfold extend.
+    rewrite app_assoc.
     apply H0.
     not_in_L x.
     rewrite HeqH'.
-    rewrite app_assoc.
-    reflexivity.
-    rewrite app_assoc.
-    rewrite app_assoc.
-    apply Ok_push.
     rewrite <- app_assoc.
+    reflexivity.
+    rewrite <- app_assoc.
+    apply Ok_push.
     assumption.
     repeat (rewrite dom_union; rewrite M.union_spec).
     repeat rewrite M.union_spec in Frx.
@@ -1015,12 +1035,91 @@ Proof.
     assumption.
 Defined.
 
-Lemma typing_subst_core : forall F E t T z u U d,
-  has_type_source (((extend z U) E) ++ F) t T d ->
-  (exists d', has_type_source E u U d') ->
-  has_type_source (E ++ F) (subst z u t) T d.
+Lemma cons_to_push : forall {A} x v (E : context A),
+  (x, v) :: E = extend x v E.
+Proof. intros; unfold extend; simpl; reflexivity. Defined.
+
+Lemma env_ind : forall {A} (P : context A -> Prop),
+  (P nil) ->
+  (forall E x v, P E -> P (extend x v E)) ->
+  (forall E, P E).
 Proof.
-  (*
+  unfold extend.
+  induction E as [|(x,v)].
+  assumption.
+  pose (H0 _ x v IHE).
+  now simpl in p.
+Defined.
+
+Lemma ok_app_l : forall {A} (E F : context A), ok (E ++ F) -> ok E.
+Proof.
+  intros A E; induction E; intros.
+  apply Ok_nil.
+  inversion H.
+  subst.
+  apply Ok_push.
+  apply (IHE _ H2).
+  not_in_L v.
+Defined.  
+  
+Lemma ok_app_r : forall {A} (E F : context A), ok (E ++ F) -> ok F.
+Proof.
+  intros A E.
+  induction E; intros.
+  - rewrite app_nil_l in H.
+    auto.
+  - inversion H; subst.
+    apply (IHE _ H2).
+Defined.
+
+Definition ok_app_and {A} (E F : context A) (H : ok (E ++ F)) : ok E /\ ok F :=
+  conj (ok_app_l _ _ H) (ok_app_r _ _ H).
+
+(*
+Lemma ok_app_and : forall {A} (E F : context A), ok (E ++ F) -> ok E /\ ok F.
+Proof.
+  intros A E F H; split; [ apply (ok_app_l _ _ H) | apply (ok_app_r _ _ H) ].
+Defined.
+*)
+  
+Lemma typing_subst_source : forall F E t T z u U d d',
+  has_type_source (((extend z U) E) ++ F) t T d ->
+  has_type_source E u U d' ->
+  has_type_source (E ++ F) (subst_source z u t) T (subst_source z u d).
+Proof.
+  intros.
+  remember (extend z U E ++ F).
+  generalize dependent Heql.
+  generalize dependent F.
+  induction t0.
+  - intros.
+    subst.
+    inversion H; subst.
+    simpl.
+    pose (VarTyp.eq_dec v z) as Hdec.
+    destruct Hdec.
+    apply eqb_eq in e.
+    rewrite e.
+    apply in_app_or in H4.
+    inversion H4.
+    apply eqb_eq in e.
+    admit.
+    admit.
+    rewrite <- eqb_eq in n.
+    
+    destruct (v =? z).
+    exfalso; apply n; reflexivity.
+    apply TyVar.
+    unfold extend in H2.
+    rewrite <- app_assoc in H2.
+    now apply ok_app_r in H2.
+    unfold extend in H4.
+    rewrite <- app_assoc in H4.
+    apply in_app_or in H4.
+    inversion H2; subst.
+Admitted.
+    
+(*
   introv Typt Typu. gen_eq G: (E & z ~ U & F). gen F.
   induction Typt; intros G Equ; subst; simpl subst.
   case_var.
@@ -1030,7 +1129,6 @@ Proof.
    rewrite* subst_open_var. apply_ih_bind* H0.
   apply* typing_app.
 *)
-Admitted.
 
 (* Smart constructors *)
 
@@ -1063,8 +1161,10 @@ intros.
 
 assert (forall {y z}, not (z = y) -> not (In y (fv_source t0)) -> not (In z (fv_source t0)) -> has_type_source (extend y A Gamma) (open_source t0 (PFVar y)) B x -> has_type_source (extend z A Gamma) (open_source t0 (PFVar z)) B x).
 intros.
-rewrite subst_intro with (x := y0). Check typing_subst_core.
-rewrite <- app_nil_r with (l := (extend z0 A Gamma)).
+admit.
+(*
+rewrite subst_intro with (x := y0).
+unfold extend. Check typing_subst_core.
 apply typing_subst_core with (U := A).
 assert (forall t, has_type_source (extend z0 A (extend y0 A Gamma) ++ nil) t B x ->
 has_type_source (extend y0 A (extend z0 A Gamma) ++ nil) t B x). admit.
@@ -1104,7 +1204,7 @@ rewrite <- open_rec_source_term.
 reflexivity.
 admit.
 rewrite H6. auto.
-admit.
+admit.*)
 Admitted.
 
 Definition tapp : forall Gamma A B t1 t2,
@@ -1161,117 +1261,6 @@ Inductive has_type_source_alg : context PTyp -> PExp -> Dir -> PTyp -> (SExp var
   | ATySub : forall Gamma t A B C E, has_type_source_alg Gamma t Inf A E -> sub A B C -> has_type_source_alg Gamma t Chk B (STApp _ (C var) E).
 
 Hint Constructors has_type_source_alg.
-
-(* Ignoring the generated expressions + smart constructors *)
-
-Definition has_ty Gamma e d t := exists E, has_type_source_alg Gamma e d t E.
-
-Definition tyvar : forall Gamma x ty, ok Gamma -> List.In (x,ty) Gamma ->
-                                      has_ty Gamma (PFVar x) Inf ty.
-intros.
-unfold has_ty. exists (STFVar _ x). apply ATyVar; auto.
-Defined.
-
-Definition tylit : forall Gamma x, ok Gamma -> has_ty Gamma (PLit x) Inf PInt.
-intros. unfold has_ty.
-exists (STLit _ x); auto.
-Defined.
-
-Definition tyapp : forall Gamma A B t1 t2,
-              has_ty Gamma t1 Inf (Fun A B) ->
-              has_ty Gamma t2 Chk A ->
-              has_ty Gamma (PApp t1 t2) Inf B.
-intros. unfold has_ty.
-inversion H. inversion H0.
-exists (STApp _ x x0).
-apply (ATyApp _ A). auto. auto.
-Defined.
-
-Definition tymerge : forall Gamma A B t1 t2,
-                has_ty Gamma t1 Inf A ->
-                has_ty Gamma t2 Inf B ->
-                has_ty Gamma (PMerge t1 t2) Inf (And A B).
-intros.
-inversion H. inversion H0.
-unfold has_ty. exists (STPair _ x x0). apply ATyMerge. auto. auto.
-Defined.
-
-Definition tyann : forall Gamma t1 A, has_ty Gamma t1 Chk A -> has_ty Gamma (PAnn t1 A) Inf A.
-intros. inversion H. unfold has_ty. exists x. apply ATyAnn. auto.
-Defined.
-
-
-Definition tylam : forall {Gamma t A B} L,
-  (forall x, not (In x L) -> 
-        has_ty (extend x A Gamma) (open_source t (PFVar x)) Chk B) ->
-  has_ty Gamma (PLam t) Chk (Fun A B).
-intros.
-unfold has_ty.  
-unfold has_ty in H.
-pick_fresh y. 
-rewrite union_spec in Fr.
-apply not_or_and in Fr.
-destruct Fr.
-rewrite union_spec in H0.
-apply not_or_and in H0.
-destruct H0.
-pose (H y H0). destruct e. exists (STLam _ (STLam var x)).
-apply_fresh ATyLam as x.
-Admitted.
-
-Lemma tysub : forall Gamma t A B, has_ty Gamma t Inf A -> Sub A B -> has_ty Gamma t Chk B.
-intros.
-unfold has_ty.
-inversion H. inversion H0.
-exists ((STApp _ (x0 var) x)).
-apply  (ATySub _ _ A). auto. auto.
-Defined.
-
-Fixpoint erase (e : PExp) : PExp :=
-  match e with
-    | PFVar x => PFVar x
-    | PBVar x => PBVar x
-    | PLit x => PLit x
-    | PLam e => PLam (erase e)
-    | PApp e1 e2 => PApp (erase e1) (erase e2)
-    | PMerge e1 e2 => PMerge (erase e1) (erase e2)
-    | PAnn e t => erase e
-  end.
-
-(* Uniqueness *)
-
-Definition almost_unique (A B : PTyp) (d : Dir) : Prop := 
-  match d with
-    | Inf => A = B
-    | Chk => True (* Is this result useful for checking: exists C, Sub C A /\ Sub C B*)
-  end.
-
-(*
-Lemma typ_unique : forall Gamma e t1 E1, has_type_source_alg Gamma e Inf t1 E1 -> forall t2 E2, has_type_source_alg Gamma e Inf t2 E2 -> t1 = t2.
-intros Gamma e t1 E1 H.
-induction H; intros; unfold almost_unique.
-(* case Var *)
-inversion H0. 
-admit. (* TODO *)
-(* Case Lit *)
-inversion H. auto.
-(* case App *)
-inversion H1.
-apply IHhas_type_source_alg1 in H5. simpl in H5.
-apply IHhas_type_source_alg2 in H6.
-injection H5. intros. auto.
-(* Case Merge *)
-inversion H1.
-apply IHhas_type_source_alg1 in H5.
-apply IHhas_type_source_alg2 in H6.
-rewrite H5. rewrite H6. auto.
-(* Case Ann *)
-inversion H0. auto.
-(* Case Lam *)
-inversion H1.
-auto. auto.
-*)
-
 
 Lemma list_impl_m : forall {A} Gamma x (v : A), List.In (x, v) Gamma -> M.In x (dom Gamma).
 Proof.
@@ -1403,39 +1392,324 @@ Proof.
   inversion H2.
   simpl in *; subst.
   inversion H0.
-  apply in_app_or in H5.
-  apply in_app_or in H6.
   inversion H5; inversion H6.
-  apply list_impl_m in H7; apply (MSetProperties.Dec.F.In_1 H4) in H7; contradiction.
-  apply list_impl_m in H7; apply (MSetProperties.Dec.F.In_1 H4) in H7; contradiction.
-  apply list_impl_m in H8; apply (MSetProperties.Dec.F.In_1 H4) in H8; contradiction.
-  inversion H7.
-  inversion H9.
-  subst.
-  inversion H8.
-  inversion H10; subst; reflexivity.
-  inversion H10.
-  inversion H9.
+  inversion H8; subst; reflexivity.
+  inversion H7; subst.
+  apply list_impl_m in H8; contradiction.
+  inversion H8; subst; reflexivity.
+  now apply IHok.
 
   inversion H3.
   simpl in *; subst.
   inversion H0.
-  apply in_app_or in H5.
-  apply in_app_or in H6.
-  inversion H5; inversion H6.  
-  apply list_impl_m in H7; apply (MSetProperties.Dec.F.In_1 H4) in H7; contradiction.
-  apply list_impl_m in H7; apply (MSetProperties.Dec.F.In_1 H4) in H7; contradiction.
-  apply list_impl_m in H8; apply (MSetProperties.Dec.F.In_1 H4) in H8; contradiction.
-  inversion H7.
-  inversion H9; subst; reflexivity.
-  inversion H9.
+  inversion H5; inversion H6.
+  inversion H7; inversion H8; subst; reflexivity.
+  inversion H7; subst; reflexivity.
+  inversion H8; subst.
+  apply list_impl_m in H7; contradiction.
+  now apply IHok.
+
     
   apply IHok.
   inversion H0; clear H0.
   split; [ (apply in_app_or in H4; inversion H4) | (apply in_app_or in H5; inversion H5) ]; try assumption; inversion H0; inversion H6; simpl in *; subst;
   exfalso; [ apply H2 | apply H3 ]; reflexivity.
+Defined.  
+
+(*
+Lemma type_correct_terms : forall Gamma E ty e, has_type_source Gamma E ty e -> STerm E.
+Proof.
+  intros.
+  induction H; auto.
+  apply_fresh PTerm_Lam as x; auto.
+  apply H0; not_in_L x.
+Defined.
+  *) 
+    
+    
+Lemma typing_weaken_alg : forall G E F t T d dir,
+   has_type_source_alg (E ++ G) t dir T d -> 
+   ok (E ++ F ++ G) ->
+   has_type_source_alg (E ++ F ++ G) t dir T d.
+Proof.
+  intros.
+  generalize dependent H0.
+  remember (E ++ G) as H'.
+  generalize dependent HeqH'.
+  generalize dependent E.
+  dependent induction H; intros; eauto.
+  (* STTyVar *)
+  - subst.
+    apply ATyVar.
+    assumption.
+    apply in_app_or in H0.
+    inversion H0.
+    apply in_or_app; left; assumption.
+    apply in_or_app; right; apply in_or_app; right; assumption.
+  (* STTyLam *)
+  - unfold extend in *.
+    apply_fresh ATyLam as x.
+    unfold open in *; simpl in *.
+    unfold extend.
+    rewrite app_assoc.
+    apply H0.
+    not_in_L x.
+    rewrite HeqH'.
+    rewrite <- app_assoc.
+    reflexivity.
+    rewrite <- app_assoc.
+    apply Ok_push.
+    assumption.
+    repeat (rewrite dom_union; rewrite M.union_spec).
+    repeat rewrite M.union_spec in Frx.
+    repeat rewrite or_assoc in *.
+    unfold not; intro HInv; destruct HInv as [HInv | [HInv | HInv]]; apply Frx; auto 8.
+    assumption.
+Defined.
+
+Lemma ok_weaken : forall A (E F G : context A), ok (E ++ F ++ G) -> ok (E ++ G).
+Proof.
+  intros.
+  remember (E ++ F ++ G).
+  generalize dependent Heql.
+  generalize dependent F.
+
+  dependent induction E.
+  simpl.
+  intros; subst.
+  now apply ok_app_r in H.
+  intros.
+  subst; simpl in *.
+  destruct a.
+  change ((v, a) :: E ++ G) with (extend v a (E ++ G)).
+  apply Ok_push.
+  eapply IHE.
+  inversion H; subst.
+  apply H2.
+  reflexivity.
+  inversion H.
+  subst.
+  rewrite dom_union in *.
+  rewrite union_spec in *.
+  apply not_or_and in H4.
+  destruct H4.
+  rewrite dom_union, union_spec in H1.
+  apply not_or_and in H1.
+  destruct H1.
+  unfold not; intros HInv; inversion HInv; contradiction.
 Defined.
   
+Lemma typing_strengthen_alg : forall z U E F t dir T d,
+  not (In z (fv_source t)) ->
+  has_type_source_alg (E ++ ((z,U) :: nil) ++ F) t dir T d ->
+  has_type_source_alg (E ++ F) t dir T d.
+Proof.
+  intros.
+  remember (E ++ ((z,U) :: nil) ++ F).
+  
+  generalize dependent Heql.
+  generalize dependent E.
+  
+  induction H0; intros; auto.
+  - subst; apply ATyVar.
+    now apply ok_weaken in H0.
+    apply in_or_app.
+    repeat apply in_app_or in H1.
+    inversion H1.
+    auto.
+    apply in_app_or in H2.
+    inversion H2.
+    inversion H3.
+    inversion H4.
+    subst.
+    exfalso; apply H; simpl.
+    left; reflexivity.
+    inversion H4.
+    auto.
+  - apply ATyLit.
+    subst.
+    now apply ok_weaken in H0.
+  - eapply ATyApp.
+    subst.
+    apply IHhas_type_source_alg1; simpl in *; not_in_L z; reflexivity.
+    subst.
+    apply IHhas_type_source_alg2; simpl in *; not_in_L z; reflexivity.
+  - subst.
+    apply ATyMerge.
+    apply IHhas_type_source_alg1; simpl in *; not_in_L z; reflexivity.
+    apply IHhas_type_source_alg2; simpl in *; not_in_L z; reflexivity.
+  - subst.
+    apply_fresh ATyLam as x.
+    unfold extend in *; simpl in *.
+    rewrite app_comm_cons.
+    apply H1.
+    not_in_L x.
+    admit. (* fv(open t1 t2) = fv t1 U fv t2 *)
+    rewrite app_comm_cons.
+    reflexivity.
+    assumption.
+Admitted.    
+    
+Lemma typing_subst_source_alg : forall F E t T z u U d d' dir,
+  has_type_source_alg (((extend z U) E) ++ F) t dir T d ->
+  has_type_source_alg E u dir U d' ->
+  has_type_source_alg (E ++ F) (subst_source z u t) dir T (subst z d' d).
+Proof.
+  intros.
+  remember (extend z U E ++ F).
+  generalize dependent F.
+  dependent induction t0; intros.
+  - inversion H; subst.
+    simpl in *.
+    assert (HaA : sumbool (MDec.eq (z,U) (v, T)) (not (MDec.eq (z,U) (v, T)))).
+    apply MDec.eq_dec.
+    destruct HaA.
+    inversion e.
+    simpl in *.
+    symmetry in H1.
+    case_eq (VarTyp.eqb v z).
+    intros; subst.
+    rewrite <- app_nil_r with (l := (E ++ F)).
+    rewrite <- app_assoc.
+    apply typing_weaken_alg.
+    now rewrite app_nil_r.
+    rewrite app_nil_r.
+    now inversion H2.
+    intros; subst.
+    rewrite H1 in H5.
+    apply EqFacts.eqb_neq in H5.
+    exfalso; now apply H5.
+    case_eq (VarTyp.eqb v z).
+    unfold MDec.eq in n.
+    apply not_and_or in n.
+    intros.
+    simpl in *.
+    inversion n.
+    apply eqb_eq in H1.
+    exfalso; now apply H3.
+    inversion H4.
+    inversion H5.
+    contradiction.
+    inversion H2; subst.
+    apply eqb_eq in H1.
+    apply list_impl_m in H5.
+    rewrite H1 in H5.
+    contradiction.
+    intros.
+Admitted.
+  
+  
+(* Ignoring the generated expressions + smart constructors *)
+
+Definition has_ty Gamma e d t := exists E, has_type_source_alg Gamma e d t E.
+
+Definition tyvar : forall Gamma x ty, ok Gamma -> List.In (x,ty) Gamma ->
+                                      has_ty Gamma (PFVar x) Inf ty.
+intros.
+unfold has_ty. exists (STFVar _ x). apply ATyVar; auto.
+Defined.
+
+Definition tylit : forall Gamma x, ok Gamma -> has_ty Gamma (PLit x) Inf PInt.
+intros. unfold has_ty.
+exists (STLit _ x); auto.
+Defined.
+
+Definition tyapp : forall Gamma A B t1 t2,
+              has_ty Gamma t1 Inf (Fun A B) ->
+              has_ty Gamma t2 Chk A ->
+              has_ty Gamma (PApp t1 t2) Inf B.
+intros. unfold has_ty.
+inversion H. inversion H0.
+exists (STApp _ x x0).
+apply (ATyApp _ A). auto. auto.
+Defined.
+
+Definition tymerge : forall Gamma A B t1 t2,
+                has_ty Gamma t1 Inf A ->
+                has_ty Gamma t2 Inf B ->
+                has_ty Gamma (PMerge t1 t2) Inf (And A B).
+intros.
+inversion H. inversion H0.
+unfold has_ty. exists (STPair _ x x0). apply ATyMerge. auto. auto.
+Defined.
+
+Definition tyann : forall Gamma t1 A, has_ty Gamma t1 Chk A -> has_ty Gamma (PAnn t1 A) Inf A.
+intros. inversion H. unfold has_ty. exists x. apply ATyAnn. auto.
+Defined.
+
+
+Definition tylam : forall {Gamma t A B} L,
+  (forall x, not (In x L) -> 
+        has_ty (extend x A Gamma) (open_source t (PFVar x)) Chk B) ->
+  has_ty Gamma (PLam t) Chk (Fun A B).
+intros.
+unfold has_ty.  
+unfold has_ty in H.
+pick_fresh y. 
+rewrite union_spec in Fr.
+apply not_or_and in Fr.
+destruct Fr.
+rewrite union_spec in H0.
+apply not_or_and in H0.
+destruct H0.
+pose (H y H0). destruct e. exists (STLam _ (STLam var x)).
+apply_fresh ATyLam as x.
+
+Admitted.
+
+Lemma tysub : forall Gamma t A B, has_ty Gamma t Inf A -> Sub A B -> has_ty Gamma t Chk B.
+intros.
+unfold has_ty.
+inversion H. inversion H0.
+exists ((STApp _ (x0 var) x)).
+apply  (ATySub _ _ A). auto. auto.
+Defined.
+
+Fixpoint erase (e : PExp) : PExp :=
+  match e with
+    | PFVar x => PFVar x
+    | PBVar x => PBVar x
+    | PLit x => PLit x
+    | PLam e => PLam (erase e)
+    | PApp e1 e2 => PApp (erase e1) (erase e2)
+    | PMerge e1 e2 => PMerge (erase e1) (erase e2)
+    | PAnn e t => erase e
+  end.
+
+(* Uniqueness *)
+
+Definition almost_unique (A B : PTyp) (d : Dir) : Prop := 
+  match d with
+    | Inf => A = B
+    | Chk => True (* Is this result useful for checking: exists C, Sub C A /\ Sub C B*)
+  end.
+
+(*
+Lemma typ_unique : forall Gamma e t1 E1, has_type_source_alg Gamma e Inf t1 E1 -> forall t2 E2, has_type_source_alg Gamma e Inf t2 E2 -> t1 = t2.
+intros Gamma e t1 E1 H.
+induction H; intros; unfold almost_unique.
+(* case Var *)
+inversion H0. 
+admit. (* TODO *)
+(* Case Lit *)
+inversion H. auto.
+(* case App *)
+inversion H1.
+apply IHhas_type_source_alg1 in H5. simpl in H5.
+apply IHhas_type_source_alg2 in H6.
+injection H5. intros. auto.
+(* Case Merge *)
+inversion H1.
+apply IHhas_type_source_alg1 in H5.
+apply IHhas_type_source_alg2 in H6.
+rewrite H5. rewrite H6. auto.
+(* Case Ann *)
+inversion H0. auto.
+(* Case Lam *)
+inversion H1.
+auto. auto.
+*)
+
 
 Lemma typ_unique : forall Gamma e d t1 E1, has_type_source_alg Gamma e d t1 E1 -> forall t2 E2, has_type_source_alg Gamma e d t2 E2 -> almost_unique t1 t2 d.
 intros Gamma e d t1 E1 H.
@@ -1728,4 +2002,4 @@ unfold open_source in h. unfold open_source.
 rewrite (erase_open t0 0 (PFVar x)) in h. auto.
 (* Sub *)
 apply (tsub _ _ A). auto. unfold Sub. exists C. auto.
-Defined.
+Defined. 
