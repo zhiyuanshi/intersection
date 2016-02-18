@@ -116,7 +116,7 @@ TODO: Emphasize differences to Dunfield better earlier on in the paper.
 > character".  The next sentence does the same thing: "…or any
 > function"; say "…and any function" instead.
 
-TODO: Fix this!
+FIXED
 
 > The example is somewhat under-motivated: there is little practical
 > value in restricting an identity function to a particular
@@ -124,12 +124,12 @@ TODO: Fix this!
 > argument, and the second one call a function "toUppercase" or
 > something. This would strengthen the example.
 
-TODO: Follow advice.
+FIXED
  
 > Under "Merge Operator", an example of a merge is given first and, a
 > little later, the notation is explained; I would expect the reverse.
 
-TODO: Fix?
+FIXED
 
 > The last sentence of 2.1, "…the compiler uses the type system to
 > extract the corresponding value": I think this could be made more
@@ -137,7 +137,7 @@ TODO: Fix?
 > contains "fst".  That is, clarify that the extraction happens at run
 > time, not at compile time.
 
-TODO: Fix this.
+FIXED
 
 > In section 2.2, the paper (correctly) argues that a biased choice of
 > branch is unsatisfying; however, it doesn't mention another
@@ -148,7 +148,7 @@ TODO: Fix this.
 > favouring the left (or right) value in the merge, and it seems worth
 > mentioning at this point.
 
-TODO: Mention alternative?
+FIXED
 
 > In 2.2, incoherence is introduced before coherence is defined in 2.3.
 > Perhaps it should be the other way around?

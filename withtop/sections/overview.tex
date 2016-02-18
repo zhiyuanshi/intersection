@@ -30,45 +30,44 @@ which can be used as either values of type $A$ or of type $B$. For instance,
 consider the following program in \name:
 
 \begin{lstlisting}
-let x : Int & Char = (*$ \ldots $*) in -- definition omitted
-let idInt (y : Int) : Int = y in
-let idChar (y : Char) : Char = y in
-(idInt x, idChar x)
+let x : Int & Bool = (*$ \ldots $*) in -- definition omitted
+let succ (y : Int) : Int = y+1 in
+let not (y : Bool) : Bool = if y then False else True in
+(succ x, not x)
 \end{lstlisting}
 
-\noindent If a value \lstinline{x} has type \lstinline{Int & Char} then
-\lstinline{x} can be used as an integer or as a character. Therefore,
+\noindent If a value \lstinline{x} has type \lstinline{Int & Bool} then
+\lstinline{x} can be used as an integer and as a boolean. Therefore,
 \lstinline{x} can be used as an argument to any function that takes
-an integer as an argument, or any
-function that take a character as an argument. In the program above
-the functions \lstinline{idInt} and \lstinline{idChar} are the
-identity functions on integers and characters, respectively.
+an integer as an argument, and any
+function that take a boolean as an argument. In the program above
+the functions \lstinline{succ} and \lstinline{not} are the
+simple functions on integers and characters, respectively.
 Passing \lstinline{x} as an argument to either one (or both) of the
 functions is valid.
 
 \paragraph{Merge Operator.}
-In the previous program we deliberately did not show how to introduce values of
-an intersection type. There are many variants of intersection types in the
-literature. Our work follows a particular formulation, where intersection types
-are introduced by a \emph{merge operator}. As
-Dunfield~\cite{dunfield2014elaborating} has argued a merge operator adds
-considerable expressiveness to a calculus. The merge operator allows two values
-to be merged in a single intersection type. For example, an implementation of
-\lstinline{x} is constructed in \name as follows:
+In the previous program we deliberately did not show how to introduce
+values of an intersection type. There are many variants of
+intersection types in the literature. Our work follows a particular
+formulation, where intersection types are introduced by a \emph{merge
+  operator}. As Dunfield~\cite{dunfield2014elaborating} has argued a
+merge operator adds considerable expressiveness to a calculus. The
+merge operator allows two values to be merged in a single intersection
+type. In \name (following Dunfield's notation), the merge of two
+values $v_1$ and $v_2$ is denoted as $v_1 ,, v_2$.  For example, an
+implementation of \lstinline{x} is constructed in \name as follows:
 
 \begin{lstlisting}
-let x : Int & Char = 1,,'c' in (*$ \ldots $*)
+let x : Int & Boolean = 1,,True in (*$ \ldots $*)
 \end{lstlisting}
-
-\noindent In \name (following Dunfield's notation), the
-merge of two values $v_1$ and $v_2$ is denoted as $v_1 ,, v_2$.
 
 \paragraph{Merge Operator and Pairs.}
 The merge operator is similar to the introduction construct on pairs.
 An analogous implementation of \lstinline{x} with pairs would be:
 
 \begin{lstlisting}
-let xPair : (Int, Char) = (1, 'c') in (*$ \ldots $*)
+let xPair : (Int, Bool) = (1, True) in (*$ \ldots $*)
 \end{lstlisting}
 
 \noindent The significant difference between intersection types with a
@@ -76,55 +75,92 @@ merge operator and pairs is in the elimination construct. With pairs
 there are explicit eliminators (\lstinline{fst} and
 \lstinline{snd}). These eliminators must be used to extract the
 components of the right type. For example, in order to use
-\lstinline{idInt} and \lstinline{idChar} with pairs, we would need to
+\lstinline{succ} and \lstinline{not} with pairs, we would need to
 write a program such as:
 
 \begin{lstlisting}
-(idInt (fst xPair), idChar (snd xPair))
+(succ (fst xPair), not (snd xPair))
 \end{lstlisting}
 
 \noindent In contrast the elimination of intersection types is done
 implicitly, by following a type-directed process. For example,
 when a value of type \lstinline{Int} is needed, but an intersection
-of type \lstinline{Int & Char} is found, the compiler uses the
-type system to extract the corresponding value.
+of type \lstinline{Int & Bool} is found, the compiler generates code 
+that uses \lstinline{fst} to extract the corresponding value at runtime.
 
-\subsection{Incoherence} \label{subsec:incoherence}
-Unfortunately the implicit nature of elimination for intersection
-types built with a merge operator can lead to incoherence.
-The merge operator combines two terms, of type $A$ and $B$
-respectively, to form a term of type $A \inter B$. For example,
-$1 \mergeop `c'$ is of type $\code{Int} \inter \code{Char}$. In this case, no
-matter if $1 \mergeop `c'$ is used as $\code{Int}$ or $\code{Char}$, the result
-of evaluation is always clear. However, with overlapping types, it is
-not straightforward anymore to see the result. For example, what
-should be the result of this program, which asks for an integer out of
-a merge of two integers:
+\subsection{(In)Coherence} \label{subsec:incoherence}
+
+Coherence is a desirable property for the semantics of a programming
+language. A semantics is said to be coherent if any \emph{valid
+  program} has exactly one meaning~\cite{reynolds1991coherence} (that
+is, the semantics is not ambiguous). In contrast a semantics is said
+to be \emph{incoherent} if there are multiple possible meanings for
+the same valid program. 
+
+\paragraph{Incoherence in Dunfield's calculus}
+A problem with Dunfield's calculus~\cite{dunfield2014elaborating} is
+that it is incoherent.  Unfortunately the implicit nature of
+elimination for intersection types built with a merge operator can
+lead to incoherence.  The merge operator combines two terms, of type
+$A$ and $B$ respectively, to form a term of type $A \inter B$. For
+example, $1 \mergeop True$ is of type $\code{Int} \inter
+\code{Bool}$. In this case, no matter if $1 \mergeop True$ is used as
+$\code{Int}$ or $\code{Bool}$, the result of evaluation is always
+clear. However, with overlapping types, it is not straightforward
+anymore to see the intended result. For example, what should be the result of
+the following program, which asks for an integer (using a type annotation) out
+of a merge of two integers:
 \begin{lstlisting}
-(fun (x: Int) (*$ \to $*) x) (1,,2)
+(1,,2) : Int
 \end{lstlisting}
 Should the result be \lstinline$1$ or \lstinline$2$?
 
-If both results are accepted, we say that the semantics is \emph{incoherent}:
-there are multiple possible meanings for the same valid program. Dunfield's
-calculus~\cite{dunfield2014elaborating} is incoherent and accepts the program
-above.
+Dunfield's calculus~\cite{dunfield2014elaborating} accepts the program
+above, and it allows that program to result in \lstinline$1$ or \lstinline$2$.
+In other words the results of the program are incoherent.\bruno{rephrase better?}
 
-\paragraph{Getting Around Incoherence: Biased Choice.}
+\paragraph{Getting Around Incoherence}
 In a real implementation of Dunfield calculus a choice has to be made
 on which value to compute. For example, one potential option is to
 always take the left-most value matching the type in the
-merge. Similarly, one could always take the right-most
-value matching the type in the merge. Either way, the meaning
-of a program will depend on a biased implementation choice,
-which is clearly unsatisfying from the theoretical point of view.
+merge. Similarly, one could always take the right-most value matching
+the type in the merge. Either way, the meaning of a program will
+depend on a biased implementation choice, which is clearly
+unsatisfying from the theoretical point of view.  Dunfield suggests
+some other possibilities, such as the possibility of restricting typing
+of merges so that a merge has type \lstinline$A$ only if exactly one
+branch has type \lstinline$A$. He also suggested another possibility,
+which is to allow only for \emph{disjoint} types in an intersection.
+This is the starting point for us and the approach that we will 
+investigate in this paper. 
+
+\subsection{The Challenges of Disjointness Intersection Types}
+Informally saying that two types are disjoint means that the set of 
+values of both types are disjoint. Disjointness is potentially useful 
+for coherence, since it rules out ambiguity when looking up a value 
+of a certain type in an intersection. However there are several issues
+that need to be addressed first in order to design a calculus with disjoint 
+intersection types and that ensures coherence. 
+
+\paragraph{Disjointness of non-atomic types} 
+A first issue is what
+does disjointness mean for non-atomic types?  For atomic types such
+as \lstinline$Int$ and \lstinline$Bool$, it is easy to see that
+disjointness holds when the two types are different. Thus the following 
+intersections would be disjoint
+
+\noindent whereas any intersection with equal atomic types are not disjoint.
+
+\paragraph{What is a suitable formal definition of
+  disjointness?}
+
+\paragraph {Is disjoiness sufficient to ensure coherence?}
 
 \subsection{Restoring Coherence: Disjoint Intersection Types}\label{sec:restoring}
-Coherence is a desirable property for a semantics. A semantics is said
-to be coherent if any \emph{valid program} has exactly one
-meaning~\cite{reynolds1991coherence} (that is, the semantics is not ambiguous).
-One option to restore coherence is to reject programs which may have
-multiple meanings.
+
+However he did not present a formal definition of disjointness and did
+not pursue further that approach. 
+
 %Of course, when rejecting programs it is important
 %not to be too conservative, and reject too many programs which are
 %actually coherent.

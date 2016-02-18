@@ -10,8 +10,11 @@ This paper presents \name: a core calculus with a variant of \emph{intersection
 types} and a \emph{merge operator}. The semantics \name is both type-safe and
 coherent. Coherence is achieved by ensuring that intersection types are
 \emph{disjoint}. Formally, two types are disjoint if they do not share a common
-supertype. We present a type system that prevents intersection types that are
+supertype.
+\bruno{Abstract needs to be fixed, disjointness is no longer the absence of 
+a common supertype!} We present a type system that prevents intersection types that are
 not disjoint, as well as an algorithmic specification to determine whether two
 types are disjoint. Moreover, we show the applicability of this calculus to
 express a simple, yet powerful form of dynamically composable traits, paving the way for new
-designs of object-oriented programming languages.
+designs of object-oriented programming languages.\bruno{Drop sentence about 
+traits and replace by other contributions?}
