@@ -134,54 +134,67 @@ which is to allow only for \emph{disjoint} types in an intersection.
 This is the starting point for us and the approach that we will 
 investigate in this paper. 
 
-\subsection{The Challenges of Disjoint Intersection Types}
-Informally saying that two types are disjoint means that the set of 
-values of both types are disjoint. Disjointness is potentially useful 
-for coherence, since it rules out ambiguity when looking up a value 
-of a certain type in an intersection. However there are several issues
-that need to be addressed first in order to design a calculus with disjoint 
-intersection types and that ensures coherence. 
+\subsection{Disjoint Intersection Types and their Challenges}
+\name requires that the
+two types of in intersection must be \emph{disjoint}.
+Informally saying that two types are disjoint means that the set of
+values of both types are disjoint. Disjoint intersection types are
+potentially useful for coherence, since they can rule out ambiguity
+when looking up a value of a certain type in an intersection. However
+there are several issues that need to be addressed first in order to
+design a calculus with disjoint intersection types and that ensures
+coherence. The key issues and the solutions provided by our work are
+discussed next. We emphasize that although Dunfield
+has mentioned disjointness as an option to restore coherence, he
+has not studied the approach further or addressed the issues discussed next.
+
+\paragraph{Simple disjoint intersection types}
+Looking back at the expression $1 \mergeop 2$ in
+Section~\ref{subsec:incoherence}, we can see that the reason for
+incoherence is that there are multiple, overlapping, integers in the
+merge. Generally speaking, if both terms can be assigned some type
+$C$, both of them can be chosen as the meaning of the merge, which
+leads to multiple meanings of a term. A natural option is to try
+to forbid such overlapping values of the same type in a merge.
+Thus, for atomic types such as \lstinline$Int$ and \lstinline$Bool$, it is
+easy to see that disjointness holds when the two types are
+different. Intersections such as \lstinline$Int & Bool$ and 
+\lstinline$String & Bool$ are clearly disjoint.
 
 \paragraph{Disjointness of non-atomic types} 
-A first issue is what
-does disjointness mean for non-atomic types?  For atomic types such
-as \lstinline$Int$ and \lstinline$Bool$, it is easy to see that
-disjointness holds when the two types are different. Thus the following 
-intersections would be disjoint
+While it is easy to see how disjointness works for atomic types, 
+it is more challenging to see what disjointness mean for non-atomic types.
+For example, consider the following intersection types of functions:
 
-\noindent whereas any intersection with equal atomic types are not disjoint.
+\begin{enumerate}
 
-\paragraph{What is a suitable formal definition of
-  disjointness?}
+\item $(\code{Int} \to \code{Int})~\inter~(\code{String} \to \code{String})$
+\item $(\code{String} \to \code{Int})~\inter~(\code{String} \to \code{String})$
+\item $(\code{Int} \to \code{String})~\inter~(\code{String} \to \code{String})$
 
-\paragraph {Is disjoiness sufficient to ensure coherence?}
+\end{enumerate}
 
-\subsection{Restoring Coherence: Disjoint Intersection Types}\label{sec:restoring}
+\noindent Which of those intersection types are disjoint? 
+It seems reasonable to expect that the first intersection type is
+disjoint: both the domain and codomain of the two functions in the
+intersection are different. However, it is less clear whether the two
+other intersection types are disjoint or not. This paper proposes the 
+following rule for determining the disjointness of two function types:
 
-However he did not present a formal definition of disjointness and did
-not pursue further that approach. 
+\begin{mathpar}
+    \ruledisfun
+\end{mathpar}
 
-%Of course, when rejecting programs it is important
-%not to be too conservative, and reject too many programs which are
-%actually coherent.
-Analyzing the expression $1 \mergeop 2$, we can see that the reason
-for incoherence is that there are multiple, overlapping, integers in the
-merge. Generally speaking, if both terms can be assigned some type $C$,
-both of them can be chosen as the meaning of the merge,
-which leads to multiple meanings of a term.
-Thus a natural option is to try to forbid such overlapping
-values of the same type in a merge.
+\noindent Here $*_i$ denotes disjointness. According to the rule the first 
+two intersection types are disjoint, whereas the last one is not. This 
+rule is justified in Section~\ref{}.\bruno{Should we stop here; or briefly argue 
+about some justification} 
 
-This is precisely the approach taken in \name. \name requires that the
-two types of in intersection must be \emph{disjoint}.  However,
-although disjointness seems a natural restriction to impose on
-intersection types, it is not obvious to formalize it. Indeed Dunfield
-has mentioned disjointness as an option to restore coherence, but he
-left it for future work due to the non-triviality of the approach.
-
-\paragraph{Searching for a Definition of Disjointness.}
-The first step towards disjoint intersection types is to come up
-with a definition of disjointness. A first attempt at such definition would
+\paragraph{Formalizing disjointness} Another challenge is how to formalize 
+the notion of disjointness? So far all discussion about disjointness has been 
+based on an informal understanding of what disjointness means. Clearly a formal 
+definition of disjointness is desirable to design a calculus with disjoint 
+intersection types. A first attempt at such definition would
 be to require that, given two types $A$ and $B$, both types are not
 subtypes of each other. Thus, denoting disjointness as $A * B$, we would have:
 \[A * B \equiv A \not<: B \wedge B \not<: A\]
@@ -202,19 +215,18 @@ $\code{Int} \inter \code{Bool}$. Clearly,
 Nevertheless the following program still leads to
 incoherence:
 \begin{lstlisting}
-(fun (x: Int) (*$ \to $*) x) ((1,,'c'),,(2,,True))
+succ ((1,,'c'),,(2,,True))
 \end{lstlisting}
-as both \lstinline{1} or \lstinline{2} are possible outcomes
+as both \lstinline{2} or \lstinline{3} are possible outcomes
 of the program. Although this attempt to define disjointness failed,
 it did bring us some additional insight: although the types of the two
 components of the merge are not subtypes of each other, they share
 some types in common.
 
-\paragraph{A Proper Definition of Disjointness.} In order for two types
-to be truly disjoint, they must not have any subcomponents sharing
-the same type. In a system with intersection types this can be ensured
-by requiring the two types not to share a common supertype - excluding any type of
-the form ${A_k} \to \top$. 
+In order for two types to be truly disjoint, they must not have any
+subcomponents sharing the same type. In a system with intersection
+types this can be ensured by requiring the two types not to share a
+common supertype - excluding any type of the form ${A_k} \to \top$.
 The following definition captures this idea more formally.
 
 \begin{definition}[Disjointness]
@@ -230,7 +242,18 @@ $\code{Int} \& \code{Bool}$, those two types are not disjoint.
 
 \name's type system only accepts programs that use disjoint intersection
 types. As shown in Section~\ref{sec:disjoint} disjoint intersection types will
-play a crucial rule in guaranteeing that the semantics is coherent. 
+play a crucial rule in guaranteeing that the semantics is coherent.
+
+
+\paragraph {Is disjoiness sufficient to ensure coherence?}
+
+\subsection{Restoring Coherence: Disjoint Intersection Types}\label{sec:restoring}
+
+However he did not present a formal definition of disjointness and did
+not pursue further that approach. 
+
+\paragraph{Searching for a Definition of Disjointness.}
+ 
 
 % \subsection{Parametric Polymorphism and Intersection Types}\label{subsec:polymorphism}
 % Before we show how \name extends the idea of disjointness to parametric
