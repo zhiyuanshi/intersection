@@ -136,7 +136,7 @@ investigate in this paper.
 
 \subsection{Disjoint Intersection Types and their Challenges}
 \name requires that the
-two types of in intersection must be \emph{disjoint}.
+two types of in an intersection must be \emph{disjoint}.
 Informally saying that two types are disjoint means that the set of
 values of both types are disjoint. Disjoint intersection types are
 potentially useful for coherence, since they can rule out ambiguity
@@ -194,8 +194,11 @@ about some justification}
 the notion of disjointness? So far all discussion about disjointness has been 
 based on an informal understanding of what disjointness means. Clearly a formal 
 definition of disjointness is desirable to design a calculus with disjoint 
-intersection types. A first attempt at such definition would
-be to require that, given two types $A$ and $B$, both types are not
+intersection types. As we shall see the particular notion of disjointness can be 
+quite sensitive to the language features that are allowed in a language. 
+
+
+A first attempt at a definition for disjointness is to require that, given two types $A$ and $B$, both types are not
 subtypes of each other. Thus, denoting disjointness as $A * B$, we would have:
 \[A * B \equiv A \not<: B \wedge B \not<: A\]
 At first sight this seems a reasonable definition and it does prevent
@@ -224,26 +227,41 @@ components of the merge are not subtypes of each other, they share
 some types in common.
 
 In order for two types to be truly disjoint, they must not have any
-subcomponents sharing the same type. In a system with intersection
-types this can be ensured by requiring the two types not to share a
-common supertype - excluding any type of the form ${A_k} \to \top$.
-The following definition captures this idea more formally.
+subcomponents sharing the same type. In a simply typed calculus with intersection
+types (and without a $\top$ type) this can be ensured by requiring the two types 
+not to share a common supertype: 
 
-\begin{definition}[Disjointness]
+\begin{definition}[Simple disjointness]
   Given two types $A$ and $B$, two types are disjoint
   (written $A \disjoint B$) if there is no type $C$ such that both $A$ and $B$ are
   subtypes of $C$:
-  \[A \disjoint B \equiv \not\exists C.~A \subtype C \wedge B \subtype C \wedge C \neq \top\]
+  \[A \disjoint B \equiv \not\exists C.~A \subtype C \wedge B \subtype C\]
 \end{definition}
 
 \noindent This definition of disjointness prevents the problematic
-merge. Since $\code{Int}$ is a common supertype of both $\code{Int} \& \code{Char}$ and
-$\code{Int} \& \code{Bool}$, those two types are not disjoint.
+\lstinline$(1,,'c') ,, (2,,True)$ merge. Since $\code{Int}$ is a
+common supertype of both $\code{Int} \& \code{Char}$ and $\code{Int}
+\& \code{Bool}$, those two types are not disjoint, according to this
+simple notion of disjointness.
+
+The simple definition of disjointness is the basis for the first calculus 
+presented in this paper: a simply typed lambda calculus with intersection 
+(but without a $\top$ type). This variant of \name is useful to study many 
+of the issues arizing from disjoint intersections.
+
+\paragraph{Disjointness in the presence of $\top$ types} In the presence of a 
+$\top$ type the simple definition of disjointness is useless. In that case there
+\emph{always} exists a common supertype (namely, the $\top$ type). So
+adding a $\top$ type requires some adaptations on the notion of disjointness. 
+This work studies two additional variants of \name with $\top$ types. The first 
+variant 
+ 
+%- excluding any type of the form ${A_k} \to \top$.
+%The following definition captures this idea more formally.
 
 \name's type system only accepts programs that use disjoint intersection
 types. As shown in Section~\ref{sec:disjoint} disjoint intersection types will
 play a crucial rule in guaranteeing that the semantics is coherent.
-
 
 \paragraph {Is disjoiness sufficient to ensure coherence?}
 
