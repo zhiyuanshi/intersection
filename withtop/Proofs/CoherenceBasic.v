@@ -609,7 +609,7 @@ Inductive has_type_source : (context PTyp) -> PExp -> PTyp -> (SExp var) -> Prop
               WFTyp ty -> has_type_source Gamma (PFVar x) ty (STFVar _ x)
   | TyLit : forall Gamma x, ok Gamma -> has_type_source Gamma (PLit x) PInt (STLit _ x)
   | TyLam : forall L Gamma t A B E, (forall x, not (In x L) -> 
-                                 has_type_source (extend x A Gamma) (open_source t (PFVar x)) B E) -> WFTyp A -> 
+                                 has_type_source (extend x A Gamma) (open_source t (PFVar x)) B (open E (STFVar _ x))) -> WFTyp A -> 
                            has_type_source Gamma (PLam A t) (Fun A B) (STLam _ (|A|) E) 
   | TyApp : forall Gamma A B C t1 t2 E E1 E2,
               has_type_source Gamma t1 (Fun A B) E1 ->
@@ -622,9 +622,22 @@ Inductive has_type_source : (context PTyp) -> PExp -> PTyp -> (SExp var) -> Prop
                 OrthoS A B -> 
                 has_type_source Gamma (PMerge t1 t2) (And A B) (STPair _ E1 E2).
 
+Definition test : PExp := PLam PInt (PBVar 0).
+Definition test_st : SExp var := (STLam _ STInt (STBVar _ 0)).
+
+Definition has_type_source_test : has_type_source nil test (Fun PInt PInt) test_st.
+  intros.
+  apply_fresh TyLam as x.
+  unfold open_source; unfold open; simpl.
+  apply TyVar.
+  auto.
+  unfold extend; left; reflexivity.
+  apply WFInt.
+  apply WFInt.
+Defined.
 
 Hint Constructors has_type_source.
-
+  
 Lemma ptyp2styp_function : forall x y, x = y -> |x| = |y|.
 Proof.                                                     
   induction x; intros.
@@ -1500,10 +1513,9 @@ Proof.
   unfold conv_context in Ha.
   simpl in Ha; unfold mapctx in Ha.
   unfold extend; simpl.
-  rewrite <- open_rec_term.
-  assumption.
-  apply typing_gives_terms in Ha.
-  assumption.  
+  simpl in H0; unfold open in H0.
+  apply H0.
+  not_in_L x.
   (* TyApp *)
   simpl in *.
   apply STTyApp with (A := |A|).
@@ -1662,7 +1674,7 @@ Proof.
   intros t Gamma A1 A2 E1 E2 H1 H2.
   generalize dependent A2.
   generalize dependent E2.
-  induction H1; intros. Print has_type_source.
+  induction H1; intros.
   (* TyVar *)
   - inversion H2. subst.
     assert (HIn : List.In (x, ty) Gamma /\ List.In (x, A2) Gamma) by (split; assumption).
@@ -1709,7 +1721,7 @@ Proof.
   inversion IHhas_type_source1; assumption.
   apply WFAnd; try assumption.
 Defined.
-  
+    
 (* Theorem 5 *)
 Theorem type_coherence :
   forall t Gamma A1 A2 E1 E2, has_type_source Gamma t A1 E1 ->
@@ -1725,12 +1737,13 @@ Proof.
   - inversion H2; subst.    
     pick_fresh x.
     assert (Ha1: not (M.In x L0)) by (not_in_L x).
-    erewrite H0.
-    reflexivity.
-    assert (Ha4: not (M.In x L)) by (not_in_L x).
-    exact Ha4.
     apply H6 in Ha1.
-    apply Ha1.
+    apply H0 in Ha1.
+    assert (HNotE : not (In x (fv E))) by (not_in_L x).
+    assert (HNotF : not (In x (fv E0))) by (not_in_L x).
+    apply f_equal.
+    apply (open_app_eq _ _ _ _ HNotE HNotF Ha1).
+    not_in_L x.
   (* STApp *)
   - inversion H2; subst.
     assert (Ha : Fun A0 A2 = Fun A B).
@@ -1757,3 +1770,5 @@ Proof.
     apply IHhas_type_source2 in H7.
     subst; reflexivity.
 Defined.
+
+End CoherenceBasic.

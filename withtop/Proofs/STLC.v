@@ -1,3 +1,4 @@
+Require Import Coq.Arith.EqNat.
 Require Import Coq.Structures.Equalities.
 Require Import Coq.Lists.List.
 Require Import Coq.MSets.MSetInterface.
@@ -693,6 +694,85 @@ Defined.
 
 Hint Resolve open_rec_term.
 
+Lemma open_app_eq : forall x E n F,
+  not (In x (fv E)) ->
+  not (In x (fv F)) ->
+  (open_rec n (STFVar var x) E) = (open_rec n (STFVar var x) F) ->
+  E = F.
+Proof.
+  intros x E.
+  induction E; intros n' F HNotE HNotF HEqOpen.
+  - simpl in *.
+    induction F; try (inversion HEqOpen; auto).
+    destruct (Nat.eqb n' n); auto.
+    exfalso; apply HNotE.
+    apply MSetProperties.Dec.F.singleton_2; inversion H0; reflexivity.
+  - induction F; simpl in *; try (now (destruct (Nat.eqb n' n); inversion HEqOpen)).
+    destruct (Nat.eqb n' n).
+    exfalso; apply HNotF.
+    apply MSetProperties.Dec.F.singleton_2; inversion HEqOpen; reflexivity. 
+    inversion HEqOpen.
+    case_eq (Nat.eqb n' n); intros.
+    case_eq (Nat.eqb n' n0); intros.
+    apply f_equal.
+    apply beq_nat_true in H.
+    apply beq_nat_true in H0.
+    now subst.
+    rewrite H in HEqOpen.
+    rewrite H0 in HEqOpen.
+    inversion HEqOpen.
+    rewrite H in HEqOpen.
+    case_eq (Nat.eqb n' n0); intros;
+    rewrite H0 in HEqOpen; inversion HEqOpen.
+    reflexivity.
+  - induction F; simpl in *; try (now inversion HEqOpen).
+    destruct (Nat.eqb n' n); [ inversion HEqOpen | auto ].
+  - induction F; simpl in *; try (now inversion HEqOpen).
+    destruct (Nat.eqb n' n0); [ inversion HEqOpen | auto ].
+  - induction F; simpl in *; try (now inversion HEqOpen).
+    destruct (Nat.eqb n' n); inversion HEqOpen.
+    inversion HEqOpen.
+    apply f_equal.
+    now apply (IHE (S n')).
+  - induction F; simpl in *; try (now inversion HEqOpen).
+    destruct (Nat.eqb n' n); inversion HEqOpen.
+    inversion HEqOpen.
+    apply f_equal.
+    now apply (IHE (S n')).
+  - induction F; simpl in *; try (now inversion HEqOpen).  
+    destruct (Nat.eqb n' n); inversion HEqOpen.
+    rewrite IHE1 with (F := F1) (n := n'); try not_in_L x.
+    rewrite IHE2 with (F := F2) (n := n'); try not_in_L x.
+    reflexivity.
+    not_in_L x.
+    not_in_L x.
+    now inversion HEqOpen.
+    not_in_L x.
+    not_in_L x.
+    now inversion HEqOpen.
+  - induction F; simpl in *; try (now inversion HEqOpen).  
+    destruct (Nat.eqb n' n); inversion HEqOpen.
+    rewrite IHE1 with (F := F1) (n := n'); try not_in_L x.
+    rewrite IHE2 with (F := F2) (n := n'); try not_in_L x.
+    reflexivity.
+    not_in_L x.
+    not_in_L x.
+    now inversion HEqOpen.
+    not_in_L x.
+    not_in_L x.
+    now inversion HEqOpen.
+  - induction F; simpl in *; try (now inversion HEqOpen).  
+    destruct (Nat.eqb n' n); inversion HEqOpen.
+    apply f_equal.
+    apply IHE with (n := n'); try not_in_L x.
+    now inversion HEqOpen.
+  - induction F; simpl in *; try (now inversion HEqOpen).  
+    destruct (Nat.eqb n' n); inversion HEqOpen.
+    apply f_equal.
+    apply IHE with (n := n'); try not_in_L x.
+    now inversion HEqOpen. 
+Defined.
+
 (* Typing rules *)
 
 (* Typing rules of STLC, inspired by STLC_Tutorial *)
@@ -883,7 +963,6 @@ Proof.
     rewrite <- app_assoc.
     apply ok_app_comm.
     rewrite <- app_assoc.
-    Check ok_app_comm.
     apply ok_app_comm.
     rewrite <- app_assoc.
     now apply ok_middle_comm.
