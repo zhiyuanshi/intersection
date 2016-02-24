@@ -1435,33 +1435,72 @@ Lemma term_abs_to_body_ty : forall t1 A B Gamma,
   has_ty Gamma (PLam t1) Chk (Fun A B) -> body_ty t1 A B Gamma.
 Proof. intros. unfold body_ty. inversion H. inversion H0. subst. exists L.
        refine (fun x NHL => ex_intro _ (open E (STFVar _ x)) (H5 x NHL)).
-Admitted.
+       subst. inversion H1.
+Qed.
 
+Lemma foo : forall L Gamma A B t1,
+  (forall x : elt,
+       ~ In x L ->
+       exists E : SExp var,
+         has_type_source_alg (extend x A Gamma) (open_source t1 (PFVar x))
+                             Chk B E) ->
+  (forall x : elt,
+       ~ In x L ->
+       exists E : SExp var,
+         has_type_source_alg (extend x A Gamma) (open_source t1 (PFVar x))
+           Chk B (open E (STFVar _ x))).
+Admitted.
+  
 Lemma body_ty_to_term_abs : forall t1 A B Gamma, 
   body_ty t1 A B Gamma -> has_ty Gamma (PLam t1) Chk (Fun A B).
-Proof. intros. unfold has_ty in *. unfold body_ty in H. inversion H as [L H1].
-       inversion H. eexists (STLam' _ _). apply_fresh ATyLam as y.
-       assert (not (In y L)) by (not_in_L y). apply H1 in H2. inversion H2.
-       inversion H3; subst.
+Proof. intros. unfold body_ty in H. unfold has_ty in *. inversion H as [L H1].
+       eexists (STLam' _ _). Check ATyLam.
+       unfold has_ty in H1. Check foo.
+       eapply (foo L Gamma A B t1) in H1. Check ATyLam.
+       eapply (ATyLam _ _ _ _ _ _ _ _).
+       pick_fresh x.
+       not_in_L x.
+       (* apply H3. *)
+       
 Admitted.
 
-  
 Lemma tylam : forall {Gamma t A B} L,
+  (exists E, forall x, not (In x L) -> has_type_source_alg (extend x A Gamma) (open_source t (PFVar x)) Chk B (open E (STFVar _ x))) ->
+  WFTyp A ->
+  has_ty Gamma (PLam t) Chk (Fun A B).
+Proof.
+  intros.
+  unfold has_ty in *.
+  inversion H.
+  exists (STLam' _ x).
+  eapply (ATyLam _ _ _ _ _ _ H1 H0).
+Defined.
+  
+Lemma tylam' : forall {Gamma t A B} L,
   (forall x, not (In x L) -> 
         has_ty (extend x A Gamma) (open_source t (PFVar x)) Chk B) ->
   has_ty Gamma (PLam t) Chk (Fun A B).
 Proof.
   intros.
+
+  unfold has_ty in *.
+  (*
+  refine (let f : forall x, ~ In x L -> Prop :=
+              fun x xNotInL => match (H x xNotInL) return Prop with
+                                | ex_intro _ _ _ => True
+                              end
+           in ex_intro _ _ _).*)
+  
   apply body_ty_to_term_abs.
   pick_fresh y.
   assert (Ha : not (In y L)) by (not_in_L y).
   apply H in Ha.
-  inversion Ha.
-  inversion H0; subst.
+  inversion Ha. 
   unfold body_ty.
+  unfold has_ty.
   exists L.
   apply H.
-Admitted.
+Defined.
 
 Definition tyvar : forall Gamma x ty, ok Gamma -> List.In (x,ty) Gamma -> WFTyp ty ->
                                       has_ty Gamma (PFVar x) Inf ty.
@@ -1985,7 +2024,7 @@ apply tyvar; auto.
 apply tylit; auto.
 (* Case TyLam *)
 apply tyann.
-apply (tylam (union (union (union L (dom Gamma)) (fv_source t0)) (fv_source t1))).
+apply (tylam' (union (union (union L (dom Gamma)) (fv_source t0)) (fv_source t1))).
 intros.
 assert (d: not (In x L)) by (not_in_L x).
 pose (H0 x d). destruct a. (*destruct H2. destruct x0.*)
