@@ -33,8 +33,9 @@
 > suspect that the restriction that the authors have choosen is rather
 > impractical. Maybe I'm wrong here, but I would have at least expected
 > a discussion of the issue.
-> 
-> 
+
+We now address T. 
+ 
 > ----------------------- REVIEW 2 ---------------------
 > PAPER: 108
 > TITLE: Disjoint Intersection Types
@@ -153,7 +154,7 @@ FIXED
 > In 2.2, incoherence is introduced before coherence is defined in 2.3.
 > Perhaps it should be the other way around?
 
-TODO: Fix?
+FIXED
 
 > In 2.3, the paper uses ∧ as a meta-logical operator meaning "and".  I
 > find this notation unfortunate in general, but it is particularly
@@ -163,7 +164,7 @@ TODO: Fix?
 > issue.  If the authors dislike "and" for some reason, they could still
 > increase clarity by putting parentheses around the slashed subtypings.
 
-TODO: Fix?
+FIXED
 
 > 
 > *** Comments on section 3
@@ -526,6 +527,7 @@ TODO: Fix?
 > union types and does not discuss type inference issues. 
 
 Acknowledge absence of union types; discuss union types somewhere?
+We now have type-inference
 
 > The paper seems
 > technically correct.  The paper claims two main contributions: fixing the
@@ -650,18 +652,21 @@ TODO: Discussion in related work.
 >  traits is folklore knowledge---given a system for typechecking
 >  non-overlapping record concatenation.
 
-No traits.
+(Partly) FIXED: No traits.
+Still need to edit other parts of the paper.
 
 > DETAILED COMMENTS:
 > 
 > - 2.1, first paragraph: citations would be appreciated here.
 
-TODO: Add citations!
+FIXED: Add citations!
 
 > In fact, very few languages have adopted intersection types with a merge
 > operator. One of the early work is that of Castagna on lambda-&.
 > Its runtime cost is certainly for something in its lack of adoption. 
-> 
+
+ADDED note in the paper.
+
 > - Top of page 5, line 4 [in<-an] intersection must...
 > 
 > - 3.1, 1st paragraph "[an<-a] symmetric operation
@@ -678,7 +683,7 @@ TODO: Add citations!
 > 
 > - page 14, last paragraph
 
-TODO: Fix above issues
+No Section 3 any more!
  
 >  This paragraph is confusing and seems self-contradictory. It says that the
 >  example is really a problem but also suggests that another solution than

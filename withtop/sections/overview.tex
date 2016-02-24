@@ -17,8 +17,8 @@ supports them.
 
 Intersection types date back as early as Coppo~\textit{et
 al.}'s work~\cite{coppo1981functional}. Since then various researchers have
-studied intersection types, and some languages have adopted them in one
-form or another.
+studied intersection types~\cite{Castagna}, and some languages have adopted them in one
+form or another\cite{CDuce}.\bruno{Reviewer asked for more references here.}
 %However, as we shall see in
 %Section~\ref{subsec:incoherence}, it also introduces difficulties. In what follows
 %intersection types and the merge operator are informally introduced.
@@ -51,7 +51,9 @@ In the previous program we deliberately did not show how to introduce
 values of an intersection type. There are many variants of
 intersection types in the literature. Our work follows a particular
 formulation, where intersection types are introduced by a \emph{merge
-  operator}. As Dunfield~\cite{dunfield2014elaborating} has argued a
+  operator}.\bruno{Perhaps mention other works with the merge operator, 
+including lambda\&} 
+As Dunfield~\cite{dunfield2014elaborating} has argued a
 merge operator adds considerable expressiveness to a calculus. The
 merge operator allows two values to be merged in a single intersection
 type. In \name (following Dunfield's notation), the merge of two
@@ -200,7 +202,7 @@ quite sensitive to the language features that are allowed in a language.
 
 A first attempt at a definition for disjointness is to require that, given two types $A$ and $B$, both types are not
 subtypes of each other. Thus, denoting disjointness as $A * B$, we would have:
-\[A * B \equiv A \not<: B \wedge B \not<: A\]
+\[A * B \equiv A \not<: B~\text{and}~B \not<: A\]
 At first sight this seems a reasonable definition and it does prevent
 merges such as \lstinline{1,,2}. However some moments of thought are enough to realize that
 such definition does not ensure disjointness. For example, consider
@@ -235,7 +237,7 @@ not to share a common supertype:
   Given two types $A$ and $B$, two types are disjoint
   (written $A \disjoint B$) if there is no type $C$ such that both $A$ and $B$ are
   subtypes of $C$:
-  \[A \disjoint B \equiv \not\exists C.~A \subtype C \wedge B \subtype C\]
+  \[A \disjoint B \equiv \not\exists C.~A \subtype C~\text{and}~B \subtype C\]
 \end{definition}
 
 \noindent This definition of disjointness prevents the problematic
@@ -266,12 +268,12 @@ In both variants the definition of disjointness is revised as follows:
 \end{enumerate}
 \end{definition}
 
-In this definition the idea is to embrace the presence of certain
+In this definition the idea is to allow $A$ and $B$ to share some 
 common supertypes. Instead of requiring that two types do not have
 any common supertype, we require that the only supertypes are
 \emph{top-like}. The unary relation $A_{\top}$ denotes such top-like
 types. As shown in this paper allowing such supertypes does not cause 
-incoherence. 
+incoherence.\bruno{Explanation probably needs to be expanded}
 
 
 
@@ -295,7 +297,8 @@ Consider the following example:
 (succ,,not) (3,,True)
 \end{lstlisting}
 
-\noindent Here there are two merges. The first merge contains two functions 
+\noindent Here there are two merges, with the first merge being applied to the second. 
+The first merge contains two functions 
 (\lstinline$succ$ and \lstinline$not$). The second merge contains two values 
 that can serve as input to the functions. The two merges are disjoint. 
 However what should be the result of this program? Should it be 
@@ -326,12 +329,7 @@ the ambiguity problem is solved by annotating the term being applied. For exampl
 
 \noindent is a valid program and results in \lstinline$4$.
 
-\subsection{Restoring Coherence: Disjoint Intersection Types}\label{sec:restoring}
 
-However he did not present a formal definition of disjointness and did
-not pursue further that approach. 
-
-\paragraph{Searching for a Definition of Disjointness.}
  
 
 % \subsection{Parametric Polymorphism and Intersection Types}\label{subsec:polymorphism}

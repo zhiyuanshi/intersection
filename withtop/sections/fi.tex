@@ -1,18 +1,20 @@
 \section{The \name Calculus}
 \label{sec:fi}
 
-This section presents the syntax, subtyping, typing, as well as the (incoherent)
-semantics of \name: a calculus with intersection types and a merge operator.
-This calculus is similar to Dunfield's calculus~\cite{dunfield2014elaborating}.
-The differences are that, in Dunfield's language, the coercions are source
-language terms and that function application allows the expression denoting the
-function to have an intersection type. In contrast, in \name coercions are
-target language terms and function applications do not allow the expression
-denoting the applied function to have an intersection type. The later
-difference will play an important role in achieving coherence.
-Sections~\ref{sec:disjoint} and \ref{sec:alg-dis} will present the more fundamental contributions of this
-paper by showing other necessary changes for supporting
+This section presents the syntax, subtyping, typing, as well as the
+(incoherent) semantics of \name: a calculus with intersection types
+and a merge operator.  This calculus is inspired by Dunfield's
+calculus~\cite{dunfield2014elaborating}.  However our calculus does
+not consider union types, and due to the fact that we are interested
+only in disjoint intersections, it also has a few less typing rules
+than in Dunfield's calculus.\bruno{rephrase next} The differences are
+that, in Dunfield's language, the coercions are source language terms
+and that function application allows the expression denoting the
+function to have an intersection type.  Sections~\ref{sec:disjoint}
+and \ref{sec:alg-dis} will present the more fundamental contributions
+of this paper by showing other necessary changes for supporting
 disjoint intersection types and ensuring coherence.
+
 
 \subsection{Syntax}
 
@@ -106,14 +108,12 @@ records and record operations can be found in the full version of the paper.
     \formt \\
     \ruletvar \and \ruletint \and
     \ruletlam \and \ruletapp \and
-    \ruletmerge \and \rulettop
+    \ruletmerge \and \rulettop \and \rulettop
   \end{mathpar}
 
-  \caption{The type system of \name.}
+  \caption{Declarative type system of \name.}
   \label{fig:fi-type}
-\end{figure}\bruno{MAJOR PROBLEM: We are missing the well-formedness
-  rules as well as their uses in Figure 2. These need to be added so
-  that we can talk about coherence later!}
+\end{figure}
 
 % Intersection types introduce natural subtyping relations among types. For
 % example, $ \code{Int} \inter \code{Bool} $ should be a subtype of $ \code{Int} $, since the former
@@ -159,7 +159,7 @@ subtyping defined by $\subtype$ is also reflexive and transitive.
 For the corresponding mechanized proofs in Coq, we refer the reader to the
 repository associated with the paper\footnote{\url{https://github.com/zhiyuanshi/intersection/tree/master/esop-16}}.
 
-\subsection{Typing}
+\subsection{Declarative Type System}
 
 The well-formedness rules are shown in the middle part of
 Figure~\ref{fig:fi-type}. In addition to the standard rules,
@@ -173,6 +173,9 @@ $A$''. The standard rules are those for variables
 $e_1 \mergeop e_2$, is assigned an intersection type composed of the
 resulting types of $e_1$ and $e_2$.
 
+\paragraph{Differences to Dunfield's Calculus}
+
+\begin{comment}
 \paragraph{Typing Applications}
 The rule that deserves more attention is the application rule
 \reflabel{\labeltapp}.  This is where the most important difference between
@@ -216,6 +219,11 @@ would necessarily be complicated, and rather ad-hoc.
 So we opted for simplicity. In any case there is no expressiveness
 loss (only loss of convinience), as it is always possibly to extract the function component from
 a merge and then apply it.
+\end{comment}
+
+\subsection{Algorithmic Type System}
+
+Introduce the bi-directional type system here?
 
 \subsection{Semantics}
 
