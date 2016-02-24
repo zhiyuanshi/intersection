@@ -136,7 +136,7 @@ investigate in this paper.
 
 \subsection{Disjoint Intersection Types and their Challenges}
 \name requires that the
-two types of in an intersection must be \emph{disjoint}.
+two types in an intersection to be \emph{disjoint}.
 Informally saying that two types are disjoint means that the set of
 values of both types are disjoint. Disjoint intersection types are
 potentially useful for coherence, since they can rule out ambiguity
@@ -247,15 +247,39 @@ simple notion of disjointness.
 The simple definition of disjointness is the basis for the first calculus 
 presented in this paper: a simply typed lambda calculus with intersection 
 (but without a $\top$ type). This variant of \name is useful to study many 
-of the issues arizing from disjoint intersections.
+important issues arizing from disjoint intersections, without the additional 
+complications of $\top$. 
 
 \paragraph{Disjointness in the presence of $\top$ types} In the presence of a 
 $\top$ type the simple definition of disjointness is useless. In that case there
-\emph{always} exists a common supertype (namely, the $\top$ type). So
+\emph{always} exists a common supertype (for example, the $\top$ type). So
 adding a $\top$ type requires some adaptations on the notion of disjointness. 
-This work studies two additional variants of \name with $\top$ types. The first 
-variant 
+This work studies two additional variants of \name with $\top$ types. 
+In both variants the definition of disjointness is revised as follows: 
+
+\begin{definition}[Disjointness with $\top$]
+  Given two types $A$ and $B$, two types are disjoint
+  (written $A \disjoint B$) if the following two condictions are meet:
+\begin{enumerate}
+  \item $\neg A_{\top}~\text{and}~\neg B_{\top}$
+  \item $\forall C.~\text{if}~ A \subtype C~\text{and}~B \subtype C~\text{then}~C_{\top}$
+\end{enumerate}
+\end{definition}
+
+In this definition the idea is to embrace the presence of certain
+common supertypes. Instead of requiring that two types do not have
+any common supertype, we require that the only supertypes are
+\emph{top-like}. The unary relation $A_{\top}$ denotes such top-like
+types. As shown in this paper allowing such supertypes does not cause 
+incoherence. 
+
+
+
  
+% Definition OrthoS (A B : PTyp) := 
+%  (not (TopLike A) /\ not (TopLike B)) /\ (forall C, Sub A C -> Sub B C -> TopLike C).
+
+
 %- excluding any type of the form ${A_k} \to \top$.
 %The following definition captures this idea more formally.
 
@@ -263,7 +287,44 @@ variant
 types. As shown in Section~\ref{sec:disjoint} disjoint intersection types will
 play a crucial rule in guaranteeing that the semantics is coherent.
 
-\paragraph {Is disjoiness sufficient to ensure coherence?}
+\paragraph {Is disjointness sufficient to ensure coherence?} A final question
+is whether disjoint intersection types are sufficient to ensure coherence. 
+Consider the following example:
+
+\begin{lstlisting}
+(succ,,not) (3,,True)
+\end{lstlisting}
+
+\noindent Here there are two merges. The first merge contains two functions 
+(\lstinline$succ$ and \lstinline$not$). The second merge contains two values 
+that can serve as input to the functions. The two merges are disjoint. 
+However what should be the result of this program? Should it be 
+\lstinline$4$ or \lstinline$False$? 
+
+At first this program appears to lead to incoherence, even though it only uses
+disjoint merges. However, a closer look reveals that there are two possible 
+types for this program: \lstinline{Int} or \lstinline{Bool}. Once the type 
+of the program is fixed, there is only one possible result: if the type is 
+\lstinline$Int$ the result of the program is \lstinline$4$; if the type 
+is \lstinline$Bool$ then the result of the program is \lstinline$False$. 
+Like other programming language features (for example type classes~\cite{}), 
+types play a fundamental role in determining the result of a program, and the 
+semantics of the language is not independent from types. 
+
+Disjointness is indeed sufficient to ensure coherence. The key point is that 
+given a program \emph{and its type} there is always a unique result for that 
+program. However, for certain programs type annotations are necessary to rule 
+out \emph{type ambiguity}. Similar type ambiguity issues arize in other type-directed 
+mechanisms such as type-classes~\cite{}. 
+
+In our implementation, which uses bi-directional type-checking techniques~\cite{}, 
+the ambiguity problem is solved by annotating the term being applied. For example:
+
+\begin{lstlisting}
+((succ,,not) : Int (*$\to$*) Int) (3,,True)
+\end{lstlisting}
+
+\noindent is a valid program and results in \lstinline$4$.
 
 \subsection{Restoring Coherence: Disjoint Intersection Types}\label{sec:restoring}
 
