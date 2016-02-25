@@ -21,7 +21,7 @@ Export M.
 Module MSetProperties := WPropertiesOn(VarTyp)(M).
 
 Inductive STyp :=
-  | STTop
+  | STUnitT : STyp
   | STInt : STyp
   | STFun : STyp -> STyp -> STyp
   | STTuple : STyp -> STyp -> STyp.
@@ -779,7 +779,7 @@ Defined.
 Inductive has_type_st : (context STyp) -> (SExp var) -> STyp -> Prop :=
   | STTyVar : forall (Gamma : context STyp) x ty,
                 ok Gamma -> List.In (x,ty) Gamma -> has_type_st Gamma (STFVar _ x) ty
-  | STTyTop : forall Gamma, ok Gamma -> has_type_st Gamma (STUnit _) STTop
+  | STTyUnit : forall Gamma, ok Gamma -> has_type_st Gamma (STUnit _) STUnitT
   | STTyLit : forall Gamma x, ok Gamma -> has_type_st Gamma (STLit _ x) STInt       
   | STTyLam : forall L Gamma t A B,
                 (forall x, not (In x L) -> 
@@ -882,7 +882,7 @@ Proof.
     left; reflexivity.
     inversion H4.
     auto.
-  - apply STTyTop.
+  - apply STTyUnit.
     subst.
     now apply ok_remove in H0.
   - apply STTyLit.
@@ -979,7 +979,7 @@ Proof.
     inversion H3.
     apply in_or_app; auto.
     apply in_or_app; right; apply in_or_app; auto.
-  - apply STTyTop.
+  - apply STTyUnit.
     now apply ok_middle_comm.
   - apply STTyLit.
     now apply ok_middle_comm.
@@ -1027,7 +1027,7 @@ Proof.
   apply STTyVar.
   apply Ok_push; assumption.
   apply in_cons; assumption.
-  apply STTyTop.
+  apply STTyUnit.
   apply Ok_push; assumption.
   apply STTyLit.
   apply Ok_push; assumption.
