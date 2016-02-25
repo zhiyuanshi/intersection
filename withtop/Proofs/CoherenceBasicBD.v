@@ -1031,56 +1031,125 @@ Fixpoint subst (z : var) (u : SExp var) (t : SExp var) {struct t} : SExp var :=
     | STUnit _       => STUnit _
   end.
 
+
+Lemma fv_source_distr_open_l :
+  forall t1 t2 x n, In x (fv_source t1) ->
+               In x (fv_source t2) ->
+               In x (fv_source (open_rec_source n t2 t1)).
+Proof.
+  induction t1; intros; simpl in *; auto.
+  unfold open_source; simpl; destruct (Nat.eqb n0 n); auto.
+  apply MSetProperties.Dec.F.union_1 in H.
+  inversion H.
+  apply MSetProperties.Dec.F.union_2.
+  now apply IHt1_1.
+  apply MSetProperties.Dec.F.union_3.
+  now apply IHt1_2.
+  apply MSetProperties.Dec.F.union_1 in H.
+  inversion H.
+  apply MSetProperties.Dec.F.union_2.
+  now apply IHt1_1.
+  apply MSetProperties.Dec.F.union_3.
+  now apply IHt1_2.  
+Qed.
+
 Lemma tsubst :
-  forall Gamma t1 t2 x y A B,
-    not (In y (dom Gamma)) ->
-    not (In y (fv_source t1)) ->
-    not (In y (fv_source t2)) ->
-    not (In x (fv_source t1)) ->
-    not (In x (fv_source t2)) ->
-    has_type_source (extend x A Gamma) (open_source t1 (PFVar x)) B (open_source t2 (PFVar x)) ->
-    has_type_source (extend y A Gamma) (subst_source x (PFVar y) (open_source t1 (PFVar x))) B (subst_source x (PFVar y) (open_source t2 (PFVar x))).
+  forall E F t1 t2 x y A B,
+    not (In y (dom (E ++ F))) ->
+    has_type_source (E ++ (extend x A F)) (open_source t1 (PFVar x)) B (open_source t2 (PFVar x)) ->
+    has_type_source (E ++ (extend y A F)) (subst_source x (PFVar y) (open_source t1 (PFVar x))) B (subst_source x (PFVar y) (open_source t2 (PFVar x))).
 Proof.
   intros.
-  remember (extend x A Gamma).
-  (*
-  remember (open_source t1 (PFVar x)).
-  remember (open_source t2 (PFVar x)).
-  *)
-  induction H4; simpl in *; subst; eauto.
+  remember (E ++ extend x A F) as G.
+  generalize dependent HeqG.
+  generalize dependent E.
+  generalize dependent F.
+  induction H0; intros; simpl in *; subst; eauto.
   - case_eq (x0 =? x); intro HEq.
     apply TyVar.
+    rewrite <- app_nil_l; apply ok_middle_comm; rewrite app_nil_l.
     apply Ok_push.
-    inversion H4; auto.
+    rewrite <- app_nil_l in H.
+    unfold extend in H; apply ok_middle_comm in H; rewrite app_nil_l in H.
+    inversion H; auto.
     auto.
-    admit.
+    assert (Ha : ty = A).
+    apply eqb_eq in HEq.
+    unfold extend in H; rewrite <- app_nil_l in H; apply ok_middle_comm in H; rewrite app_nil_l in H.
+    inversion H; subst.
+    apply in_app_or in H0.
+    inversion H0.
+    exfalso; apply H7; rewrite dom_union; rewrite union_spec; left.
+    apply list_impl_m in H3; now rewrite HEq in H3.
+    unfold extend in H3; apply in_app_or in H3. 
+    inversion H3.
+    inversion H4; now inversion H6.
+    exfalso; apply H7; rewrite dom_union; rewrite union_spec; right.
+    apply list_impl_m in H4; now rewrite HEq in H4.
+    rewrite Ha.
+    apply in_or_app.
+    right; apply in_or_app; left.
+    left; reflexivity.
     auto.
-    rewrite <- app_nil_l with (l := (extend y A Gamma)).
-    apply typing_weaken_source; rewrite app_nil_l.
+    apply typing_weaken_source.
     apply TyVar.
-    inversion H4; auto.
-    inversion H5.
-    inversion H7.
-    subst.
+    rewrite <- app_nil_l in H.
+    unfold extend in H; apply ok_middle_comm in H; rewrite app_nil_l in H.
+    inversion H; auto.
+    apply in_app_or in H0.
+    inversion H0.
+    apply in_or_app; auto.
+    unfold extend in H3.
+    apply in_app_or in H3.
+    inversion H3.
+    inversion H4.
+    inversion H5; subst.
     apply EqFacts.eqb_neq in HEq.
     exfalso; apply HEq; reflexivity.
-    now rewrite app_nil_l in H7.
+    inversion H5.
+    apply in_or_app; auto.
     auto.
+    rewrite <- app_nil_l; apply ok_middle_comm; rewrite app_nil_l.
     apply Ok_push.
-    inversion H4; auto.
-    apply H.
+    unfold extend in H; now apply ok_remove in H.
+    auto.
   - apply TyLit.
+    rewrite <- app_nil_l; apply ok_middle_comm; rewrite app_nil_l.
     apply Ok_push.
-    inversion H4; auto.
-    apply H.
-  - apply_fresh TyLam as z.
-    rewrite subst_source_fresh.
-    rewrite subst_source_fresh.
-    admit. (* use typing weaken + strengthen? *)
-    admit. (* *)
-    admit.
+    unfold extend in H.
+    rewrite <- app_nil_l in H; apply ok_middle_comm in H; rewrite app_nil_l in H.
+    inversion H; auto.
     auto.
-Admitted.
+  - apply_fresh TyLam as z. 
+    rewrite subst_source_open_var.
+    rewrite subst_source_open_var.
+    unfold extend in *.
+    rewrite app_assoc.
+    apply H0.
+    not_in_L z.
+    unfold not; intros.
+    simpl.
+    rewrite dom_union in H3; apply MSetProperties.Dec.F.union_1 in H3.
+    inversion H3.
+    rewrite dom_union in H4; apply MSetProperties.Dec.F.union_1 in H4.
+    inversion H4.
+    simpl in H5.
+    apply MSetProperties.Dec.F.add_iff in H5.
+    inversion H5.
+    apply Frz.
+    not_in_L z.
+    inversion H6.
+    apply H2; not_in_L y.
+    apply H2; not_in_L y.
+    rewrite app_assoc; reflexivity.
+    not_in_L z.
+    not_in_L x.
+    apply PTerm_Var.
+    not_in_L z.
+    not_in_L x.
+    apply PTerm_Var.
+    auto.
+Qed.
     
 Definition tlam : forall L Gamma t A B, (forall x, not (In x L) -> 
                                      has_type (extend x A Gamma) (open_source t (PFVar x)) B) ->
@@ -1092,25 +1161,26 @@ Definition tlam : forall L Gamma t A B, (forall x, not (In x L) ->
   pick_fresh y. 
   assert (HNot : not (In y L)) by not_in_L y.
   pose (H y HNot).
-  destruct e. exists (PAnn (PLam x) (Fun A B)).
+  destruct e. 
+
+  assert (E : PExp) by admit.
+  assert (x = (open_source E (PFVar y))) by admit.
+  assert (Ha : not (In y (fv_source E))) by admit.
+  subst.
+  exists (PAnn (PLam E) (Fun A B)).  
   apply_fresh TyLam as x0.
   
-  assert (has_type_source (extend y A Gamma) (open_source t0 (PFVar y)) B (open_source x (PFVar y))) by admit.
-  assert (not (In y (fv_source x))) by admit.
-
-  eapply tsubst with (y := x0) in H2.
-  rewrite subst_fresh_var in H2.
-  rewrite subst_fresh_var in H2.
-  apply H2.
+  rewrite <- app_nil_l with (l := extend y A Gamma) in H1.
+  eapply tsubst with (y := x0) in H1.
+  rewrite app_nil_l in H1.
+  rewrite subst_fresh_var in H1.
+  rewrite subst_fresh_var in H1.
+  apply H1.
   not_in_L x0.
-  apply H3.
-  not_in_L x0.
-  not_in_L y.
-  not_in_L x0.
-  not_in_L x0.
+  apply Ha.
   not_in_L x0.
   not_in_L y.
-  not_in_L y.
+  not_in_L x0.
   auto.
 (*  
   assert (forall {y z}, not (In y L) -> not (In z L ) -> has_type_source (extend y A Gamma) (open_source t0 (PFVar y)) B x = has_type_source (extend z A Gamma) (open_source t0 (PFVar z)) B x).
