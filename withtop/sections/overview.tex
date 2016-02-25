@@ -26,7 +26,7 @@ form or another\cite{CDuce}.\bruno{Reviewer asked for more references here.}
 \paragraph{Intersection Types.}
 The intersection of type $A$ and $B$ (denoted as \lstinline{A & B} in
 \name) contains exactly those values
-which can be used as either values of type $A$ or of type $B$. For instance,
+which can be used as values of type $A$ and of type $B$. For instance,
 consider the following program in \name:
 
 \begin{lstlisting}
@@ -41,7 +41,7 @@ let not (y : Bool) : Bool = if y then False else True in
 \lstinline{x} can be used as an argument to any function that takes
 an integer as an argument, and any
 function that take a boolean as an argument. In the program above
-the functions \lstinline{succ} and \lstinline{not} are the
+the functions \lstinline{succ} and \lstinline{not} are 
 simple functions on integers and characters, respectively.
 Passing \lstinline{x} as an argument to either one (or both) of the
 functions is valid.
@@ -217,7 +217,7 @@ types (and without a $\top$ type) this can be ensured by requiring the two types
 not to share a common supertype: 
 
 \begin{definition}[Simple disjointness]\label{def:simple_dis}
-  Given two types $A$ and $B$, those types are disjoint
+  Two types $A$ and $B$ are disjoint
   (written $A \disjoint B$) if there is no type $C$ such that both $A$ and $B$ are
   subtypes of $C$:
   \[A \disjoint B \equiv \not\exists C.~A \subtype C~\text{and}~B \subtype C\]
@@ -363,7 +363,7 @@ This paper studies two additional variants of \name with $\top$ types.
 In both variants the definition of disjointness is revised as follows:
 
 \begin{definition}[$\top$-Disjointness]
-  Given two types $A$ and $B$, those types are disjoint
+  Two types $A$ and $B$ are disjoint
   (written $A \disjoint B$) if the following two conditions are satisfied:
 \begin{enumerate}
   \item $\neg A_{\top}~\text{and}~\neg B_{\top}$
@@ -377,7 +377,7 @@ share any common supertype, we require that the only allowed common supertypes a
 the two types $A$ and $B$ are not themselves
 top-like (condition \#1). The unary relation $\cdot_{\top}$ denotes such top-like
 types. Top-like types obviously include the $\top$ type. However
-top-like types also allow for other types which are \emph{syntactically different}
+top-like types also include other types which are \emph{syntactically different}
 from $\top$, but behave like a $\top$ type. For example, $\code{$\top$}~\inter~\code{$\top$}$
 is syntactically different from $\top$, but it is still a supertype of
 every other type (including $\top$ itself). The standard subtyping relation for
@@ -406,8 +406,8 @@ coherence. For example, the following program is valid, and coherent:
 \end{lstlisting}
 
 \noindent Even though the types of both components of the merge are a
-subtype of the merge, the type of the program is $\top$, and its
-result is always the \emph{same} $\top$ value. Secondly,
+subtype of the type of the program ($\top$), the result of the
+program is always the \emph{unique} $\top$ value. Secondly,
 $\top$-Disjointness has the side-effect of excluding other top-like
 types from the system: the intersection type $\top \inter \top$ is not
 a well-formed disjoint intersection type. In contrast to Dunfield's
