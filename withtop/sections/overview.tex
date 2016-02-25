@@ -162,46 +162,29 @@ Thus, for atomic types such as \lstinline$Int$ and \lstinline$Bool$, it is
 easy to see that disjointness holds when the two types are
 different. Intersections such as \lstinline$Int & Bool$ and 
 \lstinline$String & Bool$ are clearly disjoint.
+While an informal, intuitive notion of disjointness is sufficient to
+see what happens with atomic types, it is less clear of what
+disjointness means in general.
 
-\paragraph{Disjointness of non-atomic types} 
-While it is easy to see how disjointness works for atomic types, 
-it is more challenging to see what disjointness mean for non-atomic types.
-For example, consider the following intersection types of functions:
+\paragraph{Formalizing disjointness} 
+Clearly a formal notion of disjointness is needed to design a
+calculus with disjoint intersection types, and to clarify what
+disjointness means in general.
+%Another challenge is how to formalize 
+%the notion of disjointness? So far all discussion about disjointness has been 
+%based on an informal understanding of what disjointness means. Clearly a formal 
+%definition of disjointness is desirable to design a calculus with disjoint 
+%intersection types. 
+As we shall see the particular notion of disjointness is quite
+sensitive to the language features that are allowed in a language.
+Nevertheless, the different notions of disjointness follow the same
+principle: they are defined in terms of the subtyping relation; and
+they describe which common supertypes are allowed in order for 
+two types to be considered disjoint.
 
-\begin{enumerate}
-
-\item $(\code{Int} \to \code{Int})~\inter~(\code{String} \to \code{String})$
-\item $(\code{String} \to \code{Int})~\inter~(\code{String} \to \code{String})$
-\item $(\code{Int} \to \code{String})~\inter~(\code{String} \to \code{String})$
-
-\end{enumerate}
-
-\noindent Which of those intersection types are disjoint? 
-It seems reasonable to expect that the first intersection type is
-disjoint: both the domain and codomain of the two functions in the
-intersection are different. However, it is less clear whether the two
-other intersection types are disjoint or not. This paper proposes the 
-following rule for determining the disjointness of two function types:
-
-\begin{mathpar}
-    \ruledisfun
-\end{mathpar}
-
-\noindent Here $*_i$ denotes disjointness. According to the rule the first 
-two intersection types are disjoint, whereas the last one is not. This 
-rule is justified in Section~\ref{}.\bruno{Should we stop here; or briefly argue 
-about some justification} 
-
-\paragraph{Formalizing disjointness} Another challenge is how to formalize 
-the notion of disjointness? So far all discussion about disjointness has been 
-based on an informal understanding of what disjointness means. Clearly a formal 
-definition of disjointness is desirable to design a calculus with disjoint 
-intersection types. As we shall see the particular notion of disjointness can be 
-quite sensitive to the language features that are allowed in a language. 
-
-
-A first attempt at a definition for disjointness is to require that, given two types $A$ and $B$, both types are not
-subtypes of each other. Thus, denoting disjointness as $A * B$, we would have:
+A first attempt at a definition for disjointness is to require that,
+given two types $A$ and $B$, both types are not subtypes of each
+other. Thus, denoting disjointness as $A * B$, we would have:
 \[A * B \equiv A \not<: B~\text{and}~B \not<: A\]
 At first sight this seems a reasonable definition and it does prevent
 merges such as \lstinline{1,,2}. However some moments of thought are enough to realize that
@@ -212,8 +195,8 @@ the following merge:
 (1,,'c') ,, (2,,True)
 \end{lstlisting}
 
-\noindent This merge has two components which are also intersection
-types. The first component \lstinline{(1,,'c')} has type $\code{Int} \inter
+\noindent This merge has two components which are also merges. 
+The first component \lstinline{(1,,'c')} has type $\code{Int} \inter
 \code{Char}$, whereas the second component \lstinline{(2 ,, True)} has type
 $\code{Int} \inter \code{Bool}$. Clearly,
 \[ \code{Int} \inter \code{Char} \not \subtype \code{Int} \inter \code{Bool} \wedge \code{Int} \inter \code{Bool} \not \subtype \code{Int} \inter \code{Char} \]
@@ -233,63 +216,102 @@ subcomponents sharing the same type. In a simply typed calculus with intersectio
 types (and without a $\top$ type) this can be ensured by requiring the two types 
 not to share a common supertype: 
 
-\begin{definition}[Simple disjointness]
-  Given two types $A$ and $B$, two types are disjoint
+\begin{definition}[Simple disjointness]\label{def:simple_dis}
+  Given two types $A$ and $B$, those types are disjoint
   (written $A \disjoint B$) if there is no type $C$ such that both $A$ and $B$ are
   subtypes of $C$:
   \[A \disjoint B \equiv \not\exists C.~A \subtype C~\text{and}~B \subtype C\]
 \end{definition}
 
-\noindent This definition of disjointness prevents the problematic
-\lstinline$(1,,'c') ,, (2,,True)$ merge. Since $\code{Int}$ is a
+\noindent This definition of disjointness prevents the problematic merge
+\lstinline$(1,,'c'),,(2,,True)$. Since $\code{Int}$ is a
 common supertype of both $\code{Int} \& \code{Char}$ and $\code{Int}
 \& \code{Bool}$, those two types are not disjoint, according to this
 simple notion of disjointness.
 
 The simple definition of disjointness is the basis for the first calculus 
 presented in this paper: a simply typed lambda calculus with intersection 
-(but without a $\top$ type). This variant of \name is useful to study many 
+(but without a $\top$ type). 
+This variant of \name is useful to study many 
 important issues arizing from disjoint intersections, without the additional 
-complications of $\top$. 
+complications of $\top$. As shown in Section~\ref{}, this
+definition of disjointness is sufficient to ensure coherence in \name.
 
-\paragraph{Disjointness in the presence of $\top$ types} In the presence of a 
-$\top$ type the simple definition of disjointness is useless. In that case there
-\emph{always} exists a common supertype (for example, the $\top$ type). So
-adding a $\top$ type requires some adaptations on the notion of disjointness. 
-This work studies two additional variants of \name with $\top$ types. 
-In both variants the definition of disjointness is revised as follows: 
+\paragraph{Disjointness of non-atomic types} Equipped with a formal
+notion of disjointness, we are now ready to see how disjointness works 
+for other, non-atomic types. 
+For example, consider the following intersection types of functions:
 
-\begin{definition}[Disjointness with $\top$]
-  Given two types $A$ and $B$, two types are disjoint
-  (written $A \disjoint B$) if the following two condictions are meet:
 \begin{enumerate}
-  \item $\neg A_{\top}~\text{and}~\neg B_{\top}$
-  \item $\forall C.~\text{if}~ A \subtype C~\text{and}~B \subtype C~\text{then}~C_{\top}$
+
+\item $(\code{Int} \to \code{Int})~\inter~(\code{String} \to \code{String})$
+\item $(\code{String} \to \code{Int})~\inter~(\code{String} \to \code{String})$
+\item $(\code{Int} \to \code{String})~\inter~(\code{String} \to \code{String})$
+
 \end{enumerate}
-\end{definition}
 
-In this definition the idea is to allow $A$ and $B$ to share some 
-common supertypes. Instead of requiring that two types do not have
-any common supertype, we require that the only supertypes are
-\emph{top-like}. The unary relation $A_{\top}$ denotes such top-like
-types. As shown in this paper allowing such supertypes does not cause 
-incoherence.\bruno{Explanation probably needs to be expanded}
+\noindent Which of those intersection types are disjoint? 
+It seems reasonable to expect that the first intersection type is
+disjoint: both the domain and codomain of the two functions in the
+intersection are different. However, it is less clear whether the two
+other intersection types are disjoint or not. Looking at 
+definition~\ref{def:simple_dis} for further guidance, and the subtyping rule for functions in
+\name (which is standard~\cite{cardelli}):
 
+\begin{mathpar}
+    \inferrule* [right=\labelsubfun]
+    {{B_1} \subtype {A_1} \\
+     {A_2} \subtype {B_2} }
+    {{A_1 \to A_2} \subtype {B_1 \to B_2}}
+\end{mathpar}
 
+\noindent we can see that the types in the 
+second intersection do not share any common supertypes. Since the
+target types of the two function types
+(\lstinline$Int$ and \lstinline$String$) do not share a common
+supertype, 
+it is not possible to find a type \lstinline$C$ that is both a common
+supertype of $(\code{String} \to \code{Int})$ and $(\code{String} \to \code{String})$.
+In contrast, for the third intersection type, it is possible to find a 
+common supertype: $\code{String}~\inter~\code{Int} \to
+\code{String}$. The contravariance of argument types
+in \reflabel{\labelsubfun}~is important here. All that we need in order to find a common supertype 
+between $(\code{Int} \to \code{String})$ and $(\code{String} \to
+\code{String})$ is to find a common subtype between $\code{Int}$ and 
+$\code{String}$. One such common subtype is
+$\code{String}~\inter~\code{Int}$. Preventing the third intersection
+type ensures that type-based lookups are not ambiguos (and cannot
+lead to incoherence). If the third intersection type was allowed then
+the following program:
 
- 
-% Definition OrthoS (A B : PTyp) := 
-%  (not (TopLike A) /\ not (TopLike B)) /\ (forall C, Sub A C -> Sub B C -> TopLike C).
+\begin{lstlisting}
+f,,g : String & Int (*$\to$*) String
+\end{lstlisting}
 
+\noindent where \lstinline$f$ is of type
+$\code{Int}~\to~\code{String}$  and \lstinline$g$ is of type
+$\code{String}~\to~\code{String}$, would be problematic. In this 
+case both \lstinline$f$ or \lstinline$g$ could be selected,
+potentially leading to very different (and incoherent) results when
+applied to some argument. 
 
-%- excluding any type of the form ${A_k} \to \top$.
-%The following definition captures this idea more formally.
+\begin{comment}
+According to the rule the first 
+two intersection types are disjoint, whereas the last one is not. This 
+rule is justified in Section~\ref{}.\bruno{Should we stop here; or briefly argue 
+about some justification} 
 
-\name's type system only accepts programs that use disjoint intersection
-types. As shown in Section~\ref{sec:disjoint} disjoint intersection types will
-play a crucial rule in guaranteeing that the semantics is coherent.
+This paper proposes the 
+following rule for determining the disjointness of two function types:
 
-\paragraph {Is disjointness sufficient to ensure coherence?} A final question
+\begin{mathpar}
+    \ruledisfun
+\end{mathpar}
+
+\noindent Here $*_i$ denotes disjointness. 
+\end{comment}
+
+\paragraph {Is disjointness sufficient to ensure coherence?} Another question
 is whether disjoint intersection types are sufficient to ensure coherence. 
 Consider the following example:
 
@@ -328,6 +350,100 @@ the ambiguity problem is solved by annotating the term being applied. For exampl
 \end{lstlisting}
 
 \noindent is a valid program and results in \lstinline$4$.
+
+\subsection{Disjointness Intersection Types with $\top$} 
+In the presence of a $\top$ type the simple definition of disjointness
+is useless: $\top$ is always a common supertype of any two types.
+Therefore, with the previous definition of disjointness no disjoint
+intersections could ever be well-formed in the presence of $\top$!
+Moreover, since $\top$ is not disjoint to any type, it does not make
+sense to allow its presence in a disjoint intersection type.  Adding a
+$\top$ type requires some adaptations on the notion of disjointness.
+This paper studies two additional variants of \name with $\top$ types.
+In both variants the definition of disjointness is revised as follows:
+
+\begin{definition}[$\top$-Disjointness]
+  Given two types $A$ and $B$, those types are disjoint
+  (written $A \disjoint B$) if the following two conditions are satisfied:
+\begin{enumerate}
+  \item $\neg A_{\top}~\text{and}~\neg B_{\top}$
+  \item $\forall C.~\text{if}~ A \subtype C~\text{and}~B \subtype C~\text{then}~C_{\top}$
+\end{enumerate}
+\end{definition}
+
+In the presence of $\top$, instead of requiring that two types do not
+share any common supertype, we require that the only allowed common supertypes are
+\emph{top-like} (condition \#2). Additionally, it is also required that
+the two types $A$ and $B$ are not themselves
+top-like (condition \#1). The unary relation $\cdot_{\top}$ denotes such top-like
+types. Top-like types obviously include the $\top$ type. However
+top-like types also allow for other types which are \emph{syntactically different}
+from $\top$, but behave like a $\top$ type. For example, $\code{$\top$}~\inter~\code{$\top$}$
+is syntactically different from $\top$, but it is still a supertype of
+every other type (including $\top$ itself). The standard subtyping relation for
+intersection types includes a rule:
+
+\begin{mathpar}
+      \inferrule* [right=\labelsubinter]
+    {{A_1} \subtype {A_2} \\
+     {A_1} \subtype {A_3} }
+    {{A_1} \subtype {A_2 \inter A_3}}
+\end{mathpar}
+
+\noindent The presence of  \reflabel{\labelsubinter} means that both  
+${\top\inter \top} \!\!\subtype\!\! {\top}$ and 
+${\top} \!\!\subtype\!\! {\top \inter \top}$ are derivable.
+In other words, in a calculus like Dunfield's there are infinitely
+many syntactically different types that behave like a $\top$ type: 
+$\top$, $\top \inter \top$, $\top \inter \top \inter \top$, \ldots
+
+The notion of $\top$-Disjointness has two benefits. Firstly, and more
+importantly, $\top$-Disjointness is sufficient to ensure
+coherence. For example, the following program is valid, and coherent:
+
+\begin{lstlisting}
+3,,True : (*$\top$*) 
+\end{lstlisting}
+
+\noindent Even though the types of both components of the merge are a
+subtype of the merge, the type of the program is $\top$, and its
+result is always the \emph{same} $\top$ value. Secondly,
+$\top$-Disjointness has the side-effect of excluding other top-like
+types from the system: the intersection type $\top \inter \top$ is not
+a well-formed disjoint intersection type. In contrast to Dunfield's
+calculus, \name has a unique syntactic $\top$ type.
+
+\paragraph{Functional intersections and top-like types}
+The two variants of \name with $\top$ differ slightly on the
+definition of top-like types. The concrete definition of top-like 
+types is important because it affects what types are allowed in intersections.
+In the simpler version of \name with $\top$, multiple
+functions cannot coexist in intersections. This is obviously a drawback and 
+would reduce the usefulness of the system. The essential
+problem is that a simple notion of top-like types is too restrictive. 
+For example consider again the intersection type: \\
+
+$(\code{String} \to \code{Int})~\inter~(\code{String} \to  \code{String})$
+\vspace{5pt}
+
+\noindent According to the simple definition of disjointness, this disjoint
+intersection type is valid. However according $\top$-Disjointness and a simple definition
+of top-like types, which accounts only for proper top types, this disjoint intersection type is not valid. 
+The two types have a common supertype which is not a supertype of
+every type: $\code{String} \to \top$. In this case $(\code{String} \to
+\top)\!\!\subtype\!\!\top$, but $\top\!\!\not\subtype\!\!(\code{String} \to
+\top)$. Therefore the two types do not meet the second condition of
+$\top$-Disjointness as there exists a common supertype, which is not top-like.
+
+\paragraph{Generalizing top-like types} In the second variant of \name 
+top-likes are defined more liberally and they allow ``local'' top
+types, as well as proper top types. \bruno{finish this}
+
+\name's type system only accepts programs that use disjoint intersection
+types. As shown in Section~\ref{sec:disjoint} disjoint intersection types will
+play a crucial rule in guaranteeing that the semantics is coherent.
+
+
 
 
  
