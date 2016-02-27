@@ -771,11 +771,10 @@ Proof.
 Defined.
 
 Lemma subst_fresh_var :
-  forall x z t, not (In z (fv_source t)) ->
-           not (In x (fv_source t)) ->
+  forall x z t, not (In x (fv_source t)) ->
            subst_source x (PFVar z) (open_source t (PFVar x)) = open_source t (PFVar z).
 Proof.
-  intros x z t H1 H2.
+  intros x z t H1.
   rewrite subst_source_open.
   simpl.
   case_eq (x =? x); intros HEq.
@@ -852,10 +851,11 @@ Proof.
   apply H0; not_in_L x.
 Defined.
 
-Lemma type_correct_source_terms' : forall Gamma E ty e, has_type_source Gamma E ty e -> PTerm E.
+Lemma type_correct_source_terms' : forall Gamma E ty e, has_type_source Gamma e ty E -> PTerm E.
 Proof.
   intros.
   induction H; auto.
+  apply PTerm_Ann.
   apply_fresh PTerm_Lam as x; auto.
   apply H0; not_in_L x.
 Defined.
@@ -1053,6 +1053,11 @@ Proof.
   now apply IHt1_2.  
 Qed.
 
+(*
+not (In y (dom Gamma)) =>  
+(x,A)::Gamma :- t1 ^ x : B (-> t2 ^ x) => 
+(y,A)::Gamma :- [x -> y] (t1 ^ x) : B (-> [x -> y] (t2 ^ x))
+*)
 Lemma tsubst :
   forall E F t1 t2 x y A B,
     not (In y (dom (E ++ F))) ->
@@ -1150,19 +1155,371 @@ Proof.
     apply PTerm_Var.
     auto.
 Qed.
+
+Lemma fv_source_in_open :
+  forall x z t0 n, not (VarTyp.eq x z) ->
+              In x (fv_source t0) ->
+              In x (fv_source (open_rec_source n (PFVar z) t0)). 
+Proof.
+  intros.
+  generalize dependent n.
+  induction t0; simpl in *; auto.
+  inversion H0.
+  intros.
+  rewrite union_spec in *.
+  inversion H0.
+  left; now apply IHt0_1.
+  right; now apply IHt0_2.
+  intros.
+  rewrite union_spec in *.
+  inversion H0.
+  left; now apply IHt0_1.
+  right; now apply IHt0_2.
+Qed.
+  
+Lemma env_impl_fv_source :
+  forall Gamma x t A E, has_type_source Gamma t A E -> In x (fv_source t) -> In x (dom Gamma).
+Proof.
+  intros.
+  induction H.
+  - simpl in *.
+    apply MSetProperties.Dec.F.singleton_1 in H0.
+    apply list_impl_m in H1.
+    now rewrite H0 in H1.
+  - inversion H0.
+  - simpl in *.
+    pick_fresh z.
+    assert (Ha : not (In z L)) by not_in_L z.
+    apply H1 in Ha.
+    apply MSetProperties.Dec.F.add_iff in Ha.
+    inversion Ha.
+    assert (HNot : not (VarTyp.eq z x)) by not_in_L z.
+    contradiction.
+    assumption.
+    apply fv_source_in_open.
+    assert (HNot : not (VarTyp.eq z x)) by not_in_L z.
+    unfold not; intros; apply HNot; now symmetry.
+    assumption.
+  - simpl in H0; rewrite union_spec in H0.
+    inversion H0.
+    now apply IHhas_type_source1.
+    now apply IHhas_type_source2.
+  - simpl in H0; rewrite union_spec in H0.
+    inversion H0.
+    now apply IHhas_type_source1.
+    now apply IHhas_type_source2.
+  - auto.
+Qed.
     
+Lemma not_env_impl_not_fv_source :
+  forall Gamma x t A E, has_type_source Gamma t A E ->
+               not (In x (dom Gamma)) ->
+               not (In x (fv_source t)).
+Proof.
+  intros Gamma x t A E H HNot.
+  induction H.
+  - apply list_impl_m in H0.
+    pose (@VarTyp.eq_dec x x0) as s.
+    inversion s.
+    rewrite H2 in HNot.
+    contradiction.
+    simpl.
+    unfold not; intros; apply H2.
+    apply MSetProperties.FM.singleton_1 in H3.
+    now symmetry.
+  - simpl; unfold not; intros HInv; now apply MSetProperties.Dec.F.empty_iff in HInv.
+  - simpl in *.
+    pick_fresh z.
+    assert (not (In z L)) by not_in_L z.
+    assert (not (VarTyp.eq z x)) by not_in_L z.
+    apply H in H2.
+    assert (not (In z L)) by not_in_L z.
+    apply H0 in H4.
+    unfold not; intros; apply H4.
+    apply fv_source_in_open.
+    unfold not; intros; apply H3; now symmetry.
+    auto.
+    unfold not; intros.
+    apply MSetProperties.Dec.F.add_iff in H5.
+    inversion H5.
+    apply H3; now symmetry.
+    contradiction.
+  - simpl; rewrite union_spec.
+    unfold not; intros HInv.
+    inversion HInv.
+    apply IHhas_type_source1; auto.
+    apply IHhas_type_source2; auto.
+  - simpl; rewrite union_spec.
+    unfold not; intros HInv.
+    inversion HInv.
+    apply IHhas_type_source1; auto.
+    apply IHhas_type_source2; auto.
+  - simpl; unfold not; intros HInv; apply IHhas_type_source; auto.
+Qed.
+
+Lemma not_env_impl_not_fv_source_E :
+  forall Gamma x t A E, has_type_source Gamma t A E ->
+               not (In x (dom Gamma)) ->
+               not (In x (fv_source E)).
+Proof.
+  intros Gamma x t A E H HNot.
+  induction H.
+  - apply list_impl_m in H0.
+    pose (@VarTyp.eq_dec x x0) as s.
+    inversion s.
+    rewrite H2 in HNot.
+    contradiction.
+    simpl.
+    unfold not; intros; apply H2.
+    apply MSetProperties.FM.singleton_1 in H3.
+    now symmetry.
+  - simpl; unfold not; intros HInv; now apply MSetProperties.Dec.F.empty_iff in HInv.
+  - simpl in *.
+    pick_fresh z.
+    assert (not (In z L)) by not_in_L z.
+    assert (not (VarTyp.eq z x)) by not_in_L z.
+    apply H in H2.
+    assert (not (In z L)) by not_in_L z.
+    apply H0 in H4.
+    unfold not; intros; apply H4.
+    apply fv_source_in_open.
+    unfold not; intros; apply H3; now symmetry.
+    auto.
+    unfold not; intros.
+    apply MSetProperties.Dec.F.add_iff in H5.
+    inversion H5.
+    apply H3; now symmetry.
+    contradiction.
+  - simpl; rewrite union_spec.
+    unfold not; intros HInv.
+    inversion HInv.
+    apply IHhas_type_source1; auto.
+    apply IHhas_type_source2; auto.
+  - simpl; rewrite union_spec.
+    unfold not; intros HInv.
+    inversion HInv.
+    apply IHhas_type_source1; auto.
+    apply IHhas_type_source2; auto.
+  - simpl; unfold not; intros HInv; apply IHhas_type_source; auto.
+Qed.
+
+  
+Lemma tsubst'' :
+  forall E F t1 x y A B,
+    not (In y (dom (E ++ F))) ->
+    has_type (E ++ (extend x A F)) (open_source t1 (PFVar x)) B ->
+    has_type (E ++ (extend y A F)) (subst_source x (PFVar y) (open_source t1 (PFVar x))) B.
+Proof.
+  unfold has_type.
+  intros.  
+  remember (E ++ extend x A F) as G.
+  generalize dependent HeqG.
+  generalize dependent E.
+  generalize dependent F.
+  inversion H0.
+  induction H; intros; simpl in *; subst; eauto.
+  - case_eq (x0 =? x); intro HEq.
+    exists (PFVar y).
+    apply TyVar.
+    rewrite <- app_nil_l; apply ok_middle_comm; rewrite app_nil_l.
+    apply Ok_push.
+    rewrite <- app_nil_l in H.
+    unfold extend in H; apply ok_middle_comm in H; rewrite app_nil_l in H.
+    inversion H; auto.
+    auto.
+    assert (Ha : ty = A).
+    apply eqb_eq in HEq.
+    unfold extend in H; rewrite <- app_nil_l in H; apply ok_middle_comm in H; rewrite app_nil_l in H.
+    inversion H; subst.
+    apply in_app_or in H1.
+    inversion H1.
+    exfalso; apply H8; rewrite dom_union; rewrite union_spec; left.
+    apply list_impl_m in H4; now rewrite HEq in H4.
+    unfold extend in H4; apply in_app_or in H4. 
+    inversion H4.
+    inversion H5; now inversion H7.
+    exfalso; apply H8; rewrite dom_union; rewrite union_spec; right.
+    apply list_impl_m in H5; now rewrite HEq in H5.
+    rewrite Ha.
+    apply in_or_app.
+    right; apply in_or_app; left.
+    left; reflexivity.
+    auto.
+    exists (PFVar x0).
+    apply typing_weaken_source.
+    apply TyVar.
+    rewrite <- app_nil_l in H.
+    unfold extend in H; apply ok_middle_comm in H; rewrite app_nil_l in H.
+    inversion H; auto.
+    apply in_app_or in H1.
+    inversion H1.
+    apply in_or_app; auto.
+    unfold extend in H4.
+    apply in_app_or in H4.
+    inversion H4.
+    inversion H5.
+    inversion H6; subst.
+    apply EqFacts.eqb_neq in HEq.
+    exfalso; apply HEq; reflexivity.
+    inversion H6.
+    apply in_or_app; auto.
+    auto.
+    rewrite <- app_nil_l; apply ok_middle_comm; rewrite app_nil_l.
+    apply Ok_push.
+    unfold extend in H; now apply ok_remove in H.
+    auto.
+  - exists (PLit x0).
+    apply TyLit.
+    rewrite <- app_nil_l; apply ok_middle_comm; rewrite app_nil_l.
+    apply Ok_push.
+    unfold extend in H.
+    rewrite <- app_nil_l in H; apply ok_middle_comm in H; rewrite app_nil_l in H.
+    inversion H; auto.
+    auto.
+  - eexists.
+    apply_fresh TyLam as z. 
+    rewrite subst_source_open_var.
+    unfold open_source at 2.
+    rewrite <- open_rec_source_term.
+    unfold extend in *.
+    rewrite app_assoc.
+    assert (Ha : (not (In z L))) by not_in_L z.
+    eapply (H1 z) in Ha.
+    inversion Ha.
+    Admitted.
+(*
+apply H4.
+    not_in_L z.
+    unfold not; intros.
+    simpl.
+    rewrite dom_union in H3; apply MSetProperties.Dec.F.union_1 in H3.
+    inversion H3.
+    rewrite dom_union in H4; apply MSetProperties.Dec.F.union_1 in H4.
+    inversion H4.
+    simpl in H5.
+    apply MSetProperties.Dec.F.add_iff in H5.
+    inversion H5.
+    apply Frz.
+    not_in_L z.
+    inversion H6.
+    apply H2; not_in_L y.
+    apply H2; not_in_L y.
+    rewrite app_assoc; reflexivity.
+    not_in_L z.
+    not_in_L x.
+    apply PTerm_Var.
+    not_in_L z.
+    not_in_L x.
+    apply PTerm_Var.
+    auto.
+Qed.*)
+
+Lemma typing_open_rec_source :
+  forall y A Gamma t B E n,
+    has_type_source (extend y A Gamma) (open_rec_source n (PFVar y) t) B E ->
+    (exists E', E = open_rec_source n (PFVar y) E').
+Proof.
+  intros.
+  remember (extend y A Gamma).
+  remember (open_source t0 (PFVar y)).
+  generalize dependent Heqc.
+  generalize dependent Heqp.
+  inversion H; intros; subst.
+  eexists. apply H0.
+  eexists. apply H0.
+  exists (PAnn (PLam t2) (Fun A0 B0)).
+  rewrite <- open_rec_source_term.
+  reflexivity.
+  now apply type_correct_source_terms' in H. 
+  exists (PApp t1' t2').
+  rewrite <- open_rec_source_term.
+  reflexivity.
+  now apply type_correct_source_terms' in H.   
+  exists (PMerge t1' t2').
+  rewrite <- open_rec_source_term.
+  reflexivity.
+  now apply type_correct_source_terms' in H.
+  exists (PAnn t' B).
+  rewrite <- open_rec_source_term.
+  reflexivity.
+  now apply type_correct_source_terms' in H.   
+  
+Defined.
+
+
+Lemma test :
+  forall z A B Gamma y t0 x0,
+    has_type_source (extend z A Gamma)
+                    (subst_source y (PFVar z) (open_source t0 (PFVar y))) B
+                    (subst_source y (PFVar z) (open_source x0 (PFVar y))) ->
+    not (In y (dom Gamma)) ->
+    not (z = y) ->
+    has_type_source (extend z A Gamma)
+                    (open_source t0 (PFVar z)) B (open_source x0 (PFVar z)).
+Proof.
+  intros.
+  remember (extend z A Gamma).
+  dependent induction H; subst.
+  simpl in *.
+  Focus 5.
+Admitted.
+  
 Definition tlam : forall L Gamma t A B, (forall x, not (In x L) -> 
                                      has_type (extend x A Gamma) (open_source t (PFVar x)) B) ->
                                WFTyp A ->
                                has_type Gamma (PLam t) (Fun A B).
-  intros. 
+  intros.
   unfold has_type.
   unfold has_type in H.
-  pick_fresh y. 
+  pick_fresh y.
+  (* at this point we should have not (In y (fv_source x0)), see admit below *)
   assert (HNot : not (In y L)) by not_in_L y.
   pose (H y HNot).
-  destruct e. 
+  destruct e.
+(*
+  assert (not (In y (match H y HNot with
+                       | ex_intro _ s _ => (fv_source s) end))).
+*)  
+  assert (Ha : has_type_source (extend y A Gamma) (open_source t0 (PFVar y)) B x) by apply H1.
+  apply typing_open_rec_source in H1.
+  destruct H1 as [x0 H1].
+  subst.
+  assert (Ha2 : has_type_source (extend y A Gamma) (open_source t0 (PFVar y)) B
+         (open_rec_source 0 (PFVar y) x0)) by apply Ha.
+  exists (PAnn (PLam x0) (Fun A B)).  
+  apply_fresh TyLam as z. 
+  rewrite <- app_nil_l with (l := extend y A Gamma) in Ha.
 
+(*
+  rewrite <- app_nil_l with (l := extend z A Gamma).
+  eapply tsubst' with (y := y).
+  simpl. not_in_L y.
+  rewrite subst_fresh_var.
+  rewrite subst_fresh_var.
+  apply Ha.
+  not_in_L y0.
+  not_in_L y0.
+  apply H0.
+  *)
+
+  apply tsubst with (y := z) in Ha.
+  rewrite app_nil_l in Ha.
+  rewrite subst_fresh_var in Ha.
+  rewrite subst_fresh_var in Ha.
+  apply Ha.
+  apply not_env_impl_not_fv_source_E with (x := y) in Ha.
+  SearchAbout has_type_source.
+  Check env_impl_fv_source.
+  Check fv_source_in_open.
+  
+  admit.
+  simpl; admit.
+  not_in_L y.
+  not_in_L y.
+  not_in_L z.
+  auto.
+  
+  (*
   assert (E : PExp) by admit.
   assert (x = (open_source E (PFVar y))) by admit.
   assert (Ha : not (In y (fv_source E))) by admit.
@@ -1182,6 +1539,8 @@ Definition tlam : forall L Gamma t A B, (forall x, not (In x L) ->
   not_in_L y.
   not_in_L x0.
   auto.
+*)
+  
 (*  
   assert (forall {y z}, not (In y L) -> not (In z L ) -> has_type_source (extend y A Gamma) (open_source t0 (PFVar y)) B x = has_type_source (extend z A Gamma) (open_source t0 (PFVar z)) B x).
   (* so, if y0 and z are both fresh *)
@@ -1609,7 +1968,7 @@ Proof. intros. unfold body_ty. inversion H. inversion H0. subst. exists L.
        subst. inversion H1.
 Qed.
 
-Lemma foo : forall L Gamma A B t1,
+Lemma foo' : forall L Gamma A B t1,
   (forall x : elt,
        ~ In x L ->
        exists E : SExp var,
@@ -1626,8 +1985,8 @@ Lemma body_ty_to_term_abs : forall t1 A B Gamma,
   body_ty t1 A B Gamma -> has_ty Gamma (PLam t1) Chk (Fun A B).
 Proof. intros. unfold body_ty in H. unfold has_ty in *. inversion H as [L H1].
        eexists (STLam' _ _). Check ATyLam.
-       unfold has_ty in H1. Check foo.
-       eapply (foo L Gamma A B t1) in H1. Check ATyLam.
+       unfold has_ty in H1. Check foo'.
+       eapply (foo' L Gamma A B t1) in H1. Check ATyLam.
        eapply (ATyLam _ _ _ _ _ _ _ _).
        pick_fresh x.
        not_in_L x.
@@ -2279,7 +2638,7 @@ rewrite (IHt0_1 n e). rewrite (IHt0_2 n e). reflexivity.
 Defined.
 
 Lemma typ_sound : forall e d A Gamma, has_ty Gamma e d A -> has_type Gamma (erase e) A.
-intros.
+intros.  
 inversion H. clear H.
 induction H0; simpl.
 (* PFVar *)
