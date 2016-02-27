@@ -19,8 +19,9 @@ disjoint intersection types and ensuring coherence.
 \subsection{Syntax}
 
 Figure~\ref{fig:fi-syntax} shows the syntax. The differences to the
-$\lambda$-calculus, highlighted in gray, are intersection types $A \inter B$ at
-the type-level and the ``merges'' $e_1 \mergeop e_2$ at the term level.
+$\lambda$-calculus, highlighted in gray, are intersection types ($A
+\inter B$) and the top type ($\top$) at
+the type-level, and merges ($e_1 \mergeop e_2$) and the top value ($\top$) the at the term level.
 
 \begin{figure}[t]
   \[
@@ -30,7 +31,7 @@ the type-level and the ``merges'' $e_1 \mergeop e_2$ at the term level.
         & A, B, C & \Coloneqq & \code{Int} & \\
         &         & \mid      & A \to B    & \\
         &         & \mid      & \highlight{$A \inter B$}  & \\
-        &         & \mid      & \top  & \\
+        &         & \mid      & \highlight{$\top$}  & \\
 
         \\
         \text{Terms}
@@ -39,7 +40,7 @@ the type-level and the ``merges'' $e_1 \mergeop e_2$ at the term level.
         &   & \mid & \lamty x A e      & \\
         &   & \mid & \app {e_1} {e_2}  & \\
         &   & \mid & \highlight{$e_1 \mergeop e_2$}  & \\
-        &   & \mid & \top & \\
+        &   & \mid & \highlight{$\top$} & \\
 
         \\
         \text{Contexts}
@@ -52,13 +53,15 @@ the type-level and the ``merges'' $e_1 \mergeop e_2$ at the term level.
   \caption{\name syntax.}
   \label{fig:fi-syntax}
 \end{figure}
+\bruno{Careful double-checking is needed throughout the paper to
+  ensure that we are not using annotatted lambdas.}
 
 \paragraph{Types.} Metavariables $A$, $B$ range over types. Types include
 function types $A \to B$. $A \inter B$ denotes the intersection of types $A$ and
 $B$. We also include $\top$ and integer types $\code{Int}$.
 
 \paragraph{Terms.} Metavariables $e$ range over terms.  Terms include standard
-constructs: variables $x$; abstraction of terms over variables of a given type
+constructs: variables $x$; abstraction of terms over variables
 $\lamty x A e$; and application of terms $e_1$ to terms $e_2$, written $\app
 {e_1} {e_2}$. The expression $e_1 \mergeop e_2$ is the \emph{merge} of two terms
 $e_1$ and $e_2$. Merges of terms correspond to intersections of types $A \inter
@@ -75,8 +78,9 @@ In addition, we also include integer literals $i$.
 In order to focus on the key features that make this language interesting, we do
 not include other forms such as type constants and fixpoints here. However they
 can be included in the formalization in standard ways and we are using them in
-discussions and examples. The formalization of nonessential features such as
-records and record operations can be found in the full version of the paper.
+discussions and examples. 
+%The formalization of nonessential features such as
+%records and record operations can be found in the full version of the paper.
 
 % \paragraph{Discussion.} A natural question the reader might ask is that why we
 % have excluded union types from the language. The answer is we found that
@@ -93,27 +97,50 @@ records and record operations can be found in the full version of the paper.
 % that are explicitly declared by the programmer.
 
 \begin{figure}
+%\begin{comment}
+\begin{mathpar}
+    \framebox{$\jatomic A$} \\
+
+    \inferrule*
+    {}
+    {\jatomic {A \to B}}
+
+    \inferrule*
+    {}
+    {\jatomic {\code{Int}}}
+
+    %\inferrule*
+    %{}
+    %{\jatomic \top}
+  \end{mathpar}
+%\end{comment}
+
   \begin{mathpar}
     \formsub \\
-    \rulesubvar \and \rulesubint \and \rulesubfun \and \rulesubinter 
-    \and \rulesubinterl \and \rulesubinterr \and \rulesubtop 
+    \rulesubint \and \rulesubtop \and \rulesubfun \and \rulesubinter 
+    \and \rulesubinterldis \and \rulesubinterrdis 
   \end{mathpar}
 
   \begin{mathpar}
     \formwf \\
-    \rulewfint \and \rulewffun \and \rulewfinter \and \rulewftop
+    \rulewfint \and \rulewffun \and \rulewfinterdis \and \rulewftop
   \end{mathpar}
 
+{\renewcommand{\yields}[1]{}
   \begin{mathpar}
     \formt \\
     \ruletvar \and \ruletint \and
     \ruletlam \and \ruletapp \and
-    \ruletmerge \and \rulettop \and \rulettop
+    \ruletmergedis \and \ruletsub \and \rulettop
   \end{mathpar}
+}
 
   \caption{Declarative type system of \name.}
   \label{fig:fi-type}
 \end{figure}
+\bruno{Draw boxes around the stuff that is related to disjointness, as
+this will be shown later. Perhaps there is no need to show the 
+definition of ordinary, here. Talk about it only later in the paper.}
 
 % Intersection types introduce natural subtyping relations among types. For
 % example, $ \code{Int} \inter \code{Bool} $ should be a subtype of $ \code{Int} $, since the former
@@ -221,9 +248,21 @@ loss (only loss of convinience), as it is always possibly to extract the functio
 a merge and then apply it.
 \end{comment}
 
-\subsection{Algorithmic Type System}
+\subsection{Bidirectional Type System}
 
 Introduce the bi-directional type system here?
+
+\begin{figure}
+  \begin{mathpar}
+    \formt \\
+    \ruletvar \and \ruletint \and
+    \ruletlam \and \ruletapp \and
+    \ruletmergedis \and \ruletsub \and \rulettop
+  \end{mathpar}
+  \caption{Bidirectional type system of \name.}
+  \label{fig:fi-typebd}
+\end{figure}
+
 
 \subsection{Semantics}
 

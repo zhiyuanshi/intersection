@@ -1,6 +1,8 @@
 \newcommand{\formt}{\framebox{$ \jtype \Gamma e A \yields E $}}
 
-\newcommand{\makelabelt}[1]{F-Ty-#1}
+\newcommand{\makelabelt}[1]{T-#1}
+
+% \renewcommand{\yields}[1]{}
 
 \newcommand{\labeltvar}{\makelabelt Var}
 \newcommand{\ruletvar} {
@@ -13,7 +15,7 @@
 \newcommand{\ruletint} {
 \inferrule* [right=\labeltint]
   { }
-  {\jtype \Gamma i {\code{Int}}}
+  {\jtype \Gamma i {\code{Int}} \yields i}
 }
 
 \newcommand{\labeltlam}{\makelabelt Lam}
@@ -27,9 +29,9 @@
 \newcommand{\ruletapp}{
 \inferrule* [right=\labeltapp]
   {\jtype \Gamma {e_1} {A_{1} \to A_{2}} \yields {E_1} \\
-   \jtype \Gamma {e_2} {A_{3}} \yields {E_2} \\
-   {A_3} \subtype {A_1} \yields {E}}
-  {\jtype \Gamma {\app {e_1} {e_2}} {A_{2}} \yields {\app {E_1} {(\app E E_2)}}}
+   \jtype \Gamma {e_2} {A_{1}} \yields {E_2}}
+%%   {A_3} \subtype {A_1} \yields {E}}
+  {\jtype \Gamma {\app {e_1} {e_2}} {A_{2}} \yields {\app {E_1} E_2}}
 }
 
 \newcommand{\labeltblam}{\makelabelt BLam}
@@ -74,11 +76,18 @@
   {\jtype \Gamma {e_1 \mergeop e_2} {A \inter B} \yields {\pair {E_1} {E_2}}}
 }
 
+\newcommand{\labeltsub}{\makelabelt Sub}
+\newcommand{\ruletsub}{
+\inferrule* [right=\labeltsub]
+  {\jtype \Gamma {e} A \yields {E} \\ {A} \subtype {B} \yields {C}}
+  {\jtype \Gamma {e} {B} \yields {\tapp C E}}
+}
+
 \newcommand{\ruletmergedis}{
 \inferrule* [right=\labeltmerge]
   {\jtype \Gamma {e_1} A \yields {E_1} \\
    \jtype \Gamma {e_2} B \yields {E_2} \\
-   \highlight{$\jdis \Gamma A B$}}
+   \framebox{$\jdis \Gamma A B$}}
   {\jtype \Gamma {e_1 \mergeop e_2} {A \inter B} \yields {\pair {E_1} {E_2}}}
 }
 
@@ -88,3 +97,7 @@
   { }
   {\jtype \Gamma \top \top \yields \unit}
 }
+
+
+
+%\renewcommand{\yields}[1]{\highlight{$\; \hookrightarrow #1$}}

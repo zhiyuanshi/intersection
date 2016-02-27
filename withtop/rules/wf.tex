@@ -1,6 +1,6 @@
 \newcommand{\formwf}{\framebox{$ \jwf \Gamma A $}}
 
-\newcommand{\makelabelwf}[1]{F-WF-#1}
+\newcommand{\makelabelwf}[1]{WF-#1}
 
 \newcommand{\labelwfvar}{\makelabelwf Var}
 \newcommand{\rulewfvar}{
@@ -54,7 +54,7 @@
   \inferrule* [right=\labelwfinter]
     {\jwf \Gamma A \\
      \jwf \Gamma B \\
-     \highlight{$\jdis \Gamma A B$}}
+     \framebox{$\jdis \Gamma A B$}}
     {\jwf \Gamma {A \inter B}}
 }
 
