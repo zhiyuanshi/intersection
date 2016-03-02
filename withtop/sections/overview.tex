@@ -336,11 +336,10 @@ Like other programming language features (for example type classes~\cite{}),
 types play a fundamental role in determining the result of a program, and the 
 semantics of the language is not independent from types. 
 
-Disjointness is indeed sufficient to ensure coherence. The key point is that 
-given a program \emph{and its type} there is always a unique result for that 
-program. However, for certain programs type annotations are necessary to rule 
-out \emph{type ambiguity}. Similar type ambiguity issues arize in other type-directed 
-mechanisms such as type-classes~\cite{}. 
+Disjointness is indeed sufficient to ensure coherence. However, for
+certain programs type annotations are necessary to rule out \emph{type
+  ambiguity}. Similar type ambiguity issues arize in other
+type-directed mechanisms such as type-classes~\cite{}.
 
 In our implementation, which uses bi-directional type-checking techniques~\cite{}, 
 the ambiguity problem is solved by annotating the term being applied. For example:
@@ -349,7 +348,8 @@ the ambiguity problem is solved by annotating the term being applied. For exampl
 ((succ,,not) : Int (*$\to$*) Int) (3,,True)
 \end{lstlisting}
 
-\noindent is a valid program and results in \lstinline$4$.
+\noindent is a valid program and results in
+\lstinline$4$.\bruno{improve text?}
 
 \subsection{Disjointness Intersection Types with $\top$} 
 In the presence of a $\top$ type the simple definition of disjointness

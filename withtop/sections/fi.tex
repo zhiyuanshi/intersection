@@ -1,20 +1,21 @@
-\section{The \name Calculus}
+\section{The \name Calculus and its Type System}
 \label{sec:fi}
 
-This section presents the syntax, subtyping, typing, as well as the
-(incoherent) semantics of \name: a calculus with intersection types
-and a merge operator.  This calculus is inspired by Dunfield's
+This section presents the syntax, subtyping and typing of \name: 
+a calculus with intersection types and a merge
+operator.  This calculus is inspired by Dunfield's
 calculus~\cite{dunfield2014elaborating}.  However our calculus does
-not consider union types, and due to the fact that we are interested
-only in disjoint intersections, it also has a few less typing rules
-than in Dunfield's calculus.\bruno{rephrase next} The differences are
-that, in Dunfield's language, the coercions are source language terms
-and that function application allows the expression denoting the
-function to have an intersection type.  Sections~\ref{sec:disjoint}
+not consider union types\bruno{Consider a discussion about union types
+later in the paper?}. Moreover, due to the fact that we are
+interested only in disjoint intersections, it also has a few less
+typing rules than in Dunfield's calculus. Sections~\ref{sec:disjoint}
 and \ref{sec:alg-dis} will present the more fundamental contributions
 of this paper by showing other necessary changes for supporting
-disjoint intersection types and ensuring coherence.
-
+disjoint intersection types and ensuring coherence. The calculus in
+this section does not include the $\top$ type, which brings some
+additional complications.  Section~\ref{} presents two variants of
+\name with a $\top$ type, and shows how coherence can be preserved in
+the presence of $\top$.
 
 \subsection{Syntax}
 
@@ -55,6 +56,7 @@ the type-level, and merges ($e_1 \mergeop e_2$) and the top value ($\top$) the a
 \end{figure}
 \bruno{Careful double-checking is needed throughout the paper to
   ensure that we are not using annotatted lambdas.}
+\bruno{Probably better to discuss all top rules later, in the top section.}
 
 \paragraph{Types.} Metavariables $A$, $B$ range over types. Types include
 function types $A \to B$. $A \inter B$ denotes the intersection of types $A$ and
@@ -171,8 +173,16 @@ sets. Under this interpretation, for example, the rule \reflabel{\labelsubinter}
 says that if $A_1$ is both the subset of $A_2$ and the subset of $A_3$, then
 $A_1$ is also the subset of the intersection of $A_2$ and $A_3$.
 
-\paragraph{Metatheory.} As other sane subtyping relations, we can show that
-subtyping defined by $\subtype$ is also reflexive and transitive.
+Note that the notion of ordinary types, which is used in rules
+\reflabel{\labelsubinter1} and \reflabel{\labelsubinter2}, was
+introduced by Davies and Pfenning~\cite{} to provide an algorithmic version of
+subtyping. In our system ordinary types are used for a different 
+purpose as well: they play a fundamantal role in ensuring that 
+subtyping produces unique coercions. Section~\ref{} will present 
+a detailed discussion on this.\bruno{improve text?}
+
+\paragraph{Metatheory.} The subtyping relation, is known to be
+reflexive and transitive~\cite{}. 
 
 \begin{lemma}[Subtyping is reflexive] \label{lemma:sub-refl}
   For all type $ A $, $ A \subtype A $.
@@ -183,24 +193,53 @@ subtyping defined by $\subtype$ is also reflexive and transitive.
   then $ A_1 \subtype A_3 $.
 \end{lemma}
 
-For the corresponding mechanized proofs in Coq, we refer the reader to the
-repository associated with the paper\footnote{\url{https://github.com/zhiyuanshi/intersection/tree/master/esop-16}}.
+%For the corresponding mechanized proofs in Coq, we refer the reader to the
+%repository associated with the paper\footnote{\url{https://github.com/zhiyuanshi/intersection/tree/master/esop-16}}.
 
 \subsection{Declarative Type System}
 
-The well-formedness rules are shown in the middle part of
-Figure~\ref{fig:fi-type}. In addition to the standard rules,
-\reflabel{\labelwfinter} is also not surprising. The typing rules are shown in
-the bottom part of the figure. The typing judgment is of the form:
+The well-formdness of types and typing relation are shown in the
+middle and bottom of Figure~\ref{fig:fi-type}, respectively.
+Importantly, the disjointness judgment, which is highlighted using a
+box, appears in the well-formedness rule for intersection types (\reflabel{\labelwfinter}) and 
+the typing rule for merges (\reflabel{\labeltmerge}). The presence of
+the disjointness judgement, as well as the use of ordinary types in
+the subtyping relation, are the most essential differences between our type system and the
+original type system by Dunfield. 
+%The role of the disjointness
+%judgement in ensuring coherence is discussed later, in
+%Section~\ref{}. 
+
+%The well-formedness rules are shown in the middle part of
+%Figure~\ref{fig:fi-type}. In addition to the standard rules,
+%\reflabel{\labelwfinter} is also not surprising, except for the
+%presence of the additional disjointness conditional.
+
+Apart from \reflabel{\labelwfinter}, the remaining rules for 
+well-formedness are standard. The typing judgment is of the form:
 \[ \jtype \Gamma e A \]
 It reads: ``in the typing context $\Gamma$, the term $e$ is of type
 $A$''. The standard rules are those for variables
 \reflabel{\labeltvar} and lambda abstractions
 \reflabel{\labeltlam}. \reflabel{\labeltmerge} means that a merge
 $e_1 \mergeop e_2$, is assigned an intersection type composed of the
-resulting types of $e_1$ and $e_2$.
+resulting types of $e_1$ and $e_2$, as long as the types of the two
+expressions are disjoint.
 
-\paragraph{Differences to Dunfield's Calculus}
+\paragraph{More differences to Dunfield's calculus}
+In Dunfield's calculus there are additional rules for intersections.
+The extra rules have an important benefit: they
+allow eliminating any uses of the subsumption rule. This is
+accomplished by transforming all expressions that make use of
+subtyping into expressions without any uses of subtyping. Our
+type-system does not have those rules. One reason is that such rules
+make less sense in a system with disjoint intersions. For example, 
+Dunfield's calculus includes the following typing rule:
+
+\bruno{rule and discussion missing here!}
+
+Another difference is that, in Dunfield's language, subtyping produces
+coercions that are source language terms.
 
 \begin{comment}
 \paragraph{Typing Applications}
@@ -248,180 +287,3 @@ loss (only loss of convinience), as it is always possibly to extract the functio
 a merge and then apply it.
 \end{comment}
 
-\subsection{Bidirectional Type System}
-
-Introduce the bi-directional type system here?
-
-\begin{figure}
-  \begin{mathpar}
-    \formt \\
-    \ruletvar \and \ruletint \and
-    \ruletlam \and \ruletapp \and
-    \ruletmergedis \and \ruletsub \and \rulettop
-  \end{mathpar}
-  \caption{Bidirectional type system of \name.}
-  \label{fig:fi-typebd}
-\end{figure}
-
-
-\subsection{Semantics}
-
-We define the dynamic semantics of the call-by-value \name by means of
-a type-directed translation to an extension of $\lambda$-calculus with pairs.
-%The type-directed translation is also shown in
-%Figure~\ref{}, where the resulting System F terms are highlighted in
-%gray.
-
-
-\paragraph{Target Language.}
-The syntax and typing of our target language is unsurprising. The syntax of the
-target language is shown in Figure~\ref{fig:f-syntax}. The highlighted part
-shows its difference with the $\lambda$-calculus. The typing rules can be found
-in the extended version of the paper.
-
-% \bruno{Does the target language does need unit? Any rules generating units? I
-% don't think so, so it can be dropped.}
-
-\paragraph{Key Idea of the Translation.}
-This translation turns merges into usual pairs, similar to Dunfield's
-elaboration approach~\cite{dunfield2014elaborating}.
-For example, \[ 1 \mergeop \code{"one"} \] becomes \pair 1
-{\code{"one"}}. In usage, the pair will be coerced according to type
-information. For example, consider the function application: \[ \app {(\lamty x
-{\code{String}} x)} {(1 \mergeop \code{"one"})} \] This expression will be translated to \[ \app
-{(\lamty x {\code{String}} x)} {(\app {(\lamty x {\pair {\code{Int}} {\code{String}}} {\proj 2 x})}
-{\pair 1 {\code{"one"}}})} \] The coercion in this case is $(\lamty x {\pair
-{\code{Int}} {\code{String}}} {\proj 2 x})$. It extracts the second item from the pair, since
-the function expects a $\code{String}$ but the translated argument is of type $\pair
-{\code{Int}} {\code{String}}$.
-
-
-\begin{figure}[t]
-  \[
-    \begin{array}{llrl}
-      \text{Types}    & T & \Coloneqq & \code{Int} \\
-                      &   & \mid      & \unit \\
-                      &   & \mid      & {T_1} \to {T_2} \\
-                      &   & \mid      & \highlight {$ \pair {T_1} {T_2} $} \\
-      \text{Terms}    & E & \Coloneqq & x \\
-                      &   & \mid      & i \\
-                      &   & \mid      & \unit \\
-                      &   & \mid      & \lamty x T E \\
-                      &   & \mid      & \app {E_1} {E_2} \\
-                      &   & \mid      & \highlight {$ \pair {E_1} {E_2} $} \\
-                      &   & \mid      & \highlight {$ \proj k E $} \quad k \in \{ 1, 2 \} \\
-      \text{Contexts} & G & \Coloneqq & \cdot \mid G, x \oftype T \\
-    \end{array}
-  \]
-  \caption{Target language syntax.}
-  \label{fig:f-syntax}
-\end{figure}
-
-\paragraph{Type and Context Translation.}
-
-Figure~\ref{fig:type-and-context-translation} defines the type translation
-function $\im \cdot$ from \name types $A$ to target language types $T$. The
-notation $\im \cdot$ is also overloaded for context translation from \name
-contexts $\Gamma$ to target language contexts $G$.
-
-\begin{figure}[t]
-  \framebox{$\im A = T$}
-
-  \begin{align*}
-    \im {\code{Int}}     &= \code{Int} \\
-    \im {A_1 \to A_2}    &= \im {A_1} \to \im {A_2} \\
-    \im {A_1 \inter A_2} &= \pair {\im {A_1}} {\im {A_2}} \\
-    \im \top             &= \unit \\
-  \end{align*}
-
-  \framebox{$\im \Gamma = G$}
-
-  \begin{align*}
-    \im \cdot                      &= \cdot \\
-    \im {\Gamma, \alpha \oftype A} &= \im \Gamma, \alpha \oftype \im A
-  \end{align*}
-
-  \caption{Type and context translation.}
-  \label{fig:type-and-context-translation}
-\end{figure}
-
-% The rules given in this section are identical with those in
-% Section~\ref{sec:fi}, except for the light blue part. The translation consists
-% of four sets of rules, which are explained below:
-
-\paragraph{Coercive subtyping.}
-
-The judgment
-\[
-A_1 \subtype A_2 \yields E
-\]
-extends the subtyping judgment in Figure~\ref{fig:fi-type} with a coercion
-on the right hand side of $ \yields {} $. A coercion $ E $ is just an term
-in the target language and is ensured to have type
-$ \im {A_1} \to \im {A_2} $ (by Lemma~\ref{lemma:sub}). For example,
-\[
-\code{Int} \inter \code{Bool} \subtype \code{Bool} \yields {\lamty x {\im {\code{Int} \inter \code{Bool}}} {\proj 2 x}}
-\]
-generates a coercion function with type: $\code{Int} \inter \code{Bool} \to \code{Bool}$.
-
-In \reflabel{\labelsubfun}, we elaborate the subtyping of
-parameter and return types by $\eta$-expanding $f$ to $\lamty x {\im {A_3}}
-{\app f x}$, applying $E_1$ to the argument and $E_2$ to the result. Rules
-\reflabel{\labelsubinterl}, \reflabel{\labelsubinterr}, and
-\reflabel{\labelsubinter} elaborate intersection types.
-\reflabel{\labelsubinter} uses both coercions to form a pair. Rules
-\reflabel{\labelsubinterl} and \reflabel{\labelsubinterr} reuse the coercion
-from the premises and create new ones that cater to the changes of the argument
-type in the conclusions. Note that the two rules are overlapping and
-hence a program can be elaborated differently, depending on which rule
-is used. Finally, all rules produce type-correct coercions:
-
-%But in the implementation one usually applies the rules sequentially with
-%pattern matching, essentially defining a deterministic order of lookup.
-
-% if we know $A_1$ is a subtype of $A_3$ and $C$ is a coercion from $A_1$
-% to $A_3$, then we can conclude that $A_1 \inter A_2$ is also a subtype
-% of $A_3$ and the new coercion is a function that takes a value $ x $ of type
-% $A_1\inter A_2$, project $x$ on the first item, and apply $ C $ to it.
-
-\begin{restatable}[Subtyping rules produce type-correct coercions]{lemma}{lemmasub}
-  \label{lemma:sub}
-  If $ A_1 \subtype A_2 \yields E $, then $ \jtype \cdot E {\im {A_1} \to \im {A_2}} $.
-\end{restatable}
-
-\begin{proof}
-  By a straightforward induction on the derivation\footnote{The proofs of major lemmata and theorems can be found in the full version of the paper.\bruno{where??}}.
-\end{proof}
-
-\paragraph{The translation judgment.} The translation judgment $\jtype \Gamma e
-A \yields E$ extends the typing judgment with an elaborated term on the right
-hand side of $\yields {}$. The translation ensures that $E$ has type $\im A$. In
-\name, one may pass more information to a function than what is required; but
-not in ordinary $\lambda$-calculus. To account for this difference, in \reflabel{\labeltapp}, the
-coercion $E$ from the subtyping relation is applied to the argument.
-\reflabel{\labeltmerge} straightforwardly translates merges into pairs.
-
-The type-directed translation is type-safe. This property is captured
-by the following two theorems.
-
-\begin{restatable}[Type preservation]{theorem}{typepreservation}
-  \label{theorem:type-preservation}
-
-  If $ \jtype \Gamma e A \yields E $,
-  then $ \jtype {\im \Gamma} E {\im A} $.
-\end{restatable}
-
-\begin{proof}
-  (Sketch) By structural induction on the term and the corresponding
-  inference rule.
-\end{proof}
-
-\begin{theorem}[Type safety]
-  If $e$ is a well-typed \name term, then $e$ evaluates to some $\lambda$-calculus
-  value $v$.
-\end{theorem}
-
-\begin{proof}
-  Since we define the dynamic semantics of \name in terms of the composition of
-  the type-directed translation and the dynamic semantics of $\lambda$-calculus, type safety follows immediately.
-\end{proof}

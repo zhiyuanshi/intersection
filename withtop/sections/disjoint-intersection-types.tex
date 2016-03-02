@@ -1,12 +1,25 @@
-\section{Disjointness and Coherence}
+\section{Semantics, Disjointness and Coherence}
 \label{sec:disjoint}
 % \bruno{This section still needs to be cleaned up to remove stuff
 %   related to polymorphism.}
-Although the system shown in the previous section is type-safe, it is not
-coherent, in the sense that one source program can be elaborated into two
-different target programs. This section shows how to modify it so that it
-guarantees coherence as well as type soundness. The result is a calculus named
-\name. The key aspect is the notion of disjoint intersection.
+The previous section introduced the type system of \name. However it 
+did not discuss the semantics or how the calculus ensures coherence. 
+This section discusses the semantics of \name, and shows a modified
+type system that
+guarantees coherence and type soundness, and is sound and complete
+with respect to the type system presented in Section~\ref{}. The key 
+aspect to ensuring coherence is the notion of disjoint intersection.
+
+\bruno{How to pitch this section:}
+Three things to ensure coherence:
+
+1) Ordinary + Well-formedness ensure that coercions produced by
+subtyping relation are unique; 
+
+2) Bi-directional type-system ensures that unambiguous types: the 
+additional type annotations are enough to remove ambiguity, and ensure
+that the calculus always elaborates every program to a unique
+expression in the target language.
 
 %From the theoretical point-of-view, the end goal of this section is to show that the resulting system has
 %a coherent (or unique) elaboration semantics:
@@ -139,6 +152,225 @@ Following the same reasoning, we might want to allow or restrict, for instance $
 %Indeed, \bruno{unfinidhed sentence}\george{Mabe show a diagram here to contrast
 %with bounded polymorphism.}
 
+\subsection{Bidirectional Type System}
+
+Introduce the bi-directional type system here?
+
+Two motivations for the bidirectional type system. 
+Firstly the presence of a subsumption rule makes the declarative type 
+system not syntax directed; bidirectional type-checking provides an 
+easy way to recover syntax-directed typing. Secondly, bidirectional 
+type-checking removes type-ambiguity. This makes it easier to talk
+about coherence. 
+
+The syntax need to be extended with one additional construct: type 
+annotations.
+
+\begin{figure}
+  \begin{mathpar}
+    \formt \\
+    \bruletvar \and \bruletint \and
+    \bruletlam \and \bruletapp \and
+    \bruletmergedis \and \bruletsub \and \brulettop \and \bruletann
+  \end{mathpar}
+  \caption{Bidirectional type system of \name.}
+  \label{fig:fi-typebd}
+\end{figure}
+
+\paragraph{Uniqueness of type-inference} An important property of the
+bidirectional type-checking is that, given an expression $e$, if it is
+possible to infer a type for $e$, then $e$ has a unique type.
+
+\begin{theorem}[Uniqueness of type-inference]
+%  If $e$ is a well-typed \name term, then $e$ evaluates to some $\lambda$-calculus
+%  value $v$.
+\bruno{statement missing.}
+\end{theorem}
+
+In contrast, in the declarative type system the uniqueness of types
+property does not hold. 
+
+\paragraph{Soundness and Compleness} The declarative type system presented in
+Figure~\ref{} is closely related to the bidirectional type system 
+in Figure~\ref{}. We can prove that the bidirectional type system 
+is sound and complete with respect to the declarative specification, 
+modulo some additional type-annotations.
+
+\begin{theorem}[Soundness of bidirectional type-checking]
+%  If $e$ is a well-typed \name term, then $e$ evaluates to some $\lambda$-calculus
+%  value $v$.
+\bruno{statement missing.}
+\end{theorem}
+
+\begin{theorem}[Completeness of bidirectional type-checking]
+%  If $e$ is a well-typed \name term, then $e$ evaluates to some $\lambda$-calculus
+%  value $v$.
+\bruno{statement missing.}
+\end{theorem}
+
+\subsection{Semantics}
+
+We define the dynamic semantics of the call-by-value \name by means of
+a type-directed translation to an extension of $\lambda$-calculus with pairs.
+%The type-directed translation is also shown in
+%Figure~\ref{}, where the resulting System F terms are highlighted in
+%gray.
+
+
+\paragraph{Target Language.}
+The syntax and typing of our target language is unsurprising. The syntax of the
+target language is shown in Figure~\ref{fig:f-syntax}. The highlighted part
+shows its difference with the $\lambda$-calculus. The typing rules can be found
+in the extended version of the paper.
+
+% \bruno{Does the target language does need unit? Any rules generating units? I
+% don't think so, so it can be dropped.}
+
+\paragraph{Key Idea of the Translation.}
+This translation turns merges into usual pairs, similar to Dunfield's
+elaboration approach~\cite{dunfield2014elaborating}.
+For example, \[ 1 \mergeop \code{"one"} \] becomes \pair 1
+{\code{"one"}}. In usage, the pair will be coerced according to type
+information. For example, consider the function application: \[ \app {(\lamty x
+{\code{String}} x)} {(1 \mergeop \code{"one"})} \] This expression will be translated to \[ \app
+{(\lamty x {\code{String}} x)} {(\app {(\lamty x {\pair {\code{Int}} {\code{String}}} {\proj 2 x})}
+{\pair 1 {\code{"one"}}})} \] The coercion in this case is $(\lamty x {\pair
+{\code{Int}} {\code{String}}} {\proj 2 x})$. It extracts the second item from the pair, since
+the function expects a $\code{String}$ but the translated argument is of type $\pair
+{\code{Int}} {\code{String}}$.
+
+
+\begin{figure}[t]
+  \[
+    \begin{array}{llrl}
+      \text{Types}    & T & \Coloneqq & \code{Int} \\
+                      &   & \mid      & \unit \\
+                      &   & \mid      & {T_1} \to {T_2} \\
+                      &   & \mid      & \highlight {$ \pair {T_1} {T_2} $} \\
+      \text{Terms}    & E & \Coloneqq & x \\
+                      &   & \mid      & i \\
+                      &   & \mid      & \unit \\
+                      &   & \mid      & \lamty x T E \\
+                      &   & \mid      & \app {E_1} {E_2} \\
+                      &   & \mid      & \highlight {$ \pair {E_1} {E_2} $} \\
+                      &   & \mid      & \highlight {$ \proj k E $} \quad k \in \{ 1, 2 \} \\
+      \text{Contexts} & G & \Coloneqq & \cdot \mid G, x \oftype T \\
+    \end{array}
+  \]
+  \caption{Target language syntax.}
+  \label{fig:f-syntax}
+\end{figure}
+
+\paragraph{Type and Context Translation.}
+
+Figure~\ref{fig:type-and-context-translation} defines the type translation
+function $\im \cdot$ from \name types $A$ to target language types $T$. The
+notation $\im \cdot$ is also overloaded for context translation from \name
+contexts $\Gamma$ to target language contexts $G$.
+
+\begin{figure}[t]
+  \framebox{$\im A = T$}
+
+  \begin{align*}
+    \im {\code{Int}}     &= \code{Int} \\
+    \im {A_1 \to A_2}    &= \im {A_1} \to \im {A_2} \\
+    \im {A_1 \inter A_2} &= \pair {\im {A_1}} {\im {A_2}} \\
+    \im \top             &= \unit \\
+  \end{align*}
+
+  \framebox{$\im \Gamma = G$}
+
+  \begin{align*}
+    \im \cdot                      &= \cdot \\
+    \im {\Gamma, \alpha \oftype A} &= \im \Gamma, \alpha \oftype \im A
+  \end{align*}
+
+  \caption{Type and context translation.}
+  \label{fig:type-and-context-translation}
+\end{figure}
+
+% The rules given in this section are identical with those in
+% Section~\ref{sec:fi}, except for the light blue part. The translation consists
+% of four sets of rules, which are explained below:
+
+\paragraph{Coercive subtyping.}
+
+The judgment
+\[
+A_1 \subtype A_2 \yields E
+\]
+extends the subtyping judgment in Figure~\ref{fig:fi-type} with a coercion
+on the right hand side of $ \yields {} $. A coercion $ E $ is just an term
+in the target language and is ensured to have type
+$ \im {A_1} \to \im {A_2} $ (by Lemma~\ref{lemma:sub}). For example,
+\[
+\code{Int} \inter \code{Bool} \subtype \code{Bool} \yields {\lamty x {\im {\code{Int} \inter \code{Bool}}} {\proj 2 x}}
+\]
+generates a coercion function with type: $\code{Int} \inter \code{Bool} \to \code{Bool}$.
+
+In \reflabel{\labelsubfun}, we elaborate the subtyping of
+parameter and return types by $\eta$-expanding $f$ to $\lamty x {\im {A_3}}
+{\app f x}$, applying $E_1$ to the argument and $E_2$ to the result. Rules
+\reflabel{\labelsubinterl}, \reflabel{\labelsubinterr}, and
+\reflabel{\labelsubinter} elaborate intersection types.
+\reflabel{\labelsubinter} uses both coercions to form a pair. Rules
+\reflabel{\labelsubinterl} and \reflabel{\labelsubinterr} reuse the coercion
+from the premises and create new ones that cater to the changes of the argument
+type in the conclusions. Note that the two rules are overlapping and
+hence a program can be elaborated differently, depending on which rule
+is used. Finally, all rules produce type-correct coercions:
+
+%But in the implementation one usually applies the rules sequentially with
+%pattern matching, essentially defining a deterministic order of lookup.
+
+% if we know $A_1$ is a subtype of $A_3$ and $C$ is a coercion from $A_1$
+% to $A_3$, then we can conclude that $A_1 \inter A_2$ is also a subtype
+% of $A_3$ and the new coercion is a function that takes a value $ x $ of type
+% $A_1\inter A_2$, project $x$ on the first item, and apply $ C $ to it.
+
+\begin{restatable}[Subtyping rules produce type-correct coercions]{lemma}{lemmasub}
+  \label{lemma:sub}
+  If $ A_1 \subtype A_2 \yields E $, then $ \jtype \cdot E {\im {A_1} \to \im {A_2}} $.
+\end{restatable}
+
+\begin{proof}
+  By a straightforward induction on the derivation\footnote{The proofs of major lemmata and theorems can be found in the full version of the paper.\bruno{where??}}.
+\end{proof}
+
+\paragraph{The translation judgment.} The translation judgment $\jtype \Gamma e
+A \yields E$ extends the typing judgment with an elaborated term on the right
+hand side of $\yields {}$. The translation ensures that $E$ has type $\im A$. In
+\name, one may pass more information to a function than what is required; but
+not in ordinary $\lambda$-calculus. To account for this difference, in \reflabel{\labeltapp}, the
+coercion $E$ from the subtyping relation is applied to the argument.
+\reflabel{\labeltmerge} straightforwardly translates merges into pairs.
+
+The type-directed translation is type-safe. This property is captured
+by the following two theorems.
+
+\begin{restatable}[Type preservation]{theorem}{typepreservation}
+  \label{theorem:type-preservation}
+
+  If $ \jtype \Gamma e A \yields E $,
+  then $ \jtype {\im \Gamma} E {\im A} $.
+\end{restatable}
+
+\begin{proof}
+  (Sketch) By structural induction on the term and the corresponding
+  inference rule.
+\end{proof}
+
+\begin{theorem}[Type safety]
+  If $e$ is a well-typed \name term, then $e$ evaluates to some $\lambda$-calculus
+  value $v$.
+\end{theorem}
+
+\begin{proof}
+  Since we define the dynamic semantics of \name in terms of the composition of
+  the type-directed translation and the dynamic semantics of $\lambda$-calculus, type safety follows immediately.
+\end{proof}
+
+\begin{comment}
 \subsection{Typing}
 
 Figure~\ref{fig:fi-type-patch} shows modifications to Figure~\ref{fig:fi-type}
@@ -230,6 +462,7 @@ type-safety still holds.
 % But after the substitution of $\code{Int}$ for $\alpha$ on the two types, the sentence
 % \[ \jdis {\alpha \disjoint \code{Int}} \code{Int} \code{Int} \]
 % is longer true since $\code{Int}$ is clearly not disjoint with itself.
+\end{comment}
 
 \subsection{Subtyping}
 

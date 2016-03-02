@@ -1,0 +1,73 @@
+\section{Design Space}
+
+This section discusses some alternatives in the design-space.
+
+\subsection{Disjointness of Functions}
+
+Talk about the option of not allowing subtyping of function arguments. 
+This should allow for a more flexible rule for disjointness of functions.
+Maybe a good option for OO type systems, where methods are invariant 
+with respect to subtyping of arguments. It would allow for static overloading, 
+similar to what is present in conventional OO languages.
+
+\begin{mathpar}
+  \inferrule* [right=\labelsubfun]
+    {{A_2} \subtype {B_2} }
+    {{A_1 \to A_2} \subtype {A_1 \to B_2}}
+\end{mathpar}
+
+\begin{mathpar}
+  \inferrule* [right=\labeldisfun]
+    {\jdisimpl \Gamma {A_1} {B_1}}
+    {\jdisimpl \Gamma {A_1 \to A_2} {B_1 \to B_2}}
+\end{mathpar}
+
+not exists E . A -> B <: E /\ C -> D <: E ->  
+
+$Int -> Int \& Char -> Int$ (disjoint according to the spec and algorithmic rules)
+
+
+
+Are those 2 functions disjoint? 
+
+$ f,,g : Int -> Int \& Char -> Int$
+
+Well, two things to consider:
+
+1) what happens if they are applied:  
+
+$(f,,g) (3,'c')$ 
+
+well, a type-annotation will then select one of the functions. So this seems to be ok.
+
+2) what happens if the functions are selected. I have two choices:
+
+f,,g : Int -> Int
+
+f,,g : Char -> Int 
+
+$f,,g : Char\&Int -> Int$ (fails because subtyping of functions is invariant).
+
+
+
+\subsection{Union Types}
+
+\begin{lstlisting}
+case 3,,'c' of
+   Int -> 1
+   Char -> 2 : Int
+\end{lstlisting}
+
+Here we have $Int \& Char <: Int | Char$, but this leads to ambiguity. The program can either 
+be $1$ or $2$. 
+
+Possible solution: require atomic constraints in or-rules, similar to the and-rules. 
+Big Problem: subtyping is no longer transitive. Minor problem, type-system is incomplete.
+
+\subsection{Parametric Polymorphism?}
+
+In principle it should be easy to extend disjointness to parametric polymorphism. 
+bruno{Show rules for parametric polymorphism}
+
+However, such rules would be quite restrictive. Future work includes how to integrate 
+parametric polymorphism is a more flexible way.  
