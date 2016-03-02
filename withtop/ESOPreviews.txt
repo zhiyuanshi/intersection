@@ -209,12 +209,12 @@ Since S3 is probably going to be dropped, we can ignore the issue?
 > 
 > "later difference" → "latter difference"
 
-TODO:
+TODO: could not find this?
 
 > In listing the differences from my language, the paper should mention
 > the lack of a ⊤ type.
 
-TODO?
+FIXED: We point to section talking about T type.
  
 > The restriction on functions (not of intersection type) seems strange.
 > To me, a function of intersection type is the *canonical* use of
@@ -226,22 +226,24 @@ TODO?
 > probably more popular than (e : A), but in systems with intersection
 > types, both formulations enjoy popularity (along with others, such as
 > a *list* of possible argument types on the binder).
-> 
+
+FIXED: We use annotations in the bidirectional version now.
+
 > 4.1.: "the 'merges' e1,,e2": It's a little late in the paper to need
 > scare-quotes around "merges".
 
-TODO: Fix
+FIXED
 
 > I would simply say "As usual, we can show" rather than "As other sane
 > subtyping relations, we can show": IMO, a relation that is not
 > reflexive and transitive just shouldn't be called a subtyping
 > relation.
 
-TODO: Fix
+Partly Fixed.
 
 > Lemma 1: "For all type A" → "For all types A"
 
-TODO: Fix
+FIXED
 
 > In 4.3, the discussion of the restriction that forbids
 > 

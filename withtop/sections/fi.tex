@@ -19,10 +19,10 @@ the presence of $\top$.
 
 \subsection{Syntax}
 
-Figure~\ref{fig:fi-syntax} shows the syntax. The differences to the
+Figure~\ref{fig:fi-syntax} shows the syntax. The difference to the
 $\lambda$-calculus, highlighted in gray, are intersection types ($A
-\inter B$) and the top type ($\top$) at
-the type-level, and merges ($e_1 \mergeop e_2$) and the top value ($\top$) the at the term level.
+\inter B$) at
+the type-level, and merges ($e_1 \mergeop e_2$) at the term level.
 
 \begin{figure}[t]
   \[
@@ -32,7 +32,7 @@ the type-level, and merges ($e_1 \mergeop e_2$) and the top value ($\top$) the a
         & A, B, C & \Coloneqq & \code{Int} & \\
         &         & \mid      & A \to B    & \\
         &         & \mid      & \highlight{$A \inter B$}  & \\
-        &         & \mid      & \highlight{$\top$}  & \\
+%        &         & \mid      & \highlight{$\top$}  & \\
 
         \\
         \text{Terms}
@@ -41,7 +41,7 @@ the type-level, and merges ($e_1 \mergeop e_2$) and the top value ($\top$) the a
         &   & \mid & \lamty x A e      & \\
         &   & \mid & \app {e_1} {e_2}  & \\
         &   & \mid & \highlight{$e_1 \mergeop e_2$}  & \\
-        &   & \mid & \highlight{$\top$} & \\
+%        &   & \mid & \highlight{$\top$} & \\
 
         \\
         \text{Contexts}
@@ -60,7 +60,7 @@ the type-level, and merges ($e_1 \mergeop e_2$) and the top value ($\top$) the a
 
 \paragraph{Types.} Metavariables $A$, $B$ range over types. Types include
 function types $A \to B$. $A \inter B$ denotes the intersection of types $A$ and
-$B$. We also include $\top$ and integer types $\code{Int}$.
+$B$. We also include integer types $\code{Int}$.
 
 \paragraph{Terms.} Metavariables $e$ range over terms.  Terms include standard
 constructs: variables $x$; abstraction of terms over variables
@@ -68,7 +68,7 @@ $\lamty x A e$; and application of terms $e_1$ to terms $e_2$, written $\app
 {e_1} {e_2}$. The expression $e_1 \mergeop e_2$ is the \emph{merge} of two terms
 $e_1$ and $e_2$. Merges of terms correspond to intersections of types $A \inter
 B$. 
-The term $\top$ corresponds to the only inhabitant of the $\top$ type.
+%The term $\top$ corresponds to the only inhabitant of the $\top$ type.
 In addition, we also include integer literals $i$.
 
 \paragraph{Contexts.} Typing contexts $ \Gamma $ track bound variables $x$ with their type $A$.
@@ -119,13 +119,14 @@ discussions and examples.
 
   \begin{mathpar}
     \formsub \\
-    \rulesubint \and \rulesubtop \and \rulesubfun \and \rulesubinter 
+    \rulesubint %\and \rulesubtop 
+    \and \rulesubfun \and \rulesubinter 
     \and \rulesubinterldis \and \rulesubinterrdis 
   \end{mathpar}
 
   \begin{mathpar}
     \formwf \\
-    \rulewfint \and \rulewffun \and \rulewfinterdis \and \rulewftop
+    \rulewfint \and \rulewffun \and \rulewfinterdis %\and \rulewftop
   \end{mathpar}
 
 {\renewcommand{\yields}[1]{}
@@ -133,7 +134,7 @@ discussions and examples.
     \formt \\
     \ruletvar \and \ruletint \and
     \ruletlam \and \ruletapp \and
-    \ruletmergedis \and \ruletsub \and \rulettop
+    \ruletmergedis \and \ruletsub %\and \rulettop
   \end{mathpar}
 }
 
@@ -185,7 +186,7 @@ a detailed discussion on this.\bruno{improve text?}
 reflexive and transitive~\cite{}. 
 
 \begin{lemma}[Subtyping is reflexive] \label{lemma:sub-refl}
-  For all type $ A $, $ A \subtype A $.
+  For all types $ A $, $ A \subtype A $.
 \end{lemma}
 
 \begin{lemma}[Subtyping is transitive] \label{lemma:sub-trans}
@@ -226,20 +227,40 @@ $e_1 \mergeop e_2$, is assigned an intersection type composed of the
 resulting types of $e_1$ and $e_2$, as long as the types of the two
 expressions are disjoint.
 
-\paragraph{More differences to Dunfield's calculus}
+\paragraph{Less rules}
 In Dunfield's calculus there are additional rules for intersections.
 The extra rules have an important benefit: they
 allow eliminating any uses of the subsumption rule. This is
 accomplished by transforming all expressions that make use of
 subtyping into expressions without any uses of subtyping. Our
-type-system does not have those rules. One reason is that such rules
-make less sense in a system with disjoint intersions. For example, 
+type-system does not have those rules. One reason is that some of
+these rules
+make less sense in a system with disjoint intersections. For example, 
 Dunfield's calculus includes the following typing rule:
 
-\bruno{rule and discussion missing here!}
 
-Another difference is that, in Dunfield's language, subtyping produces
-coercions that are source language terms.
+\begin{mathpar}
+\inferrule* 
+  {\jtype \Gamma {e} A \\
+   \jtype \Gamma {e} B }
+  {\jtype \Gamma {e} {A \inter B}}
+\end{mathpar}
+
+\noindent A first reason why such rule would not work in \name is
+that it does not restrict $A \inter B$ to be disjoint. Therefore,
+in the presence of such unrestricted rule it would be possible to 
+create non-disjoint intersections types. It is easy
+enough to have an additional disjointness restriction, which would 
+ensure the disjointness between $A$ and $B$. However, then the rule 
+would be pointless, because no derivations of programs could ever be
+created with such a rule. If $A$ and $B$ are disjoint then, by
+definition, no programs should ever have types $A$ and $B$ at 
+the same time.
+
+\bruno{Move this to text that talks about elaboration?}
+Finally, another difference is that, in Dunfield's language, subtyping produces
+coercions that are source language terms. In \name, coercions are
+produced directly on the target language.
 
 \begin{comment}
 \paragraph{Typing Applications}

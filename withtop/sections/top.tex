@@ -2,6 +2,39 @@
 
 Discuss the two variants of \name with $\top$. 
 
+\begin{figure}[t]
+  \[
+    \begin{array}{l}
+      \begin{array}{llrll}
+        \text{Types}
+        & A, B, C & \Coloneqq & \ldots \mid \highlight{$\top$}  & \\
+
+        \\
+        \text{Terms}
+        & e & \Coloneqq & \ldots \mid \highlight{$\top$} & \\
+      \end{array}
+    \end{array}
+  \]
+
+  \begin{mathpar}
+    \formsub \\
+    \rulesubtop 
+  \end{mathpar}
+
+  \begin{mathpar}
+    \formwf \\
+    \rulewftop
+  \end{mathpar}
+
+  \begin{mathpar}
+    \formt \\
+    \brulettop
+  \end{mathpar}
+
+  \caption{Extending \name with $\top$.}
+  \label{fig:fi-syntax-top}
+\end{figure}\bruno{rule form needs to be fixed in typing.}
+
 \subsection{Disjointness} Show the new definition of disjointness
 
 \subsection{A Naive Calculus with $\top$}
