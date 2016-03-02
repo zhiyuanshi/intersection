@@ -7,7 +7,7 @@ operator.  This calculus is inspired by Dunfield's
 calculus~\cite{dunfield2014elaborating}.  However our calculus does
 not consider union types\bruno{Consider a discussion about union types
 later in the paper?}. Moreover, due to the fact that we are
-interested only in disjoint intersections, it also has a few less
+interested only in disjoint intersections, \name also has slighty different
 typing rules than in Dunfield's calculus. Sections~\ref{sec:disjoint}
 and \ref{sec:alg-dis} will present the more fundamental contributions
 of this paper by showing other necessary changes for supporting
@@ -227,17 +227,19 @@ $e_1 \mergeop e_2$, is assigned an intersection type composed of the
 resulting types of $e_1$ and $e_2$, as long as the types of the two
 expressions are disjoint.
 
-\paragraph{Less rules}
-In Dunfield's calculus there are additional rules for intersections.
-The extra rules have an important benefit: they
-allow eliminating any uses of the subsumption rule. This is
-accomplished by transforming all expressions that make use of
-subtyping into expressions without any uses of subtyping. Our
-type-system does not have those rules. One reason is that some of
-these rules
+\paragraph{Different rules for intersections}
+Dunfield's calculus has different rules for intersections.
+%
+%The extra rules have an important benefit: they
+%allow eliminating any uses of the subsumption rule. This is
+%accomplished by transforming all expressions that make use of
+%subtyping into expressions without any uses of subtyping. Our
+%type-system does not have those rules. 
+%One reason for having different rules in \name is that 
+However, his rules
 make less sense in a system with disjoint intersections. For example, 
-Dunfield's calculus includes the following typing rule:
-
+Dunfield's calculus includes the following typing rule, for
+introducing intersection types:
 
 \begin{mathpar}
 \inferrule* 
@@ -255,7 +257,9 @@ ensure the disjointness between $A$ and $B$. However, then the rule
 would be pointless, because no derivations of programs could ever be
 created with such a rule. If $A$ and $B$ are disjoint then, by
 definition, no programs should ever have types $A$ and $B$ at 
-the same time.
+the same time. In contrast, in \name, the rule \reflabel{\labeltmerge}
+captures the fact that two disjoint pieces of evidence are needed to
+create a (disjoint) intersection type.
 
 \bruno{Move this to text that talks about elaboration?}
 Finally, another difference is that, in Dunfield's language, subtyping produces
