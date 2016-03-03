@@ -37,6 +37,13 @@ Discuss the two variants of \name with $\top$.
 
 \subsection{Disjointness} Show the new definition of disjointness
 
+Given two types $A$ and $B$:
+
+%\[A * B \equiv \not \toplike{A} \and \not \toplike{A} \and A \subtype B\]
+\[A * B \equiv \neg \toplike{A} \; \wedge \; \neg \toplike{B} \; \wedge \; 
+\forall_C \; ( A \subtype C \wedge B \subtype C ) \rightarrow \toplike{C} \]
+
+
 \subsection{A Naive Calculus with $\top$}
 
 \paragraph{Top-Like Types}
@@ -48,7 +55,7 @@ Before we discuss that definition, let us introduce first the notion of a top-li
   \begin{mathpar}
     \formtoplike \\ %\framebox{$\jatomic A$} \\
 
-    \ruletopltop \and \ruletoplfun \and \ruletoplinterl \and \ruletoplinterr
+    \ruletopltop \and \ruletoplinter
 
   \end{mathpar}
   \caption{Top-like types.}
@@ -61,7 +68,7 @@ Before we discuss that definition, let us introduce first the notion of a top-li
   That is, any type with arity $k$ can be a top-like type, as long as $\top$ is the result type. 
 
 \end{definition}
-Thus a top-like type is a unary relation at the type level, which can be formalized according to \ref{fig:fi-toplike}.
+Thus a top-like type is a unary relation at the type level, which can be formalized according to Figure \ref{fig:fi-toplike}.
 
 Also, $\code{Int} \to \code{Char}$ and $\code{Int} \to \code{String}$ are disjoint, 
 since their supertypes are all types with the form $A \to \top$ 
@@ -76,11 +83,45 @@ Following the same reasoning, we might want to allow or restrict, for instance $
 
 \paragraph{Algorithmic disjointness rules}
 
+\begin{figure}[h]
+  \begin{mathpar}
+    \formdis \\
+    \ruledisinterl \and \ruledisinterr \\ 
+    \ruledisatomic
+  \end{mathpar}
+
+  \begin{mathpar}
+    \formax \\
+    %\ruledisaxintfun \and \ruledisaxtop \and \ruleaxsym
+    \ruledisaxintfun \and \ruleaxsym
+  \end{mathpar}
+
+  \caption{Algorithmic Disjointness.}
+  \label{fig:disjointness}
+\end{figure}
+
+
 \subsection{An Improved Calculus with $\top$}
 
 motivation ...
 
+
+
 \paragraph{Top-Like Types}
+
+\begin{figure}[t]
+  \begin{mathpar}
+    \formtoplike \\ %\framebox{$\jatomic A$} \\
+
+    \ruletopltop \and \ruletoplinter \and \ruletoplfun
+
+  \end{mathpar}
+  \caption{Top-like types.}
+  \label{fig:fi-toplike}
+\end{figure}
+
+
+
 \joao{do we want to allow this?
  f: String $\to$ Int \\ 
  g: String $\to$ T \\
@@ -92,3 +133,22 @@ generate coercions depending on whether a type is top-like
 or not. 
 
 \paragraph{Algorithmic disjointness rules}
+
+\begin{figure}[h]
+  \begin{mathpar}
+    \formdis \\
+    \ruledisinterl \and \ruledisinterr \\ 
+    \ruledisfun \and \ruledisatomic
+  \end{mathpar}
+
+  \begin{mathpar}
+    \formax \\
+    %\ruledisaxintfun \and \ruledisaxtop \and \ruleaxsym
+    \ruledisaxintfunext \and \ruleaxsym
+  \end{mathpar}
+
+  \caption{Algorithmic Disjointness.}
+  \label{fig:disjointness}
+\end{figure}
+
+

@@ -30,4 +30,9 @@
     { \toplike{A \inter B} }
 }
 
-
+\newcommand{\labeltoplinter}{\makelabeltopl Inter}
+\newcommand{\ruletoplinter}{
+  \inferrule* [right=\labeltoplinter]
+    { \toplike{A} \\ \toplike{B}}
+    { \toplike{A \inter B} }
+}
