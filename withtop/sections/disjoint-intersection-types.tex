@@ -358,39 +358,109 @@ Those two types are not disjoint since $\code{Int} \to \code{Int}$ is their comm
 % \george{Two points are being made here: 1) nondisjoint intersections, 2) atomic
 % types. Show an offending example for each?}
 
-\subsection{Coherence of the Elaboration}
-Combining the previous results, we are able to show the central theorem:
+\subsection{Bidirectional Type System with Elaboration}
 
-\begin{restatable}[Unique elaboration]{theorem}{uniqueelaboration}
-  \label{theorem:unique-elaboration}
+In order to prove the coherence result we first introduce a bidirectional
+type system, which is closely related to the type system presented in
+Section~\ref{}. The new type system is elaborating, producing a term 
+in the target language while doing the typing derivation.
 
-  If $\jtype \Gamma e {A_1} \yields {E_1}$ and $\jtype \Gamma e {A_2} \yields
-  {E_2}$, then $E_1 \equiv E_2$. (``$\equiv$'' means syntactical equality, up to
-  $\alpha$-equality.)
+\paragraph{The translation judgment.} The translation judgment $\jtype \Gamma e
+A \yields E$ extends the typing judgment with an elaborated term on the right
+hand side of $\yields {}$. The translation ensures that $E$ has type
+$\im A$. 
 
+\paragraph{Key Idea of the Translation.}
+This translation turns merges into usual pairs, similar to Dunfield's
+elaboration approach~\cite{dunfield2014elaborating}.
+For example, \[ 1 \mergeop \code{"one"} \] becomes \pair 1
+{\code{"one"}}. In usage, the pair will be coerced according to type
+information. For example, consider the function application: \[ \app {(\lamty x
+{\code{String}} x)} {(1 \mergeop \code{"one"})} \] This expression will be translated to \[ \app
+{(\lamty x {\code{String}} x)} {(\app {(\lamty x {\pair {\code{Int}} {\code{String}}} {\proj 2 x})}
+{\pair 1 {\code{"one"}}})} \] The coercion in this case is $(\lamty x {\pair
+{\code{Int}} {\code{String}}} {\proj 2 x})$. It extracts the second item from the pair, since
+the function expects a $\code{String}$ but the translated argument is of type $\pair
+{\code{Int}} {\code{String}}$.
+
+
+
+\paragraph{Type and Context Translation.}
+
+Figure~\ref{fig:type-and-context-translation} defines the type translation
+function $\im \cdot$ from \name types $A$ to target language types $T$. The
+notation $\im \cdot$ is also overloaded for context translation from \name
+contexts $\Gamma$ to target language contexts $G$.
+
+\begin{figure}[t]
+  \framebox{$\im A = T$}
+
+  \begin{align*}
+    \im {\code{Int}}     &= \code{Int} \\
+    \im {A_1 \to A_2}    &= \im {A_1} \to \im {A_2} \\
+    \im {A_1 \inter A_2} &= \pair {\im {A_1}} {\im {A_2}} \\
+    \im \top             &= \unit \\
+  \end{align*}
+
+  \framebox{$\im \Gamma = G$}
+
+  \begin{align*}
+    \im \cdot                      &= \cdot \\
+    \im {\Gamma, \alpha \oftype A} &= \im \Gamma, \alpha \oftype \im A
+  \end{align*}
+
+  \caption{Type and context translation.}
+  \label{fig:type-and-context-translation}
+\end{figure}
+
+% The rules given in this section are identical with those in
+% Section~\ref{sec:fi}, except for the light blue part. The translation consists
+% of four sets of rules, which are explained below:
+
+
+In \name, one may pass more information to a function than what is required; but
+not in ordinary $\lambda$-calculus. To account for this difference, in \reflabel{\labeltapp}, the
+coercion $E$ from the subtyping relation is applied to the argument.
+\reflabel{\labeltmerge} straightforwardly translates merges into pairs.
+
+The type-directed translation is type-safe. This property is captured
+by the following two theorems.
+
+\begin{restatable}[Type preservation]{theorem}{typepreservation}
+  \label{theorem:type-preservation}
+
+  If $ \jtype \Gamma e A \yields E $,
+  then $ \jtype {\im \Gamma} E {\im A} $.
 \end{restatable}
 
 \begin{proof}
-  Note that the typing rules are already syntax-directed but the case of
-  \reflabel{\labeltapp} (copied below) still needs special attention since we
-  need to show that the generated coercion $E$ is unique.
-  \begin{mathpar}
-    \ruletapp
-  \end{mathpar}
-  Luckily we know that typing
-  judgments give well-formed types, and thus $\jwf \Gamma {A_1}$ and $\jwf
-  \Gamma {A_3}$. Therefore we are able to apply
-  Lemma~\ref{lemma:unique-coercion} and conclude that $E$ is unique.
-
+  (Sketch) By structural induction on the term and the corresponding
+  inference rule.
 \end{proof}
 
-\subsection{Bidirectional Type System}
+\begin{theorem}[Type safety]
+  If $e$ is a well-typed \name term, then $e$ evaluates to some $\lambda$-calculus
+  value $v$.
+\end{theorem}
 
-Proving coherence for a calculus 
+\begin{proof}
+  Since we define the dynamic semantics of \name in terms of the composition of
+  the type-directed translation and the dynamic semantics of $\lambda$-calculus, type safety follows immediately.
+\end{proof}
 
-The declarative type system presented in Section~\ref{} accepts
-programs such as:
+\begin{comment}
 
+
+\paragraph{Unique coercions and unique types}
+The bidirectional type system makes it easier to prove 
+coherence. The type system in Figure~\ref{} accepts programs such as:
+
+\begin{lstlisting}
+3,,'c'
+\end{lstlisting}
+
+\noindent Such a program can be assigned multiple types (for example ...), and 
+ 
 
 
 Two motivations for the bidirectional type system. 
@@ -463,90 +533,37 @@ in the extended version of the paper.
 % \bruno{Does the target language does need unit? Any rules generating units? I
 % don't think so, so it can be dropped.}
 
-\paragraph{Key Idea of the Translation.}
-This translation turns merges into usual pairs, similar to Dunfield's
-elaboration approach~\cite{dunfield2014elaborating}.
-For example, \[ 1 \mergeop \code{"one"} \] becomes \pair 1
-{\code{"one"}}. In usage, the pair will be coerced according to type
-information. For example, consider the function application: \[ \app {(\lamty x
-{\code{String}} x)} {(1 \mergeop \code{"one"})} \] This expression will be translated to \[ \app
-{(\lamty x {\code{String}} x)} {(\app {(\lamty x {\pair {\code{Int}} {\code{String}}} {\proj 2 x})}
-{\pair 1 {\code{"one"}}})} \] The coercion in this case is $(\lamty x {\pair
-{\code{Int}} {\code{String}}} {\proj 2 x})$. It extracts the second item from the pair, since
-the function expects a $\code{String}$ but the translated argument is of type $\pair
-{\code{Int}} {\code{String}}$.
 
 
 
-\paragraph{Type and Context Translation.}
-
-Figure~\ref{fig:type-and-context-translation} defines the type translation
-function $\im \cdot$ from \name types $A$ to target language types $T$. The
-notation $\im \cdot$ is also overloaded for context translation from \name
-contexts $\Gamma$ to target language contexts $G$.
-
-\begin{figure}[t]
-  \framebox{$\im A = T$}
-
-  \begin{align*}
-    \im {\code{Int}}     &= \code{Int} \\
-    \im {A_1 \to A_2}    &= \im {A_1} \to \im {A_2} \\
-    \im {A_1 \inter A_2} &= \pair {\im {A_1}} {\im {A_2}} \\
-    \im \top             &= \unit \\
-  \end{align*}
-
-  \framebox{$\im \Gamma = G$}
-
-  \begin{align*}
-    \im \cdot                      &= \cdot \\
-    \im {\Gamma, \alpha \oftype A} &= \im \Gamma, \alpha \oftype \im A
-  \end{align*}
-
-  \caption{Type and context translation.}
-  \label{fig:type-and-context-translation}
-\end{figure}
-
-% The rules given in this section are identical with those in
-% Section~\ref{sec:fi}, except for the light blue part. The translation consists
-% of four sets of rules, which are explained below:
 
 
+\subsection{Coherency of Elaboration}
 
-\paragraph{The translation judgment.} The translation judgment $\jtype \Gamma e
-A \yields E$ extends the typing judgment with an elaborated term on the right
-hand side of $\yields {}$. The translation ensures that $E$ has type $\im A$. In
-\name, one may pass more information to a function than what is required; but
-not in ordinary $\lambda$-calculus. To account for this difference, in \reflabel{\labeltapp}, the
-coercion $E$ from the subtyping relation is applied to the argument.
-\reflabel{\labeltmerge} straightforwardly translates merges into pairs.
+Combining the previous results, we are able to show the central theorem:
 
-The type-directed translation is type-safe. This property is captured
-by the following two theorems.
+\begin{restatable}[Unique elaboration]{theorem}{uniqueelaboration}
+  \label{theorem:unique-elaboration}
 
-\begin{restatable}[Type preservation]{theorem}{typepreservation}
-  \label{theorem:type-preservation}
+  If $\jtype \Gamma e {A_1} \yields {E_1}$ and $\jtype \Gamma e {A_2} \yields
+  {E_2}$, then $E_1 \equiv E_2$. (``$\equiv$'' means syntactical equality, up to
+  $\alpha$-equality.)
 
-  If $ \jtype \Gamma e A \yields E $,
-  then $ \jtype {\im \Gamma} E {\im A} $.
 \end{restatable}
 
 \begin{proof}
-  (Sketch) By structural induction on the term and the corresponding
-  inference rule.
+  Note that the typing rules are already syntax-directed but the case of
+  \reflabel{\labeltapp} (copied below) still needs special attention since we
+  need to show that the generated coercion $E$ is unique.
+  \begin{mathpar}
+    \ruletapp
+  \end{mathpar}
+  Luckily we know that typing
+  judgments give well-formed types, and thus $\jwf \Gamma {A_1}$ and $\jwf
+  \Gamma {A_3}$. Therefore we are able to apply
+  Lemma~\ref{lemma:unique-coercion} and conclude that $E$ is unique.
+
 \end{proof}
-
-\begin{theorem}[Type safety]
-  If $e$ is a well-typed \name term, then $e$ evaluates to some $\lambda$-calculus
-  value $v$.
-\end{theorem}
-
-\begin{proof}
-  Since we define the dynamic semantics of \name in terms of the composition of
-  the type-directed translation and the dynamic semantics of $\lambda$-calculus, type safety follows immediately.
-\end{proof}
-
-\begin{comment}
-
 
 \subsection{Typing}
 
