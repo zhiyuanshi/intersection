@@ -63,6 +63,13 @@
     {\code{Int} \disjointax A \to B}
 }
 
+\newcommand{\labeldisaxintfunext}{\makelabelax Int-Fun}
+\newcommand{\ruledisaxintfunext}{
+  \inferrule* [right=\labeldisaxintfunext]
+    { \neg \toplike{B}}
+    {\code{Int} \disjointax A \to B}
+}
+
 \newcommand{\labeldisaxbotbot}{\makelabelax Bot\_Bot}
 \newcommand{\ruledisaxbotbot}{
   \inferrule* [right=\labeldisaxbotbot]

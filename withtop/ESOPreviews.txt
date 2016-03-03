@@ -288,7 +288,7 @@ TODO: Fix & cite
 > line.  (You could put Dis-Fun after those rules.  You already discuss
 > Dis-Inter-1 and -2 first in the text...)
 
-TODO: Fix
+Fixed. (Dis Inter 1 and Dis Inter 2 do not fit in the same line, but Dis Fun has been moved below)
 
 > The explanation of Dis-Fun is very good.  Perhaps you could also
 > mention, by contrast, how disjointness for product types would work
