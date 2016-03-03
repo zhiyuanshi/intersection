@@ -86,7 +86,7 @@ Fixpoint and_coercion (t : PTyp) (e1 : Exp) (n : nat) : Exp :=
     | Fun A B => and_coercion B e1 (S n)
     | And A B => e1
   end.
-
+  
 Inductive sub : PTyp -> PTyp -> Exp -> Prop :=
   | SInt : sub PInt PInt (fun A => STLam' _ (STBVar _ 0))
   | SFun : forall o1 o2 o3 o4 c1 c2, sub o3 o1 c1 -> sub o2 o4 c2 -> 
@@ -2113,37 +2113,577 @@ Qed.
 
 Hint Resolve coercions_produce_terms.
 
-Lemma bar :
-  forall Gamma t0 t1 t2 (c : Exp) n,
-  sub t1 t0 c -> ok Gamma -> Atomic t0 ->
-  has_type_st Gamma (c var) (STFun (| t1 |) (| t0 |)) ->
-  has_type_st Gamma
-     (and_coercion t0
-        (fun A : Type => STLam' A (STApp A (c A) (STProj1 A (STBVar A 0)))) n
-        var) (STFun (| And t1 t2 |) (| t0 |)).
+Inductive TopSig : PTyp -> Prop :=
+  | TopSigF : forall A B, TopSig B -> TopSig (Fun A B)
+  | TopSigT : TopSig TopT.                    
+
+Print genCoerce.
+Print and_coercion.
+
+Fixpoint and_type (p : PTyp) (seed : PTyp) {struct p} : STyp :=
+  match p with
+  | PInt    => STUnitT
+  | Fun A B => STFun (|seed|) (and_type B A)
+  | And A B => STUnitT
+  | TopT    => STFun (|seed|) STUnitT
+  end.
+
+Lemma and_type_has_type_st :
+  forall t e r Gamma,
+    TopSig t ->
+    and_coercion t e 0 = r ->
+    exists A, has_type_st Gamma (STLam' _ (r var)) (and_type t A).
+Proof.
+  intros.
+  induction H.
+  
+Admitted.
+
+Fixpoint genCoerce' (n : nat) : Exp :=
+  match n with
+    | 0 => fun A : Type => STUnit A
+    | S m => fun A : Type => STLam' A (genCoerce' m A)
+  end.
+
+Fixpoint and_coercion' (t : PTyp) (e : Exp) (n : nat) {struct t} : Exp :=
+  match t with
+    | PInt    => e
+    | Fun _ B => and_coercion' B e (S n)
+    | And _ _ => e
+    | TopT    => genCoerce' n
+  end.
+
+Print genCoerce.
+
+Fixpoint and_coercion2 (t : PTyp) (e : Exp) {struct t} : sum Exp Exp :=
+  match t with
+    | PInt    => inr e
+    | Fun _ B => match (and_coercion2 B e) with
+                  | inl l => inl (fun A : Type => STLam' A (l A))
+                  | inr r => inr r
+                 end 
+    | And _ _ => inr e
+    | TopT    => inl (fun A : Type =>  STLam' A (STUnit A))
+  end.
+
+Lemma and_type_has_type_st' :
+  forall t e,
+    TopSig t ->
+    exists r, and_coercion2 t e = inl r.  
+Proof.
+  intros.
+  induction H.
+  destruct IHTopSig.
+  exists (fun A : Type => STLam' A (x A)).
+  simpl.
+  rewrite H0.
+  reflexivity.
+  exists (fun A : Type =>  STLam' A (STUnit A)).
+  now simpl.
+Qed.
+  
+(*
+Inductive and_coercion_def : PTyp -> Exp -> Exp -> Prop :=
+  | CPInt : forall e1, and_coercion_def PInt e1 e1
+  | CTopT : forall e1, and_coercion_def TopT e1 (fun T => STLam' T (STUnit _))
+  | CFun1 : forall A B e1 e2,
+              TopSig B ->
+              and_coercion_def B e1 e2 ->
+              and_coercion_def (Fun A B) e1 (fun T => STLam' T (e2 T))
+  | CFun2 : forall A B e1,
+              not (TopSig B) ->
+              and_coercion_def B e1 e1 ->
+              and_coercion_def (Fun A B) e1 e1
+  | CAnd : forall e1 A B, and_coercion_def (And A B) e1 e1.
+
+Check and_coercion_def_ind.
+
+Definition and_coercion_top_sig_ind :
+  forall (P : PTyp -> Exp -> Exp -> Prop),
+       (forall e1 : Exp, P TopT e1 (fun T : Type => STLam' T (STUnit T))) ->
+       (forall (A B : PTyp) (e1 e2 : Exp),
+        TopSig (Fun A B) ->
+        and_coercion_def B e1 e2 ->
+        P B e1 e2 -> P (Fun A B) e1 (fun T : Type => STLam' T (e2 T))) ->
+    forall t e r, and_coercion_def t e r -> TopSig t -> P t e r.
+  intros.
+  induction H1.
+  inversion H2.
+  auto.
+  apply H0; auto.
+  inversion H2; contradiction.
+  inversion H2.
+Defined.  
+*)
+
+Lemma and_coercion_rewrite_topsig :
+  forall t e r n,
+    TopSig t ->
+    and_coercion t e n var = r ->
+    exists m, genCoerce m var = r.              
 Proof.
   intros.
   generalize dependent n.
-  remember (c var).
-  generalize dependent Heqs.
-  induction H; intros; try now inversion H1.
-  - apply_fresh STTyLam' as x; cbn.
-    eapply STTyApp.
-    rewrite <- app_nil_l with (l := Gamma); rewrite app_comm_cons.
-    rewrite <- app_nil_l at 1; apply typing_weaken; rewrite app_nil_l.
-    rewrite Heqs in H2.
-    apply H2.
+  induction H; intros.
+  simpl in H0.
+  now apply IHTopSig in H0.
+  simpl in *.
+  now exists n.
+Qed.
+
+(*
+Inductive CountLam : PTyp -> nat -> Prop :=
+  | ZLam : CountLam TopT 0 
+  | SLam : forall t A n, CountLam t n ->
+                    CountLam (Fun A t) (S n).
+
+Lemma test :
+  forall B n e r,
+    TopSig B ->
+    and_coercion B e (S n) var = STLam' var r ->
+    and_coercion B e n var = r.
+Proof.
+Admitted.
+  
+Lemma and_coercion_rewrite_topsig' :
+  forall t e (r : SExp var) n,
+    TopSig t ->
+    and_coercion t e n var = r ->
+    exists m, genCoerce m var = r /\ CountLam t m.              
+Proof.
+  intros.
+  generalize dependent n.
+  generalize dependent r.
+  generalize dependent e.
+  dependent induction H; intros.
+  induction r; try now (
+  simpl in H0;
+  apply IHTopSig in H0;
+  inversion H0; inversion H1;
+  unfold genCoerce in H2;
+  destruct x; inversion H2).
+
+  simpl in H0.
+  apply test in H0.
+  apply IHTopSig in H0.
+  inversion H0.
+  exists (S x).
+  inversion H1.
+  split.
+  simpl.
+  apply f_equal; auto.
+  apply SLam; auto.
+  auto.
+
+  simpl in H0.
+  
+Admitted.
+*)
+Lemma and_coercion_rewrite_not_topsig : 
+  forall t e r n,
+    not (TopSig t) ->
+    and_coercion t e n = r ->
+    e = r.
+Proof.
+  intros.
+  generalize dependent n.
+  induction t0; intros.
+  now simpl in H0.
+  eapply IHt0_2.
+  unfold not; intros; apply H.
+  apply TopSigF.
+  assumption.
+  simpl in H0.
+  apply H0.
+  now simpl in H0.
+  exfalso; apply H; apply TopSigT.
+Qed.  
+
+Lemma topsig_dec : forall t, sumbool (TopSig t) (not (TopSig t)).
+Proof.
+  intro t.
+  induction t.
+  - right; unfold not; intros HInv; inversion HInv. 
+  - inversion IHt2.
+    left.
+    apply TopSigF.
+    apply H.
+    right.
+    unfold not; intros HInv; inversion HInv; subst.
+    contradiction.
+  - right; unfold not; intros HInv; inversion HInv.
+  - left; apply TopSigT.
+Qed.    
+    
+Lemma and_coercion_rewrite' :
+  forall t e (r : SExp var) n, and_coercion t e n var = r ->
+                          (r = (e var) \/ exists m, r = genCoerce m var).
+Proof.
+  intros.
+  generalize dependent n.
+  induction t0; intros.
+  simpl; auto.
+  simpl in H.
+  eapply IHt0_2.
+  apply H.
+  simpl; auto.
+  unfold and_coercion in H.
+  right; exists n; auto.
+Qed.
+
+Fixpoint and_coercion3 (t : PTyp) (e : Exp) {struct t} : sum Exp Exp :=
+  match t with
+    | PInt    => inr e
+    | Fun _ B => match (and_coercion3 B e) with
+                  | inl l => inl (fun A : Type => STLam' A (l A))
+                  | inr r => inr r
+                 end 
+    | And _ _ => inr e
+    | TopT    => inl (fun A => (STUnit A))
+  end.
+
+Definition join_sum : forall {A}, A + A -> A.
+  intros A H; destruct H as [a | a]; exact a.
+Defined.
+
+Inductive sub' : PTyp -> PTyp -> Exp -> Prop :=
+  | SSInt : sub' PInt PInt (fun A => STLam' _ (STBVar _ 0))
+  | SSFun : forall o1 o2 o3 o4 c1 c2, sub' o3 o1 c1 -> sub' o2 o4 c2 -> 
+     sub' (Fun o1 o2) (Fun  o3 o4) (fun A => STLam' _ ( 
+       STLam' _ (STApp _ (c2 A) (STApp _ (STBVar _ 1) (STApp _ (c1 A) (STBVar _ 0))))))
+  | SSAnd1 : forall t t1 t2 c1 c2, sub' t t1 c1 -> sub' t t2 c2 -> 
+     sub' t (And  t1 t2) (fun A => STLam' _ (
+       STPair _ (STApp _ (c1 A) (STBVar _ 0)) (STApp _ (c2 A) (STBVar _ 0))))
+  | SSAnd2 : forall t t1 t2 c, sub' t1 t c -> Atomic t ->
+     sub' (And  t1 t2) t (fun A => STLam' _ (join_sum (and_coercion3 t (fun A => (
+       (STApp _ (c A) (STProj1 _ (STBVar _ 0)))))) A))
+  | SSAnd3 : forall t t1 t2 c, sub' t2 t c -> Atomic t ->
+     sub' (And  t1 t2) t (fun A => STLam' _ (join_sum (and_coercion3 t (fun A => (
+       (STApp _ (c A) (STProj2 _ (STBVar _ 0)))))) A))
+  | SSTop : forall t, sub' t TopT (fun A => STLam' _ (STUnit _)).
+
+Lemma and_type_term3 :
+  forall {t e},
+    TopSig t ->
+    exists r, and_coercion3 t e = inl r /\ STTerm (r var).  
+Proof.
+  intros.
+  induction H.
+  inversion IHTopSig.
+  exists (fun A : Type => STLam' A (x A)).
+  inversion H0.
+  split.
+  simpl.
+  rewrite H1.
+  reflexivity.
+  apply_fresh STTerm_Lam' as x.
+  unfold open; rewrite <- open_rec_term; auto.
+  exists (fun A : Type => STUnit A); auto.
+Qed.
+  
+Lemma and_type_has_type_st3 :
+  forall {t e Gamma},
+    ok Gamma ->
+    TopSig t ->
+    exists r, and_coercion3 t e = inl r /\ has_type_st Gamma (r var) (|t|).  
+Proof.
+  intros.
+  induction H0.
+  destruct IHTopSig.
+  exists (fun A : Type => STLam' A (x A)).
+  simpl.
+  destruct H1.
+  rewrite H1.
+  split.
+  reflexivity.
+  apply_fresh STTyLam' as v.
+  unfold open.
+  rewrite <- open_rec_term.
+  rewrite <- app_nil_l with (l := extend v (| A |) Gamma).
+  apply typing_weaken; rewrite app_nil_l.
+  apply H2.
+  apply Ok_push; assumption.
+  now apply typing_gives_terms in H2.
+  exists (fun A : Type =>  STUnit A).
+  split.
+  now simpl.
+  simpl.
+  apply STTyUnit.
+  auto.
+Qed.
+
+Lemma and_type_has_type_st3_not_topsig :
+  forall {t e},
+    not (TopSig t) ->
+    and_coercion3 t e = inr e.
+Proof.
+  intros.
+  generalize dependent e.
+  induction t0; try simpl; auto.
+  intros.
+  assert (not (TopSig t0_2)).
+  unfold not; intros HTS; apply H.
+  apply TopSigF; apply HTS.
+  apply IHt0_2 with (e := e) in H0.
+  rewrite H0.
+  reflexivity.
+  exfalso; apply H; apply TopSigT.
+Qed.
+  
+Lemma type_correct_coercions' :
+  forall Gamma A B E, sub' A B E ->
+             ok Gamma -> 
+             has_type_st Gamma (E var) (STFun (|A|) (|B|)) .
+Proof.
+  intros.
+  induction H.
+  (* Case SInt *)
+  - simpl.
+    apply_fresh STTyLam' as x; cbn.
+    simpl; apply STTyVar.
     apply Ok_push; auto.
+    left; simpl; auto.
+  (* Case SFun *)
+  - apply_fresh STTyLam' as x; cbn.
+    apply_fresh STTyLam' as y; cbn.
+    apply STTyApp with (A := (| o2 |)).
+    rewrite <- open_rec_term.
+    rewrite <- open_rec_term.
+    repeat apply typing_weaken_extend.
+    assumption.
+    assumption. 
+    simpl.
+    not_in_L y.
+    apply MSetProperties.Dec.F.add_iff in H4; inversion H4.
+    exfalso; apply H2; apply MSetProperties.Dec.F.singleton_2; auto.
+    assumption.
+    now apply typing_gives_terms in IHsub'2.
+    rewrite <- open_rec_term.
+    now apply typing_gives_terms in IHsub'2.
+    now apply typing_gives_terms in IHsub'2.
+    eapply STTyApp.
+    apply STTyVar.
+    apply Ok_push.
+    apply Ok_push.
+    assumption.
+    assumption.
+    not_in_L y.
     not_in_L x.
+    right; left; reflexivity.
+    apply STTyApp with (A := (| o3 |)).
+    rewrite <- open_rec_term.
+    rewrite <- open_rec_term.
+    repeat apply typing_weaken_extend.
+    assumption.
+    assumption. 
+    simpl.
+    not_in_L y.
+    apply MSetProperties.Dec.F.add_iff in H4; inversion H4.
+    exfalso; apply H2; apply MSetProperties.Dec.F.singleton_2; auto.
+    assumption.
+    now apply typing_gives_terms in IHsub'1.
+    rewrite <- open_rec_term; now apply typing_gives_terms in IHsub'1.
+    apply STTyVar.
+    apply Ok_push.
+    apply Ok_push.
+    assumption.
+    assumption.
+    simpl.
+    rewrite union_spec in Fry.
+    apply not_or_and in Fry.
+    inversion Fry.
+    unfold not; intros.
+    apply MSetProperties.Dec.F.add_iff in H4.
+    inversion H4.
+    apply H2.
+    apply MSetProperties.Dec.F.singleton_2; assumption.
+    contradiction.
+    left; reflexivity.
+  (* Case SAnd1 *)
+  - apply_fresh STTyLam' as x; cbn.
+    apply STTyPair.
+    eapply STTyApp.
+    rewrite <- open_rec_term.
+    apply typing_weaken_extend.
+    apply IHsub'1.
+    assumption.
+    now apply typing_gives_terms in IHsub'1.
+    apply STTyVar.
+    apply Ok_push; auto.
+    left; reflexivity.
+    eapply STTyApp.
+    rewrite <- open_rec_term.
+    apply typing_weaken_extend.
+    apply IHsub'2.
+    assumption.
+    now apply typing_gives_terms in IHsub'2.
+    apply STTyVar.
+    apply Ok_push; auto.
+    left; reflexivity.
+  - pose (topsig_dec t0).
+    inversion s; clear s.
+    assert (Ha : exists r, and_coercion3 t0 ((fun A : Type => STApp A (c A) (STProj1 A (STBVar A 0)))) = inl r /\ has_type_st Gamma (r var) (|t0|)) by (apply and_type_has_type_st3; auto).
+    destruct Ha as [r [HCoerce HHasTy]].
+    rewrite HCoerce.
+    apply_fresh STTyLam' as x.
+    simpl.
+    unfold open; rewrite <- open_rec_term.
+    rewrite <- app_nil_l with (l := (extend x (STTuple (| t1 |) (| t2 |)) Gamma)).
+    apply typing_weaken; rewrite app_nil_l.
+    apply HHasTy.
+    apply Ok_push; auto.
+    now apply typing_gives_terms in HHasTy.
+    eapply and_type_has_type_st3_not_topsig in H2.
+    rewrite H2; simpl.
+    apply_fresh STTyLam' as x; cbn.
+    eapply STTyApp.
+    rewrite <- open_rec_term.
+    apply typing_weaken_extend.
+    apply IHsub'.
+    assumption.
+    now apply typing_gives_terms in IHsub'.
     eapply STTyProj1.
     apply STTyVar.
     apply Ok_push; auto.
-    not_in_L x.
     left; reflexivity.
-  - simpl in *. admit.
+  - pose (topsig_dec t0).
+    inversion s; clear s.
+    assert (Ha : exists r, and_coercion3 t0 ((fun A : Type => STApp A (c A) (STProj2 A (STBVar A 0)))) = inl r /\ has_type_st Gamma (r var) (|t0|)) by (apply and_type_has_type_st3; auto).
+    destruct Ha as [r [HCoerce HHasTy]].
+    rewrite HCoerce.
+    apply_fresh STTyLam' as x.
+    simpl.
+    unfold open; rewrite <- open_rec_term.
+    rewrite <- app_nil_l with (l := (extend x (STTuple (| t1 |) (| t2 |)) Gamma)).
+    apply typing_weaken; rewrite app_nil_l.
+    apply HHasTy.
+    apply Ok_push; auto.
+    now apply typing_gives_terms in HHasTy.
+    eapply and_type_has_type_st3_not_topsig in H2.
+    rewrite H2; simpl.
+    apply_fresh STTyLam' as x; cbn.
+    eapply STTyApp.
+    rewrite <- open_rec_term.
+    apply typing_weaken_extend.
+    apply IHsub'.
+    assumption.
+    now apply typing_gives_terms in IHsub'.
+    eapply STTyProj2.
+    apply STTyVar.
+    apply Ok_push; auto.
+    left; reflexivity.
+  - apply_fresh STTyLam' as x; cbn; apply STTyUnit.
+    apply Ok_push; auto.
+Qed.  
+  
+Lemma and_coercion_proj1_term' :
+  forall t0 (c : Exp),
+    STTerm (c var) ->
+    STTerm (STLam' var (join_sum (and_coercion3 t0 (fun A : Type => (STApp A (c A) (STProj1 A (STBVar A 0)))))
+        var)).
+Proof.
+  intros.
+  apply_fresh STTerm_Lam' as x; unfold open; simpl.
+  pose (topsig_dec t0).
+  inversion s; clear s.
+  assert (exists r : Exp, and_coercion3 t0 (fun A : Type =>
+                          STApp A (c A) (STProj1 A (STBVar A 0))) = inl r /\ STTerm (r var)).
+  apply and_type_term3; auto.
+  inversion H1.
+  inversion H2.
+  rewrite H3.
+  simpl.
+  rewrite <- open_rec_term; auto.
+  eapply and_type_has_type_st3_not_topsig in H0.
+  rewrite H0.
+  simpl.
+  apply STTerm_App; auto.
+  rewrite <- open_rec_term; auto.
+Qed.
+
+Lemma and_coercion_proj2_term' :
+  forall t0 (c : Exp),
+    STTerm (c var) ->
+    STTerm (STLam' var (join_sum (and_coercion3 t0 (fun A : Type => (STApp A (c A) (STProj2 A (STBVar A 0)))))
+        var)).
+Proof.
+  intros.
+  apply_fresh STTerm_Lam' as x; unfold open; simpl.
+  pose (topsig_dec t0).
+  inversion s; clear s.
+  assert (exists r : Exp, and_coercion3 t0 (fun A : Type =>
+                          STApp A (c A) (STProj2 A (STBVar A 0))) = inl r /\ STTerm (r var)).
+  apply and_type_term3; auto.
+  inversion H1.
+  inversion H2.
+  rewrite H3.
+  simpl.
+  rewrite <- open_rec_term; auto.
+  eapply and_type_has_type_st3_not_topsig in H0.
+  rewrite H0.
+  simpl.
+  apply STTerm_App; auto.
+  rewrite <- open_rec_term; auto.
+Qed.
+
+Lemma coercions_produce_terms' :
+  forall E A B, sub' A B E -> STTerm (E var).
+Proof.
+  intros.
+  induction H.
+  (* Case SInt *)
+  - apply_fresh STTerm_Lam' as x. cbn; auto.
+  (* Case SFun *)
+  - apply_fresh STTerm_Lam' as x; cbn.
+    apply_fresh STTerm_Lam' as y; cbn.
+    apply STTerm_App.
+    repeat rewrite <- open_rec_term; assumption.
+    apply STTerm_App.
+    apply STTerm_Var.
+    apply STTerm_App; [ repeat rewrite <- open_rec_term; auto | apply STTerm_Var ].
+  (* Case SAnd1 *)
+  - apply_fresh STTerm_Lam' as x; cbn.
+    apply STTerm_Pair.
+    apply STTerm_App; repeat rewrite <- open_rec_term; auto.
+    rewrite <- open_rec_term; auto.
+  (* Case SAnd2 *)
+  - apply and_coercion_proj1_term'; auto.
+  (* Case SAnd3 *)
+  - apply and_coercion_proj2_term'; auto.
+  (* Case STop *)
+  - apply_fresh STTerm_Lam' as x; cbn.
+    apply STTerm_Unit.
+Qed.
+
+(* Subtyping rules produce type-correct coercions: Lemma 3 *)
+Lemma type_correct_coercions' :
+  forall Gamma A B E, sub A B E ->
+             ok Gamma -> 
+             has_type_st Gamma (E var) (STFun (|A|) (|B|)) .
+Proof.
+  intros.
+  pose (topsig_dec B).
+  inversion s; clear s.
+  induction H.
+  admit.
+  admit.
+  admit.
+  remember (and_coercion t0
+        (fun A : Type => STLam' A (STApp A (c A) (STProj1 A (STBVar A 0)))) 0
+        var).
+  symmetry in Heqs.
+  apply (and_coercion_rewrite_topsig _ _ _ _ H1) in Heqs.
+
+  (*
+  inversion Heqs.
+  induction x.
+  rewrite <- H3.
+  simpl.
+  *)
+  
+  (* eapply (and_coercion_rewrite_topsig _ _ _ _ H1) in Heqs. *)
 Admitted.
-    
-    
+  
 (* Subtyping rules produce type-correct coercions: Lemma 3 *)
 Lemma type_correct_coercions :
   forall Gamma A B E, sub A B E ->
@@ -2234,7 +2774,40 @@ Proof.
     apply Ok_push; auto.
     left; reflexivity.
   (* Case SAnd2 *)
-  - induction H1.
+  - generalize dependent IHsub.
+    induction t0; intros.
+    simpl.
+    apply_fresh STTyLam' as x; cbn.
+    eapply STTyApp.
+    rewrite <- open_rec_term.
+    apply typing_weaken_extend.
+    subst; apply IHsub.
+    assumption.
+    now apply coercions_produce_terms in H.
+    eapply STTyProj1.
+    apply STTyVar.
+    apply Ok_push; auto.
+    left; reflexivity.
+    induction t0_2.
+    simpl; apply_fresh STTyLam' as x; cbn.
+    eapply STTyApp.
+    rewrite <- open_rec_term.
+    apply typing_weaken_extend.
+    subst; apply IHsub.
+    assumption.
+    now apply coercions_produce_terms in H.
+    eapply STTyProj1.
+    apply STTyVar.
+    apply Ok_push; auto.
+    left; reflexivity.
+    simpl in *.
+    destruct t
+    SearchAbout Atomic.
+    admit.
+
+    Print sub. inversion H. simpl.
+    
+    induction H1.
     apply_fresh STTyLam' as x; cbn.
     eapply STTyApp.
     rewrite <- open_rec_term.
