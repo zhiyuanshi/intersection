@@ -4,27 +4,30 @@
 %   related to polymorphism.}
 %The previous section introduced the type system of \name. However it 
 %did not discuss the semantics or how the calculus ensures coherence. 
-This section discusses the semantics of \name, and shows a modified
-type system that guarantees coherence and type soundness. Moreover the
-modified type system shown to be sound and complete with respect to
-the type system presented in Section~\ref{}. The new type system is
-needed because additional type annotations are necessary for both 
-avoiding type ambiguity, and ensuring decidability of type-checking. 
-The coherence theorem, which is a key result in this section, 
-relies on two key aspects of the calculus: 
+This section discusses the elaboration semantics of \name, and shows a
+bidirectional type system that guarantees coherence and type
+soundness. Moreover the bidirectional type system is shown to be sound
+and complete with respect to the type system presented in
+Section~\ref{sec:fi} (provided that terms have some additional type
+annotations). 
+%The new type system is needed because additional type
+%annotations are necessary for both avoiding type ambiguity (as well as
+%ensuring decidability of type-checking).  
+The coherence theorem presented in this section, relies on two key
+aspects of the calculus:
 
 \begin{itemize}
 
-\item {\bf Uniqueness of subtyping coercions:} 
-the notion of ordinary types and 
-well-formedness ensures that coercions produced by
-subtyping relation are unique.
+\item {\bf Uniqueness of subtyping coercions:} the notion of ordinary
+  types, well-formed disjoint intersection types ensures that
+  coercions produced by subtyping relation are unique.
 
-\item {\bf No type ambiguity:} the bi-directional
-type system does not have type-ambiguity; and thus for every program
-accepted in the bi-directional type system there is a unique coercion 
-that is generated. This property is not true for the declarative type
-system, making a direct coherence proof in that system more complicated.  
+\item {\bf No type ambiguity:} the bi-directional type system does not
+  have type-ambiguity. Thus the bi-directional type system infers a
+  unique type for every well-typed program.  Uniqueness of
+  types makes it easier to prove the coherence.  This property is not
+  true for the declarative type system, making a direct coherence
+  proof in that system more complicated.
 
 \end{itemize}
 
@@ -60,43 +63,6 @@ expression in the target language.
 %if $A \inter B \subtype C$, then either $A$ or $B$ contributes to that subtyping
 %relation, resulting in two possible coercions.
 
-\subsection{Disjointness} Throughout the paper we already presented an intuitive
-definition for disjointness. 
-% \bruno{This definition is wrong and too complicated. Since there is no
-% polymorphism, we do not need $\Gamma$.}
-We recall the definition of disjointness next.
-
-\begin{comment}
-\begin{definition}[Disjoint types]
-
-  Two types $A$ and $B$ are said to be disjoint (written $\jdis \Gamma A B$) if
-  they do not share a common supertype - excluding top-like types. 
-  That is, for all type $C$ such that $A \subtype C$ and $B \subtype C$, then $\toplike{C}$ must hold.
-
-  \[\jdis \Gamma A B \equiv \forall C.~A \subtype C \wedge B \subtype C \Rightarrow \toplike{C}\]
-
-\end{definition}
-\end{comment}
-
-\begin{definition}[Simple disjointness]\label{def:simple_dis}
-  Two types $A$ and $B$ are disjoint
-  (written $A \disjoint B$) if there is no type $C$ such that both $A$ and $B$ are
-  subtypes of $C$:
-  \[A \disjoint B \equiv \not\exists C.~A \subtype C~\text{and}~B \subtype C\]
-\end{definition}
-
-For example, $\code{Int}$ and $\code{Char}$ are disjoint,
-since the two types do not have a common supertype. On the other hand, $\code{Int}$ is not
-disjoint with itself, because $\code{Int} \subtype \code{Int}$. This implies that
-disjointness is not reflexive as subtyping is. Two types with different ``shapes''
-are always disjoint, unless one of them is an intersection type.
-For example, a function type and an intersection
-type may not be disjoint. Consider:
-\[ \code{Int} \to \code{Int} \quad \text{and} \quad (\code{Int} \to \code{Int}) \inter (\code{String} \to \code{String}) \]
-Those two types are not disjoint since $\code{Int} \to \code{Int}$ is their common supertype.
-%Also, $\code{Int} \to \code{Char}$ and $\code{Int} \to \code{String}$ are disjoint, 
-%since their supertypes are all types with the form $A \to \top$ 
-%(where A \emph{contains} \code{Int}, i.e. $\code{Int}$, $\code{Int} \inter \code{Char}$) and $\top$.
 
 %TODO move this part somewhere else
 
@@ -152,9 +118,291 @@ Those two types are not disjoint since $\code{Int} \to \code{Int}$ is their comm
 %Indeed, \bruno{unfinidhed sentence}\george{Mabe show a diagram here to contrast
 %with bounded polymorphism.}
 
+\subsection{Target of Elaboration}
+The dynamic semantics of the call-by-value \name is defined via a
+type-directed translation into the simply typed $\lambda$-calculus
+with pair and unit types. 
+%We define the dynamic semantics of the call-by-value \name by means of
+%a type-directed translation to an extension of the simply typed 
+%$\lambda$-calculus with pair and unit types.
+%The type-directed translation is also shown in
+%Figure~\ref{}, where the resulting System F terms are highlighted in
+%gray.
+The syntax and typing of our target language is unsurprising. The syntax of the
+target language is shown in Figure~\ref{fig:f-syntax}. The highlighted part
+shows its difference with the $\lambda$-calculus. 
+The typing rules can 
+be found in the extended version of the paper, and in our Coq proof
+scripts.\bruno{should we mention an extended version of the paper?}
+
+\begin{figure}[t]
+  \[
+    \begin{array}{llrl}
+      \text{Types}    & T & \Coloneqq & \code{Int} \\
+                      &   & \mid      & \unit \\
+                      &   & \mid      & {T_1} \to {T_2} \\
+                      &   & \mid      & \highlight {$ \pair {T_1} {T_2} $} \\
+      \text{Terms}    & E & \Coloneqq & x \\
+                      &   & \mid      & i \\
+                      &   & \mid      & \unit \\
+                      &   & \mid      & \lamty x T E \\
+                      &   & \mid      & \app {E_1} {E_2} \\
+                      &   & \mid      & \highlight {$ \pair {E_1} {E_2} $} \\
+                      &   & \mid      & \highlight {$ \proj k E $} \quad k \in \{ 1, 2 \} \\
+      \text{Contexts} & G & \Coloneqq & \cdot \mid G, x \oftype T \\
+    \end{array}
+  \]
+  \caption{Target language syntax.}
+  \label{fig:f-syntax}
+\end{figure}
+
+
+\subsection{Coercive Subtyping and Coherence} 
+The \name calculus uses coercive subtyping, where subtyping
+derivations produce a coercion that is used to transform values of one
+type to another type. Our calculus ensures that the coercions produced
+by subtyping are unique. Unique coercions are fundamental for proving 
+our coherence result of the semantics of \name.
+
+\paragraph{Coercive subtyping.}
+
+The judgment
+\[
+A_1 \subtype A_2 \yields E
+\]
+extends the subtyping judgment in Figure~\ref{fig:fi-type} with a coercion
+on the right hand side of $ \yields {} $. A coercion $ E $ is just an term
+in the target language and is ensured to have type
+$ \im {A_1} \to \im {A_2} $ (by Lemma~\ref{lemma:sub}). For example,
+\[
+\code{Int} \inter \code{Bool} \subtype \code{Bool} \yields {\lamty x {\im {\code{Int} \inter \code{Bool}}} {\proj 2 x}}
+\]
+generates a coercion function with type: $\code{Int} \inter \code{Bool} \to \code{Bool}$.
+
+In \reflabel{\labelsubfun}, we elaborate the subtyping of
+parameter and return types by $\eta$-expanding $f$ to $\lamty x {\im {A_3}}
+{\app f x}$, applying $E_1$ to the argument and $E_2$ to the result. Rules
+\reflabel{\labelsubinterl}, \reflabel{\labelsubinterr}, and
+\reflabel{\labelsubinter} elaborate intersection types.
+\reflabel{\labelsubinter} uses both coercions to form a pair. Rules
+\reflabel{\labelsubinterl} and \reflabel{\labelsubinterr} reuse the coercion
+from the premises and create new ones that cater to the changes of the argument
+type in the conclusions. Note that the two rules are overlapping and
+hence a program can be elaborated differently, depending on which rule
+is used. Finally, all rules produce type-correct coercions:
+
+%But in the implementation one usually applies the rules sequentially with
+%pattern matching, essentially defining a deterministic order of lookup.
+
+% if we know $A_1$ is a subtype of $A_3$ and $C$ is a coercion from $A_1$
+% to $A_3$, then we can conclude that $A_1 \inter A_2$ is also a subtype
+% of $A_3$ and the new coercion is a function that takes a value $ x $ of type
+% $A_1\inter A_2$, project $x$ on the first item, and apply $ C $ to it.
+
+\begin{restatable}[Subtyping rules produce type-correct coercions]{lemma}{lemmasub}
+  \label{lemma:sub}
+  If $ A_1 \subtype A_2 \yields E $, then $ \jtype \cdot E {\im {A_1} \to \im {A_2}} $.
+\end{restatable}
+
+\begin{proof}
+  By a straightforward induction on the derivation\footnote{The proofs of major lemmata and theorems can be found in the full version of the paper.\bruno{where??}}.
+\end{proof}
+
+\paragraph{Overlapping subtyping rules} The key problem with the
+subtyping rules in Figure~\ref{fig:fi-type} is that all three rules dealing
+with intersection types (\reflabel{\labelsubinterl} and
+\reflabel{\labelsubinterr} and \reflabel{\labelsubinter}) overlap.
+Unfortunately, this means that different coercions may be given when checking
+the subtyping between two types, depending on which derivation is chosen. This
+is the ultimate reason for incoherence. There are two important types of
+overlap:
+
+\begin{enumerate}
+
+\item The left decomposition rules for intersections (\reflabel{\labelsubinterl}
+and \reflabel{\labelsubinterr}) overlap with each other.
+
+\item The left decomposition rules for intersections (\reflabel{\labelsubinterl}
+and \reflabel{\labelsubinterr}) overlap with the right decomposition rules for
+intersections \reflabel{\labelsubinter}.
+
+\end{enumerate}
+
+\paragraph{Well-formedness and disjointness} 
+The fact that in \name all intersection types are disjoint is useful to deal
+with problem 1). Recall the definition of disjointness:
+
+\begin{definition}[Simple disjointness]\label{def:simple_dis}
+  Two types $A$ and $B$ are disjoint
+  (written $A \disjoint B$) if there is no type $C$ such that both $A$ and $B$ are
+  subtypes of $C$:
+  \[A \disjoint B \equiv \not\exists C.~A \subtype C~\text{and}~B \subtype C\]
+\end{definition}
+
+Disjoint intersections are enforced by well-formedness of types.
+Since the two types in an intersection are disjoint, it is impossible
+that both of the preconditions of the left decompositions are
+satisfied at the same time. Therefore, only one of the two left
+decomposition rules can be chosen for a disjoint intersection
+type. More formally, with disjoint intersections, we have the
+following theorem:
+
+\begin{lemma}[Unique subtype contributor]
+  \label{lemma:unique-subtype-contributor}
+
+  If $A_1 \inter A_2 \subtype B$, where $A_1 \inter A_2$ and $B$ are well-formed types,
+  then it is not possible that the following holds at the same time:
+  \begin{enumerate}
+    \item $A_1 \subtype B$
+    \item $A_2 \subtype B$
+  \end{enumerate}
+\end{lemma}
+
+Unfortunately, disjoint intersections alone are insufficient to deal with
+problem 2). In order to deal with problem 2), we introduce a distinction between
+types, and ordinary types.
+
+\paragraph{Ordinary Types.} Ordinary types are just those which are not intersection
+types, and are asserted by the judgment \[ \jatomic A \]
+
+Since types in \name are simple, the only atomic types are the
+function type and integers.
+But in richer systems, it can also include, for example, record types.
+In the left decomposition rules for intersections we introduce a requirement
+that $A_3$ is atomic. The consequence of this requirement is that when $A_3$ is
+an intersection type, then the only rule that can be applied is
+\reflabel{\labelsubinter}. With the atomic constraint, one can guarantee that at
+any moment during the derivation of a subtyping relation, at most one rule can
+be used. Consequently, the coercion of a subtyping relation $A \subtype B$ is
+uniquely determined. This fact is captured by the following lemma:
+
+\begin{restatable}[Unique coercion]{lemma}{uniquecoercion}
+  \label{lemma:unique-coercion}
+
+  If $A \subtype B \yields {E_1}$ and $A \subtype B \yields {E_2}$, where $A$
+  and $B$ are well-formed types, then $E_1 \equiv E_2$.
+\end{restatable}
+
+\paragraph{No Loss of Expressiveness.}
+Interestingly, our restrictions on subtyping do not sacrifice the expressiveness of
+subtyping since we have the following two theorems:
+\begin{theorem}
+  If $A_1 \subtype A_3$, then $A_1 \inter A_2 \subtype A_3$.
+\end{theorem}
+\begin{theorem}
+If $A_2 \subtype A_3$, then $A_1 \inter A_2 \subtype A_3$.
+\end{theorem}
+
+\noindent The interpretation of the two theorems is that: even though the
+premise is made stricter by the atomic condition, we can still derive every
+subtyping relation which is valid in the unrestricted system.
+
+
+Throughout the paper we already presented an intuitive
+definition for disjointness. 
+% \bruno{This definition is wrong and too complicated. Since there is no
+% polymorphism, we do not need $\Gamma$.}
+We recall the definition of disjointness next.
+
+\begin{comment}
+\begin{definition}[Disjoint types]
+
+  Two types $A$ and $B$ are said to be disjoint (written $\jdis \Gamma A B$) if
+  they do not share a common supertype - excluding top-like types. 
+  That is, for all type $C$ such that $A \subtype C$ and $B \subtype C$, then $\toplike{C}$ must hold.
+
+  \[\jdis \Gamma A B \equiv \forall C.~A \subtype C \wedge B \subtype C \Rightarrow \toplike{C}\]
+
+\end{definition}
+\end{comment}
+
+\begin{definition}[Simple disjointness]\label{def:simple_dis}
+  Two types $A$ and $B$ are disjoint
+  (written $A \disjoint B$) if there is no type $C$ such that both $A$ and $B$ are
+  subtypes of $C$:
+  \[A \disjoint B \equiv \not\exists C.~A \subtype C~\text{and}~B \subtype C\]
+\end{definition}
+
+For example, $\code{Int}$ and $\code{Char}$ are disjoint,
+since the two types do not have a common supertype. On the other hand, $\code{Int}$ is not
+disjoint with itself, because $\code{Int} \subtype \code{Int}$. This implies that
+disjointness is not reflexive as subtyping is. Two types with different ``shapes''
+are always disjoint, unless one of them is an intersection type.
+For example, a function type and an intersection
+type may not be disjoint. Consider:
+\[ \code{Int} \to \code{Int} \quad \text{and} \quad (\code{Int} \to \code{Int}) \inter (\code{String} \to \code{String}) \]
+Those two types are not disjoint since $\code{Int} \to \code{Int}$ is their common supertype.
+%Also, $\code{Int} \to \code{Char}$ and $\code{Int} \to \code{String}$ are disjoint, 
+%since their supertypes are all types with the form $A \to \top$ 
+%(where A \emph{contains} \code{Int}, i.e. $\code{Int}$, $\code{Int} \inter \code{Char}$) and $\top$.
+
+
+
+% Note that $A$ \emph{exclusive} or $B$ is true if and only if their truth value
+% differ. Next, we are going to investigate the minimal requirement (necessary and
+% sufficient conditions) such that the theorem holds.
+%
+% If $A_1$ and $A_2$ in this setting are the same, for example,
+% $\code{Int} \inter \code{Int} \subtype \code{Int}$, obviously the theorem will
+% not hold since both the left $\code{Int}$ and the right $\code{Int}$ are a
+% subtype of $\code{Int}$.
+%
+% We can try to rule out such possibilities by making the requirement of
+% well-formedness stronger. This suggests that the two types on the sides of
+% $\inter$ should not ``overlap''. In other words, they should be ``disjoint''. It
+% is easy to determine if two base types are disjoint. For example, $\code{Int}$
+% and $\code{Int}$ are not disjoint. Neither do $\code{Int}$ and $\code{Nat}$.
+% Also, types built with different constructors are disjoint. For example,
+% $\code{Int}$ and $\code{Int} \to \code{Int}$. For function types, disjointness
+% is harder to visualize. But bear in the mind that disjointness can defined by
+% the very requirement that the theorem holds.
+%
+%
+% This result is captured more formally by the following lemma:
+
+% \george{Note that $\bot$ does not participate in subtyping and why (because the
+% empty set intersecting the empty set is still empty).}
+
+% \george{What's the variance of the disjoint constraint? C.f. bounded
+% polymorphism.}
+
+% \george{Two points are being made here: 1) nondisjoint intersections, 2) atomic
+% types. Show an offending example for each?}
+
+\subsection{Coherence of the Elaboration}
+Combining the previous results, we are able to show the central theorem:
+
+\begin{restatable}[Unique elaboration]{theorem}{uniqueelaboration}
+  \label{theorem:unique-elaboration}
+
+  If $\jtype \Gamma e {A_1} \yields {E_1}$ and $\jtype \Gamma e {A_2} \yields
+  {E_2}$, then $E_1 \equiv E_2$. (``$\equiv$'' means syntactical equality, up to
+  $\alpha$-equality.)
+
+\end{restatable}
+
+\begin{proof}
+  Note that the typing rules are already syntax-directed but the case of
+  \reflabel{\labeltapp} (copied below) still needs special attention since we
+  need to show that the generated coercion $E$ is unique.
+  \begin{mathpar}
+    \ruletapp
+  \end{mathpar}
+  Luckily we know that typing
+  judgments give well-formed types, and thus $\jwf \Gamma {A_1}$ and $\jwf
+  \Gamma {A_3}$. Therefore we are able to apply
+  Lemma~\ref{lemma:unique-coercion} and conclude that $E$ is unique.
+
+\end{proof}
+
 \subsection{Bidirectional Type System}
 
-Introduce the bi-directional type system here?
+Proving coherence for a calculus 
+
+The declarative type system presented in Section~\ref{} accepts
+programs such as:
+
+
 
 Two motivations for the bidirectional type system. 
 Firstly the presence of a subsumption rule makes the declarative type 
@@ -171,7 +419,7 @@ annotations.
     \formt \\
     \bruletvar \and \bruletint \and
     \bruletlam \and \bruletapp \and
-    \bruletmergedis \and \bruletsub \and \brulettop \and \bruletann
+    \bruletmergedis \and \bruletsub \and \bruletann % \and \brulettop
   \end{mathpar}
   \caption{Bidirectional type system of \name.}
   \label{fig:fi-typebd}
@@ -240,26 +488,6 @@ the function expects a $\code{String}$ but the translated argument is of type $\
 {\code{Int}} {\code{String}}$.
 
 
-\begin{figure}[t]
-  \[
-    \begin{array}{llrl}
-      \text{Types}    & T & \Coloneqq & \code{Int} \\
-                      &   & \mid      & \unit \\
-                      &   & \mid      & {T_1} \to {T_2} \\
-                      &   & \mid      & \highlight {$ \pair {T_1} {T_2} $} \\
-      \text{Terms}    & E & \Coloneqq & x \\
-                      &   & \mid      & i \\
-                      &   & \mid      & \unit \\
-                      &   & \mid      & \lamty x T E \\
-                      &   & \mid      & \app {E_1} {E_2} \\
-                      &   & \mid      & \highlight {$ \pair {E_1} {E_2} $} \\
-                      &   & \mid      & \highlight {$ \proj k E $} \quad k \in \{ 1, 2 \} \\
-      \text{Contexts} & G & \Coloneqq & \cdot \mid G, x \oftype T \\
-    \end{array}
-  \]
-  \caption{Target language syntax.}
-  \label{fig:f-syntax}
-\end{figure}
 
 \paragraph{Type and Context Translation.}
 
@@ -293,49 +521,7 @@ contexts $\Gamma$ to target language contexts $G$.
 % Section~\ref{sec:fi}, except for the light blue part. The translation consists
 % of four sets of rules, which are explained below:
 
-\paragraph{Coercive subtyping.}
 
-The judgment
-\[
-A_1 \subtype A_2 \yields E
-\]
-extends the subtyping judgment in Figure~\ref{fig:fi-type} with a coercion
-on the right hand side of $ \yields {} $. A coercion $ E $ is just an term
-in the target language and is ensured to have type
-$ \im {A_1} \to \im {A_2} $ (by Lemma~\ref{lemma:sub}). For example,
-\[
-\code{Int} \inter \code{Bool} \subtype \code{Bool} \yields {\lamty x {\im {\code{Int} \inter \code{Bool}}} {\proj 2 x}}
-\]
-generates a coercion function with type: $\code{Int} \inter \code{Bool} \to \code{Bool}$.
-
-In \reflabel{\labelsubfun}, we elaborate the subtyping of
-parameter and return types by $\eta$-expanding $f$ to $\lamty x {\im {A_3}}
-{\app f x}$, applying $E_1$ to the argument and $E_2$ to the result. Rules
-\reflabel{\labelsubinterl}, \reflabel{\labelsubinterr}, and
-\reflabel{\labelsubinter} elaborate intersection types.
-\reflabel{\labelsubinter} uses both coercions to form a pair. Rules
-\reflabel{\labelsubinterl} and \reflabel{\labelsubinterr} reuse the coercion
-from the premises and create new ones that cater to the changes of the argument
-type in the conclusions. Note that the two rules are overlapping and
-hence a program can be elaborated differently, depending on which rule
-is used. Finally, all rules produce type-correct coercions:
-
-%But in the implementation one usually applies the rules sequentially with
-%pattern matching, essentially defining a deterministic order of lookup.
-
-% if we know $A_1$ is a subtype of $A_3$ and $C$ is a coercion from $A_1$
-% to $A_3$, then we can conclude that $A_1 \inter A_2$ is also a subtype
-% of $A_3$ and the new coercion is a function that takes a value $ x $ of type
-% $A_1\inter A_2$, project $x$ on the first item, and apply $ C $ to it.
-
-\begin{restatable}[Subtyping rules produce type-correct coercions]{lemma}{lemmasub}
-  \label{lemma:sub}
-  If $ A_1 \subtype A_2 \yields E $, then $ \jtype \cdot E {\im {A_1} \to \im {A_2}} $.
-\end{restatable}
-
-\begin{proof}
-  By a straightforward induction on the derivation\footnote{The proofs of major lemmata and theorems can be found in the full version of the paper.\bruno{where??}}.
-\end{proof}
 
 \paragraph{The translation judgment.} The translation judgment $\jtype \Gamma e
 A \yields E$ extends the typing judgment with an elaborated term on the right
@@ -371,6 +557,8 @@ by the following two theorems.
 \end{proof}
 
 \begin{comment}
+
+
 \subsection{Typing}
 
 Figure~\ref{fig:fi-type-patch} shows modifications to Figure~\ref{fig:fi-type}
@@ -463,141 +651,3 @@ type-safety still holds.
 % \[ \jdis {\alpha \disjoint \code{Int}} \code{Int} \code{Int} \]
 % is longer true since $\code{Int}$ is clearly not disjoint with itself.
 \end{comment}
-
-\subsection{Subtyping}
-
-% \george{Explain \reflabel{\labelsubforall} and distinction of kernel and all version.}
-
-The subtyping rules need some adjustment. An important problem with the
-subtyping rules in Figure~\ref{fig:fi-type} is that all three rules dealing
-with intersection types (\reflabel{\labelsubinterl} and
-\reflabel{\labelsubinterr} and \reflabel{\labelsubinter}) overlap.
-Unfortunately, this means that different coercions may be given when checking
-the subtyping between two types, depending on which derivation is chosen. This
-is the ultimate reason for incoherence. There are two important types of
-overlap:
-
-\begin{enumerate}
-
-\item The left decomposition rules for intersections (\reflabel{\labelsubinterl}
-and \reflabel{\labelsubinterr}) overlap with each other.
-
-\item The left decomposition rules for intersections (\reflabel{\labelsubinterl}
-and \reflabel{\labelsubinterr}) overlap with the right decomposition rules for
-intersections \reflabel{\labelsubinter}.
-
-\end{enumerate}
-
-\noindent Fortunately, disjoint intersections (which are enforced by
-well-formedness) deal with problem 1): only one of the two left decomposition
-rules can be chosen for a disjoint intersection type. Since the two types in the
-intersection are disjoint, it is impossible that both of the preconditions of
-the left decompositions are satisfied at the same time. More formally, with
-disjoint intersections, we have the following theorem:
-
-\begin{lemma}[Unique subtype contributor]
-  \label{lemma:unique-subtype-contributor}
-
-  If $A_1 \inter A_2 \subtype B$, where $A_1 \inter A_2$ and $B$ are well-formed types,
-  then it is not possible that the following holds at the same time:
-  \begin{enumerate}
-    \item $A_1 \subtype B$
-    \item $A_2 \subtype B$
-  \end{enumerate}
-\end{lemma}
-
-Unfortunately, disjoint intersections alone are insufficient to deal with
-problem 2). In order to deal with problem 2), we introduce a distinction between
-types, and atomic types.
-
-\paragraph{Atomic Types.} Atomic types are just those which are not intersection
-types, and are asserted by the judgment \[ \jatomic A \]
-
-Since types in \name are simple, the only atomic types are the
-function type and integers.
-But in richer systems, it can also include, for example, record types.
-In the left decomposition rules for intersections we introduce a requirement
-that $A_3$ is atomic. The consequence of this requirement is that when $A_3$ is
-an intersection type, then the only rule that can be applied is
-\reflabel{\labelsubinter}. With the atomic constraint, one can guarantee that at
-any moment during the derivation of a subtyping relation, at most one rule can
-be used. Consequently, the coercion of a subtyping relation $A \subtype B$ is
-uniquely determined. This fact is captured by the following lemma:
-
-\begin{restatable}[Unique coercion]{lemma}{uniquecoercion}
-  \label{lemma:unique-coercion}
-
-  If $A \subtype B \yields {E_1}$ and $A \subtype B \yields {E_2}$, where $A$
-  and $B$ are well-formed types, then $E_1 \equiv E_2$.
-\end{restatable}
-
-\paragraph{No Loss of Expressiveness.}
-Interestingly, our restrictions on subtyping do not sacrifice the expressiveness of
-subtyping since we have the following two theorems:
-\begin{theorem}
-  If $A_1 \subtype A_3$, then $A_1 \inter A_2 \subtype A_3$.
-\end{theorem}
-\begin{theorem}
-If $A_2 \subtype A_3$, then $A_1 \inter A_2 \subtype A_3$.
-\end{theorem}
-
-\noindent The interpretation of the two theorems is that: even though the
-premise is made stricter by the atomic condition, we can still derive every
-subtyping relation which is valid in the unrestricted system.
-
-% Note that $A$ \emph{exclusive} or $B$ is true if and only if their truth value
-% differ. Next, we are going to investigate the minimal requirement (necessary and
-% sufficient conditions) such that the theorem holds.
-%
-% If $A_1$ and $A_2$ in this setting are the same, for example,
-% $\code{Int} \inter \code{Int} \subtype \code{Int}$, obviously the theorem will
-% not hold since both the left $\code{Int}$ and the right $\code{Int}$ are a
-% subtype of $\code{Int}$.
-%
-% We can try to rule out such possibilities by making the requirement of
-% well-formedness stronger. This suggests that the two types on the sides of
-% $\inter$ should not ``overlap''. In other words, they should be ``disjoint''. It
-% is easy to determine if two base types are disjoint. For example, $\code{Int}$
-% and $\code{Int}$ are not disjoint. Neither do $\code{Int}$ and $\code{Nat}$.
-% Also, types built with different constructors are disjoint. For example,
-% $\code{Int}$ and $\code{Int} \to \code{Int}$. For function types, disjointness
-% is harder to visualize. But bear in the mind that disjointness can defined by
-% the very requirement that the theorem holds.
-%
-%
-% This result is captured more formally by the following lemma:
-
-% \george{Note that $\bot$ does not participate in subtyping and why (because the
-% empty set intersecting the empty set is still empty).}
-
-% \george{What's the variance of the disjoint constraint? C.f. bounded
-% polymorphism.}
-
-% \george{Two points are being made here: 1) nondisjoint intersections, 2) atomic
-% types. Show an offending example for each?}
-
-\subsection{Coherence of the Elaboration}
-Combining the previous results, we are able to show the central theorem:
-
-\begin{restatable}[Unique elaboration]{theorem}{uniqueelaboration}
-  \label{theorem:unique-elaboration}
-
-  If $\jtype \Gamma e {A_1} \yields {E_1}$ and $\jtype \Gamma e {A_2} \yields
-  {E_2}$, then $E_1 \equiv E_2$. (``$\equiv$'' means syntactical equality, up to
-  $\alpha$-equality.)
-
-\end{restatable}
-
-\begin{proof}
-  Note that the typing rules are already syntax-directed but the case of
-  \reflabel{\labeltapp} (copied below) still needs special attention since we
-  need to show that the generated coercion $E$ is unique.
-  \begin{mathpar}
-    \ruletapp
-  \end{mathpar}
-  Luckily we know that typing
-  judgments give well-formed types, and thus $\jwf \Gamma {A_1}$ and $\jwf
-  \Gamma {A_3}$. Therefore we are able to apply
-  Lemma~\ref{lemma:unique-coercion} and conclude that $E$ is unique.
-
-\end{proof}
