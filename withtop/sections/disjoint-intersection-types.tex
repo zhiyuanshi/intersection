@@ -283,6 +283,7 @@ uniquely determined. This fact is captured by the following lemma:
   and $B$ are well-formed types, then $E_1 \equiv E_2$.
 \end{restatable}
 
+\begin{comment}
 \paragraph{No Loss of Expressiveness.}
 Interestingly, our restrictions on subtyping do not sacrifice the expressiveness of
 subtyping since we have the following two theorems:
@@ -304,18 +305,6 @@ definition for disjointness.
 % polymorphism, we do not need $\Gamma$.}
 We recall the definition of disjointness next.
 
-\begin{comment}
-\begin{definition}[Disjoint types]
-
-  Two types $A$ and $B$ are said to be disjoint (written $\jdis \Gamma A B$) if
-  they do not share a common supertype - excluding top-like types. 
-  That is, for all type $C$ such that $A \subtype C$ and $B \subtype C$, then $\toplike{C}$ must hold.
-
-  \[\jdis \Gamma A B \equiv \forall C.~A \subtype C \wedge B \subtype C \Rightarrow \toplike{C}\]
-
-\end{definition}
-\end{comment}
-
 \begin{definition}[Simple disjointness]\label{def:simple_dis}
   Two types $A$ and $B$ are disjoint
   (written $A \disjoint B$) if there is no type $C$ such that both $A$ and $B$ are
@@ -335,7 +324,7 @@ Those two types are not disjoint since $\code{Int} \to \code{Int}$ is their comm
 %Also, $\code{Int} \to \code{Char}$ and $\code{Int} \to \code{String}$ are disjoint, 
 %since their supertypes are all types with the form $A \to \top$ 
 %(where A \emph{contains} \code{Int}, i.e. $\code{Int}$, $\code{Int} \inter \code{Char}$) and $\top$.
-
+\end{comment}
 
 
 % Note that $A$ \emph{exclusive} or $B$ is true if and only if their truth value
