@@ -1,11 +1,40 @@
 \section{Disjoint Intersection Types with $\top$}
 
 So far we have discussed a system with intersection types, but we have (intentionally) left out $\top$.
-\joao{expand this part}
 The $\top$ type is not only a supertype of all types, but also the type for 0-ary intersection. 
-Therefore we introduce $\top$ in our system - which is a fairly straightforward process - as shown in Figure 
-\ref{fig:fi-syntax-top}.
+Unfortunately, introducing $\top$ into our system leads to several drastic consequences:
 
+\begin{itemize}
+\item The definition of disjointness becomes useless:
+since every type has now a common supertype, it does not exist any pair of two types for which the disjointness relation
+holds. Thus, we can no longer build an intersection type.
+\item The subtyping relation becomes incoherent: its rules allow us to derive both $\top \subtype \top \inter \top$ and 
+$\top \inter \top \subtype \top$.
+\end{itemize}
+
+However, by adjusting the definition of disjointness, we can obtain more useful results, while still preserving the
+coherence of the subtyping relation.
+Even though these are desirable properties, a new definition of disjointess can be formulated in many different ways. 
+\joao{expand}
+
+We will first show how we can introduce $\top$ into our system.
+Next, a new definition of disjointness will be presented, which we will refer to as $\top$-disjointness, and
+we will briefly discuss how it can make the resulting system more useful, while maintaining the correctness
+of all properties proven for the original system.
+The definition of $\top$-disjointess will depend on a notion of a top-like type, for which at first we will just provide 
+some intuition for it.
+We will then formalise two different systems, based on two different definitions of a top-like type, while discussing their
+usability and limitations.
+The first top-like definition will solve the problem of incoherence, but it will still forbid the inclusion of
+function types within intersection types.
+To face this limitation, we proceed by extending the top-like definition, and showing how the resulting system will become 
+more expressive.
+We also show, for both systems, how to adjust the algorithmic rules, such that they are consistent with the 
+respective disjointess specification.
+
+\subsection{Introducing $\top$}
+
+Introducing the $\top$ type in our system is a fairly straightforward process, as shown in Figure \ref{fig:fi-syntax-top}.
 
 \begin{figure}[t]
   \[
@@ -40,29 +69,36 @@ Therefore we introduce $\top$ in our system - which is a fairly straightforward 
   \label{fig:fi-syntax-top}
 \end{figure}\bruno{rule form needs to be fixed in typing.}
 
-We start by adding $\top$ to the existing types. Similarly, we add the only inhabitant of type $\top$: the term $\top$.
+We start by adding $\top$ to the existing types. 
+Similarly, we add the only inhabitant of type $\top$: the term $\top$.
 We extend the subtyping relation with \reflabel{\labelsubtop}, declaring that any type is a sub-type of $\top$.
 The coercion in the target language, is a function that always returns the term $\top$, regardless of its argument.
 We also add $\top$ to the set of well-formed types, by extending the well-formedness relation with \reflabel{\labelwftop}. 
 Finally, the typing rule \reflabel{\labelttop} states that, under type inference, the term $\top$ has type $\top$ 
 and generates the term \unit in the target language.
 
-However, as discussed in Section \ref{sec:overview}, the definition of disjoitness used so far 
-is useless if we want to extend our system with $\top$.
-\joao{use same examples here?}
-Thus, we need to reformulate that definition.
-We will present two different definitions, which we will call $\top$-disjointness, and discuss their effects in the system.
+However, as discussed in Section \ref{sec:overview}, the definition of disjoitness used so far turns intersection types to
+be useless within this new system.
+Since every type now has at least one common supertype (namely, $\top$), it is impossible to create an intersection type.
+Thus, we need to reformulate that definition, which will do next.
 
 \subsection{Disjointness} 
 
-Even though we will present two distinct definitions of $\top$-disjointness, they share the same top-level definition, 
+As we have seen, a new definition of disjointess is needed in order to turn the system more useful.
+..
+We studied two different disjointness definitions...
+
+
+Even though we will show two different definitions of $\top$-disjointness, they share the same top-level definition, 
 presented next.
+\begin{definition}[$\top$-Disjointness]
 Given two types $A$ and $B$, 
 
 %\[A * B \equiv \not \toplike{A} \and \not \toplike{A} \and A \subtype B\]
 \[A \disjoint_{\top} B \equiv \neg \toplike{A} \; \wedge \; \neg \toplike{B} \; \wedge \; 
-\forall_C \; ( A \subtype C \wedge B \subtype C ) \rightarrow \toplike{C} \],
+\forall_C \; ( A \subtype C \wedge B \subtype C ) \rightarrow \toplike{C}, \]
 
+\end{definition}
 where $\toplike{C}$ means that $C$ is a top-like type.
 A top-like type is a unary relation at the type level, which we will further specialize into two different definitions. 
 However, we can first provide an intuition about this general $\top$-disjointness definition.
@@ -75,10 +111,33 @@ intersection of these types, since there might be an overlap between them.
 \end{enumerate}
 
 Next we will present two different top-like type definitions and discuss their consequences in the overall resulting system.
+We will refer to the first resulting system as \emph{naive} and to the second as \emph{improved}. 
 
 \subsection{A Naive Calculus with $\top$}
 
+As a first definition of top-like, we aim to define it in such a way that it solves the aforementioned coherence problem of
+the subtyping relation.
+\joao{rephrase this}
+Therefore, we first present the top-like definition, formalise the resulting system and  
+show how the coherence problem is solved.
+Then we will show how the original algorithmic disjointness rules can be modified to match the new $\top$-disjointness
+definition.
+Finally we will discuss the limitations of resulting system and motivate the need for a refined definition of the top-like 
+relation. 
+
 \paragraph{Top-Like Types}
+
+A simple attempt to achieve coherence in the presented system with $\top$ is to forbid any intersection enclosing 
+more than one $\top$.
+This will ensure that types such as $\top \inter \top$ are not allowed and thus ending with the inconsistency of
+$\top \subtype \top \inter \top$ and $\top \inter \top \subtype \top$.
+In other words, our system contains only one \emph{syntactic} $\top$, thus ensuring coherence in our system.
+\joao{explain this better?}
+For a similar reasion, our system forbids types of the form $A \inter \top$, where $A \neq \top$.  
+Should our system accept intersections as in $A \inter \top$, then both $A \subtype A \inter \top$ and 
+$A \inter \top \subtype A$ would hold (by \reflabel{\labelsubinter} and \reflabel{\labelsubinterl}, respectively).
+Therefore, we can introduce the notion of a top-like type that results in forbidding these kind of intersections.
+
 \begin{figure}[h]
   \begin{mathpar}
     \formtoplike \\ %\framebox{$\jatomic A$} \\
@@ -106,22 +165,12 @@ Next we will present two different top-like type definitions and discuss their c
   Any type consisting of a $n$-ary intersection composed of $n$ $\top$, is a top-like type. 
 \end{definition}
 
-
-A simple attempt to achieve coherence in the presented system with $\top$ is to forbid any intersection enclosing 
-more than one $\top$.
-This will ensure that types such as $\top \inter \top$ are not allowed and thus ending with the inconsistency of
-$\top \subtype \top \inter \top$ and $\top \inter \top \subtype \top$.
-In other words, our system contains only one \emph{syntatic} $\top$, thus ensuring coherence in our system.
-\joao{explain this better?}
-For a similar reasion, our system forbids types of the form $A \inter \top$, where $A \neq \top$.  
-Should our system accept intersections as in $A \inter \top$, then both $A \subtype A \inter \top$ and 
-$A \inter \top \subtype A$ (by \reflabel{\labelsubinter} and \reflabel{\labelsubinterl}, respectively).
-
-We may now formalise the notion of top-like type as an unary relation on a type $A$, denoted as $\toplike{A}$, as show in 
+We may formalise the notion of top-like type as an unary relation on a type $A$, denoted as $\toplike{A}$, as show in 
 Figure \ref{fig:tltypesdis}.
 This definition resembles the previous description with two rules.
 The ... states that $\top$ is a top-like type; the ... says that any n-ary intersection composed of just $\top$ is also a
 top-like type.
+
 
 %Let us consider a term $t$ with type $Char \inter Int$ and a function $f$ with type $\top \rightarrow Char$.
 %The application of $f$ to $x$ could lead to a choice between $Char$ and $Int$ and $Char \inter Int$.
@@ -168,12 +217,15 @@ As we have seen, the former definition of top-like types is, unfortunately, too 
 Namely, function types are disallowed within intersection types, which is clearly a limitation from an expressivity
 angle.
 Let us consider, again, the two function types $\code{String} \to \code{Int}$ and $\code{String} \to \code{String}$. 
-According to the original system (i.e. without $\top$) these two function types are disjoint since it does not exist
+According to the original system (i.e. without $\top$) these two types are disjoint since it does not exist
 a common supertype of both types. 
-The intersection of these two types could be useful, for instance ... \joao{finish this example}
-%However, within the improved system, this relationship does not hold anymore since there is a common supertype of both
-%functions: $String \to \top$.
-Therefore, we extend the definition of top-like type, as presented next.
+%The intersection of these two types could be useful, for instance ... \joao{finish this example}
+However, within the improved system, this relationship does not hold anymore since there is a common supertype of both
+functions: $String \to \top$.
+Therefore, we extend the definition of top-like type to include types of the form $A_k \to \top$.
+This will introduce a new ambiguity in our subtyping rules, which will lead us to changing the coercions produced by some
+rules.
+Finally, we will re-adjust the algorithmic disjointness rules to match the extended $\top$-disjointness definition. 
 
 \paragraph{Top-Like Types}
 
@@ -197,9 +249,8 @@ Therefore, we extend the definition of top-like type, as presented next.
   \end{mathpar}
 
   \caption{Top-like types and Algorithmic Disjointness for the improved calculus.}
-  \label{fig:disjointness}
+  \label{fig:tltypesextdis}
 \end{figure}
-
 
 In relation to the previous definition of top-like, we extend it as follows:
 \begin{definition}[Top-like types]
@@ -209,6 +260,13 @@ In relation to the previous definition of top-like, we extend it as follows:
 
 \end{definition}
 
+Now, according to our $\top$-disjointess definition,
+$\code{String} \to \code{Int}$ and $\code{String} \to \code{String}$ are disjoint, and thus, their intersection is a 
+well-formed type.
+The extended top-like definitions and resulting system are formalised in Figure \ref{fig:tltypesextdis}.
+Note how we just added \reflabel{\labeltoplfun} to the top-like relation, by stating that a function is top-like whenever
+its return type is also top-like.
+The rest of the changes will be discussed in the following sections.
 
 %\joao{do we want to allow this?
 % f: String $\to$ Int \\ 
@@ -217,16 +275,44 @@ In relation to the previous definition of top-like, we extend it as follows:
 
 \paragraph{Coercive Subtyping}
 
-In this improved calculus, a new problem arises when generating coercions. \joao{use a new figure showing what changed?}
-Namely, \reflabel{\labelsubinterl} and \reflabel{\labelsubinterr}, since these need to generate specialized coercions,
+In this improved calculus, a new problem arises when generating coercions. \joao{add new rules to the figure}
+As a consequence of introducing functions within intersection types, we introduce ambiguity between subtype contributors 
+under intersection types.
+In other words, Lemma ... no longer holds because, under some contexts, 
+\reflabel{\labelsubinterl} and \reflabel{\labelsubinterr} now overlap. 
+Let us demonstrate this using an example:
+suppose that we want to build a derivation for  
+$\code{Int} \to \code{Int} \inter \code{Char} \to \code{Char} \subtype (\code{Int} \inter \code{Char}) \to \top$
+Then, we can either derive it to $\code{Int} \to \code{Int} \subtype (\code{Int} \inter \code{Char}) \to \top$ 
+(using \reflabel{\labelsubinterl}), or to $\code{Char} \to \code{Char} \subtype (\code{Int} \inter \code{Char}) \to \top$
+(using \reflabel{\labelsubinterr}), and thus introducing ambiguity in our system.
+
+Facing this problem, we could solve it at least in two distinct ways:
+
+\begin{itemize}
+\item Forbid intersection types that include more than one function type; or
+\item Add new rules to the subtyping relation that deal with this situation. 
+\end{itemize}
+
+However, a closer to the function rule \joao{reference rule and finish sentence}
+Intuitively, generating a $\top$ term is done always the same way, regardless of the form of the argument(s).
+
+Thus we opted to modify the existing rules, to reflect this observation.
+Namely, \reflabel{\labelsubinterl} and \reflabel{\labelsubinterr}, since these can generate specialised coercions,
 in case $A_3$ is of the form $A_k \to \top$. 
-Thus, with this assumption over $A_3$, the coercion generated should be a nested number of $\lambda$ equal to $k+1$,
+With this assumption over $A_3$, the coercion generated should be a nested number of $\lambda$ equal to $k+1$,
 returning $\top$ as the result, regardless of the parameters.
-\joao{show example where}
+The rules of the subtyping relation therefore only suffered slight changes and we managed to maintain coherence.
+Next, we will modify the algorithmic disjointess rules, so that they match the improved top-like specification.
 
 \paragraph{Algorithmic disjointness rules}
 
 Fortunately, the algorithmic disjointness rules are, again, similar to the ones presented in the original system.
 In relation to the previous system with $\top$, we placed back $\reflabel{\labeldisfun}$, since we lifted the restriction
 of intersections with function types.
-We also had to modify $\reflabel{\labeldisaxintfun}$ to include a premise \joao{why?} 
+We also had to modify $\reflabel{\labeldisaxintfun}$ to include the premise $\neg \toplike{B}$.
+This is due to the specification of $\top$-disjointness, which requires two types not to be top-like in order for them to 
+be disjoint.
+
+\joao{add a paragraph mentioning the possibility of using two different definitions of top-like in T-disjointness, so we can get a DisAx-Int-Fun with no premise?}
+
