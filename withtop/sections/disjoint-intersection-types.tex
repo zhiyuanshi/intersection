@@ -24,28 +24,16 @@ aspects of the calculus:
 
 \item {\bf No type ambiguity:} the bi-directional type system does not
   have type-ambiguity. Thus the bi-directional type system infers a
-  unique type for every well-typed program.  Uniqueness of
-  types makes it easier to prove the coherence.  This property is not
-  true for the declarative type system, making a direct coherence
-  proof in that system more complicated.
+  unique type for every well-typed program. 
+
+%Removing type ambiguity 
+%  is essential to ensure that the dynamic 
+%Uniqueness of
+%  types makes it easier to prove the coherence.  This property is not
+%  true for the declarative type system, making a direct coherence
+%  proof in that system more complicated.
 
 \end{itemize}
-
-\begin{comment}
-The key 
-aspect to ensuring coherence is the notion of disjoint intersection.
-
-\bruno{How to pitch this section:}
-Three things to ensure coherence:
-
-1) Ordinary + Well-formedness ensure that coercions produced by
-subtyping relation are unique; 
-
-2) Bi-directional type-system ensures that unambiguous types: the 
-additional type annotations are enough to remove ambiguity, and ensure
-that the calculus always elaborates every program to a unique
-expression in the target language.
-\end{comment}
 
 %From the theoretical point-of-view, the end goal of this section is to show that the resulting system has
 %a coherent (or unique) elaboration semantics:
@@ -156,6 +144,38 @@ scripts.\bruno{should we mention an extended version of the paper?}
   \label{fig:f-syntax}
 \end{figure}
 
+\paragraph{Type and Context Translation.}
+
+Figure~\ref{fig:type-and-context-translation} defines the type translation
+function $\im \cdot$ from \name types $A$ to target language types $T$. The
+notation $\im \cdot$ is also overloaded for context translation from \name
+contexts $\Gamma$ to target language contexts $G$.
+
+\begin{figure}[t]
+  \framebox{$\im A = T$}
+
+  \begin{align*}
+    \im {\code{Int}}     &= \code{Int} \\
+    \im {A_1 \to A_2}    &= \im {A_1} \to \im {A_2} \\
+    \im {A_1 \inter A_2} &= \pair {\im {A_1}} {\im {A_2}} \\
+%    \im \top             &= \unit \\
+  \end{align*}
+
+  \framebox{$\im \Gamma = G$}
+
+  \begin{align*}
+    \im \cdot                      &= \cdot \\
+    \im {\Gamma, \alpha \oftype A} &= \im \Gamma, \alpha \oftype \im A
+  \end{align*}
+
+  \caption{Type and context translation.}
+  \label{fig:type-and-context-translation}
+\end{figure}
+
+% The rules given in this section are identical with those in
+% Section~\ref{sec:fi}, except for the light blue part. The translation consists
+% of four sets of rules, which are explained below:
+
 
 \subsection{Coercive Subtyping and Coherence} 
 The \name calculus uses coercive subtyping, where subtyping
@@ -265,13 +285,14 @@ types, and ordinary types.
 \paragraph{Ordinary Types.} Ordinary types are just those which are not intersection
 types, and are asserted by the judgment \[ \jatomic A \]
 
-Since types in \name are simple, the only atomic types are the
+\noindent Since types in \name are simple, the only ordinary types are the
 function type and integers.
-But in richer systems, it can also include, for example, record types.
+But in richer systems, it can also include, for example, record types
+or pairs.
 In the left decomposition rules for intersections we introduce a requirement
-that $A_3$ is atomic. The consequence of this requirement is that when $A_3$ is
+that $A_3$ is ordinary. The consequence of this requirement is that when $A_3$ is
 an intersection type, then the only rule that can be applied is
-\reflabel{\labelsubinter}. With the atomic constraint, one can guarantee that at
+\reflabel{\labelsubinter}. With the ordinary constraint, one can guarantee that at
 any moment during the derivation of a subtyping relation, at most one rule can
 be used. Consequently, the coercion of a subtyping relation $A \subtype B$ is
 uniquely determined. This fact is captured by the following lemma:
@@ -362,68 +383,74 @@ Those two types are not disjoint since $\code{Int} \to \code{Int}$ is their comm
 
 In order to prove the coherence result we first introduce a bidirectional
 type system, which is closely related to the type system presented in
-Section~\ref{}. The new type system is elaborating, producing a term 
-in the target language while doing the typing derivation.
+Section~\ref{}. The type system is elaborating, producing a term 
+in the target language while performing the typing derivation.
 
-\paragraph{The translation judgment.} The translation judgment $\jtype \Gamma e
-A \yields E$ extends the typing judgment with an elaborated term on the right
-hand side of $\yields {}$. The translation ensures that $E$ has type
-$\im A$. 
+The bidirectional type system is useful for two different
+reasons. Firstly, the presence of the subsumption rule
+(\reflabel{\labeltsub}) makes the type system not syntax directed,
+which presents a challenge for an implementation. Bidirectional
+type-checking makes the rules syntax directed again.  Secondly, and
+more importantly, the subsumption rule also creates type ambiguity:
+the same term can have multiple types. This is problematic because
+there can be different semantics for a term, depending on the type of
+the term. Bidirectional type-checking comes to the rescue again, by
+ensuring that with the additional type annotations only one type is
+inferred for a term.
 
-\paragraph{Key Idea of the Translation.}
-This translation turns merges into usual pairs, similar to Dunfield's
+\paragraph{Key Idea of the elaboration.}
+The key idea in the elaboration is to turn merges into usual pairs, similar to Dunfield's
 elaboration approach~\cite{dunfield2014elaborating}.
 For example, \[ 1 \mergeop \code{"one"} \] becomes \pair 1
 {\code{"one"}}. In usage, the pair will be coerced according to type
-information. For example, consider the function application: \[ \app {(\lamty x
-{\code{String}} x)} {(1 \mergeop \code{"one"})} \] This expression will be translated to \[ \app
-{(\lamty x {\code{String}} x)} {(\app {(\lamty x {\pair {\code{Int}} {\code{String}}} {\proj 2 x})}
+information. For example, consider the function application: 
+\[ \app {(\lamty x {\code{String}} x : \code{String} \to \code{String})} {(1 \mergeop \code{"one"})} \] 
+This expression will be translated to \[ \app
+{(\lamty x {\code{String}} x)} {(\app {(\lamty x {\pair {\code{Int}} {\code{String}}} {\proj 2~x})}
 {\pair 1 {\code{"one"}}})} \] The coercion in this case is $(\lamty x {\pair
-{\code{Int}} {\code{String}}} {\proj 2 x})$. It extracts the second item from the pair, since
+{\code{Int}} {\code{String}}} {\proj 2~x})$. It extracts the second item from the pair, since
 the function expects a $\code{String}$ but the translated argument is of type $\pair
 {\code{Int}} {\code{String}}$.
 
+\paragraph{The elaboration judgments and rules.}
+Figure~\ref{fig:fi-typebd} presents the elaborating bidirectional type
+system. The bidirectional type system itself is rather standard.  The
+key differences to the type system in Figure~\ref{fig:fi-type} are
+that all $:$'s are replaced with $\Rightarrow$ or $\Leftarrow$. There
+are two check-mode rules: \reflabel{\labeltlam} and
+\reflabel{\labeltsub}. The remaining rules are all in the synthesis
+mode. Moreover there is one additional rule for annotation expressions
+(\reflabel{\labeltann}). The syntax of source terms also needs to be
+extended with annotation expressions $e : A$. \bruno{References to
+  bidirectional type-checking needed somewhere?}
 
+The two elaboration judgments $\jinfer \Gamma e A \yields E$ and
+$\jcheck \Gamma e A \yields E$ extends the usal typing judgments with
+an elaborated term on the right hand side of the arrows. The
+elaboration ensures that $E$ has type $\im A$. 
+Noteworthy are the \reflabel{\labeltmerge} 
+and \reflabel{\labeltsub} rules. The \reflabel{\labeltmerge}
+straightforwardly translates merges into pairs. The
+\reflabel{\labeltsub} accounts for the type coercions arizing 
+from subtyping. The additional coercions are necessary to ensure that
+the target terms are correctly typed, since the target language lacks
+subtyping.
 
-\paragraph{Type and Context Translation.}
-
-Figure~\ref{fig:type-and-context-translation} defines the type translation
-function $\im \cdot$ from \name types $A$ to target language types $T$. The
-notation $\im \cdot$ is also overloaded for context translation from \name
-contexts $\Gamma$ to target language contexts $G$.
-
-\begin{figure}[t]
-  \framebox{$\im A = T$}
-
-  \begin{align*}
-    \im {\code{Int}}     &= \code{Int} \\
-    \im {A_1 \to A_2}    &= \im {A_1} \to \im {A_2} \\
-    \im {A_1 \inter A_2} &= \pair {\im {A_1}} {\im {A_2}} \\
-    \im \top             &= \unit \\
-  \end{align*}
-
-  \framebox{$\im \Gamma = G$}
-
-  \begin{align*}
-    \im \cdot                      &= \cdot \\
-    \im {\Gamma, \alpha \oftype A} &= \im \Gamma, \alpha \oftype \im A
-  \end{align*}
-
-  \caption{Type and context translation.}
-  \label{fig:type-and-context-translation}
+\begin{figure}
+  \begin{mathpar}
+    \formbi \\
+    \bruletvar \and \bruletint \and
+    \bruletapp \and
+    \bruletmergedis \and \bruletann \\
+   \formbc\\
+   \bruletlam \and \bruletsub
+  \end{mathpar}
+  \caption{Bidirectional type system of \name.}
+  \label{fig:fi-typebd}
 \end{figure}
 
-% The rules given in this section are identical with those in
-% Section~\ref{sec:fi}, except for the light blue part. The translation consists
-% of four sets of rules, which are explained below:
 
-
-In \name, one may pass more information to a function than what is required; but
-not in ordinary $\lambda$-calculus. To account for this difference, in \reflabel{\labeltapp}, the
-coercion $E$ from the subtyping relation is applied to the argument.
-\reflabel{\labeltmerge} straightforwardly translates merges into pairs.
-
-The type-directed translation is type-safe. This property is captured
+The type-directed elaboration is type-safe. This property is captured
 by the following two theorems.
 
 \begin{restatable}[Type preservation]{theorem}{typepreservation}
@@ -441,67 +468,20 @@ by the following two theorems.
 \begin{theorem}[Type safety]
   If $e$ is a well-typed \name term, then $e$ evaluates to some $\lambda$-calculus
   value $v$.
-\end{theorem}
+\end{theorem}\bruno{Joao, can you please adjust the lemmas for the
+  bi-directional type-checking?}
 
 \begin{proof}
   Since we define the dynamic semantics of \name in terms of the composition of
   the type-directed translation and the dynamic semantics of $\lambda$-calculus, type safety follows immediately.
 \end{proof}
 
-
-
-
-\paragraph{Unique coercions and unique types}
-The bidirectional type system makes it easier to prove 
-coherence. The type system in Figure~\ref{} accepts programs such as:
-
-\begin{lstlisting}
-3,,'c'
-\end{lstlisting}
-
-\noindent Such a program can be assigned multiple types (for example ...), and 
- 
-
-
-Two motivations for the bidirectional type system. 
-Firstly the presence of a subsumption rule makes the declarative type 
-system not syntax directed; bidirectional type-checking provides an 
-easy way to recover syntax-directed typing. Secondly, bidirectional 
-type-checking removes type-ambiguity. This makes it easier to talk
-about coherence. 
-
-The syntax need to be extended with one additional construct: type 
-annotations.
-
-\begin{figure}
-  \begin{mathpar}
-    \formt \\
-    \bruletvar \and \bruletint \and
-    \bruletlam \and \bruletapp \and
-    \bruletmergedis \and \bruletsub \and \bruletann % \and \brulettop
-  \end{mathpar}
-  \caption{Bidirectional type system of \name.}
-  \label{fig:fi-typebd}
-\end{figure}
-
-\paragraph{Uniqueness of type-inference} An important property of the
-bidirectional type-checking is that, given an expression $e$, if it is
-possible to infer a type for $e$, then $e$ has a unique type.
-
-\begin{theorem}[Uniqueness of type-inference]
-%  If $e$ is a well-typed \name term, then $e$ evaluates to some $\lambda$-calculus
-%  value $v$.
-\bruno{statement missing.}
-\end{theorem}
-
-In contrast, in the declarative type system the uniqueness of types
-property does not hold. 
-
 \paragraph{Soundness and Compleness} The declarative type system presented in
 Figure~\ref{} is closely related to the bidirectional type system 
 in Figure~\ref{}. We can prove that the bidirectional type system 
 is sound and complete with respect to the declarative specification, 
-modulo some additional type-annotations.
+modulo some additional type-annotations.\bruno{Need to add the
+  definition of erasure here}
 
 \begin{theorem}[Soundness of bidirectional type-checking]
 %  If $e$ is a well-typed \name term, then $e$ evaluates to some $\lambda$-calculus
@@ -515,28 +495,30 @@ modulo some additional type-annotations.
 \bruno{statement missing.}
 \end{theorem}
 
-\subsection{Semantics}
+\paragraph{Unique coercions and unique types}
+The bidirectional type system makes it easier to prove 
+coherence. The type system in Figure~\ref{} accepts programs such as:
 
-We define the dynamic semantics of the call-by-value \name by means of
-a type-directed translation to an extension of $\lambda$-calculus with pairs.
-%The type-directed translation is also shown in
-%Figure~\ref{}, where the resulting System F terms are highlighted in
-%gray.
+\begin{lstlisting}
+3,,'c'
+\end{lstlisting}
 
-
-\paragraph{Target Language.}
-The syntax and typing of our target language is unsurprising. The syntax of the
-target language is shown in Figure~\ref{fig:f-syntax}. The highlighted part
-shows its difference with the $\lambda$-calculus. The typing rules can be found
-in the extended version of the paper.
-
-% \bruno{Does the target language does need unit? Any rules generating units? I
-% don't think so, so it can be dropped.}
+\noindent Such a program can be assigned multiple types (for example ...), and 
+ 
 
 
+\paragraph{Uniqueness of type-inference} An important property of the
+bidirectional type-checking is that, given an expression $e$, if it is
+possible to infer a type for $e$, then $e$ has a unique type.
 
+\begin{theorem}[Uniqueness of type-inference]
+%  If $e$ is a well-typed \name term, then $e$ evaluates to some $\lambda$-calculus
+%  value $v$.
+\bruno{statement missing.}
+\end{theorem}
 
-
+In contrast, in the declarative type system the uniqueness of types
+property does not hold. 
 
 \subsection{Coherency of Elaboration}
 
@@ -565,6 +547,7 @@ Combining the previous results, we are able to show the central theorem:
 
 \end{proof}
 
+\begin{comment}
 \subsection{Typing}
 
 Figure~\ref{fig:fi-type-patch} shows modifications to Figure~\ref{fig:fi-type}
@@ -657,5 +640,4 @@ type-safety still holds.
 % \[ \jdis {\alpha \disjoint \code{Int}} \code{Int} \code{Int} \]
 % is longer true since $\code{Int}$ is clearly not disjoint with itself.
 
-\begin{comment}
 \end{comment}

@@ -1,5 +1,19 @@
 % \renewcommand{\yields}[1]{}
 
+\newcommand{\formbi}{
+\framebox{
+$ \jinfer \Gamma e A \yields E\\e$ synthesizes type $A$}
+}
+
+\newcommand{\formbc}{
+\framebox{
+$ \jcheck \Gamma e A \yields E\\e$ checks against given type $A$
+}
+}
+
+%$ \jtype \Gamma e A \Leftarrow E~~~~~
+%e$ checks againts known type $A$}}
+
 \newcommand{\bruletvar} {
 \inferrule* [right=\labeltvar]
   {x \oftype A \in \Gamma}
