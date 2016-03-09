@@ -180,9 +180,11 @@ contexts $\Gamma$ to target language contexts $G$.
 \subsection{Coercive Subtyping and Coherence} 
 The \name calculus uses coercive subtyping, where subtyping
 derivations produce a coercion that is used to transform values of one
-type to another type. Our calculus ensures that the coercions produced
+type to another type. 
+Our calculus ensures that the coercions produced
 by subtyping are unique. Unique coercions are fundamental for proving 
 our coherence result of the semantics of \name.
+
 
 \paragraph{Coercive subtyping.}
 
@@ -198,6 +200,9 @@ $ \im {A_1} \to \im {A_2} $ (by Lemma~\ref{lemma:sub}). For example,
 \code{Int} \inter \code{Bool} \subtype \code{Bool} \yields {\lamty x {\im {\code{Int} \inter \code{Bool}}} {\proj 2 x}}
 \]
 generates a coercion function with type: $\code{Int} \inter \code{Bool} \to \code{Bool}$.
+Note that, in contrast to Dunfield's elaboration approach, where subtyping produces
+coercions that are source language terms, in \name, coercions are
+produced directly on the target language.
 
 In \reflabel{\labelsubfun}, we elaborate the subtyping of
 parameter and return types by $\eta$-expanding $f$ to $\lamty x {\im {A_3}}
@@ -449,7 +454,7 @@ subtyping.
   \label{fig:fi-typebd}
 \end{figure}
 
-
+\paragraph{Type-safety}
 The type-directed elaboration is type-safe. This property is captured
 by the following two theorems.
 
@@ -495,20 +500,8 @@ modulo some additional type-annotations.\bruno{Need to add the
 \bruno{statement missing.}
 \end{theorem}
 
-\paragraph{Unique coercions and unique types}
-The bidirectional type system makes it easier to prove 
-coherence. The type system in Figure~\ref{} accepts programs such as:
-
-\begin{lstlisting}
-3,,'c'
-\end{lstlisting}
-
-\noindent Such a program can be assigned multiple types (for example ...), and 
- 
-
-
 \paragraph{Uniqueness of type-inference} An important property of the
-bidirectional type-checking is that, given an expression $e$, if it is
+bidirectional type-checking in Figure~\ref{} is that, given an expression $e$, if it is
 possible to infer a type for $e$, then $e$ has a unique type.
 
 \begin{theorem}[Uniqueness of type-inference]
@@ -517,8 +510,10 @@ possible to infer a type for $e$, then $e$ has a unique type.
 \bruno{statement missing.}
 \end{theorem}
 
-In contrast, in the declarative type system the uniqueness of types
-property does not hold. 
+In contrast, as illustrated in Section~\ref{subsec:challenges}, in the declarative type
+system some terms may have multiple, incompatible types. Therefore
+there is no uniqueness of types for the declarative type system, and
+the same term can have different semantics depending on its type.
 
 \subsection{Coherency of Elaboration}
 
@@ -543,7 +538,10 @@ Combining the previous results, we are able to show the central theorem:
   Luckily we know that typing
   judgments give well-formed types, and thus $\jwf \Gamma {A_1}$ and $\jwf
   \Gamma {A_3}$. Therefore we are able to apply
-  Lemma~\ref{lemma:unique-coercion} and conclude that $E$ is unique.
+  Lemma~\ref{lemma:unique-coercion} and conclude that $E$ is
+  unique.\bruno{This explanation is no longer valid; we need to talk
+    about the subsumption rule instead (and still about the Lemma 5);
+    and we need to talk about the role of uniqueness of type-inference.}
 
 \end{proof}
 
