@@ -1,17 +1,33 @@
 \section{Disjoint Intersection Types with $\top$}
 
-So far we have discussed a system with intersection types, but we have (intentionally) left out $\top$.
-The $\top$ type is not only a supertype of all types, but also the type for 0-ary intersection. 
-Unfortunately, introducing $\top$ into our system leads to several drastic consequences:
+This section shows how to add a $\top$ type to \name.
+%So far we have discussed a system with intersection types, but we have (intentionally) left out $\top$.
+%The $\top$ type is not only a supertype of all types, but also the type for 0-ary intersection. 
+%Unfortunately, introducing $\top$ into our system leads to several
+%drastic consequences:
+Introducing $\top$ poses some important challenges. Most prominently,
+the simple definition of disjointness is useless in the presence of
+$\top$. Since all types now have a common supertype, it is impossible
+for any two types to satisfy a simple notion of disjointness. To
+address this problem a notion of $\top$-disjointess is proposed.  The
+definition of $\top$-disjointess depends on a notion of a top-like
+type. We formalise two different variants of \name, based on two different
+definitions of a top-like type, while discussing their usability and
+limitations. Both variants retain coherence, and all other key
+properties of \name. 
+Mechanized Coq proofs for both variants are available as part of the 
+supplementary materials for the paper.
 
-\begin{itemize}
-\item The definition of disjointness becomes useless:
-since every type has now a common supertype, it does not exist any pair of two types for which the disjointness relation
-holds. Thus, we can no longer build an intersection type.
-\item The subtyping relation becomes incoherent: its rules allow us to derive, for example, both 
-$\top \subtype \top \inter \top$ and $\top \inter \top \subtype \top$.
-\end{itemize}
 
+%\begin{itemize}
+%\item The definition of disjointness becomes useless:
+%since every type has now a common supertype, it does not exist any pair of two types for which the disjointness relation
+%holds. Thus, we can no longer build an intersection type.
+%\item The subtyping relation becomes incoherent: its rules allow us to derive, for example, both 
+%$\top \subtype \top \inter \top$ and $\top \inter \top \subtype \top$.
+%\end{itemize}
+
+\begin{comment}
 However, by adjusting the definition of disjointness, we can obtain more useful results, while still preserving the
 coherence of the subtyping relation.
 Even though these are desirable properties, a new definition of disjointess can be formulated in many different ways. 
@@ -31,10 +47,9 @@ To face this limitation, we proceed by extending the top-like definition, and sh
 more expressive.
 We also show, for both systems, how to adjust the algorithmic disjointness rules such that they become consistent with the 
 respective disjointess specification.
+\end{comment}
 
 \subsection{Introducing $\top$}
-
-Introducing the $\top$ type in our system is a fairly straightforward process, as shown in Figure \ref{fig:fi-syntax-top}.
 
 \begin{figure}[t]
   \[
@@ -61,7 +76,7 @@ Introducing the $\top$ type in our system is a fairly straightforward process, a
   \end{mathpar}
 
   \begin{mathpar}
-    \formt \\
+    \formbi \\
     \rulettop
   \end{mathpar}
 
@@ -72,8 +87,9 @@ Introducing the $\top$ type in our system is a fairly straightforward process, a
 
   \caption{Extending \name with $\top$.}
   \label{fig:fi-syntax-top}
-\end{figure}\bruno{rule form needs to be fixed in typing.}
+\end{figure}
 
+Introducing the $\top$ type in \name is a straightforward process, as shown in Figure \ref{fig:fi-syntax-top}.
 We start by adding $\top$ to the existing types. 
 Similarly, we add the only inhabitant of type $\top$: the term $\top$.
 We extend the subtyping relation with \reflabel{\labelsubtop}, declaring that any type is a sub-type of $\top$.
@@ -82,14 +98,14 @@ We also add $\top$ to the set of well-formed types by extending the well-formedn
 Finally, the typing rule \reflabel{\labelttop} states that, under type inference, the term $\top$ has type $\top$ 
 and generates the term $\unit$ in the target language.
 
-However, as discussed in Section \ref{sec:overview}, the definition of disjointness used so far turns intersection types to
-be useless within this new system.
-Since every type now has at least one common supertype (namely, $\top$), it is impossible to create an intersection type.
-Thus, we need to reformulate that definition, as presented next. 
+%However, as discussed in Section \ref{sec:overview}, the definition of disjointness used so far turns intersection types to
+%be useless within this new system.
+%Since every type now has at least one common supertype (namely, $\top$), it is impossible to create an intersection type.
+%Thus, we need to reformulate that definition, as presented next. 
 
 \subsection{Disjointness} 
-
-As we have seen, a new definition of disjointness is needed in order to turn the system more useful.
+As discussed in Section \ref{sec:overview}, the definition of
+simple disjointness is useless when \name is extended with $\top$.
 We opted to differentiate \emph{top-like} types from the rest of the types,
 so that we may impose restrictions related to the former, since they are the 
 root of the problems exposed.
@@ -99,14 +115,14 @@ Having this in mind, we defined $\top$-disjointness as follows:
 %Even though we will show two different definitions of $\top$-disjointness, they share the same top-level definition, 
 %presented next.
 \begin{definition}[$\top$-Disjointness]
-Given two types $A$ and $B$, 
+Given two types $A$ and $B$ we have that:
 
 %\[A * B \equiv \not \toplike{A} \and \not \toplike{A} \and A \subtype B\]
 \[A \disjoint_{\top} B \equiv \neg \toplike{A} \; \wedge \; \neg \toplike{B} \; \wedge \; 
-\forall_C \; ( A \subtype C \wedge B \subtype C ) \rightarrow \toplike{C}, \]
+\forall_C \; ( A \subtype C \wedge B \subtype C ) \rightarrow \toplike{C} \]
 
 \end{definition}
-where $\toplike{C}$ means that $C$ is a top-like type.
+\noindent where $\toplike{C}$ means that $C$ is a top-like type.
 A top-like type is thus a unary relation at the type level, which we will further specialise into two different definitions. 
 However, we can first provide an intuition about this general $\top$-disjointness definition, in two steps:
 \begin{enumerate}
