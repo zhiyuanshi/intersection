@@ -22,8 +22,7 @@ to implement the type-system.
 
 This section presents the set of rules for determining whether two
 types are disjoint. The set of rules is algorithmic and an
-implementation is easily derived from them. Therefore we solve the
-problem of finding an algorithm to compute disjointness. The derived
+implementation is easily derived from them. The derived
 set of rules for disjointness is proved to be sound and complete with
 respect to the definition of disjointness in
 Section~\ref{sec:disjoint}.
@@ -115,7 +114,7 @@ Section~\ref{sec:disjoint}.
 
 \subsection{Algorithmic Rules}
 
-\begin{figure}[h]
+\begin{figure}[t]
   \begin{mathpar}
     \formdis \\
     \ruledisinterl \and \ruledisinterr \\ 
@@ -158,7 +157,6 @@ Figure~\ref{fig:disjointness}, which consists of two judgments.
 
 \paragraph{Main Judgment.} The judgment $\jdisimpl \Gamma A B$ says
 two types $A$ and $B$ are disjoint.
-
 The rules dealing with intersection types (\reflabel{\labeldisinterl} and
 \reflabel{\labeldisinterr}) are quite intuitive. The intuition is that if two
 types $A$ and $B$ are disjoint to some type $C$, then their intersection
@@ -168,7 +166,7 @@ inductively distributing the relation itself over the intersection constructor
 implementation does not matter as applying either of them will eventually leads
 to the same conclusion, that is, if two types are disjoint or not.
 
-The rule for functions \reflabel{\labeldisfun} is more interesting. It says that two function
+The rule for functions (\reflabel{\labeldisfun}) is more interesting. It says that two function
 types are disjoint if and only if their return types are disjoint (regardless of
 their parameter types!). At first this rule may look surprising
 because the parameter types play no role in the definition of
