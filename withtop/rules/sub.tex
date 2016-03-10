@@ -127,19 +127,19 @@
 \newcommand{\labelsubintertopl}{\makelabelsub {Inter-Top-1}}
 \newcommand{\rulesubintertopl}{
   \inferrule* [right=\labelsubintertopl]
-    {{A_1} \subtype {A_k \to \top} \yields E \\ k \in \mathbb{N}_{0}}
-    {{A_1 \inter A_2} \subtype {A_3}
+    {{A_1} \subtype {A_k \to \top} \yields E \\ k \in \mathbb{N}}
+    {{A_1 \inter A_2} \subtype {A_k \to \top}
       \yields
-        {\lamty {x_0} {\im {A_1 \inter A_2}}
-          {... \lam {x_k} {\unit}}}}
+        {\lamty {x} {\im {A_1 \inter A_2}}
+          {\lam {x_1} {... \lam {x_k} {\unit}}}}}
 }
 
 \newcommand{\labelsubintertopr}{\makelabelsub {Inter-Top-2}}
 \newcommand{\rulesubintertopr}{
   \inferrule* [right=\labelsubintertopr]
-    {{A_2} \subtype {A_k \to \top} \yields E \\ k \in \mathbb{N}_{0}}
-    {{A_1 \inter A_2} \subtype {A_3}
+    {{A_2} \subtype {A_k \to \top} \yields E \\ k \in \mathbb{N}}
+    {{A_1 \inter A_2} \subtype {A_k \to \top}
       \yields
-        {\lamty {x_0} {\im {A_1 \inter A_2}}
-          {... \lam {x_k} {\unit}}}}
+        {\lamty {x} {\im {A_1 \inter A_2}}
+          {\lam {x_1} {... \lam {x_k} {\unit}}}}}
 }
