@@ -473,42 +473,66 @@ by the following two theorems.
 \begin{theorem}[Type safety]
   If $e$ is a well-typed \name term, then $e$ evaluates to some $\lambda$-calculus
   value $v$.
-\end{theorem}\bruno{Joao, can you please adjust the lemmas for the
-  bi-directional type-checking?}
+\end{theorem}
 
 \begin{proof}
   Since we define the dynamic semantics of \name in terms of the composition of
   the type-directed translation and the dynamic semantics of $\lambda$-calculus, type safety follows immediately.
 \end{proof}
 
+\begin{figure}[t]
+  \framebox{$\erase A = T$}
+  \begin{align*}
+    \erase {i}                  &= i \\
+    \erase {x}                  &= x \\
+    \erase {\lam x E}           &= \lam x {\erase E} \\
+    \erase {\app {e_1} {e_2}}   &= {\erase {e_1}} ({\erase {e_2}}) \\
+    \erase {{e_1} ,, {e_2}}     &= {\erase {e_1}} \, ,, \, {\erase {e_2}} \\
+    \erase {e : A}              &= {\erase e} 
+  \end{align*}
+  \caption{Type annotation erasure.}
+  \label{fig:type-ann-erasure}
+\end{figure}
+
 \paragraph{Soundness and Compleness} The declarative type system presented in
-Figure~\ref{} is closely related to the bidirectional type system 
-in Figure~\ref{}. We can prove that the bidirectional type system 
+Figure~\ref{fig:fi-type} is closely related to the bidirectional type system 
+in Figure~\ref{fig:fi-typebd}. We can prove that the bidirectional type system 
 is sound and complete with respect to the declarative specification, 
-modulo some additional type-annotations.\bruno{Need to add the
-  definition of erasure here}
+modulo some additional type-annotations.
+We will use the definition of erasure, as shown in Figure~\ref{fig:type-ann-erasure}.
 
 \begin{theorem}[Soundness of bidirectional type-checking]
-%  If $e$ is a well-typed \name term, then $e$ evaluates to some $\lambda$-calculus
-%  value $v$.
-\bruno{statement missing.}
+If $ \jinfer \Gamma e A \yields E$, then $ \jtype \Gamma {\erase e} A \yields {E'} $.
 \end{theorem}
+
+\begin{proof}
+  (Sketch) By structural induction on the term and the corresponding
+  inference rule.
+\end{proof}
 
 \begin{theorem}[Completeness of bidirectional type-checking]
-%  If $e$ is a well-typed \name term, then $e$ evaluates to some $\lambda$-calculus
-%  value $v$.
-\bruno{statement missing.}
+If $ \jtype \Gamma e A \yields {E'}$, then $ \jinfer \Gamma {e'} A \yields E$, where $\erase{e'} = e$.
 \end{theorem}
 
+\begin{proof}
+  (Sketch) By structural induction on the term and the corresponding
+  inference rule.
+\end{proof}
+
 \paragraph{Uniqueness of type-inference} An important property of the
-bidirectional type-checking in Figure~\ref{} is that, given an expression $e$, if it is
+bidirectional type-checking in Figure~\ref{fig:fi-typebd} is that, given an expression $e$, if it is
 possible to infer a type for $e$, then $e$ has a unique type.
 
 \begin{theorem}[Uniqueness of type-inference]
-%  If $e$ is a well-typed \name term, then $e$ evaluates to some $\lambda$-calculus
-%  value $v$.
-\bruno{statement missing.}
+\label{theorem:uniqueness-type-inference}
+If $\jinfer \Gamma {e_1} A \yields {E_1}$ and $\jinfer \Gamma {e_2} A \yields {E_2}$ then 
+${e_1} = {e_2}$.
 \end{theorem}
+
+\begin{proof}
+  (Sketch) By structural induction on the term and the corresponding
+  inference rule.
+\end{proof}
 
 In contrast, as illustrated in Section~\ref{subsec:challenges}, in the declarative type
 system some terms may have multiple, incompatible types. Therefore
@@ -529,20 +553,23 @@ Combining the previous results, we are able to show the central theorem:
 \end{restatable}
 
 \begin{proof}
-  Note that the typing rules are already syntax-directed but the case of
-  \reflabel{\labeltapp} (copied below) still needs special attention since we
-  need to show that the generated coercion $E$ is unique.
-  \begin{mathpar}
-    \ruletapp
-  \end{mathpar}
-  Luckily we know that typing
-  judgments give well-formed types, and thus $\jwf \Gamma {A_1}$ and $\jwf
-  \Gamma {A_3}$. Therefore we are able to apply
-  Lemma~\ref{lemma:unique-coercion} and conclude that $E$ is
-  unique.\bruno{This explanation is no longer valid; we need to talk
-    about the subsumption rule instead (and still about the Lemma 5);
-    and we need to talk about the role of uniqueness of type-inference.}
-
+  By induction on the first derivation.
+  Note that two cases need special attention: \reflabel{\labeltsub} and \reflabel{\labeltapp}.
+  In the former, we know that $A$ is unique by Theorem~\ref{theorem:uniqueness-type-inference} and 
+  that $C$ is also unique, by Lemma~\ref{lemma:unique-coercion}.
+  The latter requires inference of a function type, forcing the use of a type annotation.
+  Again, by Theorem~\ref{theorem:uniqueness-type-inference} we can use the induction hypotheses.
+%  Note that the typing rules are already syntax-directed but the case of
+%  \reflabel{\labeltapp} (copied below) still needs special attention since we
+%  need to show that the generated coercion $E$ is unique.
+%  \begin{mathpar}
+%    \ruletapp
+%  \end{mathpar}
+%  Luckily we know that typing
+%  judgments give well-formed types, and thus $\jwf \Gamma {A_1}$ and $\jwf
+%  \Gamma {A_3}$. Therefore we are able to apply
+%  Lemma~\ref{lemma:unique-coercion} and conclude that $E$ is
+%  unique.
 \end{proof}
 
 \begin{comment}

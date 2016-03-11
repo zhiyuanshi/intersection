@@ -272,8 +272,7 @@ extended $\top$-disjointness definition.
 
   \begin{mathpar}
     \formsub \\
-    \rulesubinterlnottop \and \rulesubinterrnottop \\ 
-    \rulesubintertopl \and \rulesubintertopr
+    \rulesubinterlcoerce \and \rulesubinterrcoerce
   \end{mathpar}
 
   \begin{mathpar}
@@ -288,8 +287,42 @@ extended $\top$-disjointness definition.
     \ruledisaxintfunext \and \ruleaxsym
   \end{mathpar}
 
-  \caption{Top-like types, Subtyping (new/changed rules only) and Algorithmic Disjointness for the improved calculus.}
+  \caption{Top-like types, Subtyping (changed rules only) and Algorithmic Disjointness for the improved calculus.}
   \label{fig:tltypesextdis}
+\end{figure}
+
+\begin{figure}[t]
+  \framebox{$\andcoerce{A}_{C} = t$}
+  \[
+  \andcoerce{A}_{C} = 
+  \begin{cases} 
+        \toplike{A} & \andcoerce{A} \\ 
+        %A = \top & \top \\
+        %A = A_1 \to A_2 \; \wedge \; \toplike{A_2} & \lam x \andcoerce{A_2}_{C} \\
+        \text{otherwise} & {C} 
+  \end{cases}
+  \]
+
+  \framebox{$\andcoerce{A} = t$}
+  \[
+  \andcoerce{A} = 
+  \begin{cases} 
+        A = \top & \top \\
+        A = A_1 \to A_2 & \lam x \andcoerce{A_2} \\
+  \end{cases}
+  \]
+
+
+  %\begin{align*}
+  %  \erase {i}                  &= i \\
+  %  \erase {x}                  &= x \\
+  %  \erase {\lam x E}           &= \lam x {\erase E} \\
+  %  \erase {\app {e_1} {e_2}}   &= {\erase {e_1}} ({\erase {e_2}}) \\
+  %  \erase {{x_1} ,, {x_2}}     &= {\erase {x_1}} \, ,, \, {\erase {x_2}} \\
+  %  \erase {e : A}              &= {\erase e} \\
+  %\end{align*}
+  \caption{Coercion considering intersection of top-like types.}
+  \label{fig:andcoercion}
 \end{figure}
 
 In relation to the previous definition of top-like, we extend it as follows:
