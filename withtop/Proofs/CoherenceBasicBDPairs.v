@@ -633,6 +633,8 @@ Inductive PExp :=
   | PApp   : PExp -> PExp -> PExp
   | PMerge : PExp -> PExp -> PExp
   | PPair  : PExp -> PExp -> PExp
+  | PProj1 : PExp -> PExp
+  | PProj2 : PExp -> PExp
   | PAnn   : PExp -> PTyp -> PExp. (* only for the algorithmic version *) 
 
 (* Free variables *)
@@ -647,6 +649,8 @@ Fixpoint fv_source (pExp : PExp) : vars :=
     | PApp t1 t2 => union (fv_source t1) (fv_source t2)
     | PMerge t1 t2 => union (fv_source t1) (fv_source t2)
     | PPair t1 t2 => union (fv_source t1) (fv_source t2)
+    | PProj1 t => fv_source t
+    | PProj2 t => fv_source t
     | PAnn t1 A => fv_source t1
   end.
 
@@ -680,6 +684,8 @@ Fixpoint open_rec_source (k : nat) (u : PExp) (t : PExp) {struct t} : PExp  :=
   | PApp t1 t2   => PApp (open_rec_source k u t1) (open_rec_source k u t2)
   | PMerge t1 t2 => PMerge (open_rec_source k u t1) (open_rec_source k u t2)
   | PPair t1 t2  => PPair (open_rec_source k u t1) (open_rec_source k u t2)
+  | PProj1 t     => PProj1 (open_rec_source k u t)
+  | PProj2 t     => PProj2 (open_rec_source k u t)
   | PAnn e t     => PAnn (open_rec_source k u e) t
   end.
 
@@ -752,7 +758,11 @@ Proof.
     eapply IHt1_2; apply H0.
   - rewrite <- union_spec.
     eapply IHt1; apply H.
-Defined.
+  - rewrite <- union_spec.
+    eapply IHt1; apply H.
+  - rewrite <- union_spec.
+    eapply IHt1; apply H.
+Qed.
   
 (* Typing rules of source language: Figure 2 
 Note that we generate an Annotated expression, which serves as evidence for bi-directional
@@ -785,6 +795,12 @@ Inductive has_type_source : context PTyp -> PExp -> PTyp -> PExp -> Prop :=
                has_type_source Gamma t1 A t1' ->
                has_type_source Gamma t2 B t2' ->
                has_type_source Gamma (PPair t1 t2) (Pair A B) (PPair t1' t2')
+  | TyProj1 : forall Gamma A B t t',
+                has_type_source Gamma t (Pair A B) t' ->
+                has_type_source Gamma (PProj1 t) A (PProj1 t')
+  | TyProj2 : forall Gamma A B t t',
+                has_type_source Gamma t (Pair A B) t' ->
+                has_type_source Gamma (PProj2 t) B (PProj2 t')
   | TySub : forall Gamma t t' A B,
               has_type_source Gamma t A t' ->
               Sub A B ->
@@ -813,6 +829,12 @@ Inductive PTerm : PExp -> Prop :=
       PTerm t1 ->
       PTerm t2 ->
       PTerm (PPair t1 t2)
+  | PTerm_Proj1 : forall t,
+      PTerm t ->
+      PTerm (PProj1 t)
+  | PTerm_Proj2 : forall t,
+      PTerm t ->
+      PTerm (PProj2 t)
   | PTerm_Ann : forall e t,
       PTerm e ->
       PTerm (PAnn e t).  
@@ -871,6 +893,16 @@ Proof.
     erewrite <- IHt.
     reflexivity.
     apply H.
+    apply H2.
+  - inversion H0.
+    erewrite <- IHt.
+    reflexivity.
+    apply H.
+    apply H2.
+  - inversion H0.
+    erewrite <- IHt.
+    reflexivity.
+    apply H.
     apply H2. 
 Qed.
 
@@ -898,6 +930,10 @@ Proof.
   reflexivity.
   rewrite <- IHPTerm.
   reflexivity.
+  rewrite <- IHPTerm.
+  reflexivity.
+  rewrite <- IHPTerm.
+  reflexivity.
 Qed.
 
 
@@ -910,6 +946,8 @@ Fixpoint subst_source (z : var) (u : PExp) (t : PExp) {struct t} : PExp :=
     | PApp t1 t2   => PApp (subst_source z u t1) (subst_source z u t2)
     | PMerge t1 t2 => PMerge (subst_source z u t1) (subst_source z u t2)
     | PPair t1 t2  => PPair (subst_source z u t1) (subst_source z u t2)
+    | PProj1 t     => PProj1 (subst_source z u t)
+    | PProj2 t     => PProj2 (subst_source z u t)
     | PAnn t1 t2   => PAnn (subst_source z u t1) t2 
   end.
 
@@ -941,7 +979,11 @@ Proof.
   apply H; apply union_spec; [ right | left ]; auto.
   (* Case PPair *)
   simpl in *; rewrite IHt1, IHt2; auto; unfold not in *; intros;
-  apply H; apply union_spec; [ right | left ]; auto.  
+  apply H; apply union_spec; [ right | left ]; auto.
+  (* Case PProj1 *)
+  simpl in *; rewrite IHt; auto.
+  (* Case PProj2 *)
+  simpl in *; rewrite IHt; auto.
   (* Case PAnn *)
   simpl in *; rewrite IHt; auto.
 Qed.
@@ -962,6 +1004,8 @@ Proof.
   - rewrite IHt1_1; rewrite IHt1_2; reflexivity.
   - rewrite IHt1_1; rewrite IHt1_2; reflexivity.
   - rewrite IHt1_1; rewrite IHt1_2; reflexivity.
+  - rewrite IHt1; reflexivity.
+  - rewrite IHt1; reflexivity.
   - rewrite IHt1; reflexivity.
 Qed.
 
@@ -1099,6 +1143,8 @@ Proof.
   assumption.
   apply H0 with (x := x); assumption.
   inversion IHhas_type_source1; assumption.
+  inversion IHhas_type_source; assumption.
+  inversion IHhas_type_source; assumption.
 Qed.
 
 Require Import Coq.Logic.Classical_Prop.
@@ -1213,6 +1259,16 @@ Proof.
     apply TyPair.
     apply IHhas_type_source1; simpl in *; not_in_L z; reflexivity.
     apply IHhas_type_source2; simpl in *; not_in_L z; reflexivity.
+  - subst.
+    eapply TyProj1.
+    apply IHhas_type_source.
+    assumption.
+    reflexivity.
+  - subst.
+    eapply TyProj2.
+    apply IHhas_type_source.
+    assumption.
+    reflexivity.
   - subst.
     eapply TySub.
     apply IHhas_type_source.
@@ -1419,7 +1475,7 @@ Lemma env_impl_fv_source :
   forall Gamma x t A E, has_type_source Gamma t A E -> In x (fv_source t) -> In x (dom Gamma).
 Proof.
   intros.
-  induction H.
+  induction H; auto.
   - simpl in *.
     apply MSetProperties.Dec.F.singleton_1 in H0.
     apply list_impl_m in H1.
@@ -1450,7 +1506,6 @@ Proof.
     inversion H0.
     now apply IHhas_type_source1.
     now apply IHhas_type_source2.
-  - auto.
 Qed.
     
 Lemma not_env_impl_not_fv_source :
@@ -1502,6 +1557,8 @@ Proof.
     apply IHhas_type_source1; auto.
     apply IHhas_type_source2; auto.
   - simpl; unfold not; intros HInv; apply IHhas_type_source; auto.
+  - simpl; unfold not; intros HInv; apply IHhas_type_source; auto.
+  - simpl; unfold not; intros HInv; apply IHhas_type_source; auto.
 Qed.
 
 Lemma not_env_impl_not_fv_source_E :
@@ -1552,6 +1609,8 @@ Proof.
     inversion HInv.
     apply IHhas_type_source1; auto.
     apply IHhas_type_source2; auto.
+  - simpl; unfold not; intros HInv; apply IHhas_type_source; auto.
+  - simpl; unfold not; intros HInv; apply IHhas_type_source; auto.
   - simpl; unfold not; intros HInv; apply IHhas_type_source; auto.
 Qed.
 
@@ -1695,6 +1754,14 @@ Proof.
   rewrite <- open_rec_source_term.
   reflexivity.
   now apply type_correct_source_terms' in H.
+  exists (PProj1 t').
+  rewrite <- open_rec_source_term.
+  reflexivity.
+  now apply type_correct_source_terms' in H.
+  exists (PProj2 t').
+  rewrite <- open_rec_source_term.
+  reflexivity.
+  now apply type_correct_source_terms' in H.   
   exists (PAnn t' B).
   rewrite <- open_rec_source_term.
   reflexivity.
@@ -1832,6 +1899,20 @@ unfold has_type. intros. destruct H, H0.
 exists (PPair x x0). apply (TyPair); auto.
 Defined.
 
+Definition tproj1 : forall Gamma A B t,
+                has_type Gamma t (Pair A B) ->
+                has_type Gamma (PProj1 t) A.
+unfold has_type. intros. destruct H.
+exists (PProj1 x). eapply (TyProj1); apply H.
+Defined.
+
+Definition tproj2 : forall Gamma A B t,
+                has_type Gamma t (Pair A B) ->
+                has_type Gamma (PProj2 t) B.
+unfold has_type. intros. destruct H.
+exists (PProj2 x). eapply (TyProj2); apply H.
+Defined.
+
 Definition tsub : forall Gamma t A B, has_type Gamma t A -> Sub A B -> WFTyp B -> has_type Gamma t B.
 unfold has_type. intros. destruct H. exists (PAnn x B). apply (TySub _ _ _ A); auto.
 Defined.  
@@ -1867,6 +1948,12 @@ Inductive has_type_source_alg : context PTyp -> PExp -> Dir -> PTyp -> (SExp var
                 has_type_source_alg Gamma t1 Inf A E1 ->
                 has_type_source_alg Gamma t2 Inf B E2 ->
                 has_type_source_alg Gamma (PPair t1 t2) Inf (Pair A B) (STPair _ E1 E2)
+  | ATyProj1 : forall Gamma A B t E,
+                 has_type_source_alg Gamma t Inf (Pair A B) E ->
+                 has_type_source_alg Gamma (PProj1 t) Inf A (STProj1 _ E)
+  | ATyProj2 : forall Gamma A B t E,
+                 has_type_source_alg Gamma t Inf (Pair A B) E ->
+                 has_type_source_alg Gamma (PProj2 t) Inf B (STProj2 _ E)
   | ATyAnn : forall Gamma t1 A E, has_type_source_alg Gamma t1 Chk A E -> has_type_source_alg Gamma (PAnn t1 A) Inf A E
   (* Checking rules *)
   | ATyLam : forall L Gamma t A B E, (forall x, not (In x L) -> 
@@ -2039,6 +2126,8 @@ Proof.
   intros Gamma t dir T E H.
   induction H; auto.
   inversion IHhas_type_source_alg1; assumption.
+  inversion IHhas_type_source_alg; assumption.
+  inversion IHhas_type_source_alg; assumption.
   pick_fresh x.
   assert (Ha : not (M.In x L)) by (not_in_L x).
   apply WFFun.
@@ -2133,6 +2222,16 @@ Proof.
     apply ATyPair.
     apply IHhas_type_source_alg1; simpl in *; not_in_L z; reflexivity.
     apply IHhas_type_source_alg2; simpl in *; not_in_L z; reflexivity.
+  - subst.
+    eapply ATyProj1.
+    apply IHhas_type_source_alg.
+    assumption.
+    reflexivity.
+  - subst.
+    eapply ATyProj2.
+    apply IHhas_type_source_alg.
+    assumption.
+    reflexivity.
   - subst.
     apply_fresh ATyLam as x.
     unfold extend in *; simpl in *.
@@ -2381,6 +2480,22 @@ inversion H. inversion H0.
 unfold has_ty. exists (STPair _ x x0). apply ATyPair; auto.
 Defined.
 
+Definition typroj1 : forall Gamma A B t,
+                has_ty Gamma t Inf (Pair A B) ->
+                has_ty Gamma (PProj1 t) Inf A.
+intros.
+inversion H. (* inversion H0. *) 
+unfold has_ty. exists (STProj1 _ x). eapply ATyProj1. apply H0.
+Defined.
+
+Definition typroj2 : forall Gamma A B t,
+                has_ty Gamma t Inf (Pair A B) ->
+                has_ty Gamma (PProj2 t) Inf B.
+intros.
+inversion H. (* inversion H0. *)
+unfold has_ty. exists (STProj2 _ x). eapply ATyProj2; apply H0.
+Defined.
+
 Definition tyann : forall Gamma t1 A, has_ty Gamma t1 Chk A -> has_ty Gamma (PAnn t1 A) Inf A.
 intros. inversion H. unfold has_ty. exists x. apply ATyAnn. auto.
 Defined.
@@ -2402,6 +2517,8 @@ Fixpoint erase (e : PExp) : PExp :=
     | PApp e1 e2 => PApp (erase e1) (erase e2)
     | PMerge e1 e2 => PMerge (erase e1) (erase e2)
     | PPair e1 e2 => PPair (erase e1) (erase e2)
+    | PProj1 e => PProj1 (erase e)
+    | PProj2 e => PProj2 (erase e)
     | PAnn e t => erase e
   end.
 
@@ -2464,6 +2581,16 @@ induction H; intros; unfold almost_unique.
   apply IHhas_type_source_alg1 in H5.
   apply IHhas_type_source_alg2 in H6.
   rewrite H5; rewrite H6; auto.
+(* Case Proj1 *)
+- inversion H0; subst.
+  apply IHhas_type_source_alg in H3.
+  simpl in H3.
+  now inversion H3.
+(* Case Proj2 *)
+- inversion H0; subst.
+  apply IHhas_type_source_alg in H3.
+  simpl in H3.
+  now inversion H3.
 (* Case Ann *)
 - inversion H0. auto.
 (* Case Lam *)
@@ -2504,6 +2631,20 @@ induction H; intros.
   apply IHhas_type_source_alg1 in H7.
   apply IHhas_type_source_alg2 in H9.
   rewrite H7; rewrite H9; auto.
+(* Case Proj1 *)
+- inversion H0.
+  assert (Pair A B = Pair A B0).
+  apply (typ_inf_unique H H3).
+  inversion H4; subst.
+  apply IHhas_type_source_alg in H3.
+  now rewrite H3.
+(* Case Proj2 *)
+- inversion H0.
+  assert (Pair A B = Pair A0 B).
+  apply (typ_inf_unique H H3).
+  inversion H4; subst.
+  apply IHhas_type_source_alg in H3.
+  now rewrite H3.
 (* Case Ann *)
 - inversion H0.
   apply IHhas_type_source_alg in H3. auto.
@@ -2616,6 +2757,16 @@ Proof.
     apply H3.
     apply H.
     apply H2.
+  - inversion H0.
+    erewrite <- IHt.
+    reflexivity.
+    apply H.
+    apply H2.
+  - inversion H0.
+    erewrite <- IHt.
+    reflexivity.
+    apply H.
+    apply H2. 
   - inversion H0.
     erewrite <- IHt.
     reflexivity.
@@ -2822,6 +2973,10 @@ Proof.
   - simpl; apply STTyPair; assumption.
   (* TyPair *)
   - simpl; apply STTyPair; assumption.
+  (* TyProj1 *)
+  - eapply STTyProj1; apply IHhas_type_source_alg.
+  (* TyProj1 *)
+  - eapply STTyProj2; apply IHhas_type_source_alg.
   (* TyAnn *)
   - auto.
   (* TyLam *)
@@ -2913,6 +3068,24 @@ Proof.
     rewrite (IHt1_1 n t0_1 x xt01 xt11 H3).
     rewrite (IHt1_2 n t0_2 x xt02 xt12 H4).
     reflexivity.
+  (* Proj1 *)
+  - destruct t0; simpl in *; try now inversion H1.
+    destruct (Nat.eqb n n0); inversion H1.
+    erewrite IHt1.
+    reflexivity.
+    apply H.
+    apply H0.
+    inversion H1.
+    apply H3.
+  (* Proj2 *)
+  - destruct t0; simpl in *; try now inversion H1.
+    destruct (Nat.eqb n n0); inversion H1.
+    erewrite IHt1.
+    reflexivity.
+    apply H.
+    apply H0.
+    inversion H1.
+    apply H3.
   (* Ann *)
   - simpl in *.
     erewrite (IHt1 n t0 x H H0 H1).
@@ -2972,6 +3145,18 @@ apply typair; auto.
 (* erasure of Pair *)
 destruct IHhas_type_source1. destruct IHhas_type_source2.
 subst; auto.
+(* Case Proj1 *)
+destruct IHhas_type_source.
+now apply typroj1 in H0.
+(* erasure of Proj1 *)
+destruct IHhas_type_source.
+now subst.
+(* Case Proj2 *)
+destruct IHhas_type_source.
+now apply typroj2 in H0.
+(* erasure of Proj2 *)
+destruct IHhas_type_source.
+now subst.
 (* Case Ann *)
 destruct IHhas_type_source.
 apply tyann. apply (tysub _ _ A); auto.
@@ -2987,6 +3172,8 @@ rewrite (IHt0 (S n) e). reflexivity.
 rewrite (IHt0_1 n e). rewrite (IHt0_2 n e). reflexivity.
 rewrite (IHt0_1 n e). rewrite (IHt0_2 n e). reflexivity.
 rewrite (IHt0_1 n e). rewrite (IHt0_2 n e). reflexivity.
+rewrite (IHt0 n e); reflexivity.
+rewrite (IHt0 n e); reflexivity.
 Qed.
 
 Lemma typ_sound : forall e d A Gamma, has_ty Gamma e d A -> has_type Gamma (erase e) A.
@@ -3003,6 +3190,12 @@ apply (tapp _ A). auto. auto.
 apply tmerge; auto.
 (* Pair *)
 apply tpair; auto.
+(* Proj1 *)
+eapply tproj1.
+apply IHhas_type_source_alg.
+(* Proj2 *)
+eapply tproj2.
+apply IHhas_type_source_alg.
 (* Ann *)
 apply (tsub _ _ A). auto. apply reflex.
 now apply typing_wf_source_alg in H0.
@@ -3053,6 +3246,14 @@ inversion H.
 apply IHe1 in H5.
 apply IHe2 in H7.
 apply (typair); auto.
+(* Case Proj1 *)
+inversion H.
+apply typroj1 with (B := B).
+now apply IHe.
+(* Case Proj2 *)
+inversion H.
+apply typroj2 with (A := A).
+now apply IHe.
 (* Case Ann *)
 inversion H. subst.
 apply tyann. 
