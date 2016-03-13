@@ -83,6 +83,27 @@
   {\jtype \Gamma {e} {B} \yields {\tapp C E}}
 }
 
+\newcommand{\labeltprod}{\makelabelt Prod}
+\newcommand{\ruletprod}{
+\inferrule* [right=\labeltprod]
+  {\jtype \Gamma {e_1} A \yields {E_1} \\ \jtype \Gamma {e_2} B \yields {E_2}}
+  {\jtype \Gamma {\pair {e_1} {e_2}} {\tpair A B} \yields {\pair {E_1} {E_2}}}
+}
+
+\newcommand{\labeltprojl}{\makelabelt Proj1}
+\newcommand{\ruletprojl}{
+\inferrule* [right=\labeltprojl]
+  {\jtype \Gamma {e} {\tpair A B} \yields {E}}
+  {\jtype \Gamma {\proj 1 e} A \yields {\proj 1 E}}
+}
+
+\newcommand{\labeltprojr}{\makelabelt Proj2}
+\newcommand{\ruletprojr}{
+\inferrule* [right=\labeltprojr]
+  {\jtype \Gamma {e} {\tpair A B} \yields {E}}
+  {\jtype \Gamma {\proj 2 e} B \yields {\proj 2 E}}
+}
+
 \newcommand{\ruletmergedis}{
 \inferrule* [right=\labeltmerge]
   {\jtype \Gamma {e_1} A \yields {E_1} \\

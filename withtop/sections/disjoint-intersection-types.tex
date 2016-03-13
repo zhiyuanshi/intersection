@@ -445,7 +445,8 @@ subtyping.
   \begin{mathpar}
     \formbi \\
     \bruletvar \and \bruletint \and
-    \bruletapp \and
+    \bruletapp \and \brulettprod \and
+    \brulettprojl \and \brulettprojr \and
     \bruletmergedis \and \bruletann \\
    \formbc\\
    \bruletlam \and \bruletsub
@@ -483,12 +484,14 @@ by the following two theorems.
 \begin{figure}[t]
   \framebox{$\erase A = T$}
   \begin{align*}
-    \erase {i}                  &= i \\
-    \erase {x}                  &= x \\
-    \erase {\lam x E}           &= \lam x {\erase E} \\
-    \erase {\app {e_1} {e_2}}   &= {\erase {e_1}} ({\erase {e_2}}) \\
-    \erase {{e_1} ,, {e_2}}     &= {\erase {e_1}} \, ,, \, {\erase {e_2}} \\
-    \erase {e : A}              &= {\erase e} 
+    \erase {i}                   &= i \\
+    \erase {x}                   &= x \\
+    \erase {\lam x E}            &= \lam x {\erase E} \\
+    \erase {\app {e_1} {e_2}}    &= {\erase {e_1}} ({\erase {e_2}}) \\
+    \erase {\pair {e_1} {e_2}}   &= \pair {\erase {e_1}} {\erase {e_2}} \\
+    \erase {\proj k e}           &= \proj k {\erase e} \quad (k \in {1,2}) \\ 
+    \erase {{e_1} ,, {e_2}}      &= {\erase {e_1}} \, ,, \, {\erase {e_2}} \\
+    \erase {e : A}               &= {\erase e} 
   \end{align*}
   \caption{Type annotation erasure.}
   \label{fig:type-ann-erasure}

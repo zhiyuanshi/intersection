@@ -30,6 +30,13 @@
     {\jwf \Gamma {A \to B}}
 }
 
+\newcommand{\labelwfprod}{\makelabelwf Prod}
+\newcommand{\rulewfprod}{
+  \inferrule* [right=\labelwfprod]
+    {\jwf \Gamma A \\ \jwf \Gamma B}
+    {\jwf \Gamma {\tpair A B}}
+}
+
 \newcommand{\labelwfforall}{\makelabelwf Forall}
 \newcommand{\rulewfforall}{
   \inferrule* [right=\labelwfforall]

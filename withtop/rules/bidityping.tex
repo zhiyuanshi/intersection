@@ -72,6 +72,25 @@ $ \jcheck \Gamma e A \yields E\\e$ checks against given type $A$
   {\jtype \Gamma {\tapp e A} {\subst A \alpha C} \yields {\tapp E {\im A}}}
 }
 
+\newcommand{\brulettprod}{
+\inferrule* [right=\labeltprod]
+  {\jinfer \Gamma {e_1} A \yields {E_1} \\
+   \jinfer \Gamma {e_2} B \yields {E_2}}
+  {\jinfer \Gamma {\pair {e_1} {e_2}} {\tpair A B} \yields {\pair {E_1} {E_2}}}
+}
+
+\newcommand{\brulettprojl}{
+\inferrule* [right=\labeltprojl]
+  {\jinfer \Gamma {e} {\tpair A B} \yields {E}}
+  {\jinfer \Gamma {\proj 1 e} A \yields {\proj 1 E}}
+}
+
+\newcommand{\brulettprojr}{
+\inferrule* [right=\labeltprojr]
+  {\jinfer \Gamma {e} {\tpair A B} \yields {E}}
+  {\jinfer \Gamma {\proj 2 e} B \yields {\proj 2 E}}
+}
+
 \newcommand{\bruletmerge}{
 \inferrule* [right=\labeltmerge]
   {\jinfer \Gamma {e_1} A \yields {E_1} \\

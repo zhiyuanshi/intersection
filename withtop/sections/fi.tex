@@ -20,8 +20,8 @@ the presence of $\top$.
 \subsection{Syntax}
 
 Figure~\ref{fig:fi-syntax} shows the syntax. The difference to the
-$\lambda$-calculus, highlighted in gray, are intersection types ($A
-\inter B$) at
+$\lambda$-calculus (with pairs), highlighted in gray, are intersection types 
+($A \inter B$) at
 the type-level, and merges ($e_1 \mergeop e_2$) at the term level.
 
 \begin{figure}[t]
@@ -30,16 +30,19 @@ the type-level, and merges ($e_1 \mergeop e_2$) at the term level.
       \begin{array}{llrll}
         \text{Types}
         & A, B, C & \Coloneqq & \code{Int} & \\
-        &         & \mid      & A \to B    & \\
+        &         & \mid      & A \to B   & \\
+        &         & \mid      & \tpair A B & \\
         &         & \mid      & \highlight{$A \inter B$}  & \\
 %        &         & \mid      & \highlight{$\top$}  & \\
 
         \\
         \text{Terms}
-        & e & \Coloneqq & i            & \\
-        &   & \mid & x                 & \\
-        &   & \mid & \lamty x A e      & \\
-        &   & \mid & \app {e_1} {e_2}  & \\
+        & e & \Coloneqq & i                      & \\
+        &   & \mid & x                           & \\
+        &   & \mid & \lamty x A e                & \\
+        &   & \mid & \app {e_1} {e_2}            & \\
+        &   & \mid & \pair {e_1} {e_2}           & \\
+        &   & \mid & \proj k e \quad k \in \{ 1 , 2 \} & \\
         &   & \mid & \highlight{$e_1 \mergeop e_2$}  & \\
 %        &   & \mid & \highlight{$\top$} & \\
 
@@ -59,13 +62,16 @@ the type-level, and merges ($e_1 \mergeop e_2$) at the term level.
 \bruno{Probably better to discuss all top rules later, in the top section.}
 
 \paragraph{Types.} Metavariables $A$, $B$ range over types. Types include
-function types $A \to B$. $A \inter B$ denotes the intersection of types $A$ and
+function types $A \to B$ and product types $\tpair A B$. 
+$A \inter B$ denotes the intersection of types $A$ and
 $B$. We also include integer types $\code{Int}$.
 
 \paragraph{Terms.} Metavariables $e$ range over terms.  Terms include standard
 constructs: variables $x$; abstraction of terms over variables
-$\lamty x A e$; and application of terms $e_1$ to terms $e_2$, written $\app
-{e_1} {e_2}$. The expression $e_1 \mergeop e_2$ is the \emph{merge} of two terms
+$\lamty x A e$; application of terms $e_1$ to terms $e_2$, written $\app
+{e_1} {e_2}$; pairing of two terms $e_1$ and $e_2$, denoted as $\pair {e_1} {e_2}$;
+and both projections of a pair $e$, written $\proj k e$ (with $k \in \{1,2\}$).
+The expression $e_1 \mergeop e_2$ is the \emph{merge} of two terms
 $e_1$ and $e_2$. Merges of terms correspond to intersections of types $A \inter
 B$. 
 %The term $\top$ corresponds to the only inhabitant of the $\top$ type.
@@ -109,6 +115,10 @@ discussions and examples.
 
     \inferrule*
     {}
+    {\jatomic {\tpair A B}}
+
+    \inferrule*
+    {}
     {\jatomic {\code{Int}}}
 
     %\inferrule*
@@ -119,14 +129,14 @@ discussions and examples.
 
   \begin{mathpar}
     \formsub \\
-    \rulesubint %\and \rulesubtop 
-    \and \rulesubfun \and \rulesubinter 
+    \rulesubint \and \rulesubprod \\ %\and \rulesubtop 
+    \rulesubfun \and \rulesubinter 
     \and \rulesubinterldis \and \rulesubinterrdis 
   \end{mathpar}
 
   \begin{mathpar}
     \formwf \\
-    \rulewfint \and \rulewffun \and \rulewfinterdis %\and \rulewftop
+    \rulewfint \and \rulewffun \and \rulewfprod \and \rulewfinterdis %\and \rulewftop
   \end{mathpar}
 
 {\renewcommand{\yields}[1]{}
@@ -134,7 +144,9 @@ discussions and examples.
     \formt \\
     \ruletvar \and \ruletint \and
     \ruletlam \and \ruletapp \and
-    \ruletmergedis \and \ruletsub %\and \rulettop
+    \ruletmergedis \\
+    \ruletprojl \and \ruletprojr
+    \ruletsub %\and \rulettop
   \end{mathpar}
 }
 

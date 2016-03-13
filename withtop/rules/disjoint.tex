@@ -23,6 +23,20 @@
     {\jdisimpl \Gamma {A_1 \inter A_2} {B}}
 }
 
+\newcommand{\labeldisprojl}{\makelabeldis {Proj-1}}
+\newcommand{\ruledisprojl}{
+  \inferrule* [right=\labeldisprojl]
+    {\jdisimpl \Gamma {A_1} {B_1}}
+    {\jdisimpl \Gamma {\tpair {A_1} {A_2}} {\tpair {B_1} {B_2}}}
+}
+
+\newcommand{\labeldisprojr}{\makelabeldis {Proj-2}}
+\newcommand{\ruledisprojr}{
+  \inferrule* [right=\labeldisprojr]
+    {\jdisimpl \Gamma {A_2} {B_2}}
+    {\jdisimpl \Gamma {\tpair {A_1} {A_2}} {\tpair {B_1} {B_2}}}
+}
+
 \newcommand{\labeldisinterr}{\makelabeldis {Inter-2}}
 \newcommand{\ruledisinterr}{
   \inferrule* [right=\labeldisinterr]

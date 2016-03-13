@@ -28,6 +28,17 @@
             {\app {E_2} {(\app f {(\app {E_1} x)})}}}}}
 }
 
+\newcommand{\labelsubprod}{\makelabelsub Prod}
+\newcommand{\rulesubprod}{
+  \inferrule* [right=\labelsubprod]
+    {{A_1} \subtype {B_1} \yields {E_1} \\
+     {A_2} \subtype {B_2} \yields {E_2}}
+    {{\tpair {A_1} {A_2}} \subtype {\tpair {B_1} {B_2}}
+    \yields 
+        {\lamty p {\im {\tpair {A_1} {A_2}}}
+            {\pair {\app {E_1} {(\proj 1 p)}} {\app {E_2} {(\proj 2 p)}}}}}
+}
+
 \newcommand{\labelsubforall}{\makelabelsub Forall}
 \newcommand{\rulesubforall}{
   \inferrule* [right=\labelsubforall]
