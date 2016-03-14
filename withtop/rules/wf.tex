@@ -1,6 +1,6 @@
 \newcommand{\formwf}{\framebox{$ \jwf \Gamma A $}}
 
-\newcommand{\makelabelwf}[1]{WF-#1}
+\newcommand{\makelabelwf}[1]{WF$#1$}
 
 \newcommand{\labelwfvar}{\makelabelwf Var}
 \newcommand{\rulewfvar}{
@@ -9,7 +9,7 @@
     {\jwf \Gamma \alpha}
 }
 
-\newcommand{\labelwfint}{\makelabelwf Int}
+\newcommand{\labelwfint}{\makelabelwf {\mathbb{Z}}}
 \newcommand{\rulewfint}{
   \inferrule* [right=\labelwfint]
     { }
@@ -23,14 +23,14 @@
     {\jwf \Gamma \bot}
 }
 
-\newcommand{\labelwffun}{\makelabelwf Fun}
+\newcommand{\labelwffun}{\makelabelwf \rightarrow}
 \newcommand{\rulewffun}{
   \inferrule* [right=\labelwffun]
     {\jwf \Gamma A \\ \jwf \Gamma B}
     {\jwf \Gamma {A \to B}}
 }
 
-\newcommand{\labelwfprod}{\makelabelwf Prod}
+\newcommand{\labelwfprod}{\makelabelwf \times}
 \newcommand{\rulewfprod}{
   \inferrule* [right=\labelwfprod]
     {\jwf \Gamma A \\ \jwf \Gamma B}
@@ -50,7 +50,7 @@
     {\jwf \Gamma {\fordis \alpha A B}}
 }
 
-\newcommand{\labelwfinter}{\makelabelwf Inter}
+\newcommand{\labelwfinter}{\makelabelwf \inter}
 \newcommand{\rulewfinter}{
   \inferrule* [right=\labelwfinter]
     {\jwf \Gamma A \\ \jwf \Gamma B}

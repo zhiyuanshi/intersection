@@ -90,6 +90,13 @@
   {\jtype \Gamma {\pair {e_1} {e_2}} {\tpair A B} \yields {\pair {E_1} {E_2}}}
 }
 
+\newcommand{\labeltproj}{\makelabelt Proj}
+\newcommand{\ruletproj}{
+\inferrule* [right=\labeltproj]
+  {\jtype \Gamma {e} {\tpair {A_1} {A_2}} \yields {E}}
+  {\jtype \Gamma {\proj k e} {A_k} \yields {\proj k E}}
+}
+
 \newcommand{\labeltprojl}{\makelabelt Proj1}
 \newcommand{\ruletprojl}{
 \inferrule* [right=\labeltprojl]
