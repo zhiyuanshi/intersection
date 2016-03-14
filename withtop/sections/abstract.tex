@@ -1,20 +1,26 @@
-Dunfield has shown that a simply typed core calculus with intersection types and
-a merge operator is able to capture various programming language features. While
-his calculus is type-safe, it is known that it is not \emph{coherent}:
-different derivations for the same expression can lead to different results. The
-lack of coherence is an important disadvantage for adoption of his core calculus
-in implementations of programming languages, as the semantics of the programming
-language becomes implementation-dependent.
+Dunfield showed that a simply typed core calculus with intersection
+types and a merge operator is able to capture various programming
+language features. While his calculus is type-safe, it is not
+\emph{coherent}: different derivations for the same expression can
+lead to different results. The lack of coherence is an important
+disadvantage for adoption of his core calculus in implementations of
+programming languages, as the semantics of the programming language
+becomes implementation-dependent.
 
-This paper presents \name: a core calculus with a variant of \emph{intersection
-types} and a \emph{merge operator}. The semantics \name is both type-safe and
-coherent. Coherence is achieved by ensuring that intersection types are
-\emph{disjoint}. Formally, two types are disjoint if they do not share a common
-supertype.
-\bruno{Abstract needs to be fixed, disjointness is no longer the absence of 
-a common supertype!} We present a type system that prevents intersection types that are
-not disjoint, as well as an algorithmic specification to determine whether two
-types are disjoint. Moreover, we show the applicability of this calculus to
-express a simple, yet powerful form of dynamically composable traits, paving the way for new
-designs of object-oriented programming languages.\bruno{Drop sentence about 
-traits and replace by other contributions?}
+This paper presents \name: a coherent and type-safe calculus with a
+form of \emph{intersection types} and a \emph{merge
+operator}. Coherence is achieved by ensuring that intersection types
+are \emph{disjoint}. We propose a definition of disjointness where two
+types $A$ and $B$ are disjoint if only certain set of types are common
+supertypes of $A$ and $B$. We investigate three different variants of
+\name, with three variants of disjointness. In the simplest
+variant, which does not allow $\top$ types, two types are disjoint if
+they do not share any common supertypes at all. The other two variants
+introduce $\top$ types and refine the notion of disjointness to allow
+two types to be disjoint when the only the set of common supertypes are
+\emph{top-like}. The difference between the two variants with $\top$
+types is on the definition of top-like types, which has an impact on
+which types are allowed on intersections. We present a type system
+that prevents intersection types that are not disjoint, as well as an
+algorithmic specifications to determine whether two types are disjoint
+for all three variants.
