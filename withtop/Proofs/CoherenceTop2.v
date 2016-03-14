@@ -320,8 +320,15 @@ Inductive Ortho : PTyp -> PTyp -> Prop :=
   | OAnd2 : forall t1 t2 t3, Ortho t1 t2 -> Ortho t1 t3 -> Ortho t1 (And t2 t3)
   | OIntFun : forall t1 t2, Ortho PInt (Fun t1 t2)
   | OFunInt : forall t1 t2, Ortho (Fun t1 t2) PInt
-  | OFun  : forall t1 t2 t3 t4, Ortho t2 t4 -> Ortho (Fun t1 t2) (Fun t3 t4).
-
+  | OFun : forall t1 t2 t3 t4, Ortho t2 t4 ->
+                          not (t2 = TopT) ->
+                          not (t4 = TopT) ->
+                          Ortho (Fun t1 t2) (Fun t3 t4)
+  | OFun1  : forall t1 t2 t3 t4, t2 = TopT -> 
+                            Ortho (Fun t1 t2) (Fun t3 t4)
+  | OFun2 : forall t1 t2 t3 t4, t4 = TopT -> 
+                           Ortho (Fun t1 t2) (Fun t3 t4).
+                                 
 (* Well-formed types *)
 
 Inductive WFTyp : PTyp -> Prop := 
@@ -459,43 +466,34 @@ apply H.
 apply H0. apply reflex.
 *)  
 
-Lemma ortho_fun : forall t0 t1 t2 t3,
-                    WFTyp t0 -> WFTyp t1 -> WFTyp t2 -> WFTyp t3 ->
-                    OrthoS (Fun t1 t2) (Fun t0 t3) -> OrthoS t2 t3.
-Proof.
-  intros.
-  unfold OrthoS in *.
-  (*
-  assert (WFTyp (Fun t1 t2)) by (apply WFFun; auto).
-  assert (WFTyp (Fun t0 t3)) by (apply WFFun; auto).
-  *)
-  repeat split.
-
-  unfold not; intros.
-  destruct H3.
-  assert (t2 = TopT) by (apply topLikeWF; auto).
-  subst.
-  clear H3; clear H4; clear H1.
-  
-  admit.
-  admit.
-  intros.
-  assert (TopLikeExt (Fun (And t1 t0) C)). 
-  apply H3.
-  pose (reflex t1).
-  apply sfun.
-  apply sand2.
-  assumption.
-  assumption.
-  pose (reflex t0).
-  apply sfun.
-  apply sand3.
-  apply s.
-  apply H5.
-  now inversion H6.
-
+Lemma sumboolTopExt : forall t, sumbool (TopLikeExt t) (not (TopLikeExt t)).
 Admitted.
 
+Lemma sumboolTopLike : forall t, sumbool (TopLike t) (not (TopLike t)).
+Proof.
+  intro t.
+  induction t.
+  - right; unfold not; intros HInv; inversion HInv.
+  - right; unfold not; intros HInv; inversion HInv. 
+  - inversion IHt1.
+    inversion IHt2.
+    left.
+    apply TLAnd; auto.
+    right.
+    unfold not; intros HInv; inversion HInv; contradiction.
+    right.
+    unfold not; intros HInv; inversion HInv; contradiction.
+  - left; apply TLTop.
+Qed.
+
+Lemma sumboolTop : forall t, sumbool (t = TopT) (not (t = TopT)).
+Proof.
+  intro t; destruct t.
+  right; unfold not; intros HInv; inversion HInv.
+  right; unfold not; intros HInv; inversion HInv.
+  right; unfold not; intros HInv; inversion HInv.
+  left; reflexivity.
+Qed.
   
 (* Disjointness algorithm is complete: Theorem 7 *)
 
@@ -525,12 +523,67 @@ destruct H0. destruct H. destruct H1. apply TLTop.
 induction H.
 apply OFunInt.
 
+assert (Ha1 : sumbool (t2 = TopT) (not (t2 = TopT))) by apply sumboolTop.
+assert (Ha2 : sumbool (t3 = TopT) (not (t3 = TopT))) by apply sumboolTop.
+destruct Ha1.
+apply OFun1; auto.
+destruct Ha2.
+apply OFun2; auto.
+apply OFun; auto.
+apply IHwft1_2.
+auto.
+unfold OrthoS.
+repeat split.
+unfold not; intros.
+apply topLikeWF in H2; auto.
+unfold not; intros.
+apply topLikeWF in H2; auto.
 destruct H0.
+intros.
+assert (TopLikeExt (Fun (And t1 t0) C)). 
+apply H2.
+apply sfun.
+apply sand2.
+apply reflex.
+assumption.
+apply sfun.
+apply sand3.
+apply reflex.
+assumption.
+now inversion H5.
+
+
+
+(*
+assert (Ha1 : sumbool (TopLike t2) (not (TopLike t2))) by apply sumboolTopLike.
+assert (Ha2 : sumbool (TopLike t3) (not (TopLike t3))) by apply sumboolTopLike.
+destruct Ha1.
+apply OFun1.
+apply t4.
+destruct Ha2.
+apply OFun2.
+apply t4.
 apply OFun.
 apply IHwft1_2.
 auto.
-admit.
-
+unfold OrthoS.
+repeat split; auto.
+destruct H0.
+intros.
+assert (TopLikeExt (Fun (And t1 t0) C)). 
+apply H2.
+apply sfun.
+apply sand2.
+apply reflex.
+assumption.
+apply sfun.
+apply sand3.
+apply reflex.
+assumption.
+now inversion H5.
+auto.
+auto.
+*)
 (*
 destruct H. unfold not. intros. apply H. apply TLFun. auto.
 apply OFun. apply IHwft1_2. auto.
@@ -578,7 +631,7 @@ unfold OrthoS; intros. apply H4.
 apply sand3. auto. auto.
 (* Case T _|_ t2 *)
 destruct H0. destruct H0. destruct H0. apply TLTop.
-Admitted.
+Qed.
 
 (*
 Lemma nosub : forall t1 t2, OrthoS t1 t2 -> not (Sub t1 t2) /\ not (Sub t2 t1).
