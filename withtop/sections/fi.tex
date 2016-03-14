@@ -142,8 +142,8 @@ discussions and examples.
 {\renewcommand{\yields}[1]{}
   \begin{mathpar}
     \formt \\
-    \ruletvar \and \ruletint \and
-    \ruletlam \and \ruletapp \and
+    \ruletvar \and \ruletlam \and
+    \ruletint \and \ruletprod \and \ruletapp \and
     \ruletmergedis \\
     \ruletproj \and \ruletsub %\and \rulettop
   \end{mathpar}
@@ -231,12 +231,17 @@ Apart from \reflabel{\labelwfinter}, the remaining rules for
 well-formedness are standard. The typing judgment is of the form:
 \[ \jtype \Gamma e A \]
 It reads: ``in the typing context $\Gamma$, the term $e$ is of type
-$A$''. The standard rules are those for variables
-\reflabel{\labeltvar} and lambda abstractions
-\reflabel{\labeltlam}. \reflabel{\labeltmerge} means that a merge
+$A$''. The standard rules are those for 
+variables \reflabel{\labeltvar}; lambda abstractions \reflabel{\labeltlam}; 
+application \reflabel{\labeltapp}; integer literals \reflabel{\labeltint};
+products \reflabel{\labeltprod}; and projections (1 and 2) \reflabel{\labeltproj}. 
+\reflabel{\labeltmerge} means that a merge
 $e_1 \mergeop e_2$, is assigned an intersection type composed of the
 resulting types of $e_1$ and $e_2$, as long as the types of the two
-expressions are disjoint.\bruno{Mention the subsumption rule}
+expressions are disjoint.
+Finally, \reflabel{\labeltsub} states that for any types $A$ and $B$, if
+$A \subtype B$ then any expression $e$ with assigned type $B$ can also be assigned 
+the type $A$.
 
 \paragraph{Different rules for intersections}
 Dunfield's calculus has different rules for intersections.
