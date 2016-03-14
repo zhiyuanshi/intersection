@@ -155,9 +155,10 @@ contexts $\Gamma$ to target language contexts $G$.
   \framebox{$\im A = T$}
 
   \begin{align*}
-    \im {\code{Int}}     &= \code{Int} \\
-    \im {A_1 \to A_2}    &= \im {A_1} \to \im {A_2} \\
-    \im {A_1 \inter A_2} &= \pair {\im {A_1}} {\im {A_2}} \\
+    \im {\code{Int}}        &= \code{Int} \\
+    \im {A_1 \to A_2}       &= \im {A_1} \to \im {A_2} \\
+    \im {\pair {A_1} {A_2}} &= \pair {\im {A_1}} {\im {A_2}} \\
+    \im {A_1 \inter A_2}    &= \pair {\im {A_1}} {\im {A_2}} \\
 %    \im \top             &= \unit \\
   \end{align*}
 
@@ -446,7 +447,7 @@ subtyping.
     \formbi \\
     \bruletvar \and \bruletint \and
     \bruletapp \and \brulettprod \and
-    \brulettprojl \and \brulettprojr \and
+    \brulettproj \and
     \bruletmergedis \and \bruletann \\
    \formbc\\
    \bruletlam \and \bruletsub
@@ -487,7 +488,7 @@ by the following two theorems.
     \erase {i}                   &= i \\
     \erase {x}                   &= x \\
     \erase {\lam x E}            &= \lam x {\erase E} \\
-    \erase {\app {e_1} {e_2}}    &= {\erase {e_1}} ({\erase {e_2}}) \\
+    \erase {\app {e_1} {e_2}}    &= {\erase {e_1}} {\erase {e_2}} \\
     \erase {\pair {e_1} {e_2}}   &= \pair {\erase {e_1}} {\erase {e_2}} \\
     \erase {\proj k e}           &= \proj k {\erase e} \quad (k \in {1,2}) \\ 
     \erase {{e_1} ,, {e_2}}      &= {\erase {e_1}} \, ,, \, {\erase {e_2}} \\

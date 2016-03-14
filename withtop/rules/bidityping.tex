@@ -79,6 +79,12 @@ $ \jcheck \Gamma e A \yields E\\e$ checks against given type $A$
   {\jinfer \Gamma {\pair {e_1} {e_2}} {\tpair A B} \yields {\pair {E_1} {E_2}}}
 }
 
+\newcommand{\brulettproj}{
+\inferrule* [right=\labeltproj]
+  {\jinfer \Gamma {e} {\tpair {A_1} {A_2}} \yields {E}}
+  {\jinfer \Gamma {\proj k e} {A_k} \yields {\proj k E}}
+}
+
 \newcommand{\brulettprojl}{
 \inferrule* [right=\labeltprojl]
   {\jinfer \Gamma {e} {\tpair A B} \yields {E}}

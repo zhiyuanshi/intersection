@@ -1,6 +1,6 @@
 \newcommand{\formdis}{\framebox{$ \jdisimpl \Gamma A B $}}
 
-\newcommand{\makelabeldis}[1]{Dis-#1}
+\newcommand{\makelabeldis}[1]{$\disjoint #1$}
 
 \newcommand{\labeldisvar}{\makelabeldis Var}
 \newcommand{\ruledisvar}{
@@ -16,35 +16,35 @@
     {\jdisimpl \Gamma A \alpha}
 }
 
-\newcommand{\labeldisinterl}{\makelabeldis {Inter-1}}
+\newcommand{\labeldisinterl}{\makelabeldis {\inter L}}
 \newcommand{\ruledisinterl}{
   \inferrule* [right=\labeldisinterl]
     {\jdisimpl \Gamma {A_1} B \\ \jdisimpl \Gamma {A_2} B}
     {\jdisimpl \Gamma {A_1 \inter A_2} {B}}
 }
 
-\newcommand{\labeldisprojl}{\makelabeldis {Proj-1}}
+\newcommand{\labeldisprojl}{\makelabeldis {\pi_1}}
 \newcommand{\ruledisprojl}{
   \inferrule* [right=\labeldisprojl]
     {\jdisimpl \Gamma {A_1} {B_1}}
     {\jdisimpl \Gamma {\tpair {A_1} {A_2}} {\tpair {B_1} {B_2}}}
 }
 
-\newcommand{\labeldisprojr}{\makelabeldis {Proj-2}}
+\newcommand{\labeldisprojr}{\makelabeldis {\pi_2}}
 \newcommand{\ruledisprojr}{
   \inferrule* [right=\labeldisprojr]
     {\jdisimpl \Gamma {A_2} {B_2}}
     {\jdisimpl \Gamma {\tpair {A_1} {A_2}} {\tpair {B_1} {B_2}}}
 }
 
-\newcommand{\labeldisinterr}{\makelabeldis {Inter-2}}
+\newcommand{\labeldisinterr}{\makelabeldis {\inter R}}
 \newcommand{\ruledisinterr}{
   \inferrule* [right=\labeldisinterr]
     {\jdisimpl \Gamma A {B_1} \\ \jdisimpl \Gamma A {B_2}}
     {\jdisimpl \Gamma {A} {B_1 \inter B_2}}
 }
 
-\newcommand{\labeldisfun}{\makelabeldis Fun}
+\newcommand{\labeldisfun}{\makelabeldis \rightarrow}
 \newcommand{\ruledisfun}{
   \inferrule* [right=\labeldisfun]
     {\jdisimpl \Gamma {A_2} {B_2}}
@@ -58,7 +58,7 @@
     {\jdisimpl \Gamma {\fordis \alpha {A} {C}} {\fordis \beta {B} {D}}}
 }
 
-\newcommand{\labeldisax}{\makelabeldis Axiom}
+\newcommand{\labeldisax}{\makelabeldis Ax}
 \newcommand{\ruledisatomic}{
   \inferrule* [right=\labeldisax]
     {A \disjointax B}
@@ -68,13 +68,27 @@
 
 \newcommand{\formax}{\framebox{$ A \disjointax B$}}
 
-\newcommand{\makelabelax}[1]{DisAx-#1}
+\newcommand{\makelabelax}[1]{$\disjoint \text{Ax} #1$}
 
-\newcommand{\labeldisaxintfun}{\makelabelax Int-Fun}
+\newcommand{\labeldisaxintfun}{\makelabelax {(\mathbb{Z} \rightarrow)}}
 \newcommand{\ruledisaxintfun}{
   \inferrule* [right=\labeldisaxintfun]
     {}
     {\code{Int} \disjointax A \to B}
+}
+
+\newcommand{\labeldisaxintprod}{\makelabelax {(\mathbb{Z} \times)}}
+\newcommand{\ruledisaxintprod}{
+  \inferrule* [right=\labeldisaxintprod]
+    {}
+    {\code{Int} \disjointax \tpair A B}
+}
+
+\newcommand{\labeldisaxprodfun}{\makelabelax {(\times \rightarrow)}}
+\newcommand{\ruledisaxprodfun}{
+  \inferrule* [right=\labeldisaxprodfun]
+    {}
+    {A * B \disjointax C \to D}
 }
 
 \newcommand{\labeldisaxintfunext}{\makelabelax Int-Fun}
