@@ -2,7 +2,7 @@
 
 Section~\ref{sec:disjoint} presented a type system with disjoint
 intersection types that is both type-safe
-and coherent. Unfortunately the type system is not algorithmic
+and coherent. Unfortunately the type system is not yet algorithmic
 because the specification of disjointness does not lend itself to an
 implementation directly. This is a problem, because we need an
 algorithm for checking whether two types are disjoint or not in order
@@ -183,6 +183,7 @@ supertype (for example $A \& B \to C$).
 The lesson from this example is that the parameter types of two
 function types do not have any influence in determining whether those two function
 types are disjoint or not: only the return types matter.
+\bruno{Joao: how about the explanation for pairs?}
 
 % The rule for disjoint quantification (\reflabel{\labeldisforall}) . Consider the following two types:
 % \[ (\forall (\alpha * \code{Int}).~\code{Int} \& \alpha) \qquad (\forall (\alpha * \code{Char}). ~\code{Char} \& \alpha) \]
@@ -207,7 +208,8 @@ any of them is an intersection type.
 
 The following two theorems together say that the algorithmic disjointness
 judgment and the definition of disjointness are ``equivalent''. For detailed
-proofs, we refer to the Coq code in our repository.
+proofs, we refer to the Coq scripts in the supplementary material of
+the submission.
 
 \begin{restatable}[Soundness of algorithmic disjointness]{theorem}{algodissoundness}
   \label{theorem:soundness}
