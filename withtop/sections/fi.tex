@@ -7,19 +7,18 @@ operator.  This calculus is inspired by Dunfield's
 calculus~\cite{dunfield2014elaborating}.  However our calculus does
 not consider union types\bruno{Consider a discussion about union types
 later in the paper?}. Moreover, due to the fact that we are
-interested only in disjoint intersections, \name also has slighty different
-typing rules than in Dunfield's calculus. Sections~\ref{sec:disjoint}
+interested only in disjoint intersections, \name also has different
+typing rules for intersections from those in Dunfield's calculus. Sections~\ref{sec:disjoint}
 and \ref{sec:alg-dis} will present the more fundamental contributions
 of this paper by showing other necessary changes for supporting
 disjoint intersection types and ensuring coherence. The calculus in
 this section does not include the $\top$ type, which brings some
-additional complications.  Section~\ref{} presents two variants of
-\name with a $\top$ type, and shows how coherence can be preserved in
-the presence of $\top$.
+additional complications.  Section~\ref{sec:top} presents two variants of
+\name with a $\top$ type, while preserving coherence.
 
 \subsection{Syntax}
 
-Figure~\ref{fig:fi-syntax} shows the syntax. The difference to the
+Figure~\ref{fig:fi-syntax} shows the syntax of \name. The difference to the
 $\lambda$-calculus (with pairs), highlighted in gray, are intersection types 
 ($A \inter B$) at
 the type-level, and merges ($e_1 \mergeop e_2$) at the term level.
@@ -57,9 +56,6 @@ the type-level, and merges ($e_1 \mergeop e_2$) at the term level.
   \caption{\name syntax.}
   \label{fig:fi-syntax}
 \end{figure}
-\bruno{Careful double-checking is needed throughout the paper to
-  ensure that we are not using annotatted lambdas.}
-\bruno{Probably better to discuss all top rules later, in the top section.}
 
 \paragraph{Types.} Metavariables $A$, $B$ range over types. Types include
 function types $A \to B$ and product types $\tpair A B$. 
@@ -77,7 +73,7 @@ B$.
 %The term $\top$ corresponds to the only inhabitant of the $\top$ type.
 In addition, we also include integer literals $i$.
 
-\paragraph{Contexts.} Typing contexts $ \Gamma $ track bound variables $x$ with their type $A$.
+\paragraph{Contexts.} Typing contexts are standard: $ \Gamma $ tracks bound variables $x$ with their type $A$.
 
 % We use $\subst {A} \alpha {B}$
 % to denote the capture-avoiding substitution of $A$ for $\alpha$ inside $B$ and
@@ -85,8 +81,7 @@ In addition, we also include integer literals $i$.
 
 In order to focus on the key features that make this language interesting, we do
 not include other forms such as type constants and fixpoints here. However they
-can be included in the formalization in standard ways and we are using them in
-discussions and examples. 
+can be included in the formalization in standard ways. 
 %The formalization of nonessential features such as
 %records and record operations can be found in the full version of the paper.
 
@@ -152,9 +147,6 @@ discussions and examples.
   \caption{Declarative type system of \name.}
   \label{fig:fi-type}
 \end{figure}
-\bruno{Draw boxes around the stuff that is related to disjointness, as
-this will be shown later. Perhaps there is no need to show the 
-definition of ordinary, here. Talk about it only later in the paper.}
 
 % Intersection types introduce natural subtyping relations among types. For
 % example, $ \code{Int} \inter \code{Bool} $ should be a subtype of $ \code{Int} $, since the former
@@ -187,15 +179,14 @@ $A_1$ is also the subset of the intersection of $A_2$ and $A_3$.
 
 Note that the notion of ordinary types, which is used in rules
 \reflabel{\labelsubinter1} and \reflabel{\labelsubinter2}, was
-introduced by Davies and Pfenning~\cite{} to provide an algorithmic version of
+introduced by Davies and Pfenning~\cite{davies2000intersection} to provide an algorithmic version of
 subtyping. In our system ordinary types are used for a different 
 purpose as well: they play a fundamantal role in ensuring that 
-subtyping produces unique coercions. Section~\ref{} will present 
-a detailed discussion on this.\bruno{improve text?}
+subtyping produces unique coercions. Section~\ref{sec:alg-dis} will present 
+a detailed discussion on this. The subtyping relation, is known to be
+\emph{reflexive} and \emph{transitive}~\cite{davies2000intersection}. 
 
-\paragraph{Metatheory.} The subtyping relation, is known to be
-reflexive and transitive~\cite{}. 
-
+\begin{comment}
 \begin{lemma}[Subtyping is reflexive] \label{lemma:sub-refl}
   For all types $ A $, $ A \subtype A $.
 \end{lemma}
@@ -204,6 +195,7 @@ reflexive and transitive~\cite{}.
   If $ A_1 \subtype A_2 $ and $ A_2 \subtype A_3 $,
   then $ A_1 \subtype A_3 $.
 \end{lemma}
+\end{comment}
 
 %For the corresponding mechanized proofs in Coq, we refer the reader to the
 %repository associated with the paper\footnote{\url{https://github.com/zhiyuanshi/intersection/tree/master/esop-16}}.
@@ -234,7 +226,7 @@ It reads: ``in the typing context $\Gamma$, the term $e$ is of type
 $A$''. The standard rules are those for 
 variables \reflabel{\labeltvar}; lambda abstractions \reflabel{\labeltlam}; 
 application \reflabel{\labeltapp}; integer literals \reflabel{\labeltint};
-products \reflabel{\labeltprod}; and projections (1 and 2) \reflabel{\labeltproj}. 
+products \reflabel{\labeltprod}; and projections \reflabel{\labeltproj}. 
 \reflabel{\labeltmerge} means that a merge
 $e_1 \mergeop e_2$, is assigned an intersection type composed of the
 resulting types of $e_1$ and $e_2$, as long as the types of the two
@@ -243,8 +235,8 @@ Finally, \reflabel{\labeltsub} states that for any types $A$ and $B$, if
 $A \subtype B$ then any expression $e$ with assigned type $B$ can also be assigned 
 the type $A$.
 
-\paragraph{Different rules for intersections}
-Dunfield's calculus has different rules for intersections.
+\paragraph{Typing disjoint intersections}
+Dunfield's calculus has different typing rules for intersections.
 %
 %The extra rules have an important benefit: they
 %allow eliminating any uses of the subsumption rule. This is
