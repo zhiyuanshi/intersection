@@ -470,10 +470,14 @@ Proof.
   assert (WFTyp (Fun t0 t3)) by (apply WFFun; auto).
   *)
   repeat split.
+  (*destruct H3. destruct H3.*)
 
   unfold not; intros.
-  destruct H3.
+
+  destruct H3. destruct H3. 
   assert (t2 = TopT) by (apply topLikeWF; auto).
+  rewrite H7 in H5.
+  apply H3. rewrite H7.
   subst.
   clear H3; clear H4; clear H1.
   

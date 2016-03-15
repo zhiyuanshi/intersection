@@ -3,7 +3,7 @@
 %*******************************************************************************
 
 This section introduces \name and its support for intersection types and the
-merge operator. It then discusses the issue of coherence and shows how the
+merge operator. It then discusses the challenges of coherence and shows how the
 notion of disjoint intersection types achieve a coherent semantics.
 
 Note that this section uses some syntactic sugar, as well as standard
@@ -15,10 +15,15 @@ supports them.
 \subsection{Intersection Types and the Merge Operator}
 %%\subsection{Intersection Types, Merge and Polymorphism in \name}
 
-Intersection types date back as early as Coppo~\textit{et
-al.}'s work~\cite{coppo1981functional}. Since then various researchers have
-studied intersection types~\cite{Castagna}, and some languages have adopted them in one
-form or another\cite{CDuce}.\bruno{Reviewer asked for more references here.}
+Intersection types date back to Coppo~\textit{et
+  al.}~\cite{coppo1981functional} and Pottinger~\cite{Pottinger80type}
+work. Since then various researchers have
+studied various aspects and forms of intersection
+types~\cite{Freeman91refinement,pierce1991programming1,Castagna92calculus,pierce1997intersection,davies2000intersection,Dunfield03Intersections},
+and some languages have adopted them in one form or
+another~\cite{reynolds1997design,Benzaken03cduce,scala-overview,Dunfield07:Stardust}.
+\bruno{Move to intro?}
+
 %However, as we shall see in
 %Section~\ref{subsec:incoherence}, it also introduces difficulties. In what follows
 %intersection types and the merge operator are informally introduced.
@@ -51,8 +56,7 @@ In the previous program we deliberately did not show how to introduce
 values of an intersection type. There are many variants of
 intersection types in the literature. Our work follows a particular
 formulation, where intersection types are introduced by a \emph{merge
-  operator}.\bruno{Perhaps mention other works with the merge operator, 
-including lambda\&} 
+  operator}~\cite{reynolds1991coherence,Castagna92calculus,dunfield2014elaborating}. 
 As Dunfield~\cite{dunfield2014elaborating} has argued a
 merge operator adds considerable expressiveness to a calculus. The
 merge operator allows two values to be merged in a single intersection
@@ -119,7 +123,7 @@ Should the result be \lstinline$1$ or \lstinline$2$?
 
 Dunfield's calculus~\cite{dunfield2014elaborating} accepts the program
 above, and it allows that program to result in \lstinline$1$ or \lstinline$2$.
-In other words the results of the program are incoherent.\bruno{rephrase better?}
+In other words the results of the program are incoherent.
 
 \paragraph{Getting Around Incoherence}
 In a real implementation of Dunfield calculus a choice has to be made
@@ -133,7 +137,7 @@ some other possibilities, such as the possibility of restricting typing
 of merges so that a merge has type \lstinline$A$ only if exactly one
 branch has type \lstinline$A$. He also suggested another possibility,
 which is to allow only for \emph{disjoint} types in an intersection.
-This is the starting point for us and the approach that we will 
+This is the starting point for us and the approach that we 
 investigate in this paper. 
 
 \subsection{Disjoint Intersection Types and their Challenges}\label{subsec:challenges}
@@ -216,12 +220,12 @@ subcomponents sharing the same type. In a simply typed calculus with intersectio
 types (and without a $\top$ type) this can be ensured by requiring the two types 
 not to share a common supertype: 
 
-\begin{definition}[Simple disjointness]\label{def:simple_dis}
+\begin{definition}[Simple disjointness]
   Two types $A$ and $B$ are disjoint
   (written $A \disjoint B$) if there is no type $C$ such that both $A$ and $B$ are
   subtypes of $C$:
-  \[A \disjoint B \equiv \not\exists C.~A \subtype C~\text{and}~B \subtype C\]
-\end{definition}
+  \[A \disjoint B \equiv \not\exists C.~A \subtype C~\text{and}~B\subtype C\]
+\end{definition}\label{def:simple_dis}
 
 \noindent This definition of disjointness prevents the problematic merge
 \lstinline$(1,,'c'),,(2,,True)$. Since $\code{Int}$ is a
@@ -234,7 +238,7 @@ presented in this paper: a simply typed lambda calculus with intersection
 (but without a $\top$ type). 
 This variant of \name is useful to study many 
 important issues arizing from disjoint intersections, without the additional 
-complications of $\top$. As shown in Section~\ref{}, this
+complications of $\top$. As shown in Section~\ref{sec:disjoint}, this
 definition of disjointness is sufficient to ensure coherence in \name.
 
 \paragraph{Disjointness of non-atomic types} Equipped with a formal
@@ -254,9 +258,9 @@ For example, consider the following intersection types of functions:
 It seems reasonable to expect that the first intersection type is
 disjoint: both the domain and codomain of the two functions in the
 intersection are different. However, it is less clear whether the two
-other intersection types are disjoint or not. Looking at 
-definition~\ref{def:simple_dis} for further guidance, and the subtyping rule for functions in
-\name (which is standard~\cite{cardelli}):
+other intersection types are disjoint or not. Looking at the 
+definition of simple disjointness for further guidance, and the subtyping rule for functions in
+\name (which is standard~\cite{cardelli88semantics}):
 
 \begin{mathpar}
     \inferrule* [right=\labelsubfun]
@@ -332,30 +336,41 @@ types for this program: \lstinline{Int} or \lstinline{Bool}. Once the type
 of the program is fixed, there is only one possible result: if the type is 
 \lstinline$Int$ the result of the program is \lstinline$4$; if the type 
 is \lstinline$Bool$ then the result of the program is \lstinline$False$. 
-Like other programming language features (for example type classes~\cite{}), 
+Like other programming language features (for example type classes~\cite{Wadler89ad-hoc}), 
 types play a fundamental role in determining the result of a program, and the 
 semantics of the language is not independent from types. 
 
 Disjointness is indeed sufficient to ensure coherence. However, for
 certain programs type annotations are necessary to rule out \emph{type
-  ambiguity}. Similar type ambiguity issues arize in other
-type-directed mechanisms such as type-classes~\cite{}.
+  ambiguity} as well. Type ambiguity happens when some expressions can 
+be typed in multiple ways, and depending on which type is chosen 
+for the subexpressions the program may lead to different results. 
+This fenomenon is common in type-directed mechanisms, and it also 
+affects type-directed mechanisms such as type classes or, more
+generally, \emph{qualified types}~\cite{Mark93coherence}.
 
-In our implementation, which uses bi-directional type-checking techniques~\cite{}, 
-the ambiguity problem is solved by annotating the term being applied. For example:
+The typical solution to remove type ambiguity is to add type
+annotations that chose a particular type for a subexpression when
+multiple options exist. Our approach to address this problem is to 
+use bi-directional type-checking techniques~\cite{Pierce00local}. We show that 
+with a fairly standard bi-directional type system, we can guarantee 
+that every subexpression (possibly with annotations) has a unique
+type. For example:
 
 \begin{lstlisting}
 ((succ,,not) : Int (*$\to$*) Int) (3,,True)
 \end{lstlisting}
 
-\noindent is a valid program and results in
-\lstinline$4$.\bruno{improve text?}
+\noindent is a valid program, which has a unique determined type, and results in
+\lstinline$4$. In this case the bi-directional type-system 
+forces users to provide an annotation of the expression being applied.
+Without the annotation the program would be rejected.
 
 \subsection{Disjoint Intersection Types with $\top$} 
 In the presence of a $\top$ type the simple definition of disjointness
 is useless: $\top$ is always a common supertype of any two types.
 Therefore, with the previous definition of disjointness no disjoint
-intersections could ever be well-formed in the presence of $\top$!
+intersections can ever be well-formed in the presence of $\top$!
 Moreover, since $\top$ is not disjoint to any type, it does not make
 sense to allow its presence in a disjoint intersection type.  Adding a
 $\top$ type requires some adaptations on the notion of disjointness.
@@ -366,8 +381,8 @@ In both variants the definition of disjointness is revised as follows:
   Two types $A$ and $B$ are disjoint
   (written $A \disjoint B$) if the following two conditions are satisfied:
 \begin{enumerate}
-  \item $\neg A_{\top}~\text{and}~\neg B_{\top}$
-  \item $\forall C.~\text{if}~ A \subtype C~\text{and}~B \subtype C~\text{then}~C_{\top}$
+  \item $\neg \toplike{A}~\text{and}~\neg \toplike{B}$
+  \item $\forall C.~\text{if}~ A \subtype C~\text{and}~B \subtype C~\text{then}~\toplike{C}$
 \end{enumerate}
 \end{definition}
 
@@ -375,7 +390,7 @@ In the presence of $\top$, instead of requiring that two types do not
 share any common supertype, we require that the only allowed common supertypes are
 \emph{top-like} (condition \#2). Additionally, it is also required that
 the two types $A$ and $B$ are not themselves
-top-like (condition \#1). The unary relation $\cdot_{\top}$ denotes such top-like
+top-like (condition \#1). The unary relation $\toplike{\cdot}$ denotes such top-like
 types. Top-like types obviously include the $\top$ type. However
 top-like types also include other types which are \emph{syntactically different}
 from $\top$, but behave like a $\top$ type. For example, $\code{$\top$}~\inter~\code{$\top$}$
@@ -390,8 +405,8 @@ intersection types includes a rule:
     {{A_1} \subtype {A_2 \inter A_3}}
 \end{mathpar}
 
-\noindent The presence of  \reflabel{\labelsubinter} means that both  
-${\top\inter \top} \!\!\subtype\!\! {\top}$ and 
+\noindent The presence of  \reflabel{\labelsubinter} means that not only  
+${\top\inter \top} \!\!\subtype\!\! {\top}$ but also 
 ${\top} \!\!\subtype\!\! {\top \inter \top}$ are derivable.
 In other words, in a calculus like Dunfield's there are infinitely
 many syntactically different types that behave like a $\top$ type: 
@@ -410,7 +425,7 @@ subtype of the type of the program ($\top$), the result of the
 program is always the \emph{unique} $\top$ value. Secondly,
 $\top$-Disjointness has the side-effect of excluding other top-like
 types from the system: the intersection type $\top \inter \top$ is not
-a well-formed disjoint intersection type. In contrast to Dunfield's
+a \emph{well-formed} disjoint intersection type. In contrast to Dunfield's
 calculus, \name has a unique syntactic $\top$ type.
 
 \paragraph{Functional intersections and top-like types}
@@ -419,7 +434,7 @@ definition of top-like types. The concrete definition of top-like
 types is important because it affects what types are allowed in intersections.
 In the simpler version of \name with $\top$, multiple
 functions cannot coexist in intersections. This is obviously a drawback and 
-would reduce the usefulness of the system. The essential
+reduces the expressiveness of the system. The essential
 problem is that a simple notion of top-like types is too restrictive. 
 For example consider again the intersection type: \\
 
@@ -436,12 +451,16 @@ every type: $\code{String} \to \top$. In this case $(\code{String} \to
 $\top$-Disjointness as there exists a common supertype, which is not top-like.
 
 \paragraph{Generalizing top-like types} In the second variant of \name 
-top-likes are defined more liberally and they allow ``local'' top
-types, as well as proper top types. \bruno{finish this}
+top-likes are defined more liberally and they allow function types
+whose co-domain is a top type to be considered as a top-like type.
+For example, the type $\code{String}\to\top$ is considered a top-like
+type. The benefit of allowing this more liberal notion of top-like
+types is that, similarly to the first variant of \name without $\top$, 
+disjoint intersections can have multiple functions types. 
 
-\name's type system only accepts programs that use disjoint intersection
-types. As shown in Section~\ref{sec:disjoint} disjoint intersection types will
-play a crucial rule in guaranteeing that the semantics is coherent.
+%\name's type system only accepts programs that use disjoint intersection
+%types. As shown in Section~\ref{sec:disjoint} disjoint intersection types will
+%play a crucial rule in guaranteeing that the semantics is coherent.
 
 
 
