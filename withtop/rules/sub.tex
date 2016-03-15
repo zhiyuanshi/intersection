@@ -1,7 +1,7 @@
 \newcommand{\formsub}{\framebox{$ A \subtype B \yields E $}}
 
 %\newcommand{\makelabelsub}[1]{S-#1}
-\newcommand{\makelabelsub}[1]{$S#1$}
+\newcommand{\makelabelsub}[1]{S$#1$}
 
 \newcommand{\labelsubvar}{\makelabelsub Var}
 \newcommand{\rulesubvar}{
@@ -159,7 +159,7 @@
 \newcommand{\labelsubinterlcoerce}{\makelabelsub {\inter L_1}}
 \newcommand{\rulesubinterlcoerce}{
   \inferrule* [right=\labelsubinterlcoerce]
-    {{A_1} \subtype {A_3} \yields E}
+    {{A_1} \subtype {A_3} \yields E \\ \jatomic {A_3} }
     {{A_1 \inter A_2} \subtype {A_3}
       \yields
         { \lamty x {\im {A_1 \inter A_2}} {\andcoerce{A_3}_{{(
@@ -169,7 +169,7 @@
 \newcommand{\labelsubinterrcoerce}{\makelabelsub {\inter L_2}}
 \newcommand{\rulesubinterrcoerce}{
   \inferrule* [right=\labelsubinterrcoerce]
-    {{A_2} \subtype {A_3} \yields E}
+    {{A_2} \subtype {A_3} \yields E \\ \jatomic {A_3} }
     {{A_1 \inter A_2} \subtype {A_3}
       \yields 
         { \lamty x {\im {A_1 \inter A_2}} {\andcoerce{A_3}_{{(
