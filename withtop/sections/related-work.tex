@@ -4,7 +4,6 @@
 %*******************************************************************************
 \paragraph{Coherence.}
 %*******************************************************************************
-
 Reynolds invented Forsythe~\cite{reynolds1997design} in the 1980s. Our merge
 operator is analogous to his operator $p_1, p_2 $. Forsythe has a coherent
 semantics. The result was proved formally by
@@ -18,6 +17,46 @@ restrictive and it forbids, for instance, the merge of two functions (even when
 they a provably disjoint). Therefore, Forsythe treatment of coherence
 is rather ad-hoc. In contrast, disjointness in \name has a simple, well-defined
 specification and it is quite flexible.
+
+
+$\lamint$
+
+"the solution seems much more powerful than simply forbidding
+non-overlapping intersections"
+
+No it is not! $\lamint$ rejects intersections that are accepted
+in our system:
+
+{Int->Char,Int->Bool}
+
+This example violates the well-formedness conditions of $\lamint$ (see Section
+3.2 of "A Calculus for Overloaded Functions with Subtyping" (1995)). So
+clearly the conditions imposed by $\lamint$ (even for the special case of
+functions) do not subsume disjoint intersections.
+
+"The problem of coherence with intersection types was studied in the 90's
+by Castagna in the language $\lamint$"
+
+No it wasn't! Castagna studied the overloading problem for functions
+and focused only on the “merge” (in our sense) of functions. Our work
+considers a system with **arbitrary** intersections/merges and tries
+to present a coherent subset of that. The well-formedness conditions
+presented in Section 3.2 of the $\lamint$ paper cannot be ported to a
+system with arbitrary intersections, since they assume function types
+only.
+
+Moreover, although $\lamint$ can encode records, **it is unclear how to encode
+arbitrary merges**. One failed attempt to encode arbitrary merges in $\lamint$
+is to consider a record with multiple labels of the same name. For example,
+encoding 1,,’c’ as
+
+{l=1,l=‘c’}
+
+(where label l is of an isolated atomic type L, see Section 4 of the $\lamint$
+paper). However, this is also rejected in $\lamint$, since it violates the well-
+formedness conditions.
+
+Nevertheless $\lamint$ is related work and should be discussed.
 
 Pierce~\cite{pierce1991programming2} made a comprehensive review
 of coherence, especially on Curien and Ghelli~\cite{curienl1990coherence} and
@@ -150,46 +189,11 @@ subtyping seems to have important advantages over syntactic subtyping. One
 worthy avenue for future work is to study languages with intersection types
 and merge operator in a semantic subtyping setting.
 
-$\lamint$
 
-"the solution seems much more powerful than simply forbidding
-non-overlapping intersections"
+\paragraph{Coherence in other Type-directed Mechanisms} type classes and 
+qualified types.
 
-No it is not! $\lamint$ rejects intersections that are accepted
-in our system:
-
-{Int->Char,Int->Bool}
-
-This example violates the well-formedness conditions of $\lamint$ (see Section
-3.2 of "A Calculus for Overloaded Functions with Subtyping" (1995)). So
-clearly the conditions imposed by $\lamint$ (even for the special case of
-functions) do not subsume disjoint intersections.
-
-"The problem of coherence with intersection types was studied in the 90's
-by Castagna in the language $\lamint$"
-
-No it wasn't! Castagna studied the overloading problem for functions
-and focused only on the “merge” (in our sense) of functions. Our work
-considers a system with **arbitrary** intersections/merges and tries
-to present a coherent subset of that. The well-formedness conditions
-presented in Section 3.2 of the $\lamint$ paper cannot be ported to a
-system with arbitrary intersections, since they assume function types
-only.
-
-Moreover, although $\lamint$ can encode records, **it is unclear how to encode
-arbitrary merges**. One failed attempt to encode arbitrary merges in $\lamint$
-is to consider a record with multiple labels of the same name. For example,
-encoding 1,,’c’ as
-
-{l=1,l=‘c’}
-
-(where label l is of an isolated atomic type L, see Section 4 of the $\lamint$
-paper). However, this is also rejected in $\lamint$, since it violates the well-
-formedness conditions.
-
-Nevertheless $\lamint$ is related work and should be discussed.
-
-
+\begin{comment}
 %*******************************************************************************
 \paragraph{Traits and Trait Calculi.}
 %*******************************************************************************
@@ -258,3 +262,4 @@ traits and our source language's traits have four major differences:
      also support fields, mutable state and abstract types.
 
 \end{enumerate}
+\end{comment}
