@@ -143,20 +143,38 @@ intersection of these types is forbidden, as there might be an overlap between t
 %This deals with problem 2.
 \end{itemize}
 
-\bruno{I think we need to mention somewhere here that Lemma 4 no
-  longer holds in the presence of $\top$, only a weaker version for
-  non-top-like types. Ultimately this is the key reason why top types
-  make coherence a harder problem in the presence of top.}
+Another problem arising from the introduction of $\top$ is that Lemma~\ref{lemma:unique-subtype-contributor}
+no longer holds.
+For example, given any type $A_1$ and $A_2$, and considering $B = \top$; then we can prove that both of 
+them can be coerced to $B$ (because any type is a subtype of $\top$).
+Thus, in this case, the type ${A_1} \inter {A_2}$ has two contributors which can produce $\top$.
+In spite of this Lemma being a core property of our system, not all hope is lost:
+we can still prove a weaker version of it.
+Namely:
 
-Next, we will discuss two suitable definitions of top-like and discuss their consequences in a system with
-$\top$-disjointess.
+\begin{lemma}[Unique subtype contributor (with $\top$)]
+  \label{lemma:unique-subtype-contributor-with-top}
+
+  If $A_1 \inter A_2 \subtype B$, where $A_1 \inter A_2$ and $B$ are well-formed types,
+  \textbf{and $\text{B}$ is not toplike};
+  then it is not possible that the following holds at the same time:
+  \begin{enumerate}
+    \item $A_1 \subtype B$
+    \item $A_2 \subtype B$
+  \end{enumerate}
+\end{lemma}
+
+In other words, if $B$ is not top-like, then the previous property still holds!
+This suggests that we will need to introduce restrictions concerning top-like types, if we want to achieve
+coherence.
+Therefore this will be the main challenge that we will address during the upcoming sections,
+by showing two suitable definitions of top-like types and discuss  
+their consequences in a system with $\top$-disjointess.
 %Next we will present a simple top-like type definition and show how resulting system
 %becomes more expressive while achieving coherence.
 %However, we still consider that system not expressive enough, 
 %so an extended definition of the top-like type relation will be presented (also the resulting system).
 %We will refer to the first system as \emph{simple} and to the second as \emph{improved}. 
-
-
 
 \subsection{A Simple Calculus with $\top$}\label{subsec:simpletop}
 

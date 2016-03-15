@@ -461,11 +461,15 @@ by the following two theorems.
 
 \begin{restatable}[Type preservation]{theorem}{typepreservation}
   \label{theorem:type-preservation}
+  We have that:
+  \begin{itemize}
+  \item If $ \jinfer \Gamma e A \yields E $, 
+        then $ \jtype {\im \Gamma} E {\im A} \,$.
+  \item If $ \jcheck \Gamma e A \yields E $, 
+        then $ \jtype {\im \Gamma} E {\im A} $.
+  \end{itemize}
 
-  If $ \jtype \Gamma e A \yields E $,
-  then $ \jtype {\im \Gamma} E {\im A} $.
-\end{restatable}\bruno{Joao: the statement is incorrect! we need to
-  use the bi-directional judgments (and probably two of them?)!}
+\end{restatable}
 
 \begin{proof}
   (Sketch) By structural induction on the term and the corresponding
@@ -506,7 +510,11 @@ modulo some additional type-annotations. To relate terms which are
 typeable in both systems, we use the definition of erasure shown in Figure~\ref{fig:type-ann-erasure}.
 
 \begin{theorem}[Soundness of bidirectional type-checking]
-If $ \jinfer \Gamma e A \yields E$, then $ \jtype \Gamma {\erase e} A \yields {E'} $.
+  We have that:
+  \begin{itemize}
+    \item If $ \jinfer \Gamma e A \yields E$, then $ \jtype \Gamma {\erase e} A$.
+    \item If $ \jcheck \Gamma e A \yields E$, then $ \jtype \Gamma {\erase e} A$.
+  \end{itemize}
 \end{theorem}
 
 \begin{proof}
@@ -515,7 +523,7 @@ If $ \jinfer \Gamma e A \yields E$, then $ \jtype \Gamma {\erase e} A \yields {E
 \end{proof}
 
 \begin{theorem}[Completeness of bidirectional type-checking]
-If $ \jtype \Gamma e A \yields {E'}$, then $ \jinfer \Gamma {e'} A \yields E$, where $\erase{e'} = e$.
+If $ \jtype \Gamma e A$, then $ \jinfer \Gamma {e'} A \yields E$, where $\erase{e'} = e$.
 \end{theorem}
 
 \begin{proof}
@@ -551,14 +559,17 @@ Combining the previous results, we are able to show the central theorem:
 
 \begin{restatable}[Unique elaboration]{theorem}{uniqueelaboration}
   \label{theorem:unique-elaboration}
-
-  If $\jtype \Gamma e {A_1} \yields {E_1}$ and $\jtype \Gamma e {A_2} \yields
-  {E_2}$, then $E_1 \equiv E_2$. (``$\equiv$'' means syntactical equality, up to
+  We have that:
+  \begin{itemize}
+    \item If $\jinfer \Gamma e {A_1} \yields {E_1}$ and $\jinfer \Gamma e {A_2} \yields
+          {E_2}$, then $E_1 \equiv E_2$. 
+    \item If $\jcheck \Gamma e {A_1} \yields {E_1}$ and $\jcheck \Gamma e {A_2} \yields
+          {E_2}$, then $E_1 \equiv E_2$.
+  \end{itemize}
+  (``$\equiv$'' means syntactical equality, up to
   $\alpha$-equality.)
 
 \end{restatable}
-\bruno{Wrong theorem again! you need to use bi-directional
-  judgements. }
 
 \begin{proof}
   By induction on the first derivation.

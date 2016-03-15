@@ -183,7 +183,15 @@ supertype (for example $A \& B \to C$).
 The lesson from this example is that the parameter types of two
 function types do not have any influence in determining whether those two function
 types are disjoint or not: only the return types matter.
-\bruno{Joao: how about the explanation for pairs?}
+
+Finally, the rules for pairs (\reflabel{\labeldisprojl} and \reflabel{\labeldisprojr}) say that
+either the first components or the second components must be disjoint.
+This is due to product subtyping being covariant: disjointness of either
+component is enough to make it impossible to construct a supertype.
+For instance, take the following two product types:
+\[\pair {\code{Int}} {\code{String}} \qquad \pair {\code{Bool}} {\code{String}}\]
+We can never come up with a common supertype for these because it does not exist a type $C$ which is 
+both a supertype of $\code{Int}$ and $\code{Bool}$.
 
 % The rule for disjoint quantification (\reflabel{\labeldisforall}) . Consider the following two types:
 % \[ (\forall (\alpha * \code{Int}).~\code{Int} \& \alpha) \qquad (\forall (\alpha * \code{Char}). ~\code{Char} \& \alpha) \]
