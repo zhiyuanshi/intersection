@@ -12,9 +12,9 @@ for any two types to satisfy a simple notion of disjointness. To
 address this problem a notion of $\top$-disjointess is proposed.  The
 definition of $\top$-disjointess depends on a notion of a top-like
 type. We formalise two different variants of \name, based on two different
-definitions of a top-like type, while discussing their usability and
-limitations. Both variants retain coherence, and all other key
-properties of \name. 
+definitions of a top-like type, while discussing their expressiveness. Both variants retain coherence, and all other key
+properties of \name.  For simplicity and space reasons we omit pairs
+from the two variants of \name presented in this section.
 Mechanized Coq proofs for both variants are available as part of the 
 supplementary materials for the paper.
 
@@ -89,7 +89,7 @@ respective disjointess specification.
   \label{fig:fi-syntax-top}
 \end{figure}
 
-Introducing the $\top$ type in \name is a straightforward process, as
+Introducing the $\top$ type in the \name calculus is not difficult, as
 shown in Figure \ref{fig:fi-syntax-top}.  Existing types are extended
 with $\top$ and, correspondingly, we add the canonical inhabitant of type
 $\top$: the term $\top$.  The subtyping relation is extended with
@@ -234,7 +234,7 @@ intersection composed of just top-like types is also a top-like type.
 Similarly to the original system, the definition $\top$-disjointness
 does not lead to an implementation.  Fortunately, the algorithmic
 disjoitness rules remain the almost same as described in Section
-\ref{sec:sec:alg-dis}. The only significant difference is the absence
+\ref{sec:alg-dis}. The only significant difference is the absence
 of the \reflabel{\labeldisfun} rule. The reason for this is that, in
 this variant of \name, two functions \emph{always} have \emph{non top-like} common 
 supertypes. For example, consider the function types:
@@ -256,7 +256,7 @@ the system is left with only one well-formed syntactic $\top$ type.
 \subsection{An Improved Calculus with $\top$}
 
 The definition of top-like types in Section~\ref{subsec:simpletop} is,
-unfortunately, too restrictive: multiple function types are not allowed
+unfortunately, quite restrictive: multiple function types are not allowed
 within intersection types. This is in contrast with the original \name
 calculus, where multiple function types can co-exist in an
 intersection. To address this limitation, we generalize the definition
