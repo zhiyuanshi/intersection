@@ -19,11 +19,11 @@ aspects of the calculus:
 \begin{itemize}
 
 \item {\bf Uniqueness of subtyping coercions:} the notion of ordinary
-  types, well-formed disjoint intersection types ensures that
+  types and well-formed disjoint intersection types ensures that
   coercions produced by subtyping relation are unique.
 
 \item {\bf No type ambiguity:} the bi-directional type system does not
-  have type-ambiguity. Thus the bi-directional type system infers a
+  have type-ambiguity, and it infers a
   unique type for every well-typed program. 
 
 %Removing type ambiguity 
@@ -119,9 +119,7 @@ with pair and unit types.
 The syntax and typing of our target language is unsurprising. The syntax of the
 target language is shown in Figure~\ref{fig:f-syntax}. The highlighted part
 shows its difference with the $\lambda$-calculus. 
-The typing rules can 
-be found in the extended version of the paper, and in our Coq proof
-scripts.\bruno{should we mention an extended version of the paper?}
+The typing rules can be found in our Coq development.
 
 \begin{figure}[t]
   \[
@@ -194,7 +192,7 @@ The judgment
 A_1 \subtype A_2 \yields E
 \]
 extends the subtyping judgment in Figure~\ref{fig:fi-type} with a coercion
-on the right hand side of $ \yields {} $. A coercion $ E $ is just an term
+on the right hand side of $ \yields {} $. A coercion $ E $ is just a term
 in the target language and is ensured to have type
 $ \im {A_1} \to \im {A_2} $ (by Lemma~\ref{lemma:sub}). For example,
 \[
@@ -231,7 +229,7 @@ is used. Finally, all rules produce type-correct coercions:
 \end{restatable}
 
 \begin{proof}
-  By a straightforward induction on the derivation\footnote{The proofs of major lemmata and theorems can be found in the full version of the paper.\bruno{where??}}.
+  By a straightforward induction on the derivation.
 \end{proof}
 
 \paragraph{Overlapping subtyping rules} The key problem with the
@@ -288,17 +286,19 @@ Unfortunately, disjoint intersections alone are insufficient to deal with
 problem 2). In order to deal with problem 2), we introduce a distinction between
 types, and ordinary types.
 
-\paragraph{Ordinary Types.} Ordinary types are just those which are not intersection
+\paragraph{Ordinary types.} Ordinary types are just those which are not intersection
 types, and are asserted by the judgment \[ \jatomic A \]
 
-\noindent Since types in \name are simple, the only ordinary types are the
-function type and integers.
-But in richer systems, it can also include, for example, record types
-or pairs.
+\noindent Since types in \name are simple, the only ordinary types are 
+function type, integers and pairs.
+But in richer systems, it can also include, for example, record types.
 In the left decomposition rules for intersections we introduce a requirement
 that $A_3$ is ordinary. The consequence of this requirement is that when $A_3$ is
 an intersection type, then the only rule that can be applied is
-\reflabel{\labelsubinter}. With the ordinary constraint, one can guarantee that at
+\reflabel{\labelsubinter}. 
+
+\paragraph{Unique coercions.}
+Well-formedeness and ordinary types guarantee that at
 any moment during the derivation of a subtyping relation, at most one rule can
 be used. Consequently, the coercion of a subtyping relation $A \subtype B$ is
 uniquely determined. This fact is captured by the following lemma:
@@ -389,7 +389,7 @@ Those two types are not disjoint since $\code{Int} \to \code{Int}$ is their comm
 
 In order to prove the coherence result we first introduce a bidirectional
 type system, which is closely related to the type system presented in
-Section~\ref{sec:fi}. The type system is elaborating, producing a term 
+Section~\ref{sec:fi}. The bidirectional type system is elaborating, producing a term 
 in the target language while performing the typing derivation.
 
 The bidirectional type system is useful for two different
@@ -427,11 +427,10 @@ are two check-mode rules: \reflabel{\labeltlam} and
 \reflabel{\labeltsub}. The remaining rules are all in the synthesis
 mode. Moreover there is one additional rule for annotation expressions
 (\reflabel{\labeltann}). The syntax of source terms also needs to be
-extended with annotation expressions $e : A$. \bruno{References to
-  bidirectional type-checking needed somewhere?}
+extended with annotation expressions $e : A$. 
 
 The two elaboration judgments $\jinfer \Gamma e A \yields E$ and
-$\jcheck \Gamma e A \yields E$ extends the usal typing judgments with
+$\jcheck \Gamma e A \yields E$ extend the usual typing judgments with
 an elaborated term on the right hand side of the arrows. The
 elaboration ensures that $E$ has type $\im A$. 
 Noteworthy are the \reflabel{\labeltmerge} 
@@ -465,7 +464,8 @@ by the following two theorems.
 
   If $ \jtype \Gamma e A \yields E $,
   then $ \jtype {\im \Gamma} E {\im A} $.
-\end{restatable}
+\end{restatable}\bruno{Joao: the statement is incorrect! we need to
+  use the bi-directional judgments (and probably two of them?)!}
 
 \begin{proof}
   (Sketch) By structural induction on the term and the corresponding
@@ -502,8 +502,8 @@ by the following two theorems.
 Figure~\ref{fig:fi-type} is closely related to the bidirectional type system 
 in Figure~\ref{fig:fi-typebd}. We can prove that the bidirectional type system 
 is sound and complete with respect to the declarative specification, 
-modulo some additional type-annotations.
-We will use the definition of erasure, as shown in Figure~\ref{fig:type-ann-erasure}.
+modulo some additional type-annotations. To relate terms which are
+typeable in both systems, we use the definition of erasure shown in Figure~\ref{fig:type-ann-erasure}.
 
 \begin{theorem}[Soundness of bidirectional type-checking]
 If $ \jinfer \Gamma e A \yields E$, then $ \jtype \Gamma {\erase e} A \yields {E'} $.
@@ -522,6 +522,8 @@ If $ \jtype \Gamma e A \yields {E'}$, then $ \jinfer \Gamma {e'} A \yields E$, w
   (Sketch) By structural induction on the term and the corresponding
   inference rule.
 \end{proof}
+\bruno{Joao: is this correct? I think soundness or complenteness
+  require theorems in two modes (checking or inference). Please double-check!}
 
 \paragraph{Uniqueness of type-inference} An important property of the
 bidirectional type-checking in Figure~\ref{fig:fi-typebd} is that, given an expression $e$, if it is
@@ -555,13 +557,16 @@ Combining the previous results, we are able to show the central theorem:
   $\alpha$-equality.)
 
 \end{restatable}
+\bruno{Wrong theorem again! you need to use bi-directional
+  judgements. }
 
 \begin{proof}
   By induction on the first derivation.
   Note that two cases need special attention: \reflabel{\labeltsub} and \reflabel{\labeltapp}.
   In the former, we know that $A$ is unique by Theorem~\ref{theorem:uniqueness-type-inference} and 
   that $C$ is also unique, by Lemma~\ref{lemma:unique-coercion}.
-  The latter requires inference of a function type, forcing the use of a type annotation.
+  The latter requires inference of a function type, \bruno{forcing the
+    use of a type annotation}\bruno{I don't think this is a good explanation}.
   Again, by Theorem~\ref{theorem:uniqueness-type-inference} we can use the induction hypotheses.
 %  Note that the typing rules are already syntax-directed but the case of
 %  \reflabel{\labeltapp} (copied below) still needs special attention since we
