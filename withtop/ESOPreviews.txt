@@ -1,5 +1,6 @@
-We have submitted an earlier version of this paper.
-In comparison to that submission, we have dealt with the following issues:
+We have submitted an earlier version of this paper to ESOP.
+In comparison to that submission, we have addressed most of the key 
+concerns of the reviewers:
 
 - added T types and discuss 3 variants of the calculus;
 - justified the choice of Coq over Twelf (used in Dunfield’s proof) for the proofs
