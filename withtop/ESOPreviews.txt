@@ -63,13 +63,14 @@ We now address T.
 > Char) is disjoint from (Bool & Float), but (Int & Char) is not
 > disjoint from Int (because (Int & Char) <: Int).
 
-TODO: We should make a note in the paper about the restriction 
-on refinements:
+ADDED discussion on refinement intersections
 
 "This is a different restriction on the formation of A & B from the
 _refinement restriction_ found in some intersection type systems; the
 refinement restriction says A & B is a well-formed type if A and B are
 both "refinements" of the same simple (unrefined) type."
+
+
 
 > The paper applies a language based on the calculus to model
 > (prototype-based) OO traits.
@@ -98,7 +99,7 @@ both "refinements" of the same simple (unrefined) type."
 > attendant limitations, early in the paper; the issue with ⊤ is
 > mentioned only in the paper's conclusion.
 
-TODO: Emphasize differences to Dunfield better earlier on in the paper.
+DONE: Emphasize differences to Dunfield better earlier on in the paper.
  
 > "QUESTION" convention: Questions that I would like the authors to
 > address in their response are marked "QUESTION".  The authors are not
@@ -202,7 +203,7 @@ FIXED
 > 
 > Footnote 5: shouldn't the example be: {x = 1, y = 2} \ x gives {y = 2}, not {x = 1}?
 
-Since S3 is probably going to be dropped, we can ignore the issue?
+Since S3 (from the old submission) has been dropped
 
  
 > *** Comments on section 4
@@ -239,7 +240,7 @@ FIXED
 > reflexive and transitive just shouldn't be called a subtyping
 > relation.
 
-Partly Fixed.
+CHANGED wording.
 
 > Lemma 1: "For all type A" → "For all types A"
 
@@ -270,7 +271,7 @@ OK: Issue should now be fixed, but we need to have another discussion.
 > In 5.3, type of overlap 2., "right decomposition rules" → "right
 > decomposition rule".
 
-TODO: Fix
+FIXED
 
 > On the "atomic type" distinction: First, the same distinction was made
 > by Davies and Pfenning in ICFP 2000, which you already cite elsewhere
@@ -280,7 +281,7 @@ TODO: Fix
 > A1 and A2) but (as the paper mentions) record types, etc.  Davies and
 > Pfenning used "ordinary type" instead of "atomic type".
 
-TODO: Fix & cite
+FIXED
  
 > *** Comments on section 6
 > 
@@ -297,8 +298,7 @@ Fixed. (Dis Inter 1 and Dis Inter 2 do not fit in the same line, but Dis Fun has
 > second: product subtyping is covariant, so disjointness of either
 > component is enough to make it impossible to construct a supertype.
 
-TODO: Add Pairs and discuss disjointness of Pairs.
-TODO2: Also add Pairs in the formalization!
+FIXED: We now account for pairs.
 
 > The *_{ax} judgment is fine, but for a larger language it might be
 > better to define a "head connective" operator,
@@ -323,14 +323,14 @@ TODO: Mention alternative?
 > "simple", "well-defined" and "quite flexible" is a subjective
 > assessment.
 
-TODO: Imprtove text?
+FIXED
  
 > "The seminal paper by Schärli et al. ..." Two papers by Schärli et
 > al. are listed in the references.  Which of them are you calling
 > "seminal"?  (One of them has no publication information at all, which
 > you should fix.)
 
-Maybe we won't be needing those references anymore?
+CHANGED: we no longer have those references, as we do not discuss traits.
 
 > (more comments on this section below)
 > 
@@ -342,13 +342,6 @@ Maybe we won't be needing those references anymore?
 > assumes a certain setting, without announcing that these techniques
 > are (at minimum) not immediately applicable to other settings.
 
-TODO:
-
-- In the introduction, announce that disjointness is a very tunable notion, 
-and that depending on the setting, we may need to adapt it.
-
-- Add a new section discussing T types.
- 
 > For example, in 2.3 the paper defines disjointness and says:
 > 
 >  "In a system with intersection types this can be ensured by requiring
@@ -385,7 +378,8 @@ and that depending on the setting, we may need to adapt it.
 > of "a system with intersection types" in the sentence quoted above is
 > "**this** system with intersection types".
 
-TODO: Mention something about bottom types?
+FIXED: We now discuss 3 different variants, and announce that disjointness is a very tunable notion, 
+and that depending on the setting, we may need to adapt it.
 
 > After writing the above, I read Section 8 where the paper mentions ⊤
 > and this limitation.  Good, but mentioning it earlier would be better.
@@ -400,7 +394,7 @@ TODO: Mention something about bottom types?
 > some "HashTableDictionary", which usefully inherit from Dictionary,
 > but are always disjoint.
 
-TODO: This would be discussed in the section about T.
+FIXED: We have now treated the T type.
 
 > In refinement type systems, too, the disjointness test is too
 > restrictive: while "even_integer" and "integer" are genuinely not

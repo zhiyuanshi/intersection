@@ -9,6 +9,7 @@ disjoint intersections. We believe that disjoint intersection types are
 intuitive, and at the same time expressive. We have shown the
 applicability of disjoint intersection types to model a simple form of traits.
 
+\begin{comment}
 We implemented the core functionalities of the \name as part of a JVM-based
 compiler. Based on the type system of \name, we have built an ML-like
 source language compiler that offers interoperability with Java (such as object
@@ -17,16 +18,12 @@ general System $F_{\omega}$ and supports a
 number of other features, including records, polymorphism, mutually recursive
 \code{let} bindings, type aliases, algebraic data types, pattern matching, and
 first-class modules that are encoded using \code{letrec} and records.
+\end{comment}
 
 For the future, we intend to improve our source language
 and show the power of disjoint intersection types in large case
 studies. One pressing challenge is to address the intersection between 
 disjoint intersection types and polymorphism.
-We are also interested in extending our work
-to systems with a $\top$ type. This will also require an adjustment
-to the notion of disjoint types. A suitable notion of
-disjointness between two types $A$ and $B$ in the presence of $\top$
-would be to require that the only common supertype of $A$ and $B$ is $\top$.
 Finally we would like to study the
 addition of union types. This will also require changes in our
 notion of disjointness, since with union types there always exists

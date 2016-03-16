@@ -2,61 +2,61 @@
 \label{sec:related-work}
 
 %*******************************************************************************
-\paragraph{Coherence.}
+\paragraph{Merge Operator.}
 %*******************************************************************************
-Reynolds invented Forsythe~\cite{reynolds1997design} in the 1980s. Our merge
-operator is analogous to his operator $p_1, p_2 $. Forsythe has a coherent
-semantics. The result was proved formally by
-Reynolds~\cite{reynolds1991coherence} in a lambda calculus with intersection
-types and a merge operator. However  the way coherence is ensured is not general
-enough. He has four different typing rules for the merge operator, each
-accounting for various possibilities of what the types of the first and second
-components are. In some cases the meaning of the second component takes
-precedence (that is, is biased) over the first component. The set of rules is
-restrictive and it forbids, for instance, the merge of two functions (even when
-they a provably disjoint). Therefore, Forsythe treatment of coherence
-is rather ad-hoc. In contrast, disjointness in \name has a simple, well-defined
-specification and it is quite flexible.
+Reynolds invented Forsythe~\cite{reynolds1997design} in the
+1980s. Forsythe has a merge operator operator $p_1, p_2 $ and a
+coherent semantics. The result was proved formally by
+Reynolds~\cite{reynolds1991coherence} in a lambda calculus with
+intersection types and a merge operator. He has four different typing
+rules for the merge operator, each accounting for various
+possibilities of what the types of the first and second components
+are. With those four rules, a merge can only be constructed when the
+second component of the merge is either a function or a (one-field)
+record. The set of rules is restrictive and it forbids, for instance,
+the merge of two functions. In \name a merge can contain, 
+for example two primitive values (which is disallowed in Forsythe). 
+Moreover, except for the variant presented in Section~\ref{subsec:simpletop}, multiple 
+functions can co-exist in a merge as long as they are provably disjoint.
+The treatment of disjointness of functions is particularly
+challenging, specially in combination with a $\top$ type, and
+supporting multiple functions (as well as other types) in a merge is 
+a significant innovation over Reynolds approach. 
 
+Castagna et al.~\cite{Castagna92calculus} proposed $\lamint$ to study
+the overloading problem for functions. Their calculus does not have a
+$\top$ type, and contains a special merge operator that works only for
+functions. The calculus is coherent. Similarly to us they impose
+well-formedness conditions on the formation of a functional
+merge. However, their well-formedness conditions cannot be ported to a
+system with arbitrary intersections like \name, since those conditions
+assume function types only.  They also show how to encode records, but
+it seems that encoding arbitrary merges and intersections is not
+possible. Therefore their approach cannot be directly applied to a
+system with arbitrary merges.  For the special case of functional
+merges, the conditions that are used in $\lamint$ are incomparable in
+expressive power to those in \name. That is, $\lamint$ accepts some
+functional merges that \name rejects, and \name accepts some
+functional merges that $\lamint$ rejects. For example, the functional
+merge
+\[(\code{Int}\to\code{Char})\inter(\code{Int}\to\code{Bool})\] 
+\noindent is accepted in \name but not in $\lamint$. One reason 
+why \name also rejects some functional intersections which are 
+accepted in $\lamint$ seems to be related to the presence of arbitrary 
+merges. As discussed in Section~\ref{sec:alg-dis}, the combination of
+contravariance and the presence of arbitrary merges means that we can
+always find a common supertype of two functions that have non-disjoint
+co-domains. In $\lamint$ the non-existence of arbitrary merges means
+that it is harder to find common supertypes of functions, allowing for
+a more liberal notion of coherent functional merges.  
 
-$\lamint$
-
-"the solution seems much more powerful than simply forbidding
-non-overlapping intersections"
-
-No it is not! $\lamint$ rejects intersections that are accepted
-in our system:
-
-{Int->Char,Int->Bool}
-
-This example violates the well-formedness conditions of $\lamint$ (see Section
-3.2 of "A Calculus for Overloaded Functions with Subtyping" (1995)). So
-clearly the conditions imposed by $\lamint$ (even for the special case of
-functions) do not subsume disjoint intersections.
-
-"The problem of coherence with intersection types was studied in the 90's
-by Castagna in the language $\lamint$"
-
-No it wasn't! Castagna studied the overloading problem for functions
-and focused only on the “merge” (in our sense) of functions. Our work
-considers a system with **arbitrary** intersections/merges and tries
-to present a coherent subset of that. The well-formedness conditions
-presented in Section 3.2 of the $\lamint$ paper cannot be ported to a
-system with arbitrary intersections, since they assume function types
-only.
-
-Moreover, although $\lamint$ can encode records, **it is unclear how to encode
-arbitrary merges**. One failed attempt to encode arbitrary merges in $\lamint$
-is to consider a record with multiple labels of the same name. For example,
-encoding 1,,’c’ as
-
-{l=1,l=‘c’}
-
-(where label l is of an isolated atomic type L, see Section 4 of the $\lamint$
-paper). However, this is also rejected in $\lamint$, since it violates the well-
-formedness conditions.
-
-Nevertheless $\lamint$ is related work and should be discussed.
+Our work is largely inspired by
+Dunfield~\cite{dunfield2014elaborating}, and throughout the paper we
+have already made extensive comparisons with his work. He
+described a similar approach to ours: compiling a system with intersection types
+and a merge operator into ordinary $ \lambda $-calculus terms with pairs. One
+major difference is that our system does not include unions. As
+acknowledged by Dunfield, his calculus lacks of coherence.
 
 Pierce~\cite{pierce1991programming2} made a comprehensive review
 of coherence, especially on Curien and Ghelli~\cite{curienl1990coherence} and
@@ -65,39 +65,19 @@ for his $F_\wedge$ calculus. He introduced a primitive $\code{glue}$ function as
 a language extension which corresponds to our merge operator. However, in his
 system users can ``glue'' two arbitrary values, which can lead to incoherence.
 
-Our work is largely inspired by Dunfield~\cite{dunfield2014elaborating}. He
-described a similar approach to ours: compiling a system with intersection types
-and a merge operator into ordinary $ \lambda $-calculus terms with pairs. One
-major difference is that our system does not include unions. As
-acknowledged by Dunfield, his calculus lacks of coherence. He discusses the
-issue of coherence throughout his paper, mentioning biased choice as an option
-(albeit a rather unsatisfying one). He also mentioned that the notion of
-disjoint intersection could be a good way to address the problem, but he did not
-pursue this option in his work.
+\begin{comment}
+ the way coherence is ensured is not general
+enough. He has four different typing rules for the merge operator, each
+accounting for various possibilities of what the types of the first and second
+components are. In some cases the meaning of the second component takes
+precedence (that is, is biased) over the first component. The set of rules is
+restrictive and it forbids, for instance, the merge of two functions (even when
+they a provably disjoint). Therefore, Forsythe treatment of coherence
+is rather ad-hoc. In contrast, disjointness in \name has a simple, well-defined
+specification and it is quite flexible.
+\end{comment}
 
-% \url{http://homepages.inf.ed.ac.uk/gdp/publications/Sub_Par.pdf}
-
-% \cite{plotkin1994subtyping}
-
-% Also discussed intersection types!~\cite{malayeri2008integrating}.
-
-% Pierce Ph.D thesis: F<: + /|
-%        technical report: F + /|, closer to ours
-
-% \cite{barbanera1995intersection}
-%
-% \paragraph{Intersection types with polymorphism.}
-% Our type system combines intersection types and parametric polymorphism. Closest
-% to us is Pierce's work~\cite{pierce1991programming1} on a prototype
-% compiler for a language with both intersection types, union types, and
-% parametric polymorphism. Similarly to \name in his system universal
-% quantifiers do not support bounded quantification. However Pierce did not try to prove any
-% meta-theoretical results and his calculus does not have a merge
-% operator.  Pierce also studied a system where both intersection
-% types and bounded polymorphism are present in his Ph.D.
-% dissertation~\cite{pierce1991programming2} and a 1997
-% report~\cite{pierce1997intersection}.
-
+\paragraph{Coherence without Merge.}
 Recently, Castagna~\textit{et al.}~\cite{Castagna:2014} studied an very interesting
 and coherent calculus that has polymorphism and set-theoretic type connectives (such as
 intersections, unions, and negations). Unfortunately their calculus
@@ -110,15 +90,17 @@ of difficulty for achieving coherence.
 
 Going in the direction of higher
 kinds, Compagnoni and Pierce~\cite{compagnoni1996higher} added
-intersection types to System $ F_{\omega} $ and used the new calculus,
+intersection types to System $ F_{\omega} $ and used a new calculus,
 $ F^{\omega}_{\wedge} $, to model multiple inheritance. In their
 system, types include the construct of intersection of types of the
 same kind $ K $. Davies and Pfenning
 \cite{davies2000intersection} studied the interactions between
 intersection types and effects in call-by-value languages. And they
 proposed a ``value restriction'' for intersection types, similar to
-value restriction on parametric polymorphism. None of those calculi
-include a merge operator.
+value restriction on parametric polymorphism.
+We borrowed the notion of ordinary types from Davies and Pfenning's.
+Ordinary types play a fundamental role in ensuring coherence in \name.
+In contrast to \name, none of those calculi include a merge operator.
 
 There have been attempts to provide a foundational calculus
 for Scala that incorporates intersection
@@ -180,18 +162,66 @@ let merge [A, B] (f: ExpAlg A) (g: ExpAlg B) = {
 % supertype of $ A $. Our system does not have this rule.
 Refinement
 intersection~\cite{dunfield2007refined,davies2005practical,freeman1991refinement}
-is the more conservative approach of adopting intersection types. It increases
+is the more conservative approach of adopting intersection types. 
+Refinement intersections usually have a restriction on the formation
+of an intersection type $A \inter B$. In refinement intersections
+$A \inter B$ is a well-formed type if $A$ and $B$ are
+refinements of the same simple (unrefined) type. However this is a
+different restriction from disjointness. Refinement intersection increases
 only the expressiveness of types but not terms. But without a term-level
 construct like ``merge'', it is not possible to encode various language
-features. As an alternative to syntactic subtyping described in this paper,
+features. 
+
+\begin{comment}
+As an alternative to syntactic subtyping described in this paper,
 Frisch~\textit{et al.}~\cite{frisch2008semantic} studied semantic subtyping. Semantic
-subtyping seems to have important advantages over syntactic subtyping. One
+subtyping attempts to increase the expressive power of the 
+
+seems to have important advantages over syntactic subtyping. One
 worthy avenue for future work is to study languages with intersection types
 and merge operator in a semantic subtyping setting.
+\end{comment}
 
+\paragraph{Coherence in other Type-Directed Mechanisms} Other
+type-directed mechanisms such as type classes~\cite{Wadler89ad-hoc} and, more generally, 
+qualified types~\cite{jones94} also require special care to ensure coherence.
+For example, in Haskell, a well-know example of ambiguity~\cite{Mark93coherence} that could
+lead to incoherence is:
 
-\paragraph{Coherence in other Type-directed Mechanisms} type classes and 
-qualified types.
+\begin{verbatim}
+f :: String -> String
+f s = show (read s)
+\end{verbatim}
+
+\noindent Here the functions \verb|read| and \verb|show| have,
+respectively the types \verb|Read a => String -> a| and 
+\verb|Show a => a -> String|. The constraints \verb|Read a| 
+and \verb|Show a| represent requirements that the compiler 
+should implicitly infer. That is the compiler should find a suitable 
+implementation of the read and show functions for the particular type 
+\verb|a|. The problem is that there is not enough type information 
+to determine what the type \verb|a| should be. 
+An arbitrary choice 
+of \verb|a| could lead to different code being infered depending on
+the particular choice of \verb|a|. In this case the behaviour of the program would be dependent on the particular
+choice made by the compiler. As a result Haskell compilers, reject 
+programs like the above. Jones~\cite{Mark93coherence} provided a
+formal treatement of coherence for qualified types and type classes,
+designing suitable restrictions that ensure that incoherent programs 
+are not accepted. In recent versions of Haskell compilers, it is possible to use 
+type annotations to remove type ambiguity:
+
+\begin{verbatim}
+f :: String -> String
+f s = (show :: Int -> String) (read s)
+\end{verbatim}
+
+\noindent Here the type annotation instantiates \verb|a| 
+to \verb|Int|, removing the ambiguity and allowing the program to 
+be accepted. In \name we also use annotations to remove type
+ambiguity. The bidirectional type system ensures that the additional 
+annotations required in terms are sufficient to ensure that no type
+ambiguity can ever happen in \name programs.
 
 \begin{comment}
 %*******************************************************************************
