@@ -1,14 +1,27 @@
 \section{Introduction}
 \label{sec:intro}
 
-Previous work by Dunfield~\cite{dunfield2014elaborating} has shown the
-usefulness of type systems with intersection types and a merge operator. The presence of a merge
+Intersection types date back to Coppo~\textit{et
+  al.}~\cite{coppo1981functional} and Pottinger~\cite{Pottinger80type}
+work. Early work was motivated by the applications of
+intersection types to characterize exactly all strongly normalizing
+lambda terms.
+Since then various researchers~\cite{Freeman91refinement,pierce1991programming1,Castagna92calculus,pierce1997intersection,davies2000intersection,Dunfield03Intersections} have started looking at the application
+of intersection types for designing new and more powerful type systems 
+for programming languages. Since Reynolds work on the Forsythe~\cite{reynolds1997design}
+programming language, various other languages, including
+CDuce~\cite{Benzaken03cduce}, Scala~\cite{scala-overview} and 
+Stardust~\cite{Dunfield07:Stardust} have incoorporated some notion 
+of intersection types.
+
+Recently Dunfield~\cite{dunfield2014elaborating} showed the
+usefulness of type systems with intersection types and a \emph{merge operator}. The presence of a merge
 operator in a core calculus provides significant expressiveness, allowing
 encodings for many other language constructs as syntactic sugar. For example
-single-field records are easily encoded as types with a label, and multi-field
+single-field records are encoded as types with a label, and multi-field
 records are encoded as the concatenation of single-field records. Concatenation
 of records is expressed using intersection types at the type-level and the
-corresponding merge operator at the term level. Dunfield formalized a simply
+merge operator at the term level. Dunfield formalized a simply
 typed lambda calculus with intersection types and a merge operator. He showed
 how to give a semantics to the calculus by a type-directed translation to a
 simply typed lambda calculus extended with pairs. The type-directed translation
@@ -64,15 +77,24 @@ goal is to precisely capture the essence of solutions to
 extensibility.
 \end{comment}
 
-This paper presents \name: a core calculus with a variant of \emph{intersection
-types} and a \emph{merge operator}. The semantics of \name is both type-safe and
-coherent. Coherence is achieved by ensuring that intersection types are
-\emph{disjoint}.  We propose a definition of disjointness where two
-types $A$ and $B$ are disjoint when only certain set of types are common
+This paper presents \name: a type-safe and coherent core calculus with
+\emph{intersection types} and a \emph{merge operator}. Coherence is
+achieved by ensuring that intersection types are \emph{disjoint} and
+by ensuring that programs are sufficiently annotated to avoid type
+ambiguity.  We propose a definition of disjointness where two types
+$A$ and $B$ are disjoint when only certain set of types are common
 supertypes of $A$ and $B$. We investigate three different variants of
 \name, with three variants of disjointness. The difference between
 each variant of disjointness is on what exactly is the set of allowed
-common supertypes. 
+common supertypes. To avoid type ambiguity, which arizes from the
+undecidability of type assignement of intersection
+types~\cite{vanBakel92}, we use a variant of the calculus that allows type
+annotations. Without additional type annotations the same term can have
+multiple types, and consequently different semantics depending on the
+type. The additional annotations enable a type system based on 
+bi-directional type-checking techniques~\cite{Pierce00local,Dunfield04tri}, that ensures that 
+every term has a unique type, eliminating an additional source of ambiguity in
+the semantics.
 
 In the simplest variant of \name, which does not allow $\top$ types,
 two types $A$ and $B$ are disjoint ($A * B$)\footnote{The notation $A
@@ -87,7 +109,6 @@ itself directly to an algorithmic implementation.  Therefore, we also
 present an algorithmic specification to determine whether two types
 are disjoint. Moreover, this specification is shown to be sound and
 complete with respect to the formal definition of disjointness.
-\bruno{Need to mention bi-directional type system and uniqueness of types.}
 
 The other two variants of \name introduce $\top$ types and refine the
 notion of disjointness. The main problem of adding $\top$ types into
@@ -140,8 +161,8 @@ definition) is presented for three different variants of disjointness.
 %proposal for free.
 
 \item \textbf{Formalization of \name and Proof of Coherence:} An
-   elaboration semantics of \name into a simply typed $\lambda$-calculus is
-   given. Type-soundness and coherence are proved and formalized. All
+   elaboration semantics of all three variants of \name into a simply typed $\lambda$-calculus is
+   given. Type-safety and coherence are proved and formalized. All
    definitions and metatheory are mechanically formalized using the Coq theorem prover.
 
 \item \textbf{Implementation:} An implementation of \name, as
