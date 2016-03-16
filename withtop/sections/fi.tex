@@ -1,17 +1,17 @@
 \section{The \name Calculus and its Type System}
 \label{sec:fi}
 
-This section presents the syntax, subtyping and type assignement of \name: 
+This section presents the syntax, subtyping and type assignment of \name: 
 a calculus with intersection types and a merge
 operator.  This calculus is inspired by Dunfield's
-calculus~\cite{dunfield2014elaborating},  but \name does
-not consider union types. Moreover, due to the fact that we are
-interested only in disjoint intersections, \name also has different
+calculus~\cite{dunfield2014elaborating}, without 
+considering union types. Moreover, since we are only
+interested in disjoint intersections, \name also has different
 typing rules for intersections from those in Dunfield's calculus. Sections~\ref{sec:disjoint}
 and \ref{sec:alg-dis} will present the more fundamental contributions
-of this paper by showing other necessary changes for supporting
+of this paper by showing other required changes for supporting
 disjoint intersection types and ensuring coherence. The calculus in
-this section does not include the $\top$ type, which brings some
+this section does not include the $\top$ type, since it brings 
 additional complications.  Section~\ref{sec:top} presents two variants of
 \name with a $\top$ type, while preserving coherence.
 
@@ -245,7 +245,7 @@ Dunfield's calculus has different typing rules for intersections.
 %One reason for having different rules in \name is that 
 However, his rules
 make less sense in a system with disjoint intersections. For example, 
-Dunfield's calculus includes the following typing rule, for
+they include the following typing rule, for
 introducing intersection types:
 
 \begin{mathpar}
