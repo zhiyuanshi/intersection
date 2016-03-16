@@ -1294,25 +1294,8 @@ Defined.
 Definition tlam : forall L Gamma t A B, (forall x, not (In x L) -> 
                                  has_type (extend x A Gamma) (open_source t (PFVar x)) B) ->
                                has_type Gamma (PLam t) (Fun A B).
-  intros. 
-  unfold has_type.
-  unfold has_type in H.
-  pick_fresh y. 
-  assert (HNot : not (In y L)) by not_in_L y.
-  pose (H y HNot).
-  destruct e. exists (PAnn (PLam x) (Fun A B)).
-  eapply TyLam with (L := union (union L (dom Gamma)) (fv_source t0)). intros.
-  assert (forall {y z}, not (In y L) -> not (In z L ) -> has_type_source (extend y A Gamma) (open_source t0 (PFVar y)) B x = has_type_source (extend z A Gamma) (open_source t0 (PFVar z)) B x).
-  (* so, if y0 and z are both fresh *)
-  admit.
-  assert (HNotZ : not (In x0 L)) by not_in_L x0.
-  pose (H2 _ _ HNotZ HNot). rewrite <- e in H0. clear e. clear H2.
-  assert (open_rec_source 0 (PFVar x0) x = x). (* should be true if x0 not in the fv(x) *)
-  admit.
-  unfold open_source at 2.
-  rewrite H2.
-  assumption.
-  admit.
+  (* To understand why this is admitted, please refer to the same definition on
+     CoherenceBasicBD.v *)
 Admitted.
 
 Definition tapp : forall Gamma A B t1 t2,
@@ -1678,165 +1661,23 @@ Proof.
   inversion HInv; auto.
 Defined.
 
-
-Definition body_typ t A B Gamma E :=
-  exists L, forall x, not (In x L) -> has_type_source_alg (extend x A Gamma) (open_source t (PFVar x)) Chk B (open E (STFVar _ x)).
-
-(** We then show how to introduce and eliminate [body t]. *)
-Lemma term_abs_to_body_typ : forall t1 A B Gamma E, 
-  has_type_source_alg Gamma (PLam t1) Chk (Fun A B) (STLam' _ E) -> body_typ t1 A B Gamma E.
-Proof. intros. unfold body_typ. inversion H. subst. exists L. unfold open_rec. apply H5. Qed.
-
-Lemma body_typ_to_term_abs : forall t1 A B Gamma E, 
-  body_typ t1 A B Gamma E -> has_type_source_alg Gamma (PLam t1) Chk (Fun A B) (STLam' _ E).
-Proof. intros. inversion H. apply_fresh ATyLam as x.
-       assert (not (In y x)) by (not_in_L y). now apply H0 in H1. admit. Admitted.
-
-Definition alpha :forall t0 x y A Gamma B E,
-  not (In x (union (dom Gamma) (fv_source t0))) ->
-  not (In y (union (dom Gamma) (fv_source t0))) ->               
-  has_type_source_alg (extend y A Gamma) (open_source t0 (PFVar y)) Chk B (open E (STFVar _ y)) ->
-  has_type_source_alg (extend x A Gamma) (open_source t0 (PFVar x)) Chk B (open E (STFVar _ x)).        
-Proof.
-  (*
-  induction t0; intros; subst.
-  - unfold open_source in *.
-    simpl in H1; simpl.
-    rewrite <- app_nil_l with (l := (extend y A Gamma)) in H1.
-    unfold extend in H1.
-    rewrite union_spec in H0; apply not_or_and in H0; inversion H0.
-    apply (typing_strengthen_alg _ _ _ _ _ _ _ _ H3) in H1.
-    rewrite <- app_nil_l with (l := extend x A Gamma).
-    unfold extend.
-    apply typing_weaken_alg.
-    assumption.
-    rewrite app_nil_l.
-    apply Ok_push.
-    rewrite app_nil_l in H1.
-    now apply typing_alg_ok_env in H1.
-    rewrite union_spec in H; apply not_or_and in H; inversion H.
-    assumption.
-  - admit.
-  - unfold open_source in *; simpl in *.
-    inversion H1; subst.
-    admit.
-  - inversion H1; subst.
-    unfold open_source in *; simpl in *.
-    apply_fresh ATyLam as x.
-    inversion H1; subst.
-   *)
-Admitted.
-
-  
 (* Ignoring the generated expressions + smart constructors *)
 
 Definition has_ty Gamma e d t := exists E, has_type_source_alg Gamma e d t E.
 
-
-Definition body_ty t A B Gamma :=
-  exists L, forall x, not (In x L) -> has_ty (extend x A Gamma) (open_source t (PFVar x)) Chk B.
-
-Lemma term_abs_to_body_ty : forall t1 A B Gamma, 
-  has_ty Gamma (PLam t1) Chk (Fun A B) -> body_ty t1 A B Gamma.
-Proof. intros. unfold body_ty. inversion H. inversion H0. subst. exists L.
-       refine (fun x NHL => ex_intro _ (open E (STFVar _ x)) (H5 x NHL)).
-       subst. inversion H1.
-Qed.
-
-Lemma foo : forall L Gamma A B t1,
-  (forall x : elt,
-       ~ In x L ->
-       exists E : SExp var,
-         has_type_source_alg (extend x A Gamma) (open_source t1 (PFVar x))
-                             Chk B E) ->
-  (forall x : elt,
-       ~ In x L ->
-       exists E : SExp var,
-         has_type_source_alg (extend x A Gamma) (open_source t1 (PFVar x))
-           Chk B (open E (STFVar _ x))).
-Admitted.
-  
-Lemma body_ty_to_term_abs : forall t1 A B Gamma, 
-  body_ty t1 A B Gamma -> has_ty Gamma (PLam t1) Chk (Fun A B).
-Proof. intros. unfold body_ty in H. unfold has_ty in *. inversion H as [L H1].
-       eexists (STLam' _ _). Check ATyLam.
-       unfold has_ty in H1. Check foo.
-       eapply (foo L Gamma A B t1) in H1. Check ATyLam.
-       eapply (ATyLam _ _ _ _ _ _ _ _).
-       pick_fresh x.
-       not_in_L x.
-       (* apply H3. *)
-       
-Admitted.
-
-Lemma free_var : forall t Gamma A B E x y,
-  not (In y (union (dom Gamma) (union (fv_source t) (fv E)))) ->
-  has_type_source_alg (extend x A Gamma) (open_source t (PFVar x)) Chk B (E ^ x) ->
-  has_type_source_alg (extend y A Gamma) (open_source t (PFVar y)) Chk B (E ^ y).
-Proof.
-  intros t Gamma A B E x y HNot H.
-  remember (extend x A Gamma).
-  induction H.
-  - unfold open_source in *.
-    unfold open in *.
-    simpl in *; subst.
-Admitted.
-  
-Lemma tylam : forall {Gamma t A B} L,
-  (exists E, forall x, not (In x L) -> has_type_source_alg (extend x A Gamma) (open_source t (PFVar x)) Chk B (open E (STFVar _ x))) ->
-  WFTyp A ->
-  has_ty Gamma (PLam t) Chk (Fun A B).
-Proof.
-  intros.
-  unfold has_ty in *.
-  inversion H.
-  exists (STLam' _ x).
-  eapply (ATyLam _ _ _ _ _ _ H1 H0).
-Defined.
-
-Lemma tylam'' : forall {Gamma t A B} L,
-  (forall x, not (In x L) -> 
-        sig (fun E => has_type_source_alg (extend x A Gamma) (open_source t (PFVar x)) Chk B (open E (STFVar _ x)))) ->
-  sig (fun E => has_type_source_alg Gamma (PLam t) Chk (Fun A B) E).
-Proof.
-  intros.
-  pick_fresh x.
-  assert (not (In x L)) by (not_in_L x).
-
-  
-  refine (let f :=
-              fun x xNotInL => match (X x xNotInL) with
-                                | exist _ E PE => exist _ (STLam' _ E) ((fun EE => ATyLam _ _ _ A B EE _ _) E)
-                              end
-           in f x H).  
-  Check ATyLam.
-  admit.
-
-  (*
-  refine (let f : forall x, ~ In x L -> SExp var :=
-              fun x xNotInL => match (X x xNotInL) with
-                                | exist _ E PE => E
-                              end
-           in exist _ (f x H) ((fun E => ATyLam _ _ _ _ _ (STLam' var E) _ _) (f x H))). *)  
-Admitted.
-  
-Lemma tylam' : forall {Gamma t A B} L,
+Definition tylam : forall {Gamma t A B} L,
   (forall x, not (In x L) -> 
         has_ty (extend x A Gamma) (open_source t (PFVar x)) Chk B) ->
   has_ty Gamma (PLam t) Chk (Fun A B).
 Proof.
   intros.
   unfold has_ty in *.  
-  apply body_ty_to_term_abs.
   pick_fresh y.
   assert (Ha : not (In y L)) by (not_in_L y).
   apply H in Ha.
-  inversion Ha. 
-  unfold body_ty.
-  unfold has_ty.
-  exists L.
-  apply H.
-Defined.
+  inversion Ha.
+  (* we will have the same problem present in the definition of "tlam" *)
+Admitted.
 
 Definition tyvar : forall Gamma x ty, ok Gamma -> List.In (x,ty) Gamma -> WFTyp ty ->
                                       has_ty Gamma (PFVar x) Inf ty.
@@ -2465,7 +2306,7 @@ apply tyvar; auto.
 apply tylit; auto.
 (* Case TyLam *)
 apply tyann.
-apply (tylam' (union (union (union L (dom Gamma)) (fv_source t0)) (fv_source t1))).
+apply (tylam (union (union (union L (dom Gamma)) (fv_source t0)) (fv_source t1))).
 intros.
 assert (d: not (In x L)) by (not_in_L x).
 pose (H0 x d). destruct a. (*destruct H2. destruct x0.*)
@@ -2547,65 +2388,6 @@ apply (tsub _ _ A). auto. unfold Sub. exists C. auto. auto.
 apply ttop.
 auto.
 Defined.
-
-(* erasure typing *)
-
-Lemma erasure_typing :
-  forall {e Gamma t}, has_type_source Gamma (erase e) t e -> has_ty Gamma e Inf t.
-induction e; intros.
-(* case var *)  
-apply tyvar;
-inversion H; auto.
-(* case bvar *)
-simpl in H.
-inversion H.
-(* case lit *)
-inversion H.
-apply tylit.
-assumption.
-(* case lam *)
-inversion H.
-(* Case App *)
-inversion H.
-apply IHe1 in H5.
-apply IHe2 in H7.
-apply (tyapp _ A). auto.
-apply (tysub _ _ A). auto. apply reflex.
-subst.
-inversion H7.
-now apply typing_wf_source_alg in H0.
-(* Case Merge *)
-inversion H.
-apply IHe1 in H6.
-apply IHe2 in H7.
-apply (tymerge); auto.
-(* Case Ann *)
-inversion H. subst.
-apply tyann. 
-pick_fresh x.
-assert (H1 : not (In x L)). not_in_L x.
-pose (H5 x H1) as e.
-
-
-subst.
-admit.
-(*
-destruct e. inversion H3. simpl in H0. injection H0. intros. injection H0. intros.
-rewrite H7 in h. rewrite H9 in h. simpl in IHe.
-(* need some kind of substitution lemmas here to apply IHe ? *)
-assert (has_type_source (extend x A Gamma) (open_source (erase e) (PFVar x)) B
-                        (open_source e (PFVar x)) = has_type_source Gamma (PLam (erase e)) B (PLam e)).
-admit.
-rewrite H10 in h. apply IHe in h.
-assert (has_ty Gamma (PLam e) Inf B = has_ty (extend x A Gamma) (open_source e (PFVar x)) Inf B).
-admit.
-rewrite H11 in h. 
-apply (tysub _ _ B). auto. apply reflex. *)
-apply tyann.
-simpl in *.
-apply IHe in H2.
-apply (tysub _ _ A); auto.
-Admitted.
 
 End CoherenceTop.
 

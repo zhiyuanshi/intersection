@@ -1614,117 +1614,6 @@ Proof.
   - simpl; unfold not; intros HInv; apply IHhas_type_source; auto.
 Qed.
 
-  
-Lemma tsubst'' :
-  forall E F t1 x y A B,
-    not (In y (dom (E ++ F))) ->
-    has_type (E ++ (extend x A F)) (open_source t1 (PFVar x)) B ->
-    has_type (E ++ (extend y A F)) (subst_source x (PFVar y) (open_source t1 (PFVar x))) B.
-Proof.
-  unfold has_type.
-  intros.  
-  remember (E ++ extend x A F) as G.
-  generalize dependent HeqG.
-  generalize dependent E.
-  generalize dependent F.
-  inversion H0.
-  induction H; intros; simpl in *; subst; eauto.
-  - case_eq (x0 =? x); intro HEq.
-    exists (PFVar y).
-    apply TyVar.
-    rewrite <- app_nil_l; apply ok_middle_comm; rewrite app_nil_l.
-    apply Ok_push.
-    rewrite <- app_nil_l in H.
-    unfold extend in H; apply ok_middle_comm in H; rewrite app_nil_l in H.
-    inversion H; auto.
-    auto.
-    assert (Ha : ty = A).
-    apply eqb_eq in HEq.
-    unfold extend in H; rewrite <- app_nil_l in H; apply ok_middle_comm in H; rewrite app_nil_l in H.
-    inversion H; subst.
-    apply in_app_or in H1.
-    inversion H1.
-    exfalso; apply H8; rewrite dom_union; rewrite union_spec; left.
-    apply list_impl_m in H4; now rewrite HEq in H4.
-    unfold extend in H4; apply in_app_or in H4. 
-    inversion H4.
-    inversion H5; now inversion H7.
-    exfalso; apply H8; rewrite dom_union; rewrite union_spec; right.
-    apply list_impl_m in H5; now rewrite HEq in H5.
-    rewrite Ha.
-    apply in_or_app.
-    right; apply in_or_app; left.
-    left; reflexivity.
-    auto.
-    exists (PFVar x0).
-    apply typing_weaken_source.
-    apply TyVar.
-    rewrite <- app_nil_l in H.
-    unfold extend in H; apply ok_middle_comm in H; rewrite app_nil_l in H.
-    inversion H; auto.
-    apply in_app_or in H1.
-    inversion H1.
-    apply in_or_app; auto.
-    unfold extend in H4.
-    apply in_app_or in H4.
-    inversion H4.
-    inversion H5.
-    inversion H6; subst.
-    apply EqFacts.eqb_neq in HEq.
-    exfalso; apply HEq; reflexivity.
-    inversion H6.
-    apply in_or_app; auto.
-    auto.
-    rewrite <- app_nil_l; apply ok_middle_comm; rewrite app_nil_l.
-    apply Ok_push.
-    unfold extend in H; now apply ok_remove in H.
-    auto.
-  - exists (PLit x0).
-    apply TyLit.
-    rewrite <- app_nil_l; apply ok_middle_comm; rewrite app_nil_l.
-    apply Ok_push.
-    unfold extend in H.
-    rewrite <- app_nil_l in H; apply ok_middle_comm in H; rewrite app_nil_l in H.
-    inversion H; auto.
-    auto.
-  - eexists.
-    apply_fresh TyLam as z. 
-    rewrite subst_source_open_var.
-    unfold open_source at 2.
-    rewrite <- open_rec_source_term.
-    unfold extend in *.
-    rewrite app_assoc.
-    assert (Ha : (not (In z L))) by not_in_L z.
-    eapply (H1 z) in Ha.
-    inversion Ha.
-    Admitted.
-(*
-apply H4.
-    not_in_L z.
-    unfold not; intros.
-    simpl.
-    rewrite dom_union in H3; apply MSetProperties.Dec.F.union_1 in H3.
-    inversion H3.
-    rewrite dom_union in H4; apply MSetProperties.Dec.F.union_1 in H4.
-    inversion H4.
-    simpl in H5.
-    apply MSetProperties.Dec.F.add_iff in H5.
-    inversion H5.
-    apply Frz.
-    not_in_L z.
-    inversion H6.
-    apply H2; not_in_L y.
-    apply H2; not_in_L y.
-    rewrite app_assoc; reflexivity.
-    not_in_L z.
-    not_in_L x.
-    apply PTerm_Var.
-    not_in_L z.
-    not_in_L x.
-    apply PTerm_Var.
-    auto.
-Qed.*)
-
 Lemma typing_open_rec_source :
   forall y A Gamma t B E n,
     has_type_source (extend y A Gamma) (open_rec_source n (PFVar y) t) B E ->
@@ -1768,23 +1657,6 @@ Proof.
   now apply type_correct_source_terms' in H.   
 Qed.
 
-
-Lemma test :
-  forall z A B Gamma y t0 x0,
-    has_type_source (extend z A Gamma)
-                    (subst_source y (PFVar z) (open_source t0 (PFVar y))) B
-                    (subst_source y (PFVar z) (open_source x0 (PFVar y))) ->
-    not (In y (dom Gamma)) ->
-    not (z = y) ->
-    has_type_source (extend z A Gamma)
-                    (open_source t0 (PFVar z)) B (open_source x0 (PFVar z)).
-Proof.
-  intros.
-  remember (extend z A Gamma).
-  dependent induction H; subst.
-  simpl in *.
-  Focus 5.
-Admitted.
   
 Definition tlam : forall L Gamma t A B, (forall x, not (In x L) -> 
                                      has_type (extend x A Gamma) (open_source t (PFVar x)) B) ->
@@ -1811,67 +1683,19 @@ Definition tlam : forall L Gamma t A B, (forall x, not (In x L) ->
   exists (PAnn (PLam x0) (Fun A B)).  
   apply_fresh TyLam as z. 
   rewrite <- app_nil_l with (l := extend y A Gamma) in Ha.
-
-(*
-  rewrite <- app_nil_l with (l := extend z A Gamma).
-  eapply tsubst' with (y := y).
-  simpl. not_in_L y.
-  rewrite subst_fresh_var.
-  rewrite subst_fresh_var.
-  apply Ha.
-  not_in_L y0.
-  not_in_L y0.
-  apply H0.
-  *)
-
   apply tsubst with (y := z) in Ha.
   rewrite app_nil_l in Ha.
   rewrite subst_fresh_var in Ha.
   rewrite subst_fresh_var in Ha.
-  apply Ha.
-  apply not_env_impl_not_fv_source_E with (x := y) in Ha.
-  
+  apply Ha. (* apply not_env_impl_not_fv_source_E with (x := y) in Ha. *)
+  (* this admit is related to the problem described above (in this same proof) *)
   admit.
-  simpl; admit.
+  simpl.
   not_in_L y.
   not_in_L y.
   not_in_L z.
+  not_in_L z.
   auto.
-  
-  (*
-  assert (E : PExp) by admit.
-  assert (x = (open_source E (PFVar y))) by admit.
-  assert (Ha : not (In y (fv_source E))) by admit.
-  subst.
-  exists (PAnn (PLam E) (Fun A B)).  
-  apply_fresh TyLam as x0.
-  
-  rewrite <- app_nil_l with (l := extend y A Gamma) in H1.
-  eapply tsubst with (y := x0) in H1.
-  rewrite app_nil_l in H1.
-  rewrite subst_fresh_var in H1.
-  rewrite subst_fresh_var in H1.
-  apply H1.
-  not_in_L x0.
-  apply Ha.
-  not_in_L x0.
-  not_in_L y.
-  not_in_L x0.
-  auto.
-*)
-  
-(*  
-  assert (forall {y z}, not (In y L) -> not (In z L ) -> has_type_source (extend y A Gamma) (open_source t0 (PFVar y)) B x = has_type_source (extend z A Gamma) (open_source t0 (PFVar z)) B x).
-  (* so, if y0 and z are both fresh *)
-  admit.
-  assert (HNotZ : not (In x0 L)) by not_in_L x0.
-  pose (H2 _ _ HNotZ HNot). rewrite <- e in H0. clear e. clear H2.
-  assert (open_rec_source 0 (PFVar x0) x = x). (* should be true if x0 not in the fv(x) *)
-  admit.
-  unfold open_source at 2.
-  rewrite H2.
-  assumption.
-  admit. *)
 Admitted.
 
 Definition tapp : forall Gamma A B t1 t2,
@@ -2335,110 +2159,19 @@ Admitted.
 
 Definition has_ty Gamma e d t := exists E, has_type_source_alg Gamma e d t E.
 
-
-Definition body_ty t A B Gamma :=
-  exists L, forall x, not (In x L) -> has_ty (extend x A Gamma) (open_source t (PFVar x)) Chk B.
-
-Lemma term_abs_to_body_ty : forall t1 A B Gamma, 
-  has_ty Gamma (PLam t1) Chk (Fun A B) -> body_ty t1 A B Gamma.
-Proof. intros. unfold body_ty. inversion H. inversion H0. subst. exists L.
-       refine (fun x NHL => ex_intro _ (open E (STFVar _ x)) (H5 x NHL)).
-       subst. inversion H1.
-Qed.
-
-Lemma foo' : forall L Gamma A B t1,
-  (forall x : elt,
-       ~ In x L ->
-       exists E : SExp var,
-         has_type_source_alg (extend x A Gamma) (open_source t1 (PFVar x))
-                             Chk B E) ->
-  (forall x : elt,
-       ~ In x L ->
-       exists E : SExp var,
-         has_type_source_alg (extend x A Gamma) (open_source t1 (PFVar x))
-           Chk B (open E (STFVar _ x))).
-Admitted.
-  
-Lemma body_ty_to_term_abs : forall t1 A B Gamma, 
-  body_ty t1 A B Gamma -> has_ty Gamma (PLam t1) Chk (Fun A B).
-Proof. intros. unfold body_ty in H. unfold has_ty in *. inversion H as [L H1].
-       eexists (STLam' _ _).
-       unfold has_ty in H1.
-       eapply (foo' L Gamma A B t1) in H1.
-       eapply (ATyLam _ _ _ _ _ _ _ _).
-       pick_fresh x.
-       not_in_L x.
-       (* apply H3. *)
-       
-Admitted.
-
-Lemma free_var : forall t Gamma A B E x y,
-  not (In y (union (dom Gamma) (union (fv_source t) (fv E)))) ->
-  has_type_source_alg (extend x A Gamma) (open_source t (PFVar x)) Chk B (E ^ x) ->
-  has_type_source_alg (extend y A Gamma) (open_source t (PFVar y)) Chk B (E ^ y).
-Proof.
-  intros t Gamma A B E x y HNot H.
-  remember (extend x A Gamma).
-  induction H.
-  - unfold open_source in *.
-    unfold open in *.
-    simpl in *; subst.
-Admitted.
-  
-Lemma tylam : forall {Gamma t A B} L,
-  (exists E, forall x, not (In x L) -> has_type_source_alg (extend x A Gamma) (open_source t (PFVar x)) Chk B (open E (STFVar _ x))) ->
-  WFTyp A ->
-  has_ty Gamma (PLam t) Chk (Fun A B).
-Proof.
-  intros.
-  unfold has_ty in *.
-  inversion H.
-  exists (STLam' _ x).
-  eapply (ATyLam _ _ _ _ _ _ H1 H0).
-Defined.
-
-Lemma tylam'' : forall {Gamma t A B} L,
-  (forall x, not (In x L) -> 
-        sig (fun E => has_type_source_alg (extend x A Gamma) (open_source t (PFVar x)) Chk B (open E (STFVar _ x)))) ->
-  sig (fun E => has_type_source_alg Gamma (PLam t) Chk (Fun A B) E).
-Proof.
-  intros.
-  pick_fresh x.
-  assert (not (In x L)) by (not_in_L x).
-
-  
-  refine (let f :=
-              fun x xNotInL => match (X x xNotInL) with
-                                | exist _ E PE => exist _ (STLam' _ E) ((fun EE => ATyLam _ _ _ A B EE _ _) E)
-                              end
-           in f x H).  
-  admit.
-
-  (*
-  refine (let f : forall x, ~ In x L -> SExp var :=
-              fun x xNotInL => match (X x xNotInL) with
-                                | exist _ E PE => E
-                              end
-           in exist _ (f x H) ((fun E => ATyLam _ _ _ _ _ (STLam' var E) _ _) (f x H))). *)  
-Admitted.
-  
-Lemma tylam' : forall {Gamma t A B} L,
+Definition tylam : forall {Gamma t A B} L,
   (forall x, not (In x L) -> 
         has_ty (extend x A Gamma) (open_source t (PFVar x)) Chk B) ->
   has_ty Gamma (PLam t) Chk (Fun A B).
 Proof.
   intros.
   unfold has_ty in *.  
-  apply body_ty_to_term_abs.
   pick_fresh y.
   assert (Ha : not (In y L)) by (not_in_L y).
   apply H in Ha.
-  inversion Ha. 
-  unfold body_ty.
-  unfold has_ty.
-  exists L.
-  apply H.
-Defined.
+  inversion Ha.
+  (* we will have the same problem present in the definition of "tlam" *)
+Admitted.
 
 Definition tyvar : forall Gamma x ty, ok Gamma -> List.In (x,ty) Gamma -> WFTyp ty ->
                                       has_ty Gamma (PFVar x) Inf ty.
@@ -3102,7 +2835,7 @@ apply tyvar; auto.
 apply tylit; auto.
 (* Case TyLam *)
 apply tyann.
-apply (tylam' (union (union (union L (dom Gamma)) (fv_source t0)) (fv_source t1))).
+apply (tylam (union (union (union L (dom Gamma)) (fv_source t0)) (fv_source t1))).
 intros.
 assert (d: not (In x L)) by (not_in_L x).
 pose (H0 x d). destruct a. (*destruct H2. destruct x0.*)
@@ -3209,77 +2942,5 @@ auto.
 (* Sub *)
 apply (tsub _ _ A). auto. unfold Sub. exists C. auto. auto.
 Qed.
-
-(* erasure typing *)
-
-Lemma erasure_typing :
-  forall {e Gamma t}, has_type_source Gamma (erase e) t e -> has_ty Gamma e Inf t.
-induction e; intros.
-(* case var *)  
-apply tyvar;
-inversion H; auto.
-(* case bvar *)
-simpl in H.
-inversion H.
-(* case lit *)
-inversion H.
-apply tylit.
-assumption.
-(* case lam *)
-inversion H.
-(* Case App *)
-inversion H.
-apply IHe1 in H5.
-apply IHe2 in H7.
-apply (tyapp _ A). auto.
-apply (tysub _ _ A). auto. apply reflex.
-subst.
-inversion H7.
-now apply typing_wf_source_alg in H0.
-(* Case Merge *)
-inversion H.
-apply IHe1 in H6.
-apply IHe2 in H7.
-apply (tymerge); auto.
-(* Case Pair *)
-inversion H.
-apply IHe1 in H5.
-apply IHe2 in H7.
-apply (typair); auto.
-(* Case Proj1 *)
-inversion H.
-apply typroj1 with (B := B).
-now apply IHe.
-(* Case Proj2 *)
-inversion H.
-apply typroj2 with (A := A).
-now apply IHe.
-(* Case Ann *)
-inversion H. subst.
-apply tyann. 
-pick_fresh x.
-assert (H1 : not (In x L)). not_in_L x.
-pose (H5 x H1) as e.
-
-
-subst.
-admit.
-(*
-destruct e. inversion H3. simpl in H0. injection H0. intros. injection H0. intros.
-rewrite H7 in h. rewrite H9 in h. simpl in IHe.
-(* need some kind of substitution lemmas here to apply IHe ? *)
-assert (has_type_source (extend x A Gamma) (open_source (erase e) (PFVar x)) B
-                        (open_source e (PFVar x)) = has_type_source Gamma (PLam (erase e)) B (PLam e)).
-admit.
-rewrite H10 in h. apply IHe in h.
-assert (has_ty Gamma (PLam e) Inf B = has_ty (extend x A Gamma) (open_source e (PFVar x)) Inf B).
-admit.
-rewrite H11 in h. 
-apply (tysub _ _ B). auto. apply reflex. *)
-apply tyann.
-simpl in *.
-apply IHe in H2.
-apply (tysub _ _ A); auto.
-Admitted.
 
 End CoherenceBasicBDPairs.
