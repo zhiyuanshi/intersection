@@ -27,13 +27,12 @@ Castagna et al.~\cite{Castagna92calculus} proposed $\lamint$ to study
 the overloading problem for functions. Their calculus does not have a
 $\top$ type, and contains a special merge operator that works only for
 functions. The calculus is coherent. Similarly to us they impose
-well-formedness conditions on the formation of a functional
+well-formedness conditions on the formation of a (functional)
 merge. However, their well-formedness conditions cannot be ported to a
 system with arbitrary intersections like \name, since those conditions
 assume function types only.  They also show how to encode records, but
 it seems that encoding arbitrary merges and intersections is not
-possible. Therefore their approach cannot be directly applied to a
-system with arbitrary merges.  For the special case of functional
+possible.  For the special case of functional
 merges, the conditions that are used in $\lamint$ are incomparable in
 expressive power to those in \name. That is, $\lamint$ accepts some
 functional merges that \name rejects, and \name accepts some
@@ -41,8 +40,8 @@ functional merges that $\lamint$ rejects. For example, the functional
 merge
 \[(\code{Int}\to\code{Char})\inter(\code{Int}\to\code{Bool})\] 
 \noindent is accepted in \name but not in $\lamint$. One reason 
-why \name also rejects some functional intersections which are 
-accepted in $\lamint$ seems to be related to the presence of arbitrary 
+why \name also rejects some functional intersections, which are 
+accepted in $\lamint$, seems to be related to the presence of arbitrary 
 merges. As discussed in Section~\ref{sec:alg-dis}, the combination of
 contravariance and the presence of arbitrary merges means that we can
 always find a common supertype of two functions that have non-disjoint
@@ -78,7 +77,7 @@ specification and it is quite flexible.
 \end{comment}
 
 \paragraph{Coherence without Merge.}
-Recently, Castagna~\textit{et al.}~\cite{Castagna:2014} studied an very interesting
+Recently, Castagna~\textit{et al.}~\cite{Castagna:2014} studied a very interesting
 and coherent calculus that has polymorphism and set-theoretic type connectives (such as
 intersections, unions, and negations). Unfortunately their calculus
 does not include a merge operator like ours, which is our major source
@@ -115,7 +114,7 @@ calculus with intersection types and parametric polymorphism is not
 yet proven. Recently, some form of intersection
 types has been adopted in object-oriented languages such as Scala,
 Ceylon, and Grace. Generally speaking,
-the most significant difference to \name is that in all previous systems
+the most significant difference to \name is that in all those languages
 there is no explicit introduction construct like our merge operator.
 
 \begin{comment}
