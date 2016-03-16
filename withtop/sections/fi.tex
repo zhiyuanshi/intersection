@@ -1,12 +1,11 @@
 \section{The \name Calculus and its Type System}
 \label{sec:fi}
 
-This section presents the syntax, subtyping and typing of \name: 
+This section presents the syntax, subtyping and type assignement of \name: 
 a calculus with intersection types and a merge
 operator.  This calculus is inspired by Dunfield's
-calculus~\cite{dunfield2014elaborating}.  However our calculus does
-not consider union types\bruno{Consider a discussion about union types
-later in the paper?}. Moreover, due to the fact that we are
+calculus~\cite{dunfield2014elaborating},  but \name does
+not consider union types. Moreover, due to the fact that we are
 interested only in disjoint intersections, \name also has different
 typing rules for intersections from those in Dunfield's calculus. Sections~\ref{sec:disjoint}
 and \ref{sec:alg-dis} will present the more fundamental contributions
@@ -19,7 +18,7 @@ additional complications.  Section~\ref{sec:top} presents two variants of
 \subsection{Syntax}
 
 Figure~\ref{fig:fi-syntax} shows the syntax of \name. The difference to the
-$\lambda$-calculus (with pairs) \joao{should we highlight pairs too? they are highlighted in the target language}, 
+$\lambda$-calculus (with pairs), 
 highlighted in gray, are intersection types 
 ($A \inter B$) at the type-level, and merges ($e_1 \mergeop e_2$) at the term level.
 
@@ -65,7 +64,7 @@ $B$. We also include integer types $\code{Int}$.
 \paragraph{Terms.} Metavariables $e$ range over terms.  Terms include standard
 constructs: variables $x$; abstraction of terms over variables
 $\lamty x A e$; application of terms $e_1$ to terms $e_2$, written $\app
-{e_1} {e_2}$; pairing of two terms $e_1$ and $e_2$, denoted as $\pair {e_1} {e_2}$;
+{e_1} {e_2}$; pairing of two terms (denoted as $\pair {e_1} {e_2}$);
 and both projections of a pair $e$, written $\proj k e$ (with $k \in \{1,2\}$).
 The expression $e_1 \mergeop e_2$ is the \emph{merge} of two terms
 $e_1$ and $e_2$. Merges of terms correspond to intersections of types $A \inter
