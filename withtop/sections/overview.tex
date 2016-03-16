@@ -153,12 +153,12 @@ merge. Generally speaking, if both terms can be assigned some type
 $C$, both of them can be chosen as the meaning of the merge, which
 leads to multiple meanings of a term. A natural option is to try
 to forbid such overlapping values of the same type in a merge.
-Thus, for atomic types such as \lstinline$Int$ and \lstinline$Bool$, it is
+Thus, for simple types such as \lstinline$Int$ and \lstinline$Bool$, it is
 easy to see that disjointness holds when the two types are
 different. Intersections such as \lstinline$Int & Bool$ and 
 \lstinline$String & Bool$ are clearly disjoint.
 While an informal, intuitive notion of disjointness is sufficient to
-see what happens with atomic types, it is less clear of what
+see what happens with simple types, it is less clear of what
 disjointness means in general.
 
 \paragraph{Formalizing disjointness} 
@@ -174,7 +174,7 @@ As we shall see the particular notion of disjointness is quite
 sensitive to the language features that are allowed in a language.
 Nevertheless, the different notions of disjointness follow the same
 principle: they are defined in terms of the subtyping relation; 
-\joao{should we (briefly) introduce this subtyping relation beforehand?}
+%\joao{should we (briefly) introduce this subtyping relation beforehand?}
 and they describe which common supertypes are allowed in order for 
 two types to be considered disjoint.
 
@@ -233,9 +233,9 @@ important issues arizing from disjoint intersections, without the additional
 complications of $\top$. As shown in Section~\ref{sec:disjoint}, this
 definition of disjointness is sufficient to ensure coherence in \name.
 
-\paragraph{Disjointness of non-atomic types} Equipped with a formal
+\paragraph{Disjointness of other types} Equipped with a formal
 notion of disjointness, we are now ready to see how disjointness works 
-for other, non-atomic types. 
+for other types. 
 For example, consider the following intersection types of functions:
 
 \begin{enumerate}
@@ -320,22 +320,21 @@ The first merge contains two functions
 (\lstinline$succ$ and \lstinline$not$). The second merge contains two values 
 that can serve as input to the functions. The two merges are disjoint. 
 However what should be the result of this program? Should it be 
-\lstinline$4$ or \lstinline$False$? \joao{why not (4,,False)?} 
+\lstinline$4$ or \lstinline$False$? %\joao{why not (4,,False)?} 
 
-At first this program appears to lead to incoherence, even though it only uses
-disjoint merges. However, a closer look reveals that there are two possible 
+There is semantic ambiguity in this program, even though it only uses
+disjoint merges. However a close look reveals 
+a subtly different problem from the previous programs. There are two possible 
 types for this program: \lstinline{Int} or \lstinline{Bool}. Once the type 
 of the program is fixed, there is only one possible result: if the type is 
 \lstinline$Int$ the result of the program is \lstinline$4$; if the type 
 is \lstinline$Bool$ then the result of the program is \lstinline$False$. 
 Like other programming language features (for example type classes~\cite{Wadler89ad-hoc}), 
 types play a fundamental role in determining the result of a program, and the 
-semantics of the language is not independent from types. 
-
-Disjointness is indeed sufficient to ensure coherence. However, for
-certain programs type annotations are necessary to rule out \emph{type
-  ambiguity} as well. Type ambiguity happens when some expressions can 
-be typed in multiple ways, and depending on which type is chosen 
+semantics of the language is not completely independent from types. 
+In essence there is some \emph{type ambiguity}, which happens 
+when some expressions can 
+be typed in multiple ways. Depending on which type is chosen 
 for the subexpressions the program may lead to different results. 
 This fenomenon is common in type-directed mechanisms, and it also 
 affects type-directed mechanisms such as type classes or, more
@@ -344,8 +343,8 @@ generally, \emph{qualified types}~\cite{Mark93coherence}.
 The typical solution to remove type ambiguity is to add type
 annotations that chose a particular type for a subexpression when
 multiple options exist. Our approach to address this problem is to 
-use bi-directional type-checking techniques~\cite{Pierce00local}. We show that 
-with a fairly standard bi-directional type system, we can guarantee 
+use bi-directional type-checking techniques~\cite{Pierce00local,Dunfield04tri}. We show that 
+with a fairly simply and standard bi-directional type system, we can guarantee 
 that every subexpression (possibly with annotations) has a unique
 type. For example:
 
@@ -353,10 +352,11 @@ type. For example:
 ((succ,,not) : Int (*$\to$*) Int) (3,,True)
 \end{lstlisting}
 
-\noindent is a valid program, which has a unique determined type, and results in
+\noindent is a valid \name program, which has a unique determined type, and results in
 \lstinline$4$. In this case the bi-directional type-system 
 forces users to provide an annotation of the expression being applied.
-Without the annotation the program would be rejected.
+Without the annotation the program would be rejected. With the
+bi-directional type system, disjointness is indeed sufficient to ensure coherence. 
 
 \subsection{Disjoint Intersection Types with $\top$} 
 In the presence of a $\top$ type the simple definition of disjointness
