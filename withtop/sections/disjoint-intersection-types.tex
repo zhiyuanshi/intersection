@@ -439,14 +439,17 @@ extended with annotation expressions $e : A$.
 The two elaboration judgments $\jinfer \Gamma e A \yields E$ and
 $\jcheck \Gamma e A \yields E$ extend the usual typing judgments with
 an elaborated term on the right hand side of the arrows. The
-elaboration ensures that $E$ has type $\im A$. 
-Noteworthy are the \reflabel{\labeltmerge} 
-and \reflabel{\labeltsub} rules. The \reflabel{\labeltmerge}
-straightforwardly translates merges into pairs. The
-\reflabel{\labeltsub} accounts for the type coercions arizing 
-from subtyping. The additional coercions are necessary to ensure that
-the target terms are correctly typed, since the target language lacks
-subtyping.
+elaboration ensures that $E$ has type $\im A$.  Noteworthy are the
+\reflabel{\labeltmerge} and \reflabel{\labeltsub} rules. The
+\reflabel{\labeltmerge} straightforwardly translates merges into
+pairs. The \reflabel{\labeltsub} accounts for the type coercions
+arizing from subtyping. The additional coercions are necessary to
+ensure that the target terms are correctly typed, since the target
+language lacks subtyping. Note that the elaboration judgments can be
+modelled as a single relation, where the mode is an additional
+parameter of the relation. Thus for theorems that need both judgements
+simple induction is sufficient (mutual induction is not needed).
+
 
 \begin{figure}
   \begin{mathpar}
