@@ -11,7 +11,7 @@ of intersection types for designing new and more powerful type systems
 for programming languages. Since Reynolds work on the Forsythe~\cite{reynolds1997design}
 programming language, various other languages, including
 CDuce~\cite{Benzaken03cduce}, Scala~\cite{scala-overview} and 
-Stardust~\cite{Dunfield07:Stardust} have incoorporated some notion 
+Stardust~\cite{Dunfield07:Stardust} have incorporated some notion 
 of intersection types.
 
 Recently Dunfield~\cite{dunfield2014elaborating} showed the
@@ -86,8 +86,8 @@ $A$ and $B$ are disjoint when only certain set of types are common
 supertypes of $A$ and $B$. We investigate three different variants of
 \name, with three variants of disjointness. The difference between the 
 variants of disjointness is on what is the set of allowed
-common supertypes. To avoid type ambiguity, which arizes from the
-undecidability of type assignement of intersection
+common supertypes. To avoid type ambiguity, which arises from the
+undecidability of type assignment of intersection
 types~\cite{vanBakel92}, we use a variant of the calculus that allows type
 annotations. Without additional type annotations the same term can have
 multiple types, and consequently different semantics depending on the
@@ -134,7 +134,7 @@ and both notions of $\top$-disjointness have sound and complete
 algorithmic versions.
 
 We have mechanized all three variants of \name and their
-metatheoretical results in the Coq proof assistant. The definitions
+meta-theoretical results in the Coq proof assistant. The definitions
 and proofs can be found in the supplementary materials of this
 submission. The proofs use the locally nameless representation with
 co-finite quantification~\cite{aydemir-popl-08} to represent variables and

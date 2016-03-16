@@ -58,7 +58,7 @@ major difference is that our system does not include unions. As
 acknowledged by Dunfield, his calculus lacks of coherence. Dunfield
 also mechanically formalized his proofs, using the Twelf proof
 assistant~\cite{Pfenning99cade}. However he did not prove any results about
-coherence, so his metatheoretical results were not immediatly
+coherence, so his meta-theoretical results were not immediately
 useful to us. Since we were also not familiar with Twelf, we decided to
 start a new formalization in Coq (which we are familiar with), while
 proving many new results related to coherence.
@@ -208,11 +208,11 @@ implementation of the read and show functions for the particular type
 \verb|a|. The problem is that there is not enough type information 
 to determine what the type \verb|a| should be. 
 An arbitrary choice 
-of \verb|a| could lead to different code being infered depending on
-the particular choice of \verb|a|. In this case the behaviour of the program would be dependent on the particular
+of \verb|a| could lead to different code being inferred depending on
+the particular choice of \verb|a|. In this case the behavior of the program would be dependent on the particular
 choice made by the compiler. As a result Haskell compilers, reject 
 programs like the above. Jones~\cite{Mark93coherence} provided a
-formal treatement of coherence for qualified types and type classes,
+formal treatment of coherence for qualified types and type classes,
 designing suitable restrictions that ensure that incoherent programs 
 are not accepted. In recent versions of Haskell compilers, it is possible to use 
 type annotations to remove type ambiguity:
@@ -278,7 +278,7 @@ traits and our source language's traits have four major differences:
 
   \item Scala's traits cannot take constructor parameters whereas ours can. As in
   the point example below, our trait is itself a constructor and takes the x- and
-  y-coördinates as parameters:
+  y-coordinates as parameters:
 
   \begin{lstlisting}
   trait Point(x: Int, y: Int) { self: Point (*$ \to $*)

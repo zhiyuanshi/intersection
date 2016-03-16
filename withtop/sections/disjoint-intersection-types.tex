@@ -305,7 +305,7 @@ an intersection type, then the only rule that can be applied is
 \reflabel{\labelsubinter}. 
 
 \paragraph{Unique coercions.}
-Well-formedeness and ordinary types guarantee that at
+Well-formedness and ordinary types guarantee that at
 any moment during the derivation of a subtyping relation, at most one rule can
 be used. Consequently, the coercion of a subtyping relation $A \subtype B$ is
 uniquely determined. This fact is captured by the following lemma:
@@ -443,11 +443,11 @@ elaboration ensures that $E$ has type $\im A$.  Noteworthy are the
 \reflabel{\labeltmerge} and \reflabel{\labeltsub} rules. The
 \reflabel{\labeltmerge} straightforwardly translates merges into
 pairs. The \reflabel{\labeltsub} accounts for the type coercions
-arizing from subtyping. The additional coercions are necessary to
+arising from subtyping. The additional coercions are necessary to
 ensure that the target terms are correctly typed, since the target
 language lacks subtyping. Note that the elaboration judgments can be
-modelled as a single relation, where the mode is an additional
-parameter of the relation. Thus for theorems that need both judgements
+modeled as a single relation, where the mode is an additional
+parameter of the relation. Thus for theorems that need both judgments
 simple induction is sufficient (mutual induction is not needed).
 
 
@@ -512,7 +512,7 @@ by the following two theorems.
   \label{fig:type-ann-erasure}
 \end{figure}
 
-\paragraph{Soundness and Compleness} The declarative type system presented in
+\paragraph{Soundness and Completeness} The declarative type system presented in
 Figure~\ref{fig:fi-type} is closely related to the bidirectional type system 
 in Figure~\ref{fig:fi-typebd}. We can prove that the bidirectional type system 
 is sound and complete with respect to the declarative specification, 
@@ -590,13 +590,13 @@ Combining the previous results, we show the central theorem:
   Lemma~\ref{lemma:unique-coercion}), but also that $A$ is unique (by
 Theorem~\ref{theorem:uniqueness-type-inference}). Uniqueness of $A$ is
 needed to apply the
-induction hyphothesis. For \reflabel{\labeltapp}:
+induction hypothesis. For \reflabel{\labeltapp}:
 \begin{mathpar}
 \bruletapp
 \end{mathpar}
 \noindent we need to show the uniqueness of $A_1$ using
 Theorem~\ref{theorem:uniqueness-type-inference}, in order to apply the
-induction hyphothesis.
+induction hypothesis.
 %  Note that the typing rules are already syntax-directed but the case of
 %  \reflabel{\labeltapp} (copied below) still needs special attention since we
 %  need to show that the generated coercion $E$ is unique.
@@ -661,7 +661,7 @@ typing rule for merges.
 We require that the two types of an intersection must be disjoint. Under the new rules, intersection types such as $\code{Int} \inter \code{Int}$
 are no longer well-formed because the two types are not disjoint.
 
-\paragraph{Metatheory.}
+\paragraph{Meta-theory.}
 Since in this section we only restrict the type system
 in the previous section, it is easy to see that type preservation and
 type-safety still holds.

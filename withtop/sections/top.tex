@@ -11,7 +11,7 @@ $\top$. Since all types now have a common supertype, it is impossible
 for any two types to satisfy a simple notion of disjointness. To
 address this problem a notion of $\top$-disjointess is proposed.  The
 definition of $\top$-disjointess depends on a notion of a top-like
-type. We formalise two different variants of \name, based on two different
+type. We formalize two different variants of \name, based on two different
 definitions of a top-like type, while discussing their expressiveness. Both variants retain coherence, and all other key
 properties of \name.  For simplicity and space reasons we omit pairs
 from the two variants of \name presented in this section.
@@ -39,7 +39,7 @@ we will briefly discuss how it can make the resulting system more useful, while 
 of all properties proven for the original system.
 The definition of $\top$-disjointess will depend on a notion of a top-like type, for which at first we will just provide 
 some intuition for it.
-We will then formalise two different systems, based on two different definitions of a top-like type, while discussing their
+We will then formalize two different systems, based on two different definitions of a top-like type, while discussing their
 usability and limitations.
 The first top-like definition will solve the problem of incoherence, but it will still forbid the inclusion of
 function types within intersection types.
@@ -156,7 +156,7 @@ Namely:
   \label{lemma:unique-subtype-contributor-with-top}
 
   If $A_1 \inter A_2 \subtype B$, where $A_1 \inter A_2$ and $B$ are well-formed types,
-  \textbf{and $\text{B}$ is not toplike};
+  \textbf{and $\text{B}$ is not top-like};
   then it is not possible that the following holds at the same time:
   \begin{enumerate}
     \item $A_1 \subtype B$
@@ -190,7 +190,7 @@ $\top$, namely $\top$ itself. Moreover, coherence is preserved.
 %  Any type consisting of a $n$-ary intersection composed of $n$ $\top$'s, is a top-like type. 
 %\end{definition}
 
-A top-like type can be formalised as an unary relation on a type $A$, denoted as $\toplike{A}$, as show in 
+A top-like type can be formalized as an unary relation on a type $A$, denoted as $\toplike{A}$, as show in 
 Figure \ref{fig:tltypesdis}.
 The rule \reflabel{\labeltopltop} states that $\top$ is a top-like type; 
 the rule \reflabel{\labeltoplinter} indicates that any 
@@ -251,7 +251,7 @@ intersection composed of just top-like types is also a top-like type.
 
 Similarly to the original system, the definition $\top$-disjointness
 does not lead to an implementation.  Fortunately, the algorithmic
-disjoitness rules remain the almost same as described in Section
+disjointess rules remain the almost same as described in Section
 \ref{sec:alg-dis}. The only significant difference is the absence
 of the \reflabel{\labeldisfun} rule. The reason for this is that, in
 this variant of \name, two functions \emph{always} have \emph{non top-like} common 
@@ -283,7 +283,7 @@ our subtyping rules, which requires some changes on the generation of target
 language coercions.
 
 \paragraph{Top-Like Types}
-The extended top-like definitions and resulting system are formalised
+The extended top-like definitions and resulting system are formalized
 in Figure \ref{fig:tltypesextdis}.  Note how we just added
 \reflabel{\labeltoplfun} to the top-like relation, by stating that a
 function is top-like whenever its return type is also
@@ -387,7 +387,7 @@ There are two possible derivations:
 
 \end{itemize}
 
-\noindent Unfortunatelly the two derivations generate \emph{different}
+\noindent Unfortunately the two derivations generate \emph{different}
 coercions.  Thus, without further changes in \name, this would be a
 source of incoherence.
 %We could solve this problem at least in two distinct ways:
@@ -423,7 +423,7 @@ The basic idea is to look at the form of $A_3$ in both rules:
 \item when $A_3$ is not top-like: the same coercion (as in the previous
   systems) is generated.
 \end{itemize}
-This behaviour is formalised with a meta-function, denoted as $\andcoerce{A}_{C}$, and described in
+This behavior is formalized with a meta-function, denoted as $\andcoerce{A}_{C}$, and described in
 Figure~\ref{fig:andcoercion}.
 
 Finally, the reader may notice how the modified rules still overlap, in case $\toplike{A_3}$. 

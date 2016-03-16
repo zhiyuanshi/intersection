@@ -56,12 +56,12 @@ highlighted in gray, are intersection types
   \label{fig:fi-syntax}
 \end{figure}
 
-\paragraph{Types.} Metavariables $A$, $B$ range over types. Types include
+\paragraph{Types.} Meta-variables $A$, $B$ range over types. Types include
 function types $A \to B$ and product types $\tpair A B$. 
 $A \inter B$ denotes the intersection of types $A$ and
 $B$. We also include integer types $\code{Int}$.
 
-\paragraph{Terms.} Metavariables $e$ range over terms.  Terms include standard
+\paragraph{Terms.} Meta-variables $e$ range over terms.  Terms include standard
 constructs: variables $x$; abstraction of terms over variables
 $\lamty x A e$; application of terms $e_1$ to terms $e_2$, written $\app
 {e_1} {e_2}$; pairing of two terms (denoted as $\pair {e_1} {e_2}$);
@@ -180,7 +180,7 @@ Note that the notion of ordinary types, which is used in rules
 \reflabel{\labelsubinter1} and \reflabel{\labelsubinter2}, was
 introduced by Davies and Pfenning~\cite{davies2000intersection} to provide an algorithmic version of
 subtyping. In our system ordinary types are used for a different 
-purpose as well: they play a fundamantal role in ensuring that 
+purpose as well: they play a fundamental role in ensuring that 
 subtyping produces unique coercions. Section~\ref{sec:alg-dis} will present 
 a detailed discussion on this. The subtyping relation, is known to be
 \emph{reflexive} and \emph{transitive}~\cite{davies2000intersection}. 
@@ -201,12 +201,12 @@ a detailed discussion on this. The subtyping relation, is known to be
 
 \subsection{Declarative Type System}
 
-The well-formdness of types and typing relation are shown in the
+The well-formedness of types and typing relation are shown in the
 middle and bottom of Figure~\ref{fig:fi-type}, respectively.
 Importantly, the disjointness judgment, which is highlighted using a
 box, appears in the well-formedness rule for intersection types (\reflabel{\labelwfinter}) and 
 the typing rule for merges (\reflabel{\labeltmerge}). The presence of
-the disjointness judgement, as well as the use of ordinary types in
+the disjointness judgment, as well as the use of ordinary types in
 the subtyping relation, are the most essential differences between our type system and the
 original type system by Dunfield. 
 %The role of the disjointness
@@ -310,7 +310,7 @@ be present in Dunfield's calculus, while at the same time avoiding
 explicitly extracting functions from intersections. However such rule
 would necessarily be complicated, and rather ad-hoc.
 So we opted for simplicity. In any case there is no expressiveness
-loss (only loss of convinience), as it is always possibly to extract the function component from
+loss (only loss of convenience), as it is always possibly to extract the function component from
 a merge and then apply it.
 \end{comment}
 

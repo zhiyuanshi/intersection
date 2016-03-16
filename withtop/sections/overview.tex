@@ -208,7 +208,7 @@ components of the merge are not subtypes of each other, they share
 some types in common.
 
 In order for two types to be truly disjoint, they must not have any
-subcomponents sharing the same type. In a simply typed calculus with intersection
+sub-components sharing the same type. In a simply typed calculus with intersection
 types (and without a $\top$ type) this can be ensured by requiring the two types 
 not to share a common supertype: 
 
@@ -229,7 +229,7 @@ The simple definition of disjointness is the basis for the first calculus
 presented in this paper: a simply typed lambda calculus with intersection 
 (but without a $\top$ type). 
 This variant of \name is useful to study many 
-important issues arizing from disjoint intersections, without the additional 
+important issues arising from disjoint intersections, without the additional 
 complications of $\top$. As shown in Section~\ref{sec:disjoint}, this
 definition of disjointness is sufficient to ensure coherence in \name.
 
@@ -248,7 +248,7 @@ For example, consider the following intersection types of functions:
 
 \noindent Which of those intersection types are disjoint? 
 It seems reasonable to expect that the first intersection type is
-disjoint: both the domain and codomain of the two functions in the
+disjoint: both the domain and co-domain of the two functions in the
 intersection are different. However, it is less clear whether the two
 other intersection types are disjoint or not. Looking at the 
 definition of simple disjointness for further guidance, and the subtyping rule for functions in
@@ -276,7 +276,7 @@ between $(\code{Int} \to \code{String})$ and $(\code{String} \to
 \code{String})$ is to find a common subtype between $\code{Int}$ and 
 $\code{String}$. One such common subtype is
 $\code{String}~\inter~\code{Int}$. Preventing the third intersection
-type ensures that type-based lookups are not ambiguous (and cannot
+type ensures that type-based look-ups are not ambiguous (and cannot
 lead to incoherence). If the third intersection type was allowed then
 the following program:
 
@@ -335,17 +335,17 @@ semantics of the language is not completely independent from types.
 In essence there is some \emph{type ambiguity}, which happens 
 when some expressions can 
 be typed in multiple ways. Depending on which type is chosen 
-for the subexpressions the program may lead to different results. 
-This fenomenon is common in type-directed mechanisms, and it also 
+for the sub-expressions the program may lead to different results. 
+This phenomenon is common in type-directed mechanisms, and it also 
 affects type-directed mechanisms such as type classes or, more
 generally, \emph{qualified types}~\cite{Mark93coherence}.
 
 The typical solution to remove type ambiguity is to add type
-annotations that chose a particular type for a subexpression when
+annotations that chose a particular type for a sub-expression when
 multiple options exist. Our approach to address this problem is to 
 use bi-directional type-checking techniques~\cite{Pierce00local,Dunfield04tri}. We show that 
 with a fairly simple and standard bi-directional type system, we can guarantee 
-that every subexpression (possibly with annotations) has a unique
+that every sub-expression (possibly with annotations) has a unique
 type. For example:
 
 \begin{lstlisting}
