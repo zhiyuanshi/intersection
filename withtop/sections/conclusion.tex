@@ -1,13 +1,15 @@
 \section{Conclusion and Future Work}
 \label{sec:conclusion}
 
-This paper described \name: a language that combines
-intersection types and a merge operator.
-The language is proved to be type-safe and coherent.
-To ensure coherence the type system accepts only
-disjoint intersections. We believe that disjoint intersection types are
-intuitive, and at the same time expressive. We have shown the
-applicability of disjoint intersection types to model a simple form of traits.
+This paper described \name: a coherent and type-safe core calculus
+that combines intersection types and a merge operator. We investigated
+three different variants of \name: two variants with a $\top$ type;
+and another one without. To ensure coherence the type system accepts
+only disjoint intersections. For each variant of \name there is a
+different definition of disjointness. Nevertheless all definitions of
+disjointness follow the same principle: they are defined in terms of
+the subtyping relation; and they describe which common supertypes are
+allowed in order for two types to be considered disjoint.
 
 \begin{comment}
 We implemented the core functionalities of the \name as part of a JVM-based
@@ -20,15 +22,18 @@ number of other features, including records, polymorphism, mutually recursive
 first-class modules that are encoded using \code{letrec} and records.
 \end{comment}
 
-For the future, we intend to improve our source language
-and show the power of disjoint intersection types in large case
-studies. One pressing challenge is to address the intersection between 
-disjoint intersection types and polymorphism.
-Finally we would like to study the
+For the future, we would like to study the
 addition of union types. This will also require changes in our
 notion of disjointness, since with union types there always exists
 a type $A \union B$, which is the common supertype of two
-types $A$ and $B$.
+types $A$ and $B$, and that is not a top-like type.
+Another interesting challenge is to address the combination between 
+disjoint intersection types and polymorphism. A naive combination 
+does not seem to be difficult. Since an expression with a polymorphic
+type can be instantiated to \emph{any} type, a simple option is simply 
+to forbid polymorphic variables in intersections. However this has 
+limited expressiveness, and would prevent many useful programs. 
+More thought is needed to achieve more expressiveness. 
 
 % Some immediate topics for
 % further improvement of the results in this paper are discussed next.

@@ -125,10 +125,9 @@ Having this in mind, $\top$-disjointness is defined as follows:
 %presented next.
 \begin{definition}[$\top$-Disjointness]
 Given two types $A$ and $B$ we have that:
-
 %\[A * B \equiv \not \toplike{A} \and \not \toplike{A} \and A \subtype B\]
-\[A \disjoint_{\top} B \equiv \neg \toplike{A} \; \wedge \; \neg \toplike{B} \; \wedge \; 
-(\forall_C \; ( A \subtype C \wedge B \subtype C ) \rightarrow \toplike{C}) \]
+\[A \disjoint_{\top} B \equiv \neg \toplike{A} \; \text{and} \; \neg \toplike{B} \; \text{and} \; 
+(\forall_C. \; ( A \subtype C~\text{and}~B \subtype C ) \rightarrow \toplike{C}) \]
 
 \noindent where $\toplike{C}$ means that $C$ is a top-like type.
 \end{definition}
@@ -144,12 +143,13 @@ intersection of these types is forbidden, as there might be an overlap between t
 \end{itemize}
 
 Another problem arising from the introduction of $\top$ is that Lemma~\ref{lemma:unique-subtype-contributor}
-no longer holds.
-For example, given any type $A_1$ and $A_2$, and considering $B = \top$; then we can prove that both of 
-them can be coerced to $B$ (because any type is a subtype of $\top$).
-Thus, in this case, the type ${A_1} \inter {A_2}$ has two contributors which can produce $\top$.
-In spite of this Lemma being a core property of our system, not all hope is lost:
-we can still prove a weaker version of it.
+no longer holds. For example, given $A_1 \inter A_2 <: \top$ (for
+any type $A_1$ and $A_2$), both $A_1$ or $A_2$ can be coerced to
+$\top$ (because any type is a subtype of $\top$).
+Thus, in this case, the type ${A_1} \inter {A_2}$ has two subtype
+contributors violating
+Lemma~\ref{lemma:unique-subtype-contributor}. Nevertheless,
+it is still possible to prove a weaker result.
 Namely:
 
 \begin{lemma}[Unique subtype contributor (with $\top$)]
@@ -164,12 +164,12 @@ Namely:
   \end{enumerate}
 \end{lemma}
 
-In other words, if $B$ is not top-like, then the previous Lemma still holds!
-This suggests that we will need to introduce restrictions concerning top-like types, if we want to achieve
-coherence.
-Therefore this will be the main challenge we address during the upcoming sections,
-by showing two suitable definitions of top-like types and discussing 
-their consequences in a system with $\top$-disjointess.
+%In other words, if $B$ is not top-like, then the previous Lemma still holds!
+This suggests that we will need to take special care to preserve
+coherence in the presence of top-like types.
+%Therefore this will be the main challenge we address during the upcoming sections,
+%by showing two suitable definitions of top-like types and discussing 
+%their consequences in a system with $\top$-disjointess.
 %Next we will present a simple top-like type definition and show how resulting system
 %becomes more expressive while achieving coherence.
 %However, we still consider that system not expressive enough, 
@@ -439,7 +439,7 @@ of intersections with function types.
 We also had to modify $\reflabel{\labeldisaxintfun}$ to include the premise $\neg \toplike{B}$.
 This is due to the specification of $\top$-disjointness, which requires two types not to be top-like in order for them to be disjoint.
 
-\joao{add a paragraph mentioning the possibility of using two different definitions of top-like in T-disjointness, so we can get a DisAx-Int-Fun with no premise?}
+%\joao{add a paragraph mentioning the possibility of using two different definitions of top-like in T-disjointness, so we can get a DisAx-Int-Fun with no premise?}
 
 
 %\bruno{
