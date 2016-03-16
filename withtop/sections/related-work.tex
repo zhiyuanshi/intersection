@@ -220,8 +220,8 @@ f s = (show :: Int -> String) (read s)
 to \verb|Int|, removing the ambiguity and allowing the program to 
 be accepted. In \name we also use annotations to remove type
 ambiguity. The bidirectional type system ensures that the additional 
-annotations required in terms are sufficient to ensure that no type
-ambiguity can ever happen in \name programs.
+annotations required in terms are sufficient to remove any type
+ambiguity in \name programs.
 
 \begin{comment}
 %*******************************************************************************
