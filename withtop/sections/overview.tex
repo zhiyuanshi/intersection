@@ -94,7 +94,7 @@ is, the semantics is not ambiguous). In contrast a semantics is said
 to be \emph{incoherent} if there are multiple possible meanings for
 the same valid program. 
 
-\paragraph{Incoherence in Dunfield's calculus}
+\paragraph{Incoherence in Dunfield's Calculus}
 A problem with Dunfield's calculus~\cite{dunfield2014elaborating} is
 that it is incoherent.  Unfortunately the implicit nature of
 elimination for intersection types built with a merge operator can
@@ -195,7 +195,7 @@ the following merge:
 The first component \lstinline{(1,,'c')} has type $\code{Int} \inter
 \code{Char}$, whereas the second component \lstinline{(2 ,, True)} has type
 $\code{Int} \inter \code{Bool}$. Clearly,
-\[ \code{Int} \inter \code{Char} \not \subtype \code{Int} \inter \code{Bool} \wedge \code{Int} \inter \code{Bool} \not \subtype \code{Int} \inter \code{Char} \]
+\[ \code{Int} \inter \code{Char} \not \subtype \code{Int} \inter \code{Bool}~\text{and}~\code{Int} \inter \code{Bool} \not \subtype \code{Int} \inter \code{Char} \]
 Nevertheless the following program still leads to
 incoherence:
 \begin{lstlisting}
