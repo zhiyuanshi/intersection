@@ -203,6 +203,13 @@ Note that, in contrast to Dunfield's elaboration approach, where subtyping produ
 coercions that are source language terms, in \name, coercions are
 produced directly on the target language.
 
+The rule \reflabel{\labelsubint} generates the identity function as the coercion in the
+target language.
+Rule \reflabel{\labelsubprod} says that one pair is a subtype of another, as long as 
+the first and second component of the former are a subtype of the first and second component
+of the latter, respectively.
+The coercion generated extracts both components of the pair, applies the respective coercion,
+and creates a new pair using both results.
 In \reflabel{\labelsubfun}, we elaborate the subtyping of
 parameter and return types by $\eta$-expanding $f$ to $\lamty x {\im {A_3}}
 {\app f x}$, applying $E_1$ to the argument and $E_2$ to the result. Rules
@@ -530,8 +537,6 @@ If $ \jtype \Gamma e A$, then $ \jinfer \Gamma {e'} A \yields E$, where $\erase{
   (Sketch) By structural induction on the term and the corresponding
   inference rule.
 \end{proof}
-\bruno{Joao: is this correct? I think soundness or complenteness
-  require theorems in two modes (checking or inference). Please double-check!}
 
 \paragraph{Uniqueness of type-inference} An important property of the
 bidirectional type-checking in Figure~\ref{fig:fi-typebd} is that, given an expression $e$, if it is
@@ -576,9 +581,9 @@ Combining the previous results, we are able to show the central theorem:
   Note that two cases need special attention: \reflabel{\labeltsub} and \reflabel{\labeltapp}.
   In the former, we know that $A$ is unique by Theorem~\ref{theorem:uniqueness-type-inference} and 
   that $C$ is also unique, by Lemma~\ref{lemma:unique-coercion}.
-  The latter requires inference of a function type, \bruno{forcing the
-    use of a type annotation}\bruno{I don't think this is a good explanation}.
-  Again, by Theorem~\ref{theorem:uniqueness-type-inference} we can use the induction hypotheses.
+  The latter requires proving uniqueness of $A_1$.
+  We can show this, again, by Theorem~\ref{theorem:uniqueness-type-inference} and consequently use 
+  the induction hypotheses.
 %  Note that the typing rules are already syntax-directed but the case of
 %  \reflabel{\labeltapp} (copied below) still needs special attention since we
 %  need to show that the generated coercion $E$ is unique.

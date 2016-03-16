@@ -19,9 +19,9 @@ additional complications.  Section~\ref{sec:top} presents two variants of
 \subsection{Syntax}
 
 Figure~\ref{fig:fi-syntax} shows the syntax of \name. The difference to the
-$\lambda$-calculus (with pairs), highlighted in gray, are intersection types 
-($A \inter B$) at
-the type-level, and merges ($e_1 \mergeop e_2$) at the term level.
+$\lambda$-calculus (with pairs) \joao{should we highlight pairs too? they are highlighted in the target language}, 
+highlighted in gray, are intersection types 
+($A \inter B$) at the type-level, and merges ($e_1 \mergeop e_2$) at the term level.
 
 \begin{figure}[t]
   \[
@@ -232,8 +232,8 @@ $e_1 \mergeop e_2$, is assigned an intersection type composed of the
 resulting types of $e_1$ and $e_2$, as long as the types of the two
 expressions are disjoint.
 Finally, \reflabel{\labeltsub} states that for any types $A$ and $B$, if
-$A \subtype B$ then any expression $e$ with assigned type $B$ can also be assigned 
-the type $A$.
+$A \subtype B$ then any expression $e$ with assigned type $A$ can also be assigned 
+the type $B$.
 
 \paragraph{Typing disjoint intersections}
 Dunfield's calculus has different typing rules for intersections.
