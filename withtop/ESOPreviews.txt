@@ -7,8 +7,7 @@ In comparison to that submission, we have dealt with the following issues:
 - discussed lambda& in detail (as related work);
 - removed the section concerning traits.
 
-Next follow the reviews, with our notes indicating the status of the issue (i.e. solved, partially solved,
-not addressed, to do).
+Next follow the reviews, with our notes indicating if the issue was fixed. 
 
 > ----------------------- REVIEW 1 ---------------------
 > PAPER: 108
@@ -222,8 +221,6 @@ Since S3 (from the old submission) has been dropped
 > 
 > "later difference" → "latter difference"
 
-TODO: We could not find this anymore. 
-
 > In listing the differences from my language, the paper should mention
 > the lack of a ⊤ type.
 
@@ -324,8 +321,6 @@ FIXED: We now account for pairs.
 > 
 > in the premise of Dis-Axiom.
 
-TODO: Mention alternative.
-
 > *** Comments on section 7
 > 
 > (about Forsythe): "the way coherence is ensured is not general
@@ -413,16 +408,10 @@ FIXED: We have now treated the T type.
 > disjoint, and have a common supertype ("integer"), "even_integer" and
 > "odd_integer" *are* genuinely disjoint but have a common supertype
 > ("integer").
-
-TODO. 
-
 > Unfortunately, these examples also break the "adjustment" suggested in
 > Section 8 ("the only common supertype of A and B is ⊤").  "Object" is
 > arguably just another name for ⊤, but Dictionary is a common supertype
 > (of {RedBlackTree,HashTable}Dictionary) that isn't ⊤. 
-
-TODO. 
-
 > For
 > refinements, "integer" is arguably ⊤ (at least with a strict type/sort
 > distinction as followed in some of the refinement types work,
@@ -455,9 +444,6 @@ OK :)
 > weaker syntactic approaches can have "too many" common supertypes for
 > the approach formulated in the paper (with ⊤, or with refinement
 > types); with semantic subtyping this is only aggravated.
-
-TODO. 
-
 > 
 > ••• Very minor issues •••
 > 
@@ -477,9 +463,6 @@ TODO.
 > The * in Figure 5 has lopsided space; when you shade a box, TeX can't
 > figure out that * is a binary operator, so you need to add space
 > yourself.
-
-TODO.
- 
 > ••• Bibliography •••
 > 
 > [9]: "Curienl" should be "Curien".
@@ -499,9 +482,6 @@ TODO.
 > something.  Not sure what the best practice here is; maybe give both
 > titles?  Since this is a confusing case, it's important to give the
 > volume number and pages.
-
-TODO.
- 
 > ----------------------- REVIEW 3 ---------------------
 > PAPER: 108
 > TITLE: Disjoint Intersection Types
@@ -547,9 +527,6 @@ FIXED.
 > paper, but other issues of the language design, which could have been
 > discusses (efficiency, subject reduction, lack of a subtyping rule, etc.),
 > are not. 
-
-TODO
-
 > Regarding the application to traits, I did not see new ideas, but
 > the combination of known ideas: the application of intersection types for
 > typing records with record concatenation has been known for a long time (and
@@ -563,9 +540,6 @@ TODO
 > typing rules have been restricted so as to check for incoherence.  The
 > authors claim some difficulties in adjusting the type system so as to ensure
 > the coherence, but I did not find any. 
-
-TODO Expand discussion on checking coherence; give examples with functions.
-
 > Once the idea is there, the
 > adaptation of type typing rules seems relatively easy.  I recognize that it
 > is often easy to say so a posteriori, once the solution has been found.  But
@@ -616,9 +590,6 @@ FIXED We now have bi-directional type-checking.
 >  stepping after elaboration can be reproduced by stepping before the
 >  elaboration (in a typed preserving manner). This result is not shown
 >  here.
-
-TODO
-
 >  In the current proposal, subject reduction per say should not hold,
 >  because of lack of a proper subtyping rule.
 > 
@@ -628,9 +599,6 @@ TODO
 > - Another problem with both [13] and this proposal, which is inherent to the
 >  approach is that the semantics of intersection types has built-in a
 >  significant cost at runtime. This issue could have been discussed.
-
-TODO
-
 > ## Related work on coherence
 > 
 > - The problem of coherence with intersection types was studied in the 90's
@@ -711,9 +679,6 @@ No Section 3 any more!
 > - section 5.3 paragraph above lemma 5: you say if you had record types, they
 >  could be atomic, but you say earlier that record types can be encoding,
 >  thus they would not be atomic.
-
-TODO
-
 > - page 23: "studied [an<-a] very interesting"
 > 
 > - page 25: the last paragraph seems to be in contradiction with the previous
@@ -724,8 +689,6 @@ TODO
 >  what your ML-like source language is if it does not have polymorphism
 >  (nor references?)
 
-TODO
- 
 > -------------------------
 > After PC Meeting comments
 > -------------------------
