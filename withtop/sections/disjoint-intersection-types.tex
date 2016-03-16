@@ -6,7 +6,7 @@
 %did not discuss the semantics or how the calculus ensures coherence. 
 This section discusses the elaboration semantics of \name, and shows a
 bidirectional type system that guarantees coherence and type
-soundness. Moreover the bidirectional type system is shown to be sound
+safety. Moreover the bidirectional type system is shown to be sound
 and complete with respect to the type system presented in
 Section~\ref{sec:fi} (provided that terms have some additional type
 annotations). 
@@ -24,7 +24,7 @@ aspects of the calculus:
 
 \item {\bf No type ambiguity:} the bi-directional type system does not
   have type-ambiguity, and it infers a
-  unique type for every well-typed program. 
+  unique type for every well-typed expression. 
 
 %Removing type ambiguity 
 %  is essential to ensure that the dynamic 
@@ -580,7 +580,9 @@ Combining the previous results, we are able to show the central theorem:
   By induction on the first derivation.
   Note that two cases need special attention: \reflabel{\labeltsub} and \reflabel{\labeltapp}.
   In the former, we know that $A$ is unique by Theorem~\ref{theorem:uniqueness-type-inference} and 
-  that $C$ is also unique, by Lemma~\ref{lemma:unique-coercion}.
+  that $C$ is also unique, by
+  Lemma~\ref{lemma:unique-coercion}.\bruno{Still not good: what is C
+    and what is A? They are not defined above.}
   The latter requires proving uniqueness of $A_1$.
   We can show this, again, by Theorem~\ref{theorem:uniqueness-type-inference} and consequently use 
   the induction hypotheses.

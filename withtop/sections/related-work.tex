@@ -55,7 +55,14 @@ have already made extensive comparisons with his work. He
 described a similar approach to ours: compiling a system with intersection types
 and a merge operator into ordinary $ \lambda $-calculus terms with pairs. One
 major difference is that our system does not include unions. As
-acknowledged by Dunfield, his calculus lacks of coherence.
+acknowledged by Dunfield, his calculus lacks of coherence. Dunfield
+also mechanically formalized his proofs, using the Twelf proof
+assistant~\cite{Pfenning99cade}. However he did not prove any results about
+coherence, so his metatheoretical results were not immediatly
+useful to us. Since we were also not familiar with Twelf, we decided to
+start a new formalization in Coq (which we are familiar with), while
+proving many new results related to coherence.
+
 
 Pierce~\cite{pierce1991programming2} made a comprehensive review
 of coherence, especially on Curien and Ghelli~\cite{curienl1990coherence} and
