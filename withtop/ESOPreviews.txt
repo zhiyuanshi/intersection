@@ -1,3 +1,15 @@
+We have submitted an earlier version of this paper.
+In comparison to that submission, we have dealt with the following issues:
+
+- added T types and discuss 3 variants of the calculus;
+- justified the choice of Coq over Twelf (used in Dunfield’s proof) for the proofs
+- changed the calculus to include a subsumption rule;
+- discussed lambda& in detail (as related work);
+- removed the section concerning traits.
+
+Next follow the reviews, with our notes indicating the status of the issue (i.e. solved, partially solved,
+not addressed, to do).
+
 > ----------------------- REVIEW 1 ---------------------
 > PAPER: 108
 > TITLE: Disjoint Intersection Types
@@ -210,7 +222,7 @@ Since S3 (from the old submission) has been dropped
 > 
 > "later difference" → "latter difference"
 
-TODO: could not find this?
+TODO: We could not find this anymore. 
 
 > In listing the differences from my language, the paper should mention
 > the lack of a ⊤ type.
@@ -264,7 +276,7 @@ FIXED
 > respect that the authors found a solution, even if I don't like some
 > aspects of it!
 
-OK: Issue should now be fixed, but we need to have another discussion. 
+OK: Issue should now be fixed. 
  
 > *** Comments on section 5
 > 
@@ -312,7 +324,7 @@ FIXED: We now account for pairs.
 > 
 > in the premise of Dis-Axiom.
 
-TODO: Mention alternative?
+TODO: Mention alternative.
 
 > *** Comments on section 7
 > 
@@ -402,15 +414,14 @@ FIXED: We have now treated the T type.
 > "odd_integer" *are* genuinely disjoint but have a common supertype
 > ("integer").
 
-TODO: Mention refinement types? Add a small discussion section?
+TODO. 
 
 > Unfortunately, these examples also break the "adjustment" suggested in
 > Section 8 ("the only common supertype of A and B is ⊤").  "Object" is
 > arguably just another name for ⊤, but Dictionary is a common supertype
 > (of {RedBlackTree,HashTable}Dictionary) that isn't ⊤. 
 
-TODO: Is this related to our notion of top-like? Besides the discussion 
-on top-like functions, we also need a discussion on how this extends to records?
+TODO. 
 
 > For
 > refinements, "integer" is arguably ⊤ (at least with a strict type/sort
@@ -445,7 +456,7 @@ OK :)
 > the approach formulated in the paper (with ⊤, or with refinement
 > types); with semantic subtyping this is only aggravated.
 
-TODO: Rephrase?
+TODO. 
 
 > 
 > ••• Very minor issues •••
@@ -467,7 +478,7 @@ TODO: Rephrase?
 > figure out that * is a binary operator, so you need to add space
 > yourself.
 
-TODO: Fix?
+TODO.
  
 > ••• Bibliography •••
 > 
@@ -489,7 +500,7 @@ TODO: Fix?
 > titles?  Since this is a confusing case, it's important to give the
 > volume number and pages.
 
-TODO: Fix?
+TODO.
  
 > ----------------------- REVIEW 3 ---------------------
 > PAPER: 108
@@ -522,8 +533,7 @@ TODO: Fix?
 > language presented here is simpler than that of [13] since it does not have
 > union types and does not discuss type inference issues. 
 
-Acknowledge absence of union types; discuss union types somewhere?
-We now have type-inference
+FIXED.
 
 > The paper seems
 > technically correct.  The paper claims two main contributions: fixing the
@@ -538,7 +548,7 @@ We now have type-inference
 > discusses (efficiency, subject reduction, lack of a subtyping rule, etc.),
 > are not. 
 
-Should we add more discussion?
+TODO
 
 > Regarding the application to traits, I did not see new ideas, but
 > the combination of known ideas: the application of intersection types for
@@ -554,7 +564,7 @@ Should we add more discussion?
 > authors claim some difficulties in adjusting the type system so as to ensure
 > the coherence, but I did not find any. 
 
-Expand discussion on checking coherence; give examples with functions.
+TODO Expand discussion on checking coherence; give examples with functions.
 
 > Once the idea is there, the
 > adaptation of type typing rules seems relatively easy.  I recognize that it
@@ -571,15 +581,14 @@ Expand discussion on checking coherence; give examples with functions.
 > intersection types or warning in case of non-disjointness is already
 > mentioned in Dunfield's paper.
 
-TODO: Provide strong comparison with Castagna; perhaps mention Castagna's 
-work early in the paper (maybe the introduction?).
+FIXED discussed lambda-& in related work 
 
 > Since the paper is a restriction of Dunfield's, I don't see the need to redo
 > the meta-theoretical study.  Instead, the proof of Dunfield could have been
 > reused.  The proof in Coq is also superfluous from a research point of view,
 > since the meta-theory of [13] was already mechanically formalized in Twelf.
 
-TODO: Say something about formalization.
+FIXED
 
 > Besides, while the paper fixes one weakness of [13], coherence, it contains
 > some new weaknesses. These seem needed for the solution to work, but they
@@ -594,12 +603,12 @@ TODO: Say something about formalization.
 >  application typing rule. This is less elegant and less intuitive for the
 >  user.
 
-Hopefully this issue is addressed!
+FIXED Hopefully this issue is addressed!
 
 > - The new proposal does not address the issue of type inference, while [13]
 >  did.
 
-We now have bi-directional type-checking.
+FIXED We now have bi-directional type-checking.
 
 > - Although the proposed system is sound, there is no subject reduction
 >  theorem.   We do not know whether [13] has subject reduction, but it had
@@ -608,7 +617,7 @@ We now have bi-directional type-checking.
 >  elaboration (in a typed preserving manner). This result is not shown
 >  here.
 
-Do we need consistency?
+TODO
 
 >  In the current proposal, subject reduction per say should not hold,
 >  because of lack of a proper subtyping rule.
@@ -620,7 +629,7 @@ Do we need consistency?
 >  approach is that the semantics of intersection types has built-in a
 >  significant cost at runtime. This issue could have been discussed.
 
-TODO: Discuss performance. 
+TODO
 
 > ## Related work on coherence
 > 
@@ -632,7 +641,7 @@ TODO: Discuss performance.
 >  not wish such an approach, which a priori seems better than rejecting
 >  overlapping intersections altogether.
 
-TODO: Discussion in related work.
+FIXED
 
 > ## Traits
 > 
@@ -703,7 +712,7 @@ No Section 3 any more!
 >  could be atomic, but you say earlier that record types can be encoding,
 >  thus they would not be atomic.
 
-TODO: Fix?
+TODO
 
 > - page 23: "studied [an<-a] very interesting"
 > 
@@ -715,7 +724,7 @@ TODO: Fix?
 >  what your ML-like source language is if it does not have polymorphism
 >  (nor references?)
 
-TODO: Fix?
+TODO
  
 > -------------------------
 > After PC Meeting comments
@@ -742,12 +751,12 @@ TODO: Fix?
 >  of a top type. This is something that the reader had to guess. In a revision,
 >  this point should be clearly stated and the consequences discussed and assessed.
 
-Seems to be main issue; now fixed?
+FXIED 
 
 > - The absence of a proper subtyping rule also makes reasoning less intuitive
 >  for the programmer. Again, this should be discussed in the paper.
 
-Seems to be fixed, now?
+FIXED
 
 > - A question raised by one reviewer is why the meta-theoretical properties
 >  of [13] could not be reused, since your system is just a restriction of
@@ -761,18 +770,18 @@ Ok!
 >  The absence of a top type may be a problem in connection with subtyping
 >  of existential types.
 
-Discuss those?
+FIXED partially
  
 > - Regarding \lambda&, even though the work differs and is not reusable, one
 >  of the reviewers thought that the idea of disjointness is already present
 >  there and that this should have been discussed---but this was not one
 >  of the main criteria for rejection.
 
-Discuss in paper.
+FIXED
 
 > The PC did not value the contribution to traits, which is an
 > orthogonal issue, and thought that if this were an added value, it
 > should then be a separate submission to be evaluated as an OO
 > contribution.
 
-Remove traits.
+FIXED Removed traits.
