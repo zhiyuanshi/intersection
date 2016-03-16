@@ -565,14 +565,14 @@ Combining the previous results, we show the central theorem:
 \begin{restatable}[Unique elaboration]{theorem}{uniqueelaboration}
   \label{theorem:unique-elaboration}
   We have that:
-  \begin{itemize}
+  \begin{itemize*}
     \item If $\jinfer \Gamma e {A_1} \yields {E_1}$ and $\jinfer \Gamma e {A_2} \yields
           {E_2}$, then $E_1 \equiv E_2$. 
     \item If $\jcheck \Gamma e {A_1} \yields {E_1}$ and $\jcheck \Gamma e {A_2} \yields
           {E_2}$, then $E_1 \equiv E_2$.
-  \end{itemize}
-  (``$\equiv$'' means syntactical equality, up to
+  \end{itemize*}(``$\equiv$'' means syntactical equality, up to
   $\alpha$-equality.)
+  
 
 \end{restatable}
 
@@ -583,9 +583,11 @@ Combining the previous results, we show the central theorem:
 \begin{mathpar}
 \bruletsub
 \end{mathpar}
-\noindent we know that $A$ is unique by Theorem~\ref{theorem:uniqueness-type-inference} and 
-  that $C$ is also unique by
-  Lemma~\ref{lemma:unique-coercion}. For \reflabel{\labeltapp}:
+\noindent we need to show not only that $C$ is unique (by
+  Lemma~\ref{lemma:unique-coercion}), but also that $A$ is also unique (by
+Theorem~\ref{theorem:uniqueness-type-inference}). Uniqueness of $A$ is
+needed to apply the
+induction hyphothesis. For \reflabel{\labeltapp}:
 \begin{mathpar}
 \bruletapp
 \end{mathpar}
