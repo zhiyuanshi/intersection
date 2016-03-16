@@ -1,6 +1,6 @@
 \newcommand{\formdis}{\framebox{$ \jdisimpl \Gamma A B $}}
 
-\newcommand{\makelabeldis}[1]{$\disjoint #1$}
+\newcommand{\makelabeldis}[1]{$\disjoint$$#1$}
 
 \newcommand{\labeldisvar}{\makelabeldis Var}
 \newcommand{\ruledisvar}{
@@ -68,9 +68,9 @@
 
 \newcommand{\formax}{\framebox{$ A \disjointax B$}}
 
-\newcommand{\makelabelax}[1]{$\disjoint \text{Ax} #1$}
+\newcommand{\makelabelax}[1]{$\disjoint \text{Ax}#1$}
 
-\newcommand{\labeldisaxintfun}{\makelabelax {(\mathbb{Z} \rightarrow)}}
+\newcommand{\labeldisaxintfun}{\makelabelax {(\mathbb{Z} \! \rightarrow)}}
 \newcommand{\ruledisaxintfun}{
   \inferrule* [right=\labeldisaxintfun]
     {}
@@ -84,7 +84,7 @@
     {\code{Int} \disjointax \tpair A B}
 }
 
-\newcommand{\labeldisaxprodfun}{\makelabelax {(\times \rightarrow)}}
+\newcommand{\labeldisaxprodfun}{\makelabelax {(\times \! \rightarrow)}}
 \newcommand{\ruledisaxprodfun}{
   \inferrule* [right=\labeldisaxprodfun]
     {}

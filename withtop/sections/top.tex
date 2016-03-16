@@ -133,7 +133,7 @@ Given two types $A$ and $B$ we have that:
 \noindent where $\toplike{C}$ means that $C$ is a top-like type.
 \end{definition}
 
-\noindent In other words, given two
+\noindent Informally, given two
 types $A$ and $B$:
 \begin{itemize}
 \item $A$ and $B$ cannot be top-like types (i.e. preventing types such as $T \inter T$ to be well-formed).
@@ -164,11 +164,11 @@ Namely:
   \end{enumerate}
 \end{lemma}
 
-In other words, if $B$ is not top-like, then the previous property still holds!
+In other words, if $B$ is not top-like, then the previous Lemma still holds!
 This suggests that we will need to introduce restrictions concerning top-like types, if we want to achieve
 coherence.
-Therefore this will be the main challenge that we will address during the upcoming sections,
-by showing two suitable definitions of top-like types and discuss  
+Therefore this will be the main challenge we address during the upcoming sections,
+by showing two suitable definitions of top-like types and discussing 
 their consequences in a system with $\top$-disjointess.
 %Next we will present a simple top-like type definition and show how resulting system
 %becomes more expressive while achieving coherence.
@@ -357,7 +357,7 @@ are top-like types (for example: $\code{Bool}\inter\code{String} \to \code{$\top
   %  \erase {{x_1} ,, {x_2}}     &= {\erase {x_1}} \, ,, \, {\erase {x_2}} \\
   %  \erase {e : A}              &= {\erase e} \\
   %\end{align*}
-  \caption{Coercion considering intersection of top-like types.}
+  \caption{Coercion generation considering Top-like types.}
   \label{fig:andcoercion}
 \end{figure}
 
