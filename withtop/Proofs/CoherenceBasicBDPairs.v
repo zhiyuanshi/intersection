@@ -22,11 +22,12 @@ http://www.chargueraud.org/softs/ln/
 We annotate the Coq theorems with the correnposing lemmas/theorems in the paper. 
 The reader can just look for:
 
-Lemma 5
+Lemma 4
 
-for example, to look for the proof of lemma 5 in the paper.
+for example, to look for the proof of lemma 4 in the paper.
 
-All lemmas and theorems are complete: there are no uses of admit or Admitted. 
+All lemmas and theorems are complete: there are no uses of admit or Admitted,
+with the exceptions of "tlam" and "tylam" due to a technical limitation.
 
 *)
 
@@ -115,10 +116,6 @@ apply SAnd2; auto.
 inversion H0.
 Defined.
 
-(* The No loss of Expressivity Lemmas *)
-
-(* Theorem 3 *)
-
 Definition sand2 : forall t t1 t2, Sub t1 t -> Sub (And t1 t2) t.
 intro t.
 induction t; intros.
@@ -156,8 +153,6 @@ exists (fun A => STLam' _ (
 apply SAnd3. auto. auto.
 inversion H0.
 Defined.
-
-(* Theorem 4 *)
 
 Definition sand3 : forall t t1 t2, Sub t2 t -> Sub (And t1 t2) t.
 intros t; induction t; intros.
@@ -235,9 +230,9 @@ Proof.
 induction t1; intros; auto.
 Defined.
 
-(* Disjointness algorithm is complete: Theorem 7 *)
+(* Disjointness algorithm is complete: Theorem 8 *)
 
-Lemma ortho_completness : forall (t1 t2 : PTyp), OrthoS t1 t2 -> Ortho t1 t2.
+Lemma ortho_completeness : forall (t1 t2 : PTyp), OrthoS t1 t2 -> Ortho t1 t2.
 Proof.
 induction t1; intros; unfold OrthoS in H.
 (* Case PInt *)
@@ -397,7 +392,7 @@ apply sand3.
 auto.
 Defined.
 
-(* Unique subtype contributor: Lemma 4 *)
+(* Unique subtype contributor: Lemma 2 *)
 
 Lemma uniquesub : forall A B C, 
   OrthoS A B -> Sub (And A B) C -> not (Sub A C /\ Sub B C).
@@ -494,7 +489,7 @@ Proof.
   apply H2.
 Qed.
   
-(* Soundness of the disjointness algorithm: Theorem 6 *)
+(* Soundness of the disjointness algorithm: Theorem 7 *)
 
 Lemma ortho_soundness : forall (t1 t2 : PTyp), Ortho t1 t2 -> OrthoS t1 t2.
 intros.
@@ -564,7 +559,7 @@ inversion H0. inversion H2. exists c1. auto.
   exfalso; apply H0; auto.
 Qed.
 
-(* Coercive subtyping is coeherent: Lemma 5 *)
+(* Coercive subtyping is coeherent: Lemma 3 *)
 
 Lemma sub_coherent : forall {A}, WFTyp A -> forall {B}, WFTyp B -> forall {C1}, sub A B C1 -> forall {C2}, sub A B C2 -> C1 = C2.
 Proof.
@@ -1055,33 +1050,6 @@ Proof.
   exfalso; apply EqFacts.eqb_neq in HEq; apply HEq; reflexivity.
   apply PTerm_Var.
 Qed.
-  
-(* ********************************************************************** *)
-(** ** Preservation of local closure *)
-
-(** The goal of this section is to set up the appropriate lemmas 
-    for proving goals of the form [term t]. First, we defined a
-    predicate capturing that a term [t] is the body of a locally
-    closed abstraction. *)
-
-Definition body_source t :=
-  exists L, forall x, not (In x L) -> PTerm (open_source t (PFVar x)).
-
-(** We then show how to introduce and eliminate [body t]. *)
-
-Lemma term_abs_to_body_source : forall t1, 
-  PTerm (PLam t1) -> body_source t1.
-Proof.
-  intros; unfold body_source; inversion H; subst; exists L; assumption.
-Qed.
-
-Lemma body_source_to_term_abs : forall t1, 
-  body_source t1 -> PTerm (PLam t1).
-Proof. intros. inversion H. apply_fresh PTerm_Lam as x. apply H0.
-       unfold not in *. intros; apply Fry; apply union_spec; auto.
-Qed.
-
-(* Hint Resolve term_abs_to_body body_to_term_abs. *)
 
 (** We prove that terms are stable by substitution *)
 
@@ -1112,7 +1080,6 @@ Proof.
 Qed.
 
 Hint Resolve subst_source_term.
- 
 
 Lemma type_correct_source_terms : forall Gamma E ty e, has_type_source Gamma E ty e -> PTerm E.
 Proof.
@@ -2332,13 +2299,14 @@ induction H; intros; unfold almost_unique.
 - auto.
 Qed.
 
-(* type inference always gives unique types *)
+(* Type inference always gives unique types: Theorem 5 *)
 
 Lemma typ_inf_unique : forall {Gamma e t1 E1}, has_type_source_alg Gamma e Inf t1 E1 -> forall {t2 E2}, has_type_source_alg Gamma e Inf t2 E2 -> t1 = t2.
 intros.
 pose (@typ_unique _ _ _ _ _ H _ _ H0). simpl in a. auto.
 Qed.
 
+(* Theorem 6 *)
 Lemma typ_coherence : forall Gamma e d t E1, has_type_source_alg Gamma e d t E1 -> forall E2, has_type_source_alg Gamma e d t E2 -> E1 = E2.
 intros Gamma e d t E1 H.
 induction H; intros.
@@ -2544,7 +2512,7 @@ Qed.
 
 Hint Resolve coercions_produce_terms.
 
-(* Subtyping rules produce type-correct coercions: Lemma 3 *)
+(* Subtyping rules produce type-correct coercions: Lemma 1 *)
 Lemma type_correct_coercions :
   forall Gamma A B E, sub A B E ->
              ok Gamma -> 
@@ -2733,8 +2701,6 @@ Qed.
     
 (* Completeness *)
 
-(* An auxiliary lemma that, given suitable pre-conditions, I think it will hold. *)
-
 Lemma erasure_open : forall t1 n t0 x,
   not (In x (fv_source t0)) ->
   not (In x (fv_source t1)) ->                     
@@ -2825,6 +2791,7 @@ Proof.
     reflexivity.
 Qed.
 
+(* Theorem 4 *)
 Lemma typ_complete : forall Gamma e t e',
   has_type_source Gamma e t e' -> (has_ty Gamma e' Inf t) /\ erase e' = e.
 intros Gamma e t e' H.
@@ -2909,6 +2876,7 @@ rewrite (IHt0 n e); reflexivity.
 rewrite (IHt0 n e); reflexivity.
 Qed.
 
+(* Theorem 3 *)
 Lemma typ_sound : forall e d A Gamma, has_ty Gamma e d A -> has_type Gamma (erase e) A.
 intros.  
 inversion H. clear H.

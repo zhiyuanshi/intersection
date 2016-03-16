@@ -23,11 +23,12 @@ http://www.chargueraud.org/softs/ln/
 We annotate the Coq theorems with the correnposing lemmas/theorems in the paper. 
 The reader can just look for:
 
-Lemma 5
+Lemma 4
 
-for example, to look for the proof of lemma 5 in the paper.
+for example, to look for the proof of lemma 4 in the paper.
 
-All lemmas and theorems are complete: there are no uses of admit or Admitted. 
+All lemmas and theorems are complete: there are no uses of admit or Admitted,
+with the exceptions of "tlam" and "tylam" due to a technical limitation.
 
 *)
 
@@ -220,10 +221,6 @@ inversion H0.
 apply stop. (* a top case here *)
 Defined.
 
-(* The No loss of Expressivity Lemmas *)
-
-(* Theorem 3 *)
-
 Definition sand2 : forall t t1 t2, Sub t1 t -> Sub (And t1 t2) t.
 intro t; induction t; intros.
 (* Case PInt *)
@@ -258,8 +255,6 @@ apply SAnd3. auto. auto.
 inversion H0.
 apply stop. (* a top case here *)
 Defined.
-
-(* Theorem 4 *)
 
 Definition sand3 : forall t t1 t2, Sub t2 t -> Sub (And  t1 t2) t.
 intro t; induction t; intros.
@@ -412,7 +407,7 @@ apply H.
 apply H0. apply reflex.
 *)  
 
-(* Disjointness algorithm is complete: Theorem 7 *)
+(* Disjointness algorithm is complete: Theorem 8 *)
 
 Lemma ortho_completness : forall t1, WFTyp t1 -> forall t2, WFTyp t2 -> OrthoS t1 t2 -> Ortho t1 t2.
 Proof.
@@ -509,7 +504,7 @@ destruct H.
 pose (H4 C H2 H3). contradiction. 
 Defined.
 
-(* Soundness of the disjointness algorithm: Theorem 6 *)
+(* Soundness of the disjointness algorithm: Theorem 7 *)
 
 Lemma ortho_soundness : forall (t1 t2 : PTyp), Ortho t1 t2 -> OrthoS t1 t2.
 intros.
@@ -584,7 +579,7 @@ simpl. inversion H0.
 rewrite IHTopLike with (e2 := e2); auto.
 Defined.
 
-(* Coercive subtyping is coeherent: Lemma 5 *)
+(* Coercive subtyping is coeherent: Lemma 3 *)
 
 Lemma sub_coherent : forall A, WFTyp A -> forall B, WFTyp B -> forall C1, sub A B C1 -> forall C2, sub A B C2 -> C1 = C2.
 Proof.
@@ -957,163 +952,6 @@ Proof.
   reflexivity.
 Defined.
 
-(*
-Fixpoint subst_source (z : var) (u : PExp) (t : PExp) {struct t} : PExp :=
-  match t with
-    | PBVar i     => PBVar i
-    | PFVar x     => if VarTyp.eqb x z then u else (PFVar x)
-    | PLit i      => PLit i
-    | PLam t1     => PLam (subst_source z u t1)
-    | PApp t1 t2  => PApp (subst_source z u t1) (subst_source z u t2)
-    | PMerge t1 t2 => PMerge (subst_source z u t1) (subst_source z u t2)
-    | PAnn t1 t2  => PAnn (subst_source z u t1) t2 
-  end.
-
-
-Lemma subst_source_fresh : forall t x u, 
-  not (In x (fv_source t)) -> subst_source x u t = t.
-Proof.
-  intro t.
-  induction t; intros; auto.
-  (* Case PFVar *)
-  simpl.
-  remember (v =? x) as H1.
-  destruct H1.
-  exfalso.
-  apply H.
-  simpl.
-  apply singleton_spec.
-  symmetry in HeqH1.
-  apply eqb_eq in HeqH1; symmetry; assumption.
-  reflexivity.
-  (* Case PLam *)
-  simpl in *.
-  rewrite IHt; auto.
-  (* Case PApp *)
-  simpl in *; rewrite IHt1, IHt2; auto; unfold not in *; intros;
-  apply H; apply union_spec; [ right | left ]; auto.
-  (* Case PMerge *)
-  simpl in *; rewrite IHt1, IHt2; auto; unfold not in *; intros;
-  apply H; apply union_spec; [ right | left ]; auto.
-  (* Case PAnn *)
-  simpl in *; rewrite IHt; auto.
-Defined.
-
-(** Substitution distributes on the open operation. *)
-
-Lemma subst_source_open : forall x u t1 t2, PTerm u -> 
-  subst_source x u (open_source t1 t2) = open_source (subst_source x u t1) (subst_source x u t2).
-Proof.
-  intros. unfold open_source. generalize 0.
-  induction t1; intros; simpl.
-  (* STFVar *)
-  - case_eq (eqb v x); intros.
-    rewrite <- open_rec_source_term; auto.
-    simpl; reflexivity.
-  (* STFVar *)
-  - case_eq (Nat.eqb n0 n); intros; auto.
-  (* STLit *)  
-  - reflexivity.
-  (* STLam *)
-  - rewrite IHt1; reflexivity.
-  (* STApp *)
-  - rewrite IHt1_1; rewrite IHt1_2; reflexivity.
-  (* STPair *)
-  - rewrite IHt1_1; rewrite IHt1_2; reflexivity.
-  (* STProj1 *)
-  - rewrite IHt1; reflexivity.
-Defined.
-
-(** Substitution and open_var for distinct names commute. *)
-
-Lemma subst_source_open_var : forall (x y : var) u t, not (x == y) -> PTerm u ->
-  open_source (subst_source x u t) (PFVar y) = subst_source x u (open_source t (PFVar y)).
-Proof.
-  intros. rewrite subst_source_open. simpl.
-  case_eq (eqb y x); intros.
-  apply eqb_eq in H1.
-  exfalso; apply H; symmetry. assumption.
-  reflexivity.
-  assumption.
-Defined.
-  
-(** Opening up an abstraction of body [t] with a term [u] is the same as opening
-  up the abstraction with a fresh name [x] and then substituting [u] for [x]. *)
-
-Lemma subst_source_intro : forall x t u, 
-  not (In x (fv_source t)) -> PTerm u ->
-  open_source t u = subst_source x u (open_source t (PFVar x)).
-Proof.
-  intros.
-  rewrite subst_source_open; [ | assumption ].
-  rewrite subst_source_fresh; [ | assumption ].
-  simpl.
-  case_eq (eqb x x); intros.
-  reflexivity.
-  rewrite EqFacts.eqb_neq in H1.
-  exfalso.
-  apply H1.
-  reflexivity.
-Defined.
-
-(* ********************************************************************** *)
-(** ** Preservation of local closure *)
-
-(** The goal of this section is to set up the appropriate lemmas 
-    for proving goals of the form [term t]. First, we defined a
-    predicate capturing that a term [t] is the body of a locally
-    closed abstraction. *)
-
-Definition body_source t :=
-  exists L, forall x, not (In x L) -> PTerm (open_source t (PFVar x)).
-
-(** We then show how to introduce and eliminate [body t]. *)
-
-Lemma term_abs_to_body_source : forall t1, 
-  PTerm (PLam t1) -> body_source t1.
-Proof.
-  intros; unfold body_source; inversion H; subst; exists L; assumption.
-Defined.
-
-Lemma body_source_to_term_abs : forall t1, 
-  body_source t1 -> PTerm (PLam t1).
-Proof. intros. inversion H. apply_fresh PTerm_Lam as x. apply H0.
-       unfold not in *. intros; apply Fry; apply union_spec; auto.
-Defined.
-
-(* Hint Resolve term_abs_to_body body_to_term_abs. *)
-
-(** We prove that terms are stable by substitution *)
-
-Lemma subst_source_term : forall t z u,
-  PTerm u -> PTerm t -> PTerm (subst_source z u t).
-Proof.
-  induction 2; simpl; auto.
-  destruct (eqb x z).
-  assumption.
-  (* Var *)
-  - apply PTerm_Var.
-  (* Lam *)
-  - apply_fresh PTerm_Lam as x.
-    rewrite subst_source_open_var.
-    apply H1. unfold not in *.
-    intros; apply Frx.
-    apply union_spec; left.
-    apply union_spec; left.
-    apply union_spec; left.
-    assumption.
-    unfold not in *; intros; apply Frx.
-    apply union_spec; left.
-    apply union_spec; left.
-    apply union_spec; right.
-    apply singleton_spec.
-    symmetry; assumption.
-    assumption.
-Defined.
-
-Hint Resolve subst_source_term.
- *)
-
 Lemma type_correct_source_terms : forall Gamma E ty e, has_type_source Gamma E ty e -> PTerm E.
 Proof.
   intros.
@@ -1122,10 +960,11 @@ Proof.
   apply H0; not_in_L x.
 Defined.
 
-Lemma type_correct_source_terms' : forall Gamma E ty e, has_type_source Gamma E ty e -> PTerm E.
+Lemma type_correct_source_terms' : forall Gamma E ty e, has_type_source Gamma e ty E -> PTerm E.
 Proof.
   intros.
   induction H; auto.
+  apply PTerm_Ann.
   apply_fresh PTerm_Lam as x; auto.
   apply H0; not_in_L x.
 Defined.
@@ -1802,13 +1641,14 @@ induction H; intros; unfold almost_unique.
 - now inversion H0.
 Defined.
 
-(* type inference always gives unique types *)
+(* Type inference always gives unique types: Theorem 5 *)
 
 Lemma typ_inf_unique : forall {Gamma e t1 E1}, has_type_source_alg Gamma e Inf t1 E1 -> forall {t2 E2}, has_type_source_alg Gamma e Inf t2 E2 -> t1 = t2.
 intros.
 pose (@typ_unique _ _ _ _ _ H _ _ H0). simpl in a. auto.
 Defined.
 
+(* Theorem 6 *)
 Lemma typ_coherence : forall Gamma e d t E1, has_type_source_alg Gamma e d t E1 -> forall E2, has_type_source_alg Gamma e d t E2 -> E1 = E2.
 intros Gamma e d t E1 H.
 induction H; intros.
@@ -1959,7 +1799,7 @@ Proof.
   - left; apply TopSigT.
 Qed.    
 
-(* Subtyping rules produce type-correct coercions: Lemma 3 *)
+(* Subtyping rules produce type-correct coercions: Lemma 1 *)
 Lemma type_correct_coercions :
   forall Gamma A B E, sub A B E ->
              ok Gamma -> 
@@ -2296,6 +2136,7 @@ Proof.
     destruct (Nat.eqb n n0); inversion H1.
 Qed.
 
+(* Theorem 4 *)
 Lemma typ_complete : forall Gamma e t e',
   has_type_source Gamma e t e' -> (has_ty Gamma e' Inf t) /\ erase e' = e.
 intros Gamma e t e' H.
@@ -2361,6 +2202,7 @@ rewrite (IHt0_1 n e). rewrite (IHt0_2 n e). reflexivity.
 rewrite (IHt0_1 n e). rewrite (IHt0_2 n e). reflexivity.
 Defined.
 
+(* Theorem 3 *)
 Lemma typ_sound : forall e d A Gamma, has_ty Gamma e d A -> has_type Gamma (erase e) A.
 intros.
 inversion H. clear H.
