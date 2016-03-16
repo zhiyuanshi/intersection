@@ -560,7 +560,7 @@ the same term can have different semantics depending on its type.
 
 \subsection{Coherency of Elaboration}
 
-Combining the previous results, we are able to show the central theorem:
+Combining the previous results, we show the central theorem:
 
 \begin{restatable}[Unique elaboration]{theorem}{uniqueelaboration}
   \label{theorem:unique-elaboration}
@@ -579,13 +579,19 @@ Combining the previous results, we are able to show the central theorem:
 \begin{proof}
   By induction on the first derivation.
   Note that two cases need special attention: \reflabel{\labeltsub} and \reflabel{\labeltapp}.
-  In the former, we know that $A$ is unique by Theorem~\ref{theorem:uniqueness-type-inference} and 
-  that $C$ is also unique, by
-  Lemma~\ref{lemma:unique-coercion}.\bruno{Still not good: what is C
-    and what is A? They are not defined above.}
-  The latter requires proving uniqueness of $A_1$.
-  We can show this, again, by Theorem~\ref{theorem:uniqueness-type-inference} and consequently use 
-  the induction hypotheses.
+  In the \reflabel{\labeltsub} rule:
+\begin{mathpar}
+\bruletsub
+\end{mathpar}
+\noindent we know that $A$ is unique by Theorem~\ref{theorem:uniqueness-type-inference} and 
+  that $C$ is also unique by
+  Lemma~\ref{lemma:unique-coercion}. For \reflabel{\labeltapp}:
+\begin{mathpar}
+\bruletapp
+\end{mathpar}
+\noindent we need to show the uniqueness of $A_1$ using
+Theorem~\ref{theorem:uniqueness-type-inference}, in order to use the
+induction hyphothesis.
 %  Note that the typing rules are already syntax-directed but the case of
 %  \reflabel{\labeltapp} (copied below) still needs special attention since we
 %  need to show that the generated coercion $E$ is unique.
