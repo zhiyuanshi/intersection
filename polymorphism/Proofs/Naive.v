@@ -37,149 +37,261 @@ with the exceptions of "tlam" and "tylam" due to a technical limitation.
 Inductive PTyp : Type :=
   | PInt : PTyp
   | Fun : PTyp -> PTyp -> PTyp
-  | And : PTyp -> PTyp -> PTyp.
+  | And : PTyp -> PTyp -> PTyp
+  | PBVar : nat -> PTyp
+  | PFVar : var -> PTyp
+  | ForAll : PTyp -> PTyp.
 
 Fixpoint ptyp2styp (t : PTyp) : STyp :=
   match t with
     | PInt => STInt 
     | Fun t1 t2 => STFun (ptyp2styp t1) (ptyp2styp t2)
     | And t1 t2 => STTuple (ptyp2styp t1) (ptyp2styp t2)
+    | PBVar n => STBVarT n
+    | PFVar v => STFVarT v
+    | ForAll t => STForAll (ptyp2styp t)
   end.
+
+Fixpoint open_rec_ptyp (k : nat) (u : PTyp) (t : PTyp) {struct t} : PTyp :=
+  match t with
+  | PInt      => PInt
+  | Fun t1 t2 => Fun (open_rec_ptyp k u t1) (open_rec_ptyp k u t2)
+  | And t1 t2 => And (open_rec_ptyp k u t1) (open_rec_ptyp k u t2) 
+  | PFVar x   => PFVar x
+  | PBVar i   => if Nat.eqb k i then u else (PBVar i)
+  | ForAll t  => ForAll (open_rec_ptyp (S k) u t)
+  end.
+
+Definition open_ptyp (t : PTyp) u := open_rec_ptyp 0 u t.
+
+Inductive PType : PTyp -> Prop :=
+  | PType_Var : forall x, PType (PFVar x)
+  | PType_Int : PType PInt
+  | PType_Fun : forall t1 t2, PType t1 -> PType t2 -> PType (Fun t1 t2)
+  | PType_And : forall t1 t2, PType t1 -> PType t2 -> PType (And t1 t2)
+  | PType_ForAll : forall L t,
+      (forall x, not (In x L) -> PType (open_ptyp t (PFVar x))) ->
+      PType (ForAll t).
+
+Hint Constructors PType.
 
 (* Subtyping relation *)
 
 Inductive Atomic : PTyp -> Prop :=
   | AInt : Atomic PInt
-  | AFun : forall t1 t2, Atomic (Fun t1 t2).
+  | AFun : forall t1 t2, Atomic (Fun t1 t2)
+  | AForAll : forall t, Atomic (ForAll t).
 
-Inductive sub : PTyp -> PTyp -> Exp -> Prop :=
-  | SInt : sub PInt PInt (fun A => STLam _ (STBVar _ 0))
+Inductive sub : PTyp -> PTyp -> (SExp var) -> Prop :=
+  | SInt : sub PInt PInt (STLam _ (STBVar _ 0))
   | SFun : forall o1 o2 o3 o4 c1 c2, sub o3 o1 c1 -> sub o2 o4 c2 -> 
-     sub (Fun o1 o2) (Fun o3 o4) (fun A => STLam _ (STLam _ (STApp _ (c2 A) (STApp _ (STBVar _ 1) (STApp _ (c1 A) (STBVar _ 0))))))
+     sub (Fun o1 o2) (Fun o3 o4) (STLam _ (STLam _ (STApp _ c2 (STApp _ (STBVar _ 1) (STApp _ c1 (STBVar _ 0))))))
   | SAnd1 : forall t t1 t2 c1 c2, sub t t1 c1 -> sub t t2 c2 -> 
-     sub t (And  t1 t2) (fun A => STLam _
-       (STPair _ (STApp _ (c1 A) (STBVar _ 0)) (STApp _ (c2 A) (STBVar _ 0))))
-  | SAnd2 : forall t t1 t2 c, sub t1 t c -> Atomic t ->
-     sub (And  t1 t2) t (fun A => STLam _ 
-       ((STApp _ (c A) (STProj1 _ (STBVar _ 0)))))
-  | SAnd3 : forall t t1 t2 c, sub t2 t c -> Atomic t ->
-     sub (And  t1 t2) t (fun A => STLam _ 
-       ((STApp _ (c A) (STProj2 _ (STBVar _ 0))))).
+     sub t (And  t1 t2) (STLam _
+       (STPair _ (STApp _ c1 (STBVar _ 0)) (STApp _ c2 (STBVar _ 0))))
+  | SAnd2 : forall t t1 t2 c, sub t1 t c -> Atomic t -> PType t2 ->
+     sub (And  t1 t2) t (STLam _ 
+       ((STApp _ c (STProj1 _ (STBVar _ 0)))))
+  | SAnd3 : forall t t1 t2 c, sub t2 t c -> Atomic t -> PType t1 ->
+     sub (And  t1 t2) t (STLam _ 
+       ((STApp _ c (STProj2 _ (STBVar _ 0)))))
+  | SVar : forall v, sub (PFVar v) (PFVar v) (STLam _ (STBVar _ 0))
+  | SForAll : forall L t1 t2 c,
+                (forall x, not (In x L) -> sub (open_ptyp t1 (PFVar x))
+                                         (open_ptyp t2 (PFVar x))
+                                         (open_typ_term c (STFVarT x))) ->
+                sub (ForAll t1) (ForAll t2)
+                    (STLam _ (STTLam _ (STApp _ c (STTApp _ (STBVar _ 0) (STBVarT 0))))).
 
-Definition Sub (t1 t2 : PTyp) : Prop := exists (e:Exp), sub t1 t2 e.
+(* Subtyping gives locally closed types *)
+
+Lemma sub_lc : forall A B c, sub A B c -> PType A /\ PType B.
+Proof.
+  intros.
+  induction H; auto.
+  (* Case Fun *)
+  - destruct IHsub1; destruct IHsub2; auto.
+  (* Case SAnd *)
+  - destruct IHsub1; destruct IHsub2; auto.
+  (* Case SAnd2 *)
+  - destruct IHsub.
+    split; auto.
+  (* Case SAnd3 *)
+  - destruct IHsub.    
+    split; auto.
+  - split; apply PType_ForAll with (L := L); intros; pose (H0 x H1); destruct a; auto.
+Qed.
+
+Definition Sub (t1 t2 : PTyp) : Prop := exists (e:SExp var), sub t1 t2 e.
 
 (* Smart constructors for Sub *)
 
 Definition sint : Sub PInt PInt.
-unfold Sub. exists (fun A => STLam _ (STBVar _ 0)). 
+unfold Sub. exists (STLam _ (STBVar _ 0)). 
 exact SInt.
 Defined.
 
 Definition sfun : forall o1 o2 o3 o4, Sub o3 o1 -> Sub o2 o4 -> Sub (Fun o1 o2) (Fun  o3 o4).
 unfold Sub; intros. destruct H. destruct H0.
-exists (fun A => STLam _ ( 
-       STLam _ (STApp _ (x0 A) (STApp _ (STBVar _ 1) (STApp _ (x A) (STBVar _ 0)))))).
+exists (STLam _ ( 
+       STLam _ (STApp _ x0 (STApp _ (STBVar _ 1) (STApp _ x (STBVar _ 0)))))).
 apply SFun. auto. auto.
 Defined.
 
 Definition sand1 : forall t t1 t2, Sub t t1 -> Sub t t2 -> Sub t (And t1 t2).
 unfold Sub. intros. destruct H. destruct H0.
-exists (fun A => STLam _ (
-       STPair _ (STApp _ (x A) (STBVar _ 0)) (STApp _ (x0 A) (STBVar _ 0)))).
+exists (STLam _ (
+       STPair _ (STApp _ x (STBVar _ 0)) (STApp _ x0 (STBVar _ 0)))).
 apply SAnd1. auto. auto.
 Defined.
 
-Definition sand2_atomic : forall t t1 t2, Sub t1 t -> Atomic t -> Sub (And  t1 t2) t.
-unfold Sub. intros t t1 t2 H H0. destruct t. destruct H.
-exists (fun A => STLam _ ( 
-       (STApp _ (x A) (STProj1 _ (STBVar _ 0))))).
-apply SAnd2. auto. auto. destruct H.
-exists (fun A => STLam _ (
-       (STApp _ (x A) (STProj1 _ (STBVar _ 0))))).
-apply SAnd2. auto. auto.
-inversion H0.
+Definition sand2_atomic :
+  forall t t1 t2, Sub t1 t -> Atomic t -> PType t2 -> Sub (And  t1 t2) t.
+  unfold Sub. intros t t1 t2 H H0. destruct t; try (now inversion H0).
+  - destruct H.
+    exists (STLam _ ((STApp _ x (STProj1 _ (STBVar _ 0))))).
+    apply SAnd2; auto.
+  - destruct H.
+    exists (STLam _ ((STApp _ x (STProj1 _ (STBVar _ 0))))).
+    apply SAnd2; auto.
+  - destruct H.
+    exists (STLam _ ((STApp _ x (STProj1 _ (STBVar _ 0))))).
+    apply SAnd2; auto.
 Defined.
 
-Definition sand2 : forall t t1 t2, Sub t1 t -> Sub (And t1 t2) t.
-intro t.
-induction t; intros.
-(* Case PInt *)
-apply sand2_atomic. auto. exact AInt.
-(* Case Fun *)
-apply sand2_atomic. auto. apply AFun.
-(* Case And *)
-unfold Sub. unfold Sub in H. destruct H. inversion H.
-assert (Sub (And t0 t3) t1). apply IHt1.
-unfold Sub. exists c1. auto. 
-assert (Sub (And t0 t3) t2). apply IHt2.
-unfold Sub. exists c2. auto.
-unfold Sub in H6. destruct H6.
-unfold Sub in H7. destruct H7.
-exists (fun A => STLam _ (
-       STPair _ (STApp _ (x0 A) (STBVar _ 0)) (STApp _ (x1 A) (STBVar _ 0)))).
-apply SAnd1. auto. auto.
-inversion H1.
-inversion H1.
+Definition sand2 : forall t t1 t2, Sub t1 t -> PType t2 -> Sub (And t1 t2) t.
+  intro t.
+  induction t; intros.
+  (* Case PInt *)
+  - apply sand2_atomic. auto. apply AInt. auto.
+  (* Case Fun *)
+  - apply sand2_atomic. auto. apply AFun. auto.
+  (* Case And *)
+  - unfold Sub. unfold Sub in H. destruct H. inversion H.
+    assert (Sub (And t0 t3) t1). apply IHt1.
+    unfold Sub. exists c1; auto. auto.
+    assert (Sub (And t0 t3) t2). apply IHt2.
+    unfold Sub. exists c2. auto. auto.
+    unfold Sub in H7. destruct H7.
+    unfold Sub in H8. destruct H8.
+    exists (STLam _ (STPair _ (STApp _ x0 (STBVar _ 0)) (STApp _ x1 (STBVar _ 0)))).
+    apply SAnd1. auto. auto.
+    inversion H2.
+    inversion H2.
+  (* Case BVar *)
+  - destruct H; apply sub_lc in H as [H1 HInv]; inversion HInv.
+  (* Case FVar *)
+  - destruct H.
+    inversion H; subst.
+    inversion H2.
+    inversion H2.
+    eexists.
+    admit.
+  (* Case ForAll *)
+  - apply sand2_atomic; auto; apply AForAll.
+Admitted.
+
+Definition sand3_atomic :
+  forall t t1 t2, Sub t2 t -> Atomic t -> PType t1 -> Sub (And t1 t2) t.
+  unfold Sub; intros t t1 t2 H H0 H1.
+  destruct t; try (now inversion H0);
+  destruct H; exists (STLam _ ((STApp _ x (STProj2 _ (STBVar _ 0))))); apply SAnd3; auto. 
 Defined.
 
-Definition sand3_atomic : forall t t1 t2, Sub t2 t -> Atomic t -> Sub (And t1 t2) t.
-unfold Sub. intros t t1 t2 H H0. destruct t. destruct H.
-exists (fun A => STLam _ ( 
-       (STApp _ (x A) (STProj2 _ (STBVar _ 0))))).
-apply SAnd3. auto. auto. destruct H.
-exists (fun A => STLam _ ( 
-       (STApp _ (x A) (STProj2 _ (STBVar _ 0))))).
-apply SAnd3. auto. auto.
-inversion H0.
+Definition sand3 : forall t t1 t2, Sub t2 t -> PType t1 -> Sub (And t1 t2) t.
+  intros t; induction t; intros.
+  (* Case PInt *)
+  - apply sand3_atomic. auto. apply AInt. auto.
+  (* Case Fun *)
+  - apply sand3_atomic. auto. apply AFun. auto.
+  (* Case And *)
+  - unfold Sub. unfold Sub in H. destruct H. inversion H.
+    assert (Sub (And t0 t3) t1). apply IHt1.
+    unfold Sub. exists c1. auto. auto.
+    assert (Sub (And t0 t3) t2). apply IHt2.
+    unfold Sub. exists c2. auto. auto.
+    unfold Sub in H7. destruct H7.
+    unfold Sub in H8. destruct H8.
+    exists (STLam _ (STPair _ (STApp _ x0 (STBVar _ 0)) (STApp _ x1 (STBVar _ 0)))).
+    apply SAnd1. auto. auto.
+    inversion H2.
+    inversion H2.
+  (* Case BVar *)
+  - destruct H; apply sub_lc in H as [H1 HInv]; inversion HInv.
+  (* Case FVar *)
+  - destruct H.
+    inversion H; subst.
+    inversion H2.
+    inversion H2.
+    eexists.
+    admit.
+  (* Case ForAll *)
+  - apply sand3_atomic; auto; apply AForAll.
+Admitted.
+
+Definition svar : forall v, Sub (PFVar v) (PFVar v).
+  intros.
+  unfold Sub.
+  exists (STLam _ (STBVar _ 0)).
+  apply SVar.
 Defined.
 
-Definition sand3 : forall t t1 t2, Sub t2 t -> Sub (And t1 t2) t.
-intros t; induction t; intros.
-(* Case PInt *)
-apply sand3_atomic. auto. exact AInt.
-(* Case Fun *)
-apply sand3_atomic. auto. apply AFun.
-(* Case And *)
-unfold Sub. unfold Sub in H. destruct H. inversion H.
-assert (Sub (And t0 t3) t1). apply IHt1.
-unfold Sub. exists c1. auto. 
-assert (Sub (And t0 t3) t2). apply IHt2.
-unfold Sub. exists c2. auto.
-unfold Sub in H6. destruct H6.
-unfold Sub in H7. destruct H7.
-exists (fun A => STLam _ (
-       STPair _ (STApp _ (x0 A) (STBVar _ 0)) (STApp _ (x1 A) (STBVar _ 0)))).
-apply SAnd1. auto. auto.
-inversion H1.
-inversion H1.
-Defined.
-
+(*
+Definition sforall : forall L t1 t2 c,
+                (forall x, not (In x L) -> sub (open_ptyp t1 (PFVar x))
+                                         (open_ptyp t2 (PFVar x))
+                                         (open_typ_term c (STFVarT x))) ->
+                sub (ForAll t1) (ForAll t2)
+                    (STLam _ (STTLam _ (STApp _ c (STTApp _ (STBVar _ 0) (STBVarT 0))))).
+Admitted.
+*)
+  
 (* Disjointness: Implementation *)
+
+Inductive OrthoAx : PTyp -> PTyp -> Prop :=
+  | OIntFun : forall t1 t2, OrthoAx PInt (Fun t1 t2)
+  | OIntForAll : forall t, OrthoAx PInt (ForAll t)
+  | OFunForAll : forall t t1 t2, OrthoAx (Fun t1 t2) (ForAll t)
+  | OSym : forall t1 t2, OrthoAx t1 t2 -> OrthoAx t2 t1.
 
 Inductive Ortho : PTyp -> PTyp -> Prop :=
   | OAnd1 : forall t1 t2 t3, Ortho t1 t3 -> Ortho t2 t3 -> Ortho (And t1 t2) t3
   | OAnd2 : forall t1 t2 t3, Ortho t1 t2 -> Ortho t1 t3 -> Ortho t1 (And t2 t3)
   | OFun  : forall t1 t2 t3 t4, Ortho t2 t4 -> Ortho (Fun t1 t2) (Fun t3 t4)
+  (* 
   | OIntFun : forall t1 t2, Ortho PInt (Fun t1 t2)
-  | OFunInt : forall t1 t2, Ortho (Fun t1 t2) PInt.
-
+  | OFunInt : forall t1 t2, Ortho (Fun t1 t2) PInt
+  *)
+  | OForAll : forall t1 t2, Ortho t1 t2 -> Ortho (ForAll t1) (ForAll t2)
+  | OAx : forall t1 t2, OrthoAx t1 t2 -> Ortho t1 t2.
+                             
 (* Disjointness: Specification *)
 
 Definition OrthoS (A B : PTyp) := not (exists C, Sub A C /\ Sub B C).
 
 (* Well-formed types *)
 
-Inductive WFTyp : PTyp -> Prop := 
-  | WFInt : WFTyp PInt
-  | WFFun : forall t1 t2, WFTyp t1 -> WFTyp t2 -> WFTyp (Fun t1 t2)
-  | WFAnd : forall t1 t2, WFTyp t1 -> WFTyp t2 -> Ortho t1 t2 -> WFTyp (And t1 t2).
+Inductive WFTyp : context unit -> PTyp -> Prop := 
+  | WFInt : forall Gamma, ok Gamma -> WFTyp Gamma PInt
+  | WFFun : forall Gamma t1 t2, WFTyp Gamma t1 -> WFTyp Gamma t2 -> WFTyp Gamma (Fun t1 t2)
+  | WFAnd : forall Gamma t1 t2, WFTyp Gamma t1 -> WFTyp Gamma t2 -> Ortho t1 t2 -> WFTyp Gamma (And t1 t2)
+  | WFVar : forall Gamma x, List.In (x,tt) Gamma -> ok Gamma -> WFTyp Gamma (PFVar x)
+  | WFForAll : forall L Gamma t,
+                 (forall x, not (In x L) -> WFTyp (extend x tt Gamma) (open_ptyp t (PFVar x))) ->
+                 WFTyp Gamma (ForAll t).
 
 (* Reflexivity *)
-Hint Resolve sint sfun sand1 sand2 sand3 SInt SFun SAnd1 SAnd2 SAnd3.
+Hint Resolve sint sfun sand1 sand2 sand3 svar SInt SFun SAnd1 SAnd2 SAnd3 SVar SForAll.
 
-Lemma reflex : forall (t1 : PTyp), Sub t1 t1.
+Lemma reflex : forall (t1 : PTyp), PType t1 -> Sub t1 t1.
 Proof.
-induction t1; intros; auto.
+  induction 1; intros; auto.
+  eexists.
+  apply SForAll with (L := L).
+  intros.
+  pose (H0 x H1).
+  destruct s.
+  admit.
 Qed.
 
 (* Disjointness algorithm is complete: Theorem 8 *)
