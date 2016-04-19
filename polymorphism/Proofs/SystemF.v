@@ -399,6 +399,18 @@ Proof.
 Qed.
 
 (** Target language **)
+
+Fixpoint fv_typ (sTyp : STyp) : vars :=
+  match sTyp with
+  | STUnitT       => empty
+  | STInt         => empty
+  | STFun t1 t2   => union (fv_typ t1) (fv_typ t2)
+  | STTuple t1 t2 => union (fv_typ t1) (fv_typ t2)
+  | STFVarT v     => singleton v 
+  | STBVarT n     => empty
+  | STForAll t    => fv_typ t
+  end.
+
 Fixpoint fv (sExp : SExp var) : vars :=
   match sExp with
     | STFVar _ v => singleton v
@@ -411,7 +423,7 @@ Fixpoint fv (sExp : SExp var) : vars :=
     | STProj1 _ t => fv t
     | STProj2 _ t => fv t
     | STTLam _ t => fv t
-    | STTApp _ t ty => fv t      
+    | STTApp _ t ty => union (fv t) (fv_typ ty)      
   end.
 
 Fixpoint open_rec_typ (k : nat) (u : STyp) (t : STyp) {struct t} : STyp :=
@@ -501,30 +513,63 @@ Proof.
     apply (IHt1 _ _ H).
   - rewrite <- union_spec.
     apply (IHt1 _ _ H).
-  - rewrite <- union_spec.
-    apply (IHt1 _ _ H).
+  - rewrite union_spec.
+    inversion H.
+    assert (Ha : In x (union (fv t1) (fv t2))).
+    eapply IHt1. apply H0.
+    rewrite union_spec in Ha.
+    inversion Ha. auto. auto. auto.
 Qed.
 
-
-Lemma fv_open_rec_typ_term :
-  forall t1 t2 x n, In x (fv (open_rec_typ_term n t2 t1)) ->
-               In x (fv t1).
+Lemma fv_open_rec_typ :
+  forall t1 t2 x n, In x (fv_typ (open_rec_typ n t2 t1)) ->
+               In x (union (fv_typ t1) (fv_typ t2)).
 Proof.
   intros.
   generalize dependent t2.
   generalize dependent n.
-  induction t1; intros; simpl in *; auto.
-  - apply (IHt1 _ _ H).
+  induction t1; intros; simpl in *; rewrite union_spec in *; auto.
   - rewrite union_spec.
-    rewrite union_spec in H.
-    destruct H as [H | H]; [ left; apply (IHt1_1 _ _ H) | right; apply (IHt1_2 _ _ H)].
+    inversion H as [H1 | H1].
+    apply IHt1_1 in H1; rewrite union_spec in H1; inversion H1; auto.
+    apply IHt1_2 in H1; rewrite union_spec in H1; inversion H1; auto.
   - rewrite union_spec.
+    inversion H as [H1 | H1].
+    apply IHt1_1 in H1; rewrite union_spec in H1; inversion H1; auto.
+    apply IHt1_2 in H1; rewrite union_spec in H1; inversion H1; auto.
+  - destruct (Nat.eqb n0 n); auto. 
+  - rewrite <- union_spec; eapply IHt1; apply H.
+Qed.
+    
+Lemma fv_open_rec_typ_term :
+  forall t1 t2 x n, In x (fv (open_rec_typ_term n t2 t1)) ->
+               In x (union (fv t1) (fv_typ t2)).
+Proof.
+  intros.
+  generalize dependent t2.
+  generalize dependent n.
+  induction t1; intros; simpl in *; try (now rewrite union_spec; auto).
+  - eapply IHt1; apply H.
+  - repeat rewrite union_spec. 
     rewrite union_spec in H.
-    destruct H as [H | H]; [ left; apply (IHt1_1 _ _ H) | right; apply (IHt1_2 _ _ H)].
+    destruct H as [H | H].
+    apply IHt1_1 in H; rewrite union_spec in H; inversion H; auto.
+    apply IHt1_2 in H; rewrite union_spec in H; inversion H; auto.
+  - repeat rewrite union_spec. 
+    rewrite union_spec in H.
+    destruct H as [H | H].
+    apply IHt1_1 in H; rewrite union_spec in H; inversion H; auto.
+    apply IHt1_2 in H; rewrite union_spec in H; inversion H; auto.
   - apply (IHt1 _ _ H).
   - apply (IHt1 _ _ H).
   - apply (IHt1 _ _ H).
-  - apply (IHt1 _ _ H).
+  - rewrite union_spec in H.
+    repeat rewrite union_spec.
+    inversion H.
+    apply IHt1 in H0; rewrite union_spec in H0; inversion H0; auto.
+    apply fv_open_rec_typ in H0.
+    rewrite union_spec in H0.
+    inversion H0; auto.
 Qed.
     
 Inductive STType : STyp -> Prop :=
@@ -920,10 +965,154 @@ Proof.
     erewrite IHE.
     apply f_equal.
     now inversion HEqOpen.
-    auto.
-    auto.
+    not_in_L x.
+    not_in_L x.
     inversion HEqOpen.
     apply H0.
+Qed.
+
+Lemma open_typ_app_eq : forall x E n F,
+  not (In x (fv_typ E)) ->
+  not (In x (fv_typ F)) ->
+  (open_rec_typ n (STFVarT x) E) = (open_rec_typ n (STFVarT x) F) ->
+  E = F.
+Proof.
+  intros x E.
+  induction E; intros n' F HNotE HNotF HEqOpen.
+  - simpl in *.
+    induction F; try (inversion HEqOpen; auto).
+    destruct (Nat.eqb n' n); auto.
+    inversion H0.
+  - simpl in *.
+    induction F; try (inversion HEqOpen; auto).
+    destruct (Nat.eqb n' n); auto.
+    inversion H0.
+  - simpl in *.
+    induction F; try (inversion HEqOpen; auto).
+    rewrite IHE1 with (F := F1) (n := n'); try not_in_L x.
+    rewrite IHE2 with (F := F2) (n := n'); try not_in_L x.
+    reflexivity.
+    simpl; rewrite union_spec; auto.
+    auto.
+    simpl; rewrite union_spec; auto.
+    auto.
+    destruct (Nat.eqb n' n); inversion H0.
+  - simpl in *.
+    induction F; try (inversion HEqOpen; auto).
+    rewrite IHE1 with (F := F1) (n := n'); try not_in_L x.
+    rewrite IHE2 with (F := F2) (n := n'); try not_in_L x.
+    reflexivity.
+    simpl; rewrite union_spec; auto.
+    auto.
+    simpl; rewrite union_spec; auto.
+    auto.
+    destruct (Nat.eqb n' n); inversion H0.
+  - induction F; simpl in *; try (now (inversion HEqOpen)).
+    destruct (Nat.eqb n' n).
+    exfalso; apply HNotE.
+    apply MSetProperties.Dec.F.singleton_2; inversion HEqOpen; reflexivity. 
+    inversion HEqOpen.
+  - induction F; simpl in *; try (now (destruct (Nat.eqb n' n); inversion HEqOpen)).
+    destruct (Nat.eqb n' n).
+    exfalso; apply HNotF.
+    apply MSetProperties.Dec.F.singleton_2; inversion HEqOpen; reflexivity. 
+    inversion HEqOpen.
+    case_eq (Nat.eqb n' n); intros.
+    case_eq (Nat.eqb n' n0); intros.
+    apply f_equal.
+    apply beq_nat_true in H.
+    apply beq_nat_true in H0.
+    now subst.
+    rewrite H in HEqOpen.
+    rewrite H0 in HEqOpen.
+    inversion HEqOpen.
+    rewrite H in HEqOpen.
+    case_eq (Nat.eqb n' n0); intros;
+    rewrite H0 in HEqOpen; inversion HEqOpen.
+    reflexivity.
+  - simpl in *.
+    induction F; try (inversion HEqOpen; auto).
+    destruct (Nat.eqb n' n); auto.
+    inversion H0.
+    inversion H0.
+    erewrite IHE.
+    reflexivity.
+    auto.
+    auto.
+    apply H0.
+Qed.    
+    
+Lemma open_typ_term_app_eq : forall x E n F,
+  not (In x (fv E)) ->
+  not (In x (fv F)) ->
+  (open_rec_typ_term n (STFVarT x) E) = (open_rec_typ_term n (STFVarT x) F) ->
+  E = F.
+Proof.
+  intros x E.
+  induction E; intros n' F HNotE HNotF HEqOpen.
+  - simpl in *.
+    induction F; try (inversion HEqOpen; auto).
+  - simpl in *.
+    induction F; try (inversion HEqOpen; auto).
+  - simpl in *.
+    induction F; try (inversion HEqOpen; auto).
+  - simpl in *.
+    induction F; try (inversion HEqOpen; auto).
+  - simpl in *.
+    induction F; try (inversion HEqOpen; auto).
+    erewrite IHE.
+    reflexivity.
+    not_in_L x.
+    not_in_L x.
+    apply H0.
+  - destruct F; simpl in *; try (now inversion HEqOpen).  
+    erewrite IHE1 with (F := F1) (n := n').
+    erewrite IHE2 with (F := F2) (n := n').
+    auto.
+    not_in_L x.
+    not_in_L x.
+    now inversion HEqOpen.
+    not_in_L x.
+    not_in_L x.
+    now inversion HEqOpen.
+  - destruct F; simpl in *; try (now inversion HEqOpen).  
+    erewrite IHE1 with (F := F1) (n := n').
+    erewrite IHE2 with (F := F2) (n := n').
+    auto.
+    not_in_L x.
+    not_in_L x.
+    now inversion HEqOpen.
+    not_in_L x.
+    not_in_L x.
+    now inversion HEqOpen.
+  - destruct F; simpl in *; try (now inversion HEqOpen).  
+    erewrite IHE with (F := F) (n := n').
+    auto.
+    not_in_L x.
+    not_in_L x.
+    now inversion HEqOpen.
+  - destruct F; simpl in *; try (now inversion HEqOpen).  
+    erewrite IHE with (F := F) (n := n').
+    auto.
+    not_in_L x.
+    not_in_L x.
+    now inversion HEqOpen.
+  - destruct F; simpl in *; try (now inversion HEqOpen).  
+    erewrite IHE with (F := F) (n := (S n')).
+    auto.
+    not_in_L x.
+    not_in_L x.
+    now inversion HEqOpen.
+  - destruct F; simpl in *; try (now inversion HEqOpen).  
+    erewrite IHE with (F := F) (n := n').
+    inversion HEqOpen.
+    apply open_typ_app_eq in H1.
+    now subst.
+    not_in_L x.
+    not_in_L x.
+    not_in_L x.
+    not_in_L x.
+    now inversion HEqOpen.
 Qed.
 
 (* Typing rules *)

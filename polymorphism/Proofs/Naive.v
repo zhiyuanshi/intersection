@@ -236,6 +236,14 @@ Inductive OrthoAx : PTyp -> PTyp -> Prop :=
   | OFunForAll : forall t t1 t2, OrthoAx (Fun t1 t2) (ForAll t)
   | OSym : forall t1 t2, OrthoAx t1 t2 -> OrthoAx t2 t1.
 
+Lemma OrthoAx_no_sym : forall t, not (OrthoAx t t).
+Proof.
+  unfold not; intros.
+  Require Import Coq.Program.Equality.
+  dependent induction H.
+  apply IHOrthoAx.
+Qed.
+
 (*
 Inductive PTypHd : PTyp -> Prop :=
   | HdInt : PTypHd PInt
@@ -298,22 +306,6 @@ Inductive WFTyp : context unit -> PTyp -> Prop :=
 
 (* Reflexivity *)
 Hint Resolve sint sfun sand1 sand2 sand3 svar SInt SFun SAnd1 SAnd2 SAnd3 SVar SForAll.
-
-Lemma OrthoAx_no_sym : forall t, not (OrthoAx t t).
-Proof.
-  unfold not; intros.
-  Require Import Coq.Program.Equality.
-  dependent induction H.
-  apply IHOrthoAx.
-Qed.
-
-Lemma OrthoAx_no_and : forall t t1 t2, not (OrthoAx t (And t1 t2)).
-Proof.
-Admitted.
-
-Lemma OrthoAx_sym : forall t1 t2, OrthoAx t1 t2 -> OrthoAx t2 t1.
-Proof.
-Admitted.
   
 (*
 Lemma reflex : forall (t1 : PTyp), PType t1 -> Sub t1 t1.
@@ -572,7 +564,7 @@ Proof.
       apply PTypHd3; auto.
 Qed.
   
-(* Lemmas needed to prove soundness of the disjointness algorithm *)
+(* Lemmas needed to prove soundness of the disjointness algorithm 
 
 Lemma ortho_sym : forall A B, OrthoS A B -> OrthoS B A.
 Proof.
@@ -638,59 +630,77 @@ destruct H. destruct H. induction x. inversion H. inversion H1. inversion H0. in
 apply IHx1. inversion H. inversion H1. unfold Sub. exists c1. auto.
 inversion H0. inversion H1. unfold Sub. exists c1. auto.
 Qed.
+ *)
 
 (* Coercive subtyping is coeherent: Lemma 3 *)
 
-Lemma sub_coherent : forall {A}, WFTyp A -> forall {B}, WFTyp B -> forall {C1}, sub A B C1 -> forall {C2}, sub A B C2 -> C1 = C2.
+Lemma sub_coherent :
+  forall {A Gamma}, WFTyp Gamma A ->
+           forall {B}, WFTyp Gamma B ->
+                  forall {C1}, sub A B C1 ->
+                          forall {C2}, sub A B C2 -> C1 = C2.
 Proof.
-intro. intro. intro. intro. intro. intro.
-(* Case: Int <: Int *)
-induction H1; intros.
-inversion H1. 
-reflexivity.
-(* Case: Fun t1 t2 <: Fun t3 t4 *)
-inversion H1; inversion H; inversion H0.
-assert (c2 = c3). apply IHsub2; auto.
-assert (c1 = c0). apply IHsub1; auto.
-rewrite H17. rewrite H18.
-reflexivity.
-(* Case: t <: And t1 t2 *) 
-inversion H1; inversion H0.
-assert (c1 = c0). apply IHsub1; auto.
-assert (c2 = c3). apply IHsub2; auto.
-rewrite H13. rewrite H14.
-reflexivity.
-(* different coercion case*)
-inversion H3.
-(* different coercion case*)
-inversion H3.
-(* Case: And t1 t2 <: t (first) *)
-inversion H3; inversion H.
-(* different coercion *)
-rewrite <- H7 in H2. inversion H2.
-(* same coercion *)
-assert (c = c0). apply IHsub; auto. rewrite H15.
-reflexivity.
-(* contradiction: not orthogonal! *)
-subst.
-assert (HSub : Sub (And t1 t2) t0) by (apply sand2; eexists; apply H1).
-assert (Ha := uniquesub t1 t2 t0 H14 HSub).
-exfalso; apply Ha.
-split; eexists; [apply H1 | apply H6].
-(* Case: And t1 t2 <: t (second) *)
-inversion H3; inversion H.
-rewrite <- H7 in H2. inversion H2.
-(* contradiction: not orthogonal! *)
-subst.
-assert (HSub : Sub (And t1 t2) t0) by (apply sand3; eexists; apply H1).
-assert (Ha := uniquesub t1 t2 t0 H14 HSub).
-exfalso; apply Ha.
-split; eexists; [apply H6 | apply H1].
-(* same coercion; no contradiction *)
-assert (c = c0). apply IHsub; auto. rewrite H15.
-reflexivity.
+  intros.
+  generalize dependent C2.
+  generalize dependent Gamma.
+  (* Case: Int <: Int *)
+  induction H1; intros.
+  - inversion H2. 
+    reflexivity.
+  (* Case: Fun t1 t2 <: Fun t3 t4 *)
+  - inversion H. inversion H0. inversion H2.
+    assert (c2 = c3). apply IHsub2 with (Gamma := Gamma); auto.
+    assert (c1 = c0). apply IHsub1 with (Gamma := Gamma); auto.
+    now subst.
+  (* Case: t <: And t1 t2 *) 
+  - inversion H2; inversion H0; subst.
+    assert (c1 = c0) by (apply IHsub1 with (Gamma := Gamma); auto).
+    assert (c2 = c3) by (apply IHsub2 with (Gamma := Gamma); auto).
+    now subst.
+    now subst.
+    now subst.
+  (* different coercion case*)
+  - inversion H0; subst.
+    inversion H3; subst.
+    inversion H.
+    assert (c = c0). apply IHsub with (Gamma := Gamma). inversion H0; subst. auto. auto.
+    now subst.
+    now subst.
+    assert (HSub : Sub (And t1 t2) t0) by (apply sand2; eexists; apply H1).
+    assert (Ha := uniquesub t1 t2 t0 H9 HSub).
+    exfalso; apply Ha.
+    split; eexists; [apply H1 | apply H7].
+  - inversion H0; subst.
+    inversion H3; subst.
+    inversion H.
+    assert (HSub : Sub (And t1 t2) t0) by (apply sand3; eexists; apply H1).
+    assert (Ha := uniquesub t1 t2 t0 H9 HSub).
+    exfalso; apply Ha.
+    split; eexists; [apply H7 | apply H1].
+    assert (c = c0). apply IHsub with (Gamma := Gamma). inversion H0; subst. auto. auto.
+    now subst.
+    now subst.
+  - now inversion H2.
+  - inversion H1; subst.
+    inversion H2; subst.
+    inversion H3; subst.
+    pick_fresh x.
+    assert (Ha : (open_typ_term c (STFVarT x)) = (open_typ_term c0 (STFVarT x))).
+    eapply H0 with (Gamma := extend x tt Gamma).
+    not_in_L x.
+    apply H6.
+    not_in_L x.
+    apply H7.
+    not_in_L x.
+    apply H8.
+    not_in_L x.
+    assert (c = c0).
+    eapply open_typ_term_app_eq with (x := x) (n := 0).
+    not_in_L x.
+    not_in_L x.
+    apply Ha.
+    now subst.
 Qed.
-
 
 (* typing rules of lambda i *)
 
