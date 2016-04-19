@@ -80,6 +80,7 @@ Hint Constructors PType.
 Inductive Atomic : PTyp -> Prop :=
   | AInt : Atomic PInt
   | AFun : forall t1 t2, Atomic (Fun t1 t2)
+  | AVar : forall v, Atomic (PFVar v)
   | AForAll : forall t, Atomic (ForAll t).
 
 Inductive sub : PTyp -> PTyp -> (SExp var) -> Prop :=
@@ -89,10 +90,10 @@ Inductive sub : PTyp -> PTyp -> (SExp var) -> Prop :=
   | SAnd1 : forall t t1 t2 c1 c2, sub t t1 c1 -> sub t t2 c2 -> 
      sub t (And  t1 t2) (STLam _
        (STPair _ (STApp _ c1 (STBVar _ 0)) (STApp _ c2 (STBVar _ 0))))
-  | SAnd2 : forall t t1 t2 c, sub t1 t c -> Atomic t -> PType t2 ->
+  | SAnd2 : forall t t1 t2 c, sub t1 t c -> Atomic t -> (* PType t2 -> *)
      sub (And  t1 t2) t (STLam _ 
        ((STApp _ c (STProj1 _ (STBVar _ 0)))))
-  | SAnd3 : forall t t1 t2 c, sub t2 t c -> Atomic t -> PType t1 ->
+  | SAnd3 : forall t t1 t2 c, sub t2 t c -> Atomic t -> (* PType t1 -> *)
      sub (And  t1 t2) t (STLam _ 
        ((STApp _ c (STProj2 _ (STBVar _ 0)))))
   | SVar : forall v, sub (PFVar v) (PFVar v) (STLam _ (STBVar _ 0))
@@ -102,25 +103,6 @@ Inductive sub : PTyp -> PTyp -> (SExp var) -> Prop :=
                                          (open_typ_term c (STFVarT x))) ->
                 sub (ForAll t1) (ForAll t2)
                     (STLam _ (STTLam _ (STApp _ c (STTApp _ (STBVar _ 0) (STBVarT 0))))).
-
-(* Subtyping gives locally closed types *)
-
-Lemma sub_lc : forall A B c, sub A B c -> PType A /\ PType B.
-Proof.
-  intros.
-  induction H; auto.
-  (* Case Fun *)
-  - destruct IHsub1; destruct IHsub2; auto.
-  (* Case SAnd *)
-  - destruct IHsub1; destruct IHsub2; auto.
-  (* Case SAnd2 *)
-  - destruct IHsub.
-    split; auto.
-  (* Case SAnd3 *)
-  - destruct IHsub.    
-    split; auto.
-  - split; apply PType_ForAll with (L := L); intros; pose (H0 x H1); destruct a; auto.
-Qed.
 
 Definition Sub (t1 t2 : PTyp) : Prop := exists (e:SExp var), sub t1 t2 e.
 
@@ -146,7 +128,7 @@ apply SAnd1. auto. auto.
 Defined.
 
 Definition sand2_atomic :
-  forall t t1 t2, Sub t1 t -> Atomic t -> PType t2 -> Sub (And  t1 t2) t.
+  forall t t1 t2, Sub t1 t -> Atomic t -> Sub (And  t1 t2) t.
   unfold Sub. intros t t1 t2 H H0. destruct t; try (now inversion H0).
   - destruct H.
     exists (STLam _ ((STApp _ x (STProj1 _ (STBVar _ 0))))).
@@ -157,77 +139,72 @@ Definition sand2_atomic :
   - destruct H.
     exists (STLam _ ((STApp _ x (STProj1 _ (STBVar _ 0))))).
     apply SAnd2; auto.
+  - destruct H.
+    exists (STLam _ ((STApp _ x (STProj1 _ (STBVar _ 0))))).
+    apply SAnd2; auto.
 Defined.
 
-Definition sand2 : forall t t1 t2, Sub t1 t -> PType t2 -> Sub (And t1 t2) t.
+Definition sand2 : forall t t1 t2, Sub t1 t -> Sub (And t1 t2) t.
   intro t.
   induction t; intros.
   (* Case PInt *)
-  - apply sand2_atomic. auto. apply AInt. auto.
+  - apply sand2_atomic. auto. apply AInt. 
   (* Case Fun *)
-  - apply sand2_atomic. auto. apply AFun. auto.
+  - apply sand2_atomic. auto. apply AFun.
   (* Case And *)
   - unfold Sub. unfold Sub in H. destruct H. inversion H.
     assert (Sub (And t0 t3) t1). apply IHt1.
     unfold Sub. exists c1; auto. auto.
     assert (Sub (And t0 t3) t2). apply IHt2.
     unfold Sub. exists c2. auto. auto.
+    unfold Sub in H6. destruct H6.
     unfold Sub in H7. destruct H7.
-    unfold Sub in H8. destruct H8.
     exists (STLam _ (STPair _ (STApp _ x0 (STBVar _ 0)) (STApp _ x1 (STBVar _ 0)))).
     apply SAnd1. auto. auto.
-    inversion H2.
-    inversion H2.
+    inversion H1.
+    inversion H1.
   (* Case BVar *)
-  - destruct H; apply sub_lc in H as [H1 HInv]; inversion HInv.
+  - inversion H. inversion H0. inversion H2. inversion H2.
   (* Case FVar *)
-  - destruct H.
-    inversion H; subst.
-    inversion H2.
-    inversion H2.
-    eexists.
-    admit.
+  - apply sand2_atomic; auto.
+    apply AVar.
   (* Case ForAll *)
   - apply sand2_atomic; auto; apply AForAll.
-Admitted.
+Qed.
 
 Definition sand3_atomic :
-  forall t t1 t2, Sub t2 t -> Atomic t -> PType t1 -> Sub (And t1 t2) t.
-  unfold Sub; intros t t1 t2 H H0 H1.
+  forall t t1 t2, Sub t2 t -> Atomic t -> Sub (And t1 t2) t.
+  unfold Sub; intros t t1 t2 H H0.
   destruct t; try (now inversion H0);
   destruct H; exists (STLam _ ((STApp _ x (STProj2 _ (STBVar _ 0))))); apply SAnd3; auto. 
 Defined.
 
-Definition sand3 : forall t t1 t2, Sub t2 t -> PType t1 -> Sub (And t1 t2) t.
+Definition sand3 : forall t t1 t2, Sub t2 t -> Sub (And t1 t2) t.
   intros t; induction t; intros.
   (* Case PInt *)
-  - apply sand3_atomic. auto. apply AInt. auto.
+  - apply sand3_atomic. auto. apply AInt.
   (* Case Fun *)
-  - apply sand3_atomic. auto. apply AFun. auto.
+  - apply sand3_atomic. auto. apply AFun.
   (* Case And *)
   - unfold Sub. unfold Sub in H. destruct H. inversion H.
     assert (Sub (And t0 t3) t1). apply IHt1.
     unfold Sub. exists c1. auto. auto.
     assert (Sub (And t0 t3) t2). apply IHt2.
     unfold Sub. exists c2. auto. auto.
+    unfold Sub in H6. destruct H6.
     unfold Sub in H7. destruct H7.
-    unfold Sub in H8. destruct H8.
     exists (STLam _ (STPair _ (STApp _ x0 (STBVar _ 0)) (STApp _ x1 (STBVar _ 0)))).
     apply SAnd1. auto. auto.
-    inversion H2.
-    inversion H2.
+    inversion H1.
+    inversion H1.
   (* Case BVar *)
-  - destruct H; apply sub_lc in H as [H1 HInv]; inversion HInv.
+  - inversion H; inversion H0; inversion H2.
   (* Case FVar *)
-  - destruct H.
-    inversion H; subst.
-    inversion H2.
-    inversion H2.
-    eexists.
-    admit.
+  - apply sand3_atomic; auto.
+    apply AVar.
   (* Case ForAll *)
   - apply sand3_atomic; auto; apply AForAll.
-Admitted.
+Qed.
 
 Definition svar : forall v, Sub (PFVar v) (PFVar v).
   intros.
@@ -241,9 +218,14 @@ Definition sforall : forall L t1 t2 c,
                 (forall x, not (In x L) -> sub (open_ptyp t1 (PFVar x))
                                          (open_ptyp t2 (PFVar x))
                                          (open_typ_term c (STFVarT x))) ->
-                sub (ForAll t1) (ForAll t2)
-                    (STLam _ (STTLam _ (STApp _ c (STTApp _ (STBVar _ 0) (STBVarT 0))))).
-Admitted.
+                Sub (ForAll t1) (ForAll t2).
+  intros.
+  unfold Sub.
+  eexists.
+  eapply SForAll.
+  intros.
+  
+  pick_fresh.
 *)
   
 (* Disjointness: Implementation *)
@@ -254,6 +236,37 @@ Inductive OrthoAx : PTyp -> PTyp -> Prop :=
   | OFunForAll : forall t t1 t2, OrthoAx (Fun t1 t2) (ForAll t)
   | OSym : forall t1 t2, OrthoAx t1 t2 -> OrthoAx t2 t1.
 
+(*
+Inductive PTypHd : PTyp -> Prop :=
+  | HdInt : PTypHd PInt
+  | HdFun : forall t1 t2, PTypHd (Fun t1 t2)
+  | HdForAll : forall t, PTypHd (ForAll t).
+
+  | HdAnd : forall t1 t2, PTypHd (And t1 t2)
+  | HdFVar : forall v, PTypHd (PFVar v)
+  | HdBVar : forall n, PTypHd (PBVar n).
+
+
+Definition OrthoAx' (t1 t2 : PTyp) :=
+  PTypHd t1 /\ PTypHd t2 /\ not (PTypHd t1 = PTypHd t2).
+*)
+
+
+Definition hd (p : PTyp) : nat :=
+  match p with
+  | PInt      => 0
+  | Fun t1 t2 => 1
+  | ForAll t  => 2
+  | PBVar n   => 3
+  | PFVar v   => 4 
+  | And t1 t2 => 5
+  end.
+
+
+Definition OrthoAx' (t1 t2 : PTyp) : Prop :=
+  (hd t1 < 3 /\ hd t2 < 3 /\ not (hd t1 = hd t2)).
+
+
 Inductive Ortho : PTyp -> PTyp -> Prop :=
   | OAnd1 : forall t1 t2 t3, Ortho t1 t3 -> Ortho t2 t3 -> Ortho (And t1 t2) t3
   | OAnd2 : forall t1 t2 t3, Ortho t1 t2 -> Ortho t1 t3 -> Ortho t1 (And t2 t3)
@@ -262,8 +275,11 @@ Inductive Ortho : PTyp -> PTyp -> Prop :=
   | OIntFun : forall t1 t2, Ortho PInt (Fun t1 t2)
   | OFunInt : forall t1 t2, Ortho (Fun t1 t2) PInt
   *)
-  | OForAll : forall t1 t2, Ortho t1 t2 -> Ortho (ForAll t1) (ForAll t2)
-  | OAx : forall t1 t2, OrthoAx t1 t2 -> Ortho t1 t2.
+  | OForAll : forall L t1 t2,
+                (forall x, not (In x L) -> Ortho (open_ptyp t1 (PFVar x))
+                                           (open_ptyp t2 (PFVar x))) ->
+                Ortho (ForAll t1) (ForAll t2)
+  | OAx : forall t1 t2, OrthoAx' t1 t2 -> Ortho t1 t2.
                              
 (* Disjointness: Specification *)
 
@@ -283,6 +299,23 @@ Inductive WFTyp : context unit -> PTyp -> Prop :=
 (* Reflexivity *)
 Hint Resolve sint sfun sand1 sand2 sand3 svar SInt SFun SAnd1 SAnd2 SAnd3 SVar SForAll.
 
+Lemma OrthoAx_no_sym : forall t, not (OrthoAx t t).
+Proof.
+  unfold not; intros.
+  Require Import Coq.Program.Equality.
+  dependent induction H.
+  apply IHOrthoAx.
+Qed.
+
+Lemma OrthoAx_no_and : forall t t1 t2, not (OrthoAx t (And t1 t2)).
+Proof.
+Admitted.
+
+Lemma OrthoAx_sym : forall t1 t2, OrthoAx t1 t2 -> OrthoAx t2 t1.
+Proof.
+Admitted.
+  
+(*
 Lemma reflex : forall (t1 : PTyp), PType t1 -> Sub t1 t1.
 Proof.
   induction 1; intros; auto.
@@ -291,10 +324,11 @@ Proof.
   intros.
   pose (H0 x H1).
   destruct s.
-  admit.
+  
 Qed.
+ *)
 
-(* Disjointness algorithm is complete: Theorem 8 *)
+(* Disjointness algorithm is complete: Theorem 8
 
 Lemma ortho_completeness : forall (t1 t2 : PTyp), OrthoS t1 t2 -> Ortho t1 t2.
 Proof.
@@ -360,7 +394,9 @@ apply sand3.
 exact H.
 exact H0.
 Qed.
+ *)
 
+(*
 Lemma nosub : forall t1 t2, OrthoS t1 t2 -> not (Sub t1 t2) /\ not (Sub t2 t1).
 Proof.
 intros; split; unfold not.
@@ -372,8 +408,9 @@ unfold OrthoS in H. unfold not in H. intros.
 apply H.
 exists t1. split. apply reflex. auto.
 Qed.
+*)
 
-
+(*
 Lemma invAndS1 : forall t t1 t2, Sub t (And t1 t2) -> Sub t t1 /\ Sub t t2.
 Proof.
 intro t; induction t; intros.
@@ -403,13 +440,16 @@ apply sand3.
 auto.
 Qed.
 
-(* Unique subtype contributor: Lemma 2 *)
 
 Lemma uniquesub' : forall A B C, 
   OrthoS A B -> Sub (And A B) C -> not (Sub A C /\ Sub B C).
 Proof.
 intros. unfold OrthoS in H. unfold not. intros. apply H. exists C. auto.
 Qed.  
+
+*)
+
+(* Unique subtype contributor: Lemma 2 *)
 
 Lemma uniquesub : forall A B C,
   Ortho A B -> Sub (And A B) C -> not (Sub A C /\ Sub B C).
@@ -418,105 +458,118 @@ Proof.
   unfold not; intros.
   destruct H1.
   generalize dependent C.
-  induction H; intros.
+  dependent induction H; intros.
   - induction C.
-    inversion H2.
-    inversion H4; subst.
-    eapply IHOrtho1.
-    apply sand3; apply H3.
-    eexists; apply H7.
-    apply H3.
-    eapply IHOrtho2.
-    apply sand3; apply H3.
-    eexists; apply H7.
-    apply H3.
-    inversion H2.
-    inversion H4; subst.
-    eapply IHOrtho1.
-    apply sand3; apply H3.
-    eexists; apply H7.
-    apply H3.    
-    eapply IHOrtho2.
-    apply sand3; apply H3.
-    eexists; apply H7.
-    apply H3.
-    inversion H3; inversion H4; subst.
-    inversion H2; inversion H5; subst.
-    apply IHC1.
-    apply sand2.
-    eexists; apply H11.
-    eexists; apply H11.
-    eexists; apply H8.
-    inversion H13.
-    inversion H13.
-    inversion H6.
-    inversion H6.
+    + inversion H2; inversion H4; subst.
+      eapply IHOrtho1; [ apply sand3; apply H3 | eexists; apply H7 | auto ].
+      eapply IHOrtho2; [ apply sand3; apply H3 | eexists; apply H7 | auto ].   
+    + inversion H2; inversion H4; subst.
+      eapply IHOrtho1; [ apply sand3; apply H3 | eexists; apply H7 | auto ].
+      eapply IHOrtho2; [ apply sand3; apply H3 | eexists; apply H7 | auto ].   
+    + inversion H3; inversion H4; subst.
+      inversion H2; inversion H5; subst.
+      apply IHC1.
+      apply sand2.
+      eexists; apply H11.
+      eexists; apply H11.
+      eexists; apply H8.
+      inversion H13.
+      inversion H13.
+      inversion H6.
+      inversion H6.
+    + inversion H3; inversion H4; inversion H6.
+    + inversion H2; inversion H4; subst.
+      eapply IHOrtho1; [ apply sand3; apply H3 | eexists; apply H7 | auto ].
+      eapply IHOrtho2; [ apply sand3; apply H3 | eexists; apply H7 | auto ].      
+    + inversion H2; inversion H4; subst.
+      eapply IHOrtho1; [ apply sand3; apply H3 | eexists; apply H7 | auto ].
+      eapply IHOrtho2; [ apply sand3; apply H3 | eexists; apply H7 | auto ].      
   - induction C.
-    inversion H3.
-    inversion H4; subst.
-    eapply IHOrtho1.
-    apply sand2; apply H2.
-    apply H2.
-    eexists; apply H7.
-    eapply IHOrtho2.
-    apply sand2; apply H2.
-    apply H2.
-    eexists; apply H7.
-    inversion H3.
-    inversion H4; subst.
-    eapply IHOrtho1.
-    apply sand2; apply H2.
-    apply H2.
-    eexists; apply H7.
-    eapply IHOrtho2.
-    apply sand2; apply H2.
-    apply H2.
-    eexists; apply H7.
-    inversion H3; inversion H4; subst.
-    inversion H2; inversion H5; subst.
-    apply IHC1.
-    apply sand2.
-    eexists; apply H11.
-    eexists; apply H11.
-    eexists; apply H8.
-    inversion H7.
-    inversion H7.
-    inversion H10.
-    inversion H10.
-  - induction C.
-    inversion H1; inversion H3.
-    inversion H1.
-    inversion H3; subst.
-    inversion H2.
-    inversion H4; subst.
-    eapply IHOrtho.
-    apply sand2; eexists; apply H10.
-    eexists; apply H10.
-    eexists; apply H13.
-    inversion H1; inversion H3; subst.
-    inversion H2; inversion H4; subst.
-    apply IHC1.
-    apply sand2; eexists; apply H7.
-    eexists; apply H7.
-    eexists; apply H10.
-  - induction C.
-    inversion H2; inversion H.
-    inversion H1; inversion H.
-    inversion H1; inversion H; subst.
-    inversion H2; inversion H3; subst.
-    apply IHC1.
-    apply sand2; eexists; apply H6.
-    eexists; apply H6.
-    eexists; apply H9.
-  - induction C.
-    inversion H1; inversion H.
-    inversion H2; inversion H.
-    inversion H1; inversion H; subst.
-    inversion H2; inversion H3; subst.
-    apply IHC1.
-    apply sand2; eexists; apply H6.
-    eexists; apply H6.
-    eexists; apply H9.
+    + inversion H3; inversion H4; subst.
+      eapply IHOrtho1; [ apply sand2; apply H2 | apply H2 | eexists; apply H7 ].
+      eapply IHOrtho2; [ apply sand2; apply H2 | apply H2 | eexists; apply H7 ].
+    + inversion H3; inversion H4; subst.
+      eapply IHOrtho1; [ apply sand2; apply H2 | apply H2 | eexists; apply H7 ].
+      eapply IHOrtho2; [ apply sand2; apply H2 | apply H2 | eexists; apply H7 ].
+    + inversion H3; inversion H4; subst.
+      inversion H2; inversion H5; subst.
+      apply IHC1.
+      apply sand2.
+      eexists; apply H11.
+      eexists; apply H11.
+      eexists; apply H8.
+      inversion H7.
+      inversion H7.
+      inversion H10.
+      inversion H10.
+    + inversion H3; inversion H4; subst.
+      eapply IHOrtho1; [ apply sand2; apply H2 | apply H2 | eexists; apply H7 ].
+      eapply IHOrtho2; [ apply sand2; apply H2 | apply H2 | eexists; apply H7 ].
+    + inversion H3; inversion H4; subst.
+      eapply IHOrtho1; [ apply sand2; apply H2 | apply H2 | eexists; apply H7 ].
+      eapply IHOrtho2; [ apply sand2; apply H2 | apply H2 | eexists; apply H7 ].
+    + inversion H3; inversion H4; subst.
+      eapply IHOrtho1; [ apply sand2; apply H2 | apply H2 | eexists; apply H7 ].
+      eapply IHOrtho2; [ apply sand2; apply H2 | apply H2 | eexists; apply H7 ].
+  - induction C; try (now (inversion H1 as [x HInv]; inversion HInv)).
+    + inversion H1; inversion H3; subst.
+      inversion H2; inversion H4; subst.
+      eapply IHOrtho; [ apply sand2; eexists; apply H10
+                      | eexists; apply H10
+                      | eexists; apply H13 ].
+    + inversion H1; inversion H3; subst.
+      inversion H2; inversion H4; subst.
+      apply IHC1.
+      apply sand2; eexists; apply H7.
+      eexists; apply H7.
+      eexists; apply H10.
+  - induction C; try (now (inversion H1 as [x HInv]; inversion HInv)).
+    + inversion H2; inversion H4; subst.
+      inversion H2; inversion H5; subst.
+      inversion H3; inversion H6; subst.
+      apply IHC1.
+      apply sand2; eexists; apply H8.
+      eexists; apply H8.
+      eexists; apply H14.
+    + inversion H2; inversion H4; subst.
+      inversion H3; inversion H5; subst.
+      pick_fresh x.
+      clear IHC; clear H1.
+      eapply H0.
+      not_in_L x; apply H8.
+      apply sand2.
+      eexists; apply H7; not_in_L x.
+      eexists; apply H7; not_in_L x.
+      eexists; apply H9; not_in_L x.
+  - destruct H as [ PTypHd1 [ PTypHd2 PTypHd3 ]].
+    induction C.
+    + inversion H1; inversion H; subst;
+      try now (inversion PTypHd1; inversion H6; inversion H8; inversion H10).
+      inversion H2; inversion H3; subst;
+      try now (inversion PTypHd2; inversion H5; inversion H7;
+               inversion H9; inversion H11).
+      apply PTypHd3; auto.
+    + inversion H1; inversion H; subst;
+      try now (inversion PTypHd1; inversion H6; inversion H8; inversion H10).
+      inversion H2; inversion H3; subst;
+      try now (inversion PTypHd2; inversion H9; inversion H11; inversion H13).
+      apply PTypHd3; auto.
+    + inversion H1 as [x HInv1]; inversion HInv1; subst; try (now inversion H3).
+      inversion H2 as [x HInv2]; inversion HInv2; subst; try (now inversion H3).
+      apply IHC1;
+        [ apply sand2; eexists; apply H5 | eexists; apply H5 | eexists; apply H6 ].
+    + inversion H1; inversion H; subst;
+      try now (inversion PTypHd1; inversion H6; inversion H8; inversion H10).
+    + inversion H1; inversion H; subst;
+      try now (inversion PTypHd1; inversion H6; inversion H8; inversion H10).
+      inversion H2; inversion H3; subst;
+      try now (inversion PTypHd2; inversion H7; inversion H9; inversion H11).
+      apply PTypHd3; auto.
+    + inversion H1; inversion H; subst;
+      try now (inversion PTypHd1; inversion H6; inversion H8; inversion H10).
+      inversion H2; inversion H3; subst;
+      try now (inversion PTypHd2; inversion H8; inversion H10; inversion H12).
+      apply PTypHd3; auto.
 Qed.
   
 (* Lemmas needed to prove soundness of the disjointness algorithm *)
