@@ -38,8 +38,8 @@ Inductive PTyp : Type :=
   | PInt : PTyp
   | Fun : PTyp -> PTyp -> PTyp
   | And : PTyp -> PTyp -> PTyp
-  | PBVar : nat -> PTyp
-  | PFVar : var -> PTyp
+  | PBVarT : nat -> PTyp
+  | PFVarT : var -> PTyp
   | ForAll : PTyp -> PTyp.
 
 Fixpoint ptyp2styp (t : PTyp) : STyp :=
@@ -47,8 +47,8 @@ Fixpoint ptyp2styp (t : PTyp) : STyp :=
     | PInt => STInt 
     | Fun t1 t2 => STFun (ptyp2styp t1) (ptyp2styp t2)
     | And t1 t2 => STTuple (ptyp2styp t1) (ptyp2styp t2)
-    | PBVar n => STBVarT n
-    | PFVar v => STFVarT v
+    | PBVarT n => STBVarT n
+    | PFVarT v => STFVarT v
     | ForAll t => STForAll (ptyp2styp t)
   end.
 
@@ -57,20 +57,30 @@ Fixpoint open_rec_ptyp (k : nat) (u : PTyp) (t : PTyp) {struct t} : PTyp :=
   | PInt      => PInt
   | Fun t1 t2 => Fun (open_rec_ptyp k u t1) (open_rec_ptyp k u t2)
   | And t1 t2 => And (open_rec_ptyp k u t1) (open_rec_ptyp k u t2) 
-  | PFVar x   => PFVar x
-  | PBVar i   => if Nat.eqb k i then u else (PBVar i)
+  | PFVarT x  => PFVarT x
+  | PBVarT i  => if Nat.eqb k i then u else (PBVarT i)
   | ForAll t  => ForAll (open_rec_ptyp (S k) u t)
   end.
 
 Definition open_ptyp (t : PTyp) u := open_rec_ptyp 0 u t.
 
+Fixpoint fv_ptyp (pTyp : PTyp) : vars :=
+  match pTyp with
+    | PInt      => empty 
+    | Fun t1 t2 => union (fv_ptyp t1) (fv_ptyp t2)
+    | And t1 t2 => union (fv_ptyp t1) (fv_ptyp t2)
+    | PBVarT n  => empty
+    | PFVarT v  => singleton v
+    | ForAll t  => fv_ptyp t
+  end.  
+
 Inductive PType : PTyp -> Prop :=
-  | PType_Var : forall x, PType (PFVar x)
+  | PType_Var : forall x, PType (PFVarT x)
   | PType_Int : PType PInt
   | PType_Fun : forall t1 t2, PType t1 -> PType t2 -> PType (Fun t1 t2)
   | PType_And : forall t1 t2, PType t1 -> PType t2 -> PType (And t1 t2)
   | PType_ForAll : forall L t,
-      (forall x, not (In x L) -> PType (open_ptyp t (PFVar x))) ->
+      (forall x, not (In x L) -> PType (open_ptyp t (PFVarT x))) ->
       PType (ForAll t).
 
 Hint Constructors PType.
@@ -80,7 +90,7 @@ Hint Constructors PType.
 Inductive Atomic : PTyp -> Prop :=
   | AInt : Atomic PInt
   | AFun : forall t1 t2, Atomic (Fun t1 t2)
-  | AVar : forall v, Atomic (PFVar v)
+  | AVar : forall v, Atomic (PFVarT v)
   | AForAll : forall t, Atomic (ForAll t).
 
 Inductive sub : PTyp -> PTyp -> (SExp var) -> Prop :=
@@ -96,10 +106,10 @@ Inductive sub : PTyp -> PTyp -> (SExp var) -> Prop :=
   | SAnd3 : forall t t1 t2 c, sub t2 t c -> Atomic t -> (* PType t1 -> *)
      sub (And  t1 t2) t (STLam _ 
        ((STApp _ c (STProj2 _ (STBVar _ 0)))))
-  | SVar : forall v, sub (PFVar v) (PFVar v) (STLam _ (STBVar _ 0))
+  | SVar : forall v, sub (PFVarT v) (PFVarT v) (STLam _ (STBVar _ 0))
   | SForAll : forall L t1 t2 c,
-                (forall x, not (In x L) -> sub (open_ptyp t1 (PFVar x))
-                                         (open_ptyp t2 (PFVar x))
+                (forall x, not (In x L) -> sub (open_ptyp t1 (PFVarT x))
+                                         (open_ptyp t2 (PFVarT x))
                                          (open_typ_term c (STFVarT x))) ->
                 sub (ForAll t1) (ForAll t2)
                     (STLam _ (STTLam _ (STApp _ c (STTApp _ (STBVar _ 0) (STBVarT 0))))).
@@ -206,7 +216,7 @@ Definition sand3 : forall t t1 t2, Sub t2 t -> Sub (And t1 t2) t.
   - apply sand3_atomic; auto; apply AForAll.
 Qed.
 
-Definition svar : forall v, Sub (PFVar v) (PFVar v).
+Definition svar : forall v, Sub (PFVarT v) (PFVarT v).
   intros.
   unfold Sub.
   exists (STLam _ (STBVar _ 0)).
@@ -265,8 +275,8 @@ Definition hd (p : PTyp) : nat :=
   | PInt      => 0
   | Fun t1 t2 => 1
   | ForAll t  => 2
-  | PBVar n   => 3
-  | PFVar v   => 4 
+  | PBVarT n   => 3
+  | PFVarT v   => 4 
   | And t1 t2 => 5
   end.
 
@@ -284,8 +294,8 @@ Inductive Ortho : PTyp -> PTyp -> Prop :=
   | OFunInt : forall t1 t2, Ortho (Fun t1 t2) PInt
   *)
   | OForAll : forall L t1 t2,
-                (forall x, not (In x L) -> Ortho (open_ptyp t1 (PFVar x))
-                                           (open_ptyp t2 (PFVar x))) ->
+                (forall x, not (In x L) -> Ortho (open_ptyp t1 (PFVarT x))
+                                           (open_ptyp t2 (PFVarT x))) ->
                 Ortho (ForAll t1) (ForAll t2)
   | OAx : forall t1 t2, OrthoAx' t1 t2 -> Ortho t1 t2.
                              
@@ -295,13 +305,13 @@ Definition OrthoS (A B : PTyp) := not (exists C, Sub A C /\ Sub B C).
 
 (* Well-formed types *)
 
-Inductive WFTyp : context unit -> PTyp -> Prop := 
+Inductive WFTyp : context (TyEnv PTyp) -> PTyp -> Prop := 
   | WFInt : forall Gamma, ok Gamma -> WFTyp Gamma PInt
   | WFFun : forall Gamma t1 t2, WFTyp Gamma t1 -> WFTyp Gamma t2 -> WFTyp Gamma (Fun t1 t2)
   | WFAnd : forall Gamma t1 t2, WFTyp Gamma t1 -> WFTyp Gamma t2 -> Ortho t1 t2 -> WFTyp Gamma (And t1 t2)
-  | WFVar : forall Gamma x, List.In (x,tt) Gamma -> ok Gamma -> WFTyp Gamma (PFVar x)
+  | WFVar : forall Gamma x, List.In (x,TyVar _) Gamma -> ok Gamma -> WFTyp Gamma (PFVarT x)
   | WFForAll : forall L Gamma t,
-                 (forall x, not (In x L) -> WFTyp (extend x tt Gamma) (open_ptyp t (PFVar x))) ->
+                 (forall x, not (In x L) -> WFTyp (extend x (TyVar _) Gamma) (open_ptyp t (PFVarT x))) ->
                  WFTyp Gamma (ForAll t).
 
 (* Reflexivity *)
@@ -686,7 +696,7 @@ Proof.
     inversion H3; subst.
     pick_fresh x.
     assert (Ha : (open_typ_term c (STFVarT x)) = (open_typ_term c0 (STFVarT x))).
-    eapply H0 with (Gamma := extend x tt Gamma).
+    eapply H0 with (Gamma := extend x (TyVar _) Gamma).
     not_in_L x.
     apply H6.
     not_in_L x.
@@ -716,9 +726,11 @@ Inductive PExp :=
   | PLam   : PExp -> PExp
   | PApp   : PExp -> PExp -> PExp
   | PMerge : PExp -> PExp -> PExp
-  | PAnn   : PExp -> PTyp -> PExp. (* only for the algorithmic version *) 
+  | PAnn   : PExp -> PTyp -> PExp (* only for the algorithmic version *)
+  | PTLam  : PExp -> PExp
+  | PTApp  : PExp -> PTyp -> PExp.
 
-(* Free variables *)
+(* Free variables *)      
 
 (** Source language **)
 Fixpoint fv_source (pExp : PExp) : vars :=
@@ -730,6 +742,8 @@ Fixpoint fv_source (pExp : PExp) : vars :=
     | PApp t1 t2 => union (fv_source t1) (fv_source t2)
     | PMerge t1 t2 => union (fv_source t1) (fv_source t2)
     | PAnn t1 A => fv_source t1
+    | PTLam t => fv_source t
+    | PTApp t ty => union (fv_source t) (fv_ptyp ty)
   end.
 
 
@@ -741,8 +755,10 @@ Ltac gather_vars :=
   let C := gather_vars_with (fun (x : context PTyp) => dom x) in
   let D := gather_vars_with (fun (x : context STyp) => dom x) in
   let E := gather_vars_with (fun x : PExp => fv_source x) in
-  let F := gather_vars_with (fun (x : SExp var) => fv x) in
-  constr:(union A (union B (union C (union D (union E F))))).
+  let F := gather_vars_with (fun x : PTyp => fv_ptyp x) in
+  let G := gather_vars_with (fun x : STyp => fv_typ x) in
+  let H := gather_vars_with (fun (x : SExp var) => fv x) in
+  constr:(union A (union B (union C (union D (union E (union F (union G H))))))).
 
 Ltac pick_fresh x :=
   let L := gather_vars in (pick_fresh_gen L x).
@@ -762,10 +778,39 @@ Fixpoint open_rec_source (k : nat) (u : PExp) (t : PExp) {struct t} : PExp  :=
   | PApp t1 t2   => PApp (open_rec_source k u t1) (open_rec_source k u t2)
   | PMerge t1 t2 => PMerge (open_rec_source k u t1) (open_rec_source k u t2)
   | PAnn e t     => PAnn (open_rec_source k u e) t
+  | PTLam t      => PTLam (open_rec_source k u t)
+  | PTApp t ty   => PTApp (open_rec_source k u t) ty
+  end.
+
+Fixpoint open_rec_typ_source (k : nat) (u : PTyp) (t : PTyp) {struct t} : PTyp :=
+  match t with
+  | PInt      => PInt
+  | Fun t1 t2 => Fun (open_rec_typ_source k u t1) (open_rec_typ_source k u t2)
+  | And t1 t2 => And (open_rec_typ_source k u t1) (open_rec_typ_source k u t2)
+  | PBVarT i  => if Nat.eqb k i then u else (PBVarT i)
+  | PFVarT v  => PFVarT v
+  | ForAll t  => ForAll (open_rec_typ_source (S k) u t)
+  end.
+
+Fixpoint open_rec_typ_term_source (k : nat) (u : PTyp) (t : PExp) {struct t} : PExp :=
+  match t with
+  | PBVar i      => PBVar i
+  | PFVar x      => PFVar x
+  | PLit x       => PLit x                     
+  | PLam t1      => PLam (open_rec_typ_term_source k u t1)
+  | PApp t1 t2   => PApp (open_rec_typ_term_source k u t1)
+                        (open_rec_typ_term_source k u t2)
+  | PMerge t1 t2 => PMerge (open_rec_typ_term_source k u t1)
+                          (open_rec_typ_term_source k u t2)
+  | PAnn e t     => PAnn (open_rec_typ_term_source k u e) t
+  | PTLam t      => PTLam (open_rec_typ_term_source (S k) u t)
+  | PTApp t ty   => PTApp (open_rec_typ_term_source k u t)
+                         (open_rec_typ_source k u ty)
   end.
 
 Definition open_source t u := open_rec_source 0 u t.
-
+Definition open_typ_source t u := open_rec_typ_source 0 u t.
+Definition open_typ_term_source t u := open_rec_typ_term_source 0 u t.
 
 (* Functions on contexts *)
 
@@ -824,8 +869,65 @@ Proof.
     eapply IHt1_2; apply H0.
   - rewrite <- union_spec.
     eapply IHt1; apply H.
+    - rewrite <- union_spec.
+    apply (IHt1 _ _ H).
+  - rewrite union_spec.
+    inversion H.
+    assert (Ha : In x (union (fv_source t1) (fv_source t2))).
+    eapply IHt1. apply H0.
+    rewrite union_spec in Ha.
+    inversion Ha. auto. auto. auto.
 Qed.
 
+Lemma fv_open_rec_typ_source :
+  forall t1 t2 x n, In x (fv_ptyp (open_rec_typ_source n t2 t1)) ->
+               In x (union (fv_ptyp t1) (fv_ptyp t2)).
+Proof.
+  intros.
+  generalize dependent t2.
+  generalize dependent n.
+  induction t1; intros; simpl in *; rewrite union_spec in *; auto.
+  - rewrite union_spec.
+    inversion H as [H1 | H1].
+    apply IHt1_1 in H1; rewrite union_spec in H1; inversion H1; auto.
+    apply IHt1_2 in H1; rewrite union_spec in H1; inversion H1; auto.
+  - rewrite union_spec.
+    inversion H as [H1 | H1].
+    apply IHt1_1 in H1; rewrite union_spec in H1; inversion H1; auto.
+    apply IHt1_2 in H1; rewrite union_spec in H1; inversion H1; auto.
+  - destruct (Nat.eqb n0 n); auto. 
+  - rewrite <- union_spec; eapply IHt1; apply H.
+Qed.
+    
+Lemma fv_open_rec_typ_term_source :
+  forall t1 t2 x n, In x (fv_source (open_rec_typ_term_source n t2 t1)) ->
+               In x (union (fv_source t1) (fv_ptyp t2)).
+Proof.
+  intros.
+  generalize dependent t2.
+  generalize dependent n.
+  induction t1; intros; simpl in *; try (now rewrite union_spec; auto).
+  - eapply IHt1; apply H.
+  - repeat rewrite union_spec. 
+    rewrite union_spec in H.
+    destruct H as [H | H].
+    apply IHt1_1 in H; rewrite union_spec in H; inversion H; auto.
+    apply IHt1_2 in H; rewrite union_spec in H; inversion H; auto.
+  - repeat rewrite union_spec. 
+    rewrite union_spec in H.
+    destruct H as [H | H].
+    apply IHt1_1 in H; rewrite union_spec in H; inversion H; auto.
+    apply IHt1_2 in H; rewrite union_spec in H; inversion H; auto.
+  - apply (IHt1 _ _ H).
+  - apply (IHt1 _ _ H).
+  - rewrite union_spec in H.
+    repeat rewrite union_spec.
+    inversion H.
+    apply IHt1 in H0; rewrite union_spec in H0; inversion H0; auto.
+    apply fv_open_rec_typ_source in H0.
+    rewrite union_spec in H0.
+    inversion H0; auto.
+Qed.
   
 (* Typing rules of source language: Figure 2 
 Note that we generate an Annotated expression, which serves as evidence for bi-directional
@@ -834,16 +936,21 @@ type-checking completness proof.
 
 (* Declarative type system *)
 
+(*
+Definition to_unit {A} : A -> unit := fun x => tt.
+*)
+
+(*
 Inductive has_type_source : context PTyp -> PExp -> PTyp -> PExp -> Prop :=
   | TyVar : forall Gamma x ty,
             ok Gamma -> 
             List.In (x,ty) Gamma ->
-            WFTyp ty ->
+            WFTyp (mapctx to_unit Gamma) ty ->
             has_type_source Gamma (PFVar x) ty (PFVar x)
   | TyLit : forall Gamma x, ok Gamma -> has_type_source Gamma (PLit x) PInt (PLit x)
   | TyLam : forall L Gamma t t1 A B, (forall x, not (In x L) -> 
                                   has_type_source (extend x A Gamma) (open_source t (PFVar x)) B (open_source t1 (PFVar x))) ->
-                           WFTyp A ->  
+                           WFTyp (mapctx to_unit Gamma) A ->  
                            has_type_source Gamma (PLam t) (Fun A B) (PAnn (PLam t1) (Fun A B)) 
   | TyApp : forall Gamma A B t1 t1' t2 t2' ,
               has_type_source Gamma t1 (Fun A B) t1' ->
@@ -857,10 +964,11 @@ Inductive has_type_source : context PTyp -> PExp -> PTyp -> PExp -> Prop :=
   | TySub : forall Gamma t t' A B,
               has_type_source Gamma t A t' ->
               Sub A B ->
-              WFTyp B ->
+              WFTyp (mapctx to_unit Gamma) B ->
               has_type_source Gamma t B (PAnn t' B).
 
 Hint Constructors has_type_source.
+*)
 
 Inductive PTerm : PExp -> Prop :=
   | PTerm_Var : forall x,
@@ -880,90 +988,198 @@ Inductive PTerm : PExp -> Prop :=
       PTerm (PMerge t1 t2)
   | PTerm_Ann : forall e t,
       PTerm e ->
-      PTerm (PAnn e t).  
+      PTerm (PAnn e t)
+  | PTerm_TLam : forall L t,
+      (forall x, not (In x L) -> PTerm (open_typ_term_source t (PFVarT x))) ->
+      PTerm (PTLam t)
+  | PTerm_TApp : forall t ty,
+      PTerm t ->
+      PType ty ->
+      PTerm (PTApp t ty).
 
 Hint Constructors PTerm.
-  
+
+(* Lemmas on types *)
+Lemma open_rec_typ_source_core :
+  forall t j v i u,
+    i <> j ->
+    open_rec_typ_source j v t = open_rec_typ_source i u (open_rec_typ_source j v t) ->
+    t = open_rec_typ_source i u t.
+Proof.
+  intro t; induction t; intros; simpl; auto.
+  - simpl in H0; inversion H0.
+    erewrite <- IHt1.
+    erewrite <- IHt2.
+    reflexivity.
+    apply H.
+    apply H3.
+    apply H.
+    apply H2.
+  - simpl in H0; inversion H0.
+    erewrite <- IHt1.
+    erewrite <- IHt2.
+    reflexivity.
+    apply H.
+    apply H3.
+    apply H.
+    apply H2.
+  - simpl in *.
+    case_eq (Nat.eqb j n); intros.
+    case_eq (Nat.eqb i n); intros.
+    exfalso. apply H. apply Nat.eqb_eq in H1.
+    apply Nat.eqb_eq in H2. rewrite H1, H2.
+    reflexivity.
+    reflexivity.
+    rewrite H1 in H0.
+    apply H0.
+  - simpl in H0; inversion H0.
+    erewrite <- IHt.
+    reflexivity.
+    apply not_eq_S.
+    apply H.
+    apply H2.
+Qed.
+
+Lemma open_rec_type_source : forall t u,
+  PType  t -> forall k, t =  open_rec_typ_source k u t.
+Proof.
+  intros t u H.
+  induction H; intros; simpl; auto.
+  - rewrite <- IHPType1; rewrite <- IHPType2; reflexivity.
+  - rewrite <- IHPType1; rewrite <- IHPType2; reflexivity.
+  - pick_fresh x.
+    assert (Ha : not (In x L)) by not_in_L x.
+    apply H0 with (k := S k) in Ha.
+    apply open_rec_typ_source_core in Ha.
+    rewrite <- Ha.
+    reflexivity.
+    auto.
+Qed.
+
 Lemma open_rec_term_source_core :forall t j v i u, i <> j ->
   open_rec_source j v t = open_rec_source i u (open_rec_source j v t) ->
   t = open_rec_source i u t.
 Proof.
   intro t; induction t; intros; simpl.
-  reflexivity.
-  simpl in *.
-  case_eq (Nat.eqb i n); intros.
-  case_eq (Nat.eqb j n); intros.
-  exfalso. apply H. apply Nat.eqb_eq in H1.
-  apply Nat.eqb_eq in H2. rewrite H1, H2.
-  reflexivity.
-  rewrite H2 in H0.
-  unfold open_rec_source in H0.
-  rewrite H1 in H0.
-  assumption.
-  reflexivity.
-  reflexivity.
-  inversion H0.
-  erewrite <- IHt.
-  reflexivity.
-  apply not_eq_S.
-  apply H.
-  apply H2.
-  inversion H0.
-  erewrite <- IHt1.
-  erewrite <- IHt2.
-  reflexivity.
-  apply H.
-  apply H3.
-  apply H.
-  apply H2.
-  inversion H0.
-  erewrite <- IHt1.
-  erewrite <- IHt2.
-  reflexivity.
-  apply H.
-  apply H3.
-  apply H.
-  apply H2.
-  inversion H0.
-  erewrite <- IHt.
-  reflexivity.
-  apply H.
-  apply H2. 
+  - reflexivity.
+  - simpl in *.
+    case_eq (Nat.eqb i n); intros.
+    case_eq (Nat.eqb j n); intros.
+    exfalso. apply H. apply Nat.eqb_eq in H1.
+    apply Nat.eqb_eq in H2. rewrite H1, H2.
+    reflexivity.
+    rewrite H2 in H0.
+    unfold open_rec_source in H0.
+    rewrite H1 in H0.
+    assumption.
+    reflexivity.
+  - reflexivity.
+  - inversion H0.
+    erewrite <- IHt.
+    reflexivity.
+    apply not_eq_S.
+    apply H.
+    apply H2.
+  - inversion H0.
+    erewrite <- IHt1.
+    erewrite <- IHt2.
+    reflexivity.
+    apply H.
+    apply H3.
+    apply H.
+    apply H2.
+  - inversion H0.
+    erewrite <- IHt1.
+    erewrite <- IHt2.
+    reflexivity.
+    apply H.
+    apply H3.
+    apply H.
+    apply H2.
+  - inversion H0.
+    erewrite <- IHt.
+    reflexivity.
+    apply H.
+    apply H2. 
+  - inversion H0; erewrite <- IHt; [ reflexivity | apply H | apply H2 ].
+  - inversion H0; erewrite <- IHt; [ reflexivity | apply H | apply H2 ].   
+Qed.
+
+Lemma open_rec_type_term_source_core :
+  forall t j v i u,
+    open_rec_typ_term_source j v t = open_rec_source i u (open_rec_typ_term_source j v t) ->
+    t = open_rec_source i u t.
+Proof.
+  intro t; induction t; intros; simpl; auto.
+  - simpl in *.
+    inversion H.
+    erewrite <- IHt.
+    reflexivity.
+    apply H1.
+  - inversion H.
+    erewrite <- IHt1.
+    erewrite <- IHt2.
+    reflexivity.
+    apply H2.
+    apply H1.
+  - inversion H.
+    erewrite <- IHt1.
+    erewrite <- IHt2.
+    reflexivity.
+    apply H2. 
+    apply H1.
+  - inversion H.
+    erewrite <- IHt.
+    reflexivity.
+    apply H1.
+  - inversion H.
+    erewrite <- IHt.
+    reflexivity.
+    apply H1.
+  - inversion H; erewrite <- IHt; [ reflexivity | apply H1 ].  
 Qed.
 
 Lemma open_rec_source_term : forall t u,
   PTerm t -> forall k, t =  open_rec_source k u t.
 Proof.
   induction 1; intros; simpl; auto.
-  pick_fresh x.
-  rewrite <- open_rec_term_source_core with (j := 0) (v := PFVar x).
-  reflexivity.
-  auto.
-  simpl.
-  unfold open_source in *.
-  rewrite <- H0.
-  reflexivity.
-  not_in_L x.
-  rewrite <- IHPTerm1.
-  rewrite <- IHPTerm2.
-  reflexivity.
-  rewrite <- IHPTerm1.
-  rewrite <- IHPTerm2.
-  reflexivity.
-  rewrite <- IHPTerm.
-  reflexivity.
+  - pick_fresh x.
+    rewrite <- open_rec_term_source_core with (j := 0) (v := PFVar x).
+    reflexivity.
+    auto.
+    simpl.
+    unfold open_source in *.
+    rewrite <- H0.
+    reflexivity.
+    not_in_L x.
+  - rewrite <- IHPTerm1.
+    rewrite <- IHPTerm2.
+    reflexivity.
+  - rewrite <- IHPTerm1.
+    rewrite <- IHPTerm2.
+    reflexivity.
+  - rewrite <- IHPTerm.
+    reflexivity.
+  - pick_fresh x.
+    assert (Ha : not (In x L)) by not_in_L x.
+    apply H0 with (k := k) in Ha.
+    simpl; apply f_equal.
+    now apply open_rec_type_term_source_core in Ha.
+  - simpl; rewrite <- IHPTerm; reflexivity.
 Qed.
 
 
 Fixpoint subst_source (z : var) (u : PExp) (t : PExp) {struct t} : PExp :=
   match t with
-    | PBVar i     => PBVar i
-    | PFVar x     => if VarTyp.eqb x z then u else (PFVar x)
-    | PLit i      => PLit i
-    | PLam t1     => PLam (subst_source z u t1)
-    | PApp t1 t2  => PApp (subst_source z u t1) (subst_source z u t2)
+    | PBVar i      => PBVar i
+    | PFVar x      => if VarTyp.eqb x z then u else (PFVar x)
+    | PLit i       => PLit i
+    | PLam t1      => PLam (subst_source z u t1)
+    | PApp t1 t2   => PApp (subst_source z u t1) (subst_source z u t2)
     | PMerge t1 t2 => PMerge (subst_source z u t1) (subst_source z u t2)
-    | PAnn t1 t2  => PAnn (subst_source z u t1) t2 
+    | PAnn t1 t2   => PAnn (subst_source z u t1) t2
+    | PTLam t      => PTLam (subst_source z u t)
+    | PTApp t ty   => PTApp (subst_source z u t) ty
   end.
 
 
@@ -973,28 +1189,32 @@ Proof.
   intro t.
   induction t; intros; auto.
   (* Case PFVar *)
-  simpl.
-  remember (v =? x) as H1.
-  destruct H1.
-  exfalso.
-  apply H.
-  simpl.
-  apply singleton_spec.
-  symmetry in HeqH1.
-  apply eqb_eq in HeqH1; symmetry; assumption.
-  reflexivity.
+  - simpl.
+    remember (v =? x) as H1.
+    destruct H1.
+    exfalso.
+    apply H.
+    simpl.
+    apply singleton_spec.
+    symmetry in HeqH1.
+    apply eqb_eq in HeqH1; symmetry; assumption.
+    reflexivity.
   (* Case PLam *)
-  simpl in *.
-  rewrite IHt; auto.
+  - simpl in *.
+    rewrite IHt; auto.
   (* Case PApp *)
-  simpl in *; rewrite IHt1, IHt2; auto; unfold not in *; intros;
-  apply H; apply union_spec; [ right | left ]; auto.
+  - simpl in *; rewrite IHt1, IHt2; auto; unfold not in *; intros;
+    apply H; apply union_spec; [ right | left ]; auto.
   (* Case PMerge *)
-  simpl in *; rewrite IHt1, IHt2; auto; unfold not in *; intros;
-  apply H; apply union_spec; [ right | left ]; auto.
+  - simpl in *; rewrite IHt1, IHt2; auto; unfold not in *; intros;
+    apply H; apply union_spec; [ right | left ]; auto.
   (* Case PAnn *)
-  simpl in *; rewrite IHt; auto.
-Qed.
+  - simpl in *; rewrite IHt; auto.
+  (* Case PTLam *)
+  - admit.
+  (* Case PTApp *)
+  - admit.
+Admitted.
 
 (** Substitution distributes on the open operation. *)
 
@@ -1003,23 +1223,27 @@ Lemma subst_source_open : forall x u t1 t2, PTerm u ->
 Proof.
   intros. unfold open_source. generalize 0.
   induction t1; intros; simpl.
-  (* STFVar *)
+  (* PFVar *)
   - case_eq (eqb v x); intros.
     rewrite <- open_rec_source_term; auto.
     simpl; reflexivity.
-  (* STFVar *)
+  (* PFVar *)
   - case_eq (Nat.eqb n0 n); intros; auto.
   (* STLit *)  
   - reflexivity.
-  (* STLam *)
+  (* PLam *)
   - rewrite IHt1; reflexivity.
-  (* STApp *)
+  (* PApp *)
   - rewrite IHt1_1; rewrite IHt1_2; reflexivity.
-  (* STPair *)
+  (* PMerge *)
   - rewrite IHt1_1; rewrite IHt1_2; reflexivity.
-  (* STProj1 *)
+  (* PAnn *)
   - rewrite IHt1; reflexivity.
-Qed.
+  (* PTLam *)
+  - admit.
+  (* PTApp *)
+  - admit.  
+Admitted.
 
 (** Substitution and open_var for distinct names commute. *)
 
@@ -1094,10 +1318,13 @@ Proof.
     apply singleton_spec.
     symmetry; assumption.
     assumption.
-Qed.
+  (* TLam *)
+  - admit.
+Admitted.
 
 Hint Resolve subst_source_term.
 
+(*
 Lemma type_correct_source_terms : forall Gamma E ty e, has_type_source Gamma E ty e -> PTerm E.
 Proof.
   intros.
@@ -1412,6 +1639,7 @@ Proof.
     auto.
 Qed.
 
+
 Lemma fv_source_in_open :
   forall x z t0 n, not (VarTyp.eq x z) ->
               In x (fv_source t0) ->
@@ -1420,19 +1648,23 @@ Proof.
   intros.
   generalize dependent n.
   induction t0; simpl in *; auto.
-  inversion H0.
-  intros.
-  rewrite union_spec in *.
-  inversion H0.
-  left; now apply IHt0_1.
-  right; now apply IHt0_2.
-  intros.
-  rewrite union_spec in *.
-  inversion H0.
-  left; now apply IHt0_1.
-  right; now apply IHt0_2.
+  - inversion H0.
+  - intros.
+    rewrite union_spec in *.
+    inversion H0.
+    left; now apply IHt0_1.
+    right; now apply IHt0_2.
+  - intros.
+    rewrite union_spec in *.
+    inversion H0.
+    left; now apply IHt0_1.
+    right; now apply IHt0_2.
+  - intros.
+    rewrite union_spec in *.
+    destruct H0 as [ H0 | H0 ]; [ apply IHt0 with (n := n) in H0 | ]; auto.    
 Qed.
-  
+
+
 Lemma env_impl_fv_source :
   forall Gamma x t A E, has_type_source Gamma t A E -> In x (fv_source t) -> In x (dom Gamma).
 Proof.
@@ -1559,116 +1791,6 @@ Proof.
   - simpl; unfold not; intros HInv; apply IHhas_type_source; auto.
 Qed.
 
-  (*
-Lemma tsubst'' :
-  forall E F t1 x y A B,
-    not (In y (dom (E ++ F))) ->
-    has_type (E ++ (extend x A F)) (open_source t1 (PFVar x)) B ->
-    has_type (E ++ (extend y A F)) (subst_source x (PFVar y) (open_source t1 (PFVar x))) B.
-Proof.
-  unfold has_type.
-  intros.  
-  remember (E ++ extend x A F) as G.
-  generalize dependent HeqG.
-  generalize dependent E.
-  generalize dependent F.
-  inversion H0.
-  induction H; intros; simpl in *; subst; eauto.
-  - case_eq (x0 =? x); intro HEq.
-    exists (PFVar y).
-    apply TyVar.
-    rewrite <- app_nil_l; apply ok_middle_comm; rewrite app_nil_l.
-    apply Ok_push.
-    rewrite <- app_nil_l in H.
-    unfold extend in H; apply ok_middle_comm in H; rewrite app_nil_l in H.
-    inversion H; auto.
-    auto.
-    assert (Ha : ty = A).
-    apply eqb_eq in HEq.
-    unfold extend in H; rewrite <- app_nil_l in H; apply ok_middle_comm in H; rewrite app_nil_l in H.
-    inversion H; subst.
-    apply in_app_or in H1.
-    inversion H1.
-    exfalso; apply H8; rewrite dom_union; rewrite union_spec; left.
-    apply list_impl_m in H4; now rewrite HEq in H4.
-    unfold extend in H4; apply in_app_or in H4. 
-    inversion H4.
-    inversion H5; now inversion H7.
-    exfalso; apply H8; rewrite dom_union; rewrite union_spec; right.
-    apply list_impl_m in H5; now rewrite HEq in H5.
-    rewrite Ha.
-    apply in_or_app.
-    right; apply in_or_app; left.
-    left; reflexivity.
-    auto.
-    exists (PFVar x0).
-    apply typing_weaken_source.
-    apply TyVar.
-    rewrite <- app_nil_l in H.
-    unfold extend in H; apply ok_middle_comm in H; rewrite app_nil_l in H.
-    inversion H; auto.
-    apply in_app_or in H1.
-    inversion H1.
-    apply in_or_app; auto.
-    unfold extend in H4.
-    apply in_app_or in H4.
-    inversion H4.
-    inversion H5.
-    inversion H6; subst.
-    apply EqFacts.eqb_neq in HEq.
-    exfalso; apply HEq; reflexivity.
-    inversion H6.
-    apply in_or_app; auto.
-    auto.
-    rewrite <- app_nil_l; apply ok_middle_comm; rewrite app_nil_l.
-    apply Ok_push.
-    unfold extend in H; now apply ok_remove in H.
-    auto.
-  - exists (PLit x0).
-    apply TyLit.
-    rewrite <- app_nil_l; apply ok_middle_comm; rewrite app_nil_l.
-    apply Ok_push.
-    unfold extend in H.
-    rewrite <- app_nil_l in H; apply ok_middle_comm in H; rewrite app_nil_l in H.
-    inversion H; auto.
-    auto.
-  - eexists.
-    apply_fresh TyLam as z. 
-    rewrite subst_source_open_var.
-    unfold open_source at 2.
-    rewrite <- open_rec_source_term.
-    unfold extend in *.
-    rewrite app_assoc.
-    assert (Ha : (not (In z L))) by not_in_L z.
-    eapply (H1 z) in Ha.
-    inversion Ha.
-    Admitted.
-
-apply H4.
-    not_in_L z.
-    unfold not; intros.
-    simpl.
-    rewrite dom_union in H3; apply MSetProperties.Dec.F.union_1 in H3.
-    inversion H3.
-    rewrite dom_union in H4; apply MSetProperties.Dec.F.union_1 in H4.
-    inversion H4.
-    simpl in H5.
-    apply MSetProperties.Dec.F.add_iff in H5.
-    inversion H5.
-    apply Frz.
-    not_in_L z.
-    inversion H6.
-    apply H2; not_in_L y.
-    apply H2; not_in_L y.
-    rewrite app_assoc; reflexivity.
-    not_in_L z.
-    not_in_L x.
-    apply PTerm_Var.
-    not_in_L z.
-    not_in_L x.
-    apply PTerm_Var.
-    auto.
-Qed.*)
 
 Lemma typing_open_rec_source :
   forall y A Gamma t B E n,
@@ -1758,6 +1880,7 @@ Defined.
 Definition tsub : forall Gamma t A B, has_type Gamma t A -> Sub A B -> WFTyp B -> has_type Gamma t B.
 unfold has_type. intros. destruct H. exists (PAnn x B). apply (TySub _ _ _ A); auto.
 Defined.  
+ *)
 
 Inductive Dir := Inf | Chk.
 
@@ -1770,11 +1893,11 @@ Inspiration for the rules:
 
 https://www.andres-loeh.de/LambdaPi/LambdaPi.pdf
 
-*)
+ *)
 
-Inductive has_type_source_alg : context PTyp -> PExp -> Dir -> PTyp -> (SExp var) -> Prop :=
+Inductive has_type_source_alg : context (TyEnv PTyp) -> PExp -> Dir -> PTyp -> (SExp var) -> Prop :=
   (* Inference rules *)
-  | ATyVar : forall Gamma x ty, ok Gamma -> List.In (x,ty) Gamma -> WFTyp ty ->
+  | ATyVar : forall Gamma x ty, ok Gamma -> List.In (x,TermVar _ ty) Gamma -> WFTyp Gamma ty ->
                       has_type_source_alg Gamma (PFVar x) Inf ty (STFVar _ x) 
   | ATyLit : forall Gamma x, ok Gamma -> has_type_source_alg Gamma (PLit x) Inf PInt (STLit _ x)
   | ATyApp : forall Gamma A B t1 t2 E1 E2,
@@ -1786,16 +1909,31 @@ Inductive has_type_source_alg : context PTyp -> PExp -> Dir -> PTyp -> (SExp var
                 has_type_source_alg Gamma t2 Inf B E2 ->
                 Ortho A B ->
                 has_type_source_alg Gamma (PMerge t1 t2) Inf (And A B) (STPair _ E1 E2)
-  | ATyAnn : forall Gamma t1 A E, has_type_source_alg Gamma t1 Chk A E -> has_type_source_alg Gamma (PAnn t1 A) Inf A E
+  | ATyAnn : forall Gamma t1 A E, has_type_source_alg Gamma t1 Chk A E ->
+                         has_type_source_alg Gamma (PAnn t1 A) Inf A E
+  | ATyTApp : forall Gamma t A B E,
+                WFTyp Gamma A ->
+                has_type_source_alg Gamma t Inf (ForAll B) E ->
+                has_type_source_alg Gamma (PTApp t A) Inf (open_typ_source A B) (STTApp _ E (|A|))
   (* Checking rules *)
-  | ATyLam : forall L Gamma t A B E, (forall x, not (In x L) -> 
-                                 has_type_source_alg (extend x A Gamma) (open_source t (PFVar x)) Chk B (open E (STFVar _ x))) -> WFTyp A ->
-                           has_type_source_alg Gamma (PLam t) Chk (Fun A B) (STLam _ E)
+  | ATyLam : forall L Gamma t A B E,
+               (forall x, not (In x L) -> 
+                     has_type_source_alg (extend x (TermVar _ A) Gamma) (open_source t (PFVar x)) Chk B (open E (STFVar _ x))) ->
+               has_type_source_alg Gamma (PLam t) Chk (Fun A B) (STLam _ E)
   | ATySub : forall Gamma t A B C E,
                has_type_source_alg Gamma t Inf A E ->
                sub A B C ->
-               WFTyp B ->
-               has_type_source_alg Gamma t Chk B (STApp _ (C var) E).
+               WFTyp Gamma B ->
+               has_type_source_alg Gamma t Chk B (STApp _ C E)
+  | ATyTLam : forall L Gamma t A E,
+               (forall x, not (In x L) -> 
+                     has_type_source_alg (extend x (TyVar _) Gamma)
+                                         (open_typ_term_source t (PFVarT x))
+                                         Chk
+                                         (open_typ_source A (PFVarT x))
+                                         (open_typ_term E (STFVarT x))) ->
+               WFTyp Gamma A ->
+               has_type_source_alg Gamma (PTLam t) Chk (ForAll A) (STTLam _ E).
 
 Hint Constructors has_type_source_alg.
 
