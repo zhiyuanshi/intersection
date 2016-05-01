@@ -10,7 +10,7 @@ Require Import MSetProperties.
 Require Import Coq.Init.Specif.
 
 Module SysF
-       (Import VarTyp : BooleanDecidableType')
+       (Import VarTyp : UsualDecidableTypeFull)
        (Import set : MSetInterface.S).
 
 Module EqFacts := BoolEqualityFacts(VarTyp).
@@ -163,8 +163,8 @@ Ltac not_in_L x :=
     | H:_ |- context [M.In x (dom ((?v, ?t) :: ?l))] => simpl; rewrite MSetProperties.Dec.F.add_iff
     | H: _ |- context [M.In ?v (dom ((x, ?t) :: ?l))] => simpl; rewrite MSetProperties.Dec.F.add_iff
     | H1: ~ ?l, H2: ?l |- _ => contradiction
-    | H: ~ M.In ?y (M.singleton x) |- not (VarTyp.eq x ?y) => rewrite MSetProperties.Dec.F.singleton_iff in H; assumption 
-    | H: ~ M.In x (M.singleton ?y) |- not (VarTyp.eq x ?y) => rewrite MSetProperties.Dec.F.singleton_iff in H; unfold not; intros; apply H; symmetry; assumption
+    | H: ~ M.In ?y (M.singleton x) |- not (x = ?y) => rewrite MSetProperties.Dec.F.singleton_iff in H; assumption 
+    | H: ~ M.In x (M.singleton ?y) |- not (x = ?y) => rewrite MSetProperties.Dec.F.singleton_iff in H; unfold not; intros; apply H; symmetry; assumption
     | H: ~ M.In x (M.add ?v M.empty) |- _ => rewrite <- MSetProperties.singleton_equal_add in H 
     | H: not (M.In x (dom ?l)) |- _ => rewrite dom_union in H; simpl in H
     | H: not (M.In x (M.union ?l1 ?l2)) |- _ =>
@@ -178,10 +178,10 @@ Ltac not_in_L x :=
       let r := fresh in
       apply not_or_and in H; destruct H as [l r]
     | H: not (M.In x ?l1) |- not (M.In x ?l1) => assumption
-    | H:_ |- ~ (x == ?v \/ M.In ?v ?l) => unfold not; intro HInv; inversion HInv as [HH | HH]
+    | H:_ |- ~ (x = ?v \/ M.In ?v ?l) => unfold not; intro HInv; inversion HInv as [HH | HH]
     | H:_ |- not (?A \/ ?B) => apply and_not_or; split
-    | H1: ~ M.In x (M.singleton ?v), H2: ?v == x |- _ => exfalso; apply H1; apply MSetProperties.Dec.F.singleton_2; assumption
-    | H1: ~ M.In x (M.singleton ?v), H2: x == ?v |- _ => exfalso; apply H1; apply MSetProperties.Dec.F.singleton_2; symmetry; assumption
+    | H1: ~ M.In x (M.singleton ?v), H2: ?v = x |- _ => exfalso; apply H1; apply MSetProperties.Dec.F.singleton_2; assumption
+    | H1: ~ M.In x (M.singleton ?v), H2: x = ?v |- _ => exfalso; apply H1; apply MSetProperties.Dec.F.singleton_2; symmetry; assumption
     | H: not (M.In x ?l1) |- not (M.In x ?l2) =>
       unfold not; intros; apply H; repeat rewrite M.union_spec; auto 10 
   end.
@@ -299,7 +299,7 @@ Proof.
   simpl in *.
   apply H6.
   apply MSetProperties.Dec.F.add_1.
-  assumption.
+  reflexivity.
   inversion HOk; subst.
   rewrite dom_union in H6; rewrite union_spec in H6.
   apply not_or_and in H6.
@@ -1172,7 +1172,7 @@ Lemma subst_fresh : forall x t u,
   not (In x (fv t)) ->  [x ~> u] t = t.
 Proof.
   intros; induction t0; simpl in *; auto.
-  - case_eq (a =? x); intros.
+  - case_eq (eqb a x); intros.
     exfalso; apply H; simpl; apply MSetProperties.Dec.F.singleton_2;
     now apply eqb_eq in H0.
     auto.
@@ -1191,7 +1191,7 @@ Proof.
   intros; induction t0; simpl in *; auto.
   - rewrite IHt0_1; [ rewrite IHt0_2 | not_in_L x ]; [ reflexivity | not_in_L x ].
   - rewrite IHt0_1; [ rewrite IHt0_2 | not_in_L x ]; [ reflexivity | not_in_L x ].
-  - case_eq (v =? x); intros.
+  - case_eq (eqb v x); intros.
     exfalso; apply H; simpl; apply MSetProperties.Dec.F.singleton_2;
     now apply eqb_eq in H0.
     auto.
@@ -1205,7 +1205,7 @@ Lemma subst_open : forall x u t1 t2, STTerm u ->
 Proof.
   intros. unfold open. generalize 0.
   induction t1; intros; simpl; auto; try (apply f_equal; auto).
-  - case_eq (a =? x); intros; [ rewrite <- open_rec_term | ]; auto.
+  - case_eq (eqb a x); intros; [ rewrite <- open_rec_term | ]; auto.
   - case_eq (Nat.eqb n0 n); intros; auto.
   - rewrite IHt1_1; rewrite IHt1_2; auto.
   - rewrite IHt1_1; rewrite IHt1_2; auto.
@@ -1219,7 +1219,7 @@ Proof.
   induction t1; intros; simpl; auto; try (apply f_equal; auto).
   - rewrite IHt1_1; rewrite IHt1_2; auto.
   - rewrite IHt1_1; rewrite IHt1_2; auto.
-  - case_eq (v =? x); intros; [ rewrite <- open_rec_type | ]; auto.
+  - case_eq (eqb v x); intros; [ rewrite <- open_rec_type | ]; auto.
   - case_eq (Nat.eqb n0 n); intros; auto.
 Qed.
 
@@ -1235,9 +1235,8 @@ Proof.
   intros Neq Wu. intros. rewrite subst_typ_open; auto. simpl.
   case_eq (VarTyp.eqb Wu Neq); intros; auto.
   exfalso; apply H.
-  apply eqb_eq in H1.
-  admit. (* this should be trivial... *)
-Admitted.
+  now apply eqb_eq in H1.
+Qed.
 
 (** Opening up an abstraction of body [t] with a term [u] is the same as opening
   up the abstraction with a fresh name [x] and then substituting [u] for [x]. *)
@@ -1251,7 +1250,7 @@ Proof.
   rewrite subst_open.
   rewrite subst_fresh.
   simpl.
-  case_eq (Fr =? Fr); intros; auto.
+  case_eq (eqb Fr Fr); intros; auto.
   apply EqFacts.eqb_neq in H1; exfalso; apply H1; reflexivity.
   auto. auto.
 Qed.  
@@ -1265,7 +1264,7 @@ Proof.
   rewrite subst_typ_open.
   rewrite subst_typ_fresh.
   simpl.
-  case_eq (Fr =? Fr); intros; auto.
+  case_eq (eqb Fr Fr); intros; auto.
   apply EqFacts.eqb_neq in H1; exfalso; apply H1; reflexivity.
   auto. auto.
 Qed.  
@@ -1297,14 +1296,12 @@ Inductive has_type_st : (context (TyEnv STyp)) -> (SExp var) -> STyp -> Prop :=
                        has_type_st (extend x (TyVar _) Gamma)
                                    (open_typ_term t (STFVarT x))
                                    (open_typ A (STFVarT x))) ->
-                 WFType Gamma A ->
                  has_type_st Gamma (STTLam _ t) (STForAll A) 
   | STTyTApp : forall Gamma t A ty, WFType Gamma A ->
                            has_type_st Gamma t (STForAll ty) ->
                            has_type_st Gamma (STTApp _ t A) (open_typ ty A).
                             
 Hint Constructors has_type_st.
-
 
 (* WF lemmas *)
 
@@ -1559,10 +1556,9 @@ Proof.
     apply Ok_push.
     assumption.
     not_in_L x.
-    rewrite dom_union in H8.
-    rewrite union_spec in H8.
-    inversion H8; contradiction.
-    subst; auto.
+    rewrite dom_union in H7.
+    rewrite union_spec in H7.
+    inversion H7; contradiction.
   (* STTyTApp *)
   - subst; apply STTyTApp; auto.
 Qed. 
@@ -1671,9 +1667,6 @@ Proof.
     symmetry; auto. *)
     rewrite app_comm_cons.
     reflexivity.
-    apply wf_strengthen in H2.
-    assumption.
-    not_in_L z.
   - subst.
     eapply STTyTApp.
     simpl in H.
@@ -1850,7 +1843,6 @@ Proof.
     unfold extend.
     rewrite <- app_assoc.
     reflexivity.
-    now apply wf_env_comm.
   - apply STTyTApp.
     apply wf_env_comm; auto.
     apply IHhas_type_st.
@@ -1896,11 +1888,10 @@ Proof.
     apply H1.
     not_in_L y.
     not_in_L x.
-    unfold extend in H3; simpl in H3.
-    apply MSetProperties.FM.add_iff in H3; destruct H3.
+    unfold extend in H2; simpl in H2.
+    apply MSetProperties.FM.add_iff in H2; destruct H2.
     not_in_L y.
     assumption.
-    now apply wf_weaken_extend.
 Qed.
 
 Lemma typing_ok_env : forall Gamma E ty, has_type_st Gamma E ty -> ok Gamma.
