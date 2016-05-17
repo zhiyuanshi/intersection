@@ -338,6 +338,58 @@ Hint Constructors WFTyp.
 
 (* Reflexivity *)
 Hint Resolve sint sfun sand1 sand2 sand3 svar SInt SFun SAnd1 SAnd2 SAnd3 SVar SForAll.
+
+Lemma ortho_ax_sym : forall A B, OrthoAx' A B -> OrthoAx' B A.
+Proof.
+  intros.
+  destruct H as [a [b c]].
+  unfold OrthoAx'.
+  auto.
+Qed.
+  
+Lemma ortho_sym : forall Gamma A B, Ortho Gamma A B -> Ortho Gamma B A.
+Proof.
+  intros.
+  induction H; auto.
+  - apply_fresh OForAll as x; apply H0; not_in_L x.
+  - apply ortho_ax_sym in H; now apply OAx.
+Qed.
+    
+Lemma sub_and_or : forall A B C, Sub (And A B) C -> (Sub A C \/ Sub B C).
+Proof.
+  intros A B C [c HSub].
+  dependent induction HSub.
+  admit.
+  left; eexists; apply HSub.
+  right; eexists; apply HSub.
+Admitted.
+
+Lemma ortho_no_sub : forall Gamma A B, Ortho Gamma A B -> not (Sub A B).
+Proof.
+  intros Gamma A B HOrtho HSub.
+  induction HOrtho.
+  - apply sub_and_or in HSub.
+    inversion HSub; auto.
+  - destruct HSub as [x HSub].
+    inversion HSub; subst.
+    apply IHHOrtho1; eexists; apply H2.
+    inversion H0.
+    inversion H0.
+  - destruct HSub as [x HSub]; inversion HSub; subst.
+    apply IHHOrtho; eexists; apply H5.
+  - destruct HSub as [x HSub].
+    inversion HSub; subst.
+    pick_fresh x.
+    apply H0 with (x := x).
+    not_in_L x.
+    eexists; apply H5.
+    not_in_L x.
+  - destruct HSub as [c HSub].
+    inversion HSub; subst.
+    admit.
+  - admit.
+  - admit. (* this should be straightforward with a case analysis *)
+Admitted.
   
 (* Unique subtype contributor: Lemma 2 *)
 
@@ -446,10 +498,26 @@ Proof.
       eexists; apply H11.
       inversion H7.
       inversion H7.
-    + inversion H2; inversion H4; subst.
-      admit.
+    + clear H1.
+      inversion H2; inversion H1; subst.
+      assert (Ha : Ortho Gamma ty (PFVarT v)) by auto.
+      apply ortho_no_sub in Ha.
+      contradiction.
   (* same as above (var_sym) *)
-  - admit.
+  - induction C; try (now (inversion H3 as [z HInv]; inversion HInv)).
+    + inversion H2; inversion H4; subst.
+      inversion H3; inversion H5; subst.
+      apply IHC1.
+      apply sand2; eexists; apply H8.
+      eexists; apply H8.
+      eexists; apply H11.
+      inversion H6.
+      inversion H6.
+    + clear H1.
+      inversion H3; inversion H1; subst.
+      assert (Ha : Ortho Gamma ty (PFVarT v)) by auto.
+      apply ortho_no_sub in Ha.
+      contradiction.
   - destruct H as [ PTypHd1 [ PTypHd2 PTypHd3 ]].
     induction C.
     + inversion H1; inversion H; subst;
