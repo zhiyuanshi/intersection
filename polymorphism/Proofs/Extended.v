@@ -251,38 +251,25 @@ Definition sforall : forall L t1 t2 c,
   
   pick_fresh.
 *)
-  
-(* Disjointness: Implementation *)
 
-Inductive OrthoAx : PTyp -> PTyp -> Prop :=
-  | OIntFun : forall t1 t2, OrthoAx PInt (Fun t1 t2)
-  | OIntForAll : forall d t, OrthoAx PInt (ForAll d t)
-  | OFunForAll : forall d t t1 t2, OrthoAx (Fun t1 t2) (ForAll d t)
-  | OSym : forall t1 t2, OrthoAx t1 t2 -> OrthoAx t2 t1.
+Inductive TyEnvSource : Type :=
+  | TyDis : PTyp -> TyEnvSource
+  | TermV : PTyp -> TyEnvSource.
 
-Lemma OrthoAx_no_sym : forall t, not (OrthoAx t t).
+Inductive WFEnv : context TyEnvSource -> Prop :=
+  | WFNil : WFEnv nil
+  | WFPushV : forall Gamma v ty,
+                WFEnv Gamma -> not (In v (fv_ptyp ty)) -> ~ In v (dom Gamma) ->
+                WFEnv (extend v (TyDis ty) Gamma)              
+  | WFPushT : forall Gamma v ty,
+                WFEnv Gamma -> ~ In v (dom Gamma) -> WFEnv (extend v (TermV ty) Gamma).
+
+Lemma wfenv_to_ok : forall Gamma, WFEnv Gamma -> ok Gamma.
 Proof.
-  unfold not; intros.
-  Require Import Coq.Program.Equality.
-  dependent induction H.
-  apply IHOrthoAx.
-Qed.
+  intros; induction H; auto.
+Qed.  
 
-(*
-Inductive PTypHd : PTyp -> Prop :=
-  | HdInt : PTypHd PInt
-  | HdFun : forall t1 t2, PTypHd (Fun t1 t2)
-  | HdForAll : forall t, PTypHd (ForAll t).
-
-  | HdAnd : forall t1 t2, PTypHd (And t1 t2)
-  | HdFVar : forall v, PTypHd (PFVar v)
-  | HdBVar : forall n, PTypHd (PBVar n).
-
-
-Definition OrthoAx' (t1 t2 : PTyp) :=
-  PTypHd t1 /\ PTypHd t2 /\ not (PTypHd t1 = PTypHd t2).
-*)
-
+(* Disjointness: Implementation *)
 
 Definition hd (p : PTyp) : nat :=
   match p with
@@ -299,10 +286,6 @@ Definition hd (p : PTyp) : nat :=
 Definition OrthoAx' (t1 t2 : PTyp) : Prop :=
   (hd t1 < 4 /\ hd t2 < 4 /\ not (hd t1 = hd t2)).
 
-Inductive TyEnvSource : Type :=
-  | TyDis : PTyp -> TyEnvSource
-  | TermV : PTyp -> TyEnvSource.
-
 Inductive Ortho : context TyEnvSource -> PTyp -> PTyp -> Prop :=
   | OAnd1 : forall Gamma t1 t2 t3, Ortho Gamma t1 t3 -> Ortho Gamma t2 t3 -> Ortho Gamma (And t1 t2) t3
   | OAnd2 : forall Gamma t1 t2 t3, Ortho Gamma t1 t2 -> Ortho Gamma t1 t3 -> Ortho Gamma t1 (And t2 t3)
@@ -312,8 +295,8 @@ Inductive Ortho : context TyEnvSource -> PTyp -> PTyp -> Prop :=
                                            (open_typ_source t1 (PFVarT x))
                                            (open_typ_source t2 (PFVarT x))) ->
                 Ortho Gamma (ForAll d t1) (ForAll d t2)
-  | OVar : forall Gamma x ty, ok Gamma -> List.In (x,TyDis ty) Gamma -> Ortho Gamma (PFVarT x) ty
-  | OVarSym : forall Gamma x ty, ok Gamma -> List.In (x,TyDis ty) Gamma -> Ortho Gamma ty (PFVarT x)
+  | OVar : forall Gamma x ty, WFEnv Gamma -> List.In (x,TyDis ty) Gamma -> Ortho Gamma (PFVarT x) ty
+  | OVarSym : forall Gamma x ty, WFEnv Gamma -> List.In (x,TyDis ty) Gamma -> Ortho Gamma ty (PFVarT x)
   | OAx : forall Gamma t1 t2, OrthoAx' t1 t2 -> Ortho Gamma t1 t2.
 
 Hint Constructors Ortho.
@@ -325,10 +308,10 @@ Definition OrthoS (A B : PTyp) := not (exists C, Sub A C /\ Sub B C).
 (* Well-formed types *)
 
 Inductive WFTyp : context TyEnvSource -> PTyp -> Prop := 
-  | WFInt : forall Gamma, ok Gamma -> WFTyp Gamma PInt
+  | WFInt : forall Gamma, WFEnv Gamma -> WFTyp Gamma PInt
   | WFFun : forall Gamma t1 t2, WFTyp Gamma t1 -> WFTyp Gamma t2 -> WFTyp Gamma (Fun t1 t2)
   | WFAnd : forall Gamma t1 t2, WFTyp Gamma t1 -> WFTyp Gamma t2 -> Ortho Gamma t1 t2 -> WFTyp Gamma (And t1 t2)
-  | WFVar : forall Gamma x ty, List.In (x,TyDis ty) Gamma -> ok Gamma -> WFTyp Gamma (PFVarT x)
+  | WFVar : forall Gamma x ty, List.In (x,TyDis ty) Gamma -> WFEnv Gamma -> WFTyp Gamma (PFVarT x)
   | WFForAll : forall L Gamma d t,
                  (forall x ty, not (In x L) -> WFTyp (extend x (TyDis ty) Gamma) (open_typ_source d (PFVarT x))) ->
                  (forall x ty, not (In x L) -> WFTyp (extend x (TyDis ty) Gamma) (open_typ_source t (PFVarT x))) ->
@@ -354,22 +337,109 @@ Proof.
   - apply_fresh OForAll as x; apply H0; not_in_L x.
   - apply ortho_ax_sym in H; now apply OAx.
 Qed.
-    
-Lemma sub_and_or : forall A B C, Sub (And A B) C -> (Sub A C \/ Sub B C).
+
+Require Import Coq.Program.Equality.
+
+Lemma ortho_and_l : forall Gamma t1 t2 t0, Ortho Gamma (And t1 t2) t0 -> Ortho Gamma t1 t0.
 Proof.
-  intros A B C [c HSub].
-  dependent induction HSub.
-  admit.
-  left; eexists; apply HSub.
-  right; eexists; apply HSub.
+  intros.
+  dependent induction H.
+  - auto.
+  - auto.
+  - admit.
+  - destruct H; inversion H; inversion H2; inversion H4;
+    inversion H6; inversion H8; inversion H10.
 Admitted.
 
+Lemma ortho_and_r : forall Gamma t1 t2 t0, Ortho Gamma (And t1 t2) t0 -> Ortho Gamma t2 t0.
+Proof.
+  intros.
+  dependent induction H.
+  - auto.
+  - auto.
+  - admit.
+  - destruct H; inversion H; inversion H2; inversion H4;
+    inversion H6; inversion H8; inversion H10.
+Admitted.
+
+Lemma wfenv_no_refl : forall Gamma x, WFEnv Gamma -> not (List.In (x, TyDis (PFVarT x)) Gamma).
+Proof.
+  intros.
+  induction H.
+  - auto.
+  - unfold not, extend; simpl in *; intros.
+    destruct H2.
+    inversion H2; subst.
+    apply H0; simpl.
+    now apply MSetProperties.Dec.F.singleton_2.
+    contradiction.
+  - unfold not, extend; simpl; intros [a | b]; apply IHWFEnv.
+    inversion a. auto.
+Qed.
+  
+Lemma ortho_no_sub :
+  forall Gamma A B, WFTyp Gamma A -> WFTyp Gamma B -> Ortho Gamma A B -> not (Sub A B).
+Proof.
+  intros Gamma A B WFA WFB HOrtho HSub.
+
+  inversion HSub.
+  generalize dependent Gamma.
+  induction H; intros.
+  - inversion HOrtho; subst; destruct H as [a [b c]]; now apply c.
+  - inversion HOrtho; subst.
+    inversion WFA; inversion WFB; subst.
+    apply IHsub2 with (Gamma := Gamma); auto.
+    inversion HSub. inversion H1; subst.
+    eexists; apply H13.
+    destruct H1 as [a [b c]]; now apply c.
+  - inversion WFB; subst.
+    apply IHsub1 with (Gamma := Gamma); auto.
+    eexists; apply H.
+    apply ortho_sym.
+    apply ortho_and_l with (t2 := t2); auto.
+    now apply ortho_sym.
+  - inversion WFA; subst; apply IHsub with (Gamma := Gamma); auto.
+    eexists; apply H.
+    apply ortho_and_l with (t2 := t2); auto.
+  - inversion WFA; subst; apply IHsub with (Gamma := Gamma); auto.
+    eexists; apply H.
+    apply ortho_and_r with (t1 := t1); auto.
+  - inversion HOrtho; subst.
+    apply (wfenv_no_refl _ _ H0 H2).
+    apply (wfenv_no_refl _ _ H0 H3).
+    destruct H as [a [b c]]; now apply c.    
+  - inversion WFA; inversion WFB; subst.
+    inversion HSub.
+    inversion H1; subst.
+    inversion HOrtho; subst.
+    pick_fresh x.
+    eapply H0 with (x := x).
+    not_in_L x.
+    eexists; apply H8.
+    not_in_L x.
+    apply H5.
+    not_in_L x.
+    apply H10.
+    not_in_L x.
+    apply H6.
+    not_in_L x.
+    destruct H2 as [a [b HH]]; now apply HH.
+Qed.
+
+(*
 Lemma ortho_no_sub : forall Gamma A B, Ortho Gamma A B -> not (Sub A B).
 Proof.
   intros Gamma A B HOrtho HSub.
   induction HOrtho.
-  - apply sub_and_or in HSub.
-    inversion HSub; auto.
+  - inversion HSub; dependent induction H.
+    apply IHsub1.
+    apply ortho_sym; apply ortho_and_l with (t2 := t4); now apply ortho_sym.
+    apply ortho_sym; apply ortho_and_l with (t2 := t4); now apply ortho_sym.
+    eexists; apply H.
+    admit.
+    admit.
+    apply IHHOrtho1; eexists; apply H.
+    apply IHHOrtho2; eexists; apply H.
   - destruct HSub as [x HSub].
     inversion HSub; subst.
     apply IHHOrtho1; eexists; apply H2.
@@ -384,172 +454,168 @@ Proof.
     not_in_L x.
     eexists; apply H5.
     not_in_L x.
-  - destruct HSub as [c HSub].
-    inversion HSub; subst.
+  - inversion HSub; subst.
+    dependent induction H1.
+    admit.
     admit.
   - admit.
   - admit. (* this should be straightforward with a case analysis *)
 Admitted.
-  
+*)
+
+
 (* Unique subtype contributor: Lemma 2 *)
 
-Lemma uniquesub : forall Gamma A B C,
-  Ortho Gamma A B -> Sub (And A B) C -> not (Sub A C /\ Sub B C).
+Lemma uniquesub :
+  forall Gamma A B C, WFTyp Gamma A -> WFTyp Gamma B ->
+             Ortho Gamma A B -> Sub (And A B) C -> not (Sub A C /\ Sub B C).
 Proof.
-  intros.
-  unfold not; intros.
-  destruct H1.
+  intros Gamma A B C WFA WFB HOrtho HSubAnd.
+  unfold not; intros [HSubA HSubB].
   generalize dependent C.
-  dependent induction H; intros.
-  - induction C.
-    + inversion H2; inversion H4; subst.
-      eapply IHOrtho1; [ apply sand3; apply H3 | eexists; apply H7 | auto ].
-      eapply IHOrtho2; [ apply sand3; apply H3 | eexists; apply H7 | auto ].   
-    + inversion H2; inversion H4; subst.
-      eapply IHOrtho1; [ apply sand3; apply H3 | eexists; apply H7 | auto ].
-      eapply IHOrtho2; [ apply sand3; apply H3 | eexists; apply H7 | auto ].   
-    + inversion H3; inversion H4; subst.
-      inversion H2; inversion H5; subst.
+  dependent induction HOrtho; intros.
+  - induction C;
+    try (inversion WFA; subst;
+         inversion HSubA; inversion H; subst; [
+           eapply IHHOrtho1; auto; [ apply sand3; apply HSubB |
+                                     eexists; apply H5 |
+                                     auto ] | 
+           eapply IHHOrtho2; auto; [ apply sand3; apply HSubB |
+                                     eexists; apply H5 |
+                                     auto ] ]).  
+    + inversion HSubA; inversion H; subst.
+      inversion HSubB; inversion H0; subst.
       apply IHC1.
       apply sand2.
-      eexists; apply H11.
-      eexists; apply H11.
-      eexists; apply H8.
-      inversion H13.
-      inversion H13.
-      inversion H6.
-      inversion H6.
-    + inversion H3; inversion H4; inversion H6.
-    + inversion H2; inversion H4; subst.
-      eapply IHOrtho1; [ apply sand3; apply H3 | eexists; apply H7 | auto ].
-      eapply IHOrtho2; [ apply sand3; apply H3 | eexists; apply H7 | auto ].      
-    + inversion H2; inversion H4; subst.
-      eapply IHOrtho1; [ apply sand3; apply H3 | eexists; apply H7 | auto ].
-      eapply IHOrtho2; [ apply sand3; apply H3 | eexists; apply H7 | auto ].
-    + inversion H2; inversion H4; subst.
-      eapply IHOrtho1; [ apply sand3; apply H3 | eexists; apply H7 | auto ].
-      eapply IHOrtho2; [ apply sand3; apply H3 | eexists; apply H7 | auto ].
-  - induction C.
-    + inversion H3; inversion H4; subst.
-      eapply IHOrtho1; [ apply sand2; apply H2 | apply H2 | eexists; apply H7 ].
-      eapply IHOrtho2; [ apply sand2; apply H2 | apply H2 | eexists; apply H7 ].
-    + inversion H3; inversion H4; subst.
-      eapply IHOrtho1; [ apply sand2; apply H2 | apply H2 | eexists; apply H7 ].
-      eapply IHOrtho2; [ apply sand2; apply H2 | apply H2 | eexists; apply H7 ].
-    + inversion H3; inversion H4; subst.
-      inversion H2; inversion H5; subst.
+      eexists; apply H3.
+      eexists; apply H3.
+      eexists; apply H6.
+      inversion H2.
+      inversion H2.
+      inversion H5.
+      inversion H5.
+  - induction C; 
+    try (inversion WFB; subst;
+         inversion HSubB; inversion H; subst; [
+           eapply IHHOrtho1; auto; [ apply sand2; apply HSubA |
+                                     auto | 
+                                     eexists; apply H5 ] | 
+           eapply IHHOrtho2; auto; [ apply sand2; apply HSubA |
+                                     auto |
+                                     eexists; apply H5 ] ]). 
+    + inversion HSubA; inversion H; subst.
+      inversion HSubB; inversion H0; subst.
       apply IHC1.
       apply sand2.
-      eexists; apply H11.
-      eexists; apply H11.
-      eexists; apply H8.
-      inversion H7.
-      inversion H7.
-      inversion H10.
-      inversion H10.
-    + inversion H3; inversion H4; subst.
-      eapply IHOrtho1; [ apply sand2; apply H2 | apply H2 | eexists; apply H7 ].
-      eapply IHOrtho2; [ apply sand2; apply H2 | apply H2 | eexists; apply H7 ].
-    + inversion H3; inversion H4; subst.
-      eapply IHOrtho1; [ apply sand2; apply H2 | apply H2 | eexists; apply H7 ].
-      eapply IHOrtho2; [ apply sand2; apply H2 | apply H2 | eexists; apply H7 ].
-    + inversion H3; inversion H4; subst.
-      eapply IHOrtho1; [ apply sand2; apply H2 | apply H2 | eexists; apply H7 ].
-      eapply IHOrtho2; [ apply sand2; apply H2 | apply H2 | eexists; apply H7 ].
-    + inversion H3; inversion H4; subst.
-      eapply IHOrtho1; [ apply sand2; apply H2 | apply H2 | eexists; apply H7 ].
-      eapply IHOrtho2; [ apply sand2; apply H2 | apply H2 | eexists; apply H7 ].
-  - induction C; try (now (inversion H1 as [x HInv]; inversion HInv)).
-    + inversion H1; inversion H3; subst.
-      inversion H2; inversion H4; subst.
-      eapply IHOrtho; [ apply sand2; eexists; apply H10
-                      | eexists; apply H10
-                      | eexists; apply H13 ].
-    + inversion H1; inversion H3; subst.
-      inversion H2; inversion H4; subst.
+      eexists; apply H3.
+      eexists; apply H3.
+      eexists; apply H6.
+      inversion H8.
+      inversion H8.
+      inversion H1.
+      inversion H1.
+  - induction C; try (now (inversion HSubA as [x HInv]; inversion HInv)).
+    + inversion WFA; subst; inversion WFB; subst.
+      inversion HSubA; inversion H; subst.
+      inversion HSubB; inversion H0; subst.
+      eapply IHHOrtho; auto; [ apply sand2; eexists; apply H10
+                             | eexists; apply H10
+                             | eexists; apply H13 ].
+    + inversion WFA; subst; inversion WFB; subst.
+      inversion HSubA; inversion H; subst.
+      inversion HSubB; inversion H0; subst.
       apply IHC1.
       apply sand2; eexists; apply H7.
       eexists; apply H7.
       eexists; apply H10.
-  - induction C; try (now (inversion H1 as [x HInv]; inversion HInv)).
-    + inversion H2; inversion H4; subst.
-      inversion H2; inversion H5; subst.
-      inversion H3; inversion H6; subst.
+  - induction C; try (now (inversion HSubA as [x HInv]; inversion HInv)).
+    + inversion HSubA; inversion H1; subst.
+      inversion HSubB; inversion H2; subst.
       apply IHC1.
-      apply sand2; eexists; apply H8.
+      apply sand2; eexists; apply H5.
+      eexists; apply H5.
       eexists; apply H8.
-      eexists; apply H14.
-    + inversion H2; inversion H4; subst.
-      inversion H3; inversion H5; subst.
+    + inversion HSubA; inversion H1; subst.
+      inversion HSubB; inversion H2; subst.
+      inversion WFA; inversion WFB; subst.
       pick_fresh x.
-      clear IHC1; clear IHC2; clear H1.
-      eapply H0.
+      clear IHC1; clear IHC2; clear HSubAnd.
+      eapply H0 with (x := x).
       not_in_L x; apply H7.
+      apply H9; not_in_L x.
+      apply H14; not_in_L x.
       apply sand2.
-      eexists; apply H10; not_in_L x.
-      eexists; apply H10; not_in_L x.
-      eexists; apply H11; not_in_L x.
-  - induction C; try (now (inversion H2 as [z HInv]; inversion HInv)).
-    + inversion H2; inversion H4; subst.
-      inversion H3; inversion H5; subst.
+      eexists; apply H7; not_in_L x.
+      eexists; apply H7; not_in_L x.
+      eexists; apply H8; not_in_L x.
+  - induction C; try (now (inversion HSubA as [z HInv]; inversion HInv)).
+    + inversion HSubA; inversion H1; subst.
+      inversion HSubB; inversion H2; subst.
       apply IHC1.
-      apply sand2; eexists; apply H8.
+      apply sand2; eexists; apply H5.
+      eexists; apply H5.
       eexists; apply H8.
-      eexists; apply H11.
-      inversion H7.
-      inversion H7.
-    + clear H1.
-      inversion H2; inversion H1; subst.
+      inversion H4.
+      inversion H4.
+    + clear HSubAnd.
+      inversion HSubA; inversion H1; subst.
       assert (Ha : Ortho Gamma ty (PFVarT v)) by auto.
       apply ortho_no_sub in Ha.
       contradiction.
+      auto.
+      auto.
   (* same as above (var_sym) *)
-  - induction C; try (now (inversion H3 as [z HInv]; inversion HInv)).
-    + inversion H2; inversion H4; subst.
-      inversion H3; inversion H5; subst.
+  - induction C; try (now (inversion HSubB as [z HInv]; inversion HInv)).
+    + inversion HSubA; inversion H1; subst.
+      inversion HSubB; inversion H2; subst.
       apply IHC1.
-      apply sand2; eexists; apply H8.
+      apply sand2; eexists; apply H5.
+      eexists; apply H5.
       eexists; apply H8.
-      eexists; apply H11.
-      inversion H6.
-      inversion H6.
-    + clear H1.
-      inversion H3; inversion H1; subst.
+      inversion H3.
+      inversion H3.
+    + clear HSubAnd.
+      inversion HSubB; inversion H1; subst.
       assert (Ha : Ortho Gamma ty (PFVarT v)) by auto.
       apply ortho_no_sub in Ha.
       contradiction.
+      auto.
+      auto.
   - destruct H as [ PTypHd1 [ PTypHd2 PTypHd3 ]].
     induction C.
-    + inversion H1; inversion H; subst;
-      try now (inversion PTypHd1; inversion H6; inversion H8; inversion H10).
-      inversion H2; inversion H3; subst;
-      try now (inversion PTypHd2; inversion H5; inversion H7;
-               inversion H9; inversion H11).
+    + inversion HSubA; inversion H; subst;
+      try now ( inversion PTypHd1; inversion H1; inversion H3;
+                inversion H5; inversion H7; inversion H9).
+      inversion HSubB; inversion H0; subst;
+      try now ( inversion PTypHd2; inversion H2; inversion H4;
+                inversion H6; inversion H8; inversion H10). 
       apply PTypHd3; auto.
-    + inversion H1; inversion H; subst;
-      try now (inversion PTypHd1; inversion H6; inversion H8; inversion H10).
-      inversion H2; inversion H3; subst;
-      try now (inversion PTypHd2; inversion H9; inversion H11; inversion H13).
+    + inversion HSubA; inversion H; subst;
+      try now ( inversion PTypHd1; inversion H3;
+                inversion H5; inversion H7; inversion H9).
+      inversion HSubB; inversion H0; subst;
+      try now ( inversion PTypHd2; inversion H6; inversion H8;
+                inversion H10; inversion H12; inversion H14). 
       apply PTypHd3; auto.
-    + inversion H1 as [x HInv1]; inversion HInv1; subst; try (now inversion H3).
-      inversion H2 as [x HInv2]; inversion HInv2; subst; try (now inversion H3).
-      apply IHC1;
-        [ apply sand2; eexists; apply H5 | eexists; apply H5 | eexists; apply H6 ].
-    + inversion H1; inversion H; subst;
-      try now (inversion PTypHd1; inversion H6; inversion H8; inversion H10).
-    + inversion H1; inversion H; subst;
-      try now (inversion PTypHd1; inversion H6; inversion H8; inversion H10).
-      inversion H2; inversion H3; subst;
-      try now (inversion PTypHd2; inversion H7; inversion H9; inversion H11).
+    + inversion HSubA as [x HInv1]; inversion HInv1; subst; try (now inversion H0).
+      inversion HSubB as [x HInv2]; inversion HInv2; subst; try (now inversion H0).
+      apply IHC1; [ apply sand2; eexists; apply H2
+                  | eexists; apply H2
+                  | eexists; apply H3 ].
+    + inversion HSubA; inversion H; subst; inversion H1.
+    + inversion HSubA; inversion H; subst;
+      try now (inversion PTypHd1; inversion H3; inversion H5; inversion H7).
+      inversion HSubB; inversion H0; subst;
+      try now (inversion PTypHd2; inversion H4; inversion H6; inversion H8).
       apply PTypHd3; auto.
-    + inversion H1; inversion H; subst;
-      try now (inversion PTypHd1; inversion H6; inversion H8; inversion H10).
-      inversion H2; inversion H3; subst;
-      try now (inversion PTypHd2; inversion H8; inversion H10; inversion H12).
+    + inversion HSubA; inversion H; subst;
+      try now (inversion PTypHd1; inversion H3; inversion H5; inversion H7).
+      inversion HSubB; inversion H0; subst;
+      try now (inversion PTypHd2; inversion H5; inversion H7; inversion H9; inversion H11).
       apply PTypHd3; auto.
-    + inversion H1; inversion H; subst;
-      try now (inversion PTypHd1; inversion H6; inversion H8; inversion H10).
-Admitted.
+    + inversion HSubA; inversion H; subst;
+      try now (inversion PTypHd1; inversion H3; inversion H5; inversion H7; inversion H9).
+Qed.
   
 (* Lemmas needed to prove soundness of the disjointness algorithm 
 
@@ -654,14 +720,14 @@ Proof.
     now subst.
     now subst.
     assert (HSub : Sub (And t1 t2) t0) by (apply sand2; eexists; apply H1).
-    assert (Ha := uniquesub _ t1 t2 t0 H9 HSub).
+    assert (Ha := uniquesub _ t1 t2 t0 H6 H8 H9 HSub).
     exfalso; apply Ha.
     split; eexists; [apply H1 | apply H7].
   - inversion H0; subst.
     inversion H3; subst.
     inversion H.
     assert (HSub : Sub (And t1 t2) t0) by (apply sand3; eexists; apply H1).
-    assert (Ha := uniquesub _ t1 t2 t0 H9 HSub).
+    assert (Ha := uniquesub _ t1 t2 t0 H6 H8 H9 HSub).
     exfalso; apply Ha.
     split; eexists; [apply H7 | apply H1].
     assert (c = c0). apply IHsub with (Gamma := Gamma). inversion H0; subst. auto. auto.
