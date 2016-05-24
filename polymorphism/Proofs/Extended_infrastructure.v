@@ -98,7 +98,7 @@ Proof.
   intros E; induction E; intros; auto.
   inversion H;
   subst.
-  apply WFPushV; auto.
+  eapply WFPushV; auto.
   now apply IHE with (F := F).
   not_in_L v.
   apply WFPushT; auto.
@@ -125,24 +125,13 @@ Proof.
   now apply wfenv_app_r in H.
   unfold extend; rewrite <- app_assoc.
   destruct v.
-  - admit.
-  - apply WFPushT.
-    apply IHE.
-    unfold extend in H; rewrite <- app_assoc in H.
-    inversion H; subst.
-    assumption.
-    unfold extend in H.
-    inversion H; subst.
-    rewrite dom_union in *.
-    rewrite union_spec in *.
-    unfold not; intros.
-    apply H4.
-    inversion H0.
-    auto.
-    right.
-    rewrite dom_union; rewrite union_spec.
-    auto.
-Admitted.
+  - inversion H; subst.
+    apply WFPushV; auto.
+    not_in_L x.
+  - inversion H; subst.
+    apply WFPushT; auto.
+    not_in_L x.
+Qed.
 
 (** Free variable properties **)
 
@@ -477,7 +466,82 @@ Proof.
     apply in_or_app; right; apply in_or_app; auto.    
 Qed.
 
-Hint Resolve ortho_weaken.
+Lemma ortho_strengthen : forall z U E F ty1 ty2,
+  not (In z (union (fv_ptyp ty1) (fv_ptyp ty2))) ->
+  Ortho (E ++ ((z,U) :: nil) ++ F) ty1 ty2 ->
+  Ortho (E ++ F) ty1 ty2.
+Proof.
+  intros.
+  remember (E ++ ((z,U) :: nil) ++ F).
+  
+  generalize dependent Heql.
+  generalize dependent E.
+  
+  induction H0; intros; auto.
+  - apply OAnd1; [ apply IHOrtho1 | apply IHOrtho2 ];
+    simpl in H; not_in_L z; apply Heql.
+  - apply OAnd2; [ apply IHOrtho1 | apply IHOrtho2 ];
+    simpl in H; not_in_L z; apply Heql.
+  - apply OFun;
+    apply IHOrtho; simpl in H; not_in_L z; auto.
+  - apply_fresh OForAll as x.
+    subst; unfold extend; simpl.
+    rewrite app_comm_cons.
+    eapply H1.
+    not_in_L x.
+    unfold not; intro HH.
+    apply MSetProperties.Dec.F.union_1 in HH.
+    destruct HH as [HH | HH]; apply fv_open_rec_typ_source in HH.
+    apply MSetProperties.Dec.F.union_1 in HH; simpl in HH; simpl in H.
+    destruct HH as [HH | HH].
+    apply H.
+    apply MSetProperties.Dec.F.union_2.
+    apply MSetProperties.Dec.F.union_3.
+    assumption.
+    not_in_L x.
+    apply H11.
+    not_in_L z.
+    apply MSetProperties.Dec.F.singleton_2.
+    apply MSetProperties.Dec.F.singleton_1 in HH.
+    now symmetry.
+    apply MSetProperties.Dec.F.union_1 in HH; simpl in HH; simpl in H.
+    destruct HH as [HH | HH].
+    apply H.
+    apply MSetProperties.Dec.F.union_3.
+    apply MSetProperties.Dec.F.union_3.
+    assumption.
+    not_in_L x.
+    apply H11.
+    not_in_L z.
+    apply MSetProperties.Dec.F.singleton_2.
+    apply MSetProperties.Dec.F.singleton_1 in HH.
+    now symmetry.
+    unfold extend; now simpl.
+  - subst.
+    apply OVar with (A := A); auto.
+    now apply wfenv_remove in H0.
+    apply in_or_app.
+    apply in_app_or in H1.
+    destruct H1; auto.
+    destruct H1; auto.
+    inversion H1; subst; simpl in H.
+    not_in_L x.
+    exfalso; apply H3.
+    now apply MSetProperties.Dec.F.singleton_2.
+  - subst.
+    apply OVarSym with (A := A); auto.
+    now apply wfenv_remove in H0.
+    apply in_or_app.
+    apply in_app_or in H1.
+    destruct H1; auto.
+    destruct H1; auto.
+    inversion H1; subst; simpl in H.
+    not_in_L x.
+    exfalso; apply H4.
+    now apply MSetProperties.Dec.F.singleton_2.
+Qed.
+
+Hint Resolve ortho_weaken ortho_strengthen.
 
 (** Well-formedness of types **)
 
@@ -507,23 +571,25 @@ Proof.
   (* ForAll *)
   - apply_fresh WFForAll as x.
     intros.
+    intros.
     unfold open in *; simpl in *.
     subst.
     unfold extend; simpl.
     rewrite app_comm_cons.
-    apply H0 with (ty := ty).
+    apply H0.
     not_in_L x.
     unfold extend; simpl; reflexivity.
     rewrite <- app_comm_cons.
     apply WFPushV.
-    apply H1.
-    admit. (* not_in_L x. *)
+    apply H2.
     not_in_L x.
-    rewrite dom_union in H7.
-    rewrite union_spec in H7.
-    inversion H7; contradiction.
-Admitted.
-
+    not_in_L x.
+    rewrite dom_union in H8.
+    rewrite union_spec in H8.
+    inversion H8; contradiction.
+    apply IHWFTyp; auto.
+Qed.    
+    
 Lemma wf_strengthen_source : forall z U E F ty,
   not (In z (fv_ptyp ty)) ->
   WFTyp (E ++ ((z,U) :: nil) ++ F) ty ->
@@ -538,7 +604,7 @@ Proof.
   induction H0; intros; auto.
   - apply WFInt.
     subst.
-    admit. (* now apply ok_remove in H0. *)
+    now apply wfenv_remove in H0.
   - eapply WFFun.
     subst.
     apply IHWFTyp1; simpl in *; not_in_L z; reflexivity.
@@ -549,7 +615,7 @@ Proof.
     apply IHWFTyp1; simpl in *; not_in_L z; reflexivity.
     subst.
     apply IHWFTyp2; simpl in *; not_in_L z; reflexivity.
-    admit. (* assumption. *)
+    subst; eauto.
   - subst; eapply WFVar.
     apply in_or_app.
     repeat apply in_app_or in H0.
@@ -564,7 +630,7 @@ Proof.
     left; reflexivity.
     inversion H4.
     auto.
-    admit. (* now apply ok_remove in H1. *)
+    now apply wfenv_remove in H1.
   - subst.
     apply_fresh WFForAll as x.
     unfold extend in *; simpl in *; intros.
@@ -584,7 +650,10 @@ Proof.
     symmetry; assumption.
     rewrite app_comm_cons.
     reflexivity.
-Admitted.
+    apply IHWFTyp.
+    simpl in H; not_in_L z.
+    reflexivity.
+Qed.
 
 Lemma wf_env_comm_source : forall E F G H ty,
               WFTyp (E ++ F ++ G ++ H) ty ->
@@ -620,7 +689,11 @@ Proof.
     unfold extend.
     intros.
     simpl.
-    admit. (* should be possible through H1 *)
+    rewrite app_comm_cons.
+    apply H1.
+    not_in_L x.
+    unfold extend; now simpl.
+    now apply IHWFTyp.
 Admitted.
 
 Lemma wf_env_comm_extend_source : forall Gamma x y v1 v2 ty,
@@ -665,11 +738,10 @@ Proof.
   intros.
   induction H; auto.
   - apply_fresh PType_ForAll as x.
-    admit.
+    auto.
     apply H0.
-    admit.
     not_in_L x.
-Admitted.
+Qed.
 
 
 (* Substitution (at type-level) lemmas *)
@@ -765,30 +837,14 @@ Proof.
       apply H1.
       apply H0 with (Gamma := (extend x (TyVar PTyp) Gamma)). *)
       not_in_L x.
+      now apply wf_gives_types_source in H.
+      not_in_L x.
+      now apply wf_gives_types_source in H.
+    + simpl in *.
+      destruct (eqb x z).
       admit.
-      (* apply wf_weaken_extend_source; auto. *)
-      not_in_L x.
-      admit.
-      (*
-      apply H4.
-      not_in_L x.
-      apply H7; auto.
-      not_in_L x.      
-      rewrite <- subst_typ_source_open_source_var.
-      apply H5.
-      not_in_L x.
-      not_in_L x.
-      now apply wf_gives_types_source in H1.
-      rewrite <- subst_typ_source_open_source_var.
-      apply H9.
-      not_in_L x.
-      not_in_L x.
-      now apply wf_gives_types_source in H1.
-      not_in_L x.
-      now apply wf_gives_types_source in H1.
-      not_in_L x.
-      now apply wf_gives_types_source in H1. *)
-    + admit. (*
+      apply OVar with (A := A); auto.
+      admit. (*
       destruct t1; destruct t2; simpl in *; try now inversion H;
       try now (apply OAx; auto).
       now (inversion H as [H1 [H2 H3]]; inversion H2; subst; inversion H5; subst;
@@ -835,17 +891,14 @@ Proof.
   - apply_fresh WFForAll as x.
     intros.
     rewrite subst_typ_source_open_source_var.
-    apply H1.
-    not_in_L x.
-    apply wf_weaken_extend_source.
-    auto.
-    not_in_L x.
+    admit. (* apply H1. *)
     not_in_L x.
     now apply wf_gives_types_source in H.
+    now apply IHWFTyp.
 Admitted.
 
 Definition body_wf_typ t d Gamma :=
-  exists L, forall x, not (In x L) -> WFEnv (extend x (TyDis d) Gamma) ->
+  exists L, forall x, not (In x L) -> WFTyp Gamma d ->
             WFTyp (extend x (TyDis d) Gamma) (open_typ_source t (PFVarT x)).
 
 Lemma forall_to_body_wf_typ : forall d t1 Gamma, 
@@ -853,7 +906,7 @@ Lemma forall_to_body_wf_typ : forall d t1 Gamma,
 Proof. intros. unfold body_wf_typ. inversion H. subst. eauto. Qed.
 
 Lemma open_body_wf_type : forall t d u Gamma,
-  body_wf_typ t d Gamma -> WFTyp Gamma u -> WFTyp Gamma (open_typ_source t u).
+  body_wf_typ t d Gamma -> WFTyp Gamma d -> WFTyp Gamma u -> WFTyp Gamma (open_typ_source t u).
 Proof.
   intros. destruct H. pick_fresh y.
 
@@ -872,15 +925,11 @@ Proof.
   not_in_L y.
   unfold extend in H; apply H.
   not_in_L y.
-  apply WFPushV.
-  admit.
-  (* now apply wf_gives_ok_env_source in H0. *)
+  auto.
   not_in_L y.
-  not_in_L y.
-  not_in_L y.
-  admit.
-  admit.
-Admitted.
+  now apply wf_gives_types_source in H1.
+  auto.
+Qed.
 
 (** More properties on open **)
 
@@ -926,7 +975,6 @@ Proof.
     unfold extend; simpl.
     unfold open_typ_source in Ha.
     now rewrite open_rec_typ_eq_source in Ha.
-    auto.
 Qed.
 
 Hint Resolve WFTyp_to_WFType.

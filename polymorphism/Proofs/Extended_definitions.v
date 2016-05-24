@@ -303,7 +303,8 @@ Inductive WFTyp : context TyEnvSource -> PTyp -> Prop :=
   | WFAnd : forall Gamma t1 t2, WFTyp Gamma t1 -> WFTyp Gamma t2 -> Ortho Gamma t1 t2 -> WFTyp Gamma (And t1 t2)
   | WFVar : forall Gamma x ty, List.In (x,TyDis ty) Gamma -> WFEnv Gamma -> WFTyp Gamma (PFVarT x)
   | WFForAll : forall L Gamma d t,
-                 (forall x ty, not (In x L) -> WFTyp (extend x (TyDis ty) Gamma) (open_typ_source t (PFVarT x))) ->
+                 (forall x, not (In x L) -> WFTyp (extend x (TyDis d) Gamma) (open_typ_source t (PFVarT x))) ->
+                 WFTyp Gamma d ->
                  WFTyp Gamma (ForAll d t).
 
 Hint Constructors WFTyp.

@@ -6,14 +6,13 @@ Require Import Setoid.
 Require Import Coq.Program.Equality.
 Require Import SystemF.
 Require Import Extended_definitions.
-Require Import Extended_infrastructure.
 
-Module Extended
+Module ExtendedSub
        (Import VarTyp : UsualDecidableTypeFull)
        (Import set : MSetInterface.S).
 
-Module Infrastructure := Infrastructure(VarTyp)(set).
-Export Infrastructure.
+Module Definitions := Definitions(VarTyp)(set).
+Import Definitions.
 
 (* Notes:
 
@@ -157,11 +156,11 @@ Proof.
     not_in_L x.
     eexists; apply H8.
     not_in_L x.
-    apply H3.
+    apply H4.
     not_in_L x.
-    apply H7.
+    apply H9.
     not_in_L x.
-    apply H5.
+    apply H6.
     not_in_L x.
     destruct H2 as [a [b HH]]; now apply HH.
 Qed.
@@ -244,8 +243,8 @@ Proof.
       clear IHC1; clear IHC2; clear HSubAnd.
       eapply H0 with (x := x).
       not_in_L x; apply H7.
-      apply H5; not_in_L x.
-      apply H11; not_in_L x.
+      apply H6; not_in_L x.
+      apply H13; not_in_L x.
       apply sand2.
       eexists; apply H7; not_in_L x.
       eexists; apply H7; not_in_L x.
@@ -376,13 +375,13 @@ Proof.
     pick_fresh x.
     assert (Ha : (open_typ_term c (STFVarT x)) = (open_typ_term c0 (STFVarT x))).
     assert (ty := Bot).
-    eapply H0 with (Gamma := extend x (TyDis ty) Gamma).
-    not_in_L x.
-    apply H6.
+    eapply H0 with (Gamma := extend x (TyDis d) Gamma).
     not_in_L x.
     apply H7.
     not_in_L x.
-    apply H10.
+    apply H9.
+    not_in_L x.
+    apply H12.
     not_in_L x.
     assert (c = c0).
     eapply open_typ_term_app_eq with (x := x) (n := 0).
@@ -392,7 +391,19 @@ Proof.
     now subst.
 Qed.
 
- 
+End ExtendedSub.
+
+Module Extended
+       (Import VarTyp : UsualDecidableTypeFull)
+       (Import set : MSetInterface.S).
+
+Require Import Extended_infrastructure.
+Module Infrastructure := Infrastructure(VarTyp)(set).
+Export Infrastructure.
+
+Module ExtendedSub := ExtendedSub(VarTyp)(set).
+Import ExtendedSub.
+
 (* Typing lemmas *)
 
 Lemma typing_wf_source_alg:
@@ -406,8 +417,9 @@ Proof.
     unfold body_wf_typ.
     exists L.
     intros.
-    apply H3.
+    apply H4.
     not_in_L x.
+    auto.
     auto.
   - pick_fresh x.
     assert (Ha : not (M.In x L)) by (not_in_L x).
@@ -419,78 +431,10 @@ Proof.
     not_in_L x.
     rewrite app_nil_l; apply Ha.
   - apply_fresh WFForAll as x.
-    intros.
-    admit.
-Admitted.
-
-Lemma typing_weaken_alg : forall G E F t T d dir,
-   has_type_source_alg (E ++ G) t dir T d -> 
-   ok (E ++ F ++ G) ->
-   has_type_source_alg (E ++ F ++ G) t dir T d.
-Proof.
-Admitted. (*
-  intros.
-  generalize dependent H0.
-  remember (E ++ G) as H'.
-  generalize dependent HeqH'.
-  generalize dependent E.
-  dependent induction H; intros; eauto.
-  (* TyVar *)
-  - subst.
-    apply ATyVar.
-    assumption.
-    apply in_app_or in H0.
-    inversion H0.
-    apply in_or_app; left; assumption.
-    apply in_or_app; right; apply in_or_app; right; assumption.
-    apply wf_weaken_source; assumption.
-  (* TyTApp *)
-  - subst; apply ATyTApp.
-    apply wf_weaken_source; auto.
+    apply H1.
+    not_in_L x.
     auto.
-  (* TyLam *)
-  - unfold extend in *.
-    apply_fresh ATyLam as x.
-    unfold open in *; simpl in *.
-    unfold extend.
-    rewrite app_assoc.
-    apply H0.
-    not_in_L x.
-    rewrite HeqH'.
-    rewrite <- app_assoc.
-    reflexivity.
-    rewrite <- app_assoc.
-    apply Ok_push.
-    assumption.
-    repeat (rewrite dom_union; rewrite M.union_spec).
-    repeat rewrite M.union_spec in Frx.
-    repeat rewrite or_assoc in *.
-    unfold not; intro HInv; destruct HInv as [HInv | [HInv | HInv]]; apply Frx; auto 8.
-    subst; apply wf_weaken_source; assumption.
-  (* TySub *)
-  - subst.
-    apply ATySub with (A := A); auto.
-    apply wf_weaken_source; assumption.
-  (* TyTLam *)
-  - subst.
-    apply_fresh ATyTLam as x.
-    intros.
-    unfold open in *; simpl in *.
-    subst.
-    unfold extend; simpl.
-    rewrite app_comm_cons.
-    eapply H0.
-    not_in_L x.
-    unfold extend; simpl; reflexivity.
-    rewrite <- app_comm_cons.
-    apply Ok_push.
-    assumption.
-    not_in_L x.
-    rewrite dom_union in H2.
-    rewrite union_spec in H2.
-    inversion H2; contradiction.
 Qed.
-*)
 
 Lemma type_correct_alg_terms : forall Gamma E ty e dir, has_type_source_alg Gamma E dir ty e -> PTerm E.
 Proof.
@@ -631,7 +575,8 @@ induction H; intros.
   assert (WFTyp Gamma A0). now apply typing_wf_source_alg in H.
   assert (WFTyp Gamma B). assumption.
   assert (C = C0).
-  apply (sub_coherent H3 H6 H0 H4).
+  (* this works, just needs a fix of a module issue *)
+  admit. (* apply (sub_coherent H3 H6 H0 H4). *)
   subst; reflexivity.
   subst.
   inversion H.
@@ -647,58 +592,7 @@ induction H; intros.
   not_in_L x.
   apply H8.
   not_in_L x.
-Qed.
-
-(*
-Lemma open_rec_term_core :
-  forall t j v i u, i <> j -> open_rec_source j (PFVar v) t = open_rec_source i (PFVar u) (open_rec_source j (PFVar v) t) ->
-    t = open_rec_source i (PFVar u) t.
-Proof.
-  intro t; induction t; intros; simpl.
-  - reflexivity.
-  - simpl in *.
-    case_eq (Nat.eqb i n); intros.
-    case_eq (Nat.eqb j n); intros.
-    exfalso. apply H. apply Nat.eqb_eq in H1.
-    apply Nat.eqb_eq in H2. rewrite H1, H2.
-    reflexivity.
-    rewrite H2 in H0.
-    unfold open_rec_source in H0.
-    rewrite H1 in H0.
-    assumption.
-    reflexivity.
-  - reflexivity.
-  - inversion H0.
-    erewrite <- IHt.
-    reflexivity.
-    apply not_eq_S.
-    apply H.
-    apply H2.
-  - inversion H0.
-    erewrite <- IHt1.
-    erewrite <- IHt2.
-    reflexivity.
-    apply H.
-    apply H3.
-    apply H.
-    apply H2.
-  - inversion H0.
-    erewrite <- IHt1.
-    erewrite <- IHt2.
-    reflexivity.
-    apply H.
-    apply H3.
-    apply H.
-    apply H2.
-  - inversion H0.
-    erewrite <- IHt.
-    reflexivity.
-    apply H.
-    apply H2. 
-Defined.
-*)
-
-
+Admitted.
 
 Lemma coercions_produce_terms :
   forall E A B, sub A B E -> STTerm E.
@@ -941,14 +835,15 @@ Proof.
     not_in_L x.
     not_in_L y.
     simpl.
+    unfold not; intro HH.
+    apply MSetProperties.Dec.F.add_iff in HH.
+    destruct HH; subst.
     not_in_L y.
-    apply MSetProperties.Dec.F.add_iff in H7.
-    inversion H7; subst.
-    exfalso; apply H20; now apply MSetProperties.Dec.F.singleton_2.
-    contradiction.
+    exfalso; apply H22; now apply MSetProperties.Dec.F.singleton_2.
+    not_in_L y.
     unfold extend.
     apply wf_weaken_source.
-    apply H6.
+    apply H7.
     not_in_L y.
     apply WFPushV.
     apply WFPushT.
@@ -956,13 +851,14 @@ Proof.
     not_in_L x.
     not_in_L y.
     simpl.
+    unfold not; intro HH.
+    apply MSetProperties.Dec.F.add_iff in HH.
+    destruct HH; subst.
     not_in_L y.
-    apply MSetProperties.Dec.F.add_iff in H7.
-    inversion H7; subst.
-    exfalso; apply H20; now apply MSetProperties.Dec.F.singleton_2.
-    contradiction.
+    exfalso; apply H22; now apply MSetProperties.Dec.F.singleton_2.
+    not_in_L y.
     apply wf_weaken_source.
-    apply H10.
+    apply H12.
     not_in_L y.
     apply WFPushV.
     apply WFPushT.
