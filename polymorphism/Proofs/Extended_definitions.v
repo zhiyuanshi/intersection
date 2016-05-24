@@ -287,7 +287,7 @@ Inductive Ortho : context TyEnvSource -> PTyp -> PTyp -> Prop :=
                        Ortho Gamma (PFVarT x) ty
   | OVarSym : forall Gamma x ty A, WFEnv Gamma -> List.In (x,TyDis A) Gamma -> Sub A ty ->
                           Ortho Gamma ty (PFVarT x)
-  | OAx : forall Gamma t1 t2, OrthoAx t1 t2 -> Ortho Gamma t1 t2.
+  | OAx : forall Gamma t1 t2, WFEnv Gamma -> OrthoAx t1 t2 -> Ortho Gamma t1 t2.
 
 Hint Constructors Ortho.
 
