@@ -263,10 +263,28 @@ Proof.
   - simpl in *.
     inversion H; subst.
     apply WFPushV; auto.
-    admit. (* provable *)
+    unfold not; intros HH.
+    apply H4; rewrite dom_union; rewrite union_spec;
+    simpl; rewrite add_spec.
+    repeat (apply dom_union in HH;
+            rewrite union_spec in HH;
+            destruct HH as [HH | HH]); auto.
+    simpl in HH; apply add_spec in HH.
+    inversion HH.
+    subst; auto.
+    inversion H0.
     apply WFPushT; auto.
-    admit. (* provable *)
-Admitted.
+    unfold not; intros HH.
+    apply H3; rewrite dom_union; rewrite union_spec;
+    simpl; rewrite add_spec.
+    repeat (apply dom_union in HH;
+            rewrite union_spec in HH;
+            destruct HH as [HH | HH]); auto.
+    simpl in HH; apply add_spec in HH.
+    inversion HH.
+    subst; auto.
+    inversion H0.    
+Qed.
     
 Lemma wfenv_middle_comm : forall E F G H,
               WFEnv (E ++ F ++ G ++ H) ->
@@ -747,15 +765,23 @@ Proof.
     unfold extend; now simpl.
   - apply OVar with (A := A).
     now apply wfenv_extend_comm.
-    admit. (* provable *)
+    apply in_or_app; rewrite app_comm_cons.
+    repeat (apply in_app_or in H0; destruct H0 as [H0 | H0]).
+    auto.
+    right; apply in_or_app; auto.
+    right; apply in_or_app; auto.
     auto.
   - apply OVarSym with (A := A).
     now apply wfenv_extend_comm.
-    admit. (* provable *)
+    apply in_or_app; rewrite app_comm_cons.
+    repeat (apply in_app_or in H0; destruct H0 as [H0 | H0]).
+    auto.
+    right; apply in_or_app; auto.
+    right; apply in_or_app; auto.
     auto.
   - apply wfenv_extend_comm in H.
     now apply OAx. 
-Admitted.
+Qed.
 
 Lemma ortho_extend_comm' :
   forall F E x v ty1 ty2,
@@ -777,15 +803,25 @@ Proof.
     unfold extend; now simpl.
   - apply OVar with (A := A).
     now apply wfenv_extend_comm'.
-    admit. (* provable *)
+    rewrite app_comm_cons in H0.
+    apply in_or_app.
+    repeat (apply in_app_or in H0; destruct H0 as [H0 | H0]).
+    auto.
+    right; apply in_or_app; auto.
+    right; apply in_or_app; auto.
     auto.
   - apply OVarSym with (A := A).
     now apply wfenv_extend_comm'.
-    admit. (* provable *)
+    rewrite app_comm_cons in H0.
+    apply in_or_app.
+    repeat (apply in_app_or in H0; destruct H0 as [H0 | H0]).
+    auto.
+    right; apply in_or_app; auto.
+    right; apply in_or_app; auto.
     auto.
   - apply wfenv_extend_comm' in H.
     now apply OAx.
-Admitted.
+Qed.
     
 Lemma ortho_app_comm :
   forall E F ty1 ty2, Ortho (F ++ E) ty1 ty2 -> Ortho (E ++ F) ty1 ty2.
@@ -809,15 +845,19 @@ Proof.
     unfold extend; now simpl.
   - apply OVar with (A := A).
     now apply wfenv_app_comm.
-    admit. (* provable *)
+    apply in_or_app.
+    apply in_app_or in H0.
+    destruct H0; auto.
     auto.
   - apply OVarSym with (A := A).
     now apply wfenv_app_comm.
-    admit. (* provable *)
+    apply in_or_app.
+    apply in_app_or in H0.
+    destruct H0; auto.
     auto.
   - apply OAx; auto.
     now apply wfenv_app_comm.
-Admitted.
+Qed.
 
 Lemma ortho_middle_comm : forall H E F G ty1 ty2,
               Ortho (E ++ F ++ G ++ H) ty1 ty2 ->
