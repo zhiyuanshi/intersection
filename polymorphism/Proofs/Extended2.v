@@ -43,14 +43,14 @@ Qed.
   
 Lemma ortho_sym : forall Gamma A B, Ortho Gamma A B -> Ortho Gamma B A.
 Proof.
-  intros.
-  induction H; auto.
+  intros Gamma A B HOrtho.
+  induction HOrtho; auto.
   - apply_fresh OForAll as x; apply H0; not_in_L x.
   - apply OVarSym with (A := A); auto.
   - apply OVar with (A := A); auto.
-  - apply ortho_ax_sym in H; now apply OAx.
+  - apply ortho_ax_sym in H0; now apply OAx.
 Qed.
-
+  
 Lemma ortho_and_l : forall Gamma t1 t2 t0, Ortho Gamma (And t1 t2) t0 -> Ortho Gamma t1 t0.
 Proof.
   intros.
@@ -62,8 +62,7 @@ Proof.
     eexists; apply H6.
     inversion H4.
     inversion H4.
-  - destruct H; inversion H; inversion H2; inversion H4;
-    inversion H6; inversion H8; inversion H10.
+  - orthoax_inv_l.
 Qed.
 
 Lemma ortho_and_r : forall Gamma t1 t2 t0, Ortho Gamma (And t1 t2) t0 -> Ortho Gamma t2 t0.
@@ -77,8 +76,7 @@ Proof.
     eexists; apply H8.
     inversion H4.
     inversion H4.
-  - destruct H; inversion H; inversion H2; inversion H4;
-    inversion H6; inversion H8; inversion H10.
+  - orthoax_inv_l.
 Qed.
 
 Lemma wfenv_no_refl : forall Gamma x, WFEnv Gamma -> not (List.In (x, TyDis (PFVarT x)) Gamma).
@@ -124,13 +122,13 @@ Proof.
   inversion HSub.
   generalize dependent Gamma.
   induction H; intros.
-  - inversion HOrtho; subst; destruct H as [a [b c]]; now apply c.
+  - inversion HOrtho; subst. destruct H0 as [a [b c]]; now apply c.
   - inversion HOrtho; subst.
     inversion WFA; inversion WFB; subst.
     apply IHsub2 with (Gamma := Gamma); auto.
     inversion HSub. inversion H1; subst.
     eexists; apply H13.
-    destruct H1 as [a [b c]]; now apply c.
+    destruct H2 as [a [b c]]; now apply c.
   - inversion WFB; subst.
     apply IHsub1 with (Gamma := Gamma); auto.
     eexists; apply H.
@@ -146,7 +144,7 @@ Proof.
   - inversion HOrtho; subst.
     apply wfenv_no_var_sub with (Gamma := Gamma) (A := A) (x := v); auto.
     apply wfenv_no_var_sub with (Gamma := Gamma) (A := A) (x := v); auto.
-    destruct H as [a [b c]]; now apply c.    
+    destruct H0 as [a [b c]]; now apply c.    
   - inversion WFA; inversion WFB; subst.
     inversion HSub.
     inversion H1; subst.
@@ -162,7 +160,7 @@ Proof.
     not_in_L x.
     apply H6.
     not_in_L x.
-    destruct H2 as [a [b HH]]; now apply HH.
+    destruct H3 as [a [b HH]]; now apply HH.
 Qed.
 
 (* Unique subtype contributor: Lemma 2 *)
@@ -284,40 +282,25 @@ Proof.
       contradiction.
       auto.
       auto.
-  - destruct H as [ PTypHd1 [ PTypHd2 PTypHd3 ]].
+  - destruct H0 as [ PTypHd1 [ PTypHd2 PTypHd3 ]].
     induction C.
-    + inversion HSubA; inversion H; subst;
-      try now ( inversion PTypHd1; inversion H1; inversion H3;
-                inversion H5; inversion H7; inversion H9).
-      inversion HSubB; inversion H0; subst;
-      try now ( inversion PTypHd2; inversion H2; inversion H4;
-                inversion H6; inversion H8; inversion H10). 
+    + inversion HSubA as [x HsA]; inversion HsA; subst; try orthoax_inv PTypHd1.
+      inversion HSubB as [x HsB]; inversion HsB; subst; try orthoax_inv PTypHd2.
       apply PTypHd3; auto.
-    + inversion HSubA; inversion H; subst;
-      try now ( inversion PTypHd1; inversion H3;
-                inversion H5; inversion H7; inversion H9).
-      inversion HSubB; inversion H0; subst;
-      try now ( inversion PTypHd2; inversion H6; inversion H8;
-                inversion H10; inversion H12; inversion H14). 
+    + inversion HSubA as [x HsA]; inversion HsA; subst; try orthoax_inv PTypHd1.
+      inversion HSubB as [x HsB]; inversion HsB; subst; try orthoax_inv PTypHd2.
       apply PTypHd3; auto.
     + inversion HSubA as [x HInv1]; inversion HInv1; subst; try (now inversion H0).
       inversion HSubB as [x HInv2]; inversion HInv2; subst; try (now inversion H0).
-      apply IHC1; [ apply sand2; eexists; apply H2
-                  | eexists; apply H2
-                  | eexists; apply H3 ].
-    + inversion HSubA; inversion H; subst; inversion H1.
-    + inversion HSubA; inversion H; subst;
-      try now (inversion PTypHd1; inversion H3; inversion H5; inversion H7).
-      inversion HSubB; inversion H0; subst;
-      try now (inversion PTypHd2; inversion H4; inversion H6; inversion H8).
+      apply IHC1; [ apply sand2; eexists; apply H3
+                  | eexists; apply H3
+                  | eexists; apply H4 ].
+    + inversion HSubA as [x HsA]; inversion HsA; subst; inversion H1.
+    + inversion HSubA as [x HsA]; inversion HsA; subst; try orthoax_inv PTypHd1.
+    + inversion HSubA as [x HsA]; inversion HsA; subst; try orthoax_inv PTypHd1.
+      inversion HSubB as [x HsB]; inversion HsB; subst; try orthoax_inv PTypHd2.
       apply PTypHd3; auto.
-    + inversion HSubA; inversion H; subst;
-      try now (inversion PTypHd1; inversion H3; inversion H5; inversion H7).
-      inversion HSubB; inversion H0; subst;
-      try now (inversion PTypHd2; inversion H5; inversion H7; inversion H9; inversion H11).
-      apply PTypHd3; auto.
-    + inversion HSubA; inversion H; subst;
-      try now (inversion PTypHd1; inversion H3; inversion H5; inversion H7; inversion H9).
+    + inversion HSubA as [x HsA]; inversion HsA; subst; try orthoax_inv PTypHd1.
 Qed.
   
 (* Coercive subtyping is coeherent: Lemma 3 *)

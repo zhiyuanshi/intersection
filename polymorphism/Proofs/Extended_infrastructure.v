@@ -205,7 +205,7 @@ Proof.
     apply IHF; auto.
     not_in_L x0.
     unfold not; intros; apply H3; now apply MSetProperties.Dec.F.singleton_2.
-Qed.    
+Qed.
 
 Lemma wfenv_app_comm : forall (E F : context TyEnvSource), WFEnv (F ++ E) -> WFEnv (E ++ F).
 Proof.
@@ -249,8 +249,25 @@ Proof.
     rewrite <- app_nil_l in H.
     apply wfenv_extend_comm in H.
     simpl in H; now inversion H.
-Qed. 
+Qed.
 
+Lemma wfenv_extend_comm' : forall (E F : context TyEnvSource) x v,
+     WFEnv (F ++ (x, v) :: nil ++ E) ->
+     WFEnv (F ++ E ++ (x, v) :: nil).
+Proof.
+  intros E F.
+  generalize dependent E.
+  induction F; intros.
+  - simpl in *.
+    inversion H; subst; apply wfenv_app_comm; now simpl.
+  - simpl in *.
+    inversion H; subst.
+    apply WFPushV; auto.
+    admit. (* provable *)
+    apply WFPushT; auto.
+    admit. (* provable *)
+Admitted.
+    
 Lemma wfenv_middle_comm : forall E F G H,
               WFEnv (E ++ F ++ G ++ H) ->
               WFEnv (E ++ G ++ F ++ H).
@@ -728,9 +745,16 @@ Proof.
     apply H0.
     not_in_L y.
     unfold extend; now simpl.
-  - admit.
-  - admit.
-  - admit.  
+  - apply OVar with (A := A).
+    now apply wfenv_extend_comm.
+    admit. (* provable *)
+    auto.
+  - apply OVarSym with (A := A).
+    now apply wfenv_extend_comm.
+    admit. (* provable *)
+    auto.
+  - apply wfenv_extend_comm in H.
+    now apply OAx. 
 Admitted.
 
 Lemma ortho_extend_comm' :
@@ -751,11 +775,18 @@ Proof.
     apply H0.
     not_in_L y.
     unfold extend; now simpl.
-  - admit.
-  - admit.
-  - admit.
+  - apply OVar with (A := A).
+    now apply wfenv_extend_comm'.
+    admit. (* provable *)
+    auto.
+  - apply OVarSym with (A := A).
+    now apply wfenv_extend_comm'.
+    admit. (* provable *)
+    auto.
+  - apply wfenv_extend_comm' in H.
+    now apply OAx.
 Admitted.
-
+    
 Lemma ortho_app_comm :
   forall E F ty1 ty2, Ortho (F ++ E) ty1 ty2 -> Ortho (E ++ F) ty1 ty2.
 Proof.
@@ -788,35 +819,52 @@ Proof.
     now apply wfenv_app_comm.
 Admitted.
 
-Lemma ortho_middle_comm : forall E F G H ty1 ty2,
+Lemma ortho_middle_comm : forall H E F G ty1 ty2,
               Ortho (E ++ F ++ G ++ H) ty1 ty2 ->
               Ortho (E ++ G ++ F ++ H) ty1 ty2.
 Proof.
-  intros E F G H ty1 ty2 HOrtho.
-  remember (E ++ F ++ G ++ H) as Gamma.
-  generalize dependent HeqGamma.
-  generalize dependent E.
-  generalize dependent F.
-  generalize dependent G.
-  generalize dependent H.
-  induction HOrtho; auto; intros; subst.
-  - apply_fresh OForAll as x.
+  induction H; intros.
+  - rewrite app_nil_r in *.
+    rewrite app_assoc.
+    apply ortho_app_comm.
+    generalize dependent E.
+    generalize dependent F.
+    induction G; intros.
+    + intros; rewrite app_nil_r in *; now apply ortho_app_comm.
+    + intros.
+      change (F ++ E ++ a :: G) with (F ++ E ++ (a :: nil) ++ G).
+      destruct a.
+      assert ((F ++ E ++ ((v, t0) :: nil) ++ G) = (F ++ (E ++ ((v, t0) :: nil)) ++ G))
+             by now rewrite <- app_assoc.
+      rewrite H0; clear H0.
+      apply IHG.
+      rewrite <- app_assoc.
+      apply ortho_extend_comm.
+      change (E ++ F ++ (v, t0) :: G) with (E ++ F ++ ((v, t0) :: nil) ++ G) in H.
+      rewrite app_assoc in H.
+      apply ortho_extend_comm' in H.
+      now rewrite <- app_assoc in *.
+  - change (E ++ G ++ F ++ a :: H) with (E ++ G ++ F ++ (a :: nil) ++ H).
+    destruct a.
+    assert ((E ++ G ++ F ++ ((v, t0) :: nil) ++ H) =
+            (E ++ G ++ (F ++ ((v, t0) :: nil)) ++ H)) by
+    now rewrite <- app_assoc.
+    rewrite H1; clear H1.
+    apply IHlist.
+    rewrite <- app_assoc.
+    rewrite app_assoc.
+    apply ortho_extend_comm.
+    rewrite <- app_assoc.
+    rewrite <- app_assoc.
+    rewrite app_assoc in H0.
+    rewrite app_assoc in H0.
+    change (((E ++ F) ++ G) ++ (v, t0) :: H) with
+           (((E ++ F) ++ G) ++ ((v, t0) :: nil) ++ H).
+    apply ortho_extend_comm' in H0.
+    repeat rewrite <- app_assoc in H0.
     apply H0.
-    not_in_L x.
-    unfold extend.
-    admit.
-  - apply OVar with (A := A).
-    now apply wfenv_middle_comm.
-    admit. (* provable *)
-    auto.
-  - apply OVarSym with (A := A).
-    now apply wfenv_middle_comm.
-    admit. (* provable *)
-    auto.
-  - apply OAx; auto.
-    now apply wfenv_middle_comm.
-Admitted.
-  
+Qed.     
+
 Lemma ortho_gives_wfenv : forall Gamma t1 t2, Ortho Gamma t1 t2 -> WFEnv Gamma.
 Proof.
   intros.
@@ -1015,7 +1063,7 @@ Proof.
     not_in_L x.
     unfold extend; now simpl.
     now apply IHWFTyp.
-Admitted.
+Qed.
 
 Lemma wf_env_comm_extend_source : forall Gamma x y v1 v2 ty,
               WFTyp (extend x v1 (extend y v2 Gamma)) ty ->
@@ -1169,19 +1217,6 @@ Proof.
       simpl.
       apply_fresh OForAll as x.
       repeat rewrite subst_typ_source_open_source_var.
-      (*
-      assert (Ha : Ortho (extend x (TyDis d) Gamma)
-         (subst_typ_source z u (open_typ_source t1 (PFVarT x)))
-         (subst_typ_source z u (open_typ_source t2 (PFVarT x))))
-        by admit.
-      Check open_rec_type_source.
-      Check subst_typ_source_fresh.
-      rewrite <- subst_typ_source_fresh with (t := d) (x := z) (u := u) in Ha.
-      rewrite open_rec_type_source with (t := d) (k := 0) (u := u) in Ha.
-      SearchAbout subst_typ_source.
-      SearchAbout open_rec_typ_source.
-      
-      *)
       admit. (*
       apply H1.
       apply H0 with (Gamma := (extend x (TyVar PTyp) Gamma)). *)
@@ -1193,55 +1228,15 @@ Proof.
       destruct (eqb x z).
       admit.
       apply OVar with (A := A); auto.
-      admit. (*
-      destruct t1; destruct t2; simpl in *; try now inversion H;
-      try now (apply OAx; auto).
-      now (inversion H as [H1 [H2 H3]]; inversion H2; subst; inversion H5; subst;
-      inversion H6; subst; inversion H7).
-      now (inversion H as [H1 [H2 H3]]; inversion H2; subst; inversion H5; subst;
-      inversion H6; subst; inversion H7).
-      now (inversion H as [H1 [H2 H3]]; inversion H2; subst; inversion H5; subst;
-      inversion H6; subst; inversion H7).
-      now (inversion H as [H1 [H2 H3]]; inversion H1; subst; inversion H5; subst;
-           inversion H6; subst; inversion H7).
-      now (inversion H as [H1 [H2 H3]]; inversion H1; subst; inversion H5; subst;
-           inversion H6; subst; inversion H7).
-      now (inversion H as [H1 [H2 H3]]; inversion H1; subst; inversion H5; subst;
-           inversion H6; subst; inversion H7).
-      now (inversion H as [H1 [H2 H3]]; inversion H1; subst; inversion H5; subst;
-           inversion H6; subst; inversion H7).      
-      now (inversion H as [H1 [H2 H3]]; inversion H1; subst; inversion H5; subst;
-           inversion H6; subst; inversion H7).
-      now (inversion H as [H1 [H2 H3]]; inversion H2; subst; inversion H5; subst;
-           inversion H6; subst; inversion H7).  *)
+      admit.
     + admit.
     + destruct t1; destruct t2; simpl in *; try now inversion H;
-      try now (apply OAx; auto).
-      now (inversion H1 as [H2 [H3 H4]]; inversion H3; subst; inversion H6; subst;
-           inversion H7; subst; inversion H8).
-      now (inversion H1 as [H2 [H3 H4]]; inversion H3; subst; inversion H6; subst;
-           inversion H7; subst; inversion H8).
-      now (inversion H1 as [H2 [H3 H4]]; inversion H3; subst; inversion H6; subst;
-           inversion H7; subst; inversion H8).
-      now (inversion H1 as [H2 [H3 H4]]; inversion H2; subst; inversion H6; subst;
-           inversion H7; subst; inversion H8).
-      now (inversion H1 as [H2 [H3 H4]]; inversion H2; subst; inversion H6; subst;
-           inversion H7; subst; inversion H8).
-      now (inversion H1 as [H2 [H3 H4]]; inversion H2; subst; inversion H6; subst;
-           inversion H7; subst; inversion H8).
-      now (inversion H1 as [H2 [H3 H4]]; inversion H2; subst; inversion H6; subst;
-           inversion H7; subst; inversion H8).
-      now (inversion H1 as [H2 [H3 H4]]; inversion H2; subst; inversion H6; subst;
-           inversion H7; subst; inversion H8).      
-      now (inversion H1 as [H2 [H3 H4]]; inversion H3; subst; inversion H6; subst;
-           inversion H7; subst; inversion H8).
+      try (now (apply OAx; auto)); try orthoax_inv_r; try orthoax_inv_l.
   - case_eq (VarTyp.eqb x z); intros; auto.
     apply WFVar with (ty := ty); auto.
   - apply_fresh WFForAll as x.
     intros.
     rewrite subst_typ_source_open_source_var.
-    Print sub.
-    Print Ortho.
     admit. (* apply H1. *)
     not_in_L x.
     now apply wf_gives_types_source in H.

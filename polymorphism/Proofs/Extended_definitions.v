@@ -507,7 +507,7 @@ Inductive has_type_source_alg : context TyEnvSource -> PExp -> Dir -> PTyp -> (S
 
 Hint Constructors has_type_source_alg.
 
-     Lemma decidability_types :
+Lemma decidability_types :
   forall (A B : PTyp), sumbool (A = B) (not (A = B)).
 Proof.
   decide equality.
@@ -569,5 +569,28 @@ Module VarTypDecidable <: DecidableType.
     Proof. apply VarTyp.eq_dec. Defined.
   
 End VarTypDecidable.
+
+Ltac orthoax_inv H :=
+  let H' := fresh in
+  let m := fresh in
+  let H1 := fresh in
+  let H2 := fresh in
+  inversion H as [H' | m H1 H2 ]; orthoax_inv H1.
+
+(* Solving goals by inversion, with the form OrthoAx t1 t2,
+   where t1 is not part of OrthoAx *)
+Ltac orthoax_inv_l :=
+  match goal with
+    | H: OrthoAx _ _ |- _ => let H1 := fresh in
+                           destruct H as [H1 _]; orthoax_inv H1
+  end.
+
+(* Solving goals by inversion, with the form OrthoAx t1 t2,
+   where t2 is not part of OrthoAx *)
+Ltac orthoax_inv_r := 
+  match goal with
+    | H: OrthoAx _ _ |- _ => let H1 := fresh in
+                           destruct H as [_ [H1 _]]; orthoax_inv H1
+  end.
 
 End Definitions.
