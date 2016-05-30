@@ -392,18 +392,12 @@ Import ExtendedSub.
 Lemma typing_wf_source_alg:
   forall Gamma t T E dir, has_type_source_alg Gamma t dir T E -> WFTyp Gamma T.
 Proof.
-  intros Gamma t dir T E H.
+  intros Gamma t dir T E H. Print has_type_source_alg.
   induction H; auto.
   - inversion IHhas_type_source_alg1; assumption.
   - inversion IHhas_type_source_alg; subst.
-    apply open_body_wf_type with (d := d).
-    unfold body_wf_typ.
-    exists L.
-    intros.
-    apply H4.
-    not_in_L x.
-    auto.
-    auto.
+    apply open_body_wf_type' with (d := d); auto.
+    unfold body_wf_typ; eauto.
   - pick_fresh x.
     assert (Ha : not (M.In x L)) by (not_in_L x).
     apply WFFun.
@@ -488,9 +482,9 @@ induction H; intros; unfold almost_unique; auto.
 (* Case Ann *)
 - inversion H0. auto.
 (* Case TApp *)
-- inversion H1; subst.
-  apply IHhas_type_source_alg in H6.
-  injection H6; intros.
+- inversion H2; subst.
+  apply IHhas_type_source_alg in H7.
+  injection H7; intros.
   now subst.
 Qed.
 
@@ -526,13 +520,13 @@ induction H; intros.
 - inversion H0.
   apply IHhas_type_source_alg in H3. auto.
 (* Case TApp *)
-- inversion H1; subst.
+- inversion H2; subst.
   assert (Ha : ForAll d ty = ForAll d0 ty0).
   eapply typ_inf_unique.
   apply H0.
-  apply H7.
-  rewrite <- Ha in H7.
-  apply IHhas_type_source_alg in H7.
+  apply H8.
+  rewrite <- Ha in H8.
+  apply IHhas_type_source_alg in H8.
   now subst.
 (* Case Lam *)
 - inversion H2; subst.

@@ -483,6 +483,7 @@ Inductive has_type_source_alg : context TyEnvSource -> PExp -> Dir -> PTyp -> (S
   | ATyTApp : forall Gamma t A ty d E,
                 WFTyp Gamma A ->
                 has_type_source_alg Gamma t Inf (ForAll d ty) E ->
+                Ortho Gamma A d -> 
                 has_type_source_alg Gamma (PTApp t A) Inf (open_typ_source ty A) (STTApp _ E (|A|))
   (* Checking rules *)
   | ATyLam : forall L Gamma t A B E,
