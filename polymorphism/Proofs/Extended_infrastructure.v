@@ -1336,12 +1336,69 @@ Definition TyEnvMatch {A} (f : PTyp -> A) (tyenv : TyEnvSource) : A :=
     | TermV ty => f ty
   end.
 
-Lemma subst_env_fresh :
+Lemma subst_wf_env_fresh :
   forall Gamma z u t, Forall (fun x => TyEnvMatch (fun ty => not (In z (fv_ptyp ty)))
                                         (snd x)) Gamma ->
              WFTyp (subst_env Gamma z u) t ->
              WFTyp Gamma t.
 Proof.
+Admitted.
+
+Lemma dom_subst_id : forall Gamma z u, dom (subst_env Gamma z u) = dom Gamma.
+Proof.
+  intros Gamma z u.
+  induction Gamma using env_ind; auto.
+  destruct v; simpl; now rewrite IHGamma.
+Qed.
+
+Hint Rewrite dom_subst_id.
+
+(* this should not hold... *)
+Lemma subst_env_fresh :
+  forall Gamma z u, WFEnv Gamma ->
+           WFEnv (subst_env Gamma z u).
+Proof.
+  intros Gamma z u HEnv.
+  induction HEnv; auto.
+  - simpl.
+    assert (Ha : sumbool (v = z) (not (v = z))) by apply VarTyp.eq_dec.
+    destruct Ha; subst.
+    apply WFPushV; auto.
+    rewrite subst_typ_source_fresh; auto.
+    now rewrite dom_subst_id.
+    admit.
+  - simpl; apply WFPushT; auto.
+    simpl.
+Admitted.
+    
+Lemma subst_env_ortho :
+  forall Gamma z u t1 t2,
+             not (In z (union (fv_ptyp t1) (fv_ptyp t2))) ->
+             Ortho Gamma t1 t2 ->
+             Ortho (subst_env Gamma z u) t1 t2.
+Proof.  
+  intros Gamma z u t1 t2 HNotIn HOrtho.
+  generalize dependent z.
+  induction HOrtho; intros z HNotIn; simpl in HNotIn.
+  - apply OAnd1; [ apply IHHOrtho1 | apply IHHOrtho2 ]; not_in_L z.
+  - apply OAnd2; [ apply IHHOrtho1 | apply IHHOrtho2 ]; not_in_L z.
+  - apply OFun; apply IHHOrtho; not_in_L z.
+  - assert (Ha : Ortho (subst_env Gamma z u) (ForAll (subst_typ_source z u d) t1)
+                       (ForAll (subst_typ_source z u d) t2)).
+    apply_fresh OForAll as x; apply H0. not_in_L x. admit.
+    assert (Ha1 : d = subst_typ_source z u d).
+    rewrite subst_typ_source_fresh; auto.
+    not_in_L z.
+    now rewrite Ha1.
+  - apply OVar with (A := subst_typ_source z u A).
+    
+    
+    admit. (* provable *)
+    admit. (* provable *)
+    admit. (* I think this should hold, since z does not occur in ty *)
+  - admit. (* sym case *)
+  - apply OAx; auto.
+    admit. (* provable *)    
 Admitted.
 
 (** The following two lemmas are not used but were left here for reference **)
@@ -1409,13 +1466,14 @@ Proof.
     now apply wf_gives_types_source in HWFu.
   - assert (Ha : sumbool (x = z) (not (x = z))) by apply VarTyp.eq_dec.
     destruct Ha as [Ha | Ha].
-    + simpl; subst; rewrite EqFacts.eqb_refl.
-      assert (Ha : A = d). admit.
+    + assert (Ha1 : A = d). admit.
       subst.
-      assert (Ha1 : not (In z (fv_ptyp ty))). admit.
-      rewrite subst_typ_source_fresh; auto.
-      assert (Ha2 : Ortho Gamma u ty). admit.
-      admit. (* TODO is this true? *)
+      assert (Ha2 : not (In z (fv_ptyp ty))). admit.
+      assert (Ha3 : Ortho Gamma u ty). admit.
+      simpl; subst; rewrite EqFacts.eqb_refl.
+      apply subst_env_ortho.
+      admit. (* TODO this should be true *)
+      admit. (* TODO this should be true since z does not occur in ty *)
     + simpl; apply EqFacts.eqb_neq in Ha; rewrite Ha.
       apply OVar with (A := subst_typ_source z u A).
       admit. (* provable, needs lemma on WFEnv *)
@@ -1470,6 +1528,52 @@ Proof.
     apply IHHWFt; auto.    
 Admitted.
 
+Lemma subst_source_wf_typ'' :
+  forall t z u Gamma d, not (In z (fv_ptyp u)) ->
+               MapsTo Gamma z d ->
+               Forall (fun x => TyEnvMatch (fun ty => ~ In z (fv_ptyp ty)) (snd x))
+                      Gamma ->
+               Ortho Gamma u d ->
+               WFTyp Gamma d ->
+               WFTyp Gamma u ->
+               WFTyp Gamma t ->
+               WFTyp (subst_env Gamma z u) (subst_typ_source z u t).
+Proof.
+  intros t z u Gamma d HNotIn HMapsTo HForAll HOrtho HWFd HWFu HWFt.
+  induction HWFt; simpl; auto.
+  - apply WFInt.
+    admit. (* provable *)
+  - apply WFAnd; auto.
+    admit. (* TODO add a similar lemma for Ortho? *)
+  - admit.
+  - apply_fresh WFForAll as x.
+    simpl in H0.
+    rewrite subst_typ_source_open_source_var.
+    apply H0.
+    not_in_L x.
+    admit. (* provable *)
+    admit. (* TODO induction hypothesis is too strong *)
+    rewrite <- app_nil_l with (l := (extend x (TyDis d0) Gamma)).
+    apply ortho_weaken.
+    now simpl.
+    simpl; apply WFPushV.
+    now apply wf_gives_wfenv in HWFt.
+    not_in_L x.
+    not_in_L x.
+    rewrite <- app_nil_l with (l := (extend x (TyDis d0) Gamma)).
+    apply wf_weaken_source.
+    now simpl.
+    simpl; apply WFPushV.
+    now apply wf_gives_wfenv in HWFt.
+    not_in_L x.
+    not_in_L x.
+    apply wf_weaken_extend_source; auto.
+    not_in_L x.
+    not_in_L x.
+    now apply wf_gives_types_source in HWFu.
+    apply IHHWFt; auto.    
+Admitted.
+     
 (*
 Lemma ortho_subst'' :
   forall t1 t2 z u E G d,
@@ -1584,6 +1688,7 @@ Proof.
     now apply wf_gives_types_source in HWFu.
     apply IHHWFt with (E0 := E); auto.    
 Admitted.
+
 *)
 
 Hint Resolve wf_gives_wfenv wf_weaken_source wf_gives_types_source.
@@ -1602,7 +1707,7 @@ Proof.
   rewrite union_spec in HH.
   destruct HH; not_in_L y.
   rewrite subst_typ_source_intro with (x := y); eauto.
-  apply subst_env_fresh with (z := y) (u := u).
+  apply subst_wf_env_fresh with (z := y) (u := u).
   admit. (* TODO add this as condition to Fr, when generating fresh y *)
   apply subst_source_wf_typ' with (d := d); eauto.
   not_in_L y.
