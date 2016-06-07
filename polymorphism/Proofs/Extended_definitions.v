@@ -111,7 +111,7 @@ Inductive sub : PTyp -> PTyp -> (SExp var) -> Prop :=
                     (STLam _ (STTLam _ (STApp _ c (STTApp _ (STBVar _ 0) (STBVarT 0))))).
 
 Definition Sub (t1 t2 : PTyp) : Prop := exists (e:SExp var), sub t1 t2 e.
-
+  
 (* Smart constructors for Sub *)
 
 Definition sint : Sub PInt PInt.
