@@ -1225,65 +1225,8 @@ Qed.
 Lemma subst_source_wf_typ : forall t z u Gamma,
   WFTyp Gamma u -> WFTyp Gamma t -> WFTyp Gamma (subst_typ_source z u t).
 Proof.
-  induction 2; simpl; auto.
-  - apply WFAnd.
-    apply IHWFTyp1; auto.
-    apply IHWFTyp2; auto.
+ *)
 
-    assert (HH1 := H).
-    assert (HH2 := H).
-    apply IHWFTyp1 in HH1; apply IHWFTyp2 in HH2.
-    clear IHWFTyp1 IHWFTyp2.
-
-    (* generalize dependent Gamma. *)
-    induction H0; intros.
-    + simpl in *.
-      inversion H0_; subst.
-      inversion HH1; subst.
-      apply OAnd1.
-      apply IHOrtho1; auto.
-      apply IHOrtho2; auto.
-    + simpl in *.
-      inversion H0_0; subst.
-      inversion HH2; subst.   
-      apply OAnd2.
-      apply IHOrtho1; auto.
-      apply IHOrtho2; auto.
-    + simpl in *.
-      inversion HH2; inversion HH1; inversion H0_; inversion H0_0; subst.
-      apply OFun.
-      apply IHOrtho; auto.
-    + inversion H0_; inversion H0_0; subst.
-      simpl in HH1; inversion HH1; simpl in HH2; inversion HH2; subst.
-      simpl.
-      apply_fresh OForAll as x.
-      repeat rewrite subst_typ_source_open_source_var.
-      admit. (*
-      apply H1.
-      apply H0 with (Gamma := (extend x (TyVar PTyp) Gamma)). *)
-      not_in_L x.
-      now apply wf_gives_types_source in H.
-      not_in_L x.
-      now apply wf_gives_types_source in H.
-    + simpl in *.
-      destruct (eqb x z).
-      admit.
-      apply OVar with (A := A); auto.
-      admit.
-    + admit.
-    + destruct t1; destruct t2; simpl in *; try now inversion H;
-      try (now (apply OAx; auto)); try orthoax_inv_r; try orthoax_inv_l.
-  - case_eq (VarTyp.eqb x z); intros; auto.
-    apply WFVar with (ty := ty); auto.
-  - apply_fresh WFForAll as x.
-    intros.
-    rewrite subst_typ_source_open_source_var.
-    admit. (* apply H1. *)
-    not_in_L x.
-    now apply wf_gives_types_source in H.
-    now apply IHWFTyp.
-Admitted.
-*)
 Lemma wf_gives_wfenv : forall Gamma ty, WFTyp Gamma ty -> WFEnv Gamma.
 Proof.
   intros Gamma ty H; induction H; auto.
@@ -1523,6 +1466,13 @@ Proof.
   destruct H0 as [H1 [H2 H3]].
   unfold OrthoAx; auto.
 Qed.
+
+Lemma Sub_trans_forall :
+  forall d B A C, Sub (ForAll d A) (ForAll d B) ->
+             Sub (ForAll d B) (ForAll d C) ->
+             Sub (ForAll d A) (ForAll d C).
+Proof.
+Admitted.
   
 Lemma Sub_trans :
   forall B A C, Sub A B -> Sub B C -> Sub A C.
@@ -1531,20 +1481,86 @@ Proof.
   induction B; intros A C SubAB SubBC.
   - destruct SubBC as [c subBC]; dependent induction subBC; subst; auto.
   - destruct SubBC as [c subBC].
+    generalize dependent A.
     dependent induction subBC; subst; auto.
-    destruct SubAB as [c' subAB].
+    intros; destruct SubAB as [c' subAB]; clear IHsubBC1 IHsubBC2.
+    dependent induction subAB; subst; eauto.
+    apply sfun; [ apply IHB1 | apply IHB2 ]; eexists; eauto.
+  - destruct SubAB as [c subAB].
+    inversion subAB; subst; try now inversion H0.
+    assert (H1 : Sub A B1) by (eexists; eauto); clear H2.
+    assert (H2 : Sub A B2) by (eexists; eauto); clear H4.
+    clear subAB c1 c2.
+    destruct SubBC as [c subBC].
+    dependent induction subBC; auto.
+    apply IHB1; auto; eexists; eauto.
+    apply IHB2; auto; eexists; eauto. 
+  - destruct SubAB as [c subAB].
+    inversion subAB; subst; now inversion H0.
+  - destruct SubBC as [c subBC].
+    generalize dependent A.
+    dependent induction subBC; subst; auto.
+  -     generalize dependent C.
+    induction A; (try now inversion SubAB); intros.
+    destruct SubAB as [c subAB].
     inversion subAB; subst.
-    apply sfun.
-    apply IHB1; [ eexists; apply subBC1 | eexists; apply H2 ].
-    apply IHB2; [ eexists; apply H4 | eexists; apply subBC2 ].
+    apply sand2; apply IHA1. eexists; eauto. auto.
+    apply sand3; apply IHA2. eexists; eauto. auto.
+    induction C; try now inversion SubBC.
+    destruct SubBC as [c subBC]; inversion subBC; subst.
+    apply sand1.
+    apply IHC1. eexists; eauto.
+    apply IHC2. eexists; eauto.
+  (* hypothesis is not general enough *)
+    clear IHB1 IHB2 IHA1 IHA2 IHC1 IHC2.
+    destruct SubAB; inversion H; subst.
+    destruct SubBC; inversion H0; subst.
+    assert (Ha1 : Sub (ForAll C1 A2) (ForAll C1 B2)) by
+        (eexists; apply_fresh SForAll as x; apply H5; not_in_L x).
+    assert (Ha2 : Sub (ForAll C1 B2) (ForAll C1 C2)) by
+        (eexists; apply_fresh SForAll as x; apply H7; not_in_L x).
+    clear H0 H H7 H5 L0 c c0 L.
+    apply Sub_trans_forall with (B := B2); auto.
+    
+    (*
+    generalize dependent C.
+    generalize dependent B1.
+    generalize dependent B2.
+    induction A; intros; (try now inversion SubAB).
+    destruct SubAB as [c subAB].
+    inversion subAB; subst.
+    apply sand2; eapply IHA1. intros. apply IHB2. apply H. auto.
+    intros. apply IHB1. apply H. auto. eexists; eauto. auto.
+    apply sand3; eapply IHA2. intros. apply IHB2. apply H. auto.
+    intros. apply IHB1. apply H. auto. eexists; eauto. auto.
+    generalize dependent A1.
+    generalize dependent A2.
+    generalize dependent B1.
+    generalize dependent B2.
+    induction C; intros; (try now inversion SubBC).
     admit.
-    admit.
-  - admit.
-  - admit.
-  - admit.
-  - admit.
-  - admit.
-Admitted.
+    clear IHA1 IHA2 IHB1 IHB2 IHC1 IHC2.
+    *)
+
+        (*
+    destruct SubAB as [c subAB].
+    induction subAB.
+    
+    destruct SubBC as [c subBC].
+    generalize dependent A.
+    dependent induction subBC; subst; auto.
+    intros. destruct SubAB as [c' subAB].
+    dependent induction subAB; subst; eauto.
+    clear H2 H0.
+    assert (Ha1 : Sub (ForAll B1 t1) (ForAll B1 B2)).
+    eexists; apply_fresh SForAll as x; apply H1; not_in_L x.
+    assert (Ha2 : Sub (ForAll B1 B2) (ForAll B1 t2)).
+    eexists; apply_fresh SForAll as x; apply H; not_in_L x.
+    eexists; apply_fresh SForAll as x.
+    apply IHB2. *)
+  - destruct SubAB as [c subAB].
+    dependent induction subAB; auto.
+Qed.
     
 Lemma Ortho_Sub_trans :
   forall Gamma u ty d,
@@ -1605,13 +1621,22 @@ Lemma Sub_refl : forall Gamma t, WFTyp Gamma t -> Sub t t.
 Proof.
   intros Gamma t HWFt; induction HWFt; auto.
   - unfold Sub.
-    eexists.
-    apply_fresh SForAll as x.
+    pick_fresh x.
     assert (Ha : not (In x L)) by not_in_L x.
     apply H0 in Ha.
-    admit. (*TODO looks like the same unsolved problem we were having before...*)
-Admitted.
-    
+    assert (Ha1 : exists c, forall x : elt,
+       ~ In x L ->
+       sub (open_typ_source t0 (PFVarT x))
+           (open_typ_source t0 (PFVarT x))
+           (open_typ_term c (STFVarT x))). admit.
+    destruct Ha1.
+    eexists.
+    apply_fresh SForAll as y.
+    apply H1.
+    not_in_L y.
+    (*TODO looks like the same unsolved problem we were having before...*)
+Admitted.  
+
 Lemma Sub_subst :
   forall Gamma A B z u,
     Sub A B ->
@@ -1642,6 +1667,139 @@ Proof.
     not_in_L x.
 Admitted.  
 
+(* Perhaps we want to prove something like this instead? *)
+
+Fixpoint subst_typ_term (z : var) (u : STyp) (t : SExp var) {struct t} :
+  SExp var :=
+  match t with
+  | STFVar _ x => STFVar var x
+  | STBVar _ i => STBVar var i
+  | STUnit _ => STUnit var
+  | STLit _ n => STLit var n
+  | STLam _ t0 => STLam var (subst_typ_term z u t0)
+  | STApp _ t1 t2 => STApp var (subst_typ_term z u t1) (subst_typ_term z u t2)
+  | STPair _ t1 t2 => STPair var (subst_typ_term z u t1) (subst_typ_term z u t2)
+  | STProj1 _ t0 => STProj1 var (subst_typ_term z u t0)
+  | STProj2 _ t0 => STProj2 var (subst_typ_term z u t0)
+  | STTLam _ t0 => STTLam var (subst_typ_term z u t0)
+  | STTApp _ t0 ty => STTApp var (subst_typ_term z u t0) (subst_typ z u ty)
+  end.
+
+Hint Constructors Atomic.
+Hint Constructors STType.
+
+(** More properties on open **)
+
+Lemma open_comm_open_typ_term :
+  forall y x c n m, open_rec_typ_term n (STFVarT y) (open_rec m (STFVar elt x) c) =
+               open_rec m (STFVar elt x) (open_rec_typ_term n (STFVarT y) c).
+Proof.
+  intros y x c.
+  induction c; intros; simpl; auto.
+  - case_eq (m =? n); intros; reflexivity.
+  - apply f_equal; apply IHc.
+  - rewrite IHc1; rewrite IHc2; reflexivity.
+  - rewrite IHc1; rewrite IHc2; reflexivity.
+  - rewrite IHc; reflexivity.
+  - rewrite IHc; reflexivity.
+  - apply f_equal; apply IHc.
+  - rewrite IHc; reflexivity.
+Qed.    
+
+Lemma open_rec_typ_eq_source :
+  forall ty n A, | open_rec_typ_source n A ty | = open_rec_typ n (| A |) (| ty |).
+Proof.
+  intro t.
+  induction t; intros; auto.
+  - simpl; rewrite IHt1; rewrite IHt2; auto.
+  - simpl; rewrite IHt1; rewrite IHt2; auto.
+  - simpl; case_eq (n0 =? n); intros; simpl; auto.
+  - simpl; rewrite IHt2; auto.
+Qed.
+
+Lemma subst_typ_term_open_source_var
+     : forall (x y : var) u t,
+       y <> x ->
+       STType u ->
+       open_typ_term (subst_typ_term x u t) (STFVarT y) =
+       subst_typ_term x u (open_typ_term t (STFVarT y)).
+Proof.
+  intros Neq Wu. intros.
+Admitted.
+
+Lemma type_source_gives_type_target :
+  forall t, PType t -> STType (| t |).
+Proof.
+  intros t HPType.
+  induction HPType; simpl; auto.
+  - apply_fresh STType_ForAll as x.
+    assert (Ha : not (In x L)) by not_in_L x.
+    apply H0 in Ha.
+    unfold open_typ_source in Ha; now rewrite open_rec_typ_eq_source in Ha.
+Qed.
+
+Lemma not_atomic : forall t Gamma, WFTyp Gamma t -> ~ Atomic t -> exists t1 t2, t = And t1 t2.
+Proof.
+  intros t Gamma HWFTyp HNAtomic.
+  inversion HWFTyp; subst; try (now exfalso; apply HNAtomic).
+  eauto.
+Qed.
+  
+Lemma Sub_subst' :
+  forall Gamma A B z u c,
+    sub A B c ->
+    WFTyp Gamma u ->
+    WFTyp Gamma A ->
+    WFTyp Gamma B ->
+    sub (subst_typ_source z u A) (subst_typ_source z u B)
+        (subst_typ_term z (|u|) c).
+Proof.
+  intros Gamma A B z u c Hsub HWFu HWFA HWFB.
+  generalize dependent Gamma.
+  induction Hsub; intros; simpl;
+  (try now (inversion HWFA; inversion HWFB; subst; eauto)).
+  - inversion HWFA; subst.
+    inversion H; simpl; subst; try now (apply SAnd2; eauto).
+    assert (Ha : sumbool (Atomic u) (not (Atomic u))) by admit.
+    destruct Ha.
+    + apply SAnd2; eauto; now destruct (eqb v z).
+    + apply (not_atomic _ _ HWFu) in n as [t1' [t2' n]]. subst.
+      simpl in *.
+      destruct (eqb v z).
+      Print SAnd1.
+      admit. (* ? *)
+      admit.
+  - inversion HWFA; subst.
+    apply SAnd3. eauto.
+    inversion H; simpl; auto.
+    admit. (* ? *)
+  - destruct (eqb v z).
+    admit. (* we could include reflexivity in our sub datatype *)
+    apply SVar.
+  - inversion HWFA; inversion HWFB; subst.
+    pick_fresh x.
+    assert (Ha : not (In x L)) by (not_in_L x).
+    apply_fresh SForAll as y.
+    repeat rewrite subst_typ_source_open_source_var.
+    rewrite subst_typ_term_open_source_var.
+    eapply H0.
+    not_in_L y.
+    Focus 2.
+    apply H4.
+    not_in_L y.
+    apply wf_weaken_extend_source; auto.
+    not_in_L y.
+    apply H9.
+    not_in_L y.
+    not_in_L y.
+    apply type_source_gives_type_target.
+    now apply wf_gives_types_source in HWFu.
+    not_in_L y.
+    now apply wf_gives_types_source in HWFu.
+    not_in_L y.
+    now apply wf_gives_types_source in HWFu.
+Admitted.
+
 Lemma sub_subst_not_in :
   forall Gamma A B u z,
     not (In z (fv_ptyp B)) ->
@@ -1657,104 +1815,39 @@ Proof.
   auto.
 Qed.
 
-Lemma Ortho_subst :
-  forall Gamma t1 t2 z u,
-    WFTyp Gamma t1 -> WFTyp Gamma t2 ->
+Lemma ortho_subst_not_in :
+  forall Gamma z u t1 t2,
+    not (In z (union (fv_ptyp t1) (fv_ptyp t2))) ->
     WFEnv (subst_env Gamma z u) ->
+    WFTyp Gamma u ->
+    WFTyp Gamma t1 ->
+    WFTyp Gamma t2 ->
     Ortho Gamma t1 t2 ->
-    ~ In z (union (fv_ptyp t1) (fv_ptyp t2)) ->
     Ortho (subst_env Gamma z u) t1 t2.
-Proof.
-  intros Gamma t1 t2 z u HWFt1 HWFt2 HWFEnv HOrtho HNotIn.
-  induction HOrtho; simpl in HNotIn; auto.
+Proof.  
+  intros Gamma z u t1 t2 HNotIn HWFEnv HWFu HWFt1 HWFt2 HOrtho.
+  generalize dependent z.
+  induction HOrtho; intros z HNotIn HWFEnv; simpl in HNotIn.
   - apply OAnd1; [ apply IHHOrtho1 | apply IHHOrtho2 ]; auto; not_in_L z;
     now inversion HWFt1.
   - apply OAnd2; [ apply IHHOrtho1 | apply IHHOrtho2 ]; auto; not_in_L z;
     now inversion HWFt2.
-  - apply OFun; apply IHHOrtho; auto; not_in_L z;
-    now (inversion HWFt1; inversion HWFt2).
+  - apply OFun; apply IHHOrtho; auto; not_in_L z. now inversion HWFt1.
+    now inversion HWFt2.
   - inversion HWFt1; inversion HWFt2; subst.
-    rewrite <- subst_typ_source_fresh with (x := z) (u := u) (t := d).
-    apply_fresh OForAll as x.
-    apply H0.
-    not_in_L x.
-    apply H4.
-    not_in_L x.
-    apply H9.
-    not_in_L x.
-    simpl; apply WFPushV; auto.
-    unfold not; intros HH; apply fv_subst_source in HH;
-    rewrite union_spec in HH; destruct HH.
-    not_in_L x.
-    not_in_L x.
-    rewrite dom_subst_id; not_in_L x.
-    admit. (* TODO improve not_in_L Ltac to prove this *)
-    not_in_L z.
-  - apply OVar with (A := subst_typ_source z u A); auto.
-    apply in_persists_subst_env; auto.
-    apply sub_subst_not_in with (Gamma := Gamma); auto.
-    not_in_L z.
-    admit. (* WFTyp *)
-    admit. (* WFTyp *)
-Admitted.
-  
-Lemma WFTyp_subst :
-  forall Gamma z t u, WFEnv (subst_env Gamma z u) ->
-             WFTyp Gamma t ->
-             ~ In z (fv_ptyp t) ->
-             WFTyp (subst_env Gamma z u) t.
-Proof.
-  intros Gamma z t u HWFEnv HWFt HNotIn.
-  induction HWFt; auto.
-  - simpl in HNotIn; apply WFFun; [ apply IHHWFt1 | apply IHHWFt2 ];
-    auto; not_in_L z.
-  - simpl in HNotIn; apply WFAnd.
-    apply IHHWFt1; auto; not_in_L z.
-    apply IHHWFt2; auto; not_in_L z.
-    apply Ortho_subst; auto.
-  - apply WFVar with (ty := subst_typ_source z u ty); auto.
-    now apply in_persists_subst_env.
-  - rewrite <- subst_typ_source_fresh with (x := z) (u := u) (t := d).
-    apply_fresh WFForAll as x.
-    apply H0.
-    not_in_L x.
-    simpl; apply WFPushV; auto.
-    unfold not; intros HH; apply fv_subst_source in HH;
-    rewrite union_spec in HH; destruct HH as [HH | HH]; not_in_L x.
-    rewrite dom_subst_id; not_in_L x.
-    unfold not; intros HH; apply fv_open_rec_typ_source in HH; simpl in *.
-    rewrite union_spec in HH; destruct HH as [HH | HH].
-    not_in_L z.
-    not_in_L x.
-    apply H7; apply MSetProperties.Dec.F.singleton_iff;
-    apply MSetProperties.Dec.F.singleton_iff in HH; auto.
-    rewrite subst_typ_source_fresh.
-    apply IHHWFt; auto.
-    not_in_L z; simpl; rewrite union_spec; auto.
-    not_in_L z; simpl; rewrite union_spec; auto.
-    not_in_L z; simpl; rewrite union_spec; auto.
-Qed.
-
-Lemma subst_env_ortho :
-  forall Gamma z u t1 t2,
-    not (In z (union (fv_ptyp t1) (fv_ptyp t2))) ->
-    WFEnv (subst_env Gamma z u) ->
-    Ortho Gamma t1 t2 ->
-    Ortho (subst_env Gamma z u) t1 t2.
-Proof.  
-  intros Gamma z u t1 t2 HNotIn HWFEnv HOrtho.
-  generalize dependent z.
-  induction HOrtho; intros z HNotIn HWFEnv; simpl in HNotIn.
-  - apply OAnd1; [ apply IHHOrtho1 | apply IHHOrtho2 ]; auto; not_in_L z. 
-  - apply OAnd2; [ apply IHHOrtho1 | apply IHHOrtho2 ]; auto; not_in_L z.
-  - apply OFun; apply IHHOrtho; auto; not_in_L z.
-  - assert (Ha : Ortho (subst_env Gamma z u) (ForAll (subst_typ_source z u d) t1)
+    assert (Ha : Ortho (subst_env Gamma z u) (ForAll (subst_typ_source z u d) t1)
                        (ForAll (subst_typ_source z u d) t2)).
     apply_fresh OForAll as x; apply H0. not_in_L x.
+    apply wf_weaken_extend_source.
+    auto.
+    not_in_L x.
+    apply H4; not_in_L x.
+    apply H9; not_in_L x.
     unfold not; intros HH; rewrite union_spec in HH; destruct HH as [HH | HH];
     apply fv_open_rec_typ_source in HH; simpl in HH; rewrite union_spec in HH;
-    destruct HH as [HH | HH]; try (now not_in_L z); not_in_L x;
-    apply H8; apply MSetProperties.Dec.F.singleton_iff;
+    destruct HH as [HH | HH]; try (now not_in_L z);
+    not_in_L x;
+    apply H12; apply MSetProperties.Dec.F.singleton_iff;
     apply MSetProperties.Dec.F.singleton_iff in HH; auto.
     simpl; apply WFPushV; auto.
     rewrite subst_typ_source_fresh.
@@ -1768,21 +1861,17 @@ Proof.
     now rewrite Ha1.
   - apply OVar with (A := subst_typ_source z u A); auto.
     apply in_persists_subst_env; auto.
-    eapply sub_subst_not_in; auto.
+    eapply sub_subst_not_in with (Gamma := Gamma); auto.
     not_in_L z.
-    admit. (* WFTyp *)
-    admit. (* WFTyp *)
     admit. (* WFTyp *)
   - apply OVarSym with (A := subst_typ_source z u A); auto.
     apply in_persists_subst_env; auto.
     apply sub_subst_not_in with (Gamma := Gamma); auto.
     not_in_L z.
     admit. (* WFTyp *)
-    admit. (* WFTyp *)
-    admit. (* WFTyp *)
   - apply OAx; auto.
 Admitted.
-  
+
 Lemma ortho_subst :
   forall z u Gamma d t1 t2,
     not (In z (fv_ptyp u)) ->
@@ -1842,13 +1931,17 @@ Proof.
       assert (Ha3 : Ortho Gamma u ty) by
           (subst; apply Ortho_Sub_trans with (d := d); eauto).
       simpl; subst; rewrite EqFacts.eqb_refl.
-      apply subst_env_ortho; auto.
       rewrite subst_typ_source_fresh; auto.
+      apply ortho_subst_not_in; auto.
       not_in_L z.
-      rewrite subst_typ_source_fresh; auto.
     + simpl; apply EqFacts.eqb_neq in Ha; rewrite Ha.
       apply OVar with (A := subst_typ_source z u A); auto.
       apply in_persists_subst_env; auto.
+      (*
+      destruct H1.
+      exists (subst_typ_term z (|u|) x0).
+      apply Sub_subst' with (Gamma := Gamma); auto.
+      *)
       apply Sub_subst with (Gamma := Gamma); auto.
       admit. (* WFTyp *)
   - assert (Ha : sumbool (x = z) (not (x = z))) by apply VarTyp.eq_dec.
@@ -1860,9 +1953,10 @@ Proof.
       assert (Ha3 : Ortho Gamma u ty) by
           (subst; apply Ortho_Sub_trans with (d := d); eauto).
       simpl; subst; rewrite EqFacts.eqb_refl.
-      apply subst_env_ortho; auto.
+      apply ortho_subst_not_in; auto.
       rewrite subst_typ_source_fresh; auto.
       not_in_L z.
+      rewrite subst_typ_source_fresh; auto.
       rewrite subst_typ_source_fresh; auto.
       now apply Ortho_sym.
     + simpl; apply EqFacts.eqb_neq in Ha; rewrite Ha.
@@ -1874,6 +1968,44 @@ Proof.
     assert (Ha : OrthoAx t1 t2) by assumption.
     destruct t1; destruct t2; auto; simpl; try (now orthoax_inv_r H0);
     try now orthoax_inv_l H0.
+Admitted.
+
+Lemma subst_source_wf_typ_not_in :
+  forall Gamma z t u, WFEnv (subst_env Gamma z u) ->
+             WFTyp Gamma t ->
+             ~ In z (fv_ptyp t) ->
+             WFTyp (subst_env Gamma z u) t.
+Proof.
+  intros Gamma z t u HWFEnv HWFt HNotIn.
+  induction HWFt; auto.
+  - simpl in HNotIn; apply WFFun; [ apply IHHWFt1 | apply IHHWFt2 ];
+    auto; not_in_L z.
+  - simpl in HNotIn; apply WFAnd.
+    apply IHHWFt1; auto; not_in_L z.
+    apply IHHWFt2; auto; not_in_L z.
+    apply ortho_subst_not_in; auto.
+    admit. (* WTyp *)
+  - apply WFVar with (ty := subst_typ_source z u ty); auto.
+    now apply in_persists_subst_env.
+  - rewrite <- subst_typ_source_fresh with (x := z) (u := u) (t := d).
+    apply_fresh WFForAll as x.
+    apply H0.
+    not_in_L x.
+    simpl; apply WFPushV; auto.
+    unfold not; intros HH; apply fv_subst_source in HH;
+    rewrite union_spec in HH; destruct HH as [HH | HH]; not_in_L x.
+    rewrite dom_subst_id; not_in_L x.
+    unfold not; intros HH; apply fv_open_rec_typ_source in HH; simpl in *.
+    rewrite union_spec in HH; destruct HH as [HH | HH].
+    not_in_L z.
+    not_in_L x.
+    apply H7; apply MSetProperties.Dec.F.singleton_iff;
+    apply MSetProperties.Dec.F.singleton_iff in HH; auto.
+    rewrite subst_typ_source_fresh.
+    apply IHHWFt; auto.
+    not_in_L z; simpl; rewrite union_spec; auto.
+    not_in_L z; simpl; rewrite union_spec; auto.
+    not_in_L z; simpl; rewrite union_spec; auto.
 Admitted.
 
 Lemma subst_source_wf_typ :
@@ -1893,7 +2025,7 @@ Proof.
   - assert (Ha : sumbool (x = z) (not (x = z))) by apply VarTyp.eq_dec.
     destruct Ha as [Ha | Ha].
     + subst; rewrite EqFacts.eqb_refl; auto.
-      apply WFTyp_subst; auto.
+      apply subst_source_wf_typ_not_in; auto.
     + apply EqFacts.eqb_neq in Ha.
       rewrite Ha.
       apply WFVar with (ty := subst_typ_source z u ty); auto.
@@ -1978,36 +2110,6 @@ Proof.
 Admitted.
 
 (*** PROOF END ***)
-
-(** More properties on open **)
-
-Lemma open_comm_open_typ_term :
-  forall y x c n m, open_rec_typ_term n (STFVarT y) (open_rec m (STFVar elt x) c) =
-               open_rec m (STFVar elt x) (open_rec_typ_term n (STFVarT y) c).
-Proof.
-  intros y x c.
-  induction c; intros; simpl; auto.
-  - case_eq (m =? n); intros; reflexivity.
-  - apply f_equal; apply IHc.
-  - rewrite IHc1; rewrite IHc2; reflexivity.
-  - rewrite IHc1; rewrite IHc2; reflexivity.
-  - rewrite IHc; reflexivity.
-  - rewrite IHc; reflexivity.
-  - apply f_equal; apply IHc.
-  - rewrite IHc; reflexivity.
-Qed.    
-
-Lemma open_rec_typ_eq_source :
-  forall ty n A, | open_rec_typ_source n A ty | = open_rec_typ n (| A |) (| ty |).
-Proof.
-  intro t.
-  induction t; intros; auto.
-  - simpl; rewrite IHt1; rewrite IHt2; auto.
-  - simpl; rewrite IHt1; rewrite IHt2; auto.
-  - simpl; case_eq (n0 =? n); intros; simpl; auto.
-  - simpl; rewrite IHt2; auto.
-Qed.
-
 
 Lemma WFTyp_to_WFType : forall Gamma ty, WFTyp Gamma ty -> WFType (∥ Gamma ∥) (| ty |).
 Proof.
