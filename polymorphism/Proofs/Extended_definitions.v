@@ -89,6 +89,18 @@ Inductive Atomic : PTyp -> Prop :=
   | AForAll : forall d t, Atomic (ForAll d t)
   | ABot : Atomic Bot.
 
+Inductive usub : PTyp -> PTyp -> Prop :=
+  | USInt : usub PInt PInt
+  | USFun : forall o1 o2 o3 o4, usub o3 o1 -> usub o2 o4 -> usub (Fun o1 o2) (Fun  o3 o4) 
+  | USAnd1 : forall t t1 t2, usub t t1 -> usub t t2 -> usub t (And  t1 t2) 
+  | USAnd2 : forall t t1 t2 , usub t1 t -> usub (And t1 t2) t 
+  | USAnd3 : forall t t1 t2, usub t2 t -> usub (And t1 t2) t
+  | UVar   : forall v, usub (PFVarT v) (PFVarT v) 
+  | UForAll : forall L d t1 t2,
+                (forall x, not (In x L) -> usub (open_typ_source t1 (PFVarT x))
+                                         (open_typ_source t2 (PFVarT x))) ->
+                usub (ForAll d t1) (ForAll d t2).
+
 Inductive sub : PTyp -> PTyp -> (SExp var) -> Prop :=
   | SInt : sub PInt PInt (STLam _ (STBVar _ 0))
   | SFun : forall o1 o2 o3 o4 c1 c2, sub o3 o1 c1 -> sub o2 o4 c2 -> 
@@ -109,6 +121,8 @@ Inductive sub : PTyp -> PTyp -> (SExp var) -> Prop :=
                                          (open_typ_term c (STFVarT x))) ->
                 sub (ForAll d t1) (ForAll d t2)
                     (STLam _ (STTLam _ (STApp _ c (STTApp _ (STBVar _ 0) (STBVarT 0))))).
+
+Hint Constructors Atomic sub usub.
 
 Definition Sub (t1 t2 : PTyp) : Prop := exists (e:SExp var), sub t1 t2 e.
   
@@ -176,7 +190,6 @@ Definition sand2 : forall t t1 t2, Sub t1 t -> Sub (And t1 t2) t.
   - inversion H. inversion H0. inversion H2. inversion H2.
   (* Case FVar *)
   - apply sand2_atomic; auto.
-    apply AVar.
   (* Case ForAll *)
   - apply sand2_atomic; auto; apply AForAll.
   (* Case Bot *)
@@ -212,7 +225,6 @@ Definition sand3 : forall t t1 t2, Sub t2 t -> Sub (And t1 t2) t.
   - inversion H; inversion H0; inversion H2.
   (* Case FVar *)
   - apply sand3_atomic; auto.
-    apply AVar.
   (* Case ForAll *)
   - apply sand3_atomic; auto; apply AForAll.
   (* Case Bot *)
@@ -283,9 +295,9 @@ Inductive Ortho : context TyEnvSource -> PTyp -> PTyp -> Prop :=
                                            (open_typ_source t1 (PFVarT x))
                                            (open_typ_source t2 (PFVarT x))) ->
                 Ortho Gamma (ForAll d t1) (ForAll d t2)
-  | OVar : forall Gamma x ty A, WFEnv Gamma -> List.In (x,TyDis A) Gamma -> Sub A ty ->
+  | OVar : forall Gamma x ty A, WFEnv Gamma -> List.In (x,TyDis A) Gamma -> usub A ty ->
                        Ortho Gamma (PFVarT x) ty
-  | OVarSym : forall Gamma x ty A, WFEnv Gamma -> List.In (x,TyDis A) Gamma -> Sub A ty ->
+  | OVarSym : forall Gamma x ty A, WFEnv Gamma -> List.In (x,TyDis A) Gamma -> usub A ty ->
                           Ortho Gamma ty (PFVarT x)
   | OAx : forall Gamma t1 t2, WFEnv Gamma -> OrthoAx t1 t2 -> Ortho Gamma t1 t2.
 
@@ -593,5 +605,22 @@ Ltac orthoax_inv_r :=
     | H: OrthoAx _ _ |- _ => let H1 := fresh in
                            destruct H as [_ [H1 _]]; orthoax_inv H1
   end.
+
+Lemma sound_sub : forall t1 t2, usub t1 t2 -> Sub t1 t2.
+Proof.
+  intros; induction H; auto.
+  - unfold Sub.
+    eexists.
+    apply_fresh SForAll as x.
+    admit.
+Admitted.
+
+Lemma complete_sub : forall t1 t2, Sub t1 t2 -> usub t1 t2.
+Proof.
+  intros; destruct H; induction H; auto.
+  - apply_fresh UForAll as x.
+    apply H0.
+    not_in_L x.
+Qed.  
 
 End Definitions.
