@@ -1494,12 +1494,95 @@ Proof.
     apply H0.
     not_in_L x.
 Qed.
-    
+
+Lemma usub_and_l : forall t1 t2 t3, usub t1 (And t2 t3) -> usub t1 t2.
+Proof.
+  intros t1 t2 t3 Husub.
+  apply complete_sub.
+  apply sound_sub in Husub as [c Hsub].
+  inversion Hsub; subst; [ exists c1; auto | | ]; inversion H0.
+Qed.
+
+Lemma usub_and_r : forall t1 t2 t3, usub t1 (And t2 t3) -> usub t1 t3.
+Proof.
+  intros t1 t2 t3 Husub.
+  apply complete_sub.
+  apply sound_sub in Husub as [c Hsub].
+  inversion Hsub; subst; [ exists c2; auto | | ]; inversion H0.
+Qed.
+
+Lemma usub_trans_mid :
+  forall A B C D, usub A B -> usub B C -> usub C D -> usub A D.
+Proof.
+  intros A B C D HusubAB HusubBC HusubCD.
+  generalize dependent A.
+  generalize dependent D.
+  induction HusubBC; intros; auto.
+  - dependent induction HusubAB; subst; auto.
+  - dependent induction HusubAB; subst; auto.
+    dependent induction HusubCD; subst; auto.
+    apply USAnd1.
+    apply IHHusubCD1; auto.
+    intros; auto.
+    subst.
+    apply usub_and_l with (t3 := t2); eauto.
+    intros; auto.
+    subst.
+    apply usub_and_l with (t3 := t2); eauto.
+    apply IHHusubCD2; auto.
+    intros; auto.
+    subst.
+    apply usub_and_r with (t2 := t1); eauto.
+    intros; auto.
+    subst.
+    apply usub_and_r with (t2 := t1); eauto.
+  - dependent induction HusubCD; subst; auto.
+  - dependent induction HusubAB; subst; auto.
+  - dependent induction HusubAB; subst; auto.
+  - dependent induction HusubCD; subst; auto.
+  - dependent induction HusubCD; subst; auto.
+    dependent induction HusubAB; subst; auto.
+    apply_fresh UForAll as x.
+    apply H0 with (x := x).
+    not_in_L x.
+    apply H1.
+    not_in_L x.
+    apply H3.
+    not_in_L x.
+Qed.
+
 Lemma usub_trans :
+  forall B A C Gamma, WFTyp Gamma C -> usub A B -> usub B C -> usub A C.
+Proof.
+  intros B A C Gamma HWFC HusubAB HusubBC.
+  assert (HusubCC : usub C C).
+  eapply usub_refl; apply HWFC.
+  eapply usub_trans_mid.
+  apply HusubAB.
+  apply HusubBC.
+  apply HusubCC.
+Qed.
+
+Lemma usub_trans_old :
   forall B A C, usub A B -> usub B C -> usub A C.
 Proof.
+  intros B A C HusubAB HusubBC.
+  generalize dependent C.
+  induction HusubAB; intros; auto.
+  - dependent induction HusubBC; auto.
+    apply USFun; auto.
+    admit.
+  - dependent induction HusubBC; auto.
+  - dependent induction HusubBC; auto.
+    apply_fresh UForAll as x.
+    apply H0.
+    not_in_L x.
+    apply H1.
+    not_in_L x.
+Admitted.
+(*  
   intro B.
-  dependent induction B; intros A C usubAB usubBC.
+  induction B; intros A C usubAB usubBC.
   - dependent induction usubBC; subst; auto.
   - generalize dependent A.
     dependent induction usubBC; subst; auto.
@@ -1518,6 +1601,7 @@ Proof.
     intros.
     dependent induction usubAB; subst; eauto.
     apply_fresh UForAll as x.
+    apply IHB1.
     eapply H0.
     not_in_L x.
     apply IHB2.
@@ -1525,8 +1609,7 @@ Proof.
     admit.
     admit.
   - dependent induction usubAB; auto.
-Admitted.   
-
+*) 
 
 Lemma Ortho_usub_trans :
   forall Gamma u ty d,
@@ -1546,7 +1629,7 @@ Proof.
     not_in_L x.
     apply H2.
     not_in_L x.
-  - pose (usub_trans _ _ _ H1 HSub).
+  - pose (usub_trans_old _ _ _ H1 HSub).
     eapply OVar; auto.
     apply H0.
     apply u.
@@ -1557,6 +1640,44 @@ Proof.
     try (destruct H0 as [_ [_ H0]]; exfalso; now apply H0);
     try (now orthoax_inv_r H0); try (now orthoax_inv_l H0);
     try now (induction ty; inversion HSub; auto).
+Qed.
+
+Lemma Ortho_usub_trans' :
+  forall Gamma u ty d,
+    WFTyp Gamma ty ->
+    Ortho Gamma u d ->
+    usub d ty ->
+    Ortho Gamma u ty.
+Proof.
+  intros Gamma u ty d HWFty HOrtho HSub.
+  generalize dependent ty.
+  induction HOrtho; intros; eauto.
+  - induction ty; try now (inversion HSub; subst; auto);
+    inversion HWFty; inversion HSub; subst; auto.
+  - induction ty; try now (inversion HSub; subst; auto);
+    inversion HWFty; inversion HSub; subst; auto.
+  - induction ty; try now (inversion HSub; subst; auto);
+    inversion HWFty; inversion HSub; subst; auto.
+    inversion HWFty; subst.
+    inversion HSub; subst.
+    apply_fresh OForAll as x.
+    apply H0.
+    not_in_L x.
+    apply H4.
+    not_in_L x.
+    apply H2.
+    not_in_L x.
+  - pose (usub_trans _ _ _ Gamma HWFty H1 HSub).
+    eapply OVar; auto.
+    apply H0.
+    apply u.
+  - induction ty0; try (now inversion HSub).
+    inversion HSub; subst; inversion HWFty; auto.
+    inversion HSub; subst; eauto.
+  - destruct t1; destruct t2;
+    try (destruct H0 as [_ [_ H0]]; exfalso; now apply H0);
+    try (now orthoax_inv_r H0); try (now orthoax_inv_l H0);
+    try now (induction ty; inversion HSub; subst; inversion HWFty; auto).
 Qed.
 
 Hint Constructors Atomic.
@@ -1796,7 +1917,7 @@ Proof.
           (subst; apply not_in_usub with (d := d); auto; eapply not_in_wfenv;
            eauto).
       assert (Ha3 : Ortho Gamma u ty) by
-          (subst; apply Ortho_usub_trans with (d := d); eauto).
+          (subst; apply Ortho_usub_trans' with (d := d); eauto).
       simpl; subst; rewrite EqFacts.eqb_refl.
       rewrite subst_typ_source_fresh; auto.
       apply ortho_subst_not_in; auto.
@@ -1811,7 +1932,7 @@ Proof.
       subst; simpl.
       rewrite EqFacts.eqb_refl.
       assert (Ha3 : Ortho Gamma u ty) by
-          (subst; apply Ortho_usub_trans with (d := d); eauto).
+          (subst; apply Ortho_usub_trans' with (d := d); eauto).
       assert (Ha4 : Ortho Gamma (PFVarT z) ty) by
           (apply OVar with (A := d); auto).
       admit.
