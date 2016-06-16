@@ -8,7 +8,7 @@ intersection types to characterize exactly all strongly normalizing
 lambda terms.
 Since then various researchers~\cite{Freeman91refinement,pierce1991programming1,Castagna92calculus,pierce1997intersection,davies2000intersection,Dunfield03Intersections} have started looking at the application
 of intersection types for designing new and more powerful type systems 
-for programming languages. Since Reynolds work on the Forsythe~\cite{reynolds1997design}
+for programming languages. Since Reynolds' work on the Forsythe~\cite{reynolds1997design}
 programming language, various other languages, including
 CDuce~\cite{Benzaken03cduce}, Scala~\cite{scala-overview} and 
 Stardust~\cite{Dunfield07:Stardust} have incorporated some notion 
@@ -59,8 +59,9 @@ is elegant and type-safe.
 %various solutions.
 
 While Dunfield's calculus is type-safe, it lacks the property of
-\emph{coherence}: different derivations for the same expression can
-lead to different results. Dunfield left coherence as
+\emph{coherence}: different derivations for the same source expression can
+lead to target expressions that evaluate to different values. 
+Dunfield left coherence as
 an \emph{open problem}. The lack of coherence is an important
 disadvantage for adoption of his core calculus in implementations of
 programming languages, as the semantics of the programming language
@@ -122,7 +123,7 @@ types is on the particular definition of top-like types,
 which has an impact on which types are allowed on intersections.
 In a simple version, top-like types are the set of types: $\top$, 
 $\top\inter\top$, $\top\inter\top\inter\top$, \ldots. All such types
-are \emph{proper} top types: that is they are supertypes of every
+are \emph{proper} top types: that is, they are supertypes of every
 other type. Unfortunately the simple notion of top-like types 
 has limited expressiveness because it forbids any two function types 
 to be disjoint. The second definition of top-like types 
@@ -142,7 +143,7 @@ binders. Except for two auxiliary lemmas used in the lambda cases for
 the proofs of soundness and completeness of bi-directional
 type-checking, all proofs are ``admit'' free. In particular,
 the main proofs of this paper (coherence and type-preservation) are
-complete.  The two auxilliary theorems that we did not manage to prove
+complete.  The two auxiliary theorems that we did not manage to prove
 are trivially true, but they proved surprisingly tricky to prove using
 the locally nameless representation with co-finite quantification.
 

@@ -79,8 +79,8 @@
 \newcommand{\labeltsub}{\makelabelt Sub}
 \newcommand{\ruletsub}{
 \inferrule* [right=\labeltsub]
-  {\jtype \Gamma {e} A \yields {E} \\ {A} \subtype {B} \yields {C}}
-  {\jtype \Gamma {e} {B} \yields {\tapp C E}}
+  {\jtype \Gamma {e} A \yields {E} \\ {A} \subtype {B} \yields {E_{sub}}}
+  {\jtype \Gamma {e} {B} \yields {\tapp {E_{sub}} E}}
 }
 
 \newcommand{\labeltprod}{\makelabelt Prod}

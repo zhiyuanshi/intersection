@@ -39,3 +39,12 @@ footempfile.txt
 
 # Ott
 ott_distro_0.25*
+
+# VI
+*.bak
+*.swp
+
+# Coq
+*.vo
+*.vio
+*.glob

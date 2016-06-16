@@ -1,0 +1,494 @@
+>> ===========================================================================
+>>                           ICFP 2016 Review #106A
+>> ---------------------------------------------------------------------------
+>>                   Paper #106: Disjoint Intersection Types
+>> ---------------------------------------------------------------------------
+>> 
+>>                       Overall merit: B. OK paper, but I will not champion
+>>                                         it
+>>                          Confidence: Y. I am knowledgeable in this area,
+>>                                         but not an expert
+>> 
+>>                          ===== Paper summary =====
+>> 
+>> This paper studies the introduction of intersection types in a
+>> functional programming language (called \lambda_i). The main goal of
+>> the authors is to guarantee the coherence of the semantics (i.e., each
+>> term has exactly one type) with the presence of a merge operator
+>> (i.e., a constructor for intersection typed terms). They show that in
+>> the absence of a top-type (T), a simple notion of disjointness is a
+>> key feature to guarantee coherence. An intersection type A&B is
+>> "disjoint" if there is no type C such that A <: C and B <: C (where <:
+>> is the subtyping relation). 
+>> 
+>> In the presence of a top-type, they study two different versions of
+>> disjointness in \lambda_i:
+>> 
+>> 1. A simple version that ends up ruling out all intersections of
+>>    function types, e.g.,
+>>   	   (Bool -> Int)&(String->String)
+>>    is not disjoint (and therefore not allowed) because 
+>>      	   (Bool&String) -> T
+>>    is a supertype of the two components of the previous type.x
+>> 
+>> 2. A version with a more relaxed version of disjointness, by
+>> considering any function of type A1...Ak -> T as a top-like type.
+>> 
+>> 
+>> For each version of \lambda_i, the authors give subtyping, typing, and
+>> disjointness rules, both in declarative and algorithmic forms.
+>> 
+>> Another key features of \lambda_i to guarantee coherence is a coercive
+>> subtyping. Essentially, the semantics of \lambda_i is given as a
+>> translation to the lambda-calculus with pair and unit types (the
+>> "target language"). The authors also give an bidirectional type
+>> systems for \lambda_i that produces terms in the target the language,
+>> to remove any possible type ambiguity.
+>> 
+>> In the rest of the paper, the authors briefly mention the existence of
+>> an implementation of \lambda_i and some mechanised proofs. The paper
+>> ends with a good discussion on related work, and some conclusions and
+>> future work.
+>> 
+>>                       ===== Comments for author =====
+>> 
+>> This paper presents very nicely a very neat and intuitive theory for
+>> introducing intersection types in a coherent functional programming
+>> language. The author describe very well the problems at hand, as well
+>> as the different steps to solve them. Each problem and solution is
+>> very well illustrated by means of a minimal example.
+>> 
+>> The authors also mention an implementation and mechanisation of the
+>> proofs, which would complement this work very well. Sadly, the
+>> implementation of lambda_i mentioned by the authors is not presented
+>> in the paper (a brief presentation and some discussion on
+>> usability/performance would have been interesting).
+>> 
+>> One bad point is that, even though I believe that their notion of
+>> disjointness of types is indeed intuitive and *useful*, I would have
+>> liked to see a few *practical/real* examples of terms/types that their
+>> framework allows while previous/related works don't. In other words,
+>> the authors should explain better why their notion of disjointness is
+>> good.
+>> 
+>> This leads me to another marginal weakness of the paper: it would
+>> benefit better motivations as to (i) Why are intersection types of
+>> interest for the general programmer? (ii) Why is having a top type
+>> important? (iii) Why is having a 'merge' construct important? For
+>> instance, the authors write [in related work] "But without a
+>> term-level construct like “merge”, it is not possible to encode
+>> various language features". The authors should explain what these
+>> features are.
+>> 
+>> Overall, I believe this paper presents a nice theory that should be of
+>> interest for anyone studying or implementing intersection types. In
+>> addition, the paper is a pleasant read, so I suggest acceptance.
+>> 
+>> 
+>> 
+>> Minor comments/questions for the authors:	
+>> 
+>> - Can you quantify how much typing annotations one needs for all type
+>>   ambiguity to disappear?
+>> 
+>> - Can you convince the reader that your approach would be somewhat
+>>   adaptable to the presence of union types?
+>> 
+>> - Section 3.2: Rules S&R1 and S&R2 are mentioned but do not exist.
+>> 
+>> - Section 6: Do pairs pose a particular problem in \lambda_i with T?
+>> 
+>> - Page 10, bottom column 1: as show -> as shown
+>> 
+>> ===========================================================================
+>>                           ICFP 2016 Review #106B
+>>                      Updated 17 May 2016 4:06:58pm EDT
+>> ---------------------------------------------------------------------------
+>>                   Paper #106: Disjoint Intersection Types
+>> ---------------------------------------------------------------------------
+>> 
+>>                       Overall merit: C. Weak paper, though I will not fight
+>>                                         strongly against it
+>>                          Confidence: Y. I am knowledgeable in this area,
+>>                                         but not an expert
+>> 
+>>                          ===== Paper summary =====
+>> 
+>> This paper describes a lambda calculus with functions, pairs and a
+>> special kind of intersection type (the latter due to Dunfield in 
+>> recent work).  The intersection type is introduced via a merge 
+>> operator (e1,,e2).  It is eliminated implicitly using subtyping.
+>> The surface-level intersections are elaborated in to pairs and
+>> the subtyping judgements turn in to coercions that extract the
+>> relevant data.  The main change from Dunfield's earlier work
+>> is that the left- and right-hand sides of the intersection must be
+>> disjoint.  When intersections are disjoint, and suitable typing
+>> annotations are applied to eliminate other ambiguities, the calculus becomes
+>> coherent (each term has one meaning).  The authors prove several results
+>> 
+>>                       ===== Comments for author =====
+>> 
+>> Edit after the PC meeting:
+>> 
+>> I waffled on this paper and wound up downloading my grade to a C.  The reason I did so was that I was still unsure of the utility of this form of intersection type.  In the response,
+>> you mention that "intersection types (but not the merge operator!) are already part of some prominent languages, such as Scala (and Redhat's Ceylon)".  But those intersection types have different semantics and different restrictions.  It is not clear that the intersections proposed in this paper suffice to replace those in Scala and Ceylon, especially because of the lack of support for polymorphism here.  Hence, this argument is very unconvincing.
+>> 
+>> I strongly recommend the authors add a section (or a few paragraphs) to this paper to concretely demonstrate the utility of this form of intersection by encoding, perhaps, Scala-style intersections or some other feature (perhaps traits, multiple inheritence) from another language.  Note that the restrictions vis-a-vis disjointedness may prevent the use of these intersections to encode general multiple inheritence and other such features.  (Does it?)  It is not enough to rely on Dunfield's motivation --- his intersections do not have the same restrictions and may be more generally useful.
+>> 
+>> ---------------------
+>> 
+>> Edit after author response:
+>> 
+>> I read the response.  Thank you.  I was not convinced by this point:  "For the general programmer, intersection types (but not the merge operator!) are already part of some prominent languages, such as ..."  I am not an expert on the semantics of the intersection types in the other languages mentioned.  Are they really the same as the semantics given here?  The merge operator adds some operational overhead by creating a pair.  Is the notion of intersection type used here really all that similar to what is happening in Scala?  Would this really just be a conservative extension of Scala?  This is a question I will continue to discuss with the other reviewers.
+>> 
+>> -----------
+>> 
+>> 
+>> I am have two opinions about this paper.  
+>> 
+>> (1) On the one hand, I find the paper to be aesthetically beautiful 
+>> treatment of the issue of coherence in intersection types, a
+>> theoretical issue, which has plagued such type systems for quite a while. 
+>> The paper is simple and very clear.  It is easy to follow and yet it
+>> reports new results.
+>> 
+>> (2) On the other hand, I'm skeptical about the utility of this form of
+>> intersection type.  The authors explain the similarities and
+>> differences between these intersection types and pairs very clearly.
+>> The run-time representation is identical: both intersections and pairs
+>> are represented as pairs. The introduction forms are the same; the
+>> elimination forms are different.  To eliminate a pair, a programmer
+>> must write an explicit projection.  To eliminate an intersection, a
+>> programmer must write nothing -- a coercion will be generated from the
+>> appropriate subtyping relation where needed.  Hence, intersections
+>> provide users with some notational brevity along this dimension.
+>> However, the cost to using these intersections is heavy:
+>> 
+>> * one must adopt a bi-directional type system, which while theoretically
+>> elegant, has much heavier annotation costs than standard Hindley-Milner
+>> type inference mechanisms
+>> 
+>> * the disjointedness requirement means one cannot always use intersections
+>> and one must fall back on pairs when the left- and right-hand sides
+>> are not disjoint.  These restrictions and the subtyping rules
+>> make intersection types more complex from a programmer's perspective
+>> 
+>> * it is not clear how they interact with polymorphism (clearly, a
+>> crucial feature in functional languages).  The naive suggestion
+>> in the conclusion to simply disallow type variables under 
+>> intersections would seem to limit the use of intersections too 
+>> dramatically.
+>> 
+>> On balance, if given the choice of whether to add such intersections
+>> to my language (say OCaml) or not, I simply wouldn't do it.  The costs
+>> (significant) outweigh the benefits (marginal) as far as I can see.  I
+>> would be happy if the authors made a more compelling case in the
+>> rebuttal though.
+>> 
+>> Despite these pragmatic concerns, I am slightly tilted towards
+>> accepting this paper, due to the elegance of the design, the
+>> theoretical contributions and the clarity of presentation.  Who knows,
+>> may be some future language will benefit from this design in ways I
+>> cannot envision?  Having said that, my support for this paper is weak.
+>> If space is tight in conference program, or if the other reviewers
+>> disagree, I will not advocate strongly to keep this one.
+>> 
+>> Minor Comments:
+>> 
+>> -- at the top of pg 4, right-hand column, the reader is suddenly told
+>> that there is only 1 value of type T.  I would have introduced this
+>> concept earlier when T is introduced.  It was a bit of a surprise.
+>> 
+>> -- If space is an issue, I would choose to dispense with the formal
+>> description of the "simple calculus with T" (sec 6.3) -- I think
+>> just showing the final calculus in 6.4 is more worthwhile.  (It is
+>> still nice to discuss the "simple calculus with T" in the introductory
+>> parts of the paper.)
+>> 
+>> -- In sec 6, the authors stopped providing summaries of the theorems
+>> they have proven about their system.  In particular, does the main
+>> coherence theorem still hold for the extensions in sections 6.3 and
+>> 6.4 (an analogue to theorem 6 for the extended language)?  Please
+>> answer that question in the rebuttal.  (The answer is probably in the
+>> Coq development but readers and reviewers should not have to look
+>> there for it.)
+>> 
+>> ===========================================================================
+>>                           ICFP 2016 Review #106C
+>> ---------------------------------------------------------------------------
+>>                   Paper #106: Disjoint Intersection Types
+>> ---------------------------------------------------------------------------
+>> 
+>>                       Overall merit: A. Good paper, I will champion it
+>>                          Confidence: X. I am an expert in this area
+>> 
+>>                          ===== Paper summary =====
+>> 
+>> The paper develops a calculus with binary intersection &, but unlike many intersection type systems, there is an explicit introduction form (the merge construct).  The main contribution is that, unlike the system of Dunfield with &, ⊤, and merge, the calculus enjoys coherence: the choice of which branch of a merge to use is always consistent, because intersection is required to be *disjoint*.  The paper defines disjointness to be the lack of a common supertype, so that (Int & Char) is disjoint from (Bool & Float), but (Int & Char) is not disjoint from Int (because (Int & Char) <: Int).
+>> 
+>> The first system the authors present takes a fairly straightforward approach to ensuring disjointness.  However, intersection type systems (and OO languages) often include a top type.  In a second system, the authors add a top type.  This is nontrivial, because the notion of "common supertype" must be refined (⊤ is a common supertype of everything).
+>> 
+>> I think this is an interesting line of work.  While this version has some minor errors and a couple of places where more explanation is needed, it's highly readable and makes a solid contribution to the design space.  I support acceptance.
+>> 
+>> Since I am asking for some additional explanations, if the authors are looking for more space, I would suggest tightening the figures (e.g. cutting vertical whitespace in Figs. 4, 8, 9).
+>> 
+>>                       ===== Comments for author =====
+>> 
+>> In the introduction, clarify what you mean by "different results": different derivations lead to expressions that evaluate to different values.  "Results" could be interpreted as the result of elaboration (two different elaborations conceivably might differ harmlessly), but you mean that the resulting programs actually produce different values.
+>> 
+
+Fixed.
+
+>> In fig. 4: $|(A_1, A_2)|$ should be $|A_1 \times A_2|$.
+
+Fixed in several places where we were using "(A,B)" at type-level, instead of "A x B".
+
+>> 4.3:
+>> 
+>> "The bidirectional type system itself is rather standard."  If so, please cite a similar system, but I don't think it is standard: you are not following the "Pfenning recipe" (Davies and Pfenning 2000; Dunfield and Pfenning 2004) of intro rules ⇐, elim rules ⇒.  Instead, you seem to be following a recipe of "make every rule synthesize by default".  That's not necessarily bad, particularly as it should reduce the annotation burden, but it needs some explanation.
+
+TODO
+
+>> In rule T-Sub (fig. 5), you use "C" as a meta-variable for a target term, but you already use C as a source type.  (Also applies to the proof of Thm. 6.)
+
+Fixed: Changed C to E_{sub}.
+
+>> In fig. 6, the case for λ should have lowercase e on both sides.
+
+Fixed.
+
+>> 
+>> 6.1:
+>> 
+>> This part follows Dunfield's system closely, which should be mentioned.
+
+Fixed. Added a reference to Dunfield's work.
+
+>> 6.4:
+>> 
+>> "local top-types for function-types": Perhaps these could be called "pre-top-types": applying a value of pre-top-type results in a value of type top.
+
+Fixed and re-phrased.
+
+>> This notion of top-like functions seems related to definitions in some intersection type systems.  For example, Coppo et al. (1981), which you cite elsewhere as [9], use a notion of "tailproper" types where the codomain was not top (ω).  You should at least mention this, as it suggests that your definition is not arbitrary; whether there are deeper connections should probably be left to future work.
+
+TODO A paragraph has been added explaining this but it should be double-checked with the referenced Coppo et al. paper.
+
+>> In Fig. 11, the boxes have t rather than T.
+
+Fixed.
+
+>> 
+>> Other remarks:
+>> 
+>> p. 1:
+>> 
+>> "Reynolds work" → "Reynolds' work"
+>>
+>>
+>> "that is they" → "that is, they"
+
+Fixed both.
+
+>> p. 2:
+>> 
+>> "auxilliary"
+>> 
+>> "the notion of disjoint intersection types achieve+s+"
+>> 
+>> "Dunfield calculus" → "Dunfield's calculus"
+
+Fixed all.
+
+>> p. 3:
+>> 
+>> "less clear of" → "less clear"
+>> 
+>> "String & Int → String": add parentheses and/or mention your precedence convention (various intersection types papers have used conflicting conventions, so it should be explicit)
+>> 
+>> "In this case both f or g" → "In this case either f or g"
+
+Fixed all.
+
+>> p. 4:
+>> 
+>> "that chose" → "that choose"
+>> "adaptations on the notion" → "adaptations to the notion"
+>> 
+>> Def. 2.: using "not" instead of ¬ would be more clear (the reader does not have to figure out whether ¬ is in the object logic)
+>> 
+>> "The standard subtyping relation": I would say "A standard".
+>> 
+>> "⊤-Disjointness": don't capitalize "disjointness".
+>> 
+>> "However according +to+"
+>> 
+>> "top-likes" → "top-like types"
+>> 
+>> "functions types" → "function types"
+>> 
+>> "difference to" → "differences from"
+>> 
+>> Under "Types", add a note about precedence of & vs. →.
+
+Fixed all.
+
+>> p. 5:
+>> 
+>> "well-formedness of types and +the+ typing relation"
+
+Fixed.
+
+>> p. 6, fig. 3: You introduce a type () and target term (); mention in the text that they will be used later.
+
+TODO fixed, but shouldn't we highlight ()? (i.e. 0-ary product)
+
+>> "such +an+ unrestricted rule"
+
+Fixed.
+
+>> p. 7: "right decomposition rules" → "...rule"
+>> 
+>> "not possible that the following holds at the same time"
+>> → "not possible that both of the following hold at the same time"
+>> 
+>> "But in richer systems, it can also include"
+>> →"But in richer systems, ordinary types can also include"
+
+Fixed both.
+
+>> p. 9:
+>> 
+>> "how can be the fact" → "how can the fact"
+>> 
+>> "disjointess" → "disjointness" (several occurrences)
+
+Fixed all.
+
+>> Def. 4: see remark on Def. 2 (for ≡ and →), especially since you elsewhere use ≡ for α-equivalence and → for functions.  (Also, the C in ∀C should not be a subscript.)
+
+TODO: should we just use the same terminology used in Def. 2?
+
+>> p. 10:
+>> 
+>> "and B is not top-like;"
+>> → "and B is not top-like,"
+>> 
+>> "an unary" → "a unary"
+>> "as show" → "as shown"
+>> "definition +of+ ⊤-disjointness"
+>> "non top-like" → "non-top-like"
+
+Fixed all.
+
+>> p. 11:
+>> 
+>> "still overlap, in case" → "still overlap when"
+>> "Reynolds+'+ approach"
+
+Fixed all.
+
+>> p. 12:
+>> 
+>> "lacks of coherence" → "lacks coherence"
+>> 
+>> "Davies and Pfenning's." → "Davies and Pfenning."
+>> 
+>> "well-know" → "well-known"
+
+Fixed all.
+
+>> References:
+>> 
+>> 4, 14, 19, 22: capitalization problems
+>> 
+>> 9 should have volume/number/page
+>> 
+>> 11: institution should be Carnegie Mellon
+
+Fixed.
+
+>> 13/14 and 18/19 are duplicates
+
+Fixed.
+
+>> 22: "and al."
+
+Fixed, changed to et al.
+
+>> 24 and 30 are missing identifying information ("CMU-CS-TR-..."); also, check the year of 30
+>> 
+>> ===========================================================================
+>>                Response by Bruno Oliveira <bruno@cs.hku.hk>
+>> ---------------------------------------------------------------------------
+>> Thanks to the reviewers for their comments!
+>> 
+>> #106A
+>> 
+>> (i)Why are intersection types of interest for the general programmer?
+>> (ii)Why is having a top type important?
+>> (iii)Why is having a 'merge' construct important?
+>> 
+>> The reviewer is right to point out that the paper is brief in
+>> motivating intersection types and/or the merge operator. One reason is
+>> that we significantly build on Dunfield's work and he already does a
+>> very good job motivating the merge operator. As Dunfield points out,
+>> the merge operator can be used to encode various language features,
+>> such as records, and operator overloading. Intersection types without
+>> a merge operator cannot easily encode such features.
+>> 
+>> For the general programmer, intersection types (but not the merge
+>> operator!) are already part of some prominent languages, such as Scala
+>> (and Redhat's Ceylon). They have also been used in languages like
+>> CDuce (whose design has featured in papers in FP/PL conferences).
+>> Moreover intersection types feature prominently in various calculi
+>> aiming at modelling OO features (some examples are discussed in our
+>> related work). For OO calculi the top type is ofcourse of crutial
+>> importance, which justifies why investigating top is relevant.
+>> 
+>> #106B
+>> 
+>> -"more compelling case in the rebuttal though"
+>> 
+>> We still view this work as a step towards having a practical
+>> functional language with disjoint intersections: it is certainly not
+>> the final step. So we understand that the reviewer is skeptical to
+>> have the current work included in OCaml. Polymorphism is quite
+>> important to deal with. We agree that the naive approach that we
+>> suggest (while easy and doable) is probably not going to be practical.
+>> Polymorphism is what we want to address next.
+>> 
+>> Regarding type-inference, there is also clearly work to be done here,
+>> especially if the language we are considering uses HM. However we
+>> would like to point out that there are practical functional languages
+>> (example: Scala) that use bi-directional type-checking techniques, and
+>> require significantly more annotations any way. We believe the current
+>> work would already be quite appealing for this class of languages.
+>> 
+>> -"does the main coherence theorem still hold for the extensions in
+>> sections 6.3 and 6.4?"
+>> 
+>> Yes it does, and is proved in the submitted Coq scripts. We do
+>> mention this in the paper. For example:
+>> 
+>> "Both variants retain coherence, and all other key properties of λi...
+>> Mechanized Coq proofs for both variants are available as part of the
+>> supplementary materials for the paper."(Section 6)
+>> 
+>> The reason why we did not show the lemma statements in Section 6 is
+>> that they are essentially the same as those found in Section 4&5,
+>> so it would be quite repetitive (and space consuming) to restate
+>> them again.
+>> 
+>> We will make this clearer in the final version.
+>> 
+>> #106C
+>> 
+>> -standard bidirectional type system
+>> 
+>> The reviewer is right. "standard" is probably a bad choice of word.
+>> Perhaps "unremarkable" is a better word. We wanted to present a simple
+>> bidirectional type system, and we were indeed aiming at maximizing
+>> type-inference. We agree that the more standard design is the
+>> "Pfenning recipe". We will clarify this.
+>> 

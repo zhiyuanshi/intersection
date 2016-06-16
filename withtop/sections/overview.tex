@@ -3,8 +3,8 @@
 %*******************************************************************************
 
 This section introduces \name and its support for intersection types and the
-merge operator. It then discusses the challenges of coherence and shows how the
-notion of disjoint intersection types achieve a coherent semantics.
+merge operator. 
+notion of disjoint intersection types achieves a coherent semantics.
 
 Note that this section uses some syntactic sugar, as well as standard
 programming language features, to illustrate the various concepts in
@@ -117,7 +117,7 @@ above, and it allows that program to result in \lstinline$1$ or \lstinline$2$.
 In other words the results of the program are incoherent.
 
 \paragraph{Getting Around Incoherence}
-In a real implementation of Dunfield calculus a choice has to be made
+In a real implementation of Dunfield's calculus a choice has to be made
 on which value to compute. For example, one potential option is to
 always take the left-most value matching the type in the
 merge. Similarly, one could always take the right-most value matching
@@ -158,7 +158,7 @@ easy to see that disjointness holds when the two types are
 different. Intersections such as \lstinline$Int & Bool$ and 
 \lstinline$String & Bool$ are clearly disjoint.
 While an informal, intuitive notion of disjointness is sufficient to
-see what happens with simple types, it is less clear of what
+see what happens with simple types, it is less clear what
 disjointness means in general.
 
 \paragraph{Formalizing disjointness} 
@@ -264,7 +264,7 @@ definition of simple disjointness for further guidance, and the subtyping rule f
 \noindent we can see that the types in the 
 second intersection do not share any common supertypes. Since the
 target types of the two function types
-(\lstinline$Int$ and \lstinline$String$) do not share a common
+($\code{Int}$ and $\code{String}$) do not share a common
 supertype, 
 it is not possible to find a type \lstinline$C$ that is both a common
 supertype of $(\code{String} \to \code{Int})$ and $(\code{String} \to \code{String})$.
@@ -281,13 +281,13 @@ lead to incoherence). If the third intersection type was allowed then
 the following program:
 
 \begin{lstlisting}
-f,,g : String & Int (*$\to$*) String
+f,,g : (String & Int) (*$\to$*) String
 \end{lstlisting}
 
-\noindent where \lstinline$f$ is of type
-$\code{Int}~\to~\code{String}$  and \lstinline$g$ is of type
+\noindent where \lstinline$f$ has type
+$\code{Int}~\to~\code{String}$  and \lstinline$g$ has type
 $\code{String}~\to~\code{String}$, would be problematic. In this 
-case both \lstinline$f$ or \lstinline$g$ could be selected,
+case either \lstinline$f$ or \lstinline$g$ could be selected,
 potentially leading to very different (and incoherent) results when
 applied to some argument. 
 
@@ -341,7 +341,7 @@ affects type-directed mechanisms such as type classes or, more
 generally, \emph{qualified types}~\cite{Mark93coherence}.
 
 The typical solution to remove type ambiguity is to add type
-annotations that chose a particular type for a sub-expression when
+annotations that choose a particular type for a sub-expression when
 multiple options exist. Our approach to address this problem is to 
 use bi-directional type-checking techniques~\cite{Pierce00local,Dunfield04tri}. We show that 
 with a fairly simple and standard bi-directional type system, we can guarantee 
@@ -365,15 +365,15 @@ Therefore, with the previous definition of disjointness no disjoint
 intersections can ever be well-formed in the presence of $\top$!
 Moreover, since $\top$ is not disjoint to any type, it does not make
 sense to allow its presence in a disjoint intersection type.  Adding a
-$\top$ type requires some adaptations on the notion of disjointness.
+$\top$ type requires some adaptations to the notion of disjointness.
 This paper studies two additional variants of \name with $\top$ types.
 In both variants the definition of disjointness is revised as follows:
 
-\begin{definition}[$\top$-Disjointness]
+\begin{definition}[$\top$-disjointness]
   Two types $A$ and $B$ are disjoint
   (written $A \disjoint B$) if the following two conditions are satisfied:
 \begin{enumerate}
-  \item $\neg \toplike{A}~\text{and}~\neg \toplike{B}$
+  \item $\text{not}~ \toplike{A} \text{\, and \, not}~ \toplike{B} $
   \item $\forall C.~\text{if}~ A \subtype C~\text{and}~B \subtype C~\text{then}~\toplike{C}$
 \end{enumerate}
 \end{definition}
@@ -387,7 +387,7 @@ types. Top-like types obviously include the $\top$ type. However
 top-like types also include other types which are \emph{syntactically different}
 from $\top$, but behave like a $\top$ type. For example, $\code{$\top$}~\inter~\code{$\top$}$
 is syntactically different from $\top$, but it is still a supertype of
-every other type (including $\top$ itself). The standard subtyping relation for
+every other type (including $\top$ itself). A standard subtyping relation for
 intersection types includes a rule:
 
 \begin{mathpar}
@@ -404,8 +404,8 @@ In other words, in a calculus like Dunfield's there are infinitely
 many syntactically different types that behave like a $\top$ type: 
 $\top$, $\top \inter \top$, $\top \inter \top \inter \top$, \ldots
 
-The notion of $\top$-Disjointness has two benefits. Firstly, and more
-importantly, $\top$-Disjointness is sufficient to ensure
+The notion of $\top$-disjointness has two benefits. Firstly, and more
+importantly, $\top$-disjointness is sufficient to ensure
 coherence. For example, the following program is valid, and coherent:
 
 \begin{lstlisting}
@@ -415,7 +415,7 @@ coherence. For example, the following program is valid, and coherent:
 \noindent Even though the types of both components of the merge are a
 subtype of the type of the program ($\top$), the result of the
 program is always the \emph{unique} $\top$ value. Secondly,
-$\top$-Disjointness has the side-effect of excluding other top-like
+$\top$-disjointness has the side-effect of excluding other top-like
 types from the system: the type $\top \inter \top$ is not
 a \emph{well-formed} disjoint intersection type. In contrast to Dunfield's
 calculus, \name has a unique syntactic $\top$ type.
@@ -434,16 +434,16 @@ $(\code{String} \to \code{Int})~\inter~(\code{String} \to  \code{String})$
 \vspace{5pt}
 
 \noindent According to the simple definition of disjointness, this disjoint
-intersection type is valid. However according $\top$-Disjointness and a simple definition
+intersection type is valid. However according to $\top$-disjointness and a simple definition
 of top-like types, which accounts only for proper top types, this disjoint intersection type is not valid. 
 The two types have a common supertype which is not a supertype of
 every type: $\code{String} \to \top$. In this case $(\code{String} \to
 \top)\!\!\subtype\!\!\top$, but $\top\!\!\not\subtype\!\!(\code{String} \to
 \top)$. Therefore the two types do not meet the second condition of
-$\top$-Disjointness as there exists a common supertype, which is not top-like.
+$\top$-disjointness as there exists a common supertype, which is not top-like.
 
 \paragraph{Generalizing top-like types} In the second variant of \name 
-top-likes are defined more liberally and they allow function types
+top-like types are defined more liberally and they allow function types
 whose co-domain is a top type to be considered as a top-like type.
 For example, the type $\code{String}\to\top$ is considered a top-like
 type. The benefit of allowing this more liberal notion of top-like

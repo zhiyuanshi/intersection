@@ -17,7 +17,7 @@ additional complications.  Section~\ref{sec:top} presents two variants of
 
 \subsection{Syntax}
 
-Figure~\ref{fig:fi-syntax} shows the syntax of \name. The difference to the
+Figure~\ref{fig:fi-syntax} shows the syntax of \name. The difference from the
 $\lambda$-calculus (with pairs), 
 highlighted in gray, are intersection types 
 ($A \inter B$) at the type-level, and merges ($e_1 \mergeop e_2$) at the term level.
@@ -60,6 +60,8 @@ highlighted in gray, are intersection types
 function types $A \to B$ and product types $\tpair A B$. 
 $A \inter B$ denotes the intersection of types $A$ and
 $B$. We also include integer types $\code{Int}$.
+Note that $\inter$ has higher precedence than $\to$, meaning that
+$A \inter B \to C$ is equivalent to $(A \inter B) \to C$.
 
 \paragraph{Terms.} Meta-variables $e$ range over terms.  Terms include standard
 constructs: variables $x$; abstraction of terms over variables
@@ -201,7 +203,7 @@ a detailed discussion on this. The subtyping relation, is known to be
 
 \subsection{Declarative Type System}
 
-The well-formedness of types and typing relation are shown in the
+The well-formedness of types and the typing relation are shown in the
 middle and bottom of Figure~\ref{fig:fi-type}, respectively.
 Importantly, the disjointness judgment, which is highlighted using a
 box, appears in the well-formedness rule for intersection types (\reflabel{\labelwfinter}) and 
@@ -257,7 +259,7 @@ introducing intersection types:
 
 \noindent A first reason why such rule would not work in \name is
 that it does not restrict $A \inter B$ to be disjoint. Therefore,
-in the presence of such unrestricted rule it would be possible to 
+in the presence of such an unrestricted rule it would be possible to 
 create non-disjoint intersections types. It is easy
 enough to have an additional disjointness restriction, which would 
 ensure the disjointness between $A$ and $B$. However, then the rule 

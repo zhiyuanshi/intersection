@@ -106,8 +106,8 @@ $ \jcheck \Gamma e A \yields E\\e$ checks against given type $A$
 
 \newcommand{\bruletsub}{
 \inferrule* [right=\labeltsub]
-  {\jinfer \Gamma {e} A \yields {E} \\ {A} \subtype {B} \yields {C}}
-  {\jcheck \Gamma {e} {B} \yields {\tapp C E}}
+  {\jinfer \Gamma {e} A \yields {E} \\ {A} \subtype {B} \yields {E_{sub}}}
+  {\jcheck \Gamma {e} {B} \yields {\tapp {E_{sub}} E}}
 }
 
 \newcommand{\bruletmergedis}{

@@ -21,7 +21,7 @@ functions can co-exist in a merge as long as they are provably disjoint.
 The treatment of disjointness of functions is particularly
 challenging, specially in combination with a $\top$ type, and
 supporting multiple functions (as well as other types) in a merge is 
-a significant innovation over Reynolds approach. 
+a significant innovation over Reynolds' approach. 
 
 Castagna et al.~\cite{Castagna92calculus} proposed $\lamint$ to study
 the overloading problem for functions. Their calculus does not have a
@@ -55,7 +55,7 @@ have already made extensive comparisons with his work. He
 described a similar approach to ours: compiling a system with intersection types
 and a merge operator into ordinary $ \lambda $-calculus terms with pairs. One
 major difference is that our system does not include unions. As
-acknowledged by Dunfield, his calculus lacks of coherence. Dunfield
+acknowledged by Dunfield, his calculus lacks coherence. Dunfield
 also mechanically formalized his proofs, using the Twelf proof
 assistant~\cite{Pfenning99cade}. However he did not prove any results about
 coherence, so his meta-theoretical results were not immediately
@@ -104,7 +104,7 @@ same kind $ K $. Davies and Pfenning
 intersection types and effects in call-by-value languages. And they
 proposed a ``value restriction'' for intersection types, similar to
 value restriction on parametric polymorphism.
-We borrowed the notion of ordinary types from Davies and Pfenning's.
+We borrowed the notion of ordinary types from Davies and Pfenning.
 Ordinary types play a fundamental role in ensuring coherence in \name.
 In contrast to \name, none of those calculi include a merge operator.
 
@@ -167,7 +167,7 @@ let merge [A, B] (f: ExpAlg A) (g: ExpAlg B) = {
 % if an term has been inferred of type $ A $, then it is also of any
 % supertype of $ A $. Our system does not have this rule.
 Refinement
-intersection~\cite{dunfield2007refined,davies2005practical,freeman1991refinement}
+intersection~\cite{Dunfield07:Stardust,davies2005practical,Freeman91refinement}
 is the more conservative approach of adopting intersection types. 
 Refinement intersections usually have a restriction on the formation
 of an intersection type $A \inter B$. In refinement intersections
@@ -191,8 +191,8 @@ and merge operator in a semantic subtyping setting.
 \paragraph{Coherence in other Type-Directed Mechanisms} Other
 type-directed mechanisms such as type classes~\cite{Wadler89ad-hoc} and, more generally, 
 qualified types~\cite{jones94} also require special care to ensure coherence.
-For example, in Haskell, a well-know example of ambiguity~\cite{Mark93coherence} that could
-lead to incoherence is:
+For example, in Haskell, a well-known example of ambiguity~\cite{Mark93coherence} 
+that could lead to incoherence is:
 
 \begin{verbatim}
 f :: String -> String
@@ -209,7 +209,8 @@ implementation of the read and show functions for the particular type
 to determine what the type \verb|a| should be. 
 An arbitrary choice 
 of \verb|a| could lead to different code being inferred depending on
-the particular choice of \verb|a|. In this case the behavior of the program would be dependent on the particular
+the particular choice of \verb|a|. In this case the behavior of the program 
+would be dependent on the particular
 choice made by the compiler. As a result Haskell compilers, reject 
 programs like the above. Jones~\cite{Mark93coherence} provided a
 formal treatment of coherence for qualified types and type classes,
