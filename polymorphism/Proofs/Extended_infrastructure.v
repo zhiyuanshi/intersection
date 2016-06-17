@@ -663,7 +663,7 @@ Proof.
     inversion H0.
     apply in_or_app.
     auto.
-    apply in_or_app; right; apply in_or_app; auto.    
+    apply in_or_app; right; apply in_or_app; auto.
 Qed.
 
 Lemma ortho_strengthen : forall z U E F ty1 ty2,
@@ -1434,50 +1434,7 @@ Proof.
   - inversion H.
   - destruct H; auto.
 Qed.
-
-(* not true. counter example: Int -> Int <: (z & Int) -> Int *)
-Lemma in_usub :
-  forall B A z,
-    In z (fv_ptyp B) ->
-    usub A B ->
-    In z (fv_ptyp A).
-Proof.
-  intros B A z HIn Husub.
-  generalize dependent z.
-  induction Husub; intros; auto.
-  - simpl in *; rewrite union_spec in *; destruct HIn; auto.
-    admit.
-  - simpl in HIn; rewrite union_spec in HIn; destruct HIn; auto.
-  - simpl; rewrite union_spec; auto.
-  - simpl; rewrite union_spec; auto.
-  - simpl in *; rewrite union_spec in *.
-    destruct HIn; auto.
-    pick_fresh x.
-    assert (Ha : not (In x L)) by not_in_L x.
-    apply H0 with (z := z) in Ha.
-    apply fv_open_rec_typ_source in Ha.
-    rewrite union_spec in Ha; destruct Ha; auto.
-    simpl in *.
-    exfalso; apply Fr.
-    not_in_L x.
-    exfalso; apply H8.
-    apply MSetProperties.Dec.F.singleton_iff.
-    apply MSetProperties.Dec.F.singleton_iff in H2.
-    now symmetry.
-    now apply fv_ptyp_open_rec_typ_source.
-Admitted.
   
-Lemma not_in_usub :
-  forall ty z d,
-    not (In z (fv_ptyp d)) ->
-    usub d ty ->
-    not (In z (fv_ptyp ty)).
-Proof.
-  intros ty z d HNotIn HSub.
-  unfold not; intros; apply HNotIn.
-  eapply in_usub; eauto.
-Qed.
-
 Lemma Ortho_sym : forall Gamma t1 t2, Ortho Gamma t1 t2 -> Ortho Gamma t2 t1.
 Proof.
   intros Gamma t1 t2 HOrtho.
@@ -1490,7 +1447,7 @@ Qed.
 Lemma usub_refl : forall Gamma t, WFTyp Gamma t -> usub t t.
 Proof.
   intros Gamma t HWFt; induction HWFt; auto.
-  - apply_fresh UForAll as x.
+  - apply_fresh USForAll as x.
     apply H0.
     not_in_L x.
 Qed.
@@ -1542,7 +1499,7 @@ Proof.
   - dependent induction HusubCD; subst; auto.
   - dependent induction HusubCD; subst; auto.
     dependent induction HusubAB; subst; auto.
-    apply_fresh UForAll as x.
+    apply_fresh USForAll as x.
     apply H0 with (x := x).
     not_in_L x.
     apply H1.
@@ -1574,7 +1531,7 @@ Proof.
     admit.
   - dependent induction HusubBC; auto.
   - dependent induction HusubBC; auto.
-    apply_fresh UForAll as x.
+    apply_fresh USForAll as x.
     apply H0.
     not_in_L x.
     apply H1.
@@ -1611,7 +1568,7 @@ Admitted.
   - dependent induction usubAB; auto.
 *) 
 
-Lemma Ortho_usub_trans :
+Lemma Ortho_usub_trans_old :
   forall Gamma u ty d,
     Ortho Gamma u d ->
     usub d ty ->
@@ -1642,7 +1599,7 @@ Proof.
     try now (induction ty; inversion HSub; auto).
 Qed.
 
-Lemma Ortho_usub_trans' :
+Lemma Ortho_usub_trans :
   forall Gamma u ty d,
     WFTyp Gamma ty ->
     Ortho Gamma u d ->
@@ -1734,7 +1691,7 @@ Proof.
   induction HSub; intros; simpl; eauto.
   - destruct eqb; auto.
     eapply usub_refl; apply HWFu.
-  - apply_fresh UForAll as x.
+  - apply_fresh USForAll as x.
     repeat rewrite subst_typ_source_open_source_var.
     apply H0 with (Gamma := (extend x (TyDis d) Gamma)); auto.
     not_in_L x.
@@ -1814,52 +1771,6 @@ Proof.
   - apply OAx; auto.
 Qed.
 
-(* Test *)
-
-Lemma ortho_subst1 :
-  forall Gamma z ty u d,
-    not (In z (fv_ptyp u)) ->
-    WFTyp Gamma u ->
-    WFTyp Gamma d ->
-    WFEnv (subst_env Gamma z u) ->
-    MapsTo Gamma z d ->
-    usub d ty ->
-    Ortho (subst_env Gamma z u) d u ->
-    Ortho (subst_env Gamma z u) (subst_typ_source z u ty) u.
-Proof.
-  intros Gamma z ty u d HNotIn HWFu HWFd HWFEnv HMapsTo Husub HOrthoud.
-  generalize dependent z.
-  generalize dependent u.
-  dependent induction Husub; intros; try now simpl; auto.
-  - induction u; try (now simpl; auto); try now (
-    simpl; apply OAx; auto; unfold OrthoAx; simpl; auto with arith).
-    simpl; apply OFun.
-Admitted. 
-    
-Lemma ortho_subst2 :
-  forall Gamma z ty u,
-    not (In z (fv_ptyp u)) ->
-    Ortho Gamma (PFVarT z) ty ->
-    Ortho Gamma ty u ->
-    Ortho (subst_env Gamma z u) (subst_typ_source z u ty) u.
-Proof.
-  intros Gamma z ty u HNotIn (* HIn *) HOrthozty HOrthotyu.
-  generalize dependent u.
-  dependent induction HOrthozty; intros; simpl in *; auto.
-  - apply OAnd1.
-    apply IHHOrthozty1; auto.
-    apply Ortho_sym; apply Ortho_usub_trans with (d := (And t2 t3)).
-    now apply Ortho_sym.
-    apply USAnd2; eapply usub_refl; admit. (* WFTyp *)
-    apply IHHOrthozty2; auto.
-    apply Ortho_sym; apply Ortho_usub_trans with (d := (And t2 t3)).
-    now apply Ortho_sym.
-    apply USAnd3; eapply usub_refl; admit. (* WFTyp *)
-  - 
-Admitted.
-
-(* test end *)
-
 Lemma ortho_subst :
   forall z u Gamma d t1 t2,
     not (In z (fv_ptyp u)) ->
@@ -1875,7 +1786,7 @@ Lemma ortho_subst :
 Proof.
   intros z u Gamma d t1 t2 HNotIn HWFEnv HMapsTo HOrthoud HOrthot1t2 HWFu HWFd HWFt1
          HWFt2.
-  induction HOrthot1t2. Print SFun.
+  induction HOrthot1t2.
   - simpl; inversion HWFt1; auto.
   - simpl; inversion HWFt2; auto.
   - simpl; inversion HWFt1; inversion HWFt2; subst; auto.
@@ -1912,30 +1823,31 @@ Proof.
     now apply wf_gives_types_source in HWFu.
   - assert (Ha : sumbool (x = z) (not (x = z))) by apply VarTyp.eq_dec.
     destruct Ha as [Ha | Ha].
-    + assert (Ha1 : A = d) by (subst; eapply MapsTo_In_eq; eauto).
-      assert (Ha2 : not (In z (fv_ptyp ty))) by
-          (subst; apply not_in_usub with (d := d); auto; eapply not_in_wfenv;
-           eauto).
-      assert (Ha3 : Ortho Gamma u ty) by
-          (subst; apply Ortho_usub_trans' with (d := d); eauto).
-      simpl; subst; rewrite EqFacts.eqb_refl.
+    + assert (Ha1 : A = d) by (subst; eapply MapsTo_In_eq with (Gamma := Gamma); eauto).
+      subst; simpl; rewrite EqFacts.eqb_refl.
+      apply Ortho_usub_trans_old with (d := subst_typ_source z u d).
+      assert (Ha2 : not (In z (fv_ptyp d))) by
+          (apply not_in_wfenv with (Gamma := Gamma); auto).
       rewrite subst_typ_source_fresh; auto.
       apply ortho_subst_not_in; auto.
       not_in_L z.
+      apply usub_subst with (Gamma := Gamma); auto.
     + simpl; apply EqFacts.eqb_neq in Ha; rewrite Ha.
       apply OVar with (A := subst_typ_source z u A); auto.
       apply in_persists_subst_env; auto.
       apply usub_subst with (Gamma := Gamma); auto.
   - assert (Ha : sumbool (x = z) (not (x = z))) by apply VarTyp.eq_dec.
     destruct Ha as [Ha | Ha].
-    + assert (Ha1 : A = d) by (subst; eapply MapsTo_In_eq; eauto).
-      subst; simpl.
-      rewrite EqFacts.eqb_refl.
-      assert (Ha3 : Ortho Gamma u ty) by
-          (subst; apply Ortho_usub_trans' with (d := d); eauto).
-      assert (Ha4 : Ortho Gamma (PFVarT z) ty) by
-          (apply OVar with (A := d); auto).
-      admit.
+    + assert (Ha1 : A = d) by (subst; eapply MapsTo_In_eq with (Gamma := Gamma); eauto).
+      subst; simpl; rewrite EqFacts.eqb_refl.
+      apply Ortho_sym.
+      apply Ortho_usub_trans_old with (d := subst_typ_source z u d).
+      assert (Ha2 : not (In z (fv_ptyp d))) by
+          (apply not_in_wfenv with (Gamma := Gamma); auto).
+      rewrite subst_typ_source_fresh; auto.
+      apply ortho_subst_not_in; auto.
+      not_in_L z.
+      apply usub_subst with (Gamma := Gamma); auto.
     + simpl; apply EqFacts.eqb_neq in Ha; rewrite Ha.
       apply OVarSym with (A := subst_typ_source z u A); auto.
       apply in_persists_subst_env; auto.
@@ -1944,7 +1856,7 @@ Proof.
     assert (Ha : OrthoAx t1 t2) by assumption.
     destruct t1; destruct t2; auto; simpl; try (now orthoax_inv_r H0);
     try now orthoax_inv_l H0.
-Admitted.
+Qed.
 
 Lemma subst_source_wf_typ_not_in :
   forall Gamma z t u, WFEnv (subst_env Gamma z u) ->
@@ -2072,7 +1984,7 @@ Proof.
                 subst_env (nil ++ (extend y (TyDis d) Gamma)) y u).
   rewrite subst_env_fresh. reflexivity.
   admit. (* TODO add this as condition to Fr, when generating fresh y *)
-  rewrite Ha1. Check subst_source_wf_typ.
+  rewrite Ha1.
   apply subst_source_wf_typ with (d := d); eauto.
   not_in_L y.
   unfold MapsTo; simpl; now rewrite EqFacts.eqb_refl.
@@ -2087,31 +1999,6 @@ Proof.
   not_in_L y.
   not_in_L y.
 Admitted.
-
-(*
-Lemma subst_source_wf_typ' :
-  forall t z u Gamma d, not (In z (fv_ptyp u)) ->
-               Forall
-                 (fun x0 : var * TyEnvSource =>
-                    TyEnvMatch (fun ty : PTyp => ~ In z (fv_ptyp ty)) (snd x0))
-                 Gamma ->
-               MapsTo Gamma z d ->
-               Ortho Gamma u d ->
-               WFTyp Gamma d ->
-               WFTyp Gamma u ->
-               WFTyp Gamma t ->
-               WFTyp (subst_env Gamma z u) (subst_typ_source z u t).
-Proof.
-  intros t z u Gamma d HNotIn HForall HMapsTo HOrtho HWFd HWFu HWFt.
-  induction HWFt.
-  - admit.
-  - admit.
-  - admit.
-  - admit.
-  - intros; subst; simpl.
-    apply_fresh WFForAll as x.
-    apply H0.
-*)
 
 (*** PROOF END ***)
 

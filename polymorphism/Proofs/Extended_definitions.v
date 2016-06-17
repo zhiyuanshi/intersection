@@ -95,11 +95,11 @@ Inductive usub : PTyp -> PTyp -> Prop :=
   | USAnd1 : forall t t1 t2, usub t t1 -> usub t t2 -> usub t (And  t1 t2) 
   | USAnd2 : forall t t1 t2 , usub t1 t -> usub (And t1 t2) t 
   | USAnd3 : forall t t1 t2, usub t2 t -> usub (And t1 t2) t
-  | UVar   : forall v, usub (PFVarT v) (PFVarT v) 
-  | UForAll : forall L d t1 t2,
-                (forall x, not (In x L) -> usub (open_typ_source t1 (PFVarT x))
-                                         (open_typ_source t2 (PFVarT x))) ->
-                usub (ForAll d t1) (ForAll d t2).
+  | USVar   : forall v, usub (PFVarT v) (PFVarT v) 
+  | USForAll : forall L d t1 t2,
+                 (forall x, not (In x L) -> usub (open_typ_source t1 (PFVarT x))
+                                           (open_typ_source t2 (PFVarT x))) ->
+                 usub (ForAll d t1) (ForAll d t2).
 
 Inductive sub : PTyp -> PTyp -> (SExp var) -> Prop :=
   | SInt : sub PInt PInt (STLam _ (STBVar _ 0))
@@ -108,10 +108,10 @@ Inductive sub : PTyp -> PTyp -> (SExp var) -> Prop :=
   | SAnd1 : forall t t1 t2 c1 c2, sub t t1 c1 -> sub t t2 c2 -> 
      sub t (And  t1 t2) (STLam _
        (STPair _ (STApp _ c1 (STBVar _ 0)) (STApp _ c2 (STBVar _ 0))))
-  | SAnd2 : forall t t1 t2 c, sub t1 t c -> Atomic t -> (* PType t2 -> *)
+  | SAnd2 : forall t t1 t2 c, sub t1 t c -> Atomic t ->
      sub (And  t1 t2) t (STLam _ 
        ((STApp _ c (STProj1 _ (STBVar _ 0)))))
-  | SAnd3 : forall t t1 t2 c, sub t2 t c -> Atomic t -> (* PType t1 -> *)
+  | SAnd3 : forall t t1 t2 c, sub t2 t c -> Atomic t ->
      sub (And  t1 t2) t (STLam _ 
        ((STApp _ c (STProj2 _ (STBVar _ 0)))))
   | SVar : forall v, sub (PFVarT v) (PFVarT v) (STLam _ (STBVar _ 0))
@@ -281,7 +281,6 @@ Definition hd (p : PTyp) : nat :=
   | PFVarT v   => 5 
   | And t1 t2  => 6
   end.
-
 
 Definition OrthoAx (t1 t2 : PTyp) : Prop :=
   (hd t1 < 4 /\ hd t2 < 4 /\ not (hd t1 = hd t2)).
@@ -618,7 +617,7 @@ Admitted.
 Lemma complete_sub : forall t1 t2, Sub t1 t2 -> usub t1 t2.
 Proof.
   intros; destruct H; induction H; auto.
-  - apply_fresh UForAll as x.
+  - apply_fresh USForAll as x.
     apply H0.
     not_in_L x.
 Qed.  

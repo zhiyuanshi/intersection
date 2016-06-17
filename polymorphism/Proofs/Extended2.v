@@ -58,10 +58,13 @@ Proof.
   - auto.
   - auto.
   - apply OVarSym with (A := A); auto.
-    inversion H1; inversion H2; subst.
-    eexists; apply H6.
-    inversion H4.
-    inversion H4.
+    apply sound_sub in H1.
+    destruct H1.
+    inversion H1; subst.
+    apply complete_sub.
+    eexists; apply H5.
+    inversion H3.
+    inversion H3.
   - orthoax_inv_l.
 Qed.
 
@@ -72,10 +75,13 @@ Proof.
   - auto.
   - auto.
   - apply OVarSym with (A := A); auto.
-    inversion H1; inversion H2; subst.
-    eexists; apply H8.
-    inversion H4.
-    inversion H4.
+    apply sound_sub in H1.
+    destruct H1.
+    inversion H1; subst.
+    apply complete_sub.
+    eexists; apply H7.
+    inversion H3.
+    inversion H3.
   - orthoax_inv_l.
 Qed.
 
@@ -143,7 +149,9 @@ Proof.
     apply ortho_and_r with (t1 := t1); auto.
   - inversion HOrtho; subst.
     apply wfenv_no_var_sub with (Gamma := Gamma) (A := A) (x := v); auto.
+    now apply sound_sub.
     apply wfenv_no_var_sub with (Gamma := Gamma) (A := A) (x := v); auto.
+    now apply sound_sub.
     destruct H0 as [a [b c]]; now apply c.    
   - inversion WFA; inversion WFB; subst.
     inversion HSub.
@@ -248,16 +256,16 @@ Proof.
       eexists; apply H7; not_in_L x.
       eexists; apply H8; not_in_L x.
   - induction C; try (now (inversion HSubA as [z HInv]; inversion HInv)).
-    + inversion HSubA; inversion H2; subst.
-      inversion HSubB; inversion H3; subst.
+    + destruct HSubA as [c HsubA]; inversion HsubA; subst.
+      destruct HSubB as [c HsubB]; inversion HsubB; subst.
       apply IHC1.
-      apply sand2; eexists; apply H6.
+      apply sand2; eexists; apply H5.
+      eexists; apply H5.
       eexists; apply H6.
-      eexists; apply H9.
-      inversion H5.
-      inversion H5.
+      inversion H3.
+      inversion H3.
     + clear HSubAnd.
-      inversion HSubA; inversion H2; subst.
+      destruct HSubA as [c HsubA]; inversion HsubA; subst.
       assert (Ha : Ortho Gamma ty (PFVarT v)).
       apply OVarSym with (A := A); auto.
       apply ortho_no_sub in Ha.
@@ -266,16 +274,16 @@ Proof.
       auto.
   (* same as above (var_sym) *)
   - induction C; try (now (inversion HSubB as [z HInv]; inversion HInv)).
-    + inversion HSubA; inversion H2; subst.
-      inversion HSubB; inversion H3; subst.
+    + destruct HSubA as [c HsubA]; inversion HsubA; subst.
+      destruct HSubB as [c HsubB]; inversion HsubB; subst.
       apply IHC1.
-      apply sand2; eexists; apply H6.
+      apply sand2; eexists; apply H5.
+      eexists; apply H5.
       eexists; apply H6.
-      eexists; apply H9.
-      inversion H4.
-      inversion H4.
+      inversion H3.
+      inversion H3.
     + clear HSubAnd.
-      inversion HSubB; inversion H2; subst.
+      destruct HSubB as [c HsubB]; inversion HsubB; subst.
       assert (Ha : Ortho Gamma ty (PFVarT v)).
       apply OVarSym with (A := A); auto.
       apply ortho_no_sub in Ha.
@@ -392,11 +400,11 @@ Import ExtendedSub.
 Lemma typing_wf_source_alg:
   forall Gamma t T E dir, has_type_source_alg Gamma t dir T E -> WFTyp Gamma T.
 Proof.
-  intros Gamma t dir T E H. Print has_type_source_alg.
+  intros Gamma t dir T E H.
   induction H; auto.
   - inversion IHhas_type_source_alg1; assumption.
   - inversion IHhas_type_source_alg; subst.
-    apply open_body_wf_type' with (d := d); auto.
+    apply open_body_wf_type with (d := d); auto.
     unfold body_wf_typ; eauto.
   - pick_fresh x.
     assert (Ha : not (M.In x L)) by (not_in_L x).
