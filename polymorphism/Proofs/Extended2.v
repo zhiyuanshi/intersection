@@ -57,14 +57,15 @@ Proof.
   dependent induction H.
   - auto.
   - auto.
-  - apply OVarSym with (A := A); auto.
+  - inversion H2; subst.
+    apply OVarSym with (A := A); auto.
     apply sound_sub in H1.
     destruct H1.
     inversion H1; subst.
     apply complete_sub.
-    eexists; apply H5.
-    inversion H3.
-    inversion H3.
+    eexists; apply H8.
+    inversion H4.
+    inversion H4.
   - orthoax_inv_l.
 Qed.
 
@@ -74,14 +75,15 @@ Proof.
   dependent induction H.
   - auto.
   - auto.
-  - apply OVarSym with (A := A); auto.
+  - inversion H2; subst.
+    apply OVarSym with (A := A); auto.
     apply sound_sub in H1.
     destruct H1.
     inversion H1; subst.
     apply complete_sub.
-    eexists; apply H7.
-    inversion H3.
-    inversion H3.
+    eexists; apply H10.
+    inversion H4.
+    inversion H4.
   - orthoax_inv_l.
 Qed.
 
@@ -169,6 +171,22 @@ Proof.
     apply H6.
     not_in_L x.
     destruct H3 as [a [b HH]]; now apply HH.
+    inversion H5.
+    inversion H9. 
+    inversion HSub; inversion H1; subst.
+    inversion HOrtho; subst.
+    pick_fresh x.
+    eapply H0 with (x := x).
+    not_in_L x.
+    eexists; apply H9.
+    not_in_L x.
+    apply H3.
+    not_in_L x.
+    apply H7.
+    not_in_L x.
+    apply H6.
+    not_in_L x.
+    destruct H4 as [a [b HH]]; now apply HH.
 Qed.
 
 (* Unique subtype contributor: Lemma 2 *)
@@ -255,15 +273,27 @@ Proof.
       eexists; apply H7; not_in_L x.
       eexists; apply H7; not_in_L x.
       eexists; apply H8; not_in_L x.
+      inversion H9.
+      inversion H13.
+      pick_fresh x.
+      clear IHC1; clear IHC2; clear HSubAnd.
+      eapply H0 with (x := x).
+      not_in_L x; apply H7.
+      apply H5; not_in_L x.
+      apply H11; not_in_L x.
+      apply sand2.
+      eexists; apply H7; not_in_L x.
+      eexists; apply H7; not_in_L x.
+      eexists; apply H8; not_in_L x.
   - induction C; try (now (inversion HSubA as [z HInv]; inversion HInv)).
     + destruct HSubA as [c HsubA]; inversion HsubA; subst.
       destruct HSubB as [c HsubB]; inversion HsubB; subst.
       apply IHC1.
-      apply sand2; eexists; apply H5.
-      eexists; apply H5.
+      apply sand2; eexists; apply H6.
       eexists; apply H6.
-      inversion H3.
-      inversion H3.
+      eexists; apply H7.
+      inversion H4.
+      inversion H4.
     + clear HSubAnd.
       destruct HSubA as [c HsubA]; inversion HsubA; subst.
       assert (Ha : Ortho Gamma ty (PFVarT v)).
@@ -277,11 +307,11 @@ Proof.
     + destruct HSubA as [c HsubA]; inversion HsubA; subst.
       destruct HSubB as [c HsubB]; inversion HsubB; subst.
       apply IHC1.
-      apply sand2; eexists; apply H5.
-      eexists; apply H5.
+      apply sand2; eexists; apply H6.
       eexists; apply H6.
-      inversion H3.
-      inversion H3.
+      eexists; apply H7.
+      inversion H4.
+      inversion H4.
     + clear HSubAnd.
       destruct HSubB as [c HsubB]; inversion HsubB; subst.
       assert (Ha : Ortho Gamma ty (PFVarT v)).
@@ -380,6 +410,30 @@ Proof.
     not_in_L x.
     apply Ha.
     now subst.
+    inversion H8.
+    inversion H1; subst;
+    inversion H2; subst;
+    inversion H3; subst.
+    inversion H11.
+    inversion H9.
+    inversion H10.
+    pick_fresh x.
+    assert (Ha : (open_typ_term c (STFVarT x)) = (open_typ_term c0 (STFVarT x))).
+    assert (ty := Bot).
+    eapply H0 with (Gamma := extend x (TyDis Bot) Gamma).
+    not_in_L x.
+    apply H7.
+    not_in_L x.
+    apply H8.
+    not_in_L x.
+    apply H11.
+    not_in_L x.
+    assert (c = c0).
+    eapply open_typ_term_app_eq with (x := x) (n := 0).
+    not_in_L x.
+    not_in_L x.
+    apply Ha.
+    now subst.
 Qed.
 
 End ExtendedSub.
@@ -406,6 +460,10 @@ Proof.
   - inversion IHhas_type_source_alg; subst.
     apply open_body_wf_type with (d := d); auto.
     unfold body_wf_typ; eauto.
+    inversion IHhas_type_source_alg; subst.
+    inversion H7.
+    apply open_body_wf_type_bot; auto.
+    unfold body_wf_typ; eauto.
   - pick_fresh x.
     assert (Ha : not (M.In x L)) by (not_in_L x).
     apply WFFun.
@@ -419,6 +477,9 @@ Proof.
     apply H1.
     not_in_L x.
     auto.
+  - apply_fresh WFForAllBot as x.
+    apply H0.
+    not_in_L x.
 Qed.
 
 Lemma type_correct_alg_terms : forall Gamma E ty e dir, has_type_source_alg Gamma E dir ty e -> PTerm E.
@@ -432,6 +493,8 @@ Proof.
     apply H0; not_in_L x.
   - apply_fresh PTerm_TLam as x.
     apply H1; not_in_L x.
+  - apply_fresh PTerm_TLam as x.
+    apply H0; not_in_L x.
 Qed.
 
 
@@ -447,6 +510,10 @@ Proof.
   - pick_fresh x.
     assert (Ha : not (In x L)) by not_in_L x.
     apply H1 in Ha.
+    now inversion Ha.
+  - pick_fresh x.
+    assert (Ha : not (In x L)) by not_in_L x.
+    apply H0 in Ha.
     now inversion Ha.
 Qed.
   
@@ -563,8 +630,8 @@ induction H; intros.
   (* this works, just needs a fix of a module issue *)
   admit. (* apply (sub_coherent H3 H6 H0 H4). *)
   subst; reflexivity.
-  subst.
-  inversion H.
+  subst; inversion H.
+  subst; inversion H.
 (* Case TLam *)
 - inversion H2; subst.
   inversion H3.
@@ -577,6 +644,7 @@ induction H; intros.
   not_in_L x.
   apply H8.
   not_in_L x.
+  inversion H.
 Admitted.
 
 Lemma coercions_produce_terms :
@@ -879,6 +947,108 @@ Proof.
     not_in_L x.
     right; left; auto.
     subst; now apply WFTyp_to_WFType in H2.
+    subst; inversion H8.
+    subst.
+
+
+    inversion H2; inversion H3; subst.
+    inversion H14.
+    inversion H9.
+    inversion H12.
+    apply_fresh STTyLam as x.
+    unfold open; simpl.
+    apply_fresh STTyTLam as y.
+    unfold open_typ_term; simpl.
+    apply STTyApp with (A := (open_typ (| t1 |) (STFVarT y))).
+    rewrite open_comm_open_typ_term.
+    rewrite <- open_rec_term.
+    unfold open_typ; simpl.
+    unfold open_typ_source in H0; simpl in H0.
+    subst.
+    change (extend y (TyVar STyp)
+                   (extend x (TermVar STyp (STForAll (| t1 |))) (∥ Gamma ∥))) with
+    (∥ (extend y (TyDis Bot)
+               (extend x (TermV (ForAll Bot t1)) Gamma)) ∥).
+    change (STFVarT y) with (| PFVarT y |).
+    rewrite <- open_rec_typ_eq_source.
+    rewrite <- open_rec_typ_eq_source.
+    apply H0.
+    not_in_L y.
+    apply WFPushV.
+    apply WFPushT.
+    auto.
+    not_in_L x.
+    not_in_L y.
+    inversion H4.
+    simpl.
+    unfold not; intro HH.
+    apply MSetProperties.Dec.F.add_iff in HH.
+    destruct HH; subst.
+    not_in_L y.
+    exfalso; apply H13; now apply MSetProperties.Dec.F.singleton_2.
+    not_in_L y.
+    unfold extend.
+    apply wf_weaken_source.
+    apply H6.
+    not_in_L y.
+    apply WFPushV.
+    apply WFPushT.
+    auto.
+    not_in_L x.
+    not_in_L y.
+    inversion H4.
+    simpl.
+    unfold not; intro HH.
+    apply MSetProperties.Dec.F.add_iff in HH.
+    destruct HH; subst.
+    not_in_L y.
+    exfalso; apply H13; now apply MSetProperties.Dec.F.singleton_2.
+    not_in_L y.
+    apply wf_weaken_source.
+    apply H10.
+    not_in_L y.
+    apply WFPushV.
+    apply WFPushT.
+    auto.
+    not_in_L x.
+    unfold not; intros HH; inversion HH.
+    not_in_L y.
+    not_in_L y.
+    not_in_L x.
+    assert (Ha : not (In y L)) by not_in_L y.
+    apply H in Ha.
+    now apply coercions_produce_terms in Ha.
+    apply STTyTApp.
+    apply WFType_Var.
+    apply Ok_push.
+    apply Ok_push.
+    subst; auto.
+    not_in_L x.
+    (* TODO add this to not_in_L *)
+    unfold conv_context in H8; rewrite <- dom_map_id in H8; contradiction.
+    unfold extend; not_in_L y.
+    not_in_L x.
+    unfold conv_context in H4; rewrite <- dom_map_id in H4; contradiction.
+    left; auto.
+    apply STTyVar.
+    apply WFTyp_to_WFType in H2.
+    repeat apply wf_weaken_extend.
+    subst; apply H2.
+    not_in_L x.
+    unfold conv_context in H8; rewrite <- dom_map_id in H8; contradiction.
+    unfold extend; not_in_L y.
+    not_in_L x.
+    unfold conv_context in H4; rewrite <- dom_map_id in H4; contradiction.
+    apply Ok_push.
+    apply Ok_push.
+    subst; auto.
+    not_in_L x.
+    unfold conv_context in H8; rewrite <- dom_map_id in H8; contradiction.
+    unfold extend; not_in_L y.
+    not_in_L x.
+    unfold conv_context in H4; rewrite <- dom_map_id in H4; contradiction.
+    right; left; auto.
+    subst; now apply WFTyp_to_WFType in H2.
 Qed.
   
 (* Type preservation: Theorem 1 *)
@@ -933,6 +1103,14 @@ Proof.
     change (STFVarT x) with (| PFVarT x |).
     rewrite <- open_rec_typ_eq_source.
     apply H1.
+    not_in_L x.
+  (* ATyTLamBot *)
+  - simpl; apply_fresh STTyTLam as x.
+    simpl in *.
+    unfold open_typ.
+    change (STFVarT x) with (| PFVarT x |).
+    rewrite <- open_rec_typ_eq_source.
+    apply H0.
     not_in_L x.
 Qed.
 

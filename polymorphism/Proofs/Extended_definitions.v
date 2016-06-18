@@ -39,7 +39,7 @@ Fixpoint ptyp2styp (t : PTyp) : STyp :=
     | PBVarT n => STBVarT n
     | PFVarT v => STFVarT v
     | ForAll _ t => STForAll (ptyp2styp t)
-    | Bot => STUnitT (* TODO: maybe include bot type in sysf? *)
+    | Bot => STForAll (STBVarT 0)
   end.
 
 Fixpoint open_rec_typ_source (k : nat) (u : PTyp) (t : PTyp) {struct t} : PTyp :=
@@ -76,7 +76,9 @@ Inductive PType : PTyp -> Prop :=
                      PType d ->
                      (forall x, not (In x L) -> PType (open_typ_source t (PFVarT x))) ->
                      PType (ForAll d t)
-  | PType_Bot : PType Bot.
+  | PType_ForAllBot : forall L t,
+                     (forall x, not (In x L) -> PType (open_typ_source t (PFVarT x))) ->
+                     PType (ForAll Bot t).
 
 Hint Constructors PType.
 
@@ -295,8 +297,10 @@ Inductive Ortho : context TyEnvSource -> PTyp -> PTyp -> Prop :=
                                            (open_typ_source t2 (PFVarT x))) ->
                 Ortho Gamma (ForAll d t1) (ForAll d t2)
   | OVar : forall Gamma x ty A, WFEnv Gamma -> List.In (x,TyDis A) Gamma -> usub A ty ->
+                       PType ty ->
                        Ortho Gamma (PFVarT x) ty
   | OVarSym : forall Gamma x ty A, WFEnv Gamma -> List.In (x,TyDis A) Gamma -> usub A ty ->
+                          PType ty ->
                           Ortho Gamma ty (PFVarT x)
   | OAx : forall Gamma t1 t2, WFEnv Gamma -> OrthoAx t1 t2 -> Ortho Gamma t1 t2.
 
@@ -316,7 +320,11 @@ Inductive WFTyp : context TyEnvSource -> PTyp -> Prop :=
   | WFForAll : forall L Gamma d t,
                  (forall x, not (In x L) -> WFTyp (extend x (TyDis d) Gamma) (open_typ_source t (PFVarT x))) ->
                  WFTyp Gamma d ->
-                 WFTyp Gamma (ForAll d t).
+                 WFTyp Gamma (ForAll d t)
+  | WFForAllBot : forall L Gamma t,
+                    (forall x, not (In x L) -> WFTyp (extend x (TyDis Bot) Gamma)
+                                               (open_typ_source t (PFVarT x))) ->
+                    WFTyp Gamma (ForAll Bot t).
 
 Hint Constructors WFTyp.
 
@@ -515,7 +523,15 @@ Inductive has_type_source_alg : context TyEnvSource -> PExp -> Dir -> PTyp -> (S
                                          Chk
                                          (open_typ_source A (PFVarT x))
                                          (open_typ_term E (STFVarT x))) ->
-               has_type_source_alg Gamma (PTLam d t) Chk (ForAll d A) (STTLam _ E).
+               has_type_source_alg Gamma (PTLam d t) Chk (ForAll d A) (STTLam _ E)
+  | ATyTLamBot : forall L Gamma t A E,
+                   (forall x, not (In x L) -> 
+                         has_type_source_alg (extend x (TyDis Bot) Gamma)
+                                             (open_typ_term_source t (PFVarT x))
+                                             Chk
+                                             (open_typ_source A (PFVarT x))
+                                             (open_typ_term E (STFVarT x))) ->
+                   has_type_source_alg Gamma (PTLam Bot t) Chk (ForAll Bot A) (STTLam _ E).
 
 Hint Constructors has_type_source_alg.
 
