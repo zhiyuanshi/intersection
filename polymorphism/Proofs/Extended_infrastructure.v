@@ -1322,7 +1322,26 @@ Proof.
       apply H0 in Ha; now inversion Ha.
 Qed.
 
-(*** PROOF START ***)
+(* Properties of free variables and substitution *)
+
+Lemma fv_subst_source :
+  forall t z x u, In x (fv_ptyp (subst_typ_source z u t)) ->
+             In x (union (fv_ptyp u) (fv_ptyp t)).
+Proof.
+  intro t; induction t; intros; simpl in *; try now inversion H.
+  - repeat rewrite union_spec; rewrite union_spec in H; destruct H;
+    [ apply IHt1 in H | apply IHt2 in H ]; rewrite union_spec in H; destruct H;
+    auto.
+  - repeat rewrite union_spec; rewrite union_spec in H; destruct H;
+    [ apply IHt1 in H | apply IHt2 in H ]; rewrite union_spec in H; destruct H;
+    auto.
+  - rewrite union_spec; destruct (eqb v z); auto.
+  - repeat rewrite union_spec; rewrite union_spec in H; destruct H;
+    [ apply IHt1 in H | apply IHt2 in H ]; rewrite union_spec in H; destruct H;
+    auto.
+Qed.  
+
+(* Properties concerning environments *)
 
 Lemma dom_subst_id : forall Gamma z u, dom (subst_env Gamma z u) = dom Gamma.
 Proof.
@@ -1332,6 +1351,24 @@ Proof.
 Qed.
 
 Hint Rewrite dom_subst_id.
+
+Lemma codom_union : forall (E G : context TyEnvSource) (x : elt),
+                      In x (codom (E ++ G)) <-> In x (union (codom E) (codom G)).
+Proof.
+  intros E G x; split.
+  - intro HIn; induction E; simpl in *; auto.
+    rewrite union_spec in HIn; destruct HIn.
+    repeat rewrite union_spec; auto.
+    repeat rewrite union_spec in *.
+    rewrite or_assoc.
+    right; now apply IHE.
+  - intro HIn; induction E; simpl in *; auto.
+    repeat rewrite union_spec in *.
+    rewrite or_assoc in HIn.
+    destruct HIn; auto.
+Qed.
+
+Hint Rewrite codom_union.
 
 Lemma in_persists_subst_env :
   forall x A Gamma z u, 
@@ -1350,25 +1387,6 @@ Proof.
     inversion H.
     simpl; right; now apply IHGamma.
 Qed.
-    
-Lemma fv_subst_source :
-  forall t z x u, In x (fv_ptyp (subst_typ_source z u t)) ->
-             In x (union (fv_ptyp u) (fv_ptyp t)).
-Proof.
-  intro t; induction t; intros; simpl in *; try now inversion H.
-  - repeat rewrite union_spec; rewrite union_spec in H; destruct H;
-    [ apply IHt1 in H | apply IHt2 in H ]; rewrite union_spec in H; destruct H;
-    auto.
-  - repeat rewrite union_spec; rewrite union_spec in H; destruct H;
-    [ apply IHt1 in H | apply IHt2 in H ]; rewrite union_spec in H; destruct H;
-    auto.
-  - rewrite union_spec; destruct (eqb v z); auto.
-  - repeat rewrite union_spec; rewrite union_spec in H; destruct H;
-    [ apply IHt1 in H | apply IHt2 in H ]; rewrite union_spec in H; destruct H;
-    auto.
-Qed.  
-
-(** Properties about co-dom **)
 
 Lemma subst_env_codom_fresh :
   forall Gamma z u,
@@ -1387,66 +1405,6 @@ Proof.
     apply IHGamma.
     not_in_L z.
 Qed.
-
-(*
-Lemma subst_wfenv_codom_fresh :
-  forall Gamma z u, WFEnv Gamma ->
-           not (In z (fv_ptyp u)) ->
-           not (In z (codom Gamma)) ->
-           WFEnv (subst_env Gamma z u).
-Proof.
-  intros Gamma z u HEnv HNotInU HNotInCodom.
-  induction HEnv; simpl in *; auto.
-  - inversion HNotInCodom; subst.
-    simpl in *.
-    apply WFPushV; auto.
-    rewrite subst_typ_source_fresh; auto.
-    rewrite dom_subst_id; auto.
-  - inversion HForAll; subst.
-    simpl in *.
-    apply WFPushT; auto.
-    rewrite dom_subst_id; auto.
-*)
-  
-Lemma subst_env_fresh :
-  forall Gamma z u,
-    Forall (fun x => TyEnvMatch (fun ty => not (In z (fv_ptyp ty)))
-                                      (snd x)) Gamma ->
-    subst_env Gamma z u = Gamma. 
-Proof.
-  intros Gamma z u HForall.
-  induction Gamma; auto.
-  - destruct a; destruct t0.
-    simpl; inversion HForall; subst.
-    simpl in H1.
-    rewrite subst_typ_source_fresh; auto.
-    apply f_equal.
-    now apply IHGamma.
-    simpl; inversion HForall; subst.
-    simpl in H1.
-    apply f_equal.
-    now apply IHGamma.
-Qed.
-  
-(** The following two lemmas are not used but were left here for reference **)
-Lemma wf_weaken_ortho :
-  forall y d Gamma t u,
-    WFTyp Gamma d -> WFTyp Gamma u ->
-    Ortho Gamma d u ->
-    WFTyp (extend y (TyDis u) Gamma) t ->
-    WFTyp (extend y (TyDis (And d u)) Gamma) t.
-Proof.
-Admitted.
-
-(* A generalization the previous lemma *)
-Lemma wf_weaken_sub :
-  forall y d Gamma t u,
-    WFTyp Gamma d -> WFTyp Gamma u ->
-    usub d u ->
-    WFTyp (extend y (TyDis u) Gamma) t ->
-    WFTyp (extend y (TyDis d) Gamma) t.
-Proof.
-Admitted.
 
 Lemma MapsTo_extend :
   forall Gamma x z d a,
@@ -1536,6 +1494,8 @@ Proof.
   destruct H0 as [H1 [H2 H3]].
   unfold OrthoAx; auto.
 Qed.
+
+(* Properties about sub *)
 
 Lemma usub_refl : forall t, PType t -> usub t t.
 Proof.
@@ -1717,6 +1677,8 @@ Proof.
     unfold open_typ_source in Ha; now rewrite open_rec_typ_eq_source in Ha.
 Qed.
 
+(* Properties concerning substitution and sub/ortho/wf *)
+
 Lemma usub_subst :
   forall A B z u,
     usub A B ->
@@ -1798,8 +1760,6 @@ Proof.
     now apply wf_gives_types_source in HWFu.
   - apply OAx; auto.
 Qed.
-
-(* STOP HERE *)
 
 Lemma ortho_subst :
   forall z u Gamma d t1 t2,
@@ -2059,22 +2019,6 @@ Proof.
 Qed.
 
 Hint Resolve wf_gives_wfenv wf_weaken_source wf_gives_types_source.
-
-Lemma codom_union : forall (E G : context TyEnvSource) (x : elt),
-                      In x (codom (E ++ G)) <-> In x (union (codom E) (codom G)).
-Proof.
-  intros E G x; split.
-  - intro HIn; induction E; simpl in *; auto.
-    rewrite union_spec in HIn; destruct HIn.
-    repeat rewrite union_spec; auto.
-    repeat rewrite union_spec in *.
-    rewrite or_assoc.
-    right; now apply IHE.
-  - intro HIn; induction E; simpl in *; auto.
-    repeat rewrite union_spec in *.
-    rewrite or_assoc in HIn.
-    destruct HIn; auto.
-Qed.
     
 Definition body_wf_typ t d Gamma :=
   exists L, forall x, not (In x L) -> WFTyp Gamma d \/ d = Bot ->
@@ -2151,8 +2095,6 @@ Proof.
   inversion H2.
   not_in_L y.
 Qed.
-
-(*** PROOF END ***)
 
 Lemma WFTyp_to_WFType : forall Gamma ty, WFTyp Gamma ty -> WFType (∥ Gamma ∥) (| ty |).
 Proof.
