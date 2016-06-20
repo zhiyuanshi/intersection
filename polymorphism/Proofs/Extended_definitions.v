@@ -56,6 +56,17 @@ Fixpoint open_rec_typ_source (k : nat) (u : PTyp) (t : PTyp) {struct t} : PTyp :
 
 Definition open_typ_source (t : PTyp) u := open_rec_typ_source 0 u t.
 
+Fixpoint subst_typ_source (z : var) (u : PTyp) (t : PTyp) {struct t} : PTyp :=
+  match t with
+  | PInt        => PInt
+  | Fun t1 t2   => Fun (subst_typ_source z u t1) (subst_typ_source z u t2)
+  | And t1 t2   => And (subst_typ_source z u t1) (subst_typ_source z u t2)
+  | PFVarT x    => if VarTyp.eqb x z then u else (PFVarT x)
+  | PBVarT i    => PBVarT i
+  | ForAll d t  => ForAll (subst_typ_source z u d) (subst_typ_source z u t)
+  | Bot         => Bot
+  end.
+
 Fixpoint fv_ptyp (pTyp : PTyp) : vars :=
   match pTyp with
     | PInt        => empty 
@@ -253,7 +264,9 @@ Definition sforall : forall L t1 t2 c,
   intros.
   
   pick_fresh.
-*)
+ *)
+
+(** Environment definitions **)
 
 Inductive TyEnvSource : Type :=
   | TyDis : PTyp -> TyEnvSource
@@ -270,6 +283,26 @@ Inductive WFEnv : context TyEnvSource -> Prop :=
                 WFEnv Gamma -> ~ In v (dom Gamma) -> WFEnv (extend v (TermV ty) Gamma).
 
 Hint Constructors WFEnv.
+
+Fixpoint subst_env (Gamma : context TyEnvSource) (z : var) (u : PTyp) :=
+  match Gamma with
+    | nil => nil
+    | (x,TyDis d) :: tl => (x, TyDis (subst_typ_source z u d)) ::
+                           (subst_env tl z u)
+    | (x, TermV ty) :: tl => (x, TermV ty) :: (subst_env tl z u)
+  end.
+
+Definition MapsTo (Gamma : context TyEnvSource) (z : var) (d : PTyp) :=
+  find (fun x => eqb (fst x) z) Gamma = Some (z, TyDis d).
+
+Definition TyEnvMatch {A} (f : PTyp -> A) (tyenv : TyEnvSource) : A :=
+  match tyenv with
+    | TyDis d => f d
+    | TermV ty => f ty
+  end.
+
+Definition codom (c : context TyEnvSource) : vars :=
+  fold_right (fun el r => union (TyEnvMatch fv_ptyp (snd el)) r) empty c.
 
 (* Disjointness: Implementation *)
 
@@ -367,12 +400,13 @@ Fixpoint fv_source (pExp : PExp) : vars :=
 Ltac gather_vars :=
   let A := gather_vars_with (fun x : vars => x) in
   let B := gather_vars_with (fun x : var => singleton x) in
-  let C := gather_vars_with (fun (x : context TyEnvSource) => dom x) in
-  let D := gather_vars_with (fun (x : context (TyEnv STyp)) => dom x) in
-  let E := gather_vars_with (fun x : PExp => fv_source x) in
-  let F := gather_vars_with (fun x : PTyp => fv_ptyp x) in
-  let G := gather_vars_with (fun x : STyp => fv_typ x) in
-  let H := gather_vars_with (fun (x : SExp var) => fv x) in
+  let C := gather_vars_with (fun x : PExp => fv_source x) in
+  let D := gather_vars_with (fun x : PTyp => fv_ptyp x) in
+  let E := gather_vars_with (fun x : STyp => fv_typ x) in
+  let F := gather_vars_with (fun (x : SExp var) => fv x) in
+  let G := gather_vars_with (fun (x : context (TyEnv STyp)) => dom x) in
+  let H := gather_vars_with (fun (x : context TyEnvSource) =>
+                              union (dom x) (codom x)) in
   constr:(union A (union B (union C (union D (union E (union F (union G H))))))).
 
 Ltac pick_fresh x :=
@@ -415,17 +449,6 @@ Fixpoint open_rec_typ_term_source (k : nat) (u : PTyp) (t : PExp) {struct t} : P
 
 Definition open_source t u := open_rec_source 0 u t.
 Definition open_typ_term_source t u := open_rec_typ_term_source 0 u t.
-
-Fixpoint subst_typ_source (z : var) (u : PTyp) (t : PTyp) {struct t} : PTyp :=
-  match t with
-  | PInt        => PInt
-  | Fun t1 t2   => Fun (subst_typ_source z u t1) (subst_typ_source z u t2)
-  | And t1 t2   => And (subst_typ_source z u t1) (subst_typ_source z u t2)
-  | PFVarT x    => if VarTyp.eqb x z then u else (PFVarT x)
-  | PBVarT i    => PBVarT i
-  | ForAll d t  => ForAll (subst_typ_source z u d) (subst_typ_source z u t)
-  | Bot         => Bot
-  end.
 
 (* Functions on contexts *)
 

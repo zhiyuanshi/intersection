@@ -7,12 +7,17 @@ Require Import Coq.Program.Equality.
 Require Import SystemF.
 Require Import Extended_definitions.
 
-Module ExtendedSub
+Module Extended
        (Import VarTyp : UsualDecidableTypeFull)
        (Import set : MSetInterface.S).
 
+(*
 Module Definitions := Definitions(VarTyp)(set).
 Import Definitions.
+*)
+Require Import Extended_infrastructure.
+Module Infrastructure := Infrastructure(VarTyp)(set).
+Export Infrastructure.
 
 (* Notes:
 
@@ -436,6 +441,7 @@ Proof.
     now subst.
 Qed.
 
+(*
 End ExtendedSub.
 
 Module Extended
@@ -448,6 +454,7 @@ Export Infrastructure.
 
 Module ExtendedSub := ExtendedSub(VarTyp)(set).
 Import ExtendedSub.
+ *)
 
 (* Typing lemmas *)
 
@@ -627,8 +634,7 @@ induction H; intros.
   assert (WFTyp Gamma A0). now apply typing_wf_source_alg in H.
   assert (WFTyp Gamma B). assumption.
   assert (C = C0).
-  (* this works, just needs a fix of a module issue *)
-  admit. (* apply (sub_coherent H3 H6 H0 H4). *)
+  apply (sub_coherent H3 H6 H0 H4).
   subst; reflexivity.
   subst; inversion H.
   subst; inversion H.
@@ -645,7 +651,19 @@ induction H; intros.
   apply H8.
   not_in_L x.
   inversion H.
-Admitted.
+- inversion H1; subst.
+  inversion H2.
+  inversion H6.
+  apply f_equal.
+  pick_fresh x.
+  apply open_typ_term_app_eq with (E := E) (F := E0) (x := x) (n := 0).
+  not_in_L x.
+  not_in_L x.
+  apply H0.
+  not_in_L x.
+  apply H5.
+  not_in_L x.
+Qed.
 
 Lemma coercions_produce_terms :
   forall E A B, sub A B E -> STTerm E.
@@ -892,7 +910,7 @@ Proof.
     apply MSetProperties.Dec.F.add_iff in HH.
     destruct HH; subst.
     not_in_L y.
-    exfalso; apply H22; now apply MSetProperties.Dec.F.singleton_2.
+    exfalso; apply H25; now apply MSetProperties.Dec.F.singleton_2.
     not_in_L y.
     unfold extend.
     apply wf_weaken_source.
@@ -908,7 +926,7 @@ Proof.
     apply MSetProperties.Dec.F.add_iff in HH.
     destruct HH; subst.
     not_in_L y.
-    exfalso; apply H22; now apply MSetProperties.Dec.F.singleton_2.
+    exfalso; apply H25; now apply MSetProperties.Dec.F.singleton_2.
     not_in_L y.
     apply wf_weaken_source.
     apply H12.
@@ -979,13 +997,13 @@ Proof.
     auto.
     not_in_L x.
     not_in_L y.
-    inversion H4.
+    inversion H8.
     simpl.
     unfold not; intro HH.
     apply MSetProperties.Dec.F.add_iff in HH.
     destruct HH; subst.
     not_in_L y.
-    exfalso; apply H13; now apply MSetProperties.Dec.F.singleton_2.
+    exfalso; apply H14; now apply MSetProperties.Dec.F.singleton_2.
     not_in_L y.
     unfold extend.
     apply wf_weaken_source.
@@ -996,13 +1014,13 @@ Proof.
     auto.
     not_in_L x.
     not_in_L y.
-    inversion H4.
+    inversion H8.
     simpl.
     unfold not; intro HH.
     apply MSetProperties.Dec.F.add_iff in HH.
     destruct HH; subst.
     not_in_L y.
-    exfalso; apply H13; now apply MSetProperties.Dec.F.singleton_2.
+    exfalso; apply H14; now apply MSetProperties.Dec.F.singleton_2.
     not_in_L y.
     apply wf_weaken_source.
     apply H10.
@@ -1025,28 +1043,28 @@ Proof.
     subst; auto.
     not_in_L x.
     (* TODO add this to not_in_L *)
-    unfold conv_context in H8; rewrite <- dom_map_id in H8; contradiction.
+    unfold conv_context in H4; rewrite <- dom_map_id in H4; contradiction.
     unfold extend; not_in_L y.
     not_in_L x.
-    unfold conv_context in H4; rewrite <- dom_map_id in H4; contradiction.
+    unfold conv_context in H8; rewrite <- dom_map_id in H8; contradiction.
     left; auto.
     apply STTyVar.
     apply WFTyp_to_WFType in H2.
     repeat apply wf_weaken_extend.
     subst; apply H2.
     not_in_L x.
-    unfold conv_context in H8; rewrite <- dom_map_id in H8; contradiction.
+    unfold conv_context in H4; rewrite <- dom_map_id in H4; contradiction.
     unfold extend; not_in_L y.
     not_in_L x.
-    unfold conv_context in H4; rewrite <- dom_map_id in H4; contradiction.
+    unfold conv_context in H8; rewrite <- dom_map_id in H8; contradiction.
     apply Ok_push.
     apply Ok_push.
     subst; auto.
     not_in_L x.
-    unfold conv_context in H8; rewrite <- dom_map_id in H8; contradiction.
+    unfold conv_context in H4; rewrite <- dom_map_id in H4; contradiction.
     unfold extend; not_in_L y.
     not_in_L x.
-    unfold conv_context in H4; rewrite <- dom_map_id in H4; contradiction.
+    unfold conv_context in H8; rewrite <- dom_map_id in H8; contradiction.
     right; left; auto.
     subst; now apply WFTyp_to_WFType in H2.
 Qed.

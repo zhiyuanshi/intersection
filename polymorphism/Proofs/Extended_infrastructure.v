@@ -652,10 +652,10 @@ Proof.
     auto.
     not_in_L x.
     not_in_L x. 
-    rewrite dom_union in H2.
+    rewrite dom_union in H4.
     exfalso.
-    apply MSetProperties.Dec.F.union_1 in H2.
-    inversion H2; contradiction.
+    apply MSetProperties.Dec.F.union_1 in H4.
+    inversion H4; contradiction.
     unfold extend; simpl; reflexivity.
   - apply OVar with (A := A); auto.
     apply in_app_or in H0.
@@ -704,7 +704,7 @@ Proof.
     apply MSetProperties.Dec.F.union_3.
     assumption.
     not_in_L x.
-    apply H11.
+    apply H14.
     not_in_L z.
     apply MSetProperties.Dec.F.singleton_2.
     apply MSetProperties.Dec.F.singleton_1 in HH.
@@ -716,7 +716,7 @@ Proof.
     apply MSetProperties.Dec.F.union_3.
     assumption.
     not_in_L x.
-    apply H11.
+    apply H14.
     not_in_L z.
     apply MSetProperties.Dec.F.singleton_2.
     apply MSetProperties.Dec.F.singleton_1 in HH.
@@ -990,11 +990,11 @@ Proof.
     apply WFPushV.
     apply H1.
     not_in_L x.
-    inversion H6.
+    inversion H4.
     not_in_L x.
-    rewrite dom_union in H6.
-    rewrite union_spec in H6.
-    inversion H6; contradiction.
+    rewrite dom_union in H4.
+    rewrite union_spec in H4.
+    inversion H4; contradiction.
 Qed.    
     
 Lemma wf_strengthen_source : forall z U E F ty,
@@ -1324,23 +1324,6 @@ Qed.
 
 (*** PROOF START ***)
 
-Fixpoint subst_env (Gamma : context TyEnvSource) (z : var) (u : PTyp) :=
-  match Gamma with
-    | nil => nil
-    | (x,TyDis d) :: tl => (x, TyDis (subst_typ_source z u d)) ::
-                           (subst_env tl z u)
-    | (x, TermV ty) :: tl => (x, TermV ty) :: (subst_env tl z u)
-  end.
-
-Definition MapsTo (Gamma : context TyEnvSource) (z : var) (d : PTyp) :=
-  find (fun x => eqb (fst x) z) Gamma = Some (z, TyDis d).
-
-Definition TyEnvMatch {A} (f : PTyp -> A) (tyenv : TyEnvSource) : A :=
-  match tyenv with
-    | TyDis d => f d
-    | TermV ty => f ty
-  end.
-
 Lemma dom_subst_id : forall Gamma z u, dom (subst_env Gamma z u) = dom Gamma.
 Proof.
   intros Gamma z u.
@@ -1385,6 +1368,46 @@ Proof.
     auto.
 Qed.  
 
+(** Properties about co-dom **)
+
+Lemma subst_env_codom_fresh :
+  forall Gamma z u,
+    not (In z (codom Gamma)) ->
+    subst_env Gamma z u = Gamma. 
+Proof.
+  intros Gamma z u HNotIn.
+  induction Gamma; auto.
+  - destruct a; destruct t0; simpl in *.
+    rewrite subst_typ_source_fresh.
+    apply f_equal.
+    apply IHGamma.
+    not_in_L z.
+    not_in_L z.
+    apply f_equal.
+    apply IHGamma.
+    not_in_L z.
+Qed.
+
+(*
+Lemma subst_wfenv_codom_fresh :
+  forall Gamma z u, WFEnv Gamma ->
+           not (In z (fv_ptyp u)) ->
+           not (In z (codom Gamma)) ->
+           WFEnv (subst_env Gamma z u).
+Proof.
+  intros Gamma z u HEnv HNotInU HNotInCodom.
+  induction HEnv; simpl in *; auto.
+  - inversion HNotInCodom; subst.
+    simpl in *.
+    apply WFPushV; auto.
+    rewrite subst_typ_source_fresh; auto.
+    rewrite dom_subst_id; auto.
+  - inversion HForAll; subst.
+    simpl in *.
+    apply WFPushT; auto.
+    rewrite dom_subst_id; auto.
+*)
+  
 Lemma subst_env_fresh :
   forall Gamma z u,
     Forall (fun x => TyEnvMatch (fun ty => not (In z (fv_ptyp ty)))
@@ -1404,27 +1427,7 @@ Proof.
     apply f_equal.
     now apply IHGamma.
 Qed.
-
-Lemma subst_wfenv_fresh :
-  forall Gamma z u, WFEnv Gamma ->
-           not (In z (fv_ptyp u)) ->
-           Forall (fun x => TyEnvMatch (fun ty => not (In z (fv_ptyp ty)))
-                                        (snd x)) Gamma ->
-           WFEnv (subst_env Gamma z u).
-Proof.
-  intros Gamma z u HEnv HNotIn HForAll.
-  induction HEnv; auto.
-  - inversion HForAll; subst.
-    simpl in *.
-    apply WFPushV; auto.
-    rewrite subst_typ_source_fresh; auto.
-    rewrite dom_subst_id; auto.
-  - inversion HForAll; subst.
-    simpl in *.
-    apply WFPushT; auto.
-    rewrite dom_subst_id; auto.
-Qed.    
-
+  
 (** The following two lemmas are not used but were left here for reference **)
 Lemma wf_weaken_ortho :
   forall y d Gamma t u,
@@ -1767,12 +1770,11 @@ Proof.
     apply wf_weaken_extend_source.
     auto.
     not_in_L x.
-
     unfold not; intros HH; rewrite union_spec in HH; destruct HH as [HH | HH];
     apply fv_open_rec_typ_source in HH; simpl in HH; rewrite union_spec in HH;
     destruct HH as [HH | HH]; try (now not_in_L z);
     not_in_L x;
-    apply H8; apply MSetProperties.Dec.F.singleton_iff;
+    apply H9; apply MSetProperties.Dec.F.singleton_iff;
     apply MSetProperties.Dec.F.singleton_iff in HH; auto.
     simpl; apply WFPushV; auto.
     rewrite subst_typ_source_fresh.
@@ -1867,7 +1869,7 @@ Proof.
     unfold not; intros HH; inversion HH.
     not_in_L x.
     apply wf_weaken_extend_source; auto.
-    not_in_L x. inversion H1.
+    not_in_L x. inversion H4.
     apply H3.
     not_in_L x.
     apply H7.
@@ -1952,7 +1954,7 @@ Proof.
     rewrite union_spec in HH; destruct HH as [HH | HH].
     not_in_L z.
     not_in_L x.
-    apply H7; apply MSetProperties.Dec.F.singleton_iff;
+    apply H8; apply MSetProperties.Dec.F.singleton_iff;
     apply MSetProperties.Dec.F.singleton_iff in HH; auto.
     rewrite subst_typ_source_fresh.
     apply IHHWFt; auto.
@@ -1967,12 +1969,12 @@ Proof.
     unfold not; intros HH; inversion HH.
     rewrite dom_subst_id; not_in_L x.
     apply wf_weaken_extend_source; auto.
-    not_in_L x. inversion H1.
+    not_in_L x. inversion H3.
     unfold not; intros HH; apply fv_open_rec_typ_source in HH; simpl in *.
     rewrite union_spec in HH; destruct HH as [HH | HH].
     not_in_L z.
     not_in_L x.
-    apply H6; apply MSetProperties.Dec.F.singleton_iff;
+    apply H7; apply MSetProperties.Dec.F.singleton_iff;
     apply MSetProperties.Dec.F.singleton_iff in HH; auto.
     unfold not; intros HH; inversion HH.
 Qed.
@@ -2058,7 +2060,22 @@ Qed.
 
 Hint Resolve wf_gives_wfenv wf_weaken_source wf_gives_types_source.
 
-
+Lemma codom_union : forall (E G : context TyEnvSource) (x : elt),
+                      In x (codom (E ++ G)) <-> In x (union (codom E) (codom G)).
+Proof.
+  intros E G x; split.
+  - intro HIn; induction E; simpl in *; auto.
+    rewrite union_spec in HIn; destruct HIn.
+    repeat rewrite union_spec; auto.
+    repeat rewrite union_spec in *.
+    rewrite or_assoc.
+    right; now apply IHE.
+  - intro HIn; induction E; simpl in *; auto.
+    repeat rewrite union_spec in *.
+    rewrite or_assoc in HIn.
+    destruct HIn; auto.
+Qed.
+    
 Definition body_wf_typ t d Gamma :=
   exists L, forall x, not (In x L) -> WFTyp Gamma d \/ d = Bot ->
             WFTyp (extend x (TyDis d) Gamma) (open_typ_source t (PFVarT x)).
@@ -2084,8 +2101,9 @@ Proof.
   change (nil ++ ((y, TyDis d) :: nil) ++ Gamma) with (nil ++ extend y (TyDis d) Gamma).
   assert (Ha1 : nil ++ (extend y (TyDis d) Gamma) =
                 subst_env (nil ++ (extend y (TyDis d) Gamma)) y u).
-  rewrite subst_env_fresh. reflexivity.
-  admit. (* TODO add this as condition to Fr, when generating fresh y *)
+  rewrite subst_env_codom_fresh. reflexivity.
+  not_in_L y.
+  simpl in H5; rewrite union_spec in H5; destruct H5; contradiction.
   rewrite Ha1.
   apply subst_source_wf_typ with (d := d); eauto.
   not_in_L y.
@@ -2098,7 +2116,7 @@ Proof.
   apply wf_weaken_extend_source; auto.
   not_in_L y.
   not_in_L y.
-Admitted.
+Qed.
 
 Lemma open_body_wf_type_bot :
   forall t u Gamma, body_wf_typ t Bot Gamma -> Ortho Gamma u Bot -> WFTyp Gamma u ->
@@ -2117,8 +2135,8 @@ Proof.
   change (nil ++ ((y, TyDis Bot) :: nil) ++ Gamma) with (nil ++ extend y (TyDis Bot) Gamma).
   assert (Ha1 : nil ++ (extend y (TyDis Bot) Gamma) =
                 subst_env (nil ++ (extend y (TyDis Bot) Gamma)) y u).
-  rewrite subst_env_fresh. reflexivity.
-  admit. (* TODO add this as condition to Fr, when generating fresh y *)
+  rewrite subst_env_codom_fresh. reflexivity.
+  not_in_L y.
   rewrite Ha1.
   apply subst_source_wf_typ with (d := Bot); eauto.
   not_in_L y.
@@ -2130,9 +2148,9 @@ Proof.
   now apply wf_gives_wfenv in Ha.
   apply wf_weaken_extend_source; auto.
   not_in_L y.
-  inversion H4.
+  inversion H2.
   not_in_L y.
-Admitted.
+Qed.
 
 (*** PROOF END ***)
 
