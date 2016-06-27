@@ -79,7 +79,9 @@
 >> term-level construct like “merge”, it is not possible to encode
 >> various language features". The authors should explain what these
 >> features are.
->> 
+
+TODO should we explain better (i) (ii) and (iii)?
+
 >> Overall, I believe this paper presents a nice theory that should be of
 >> interest for anyone studying or implementing intersection types. In
 >> addition, the paper is a pleasant read, so I suggest acceptance.
@@ -90,16 +92,26 @@
 >> 
 >> - Can you quantify how much typing annotations one needs for all type
 >>   ambiguity to disappear?
->> 
+
+TODO
+
 >> - Can you convince the reader that your approach would be somewhat
 >>   adaptable to the presence of union types?
->> 
+
+TODO
+
 >> - Section 3.2: Rules S&R1 and S&R2 are mentioned but do not exist.
->> 
+
+Fixed.
+
 >> - Section 6: Do pairs pose a particular problem in \lambda_i with T?
->> 
+
+TODO
+
 >> - Page 10, bottom column 1: as show -> as shown
->> 
+
+Fixed.
+
 >> ===========================================================================
 >>                           ICFP 2016 Review #106B
 >>                      Updated 17 May 2016 4:06:58pm EDT
@@ -198,13 +210,17 @@
 >> -- at the top of pg 4, right-hand column, the reader is suddenly told
 >> that there is only 1 value of type T.  I would have introduced this
 >> concept earlier when T is introduced.  It was a bit of a surprise.
->> 
+
+TODO I thought this was standard -- should we add a sentence in the beginning of 2.4?
+
 >> -- If space is an issue, I would choose to dispense with the formal
 >> description of the "simple calculus with T" (sec 6.3) -- I think
 >> just showing the final calculus in 6.4 is more worthwhile.  (It is
 >> still nice to discuss the "simple calculus with T" in the introductory
 >> parts of the paper.)
->> 
+
+TODO might become handy if space is an issue 
+
 >> -- In sec 6, the authors stopped providing summaries of the theorems
 >> they have proven about their system.  In particular, does the main
 >> coherence theorem still hold for the extensions in sections 6.3 and
@@ -212,7 +228,9 @@
 >> answer that question in the rebuttal.  (The answer is probably in the
 >> Coq development but readers and reviewers should not have to look
 >> there for it.)
->> 
+
+TODO we do say that we provide mechanized proofs
+
 >> ===========================================================================
 >>                           ICFP 2016 Review #106C
 >> ---------------------------------------------------------------------------
@@ -401,9 +419,13 @@ Fixed all.
 >> References:
 >> 
 >> 4, 14, 19, 22: capitalization problems
->> 
+
+Fixed.
+
 >> 9 should have volume/number/page
->> 
+
+Fixed.
+
 >> 11: institution should be Carnegie Mellon
 
 Fixed.
@@ -417,7 +439,9 @@ Fixed.
 Fixed, changed to et al.
 
 >> 24 and 30 are missing identifying information ("CMU-CS-TR-..."); also, check the year of 30
->> 
+
+Fixed.
+
 >> ===========================================================================
 >>                Response by Bruno Oliveira <bruno@cs.hku.hk>
 >> ---------------------------------------------------------------------------

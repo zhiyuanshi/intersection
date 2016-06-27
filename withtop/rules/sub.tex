@@ -80,6 +80,7 @@
           {\app E {(\proj 1 x)}}}}
 }
 
+\newcommand{\labelsubinterldis}{\makelabelsub {\inter L_1}}
 \newcommand{\rulesubinterldis}{
 \inferrule* [right=\labelsubinterl]
     {{A_1} \subtype {A_3} \yields E \\ \framebox{$\jatomic {A_3}$}}
@@ -99,6 +100,7 @@
           {\app E {(\proj 2 x)}}}}
 }
 
+\newcommand{\labelsubinterrdis}{\makelabelsub {\inter L_2}}
 \newcommand{\rulesubinterrdis}{
   \inferrule* [right=\labelsubinterr]
     {{A_2} \subtype {A_3} \yields E \\ \framebox{$\jatomic {A_3}$} }%\\ \highlight{$\neg \toplike{A_3}$} }
