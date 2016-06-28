@@ -106,7 +106,7 @@ Fixed.
 
 >> - Section 6: Do pairs pose a particular problem in \lambda_i with T?
 
-TODO
+Fixed. First paragraph of section 6.
 
 >> - Page 10, bottom column 1: as show -> as shown
 
@@ -211,7 +211,8 @@ Fixed.
 >> that there is only 1 value of type T.  I would have introduced this
 >> concept earlier when T is introduced.  It was a bit of a surprise.
 
-TODO I thought this was standard -- should we add a sentence in the beginning of 2.4?
+Fixed: added a sentence in the first paragraph of 2.4, with a reference to 
+Dunfield's system.
 
 >> -- If space is an issue, I would choose to dispense with the formal
 >> description of the "simple calculus with T" (sec 6.3) -- I think
@@ -229,7 +230,7 @@ TODO might become handy if space is an issue
 >> Coq development but readers and reviewers should not have to look
 >> there for it.)
 
-TODO we do say that we provide mechanized proofs
+Fixed. (first paragraph of section 6).
 
 >> ===========================================================================
 >>                           ICFP 2016 Review #106C
@@ -385,7 +386,7 @@ Fixed all.
 
 >> Def. 4: see remark on Def. 2 (for ≡ and →), especially since you elsewhere use ≡ for α-equivalence and → for functions.  (Also, the C in ∀C should not be a subscript.)
 
-TODO: should we just use the same terminology used in Def. 2?
+Fixed.
 
 >> p. 10:
 >> 

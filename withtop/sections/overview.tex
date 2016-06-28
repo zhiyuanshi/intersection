@@ -366,14 +366,16 @@ intersections can ever be well-formed in the presence of $\top$!
 Moreover, since $\top$ is not disjoint to any type, it does not make
 sense to allow its presence in a disjoint intersection type.  Adding a
 $\top$ type requires some adaptations to the notion of disjointness.
-This paper studies two additional variants of \name with $\top$ types.
+This paper studies two additional variants of \name with $\top$ types,
+where $\top$ is treated as an \emph{unit} type, in the same flavour of 
+Dunfield's system~\cite{dunfield2014elaborating}.
 In both variants the definition of disjointness is revised as follows:
 
 \begin{definition}[$\top$-disjointness]
   Two types $A$ and $B$ are disjoint
   (written $A \disjoint B$) if the following two conditions are satisfied:
 \begin{enumerate}
-  \item $\text{not}~ \toplike{A} \text{\, and \, not}~ \toplike{B} $
+  \item $(\text{not}~\toplike{A})~\text{and}~(\text{not}~\toplike{B}) $
   \item $\forall C.~\text{if}~ A \subtype C~\text{and}~B \subtype C~\text{then}~\toplike{C}$
 \end{enumerate}
 \end{definition}

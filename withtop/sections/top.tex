@@ -12,12 +12,14 @@ for any two types to satisfy a simple notion of disjointness. To
 address this problem a notion of $\top$-disjointness is proposed.  The
 definition of $\top$-disjointness depends on a notion of a top-like
 type. We formalize two different variants of \name, based on two different
-definitions of a top-like type, while discussing their expressiveness. Both variants retain coherence, and all other key
-properties of \name.  For simplicity and space reasons we omit pairs
-from the two variants of \name presented in this section.
-Mechanized Coq proofs for both variants are available as part of the 
-supplementary materials for the paper.
-
+definitions of a top-like type, while discussing their expressiveness. 
+Both variants retain coherence, and all other key
+properties of \name.  
+For space reasons, we opted not to restate these properties.
+For the same reasons, we omit pairs from the two variants of \name presented in this section, 
+as they do not impose any important challenge and their introduction is quite straightforward.
+Mechanized Coq proofs for both variants are available as part 
+of the supplementary materials for the paper.
 
 %\begin{itemize}
 %\item The definition of disjointness becomes useless:
@@ -128,8 +130,12 @@ Having this in mind, $\top$-disjointness is defined as follows:
 \begin{definition}[$\top$-Disjointness]
 Given two types $A$ and $B$ we have that:
 %\[A * B \equiv \not \toplike{A} \and \not \toplike{A} \and A \subtype B\]
-\[A \disjoint_{\top} B \equiv \neg \toplike{A} \; \text{and} \; \neg \toplike{B} \; \text{and} \; 
-(\forall_C. \; ( A \subtype C~\text{and}~B \subtype C ) \rightarrow \toplike{C}) \]
+%\[A \disjoint_{\top} B = (\text{not}~\toplike{A}) \; \text{and} \; (\text{not}~\toplike{B}) \; \text{and} \; 
+%(\forall C. \; \text{if}~A \subtype C~\text{and}~B \subtype C \text{then}~\toplike{C}) \]
+\begin{align*}
+A \disjoint_{\top} B = \, &(\text{not}~\toplike{A}) \; \text{and} \; (\text{not}~\toplike{B}) \; \text{and} \\ 
+&(\forall C. \; \text{if}~A \subtype C~\text{and}~B \subtype C~\text{then}~\toplike{C})
+\end{align*}
 
 \noindent where $\toplike{C}$ means that $C$ is a top-like type.
 \end{definition}

@@ -429,15 +429,35 @@ the function expects a $\code{String}$ but the translated argument is of type $\
 
 \paragraph{The elaboration judgments and rules.}
 Figure~\ref{fig:fi-typebd} presents the elaborating bidirectional type
-system. The bidirectional type system itself is rather standard.  The
-key differences to the type system in Figure~\ref{fig:fi-type} are
+system, which is closely related to the declarative type-system, presented
+in Figure~\ref{fig:fi-type}. 
+The key differences between them are
 that all $:$'s are replaced with $\Rightarrow$ or $\Leftarrow$. There
 are two check-mode rules: \reflabel{\labeltlam} and
 \reflabel{\labeltsub}. The remaining rules are all in the synthesis
 mode. Moreover there is one additional rule for annotation expressions
 (\reflabel{\labeltann}). The syntax of source terms also needs to be
 extended with annotation expressions $e : A$. 
+The reader might notice that the choice for this type-system in rather
+unconventional, as it does not follow the rule of making introduction forms as checked
+and elimination forms as synthesized \cite{davies2000intersection} \cite{Dunfield04tri}.
+However, we can justify our design with several reasons:
 
+\begin{enumerate}
+\item We aim at maximizing type-inference: annotation becomes 
+less of a burden as there are only two \emph{checked} premises in our rules (excluding \reflabel{\labeltann});
+\item Most of the language is simple enough to rely on type inference (i.e. it is decidable);
+\item The simplicity of this design allows us to concentrate on its key property, 
+which is the coherence of the type-system.
+\end{enumerate}
+
+% Complete and Easy Bidirectional Typechecking for Higher-rank Polymorphism states: 
+%Actual bidirectional type-systems tend to take a more liberal view in what concerns checked versus synthesized rules.
+Having this in mind, we do not claim this bidirectional type-system is the optimal choice
+for the system, and other design choices could be equaly justified had our intentions been
+different.
+
+We may now explain in more detail this elaborating bidirectional type-system.
 The two elaboration judgments $\jinfer \Gamma e A \yields E$ and
 $\jcheck \Gamma e A \yields E$ extend the usual typing judgments with
 an elaborated term on the right hand side of the arrows. The
