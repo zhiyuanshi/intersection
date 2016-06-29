@@ -3,7 +3,7 @@
 %*******************************************************************************
 
 This section introduces \name and its support for intersection types and the
-merge operator. 
+merge operator. We also discuss how the 
 notion of disjoint intersection types achieves a coherent semantics.
 
 Note that this section uses some syntactic sugar, as well as standard
@@ -344,7 +344,7 @@ The typical solution to remove type ambiguity is to add type
 annotations that choose a particular type for a sub-expression when
 multiple options exist. Our approach to address this problem is to 
 use bi-directional type-checking techniques~\cite{Pierce00local,Dunfield04tri}. We show that 
-with a fairly simple and standard bi-directional type system, we can guarantee 
+with a fairly simple and unremarkable bi-directional type system, we can guarantee 
 that every sub-expression (possibly with annotations) has a unique
 type. For example:
 
@@ -366,9 +366,7 @@ intersections can ever be well-formed in the presence of $\top$!
 Moreover, since $\top$ is not disjoint to any type, it does not make
 sense to allow its presence in a disjoint intersection type.  Adding a
 $\top$ type requires some adaptations to the notion of disjointness.
-This paper studies two additional variants of \name with $\top$ types,
-where $\top$ is treated as an \emph{unit} type, in the same flavour of 
-Dunfield's system~\cite{dunfield2014elaborating}.
+This paper studies two additional variants of \name with $\top$ types.
 In both variants the definition of disjointness is revised as follows:
 
 \begin{definition}[$\top$-disjointness]

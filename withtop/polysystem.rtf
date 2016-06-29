@@ -1,17 +1,16 @@
-{\rtf1\ansi\ansicpg1252\cocoartf1348\cocoasubrtf170
+{\rtf1\ansi\ansicpg1252\cocoartf1404\cocoasubrtf130
 {\fonttbl\f0\fnil\fcharset0 HelveticaNeue;\f1\fnil\fcharset0 STIXGeneral-Regular;\f2\fnil\fcharset0 AppleSymbols;
 }
 {\colortbl;\red255\green255\blue255;}
-\paperw11900\paperh16840\margl1440\margr1440\vieww10800\viewh14180\viewkind0
+\paperw11900\paperh16840\margl1440\margr1440\vieww16660\viewh15460\viewkind0
 \deftab720
-\pard\pardeftab720
+\pard\pardeftab720\partightenfactor0
 
 \f0\fs36 \cf0 \expnd0\expndtw0\kerning0
 \'97\'97\'97\'97 Type system \'97\'97\'97\'97 \
 \
 Inference rules
-\fs28 \expnd0\expndtw0\kerning0
-\
+\fs28 \
 \
 \'a0 \'a0x : A in\'a0
 \f1 \uc0\u55349 \u57002 
@@ -91,10 +90,8 @@ Inference rules
 \f0  e A => [a := A] B \
 \
 
-\fs36 \expnd0\expndtw0\kerning0
-Checking rules
-\fs28 \expnd0\expndtw0\kerning0
-\
+\fs36 Checking rules
+\fs28 \
 \
 
 \f1 \uc0\u55349 \u57002 
@@ -124,15 +121,11 @@ Checking rules
 \f2 \uc0\u8866 
 \f0  e <= B \
 \
-a\'a0
-\f2 \uc0\u8713 
-\f0 \'a0ftv(
-\f1 \uc0\u55349 \u57002 
-\f0 ) \'a0 \'a0
+ 
 \f1 \uc0\u55349 \u57002 
 \f0 \'a0
-\f2 \uc0\u8866 
-\f0  WF(A) \'a0\'a0 
+\f2 \uc0\u8866  
+\f0 A \'a0\'a0 
 \f1 \uc0\u55349 \u57002 
 \f0 , a 
 \f2 \uc0\u8866 
@@ -144,21 +137,15 @@ a\'a0
 \f2 \uc0\u8866 
 \f0  /\\a. e <= forall a. A \
 \
-Obs: WF as \expnd0\expndtw0\kerning0
-in \'93Disjoint Intersection Types with Disjoint Quantification\'94 (excl. disj. quantifiers)\expnd0\expndtw0\kerning0
-\
+Obs: WF as in \'93Disjoint Intersection Types with Disjoint Quantification\'94 (excl. disj. quantifiers)\
 \
 \'97\'97\'97\'97
-\fs36 \expnd0\expndtw0\kerning0
-Disjointness
-\fs28 \expnd0\expndtw0\kerning0
- \'97\'97\'97\'97 \
+\fs36 Disjointness
+\fs28  \'97\'97\'97\'97 \
 \
 
-\fs36 \expnd0\expndtw0\kerning0
-Algorithmic rules
-\fs28 \expnd0\expndtw0\kerning0
-\
+\fs36 Algorithmic rules
+\fs28 \
 ToDo: remove 
 \f1 \uc0\u55349 \u57002 
 \f0 ? remove forall rule? \
@@ -217,7 +204,7 @@ ToDo: remove
 \f1 \uc0\u55349 \u57002 
 \f0 \'a0
 \f2 \uc0\u8866 
-\f0  forall a.A * forall a.B \
+\f0  forall a. A * forall a. B \
 \
   A *ax B \
 \'97\'97\'97\'97\'97\
@@ -228,10 +215,8 @@ ToDo: remove
 \f0  A * B \
 \
 
-\fs36 \expnd0\expndtw0\kerning0
-Algorithmic rules (axioms)
-\fs28 \expnd0\expndtw0\kerning0
-\
+\fs36 Algorithmic rules (axioms)
+\fs28 \
 \
 bot *ax bot \
 bot *ax fun \
@@ -242,12 +227,8 @@ A1 -> A2 \'a0*ax Int \
 Int *ax forall a.A \
 B *ax A <=> A *ax B \
 \
-\pard\pardeftab720
-\cf0 \expnd0\expndtw0\kerning0
 \'97\'97\'97\'97
-\fs36 \expnd0\expndtw0\kerning0
-Subtyping
-\fs28 \expnd0\expndtw0\kerning0
- \'97\'97\'97\'97 \
+\fs36 Subtyping
+\fs28  \'97\'97\'97\'97 \
 \
 For now, the same as in \'93Disjoint Intersection Types with Disjoint Quantification\'94 (excl. disj. quantifiers)}

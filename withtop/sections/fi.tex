@@ -262,10 +262,9 @@ that it does not restrict $A \inter B$ to be disjoint. Therefore,
 in the presence of such an unrestricted rule it would be possible to 
 create non-disjoint intersections types. It is easy
 enough to have an additional disjointness restriction, which would 
-ensure the disjointness between $A$ and $B$. However, then the rule 
-would be pointless, because no derivations of programs could ever be
-created with such a rule. If $A$ and $B$ are disjoint then, by
-definition, no programs should ever have types $A$ and $B$ at 
+ensure the disjointness between $A$ and $B$. However, even if that
+issue is fixed, the rule would be counter-intuitive. If $A$ and $B$ are disjoint then, by
+definition, no expressions should ever have types $A$ and $B$ at 
 the same time. In contrast, in \name, the rule \reflabel{\labeltmerge}
 captures the fact that two disjoint pieces of evidence are needed to
 create a (disjoint) intersection type.

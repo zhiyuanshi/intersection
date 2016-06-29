@@ -148,7 +148,10 @@ Fixed.
 >> you mention that "intersection types (but not the merge operator!) are already part of some prominent languages, such as Scala (and Redhat's Ceylon)".  But those intersection types have different semantics and different restrictions.  It is not clear that the intersections proposed in this paper suffice to replace those in Scala and Ceylon, especially because of the lack of support for polymorphism here.  Hence, this argument is very unconvincing.
 >> 
 >> I strongly recommend the authors add a section (or a few paragraphs) to this paper to concretely demonstrate the utility of this form of intersection by encoding, perhaps, Scala-style intersections or some other feature (perhaps traits, multiple inheritence) from another language.  Note that the restrictions vis-a-vis disjointedness may prevent the use of these intersections to encode general multiple inheritence and other such features.  (Does it?)  It is not enough to rely on Dunfield's motivation --- his intersections do not have the same restrictions and may be more generally useful.
->> 
+>>
+
+TODO?
+
 >> ---------------------
 >> 
 >> Edit after author response:
@@ -215,6 +218,7 @@ Fixed.
 
 Fixed: added a sentence in the first paragraph of 2.4, with a reference to 
 Dunfield's system.
+BRUNO: Unsure about this. Prefer to remove.
 
 >> -- If space is an issue, I would choose to dispense with the formal
 >> description of the "simple calculus with T" (sec 6.3) -- I think
