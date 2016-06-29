@@ -80,7 +80,8 @@
 >> various language features". The authors should explain what these
 >> features are.
 
-TODO should we explain better (i) (ii) and (iii)?
+TODO Joao: should we explain better (i) (ii) and (iii)? I guess that
+Dunfield already does this quite well, but we could add a sentence or two.
 
 >> Overall, I believe this paper presents a nice theory that should be of
 >> interest for anyone studying or implementing intersection types. In
@@ -93,12 +94,13 @@ TODO should we explain better (i) (ii) and (iii)?
 >> - Can you quantify how much typing annotations one needs for all type
 >>   ambiguity to disappear?
 
-TODO
+TODO Joao: I don't know how we can do this
 
 >> - Can you convince the reader that your approach would be somewhat
 >>   adaptable to the presence of union types?
 
-TODO
+TODO Joao: can we say that Dunfield himself encoded union types in his work? 
+since our work is closely related, in shouldn't be a problem.
 
 >> - Section 3.2: Rules S&R1 and S&R2 are mentioned but do not exist.
 
@@ -266,7 +268,7 @@ Fixed in several places where we were using "(A,B)" at type-level, instead of "A
 >> 
 >> "The bidirectional type system itself is rather standard."  If so, please cite a similar system, but I don't think it is standard: you are not following the "Pfenning recipe" (Davies and Pfenning 2000; Dunfield and Pfenning 2004) of intro rules ⇐, elim rules ⇒.  Instead, you seem to be following a recipe of "make every rule synthesize by default".  That's not necessarily bad, particularly as it should reduce the annotation burden, but it needs some explanation.
 
-TODO
+TODO Joao: I have added a paragraph with reasons justifying our design decisions. Can you please double-check?
 
 >> In rule T-Sub (fig. 5), you use "C" as a meta-variable for a target term, but you already use C as a source type.  (Also applies to the proof of Thm. 6.)
 

@@ -1,4 +1,4 @@
-\documentclass[preprint,numbers,nocopyrightspace]{sigplanconf}
+\documentclass[numbers]{sigplanconf}
 
 \input{packages.tex}
 \input{macros.tex}
@@ -12,7 +12,7 @@
 \input{rules/toplike.tex}
 
 \begin{document}
-
+\toappear{}
 %\special{papersize=8.5in,11in}
 %\setlength{\pdfpageheight}{\paperheight}
 %\setlength{\pdfpagewidth}{\paperwidth}
@@ -41,15 +41,14 @@
   \input{sections/abstract.tex}
 \end{abstract}
 
-\begin{comment}
-\category{CR-number}{subcategory}{third-level}
+\category{D.3.2}{Language Classifications}{Applicative (functional) languages}
+\category{F.3.3}{Studies of Program Constructs}{Functional constructs}
 
 % general terms are not compulsory anymore,
 % you may leave them out
 \terms Design, Languages, Theory
 
-\keywords Intersecion Types, Polymorphism, Type System
-\end{comment}
+\keywords Intersection Types, Type System
 
 \input{sections/introduction.tex}
 \input{sections/overview.tex}
@@ -62,7 +61,11 @@
 \input{sections/related-work.tex}
 \input{sections/conclusion.tex}
 
-\newpage
+\section*{Acknowledgments}
+We would like to thank the ICFP reviewers for their helpful comments.
+This work has been sponsored by the Hong Kong Research Grant Council Early Career Scheme project number 27200514.
+
+%\newpage
 \bibliographystyle{abbrvnat}
 \bibliography{references}
 
