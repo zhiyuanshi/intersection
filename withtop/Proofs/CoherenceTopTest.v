@@ -310,10 +310,9 @@ Qed.
 (* Disjointness: Specification *)
 
 Definition OrthoS (A B : PTyp) :=
-  (TopSig A /\ not (TopLike B)) \/
-  (TopSig B /\ not (TopLike A)) \/
-  ((not (TopLike A) /\ not (TopLike B)) /\ (forall C, Sub A C -> Sub B C -> TopLike C)).
+  (forall C, Sub A C -> Sub B C -> TopLike C).
 
+(*
 Lemma applyOrthoS : forall {A B}, OrthoS A B -> forall C, Sub A C -> Sub B C -> TopLike C.
 Proof.
   intros.
@@ -353,6 +352,7 @@ Proof.
     inversion H3; inversion H2; subst; try now inversion H5.
   - auto.
 Qed.
+*)
 
 (* Disjointness: Implementation *)
 
@@ -362,8 +362,8 @@ Inductive Ortho : PTyp -> PTyp -> Prop :=
   | OIntFun : forall t1 t2, Ortho PInt (Fun t1 t2)
   | OFunInt : forall t1 t2, Ortho (Fun t1 t2) PInt
   | OFun  : forall t1 t2 t3 t4, Ortho t2 t4 -> Ortho (Fun t1 t2) (Fun t3 t4)
-  | OTop1 : forall t, not (TopLike t) -> Ortho t TopT
-  | OTop2 : forall t, not (TopLike t) -> Ortho TopT t.
+  | OTop1 : forall t, Ortho t TopT
+  | OTop2 : forall t, Ortho TopT t.
 
 (* Well-formed types *)
 
@@ -382,10 +382,11 @@ Proof.
 induction t1; intros; auto.
 Defined.
 
+(*
 Lemma OrthoSNotEq : forall A B, OrthoS A B -> not (A = B).
 Proof.
   intros.
-  destruct H as [ [H3 H4 ] | [ [H3 H4] | [[H3 H4] H5] ] ]; subst.
+  unfold OrthoS in *.
   - unfold not; intros; subst; auto.
     apply topsig_gives_toplike in H3.
     contradiction.
@@ -395,13 +396,13 @@ Proof.
   - unfold not; intros; subst.
     apply H3; apply H5; apply reflex.
 Qed.
+*)
 
 (* Lemmas needed to prove soundness of the disjointness algorithm *)
 
 Lemma ortho_sym : forall {A B}, OrthoS A B -> OrthoS B A.
 Proof.
-  unfold OrthoS; intros.
-  destruct H as [ [H3 H4 ] | [ [H3 H4] | [[H3 H4] H5] ] ]; subst; auto.
+  unfold OrthoS; intros; auto.
 Defined.
 
 Lemma invAndS1 : forall t t1 t2, Sub t (And t1 t2) -> Sub t t1 /\ Sub t t2.
@@ -449,90 +450,40 @@ apply H0. apply reflex.
   
 (* Disjointness algorithm is complete: Theorem 8 *)
 
-Lemma ortho_completeness : forall t1, WFTyp t1 -> forall t2, WFTyp t2 -> OrthoS t1 t2 -> Ortho t1 t2.
+Lemma ortho_completeness : forall t1 t2, OrthoS t1 t2 -> Ortho t1 t2.
 Proof.
-  intros t1 wft1.
-  induction wft1; intros.
+  unfold OrthoS; intros t1.
+  induction t1.
   (* Case PInt *)
-  - generalize dependent H0; induction H; intros.
-    destruct H0 as [ [H3 H4 ] | [ [H3 H4] | [[H3 H4] H5] ] ]; subst; auto.
-    inversion H3.
-    inversion H3.
-    pose (H5 PInt sint sint). inversion t0.
+  - intros.
+    induction t2.
+    assert (Ha : TopLike PInt) by (apply H; apply reflex).
+    inversion Ha.
     apply OIntFun.
-    destruct H1 as [ [H5 H6 ] | [ [H5 H6] | [[H5 H6] H7] ] ]; subst; auto.
-    apply topsig_gives_toplike in H5; contradiction.
-    apply topsig_gives_toplike in H5; contradiction.
-    destruct H4 as [ [H8 H9 ] | [ [H8 H9] | [[H8 H9] H10] ] ]; subst; auto.
-    inversion H8.
-    inversion H8.
-    apply OAnd2. 
-    apply IHWFTyp1; unfold OrthoS; right; right; split; auto.
-    apply IHWFTyp2; unfold OrthoS; right; right; split; auto.
+    apply OAnd2.
+    apply IHt2_1; intros; apply H; auto.
+    apply IHt2_2; intros; apply H; auto.
     apply OTop1.
-    unfold not; intros HInv; inversion HInv.
   (* Case Fun t1 t2 *)
-  - induction H.
+  - intros.
+    induction t2.
     apply OFunInt.
-    destruct H0 as [ [H3 H4 ] | [ [H3 H4] | [[H3 H4] H5] ] ]; subst; auto.
     apply OFun.
-    apply IHwft1_2; auto.
-    unfold OrthoS.
-    left.
-    inversion H3; split; auto.
-    apply OFun.
-    apply IHwft1_2; auto.
-    unfold OrthoS.
-    right; left.
-    inversion H3; split; auto.
-    apply OFun. apply IHwft1_2; auto.
-    unfold OrthoS. right; right; split.
-    split; unfold not; intros; auto.
+    apply IHt1_2.
     intros.
-    assert (Ha : TopLike (Fun (And t1 t0) C)).
-    apply H5; auto.
+    assert (Ha : TopLike (Fun (And t1_1 t2_1) C)).
+    apply H; auto.   
     apply sfun; auto. apply sand2; auto. apply reflex; auto.
     apply sfun; auto. apply sand3; auto. apply reflex; auto.
     now inversion Ha.
     (* Case t11 -> t12 _|_ t21 & t22 *)
-    apply OAnd2.
-    apply IHWFTyp1.
-    destruct H0 as [ [H5 H6 ] | [ [H5 H6] | [[H5 H6] H7] ] ]; subst; auto.
-    unfold OrthoS; left; auto.
-    inversion H5.
-    unfold OrthoS; right; right.
-    split.
-    split; auto.
-    intros; apply H7; auto.
-    apply IHWFTyp2.
-    destruct H0 as [ [H5 H6 ] | [ [H5 H6] | [[H5 H6] H7] ] ]; subst; auto.
-    unfold OrthoS; left; auto.
-    inversion H5.
-    unfold OrthoS; right; right.
-    split.
-    split; auto.
-    intros; apply H7; auto.
+    apply OAnd2; auto.
     (* Case t11 -> t12 _|_ T *)
     apply OTop1.
-    destruct H0 as [ [H5 H6 ] | [ [H5 H6] | [[H5 H6] H7] ] ]; subst; auto.
     (* Case (t11 & t12) _|_ t2 *)
-  - destruct H3 as [ [H5 H6 ] | [ [H5 H6] | [[H5 H6] H7] ] ]; subst; auto.
-    inversion H5.
-    apply OAnd1.
-    apply IHwft1_1; auto.
-    unfold OrthoS; right; left; auto.
-    apply IHwft1_2; auto.
-    unfold OrthoS; right; left; auto.
-    apply OAnd1.
-    apply IHwft1_1; auto.
-    unfold OrthoS. right; right. split. split; auto.
-    intros; apply H7; auto.
-    apply IHwft1_2. auto.
-    unfold OrthoS. right; right; split. split; auto.
-    intros; apply H7; auto.
+  - intros; auto.
     (* Case T _|_ t2 *)
-  - apply OTop2.
-    destruct H0 as [ [H5 H6 ] | [ [H5 H6] | [[H5 H6] H7] ] ]; subst; auto.
+  - intros; auto.
 Qed.
 
 (*
@@ -568,109 +519,69 @@ Lemma uniquesub : forall A B C,
   OrthoS A B -> Sub (And A B) C -> not (TopLike C) ->  not (Sub A C /\ Sub B C).
 Proof.
   intros.
-  destruct H as [ [H5 H6 ] | [ [H5 H6] | [[H5 H6] H7] ] ]; subst; auto.
+  unfold OrthoS in H.
   - destruct H0.
-    dependent induction H.
+    Require Import Coq.Program.Equality.
+    dependent induction H0.
     + apply not_toplike_and_distr in H1.
       destruct H1.
       unfold not; intros [H2 H3].
       apply IHsub1; auto.
-      destruct H2; inversion H2; subst.
-      destruct H3; inversion H3; subst.
+      destruct H2 as [x2 H2]; inversion H2; subst.
+      destruct H3 as [x3 H3]; inversion H3; subst.
       split; unfold Sub; eauto.
-      inversion H7.
-      inversion H7.
-      inversion H7.
-      inversion H7.
+      inversion H4.
+      inversion H4.
+      inversion H4.
+      inversion H4.
       unfold not; intros [H2 H3].
       apply IHsub2; auto.
-      destruct H2; inversion H2; subst.
-      destruct H3; inversion H3; subst.
+      destruct H2 as [x2 H2]; inversion H2; subst.
+      destruct H3 as [x3 H3]; inversion H3; subst.
       split; unfold Sub; eauto.
-      inversion H7.
-      inversion H7.
-      inversion H7.
-      inversion H7.
-    + assert (Ha : Sub A t0) by (unfold Sub; eauto).
-      apply topsig_gives_toplike in H5.
-      apply (topLikeSub _ _ Ha) in H5.
-      contradiction.
-    + apply topsig_gives_toplike in H5.
-      unfold not; intros [H2 H3].
-      apply (topLikeSub _ _ H2) in H5.
-      contradiction.
-    + exfalso; apply H1; auto.
-  - destruct H0.
-    dependent induction H.
-    + apply not_toplike_and_distr in H1.
+      inversion H4.
+      inversion H4.
+      inversion H4.
+      inversion H4.
+    + unfold not; intros [H3 H4]. 
       destruct H1.
-      unfold not; intros [H2 H3].
-      apply IHsub1; auto.
-      destruct H2; inversion H2; subst.
-      destruct H3; inversion H3; subst.
-      split; unfold Sub; eauto.
-      inversion H7.
-      inversion H7.
-      inversion H7.
-      inversion H7.
-      unfold not; intros [H2 H3].
-      apply IHsub2; auto.
-      destruct H2; inversion H2; subst.
-      destruct H3; inversion H3; subst.
-      split; unfold Sub; eauto.
-      inversion H7.
-      inversion H7.
-      inversion H7.
-      inversion H7.
-    + apply topsig_gives_toplike in H5.
-      unfold not; intros [H2 H3].
-      apply (topLikeSub _ _ H3) in H5.
-      contradiction.
-    + assert (Ha : Sub B t0) by (unfold Sub; eauto).
-      apply topsig_gives_toplike in H5.
-      apply (topLikeSub _ _ Ha) in H5.
-      contradiction.
+      assert (Ha := H _ H3 H4).
+      inversion Ha.
+      assert (Ha := H _ H3 H4).
+      inversion Ha; subst.
+      apply H2; auto.
+    + unfold not; intros [H3 H4]. 
+      destruct H1.
+      assert (Ha := H _ H3 H4).
+      inversion Ha.
+      assert (Ha := H _ H3 H4).
+      inversion Ha; subst.
+      apply H2; auto.
     + exfalso; apply H1; auto.
-  - unfold not; intros [HSub1 HSub2].
-    apply H1; apply H7; auto.
 Qed.
 
 Lemma ortho_and :
-  forall {A B C}, not (TopLike A) -> not (TopLike B) -> not (TopLike C) ->
-             OrthoS A C -> OrthoS B C -> OrthoS (And A B) C.
+  forall {A B C}, OrthoS A C -> OrthoS B C -> OrthoS (And A B) C.
 Proof.
-  intros A B C HNotTLA HNotTLB HNotTLC H1 H2; unfold OrthoS.
-  destruct H1 as [ [H3 H4 ] | [ [H3 H4] | [[H3 H4] H5] ] ]; subst. 
-  - exfalso; apply HNotTLA; auto.
-    now apply topsig_gives_toplike in H3.
-  - right; left; split; auto.
-    unfold not; intros H; inversion H; subst.
-    contradiction.
-  - right; right; split; auto.
-    split; auto.
-    unfold not; intros; inversion H; subst; contradiction. 
-    destruct H2 as [ [H6 H7 ] | [ [H6 H7] | [[H6 H7] H8] ] ]; subst; auto.
-    + exfalso; apply HNotTLB; auto.
-      now apply topsig_gives_toplike in H6.
-    + exfalso; apply HNotTLC; auto.
-      now apply topsig_gives_toplike in H6.
-    + intros.
-      destruct H.
-      dependent induction H.
-      inversion H1.
-      inversion H2; subst.
-      apply TLAnd.
-      apply IHsub1; auto.
-      unfold Sub; eauto.
-      apply IHsub2; auto.
-      unfold Sub; eauto.
-      inversion H10.
-      inversion H10.
-      apply H5; auto.
-      unfold Sub; eauto.
-      apply H8; auto.
-      unfold Sub; eauto.
-      apply TLTop.
+  intros A B C H1 H2; unfold OrthoS.
+  unfold OrthoS in H1, H2.
+  intros.
+  destruct H.
+  dependent induction H.
+  - inversion H3.
+    inversion H4; subst.
+    apply TLAnd.
+    apply IHsub1; auto.
+    unfold Sub; eauto.
+    apply IHsub2; auto.
+    unfold Sub; eauto.
+    inversion H6.
+    inversion H6.
+  - apply H1; auto.
+    unfold Sub; eauto.
+  - apply H2; auto.
+    unfold Sub; eauto.
+  - apply TLTop.
 Qed.
 
 Lemma topsig_dec : forall t, sumbool (TopSig t) (not (TopSig t)).
@@ -723,107 +634,76 @@ Qed.
 
 (* Soundness of the disjointness algorithm: Theorem 7 *)
 
-Lemma ortho_soundness : forall (t1 t2 : PTyp), WFTyp t1 -> WFTyp t2 -> Ortho t1 t2 -> OrthoS t1 t2.
+Lemma ortho_soundness : forall (t1 t2 : PTyp), Ortho t1 t2 -> OrthoS t1 t2.
 Proof.
   intros.
-  induction H1.
+  induction H.
   (* Hard case *)
-  - inversion H; subst.
-    destruct IHOrtho1 as [ [H1 H2 ] | [ [H1 H2] | [[H1 H2] H8] ] ]; subst; auto.
-    apply topsig_gives_toplike in H1.
-    contradiction.
-    destruct IHOrtho2 as [ [H8 H9 ] | [ [H8 H9] | [[H8 H9] H10] ] ]; subst; auto.
-    apply topsig_gives_toplike in H8.
-    exfalso; apply H7; auto.
-    unfold OrthoS.
-    right; left; split; auto.
-    unfold not; intros HH; inversion HH; subst; contradiction.
-    apply topsig_gives_toplike in H1; contradiction.
-    destruct IHOrtho2 as [ [H9 H10 ] | [ [H9 H10] | [[H9 H10] H11] ] ]; subst;
+  - apply ortho_and; auto.
+  - apply ortho_sym; apply ortho_and; now apply ortho_sym.
+  (* Case IntFun *)
+  - unfold OrthoS.
+    intros.
+    induction C; intros.
+    destruct H0 as [x HInv]; inversion HInv.
+    destruct H as [x HInv]; inversion HInv.
+    destruct H as [x H1]; inversion H1.
+    destruct H0 as [x10 H10]; inversion H10.
+    subst.
+    apply TLAnd.
+    apply IHC1; unfold Sub; eauto. 
+    apply IHC2; unfold Sub; eauto.
+    (* TopT *)
+    apply TLTop.
+  (* Case IntFun *)
+  - unfold OrthoS.
+    intros.
+    induction C; intros.
+    destruct H as [x HInv]; inversion HInv.
+    destruct H0 as [x HInv]; inversion HInv.
+    destruct H as [x H1]; inversion H1.
+    destruct H0 as [x10 H10]; inversion H10.
+    subst.
+    apply TLAnd.
+    apply IHC1; unfold Sub; eauto. 
+    apply IHC2; unfold Sub; eauto.
+    (* TopT *)
+    apply TLTop.
+  (* FunFun *)
+  - unfold OrthoS in *.
+    intros.
+    induction C.
+    destruct H0 as [x HInv]; inversion HInv.
+    destruct H1 as [x H1]; inversion H1.
+    destruct H0 as [x10 H10]; inversion H10.
+    subst.
+    apply TLFun.
+    apply IHOrtho; unfold Sub; eauto.
+    destruct H1 as [x H1]; inversion H1.
+    destruct H0 as [x10 H10]; inversion H10.
+    subst.
+    apply TLAnd.
+    apply IHC1; unfold Sub; eauto.
+    apply IHC2; unfold Sub; eauto.
     auto.
-    apply topsig_gives_toplike in H9; contradiction.
-    apply topsig_gives_toplike in H9; contradiction.
-    apply ortho_and; auto.
-    unfold OrthoS; right; right; split; auto.
-    unfold OrthoS; right; right; split; auto.
-  - inversion H0; subst.
-    destruct IHOrtho1 as [ [H1 H2 ] | [ [H1 H2] | [[H1 H2] H8] ] ]; subst; auto.
-    unfold OrthoS.
-    left; split; auto.
-    unfold not; intros HInv; inversion HInv; subst; contradiction.
-    apply topsig_gives_toplike in H1.
-    contradiction.
-    destruct IHOrtho2 as [ [H9 H10 ] | [ [H9 H10] | [[H9 H10] H11] ] ];
-      subst; auto.
-    apply topsig_gives_toplike in H9.
-    contradiction.
-    apply topsig_gives_toplike in H9.
-    contradiction.
-    apply ortho_sym.
-    apply ortho_and; auto.
-    unfold OrthoS; right; right; split; auto.
-    unfold OrthoS; right; right; split; auto.
-  (* Case IntFun *)
-  - unfold OrthoS.
-    destruct (topsig_dec (Fun t1 t2)).
-    right; left; split; auto.
-    unfold not; intros HInv; inversion HInv.    
-    right; right. split. split. unfold not; intros. inversion H1.
-    unfold not; intros H1; apply n.
-    now apply toplike_wf_gives_topsig.
-    intros.
-    induction C; intros. inversion H2. inversion H3. inversion H1. inversion H3.
-    inversion H1. inversion H2. inversion H3. inversion H4.
-    subst.
+  - unfold OrthoS; intros C H H0.
+    destruct H0 as [x H0]; dependent induction H0; subst.
+    destruct H as [x H1]; inversion H1; subst.
     apply TLAnd.
-    apply IHC1; unfold Sub; eauto. 
-    apply IHC2; unfold Sub; eauto.
-    (* TopT *)
-    apply TLTop.
-  (* Case IntFun *)
-  - unfold OrthoS.
-    destruct (topsig_dec (Fun t1 t2)).
-    left; split; auto.
-    unfold not; intros HInv; inversion HInv.    
-    right; right. split. split.
-    unfold not; intros H1; apply n.
-    now apply toplike_wf_gives_topsig.
-    unfold not; intros. inversion H1.
-    intros.
-    induction C; intros. inversion H1. inversion H3. inversion H2. inversion H3.
-    inversion H1. inversion H2. inversion H3. inversion H4.
-    subst.
+    apply IHsub1; unfold Sub; eauto.
+    apply IHsub2; unfold Sub; eauto.
+    inversion H0.
+    inversion H0.
+    auto.
+  - unfold OrthoS; intros C H0 H.
+    destruct H0 as [x H0]; dependent induction H0; subst.
+    destruct H as [x H1]; inversion H1; subst.
     apply TLAnd.
-    apply IHC1; unfold Sub; eauto. 
-    apply IHC2; unfold Sub; eauto.
-    (* TopT *)
-    apply TLTop.
-    (* FunFun *)
-  - destruct IHOrtho as [ [H2 H3 ] | [ [H2 H3] | [[H2 H3] H4] ] ]; subst; auto.
-    inversion H; auto.
-    inversion H0; auto.
-    unfold OrthoS.
-    left; split; auto.
-    unfold not; intros H4; apply H3.
-    now inversion H4.
-    unfold OrthoS.
-    right; left; split; auto.
-    unfold not; intros H4; apply H3.
-    now inversion H4.
-    unfold OrthoS. right; right; split. split. unfold not. intros.
-    apply H2. inversion H5. auto.
-    unfold not; intros. apply H3. inversion H5. auto.
-    intros.
-    induction C. inversion H5. inversion H7.
-    destruct H5 as [x H5]; inversion H5; subst.
-    destruct H6 as [x H6]; inversion H6; subst.
-    apply TLFun. apply H4; unfold Sub; eauto.
-    destruct H5 as [x H5]; inversion H5; subst.
-    destruct H6 as [x H6]; inversion H6; subst.
-    apply TLAnd; [ apply IHC1 | apply IHC2 ]; unfold Sub; eauto.    
-    apply TLTop.
-  - unfold OrthoS; auto.
-  - unfold OrthoS; auto.        
+    apply IHsub1; unfold Sub; eauto.
+    apply IHsub2; unfold Sub; eauto.
+    inversion H0.
+    inversion H0.
+    auto.     
 Qed.
 
 Lemma same_coercion : forall B, TopLike B -> WFTyp B -> forall A e1 e2,
@@ -834,13 +714,7 @@ Proof.
   (* Case TopT *)
   - simpl. reflexivity.
   (* Case And *)
-  - simpl in IHTopLike1.
-    simpl in IHTopLike2.
-    simpl. inversion H1; subst.
-    destruct H6. destruct H2. apply topsig_gives_toplike in H2. contradiction.
-    destruct H2. destruct H2. apply topsig_gives_toplike in H2. contradiction.
-    destruct H2. destruct H2.
-    destruct H6. contradiction.
+  - inversion H1; contradiction.
   (* Case Fun *)
   - simpl in IHTopLike.
     simpl. inversion H0.
@@ -880,14 +754,10 @@ Proof.
     now subst.
     (* contradiction: not orthogonal! *)
     unfold OrthoS in H14; subst.
-    destruct H14 as [ [H4 H5 ] | [ [H4 H5] | [[H4 H5] H7] ] ]; subst; auto.
-    apply topsig_gives_toplike in H4; contradiction.
-    apply topsig_gives_toplike in H4; contradiction.
-    assert (TopLike t0). apply H7; unfold Sub; eauto.
-    inversion H8; subst.
+    assert (TopLike t0). apply H14; unfold Sub; eauto.
+    destruct H4.
     inversion H9.
     inversion H9.
-    inversion H8; subst.
     inversion H0; subst.
     erewrite same_coercion; auto.
     (* top case *)
@@ -897,16 +767,12 @@ Proof.
     rewrite <- H7 in H2. inversion H2.
     (* contradiction: not orthogonal! *)
     unfold OrthoS in H14; subst.
-    destruct H14 as [ [H4 H5 ] | [ [H4 H5] | [[H4 H5] H7] ] ]; subst; auto.
-    apply topsig_gives_toplike in H4; contradiction.
-    apply topsig_gives_toplike in H4; contradiction.    
-    assert (TopLike t0). apply H7; unfold Sub; eauto.
-    inversion H8; subst.
+    assert (TopLike t0). apply H14; unfold Sub; eauto.
+    destruct H4.
     inversion H9.
     inversion H9.
-    inversion H8; subst.
     inversion H0; subst.
-    erewrite same_coercion; subst; auto.
+    erewrite same_coercion; auto.
     (* same coercion *)
     assert (c = c0). apply IHsub; auto.
     now subst.
