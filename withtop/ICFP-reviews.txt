@@ -150,7 +150,7 @@ Fixed.
 >> I strongly recommend the authors add a section (or a few paragraphs) to this paper to concretely demonstrate the utility of this form of intersection by encoding, perhaps, Scala-style intersections or some other feature (perhaps traits, multiple inheritence) from another language.  Note that the restrictions vis-a-vis disjointedness may prevent the use of these intersections to encode general multiple inheritence and other such features.  (Does it?)  It is not enough to rely on Dunfield's motivation --- his intersections do not have the same restrictions and may be more generally useful.
 >>
 
-TODO?
+Added some more sentences about applications in the conclusion.
 
 >> ---------------------
 >> 
