@@ -93,7 +93,7 @@ types~\cite{vanBakel92}, we use a variant of the calculus that allows type
 annotations. Without additional type annotations the same term can have
 multiple types, and consequently different semantics depending on the
 type. The additional annotations enable a type system based on 
-bi-directional type-checking techniques~\cite{Pierce00local,Dunfield04tri}, that ensures that 
+bidirectional type-checking techniques~\cite{Pierce00local,Dunfield04tri}, that ensures that 
 every term has a unique type, eliminating an additional source of ambiguity in
 the semantics.
 
@@ -135,12 +135,12 @@ and both notions of $\top$-disjointness have sound and complete
 algorithmic versions.
 
 We have mechanized all three variants of \name and their
-meta-theoretical results in the Coq proof assistant. The definitions
-and proofs can be found at https://github.com/jalpuim/disjoint-intersection-types. 
-The proofs use the locally nameless representation with
+meta-theoretical results in the Coq proof assistant. 
+%The definitions and proofs can be found at https://github.com/jalpuim/disjoint-intersection-types. 
+The definitions and proofs use the locally nameless representation with
 co-finite quantification~\cite{aydemir-popl-08} to represent variables and
 binders. Except for two auxiliary lemmas used in the lambda cases for
-the proofs of soundness and completeness of bi-directional
+the proofs of soundness and completeness of bidirectional
 type-checking, all proofs are ``admit'' free. In particular,
 the main proofs of this paper (coherence and type-preservation) are
 complete.  The two auxiliary theorems that we did not manage to prove

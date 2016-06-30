@@ -343,8 +343,8 @@ generally, \emph{qualified types}~\cite{Mark93coherence}.
 The typical solution to remove type ambiguity is to add type
 annotations that choose a particular type for a sub-expression when
 multiple options exist. Our approach to address this problem is to 
-use bi-directional type-checking techniques~\cite{Pierce00local,Dunfield04tri}. We show that 
-with a fairly simple and unremarkable bi-directional type system, we can guarantee 
+use bidirectional type-checking techniques~\cite{Pierce00local,Dunfield04tri}. We show that 
+with a fairly simple and unremarkable bidirectional type system, we can guarantee 
 that every sub-expression (possibly with annotations) has a unique
 type. For example:
 
@@ -353,10 +353,10 @@ type. For example:
 \end{lstlisting}
 
 \noindent is a valid \name program, which has a unique determined type, and results in
-\lstinline$4$. In this case the bi-directional type-system 
+\lstinline$4$. In this case the bidirectional type-system 
 forces users to provide an annotation of the expression being applied.
 Without the annotation the program would be rejected. With the
-bi-directional type system, disjointness is indeed sufficient to ensure coherence. 
+bidirectional type system, disjointness is indeed sufficient to ensure coherence. 
 
 \subsection{Disjoint Intersection Types with $\top$} 
 In the presence of a $\top$ type the simple definition of disjointness
@@ -448,7 +448,7 @@ whose co-domain is a top type to be considered as a top-like type.
 For example, the type $\code{String}\to\top$ is considered a top-like
 type. The benefit of allowing this more liberal notion of top-like
 types is that, similarly to the first variant of \name without $\top$, 
-disjoint intersections can have multiple functions types. 
+disjoint intersections can have multiple function types. 
 
 %\name's type system only accepts programs that use disjoint intersection
 %types. As shown in Section~\ref{sec:disjoint} disjoint intersection types will
