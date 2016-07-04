@@ -1183,9 +1183,11 @@ Proof.
     rewrite subst_typ_source_open_source_var.
     apply H2.
     not_in_L x.
-    not_in_L x.
+    not_in_L x. unfold not. intros. apply H8. rewrite H3. 
+    admit. (* trivially true *)
+    (* apply H8. *)
     apply H.
-Qed.
+Admitted.
 
 (* Properties of free variables and substitution *)
 
@@ -1393,6 +1395,8 @@ Qed.
 Lemma usub_lc : forall t1 t2, usub t1 t2 -> PType t1 /\ PType t2.
 Admitted.
 
+(* Seems an odd lemma: why not just prove transitivity and apply it twice to prove 
+this one ?? *)
 Lemma usub_trans_mid :
   forall A B C D, usub A B -> usub B C -> usub C D -> usub A D.
 Proof.
@@ -1461,6 +1465,50 @@ Proof.
   apply HusubCC.
 Qed.
 
+
+Lemma fresh_bot_aux : forall t2 x L n, ~(In x L) -> BottomLike (open_rec_typ_source n (PFVarT x) t2) ->
+                                     forall y, ~(In y L) -> BottomLike (open_rec_typ_source n (PFVarT y) t2).
+  induction t2; simpl; intros.
+  auto.
+  apply BLFun. inversion H0; subst.
+  apply (IHt2_2 x L n H H3 y H1).
+  inversion H0; subst. apply BLAnd1.
+  apply (IHt2_1 x L n H H3 y H1).
+  apply BLAnd2.
+  apply (IHt2_2 x L n H H3 y H1).
+  destruct (n0 =? n).
+  inversion H0. inversion H0. inversion H0.
+  inversion H0; subst. apply BLForAll with (L := L0). intros.
+  apply (H3 x0) in H2.
+  admit. (* Need lemma here *)
+  (* apply (IHt2_2 x L (S n) H H5 y H1). *)
+  auto.
+Admitted.  
+
+Lemma fresh_bot : forall t2 x L, ~(In x L) -> BottomLike (open_typ_source t2 (PFVarT x)) ->
+                                 forall y, ~(In y L) -> BottomLike (open_typ_source t2 (PFVarT y)).
+  intros. apply (fresh_bot_aux t2 x L). auto. auto. auto.
+Defined.
+
+Lemma bottom_usub : forall t ty, usub ty t -> BottomLike t -> BottomLike ty.
+  intros t ty us.
+  induction us; intros.
+  auto. apply BLFun. inversion H; subst. apply IHus2. auto.
+  inversion H; subst.
+  apply (IHus1 H1). apply (IHus2 H1).
+  apply BLAnd1. auto. apply BLAnd2. auto.
+  auto.
+  inversion H1; subst.
+  apply_fresh BLForAll as x. apply H0. not_in_L x. 
+  apply H3. not_in_L x. 
+  apply BLBot.
+  Defined.
+
+Lemma not_bottom_usub : forall t ty, usub ty t -> ~ (BottomLike ty) -> ~(BottomLike t).
+  intros.
+  unfold not; intros; apply H0. apply (bottom_usub _ _ H). auto.
+Defined.
+
 Lemma Ortho_usub_trans :
   forall Gamma u ty d,
     not (BottomLike d) ->
@@ -1482,23 +1530,22 @@ Proof.
         (unfold not; intros; apply HNotBot; now apply BLFun).
     induction ty; try now (inversion HSub; subst; auto);
     inversion HWFty; inversion HSub; subst; auto.
-  - induction ty; try now (inversion HSub; subst; auto);
+  - pose (not_bottom_usub _ _ HSub HNotBot).
+    induction ty; try now (inversion HSub; subst; auto);
     inversion HWFty; inversion HSub; subst; auto.
     inversion HWFty; subst.
     inversion HSub; subst.
     apply_fresh OForAll as x.
-    apply H0.
     not_in_L x.
-    unfold not; intro HH; apply HNotBot.
+    apply (H0 x H6).
+    unfold not. intros. apply HNotBot.
     apply_fresh BLForAll as x.
-    admit.
-    apply H4.
-    not_in_L x.
-    apply H2.
-    not_in_L x.
+    apply (fresh_bot t2 x L H6 H1). not_in_L y.
+    apply H4. auto.
+    apply H2. auto.
   - pose (usub_trans _ _ _ HWFty H0 HSub).
     apply OVar with (A := A) ; auto.
-    admit.
+    apply (not_bottom_usub _ _ HSub H1).
   - induction ty0; try (now inversion HSub).
     inversion HSub; subst; inversion HWFty; auto.
     inversion HSub; subst; eauto.
@@ -1507,7 +1554,7 @@ Proof.
     try (destruct H0 as [_ [_ H0]]; exfalso; now apply H0);
     try (now orthoax_inv_r H0); try (now orthoax_inv_l H0);
     try now (induction ty; inversion HSub; subst; inversion HWFty; auto).
-Admitted.
+Defined.
 
 Hint Constructors Atomic.
 Hint Constructors STType.

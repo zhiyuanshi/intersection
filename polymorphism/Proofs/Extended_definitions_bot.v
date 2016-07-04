@@ -104,7 +104,7 @@ Inductive BottomLike : PTyp -> Prop :=
   | BLBot : BottomLike Bot
   | BLAnd1 : forall t1 t2, BottomLike t1 -> BottomLike (And t1 t2)                   
   | BLAnd2 : forall t1 t2, BottomLike t2 -> BottomLike (And t1 t2)
-  | BLFun : forall t1 t2, BottomLike t2 -> BottomLike (Fun t1 t2)
+  | BLFun : forall t1 t2, BottomLike t2 -> BottomLike (Fun t1 t2) (* what if t1 is bottomlike? should be bottom too ? *)
   | BLForAll : forall L d t,
                  (forall x, not (In x L) -> BottomLike (open_typ_source t (PFVarT x))) ->
                  BottomLike (ForAll d t).
