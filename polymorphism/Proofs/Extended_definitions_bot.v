@@ -361,8 +361,8 @@ Inductive Ortho : context TyEnvSource -> PTyp -> PTyp -> Prop :=
                           not (BottomLike ty) ->
                           PType ty ->
                           Ortho Gamma ty (PFVarT x)
-  | OBot1 : forall Gamma t, Ortho Gamma Bot t
-  | OBot2 : forall Gamma t, Ortho Gamma t Bot
+  | OBot1 : forall Gamma t A, BottomLike A -> Ortho Gamma A t
+  | OBot2 : forall Gamma t A, BottomLike A -> Ortho Gamma t A
   | OAx : forall Gamma t1 t2, OrthoAx t1 t2 -> Ortho Gamma t1 t2.
 
 Hint Constructors Ortho.
