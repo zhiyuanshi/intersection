@@ -1681,18 +1681,6 @@ Proof.
     now apply wf_gives_types_source in HWFu.
 Qed.
 
-
-Lemma bottomLike_subst : forall {A}, BottomLike A -> forall {z u}, BottomLike (subst_typ_source z u A).
-  intros A bA.
-  induction bA; intros; simpl.
-  - apply BLBot.
-  - apply BLAnd1. auto.
-  - apply BLAnd2. auto.
-  - apply BLFun. auto.
-  - apply_fresh BLForAll as x. admit.
-Admitted.
-
-
 Lemma ortho_subst :
   forall z u Gamma d t1 t2,
     not (In z (fv_ptyp u)) ->
@@ -1781,8 +1769,10 @@ Proof.
       apply usub_subst; auto.
       now apply wf_gives_types_source in HWFu.
       apply subst_source_lc; now apply wf_gives_types_source in HWFu.
-  - simpl; apply OBot1. apply (bottomLike_subst H). 
-  - simpl; apply OBot2. apply (bottomLike_subst H).
+  - simpl; apply OBot1. apply bottomlike_subst; auto.
+    now apply wf_gives_types_source in HWFu.
+  - simpl; apply OBot2. apply bottomlike_subst; auto.
+    now apply wf_gives_types_source in HWFu.
   - apply OAx; auto.
     assert (Ha : OrthoAx t1 t2) by assumption.
     destruct t1; destruct t2; auto; simpl; try (now orthoax_inv_r H0);
