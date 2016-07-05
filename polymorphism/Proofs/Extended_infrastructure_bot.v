@@ -1640,14 +1640,116 @@ Proof.
   auto.
 Qed.
 
+
+Lemma bottomlike_eq_dec_forall_spec :
+  forall L t,
+    (forall x : elt,
+       ~ In x L ->
+       BottomLike (open_typ_source t (PFVarT x)) \/
+       (BottomLike (open_typ_source t (PFVarT x)) -> False)) ->
+  ((forall x : elt,
+      ~ In x (union L (fv_ptyp t)) ->
+       BottomLike (open_typ_source t (PFVarT x))) \/
+   (forall x : elt,
+      ~ In x (union L (fv_ptyp t)) ->
+      (BottomLike (open_typ_source t (PFVarT x)) -> False))).
+Proof.
+  intros.
+  pick_fresh x.
+  assert (Ha : not (In x L)) by not_in_L x.
+  apply H in Ha.
+  destruct Ha.
+  left.
+  intros.
+  apply fresh_bot with (x := x); auto.
+  not_in_L x.
+  not_in_L x0.
+  right.
+  intros.
+  apply H0.
+  apply fresh_bot with (x := x0); auto.
+  not_in_L x0.
+  not_in_L x.
+Qed.
+
+    
+Lemma bottomlike_eq_dec :
+  forall t, PType t -> (BottomLike t) \/ (~ BottomLike t).
+Proof.
+  intros t HPType.
+  unfold not.
+  induction HPType.
+  - right; intro HInv; inversion HInv.
+  - right; intro HInv; inversion HInv.
+  - destruct IHHPType2; auto.
+    right; intro HInv; inversion HInv; subst; contradiction.
+  - destruct IHHPType1; destruct IHHPType2; auto.
+    right; intro HInv; inversion HInv; subst; contradiction.
+  - apply bottomlike_eq_dec_forall_spec in H0.
+    destruct H0.
+    left; apply_fresh BLForAll as y.
+    apply H0.
+    not_in_L y.
+    right; intros.
+    inversion H1; subst.
+    pick_fresh x.
+    assert (Ha : not (In x L0)) by not_in_L x.
+    apply H3 in Ha.
+    apply H0 with (x := x); auto.
+    not_in_L x.
+  - auto.
+Qed.
+    
+Lemma bottomlike_subst_eq_dec :
+  forall z u ty,
+    PType u ->
+    PType ty ->
+    BottomLike (subst_typ_source z u ty) \/ ~ BottomLike (subst_typ_source z u ty).
+Proof.
+  intros z u ty PTypu PTypty.
+  apply bottomlike_eq_dec.
+  apply subst_source_lc; auto.
+Qed.
+
+Lemma bottomlike_subst_or :
+  forall z u t,
+    PType t ->
+    PType u ->
+    BottomLike (subst_typ_source z u t) ->
+    BottomLike u \/ BottomLike t.
+Proof.
+  intros z u t HPTypt HPTypu HBotSubst.
+  induction HPTypt; simpl in *; auto.
+  - destruct (eqb x z); auto.
+  - inversion HBotSubst; subst.
+    apply IHHPTypt2 in H0; inversion H0; auto.
+  - inversion HBotSubst; subst.
+    apply IHHPTypt1 in H0; inversion H0; auto.
+    apply IHHPTypt2 in H0; inversion H0; auto.
+  - inversion HBotSubst; subst.
+    pick_fresh x.
+    assert (Ha : not (In x L0)) by not_in_L x.
+    apply H2 in Ha.
+    rewrite subst_typ_source_open_source_var in Ha; auto.
+    assert (Ha1 : not (In x L)) by not_in_L x.
+    apply (H0 _ Ha1) in Ha.
+    destruct Ha; auto.
+    right; apply_fresh BLForAll as y.
+    apply fresh_bot with (x := x); auto.
+    not_in_L x.
+    not_in_L y.
+    not_in_L x.
+Qed.
+  
 Lemma ortho_subst_not_in :
   forall Gamma z u t1 t2,
     not (In z (union (fv_ptyp t1) (fv_ptyp t2))) ->
+    not (BottomLike u) ->
     WFTyp Gamma u ->
     Ortho Gamma t1 t2 ->
     Ortho (subst_env Gamma z u) t1 t2.
 Proof.  
-  intros Gamma z u t1 t2 HNotIn HWFu HOrtho.
+  intros Gamma z u t1 t2 HNotIn HNotBotu HWFu HOrtho.
   generalize dependent z.
   induction HOrtho; intros z HNotIn; simpl in HNotIn; auto.
   - apply OAnd1; [ apply IHHOrtho1 | apply IHHOrtho2 ]; auto; not_in_L z;
@@ -1671,21 +1773,25 @@ Proof.
     rewrite subst_typ_source_fresh; auto.
     not_in_L z.
     now rewrite Ha1.
-  - apply OVar with (A := A); auto. admit. (* x should still be in the substituted env *)
-    (*
-    apply OVar with (A := subst_typ_source z u A); auto.
+  - apply OVar with (A := subst_typ_source z u A); auto.
     apply in_persists_subst_env; auto.
     apply usub_subst_not_in; auto.
     not_in_L z.
-    now apply wf_gives_types_source in HWFu. *)
-  - apply OVarSym with (A := A); auto. (* same as previous case *)
-    (*
-    apply OVarSym with (A := subst_typ_source z u A); auto.
+    now apply wf_gives_types_source in HWFu.
+    unfold not; intro H3.
+    apply bottomlike_subst_or in H3. destruct H3; contradiction.
+    admit.
+    now apply wf_gives_types_source in HWFu.
+  - apply OVarSym with (A := subst_typ_source z u A); auto.
     apply in_persists_subst_env; auto.
     apply usub_subst_not_in; auto.
     not_in_L z.
-    now apply wf_gives_types_source in HWFu. *)
-Admitted.
+    now apply wf_gives_types_source in HWFu.
+    unfold not; intro H3.
+    apply bottomlike_subst_or in H3. destruct H3; contradiction.
+    admit.
+    now apply wf_gives_types_source in HWFu.
+Admitted.    
 
 Lemma ortho_subst :
   forall z u Gamma d t1 t2,
@@ -1740,17 +1846,29 @@ Proof.
       rewrite subst_typ_source_fresh; auto. 
       apply subst_source_lc; now apply wf_gives_types_source in HWFu.
       rewrite subst_typ_source_fresh; auto.
+      destruct (bottomlike_eq_dec u).
+      now apply wf_gives_types_source in HWFu.
+      apply OBot1; auto.      
       apply ortho_subst_not_in; auto.
       not_in_L z.
       apply usub_subst; auto.
       now apply wf_gives_types_source in HWFu.
-    + simpl; apply EqFacts.eqb_neq in Ha; rewrite Ha.
-      assert (sumbool (BottomLike (subst_typ_source z u ty)) (~ BottomLike (subst_typ_source z u ty))). admit. destruct H3. apply OBot2. auto.  
+    + simpl; apply EqFacts.eqb_neq in Ha; rewrite Ha. 
+      assert ((BottomLike (subst_typ_source z u ty)) \/ (~ BottomLike (subst_typ_source z u ty))).
+      apply bottomlike_subst_eq_dec; auto; now apply wf_gives_types_source in HWFu. 
+      destruct H3. apply OBot2. auto.
+
+
+      assert ((BottomLike (subst_typ_source z u A)) \/ (~ BottomLike (subst_typ_source z u A))).
+      apply bottomlike_subst_eq_dec; auto.
+      now apply wf_gives_types_source in HWFu.
+      admit. (* PType A *)
+      destruct H4.
+      admit.
       apply OVar with (A := subst_typ_source z u A); auto.
       apply in_persists_subst_env; auto.
       apply usub_subst; auto.
-      now apply wf_gives_types_source in HWFu. unfold not. intros.
-      apply n. admit. (* A <: ty -> BottomLike (subst z u A) -> BottomLike (subst z u ty) *)
+      now apply wf_gives_types_source in HWFu.
       apply subst_source_lc; now apply wf_gives_types_source in HWFu.
   - assert (Ha : sumbool (x = z) (not (x = z))) by apply VarTyp.eq_dec.
     destruct Ha as [Ha | Ha].
@@ -1764,17 +1882,22 @@ Proof.
       rewrite subst_typ_source_fresh; auto.
       apply subst_source_lc; now apply wf_gives_types_source in HWFu.
       rewrite subst_typ_source_fresh; auto.
+      destruct (bottomlike_eq_dec u).
+      now apply wf_gives_types_source in HWFu.
+      apply OBot1; auto.    
       apply ortho_subst_not_in; auto.
       not_in_L z.
       apply usub_subst; auto.
       now apply wf_gives_types_source in HWFu.
     + simpl; apply EqFacts.eqb_neq in Ha; rewrite Ha.
-      assert (sumbool (BottomLike (subst_typ_source z u ty)) (~ BottomLike (subst_typ_source z u ty))). admit. destruct H3. apply OBot1. auto.
+      assert ((BottomLike (subst_typ_source z u ty)) \/ (~ BottomLike (subst_typ_source z u ty))).
+      apply bottomlike_subst_eq_dec; auto; now apply wf_gives_types_source in HWFu. 
+      destruct H3. apply OBot1. auto.  
       apply OVarSym with (A := subst_typ_source z u A); auto.
       apply in_persists_subst_env; auto.
       apply usub_subst; auto.
       now apply wf_gives_types_source in HWFu.
-      unfold not; intros. apply n. admit. (* symmetry with previous case *)
+      unfold not; intros. apply H3. admit. (* symmetry with previous case *)
       apply subst_source_lc; now apply wf_gives_types_source in HWFu.
   - simpl; apply OBot1. apply bottomlike_subst; auto.
     now apply wf_gives_types_source in HWFu.
