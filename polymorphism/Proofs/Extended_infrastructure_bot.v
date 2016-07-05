@@ -1877,7 +1877,6 @@ Qed.
 
 Hint Resolve wf_gives_wfenv wf_weaken_source wf_gives_types_source.
 
-(*
 Lemma subst_source_wf_typ_bot :
   forall t Gamma, WFTyp Gamma t -> forall z u d,
                        BottomLike u ->
@@ -1897,8 +1896,7 @@ Proof.
     apply H.
     auto.
   - apply_fresh WFForAll as x.
-Admitted.
-*)  
+Admitted.  
     
 Definition body_wf_typ t d Gamma :=
   exists L, forall x, not (In x L) -> WFTyp Gamma d ->
