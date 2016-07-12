@@ -69,6 +69,18 @@ Fixpoint subst_typ_source (z : var) (u : PTyp) (t : PTyp) {struct t} : PTyp :=
   | Bot         => Bot
   end.
 
+
+Fixpoint bot_source (t : PTyp) {struct t} : PTyp :=
+  match t with
+  | PInt        => PInt
+  | Fun t1 t2   => Fun (bot_source t1) (bot_source t2)
+  | And t1 t2   => And (bot_source t1) (bot_source t2)
+  | PFVarT x    => Bot
+  | PBVarT i    => PBVarT i
+  | ForAll d t  => ForAll (bot_source d) (bot_source t)
+  | Bot         => Bot
+  end.
+
 Fixpoint fv_ptyp (pTyp : PTyp) : vars :=
   match pTyp with
     | PInt        => empty 
@@ -101,6 +113,7 @@ Inductive Atomic : PTyp -> Prop :=
   | ABot : Atomic Bot.
 
 Inductive BottomLike : PTyp -> Prop :=
+  (* | BLVar : forall x, BottomLike (PFVarT x) *)
   | BLBot : BottomLike Bot
   | BLAnd1 : forall t1 t2, BottomLike t1 -> BottomLike (And t1 t2)                   
   | BLAnd2 : forall t1 t2, BottomLike t2 -> BottomLike (And t1 t2)
@@ -352,18 +365,22 @@ Inductive Ortho : context TyEnvSource -> PTyp -> PTyp -> Prop :=
                                            (open_typ_source t2 (PFVarT x))) ->
                 Ortho Gamma (ForAll d t1) (ForAll d t2)
   | OVar : forall Gamma x ty A, List.In (x,TyDis A) Gamma ->
-                       usub A ty ->
-                       not (BottomLike A) ->
+                       usub (bot_source A) (bot_source ty) ->
                        PType ty ->
                        Ortho Gamma (PFVarT x) ty
   | OVarSym : forall Gamma x ty A, List.In (x,TyDis A) Gamma ->
-                          usub A ty ->
-                          not (BottomLike A) ->
+                          usub (bot_source A) (bot_source ty) ->
                           PType ty ->
                           Ortho Gamma ty (PFVarT x)
-  | OBot1 : forall Gamma t A, BottomLike A -> Ortho Gamma A t
-  | OBot2 : forall Gamma t A, BottomLike A -> Ortho Gamma t A
+  | OBot1 : forall Gamma t, Ortho Gamma Bot t
+  | OBot2 : forall Gamma t, Ortho Gamma t Bot
   | OAx : forall Gamma t1 t2, OrthoAx t1 t2 -> Ortho Gamma t1 t2.
+
+              (*
+Lemma obot1 : forall A, BottomLike A -> forall B Gamma, Ortho Gamma A B.
+  intros A botA. induction botA; intros.
+  apply OBot1. apply OAnd1. auto. auto.
+*)
 
 Hint Constructors Ortho.
 
