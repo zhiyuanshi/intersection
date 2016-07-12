@@ -367,10 +367,12 @@ Inductive Ortho : context TyEnvSource -> PTyp -> PTyp -> Prop :=
   | OVar : forall Gamma x ty A, List.In (x,TyDis A) Gamma ->
                        usub (bot_source A) (bot_source ty) ->
                        PType ty ->
+                       PType A ->
                        Ortho Gamma (PFVarT x) ty
   | OVarSym : forall Gamma x ty A, List.In (x,TyDis A) Gamma ->
                           usub (bot_source A) (bot_source ty) ->
                           PType ty ->
+                          PType A ->
                           Ortho Gamma ty (PFVarT x)
   | OBot1 : forall Gamma t, Ortho Gamma Bot t
   | OBot2 : forall Gamma t, Ortho Gamma t Bot
