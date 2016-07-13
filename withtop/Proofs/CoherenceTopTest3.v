@@ -72,11 +72,7 @@ for sub *)
 
 Inductive Atomic : PTyp -> Prop :=
   | AInt : Atomic PInt
-  | AFun : forall t1 t2, Atomic (Fun t1 t2).
-
-Inductive TopSig : PTyp -> Prop :=
-  | TopSigF : forall A B, TopSig B -> TopSig (Fun A B)
-  | TopSigT : TopSig TopT.  
+  | AFun : forall t1 t2, Atomic (Fun t1 t2).  
 
 Fixpoint and_coercion (t : PTyp) (e : Exp) {struct t} : sum Exp Exp :=
   match t with
@@ -113,76 +109,6 @@ Inductive sub : PTyp -> PTyp -> Exp -> Prop :=
   | STop : forall t, sub t TopT (fun A => STLam' _ (STUnit _)).
 
 Notation "'|' t '|'" := (ptyp2styp t) (at level 60).
-
-Lemma and_coercion_inl_term :
-  forall {t e},
-    TopSig t ->
-    exists r, and_coercion t e = inl r /\ STTerm (r var).  
-Proof.
-  intros.
-  induction H.
-  inversion IHTopSig.
-  exists (fun A : Type => STLam' A (x A)).
-  inversion H0.
-  split.
-  simpl.
-  rewrite H1.
-  reflexivity.
-  apply_fresh STTerm_Lam' as x.
-  unfold open; rewrite <- open_rec_term; auto.
-  exists (fun A : Type => STUnit A); auto.
-Qed.
-  
-Lemma and_coercion_inl_typing :
-  forall {t e Gamma},
-    ok Gamma ->
-    TopSig t ->
-    exists r, and_coercion t e = inl r /\ has_type_st Gamma (r var) (|t|).  
-Proof.
-  intros.
-  induction H0.
-  destruct IHTopSig.
-  exists (fun A : Type => STLam' A (x A)).
-  simpl.
-  destruct H1.
-  rewrite H1.
-  split.
-  reflexivity.
-  apply_fresh STTyLam' as v.
-  unfold open.
-  rewrite <- open_rec_term.
-  rewrite <- app_nil_l with (l := extend v (| A |) Gamma).
-  apply typing_weaken; rewrite app_nil_l.
-  apply H2.
-  apply Ok_push; assumption.
-  now apply typing_gives_terms in H2.
-  exists (fun A : Type =>  STUnit A).
-  split.
-  now simpl.
-  simpl.
-  apply STTyUnit.
-  auto.
-Qed.
-
-(*
-Lemma and_coercion_inr :
-  forall {t e},
-    not (TopSig t) ->
-    and_coercion t e = inr e.
-Proof.
-  intros.
-  generalize dependent e.
-  induction t0; try simpl; auto.
-  intros.
-  assert (not (TopSig t0_2)).
-  unfold not; intros HTS; apply H.
-  apply TopSigF; apply HTS.
-  apply IHt0_2 with (e := e) in H0.
-  rewrite H0.
-  reflexivity.
-  exfalso; apply H; apply TopSigT.
-Qed.
-*)
 
 Definition Sub (t1 t2 : PTyp) : Prop := exists (e:Exp), sub t1 t2 e.
 
