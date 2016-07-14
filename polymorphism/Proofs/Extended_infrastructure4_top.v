@@ -1004,7 +1004,7 @@ Proof.
     apply IHWFTyp.
     simpl in H; not_in_L z.
     reflexivity.
-  - apply WFBot.
+  - apply WFTop.
     subst.
     now apply wfenv_remove in H0.
 Qed.
@@ -1053,7 +1053,7 @@ Proof.
     not_in_L x.
     unfold extend; now simpl.
     now apply IHWFTyp.
-  - apply WFBot.
+  - apply WFTop.
     now apply wfenv_middle_comm in H0.
 Qed.
 
@@ -1102,7 +1102,7 @@ Proof.
     not_in_L x.
     apply IHWFTyp.
     not_in_L x.
-  - apply WFBot.
+  - apply WFTop.
     apply WFPushV; auto.
     not_in_L x.
     not_in_L x.
@@ -1417,13 +1417,13 @@ Proof.
     subst.
     apply usub_and_r with (t2 := t1); eauto.    
     apply usub_lc in HusubAB1; apply usub_lc in HusubAB2.
-    apply USBot; destruct HusubAB1; destruct HusubAB2; auto.
+    apply USTop; destruct HusubAB1; destruct HusubAB2; auto.
   - dependent induction HusubCD; subst; auto.
-    apply usub_lc in HusubAB; apply USBot; destruct HusubAB; auto.
+    apply usub_lc in HusubAB; apply USTop; destruct HusubAB; auto.
   - dependent induction HusubAB; subst; auto.
   - dependent induction HusubAB; subst; auto.
   - dependent induction HusubCD; subst; auto.
-    apply usub_lc in HusubAB; apply USBot; destruct HusubAB; auto. 
+    apply usub_lc in HusubAB; apply USTop; destruct HusubAB; auto. 
   - dependent induction HusubCD; subst; auto.
     dependent induction HusubAB; subst; auto.
     apply_fresh USForAll as x.
@@ -1433,9 +1433,9 @@ Proof.
     not_in_L x.
     apply H3.
     not_in_L x.
-    apply usub_lc in HusubAB; apply USBot; destruct HusubAB; auto.
+    apply usub_lc in HusubAB; apply USTop; destruct HusubAB; auto.
   - dependent induction HusubCD; subst; auto.
-    apply usub_lc in HusubAB; apply USBot; destruct HusubAB; auto.
+    apply usub_lc in HusubAB; apply USTop; destruct HusubAB; auto.
 Qed.
 
 Lemma usub_trans :
@@ -1555,7 +1555,7 @@ Proof.
     not_in_L x.
     not_in_L x.
     not_in_L x.
-  - apply USBot.
+  - apply USTop.
     apply subst_source_lc; auto.
 Qed.
 
@@ -1613,29 +1613,6 @@ Proof.
     apply usub_subst_not_in; auto.
     not_in_L z.
     now apply wf_gives_types_source in HWFu.
-Qed.
-
-Lemma bottomlike_subst :
-  forall z u d,
-    BottomLike (subst_typ_source z u d) ->
-    BottomLike d.
-Proof.
-  intros.
-  induction d; simpl in *; auto.
-  - apply BLFun; apply IHd2; now inversion H.
-  - inversion H.
-    apply BLAnd1; auto.
-    apply BLAnd2; auto.
-Admitted.
-
-Lemma not_bottomlike_subst :
-  forall z u d,
-    not (BottomLike d) ->
-    not (BottomLike (subst_typ_source z u d)).
-Proof.
-  intros z u d HNotBot.
-  unfold not; intro HBot; apply HNotBot.
-  eapply bottomlike_subst; apply HBot.
 Qed.
   
 Lemma ortho_subst :
@@ -1721,8 +1698,8 @@ Proof.
       apply usub_subst; auto.
       now apply wf_gives_types_source in HWFu.
       apply subst_source_lc; now apply wf_gives_types_source in HWFu.
-  - simpl; apply OBot1.
-  - simpl; apply OBot2.
+  - simpl; apply OTop1.
+  - simpl; apply OTop2.
   - apply OAx; auto.
     assert (Ha : OrthoAx t1 t2) by assumption.
     destruct t1; destruct t2; auto; simpl; try (now orthoax_inv_r H0);

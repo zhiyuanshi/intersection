@@ -82,8 +82,9 @@ Fixpoint and_coercion (t : PTyp) (e : Exp) {struct t} : sum Exp Exp :=
                   | inr r => inr r
                  end 
     | And A B => match (and_coercion A e, and_coercion B e) with
-                   | (inl l1, inl l2) => inl (fun A : Type => STLam' A (l1 A)) (* wrong: FIx me! *)
-                   | _ => inr e
+                  | (inl l1, inl l2) =>
+                    inl (fun A : Type => STPair _ (l1 A) (l2 A))
+                  | _ => inr e
                  end
     | TopT    => inl (fun A => (STUnit A))
   end.
@@ -459,7 +460,7 @@ Lemma foo : forall A, TopLike A -> forall e1, exists e2, and_coercion A e1 = inl
   intros A T. induction T; simpl; intros.
   exists (fun A : Type => STUnit A). auto.
   destruct (IHT1 e1). destruct (IHT2 e1). rewrite H, H0.
-  exists (fun A0 : Type => STLam' A0 (x A0)). auto.
+  eauto.
   destruct (IHT e1). rewrite H.
   exists (fun A0 : Type => STLam' A0 (x A0)). auto.
   Defined.
@@ -570,17 +571,6 @@ forbid TopLike Types in intersections!
 allow Int -> String & Int -> Char, even though the types intersect
 
  *)
-
-(* Looking for some alternative specifications *)
-
-Lemma rest : forall A B, not (Sub A B) /\ not (Sub B A) -> not (TopLike A).
-intros.
-destruct H. 
-unfold not. intros. generalize H H0 B. clear H H0. generalize B. clear B.
-induction H1; intros. apply H0. apply stop.
-assert (not (Sub B0 A) /\ not (Sub B0 B)).
-split. unfold not. intros.
-Admitted.
 
 
 (* typing rules of lambda i *)
@@ -1669,23 +1659,88 @@ Proof.
     apply H.
     apply H2. 
   - reflexivity.
-Defined.
+Defined. 
 
-Lemma topsig_dec : forall t, sumbool (TopSig t) (not (TopSig t)).
+(** TODO move these three lemmas to the beginning **)
+
+Lemma and_coercion_inl_term :
+  forall {t e},
+    TopLike t ->
+    exists r, and_coercion t e = inl r /\ STTerm (r var).  
 Proof.
-  intro t.
-  induction t.
-  - right; unfold not; intros HInv; inversion HInv. 
-  - inversion IHt2.
-    left.
-    apply TopSigF.
-    apply H.
-    right.
-    unfold not; intros HInv; inversion HInv; subst.
-    contradiction.
-  - right; unfold not; intros HInv; inversion HInv.
-  - left; apply TopSigT.
-Qed.    
+  intros.
+  induction H.
+  - exists (fun A : Type => STUnit A); auto.
+  - destruct IHTopLike1, IHTopLike2, H1, H2.
+    simpl; rewrite H1, H2.
+    exists (fun A0 : Type => STPair A0 (x A0) (x0 A0)); auto.
+  - inversion IHTopLike.
+    exists (fun A : Type => STLam' A (x A)).
+    inversion H0.
+    split.
+    simpl.
+    rewrite H1.
+    reflexivity.
+    apply_fresh STTerm_Lam' as x.
+    unfold open; rewrite <- open_rec_term; auto.
+Qed.
+
+Lemma and_coercion_inl_typing :
+  forall {t e Gamma},
+    ok Gamma ->
+    TopLike t ->
+    exists r, and_coercion t e = inl r /\ has_type_st Gamma (r var) (|t|).  
+Proof.
+  intros.
+  induction H0.
+  - exists (fun A : Type =>  STUnit A); auto.
+  - destruct IHTopLike1, IHTopLike2.
+    destruct H0, H1.
+    exists (fun A : Type => STPair A (x A) (x0 A)).
+    split; simpl.
+    now rewrite H0, H1.
+    apply STTyPair; auto.
+  - destruct IHTopLike.
+    exists (fun A : Type => STLam' A (x A)).
+    simpl.
+    destruct H1.
+    rewrite H1.
+    split.
+    reflexivity.
+    apply_fresh STTyLam' as v.
+    unfold open.
+    rewrite <- open_rec_term.
+    rewrite <- app_nil_l with (l := extend v (| A |) Gamma).
+    apply typing_weaken; rewrite app_nil_l.
+    apply H2.
+    apply Ok_push; assumption.
+    now apply typing_gives_terms in H2.
+Qed.
+
+Lemma and_coercion_inr :
+  forall {t e},
+    not (TopLike t) ->
+    and_coercion t e = inr e.
+Proof.
+  intros.
+  generalize dependent e.
+  induction t0; try simpl; auto.
+  - intros.
+    assert (not (TopLike t0_2)).
+    unfold not; intros HTS; apply H.
+    apply TLFun; apply HTS.
+    apply IHt0_2 with (e := e) in H0.
+    rewrite H0.
+    reflexivity.
+  - intros.
+    assert (Ha : ~ TopLike t0_1 \/ ~ TopLike t0_2) by
+        (apply not_and_or; unfold not; intros; apply H; now apply TLAnd).
+    destruct Ha.
+    rewrite IHt0_1; auto.
+    rewrite IHt0_2; auto.
+    now destruct (and_coercion t0_1 e).
+  - exfalso; apply H; apply TLTop.
+Qed.
 
 (* Subtyping rules produce type-correct coercions: Lemma 1 *)
 Lemma type_correct_coercions :
@@ -1778,7 +1833,7 @@ Proof.
     apply STTyVar.
     apply Ok_push; auto.
     left; reflexivity.
-  - pose (topsig_dec t0).
+  - pose (toplike_dec t0).
     inversion s; clear s.
     assert (Ha : exists r, and_coercion t0 ((fun A : Type => STApp A (c A) (STProj1 A (STBVar A 0)))) = inl r /\ has_type_st Gamma (r var) (|t0|)) by (apply and_coercion_inl_typing; auto).
     destruct Ha as [r [HCoerce HHasTy]].
@@ -1804,7 +1859,7 @@ Proof.
     apply STTyVar.
     apply Ok_push; auto.
     left; reflexivity.
-  - pose (topsig_dec t0).
+  - pose (toplike_dec t0).
     inversion s; clear s.
     assert (Ha : exists r, and_coercion t0 ((fun A : Type => STApp A (c A) (STProj2 A (STBVar A 0)))) = inl r /\ has_type_st Gamma (r var) (|t0|)) by (apply and_coercion_inl_typing; auto).
     destruct Ha as [r [HCoerce HHasTy]].
@@ -1842,7 +1897,7 @@ Lemma and_coercion_proj1_term :
 Proof.
   intros.
   apply_fresh STTerm_Lam' as x; unfold open; simpl.
-  pose (topsig_dec t0).
+  pose (toplike_dec t0).
   inversion s; clear s.
   assert (exists r : Exp, and_coercion t0 (fun A : Type =>
                           STApp A (c A) (STProj1 A (STBVar A 0))) = inl r /\ STTerm (r var)).
@@ -1867,7 +1922,7 @@ Lemma and_coercion_proj2_term :
 Proof.
   intros.
   apply_fresh STTerm_Lam' as x; unfold open; simpl.
-  pose (topsig_dec t0).
+  pose (toplike_dec t0).
   inversion s; clear s.
   assert (exists r : Exp, and_coercion t0 (fun A : Type =>
                           STApp A (c A) (STProj2 A (STBVar A 0))) = inl r /\ STTerm (r var)).

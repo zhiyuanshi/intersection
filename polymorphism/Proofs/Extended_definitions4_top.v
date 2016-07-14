@@ -29,7 +29,7 @@ Inductive PTyp : Type :=
   | PBVarT : nat -> PTyp
   | PFVarT : var -> PTyp
   | ForAll : PTyp -> PTyp -> PTyp (* disjoint constraint *)
-  | Bot : PTyp.
+  | Top : PTyp.
 
 Fixpoint ptyp2styp (t : PTyp) : STyp :=
   match t with
@@ -39,7 +39,7 @@ Fixpoint ptyp2styp (t : PTyp) : STyp :=
     | PBVarT n => STBVarT n
     | PFVarT v => STFVarT v
     | ForAll _ t => STForAll (ptyp2styp t)
-    | Bot => STForAll (STBVarT 0)
+    | Top => STForAll (STBVarT 0)
   end.
 
 Notation "'|' t '|'" := (ptyp2styp t) (at level 60).
@@ -53,7 +53,7 @@ Fixpoint open_rec_typ_source (k : nat) (u : PTyp) (t : PTyp) {struct t} : PTyp :
   | PBVarT i    => if Nat.eqb k i then u else (PBVarT i)
   | ForAll d t => ForAll (open_rec_typ_source k u d) (* d comes before forall *)
                         (open_rec_typ_source (S k) u t)
-  | Bot         => Bot
+  | Top         => Top
   end.
 
 Definition open_typ_source (t : PTyp) u := open_rec_typ_source 0 u t.
@@ -66,7 +66,7 @@ Fixpoint subst_typ_source (z : var) (u : PTyp) (t : PTyp) {struct t} : PTyp :=
   | PFVarT x    => if VarTyp.eqb x z then u else (PFVarT x)
   | PBVarT i    => PBVarT i
   | ForAll d t  => ForAll (subst_typ_source z u d) (subst_typ_source z u t)
-  | Bot         => Bot
+  | Top         => Top
   end.
 
 Fixpoint fv_ptyp (pTyp : PTyp) : vars :=
@@ -77,7 +77,7 @@ Fixpoint fv_ptyp (pTyp : PTyp) : vars :=
     | PBVarT n    => empty
     | PFVarT v    => singleton v
     | ForAll d t  => union (fv_ptyp d) (fv_ptyp t)
-    | Bot         => empty
+    | Top         => empty
   end.  
 
 Inductive PType : PTyp -> Prop :=
@@ -89,7 +89,7 @@ Inductive PType : PTyp -> Prop :=
                      PType d ->
                      (forall x, not (In x L) -> PType (open_typ_source t (PFVarT x))) ->
                      PType (ForAll d t)
-  | PType_Bot : PType Bot.
+  | PType_Top : PType Top.
 
 Hint Constructors PType.
 
@@ -98,16 +98,7 @@ Inductive Atomic : PTyp -> Prop :=
   | AFun : forall t1 t2, Atomic (Fun t1 t2)
   | AVar : forall v, Atomic (PFVarT v)
   | AForAll : forall d t, Atomic (ForAll d t)
-  | ABot : Atomic Bot.
-
-Inductive BottomLike : PTyp -> Prop :=
-  | BLBot : BottomLike Bot
-  | BLAnd1 : forall t1 t2, BottomLike t1 -> BottomLike (And t1 t2)                   
-  | BLAnd2 : forall t1 t2, BottomLike t2 -> BottomLike (And t1 t2)
-  | BLFun : forall t1 t2, BottomLike t2 -> BottomLike (Fun t1 t2)
-  | BLForAll : forall L d t,
-                 (forall x, not (In x L) -> BottomLike (open_typ_source t (PFVarT x))) ->
-                 BottomLike (ForAll d t).
+  | ATop : Atomic Top.
                                        
 (* Subtyping relation *)
 
@@ -122,7 +113,7 @@ Inductive usub : PTyp -> PTyp -> Prop :=
                  (forall x, not (In x L) -> usub (open_typ_source t1 (PFVarT x))
                                            (open_typ_source t2 (PFVarT x))) ->
                  usub (ForAll d t1) (ForAll d t2)
-  | USBot : forall t, PType t -> usub t Bot.
+  | USTop : forall t, PType t -> usub t Top.
 
 Inductive sub : PTyp -> PTyp -> (SExp var) -> Prop :=
   | SInt : sub PInt PInt (STLam _ (STBVar _ 0))
@@ -144,7 +135,7 @@ Inductive sub : PTyp -> PTyp -> (SExp var) -> Prop :=
                                          (open_typ_term c (STFVarT x))) ->
                 sub (ForAll d t1) (ForAll d t2)
                     (STLam _ (STTLam _ (STApp _ c (STTApp _ (STBVar _ 0) (STBVarT 0)))))
-  | SBot : forall t, PType t -> sub t Bot (STLam _ (STUnit _)).
+  | STop : forall t, PType t -> sub t Top (STLam _ (STUnit _)).
 
 Hint Constructors Atomic sub usub.
 
@@ -216,8 +207,8 @@ Definition sand2 : forall t t1 t2, Sub t1 t -> Sub (And t1 t2) t.
   - apply sand2_atomic; auto.
   (* Case ForAll *)
   - apply sand2_atomic; auto; apply AForAll.
-  (* Case Bot *)
-  - apply sand2_atomic; auto; apply ABot.
+  (* Case Top *)
+  - apply sand2_atomic; auto; apply ATop.
 Qed.
 
 Definition sand3_atomic :
@@ -251,8 +242,8 @@ Definition sand3 : forall t t1 t2, Sub t2 t -> Sub (And t1 t2) t.
   - apply sand3_atomic; auto.
   (* Case ForAll *)
   - apply sand3_atomic; auto; apply AForAll.
-  (* Case Bot *)
-  - apply sand3_atomic; auto; apply ABot.
+  (* Case Top *)
+  - apply sand3_atomic; auto; apply ATop.
 Qed.
 
 Definition svar : forall v, Sub (PFVarT v) (PFVarT v).
@@ -322,7 +313,7 @@ Definition hd (p : PTyp) : nat :=
   | PInt       => 0
   | Fun t1 t2  => 1
   | ForAll d t => 2
-  | Bot        => 3
+  | Top        => 3
   | PBVarT n   => 4
   | PFVarT v   => 5 
   | And t1 t2  => 6
@@ -348,8 +339,8 @@ Inductive Ortho : context TyEnvSource -> PTyp -> PTyp -> Prop :=
                           usub A ty ->
                           PType ty ->
                           Ortho Gamma ty (PFVarT x)
-  | OBot1 : forall Gamma t, Ortho Gamma Bot t
-  | OBot2 : forall Gamma t, Ortho Gamma t Bot
+  | OTop1 : forall Gamma t, Ortho Gamma Top t
+  | OTop2 : forall Gamma t, Ortho Gamma t Top
   | OAx : forall Gamma t1 t2, OrthoAx t1 t2 -> Ortho Gamma t1 t2.
 
 Hint Constructors Ortho.
@@ -369,7 +360,7 @@ Inductive WFTyp : context TyEnvSource -> PTyp -> Prop :=
                  (forall x, not (In x L) -> WFTyp (extend x (TyDis d) Gamma) (open_typ_source t (PFVarT x))) ->
                  WFTyp Gamma d ->
                  WFTyp Gamma (ForAll d t)
-  | WFBot : forall Gamma, WFEnv Gamma -> WFTyp Gamma Bot.
+  | WFTop : forall Gamma, WFEnv Gamma -> WFTyp Gamma Top.
 
 Hint Constructors WFTyp.
 
