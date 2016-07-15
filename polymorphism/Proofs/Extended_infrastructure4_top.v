@@ -1368,6 +1368,7 @@ Proof.
   - apply_fresh USForAll as x.
     apply H0.
     not_in_L x.
+    auto.
 Qed.
 
 Lemma usub_and_l : forall t1 t2 t3, usub t1 (And t2 t3) -> usub t1 t2.
@@ -1389,8 +1390,12 @@ Proof.
 Qed.
 
 Lemma usub_lc : forall t1 t2, usub t1 t2 -> PType t1 /\ PType t2.
-Admitted.
-
+Proof.
+  intros.
+  apply sound_sub in H.
+  now apply sub_lc in H.
+Qed.
+  
 Lemma usub_trans_mid :
   forall A B C D, usub A B -> usub B C -> usub C D -> usub A D.
 Proof.
@@ -1429,10 +1434,11 @@ Proof.
     apply_fresh USForAll as x.
     apply H0 with (x := x).
     not_in_L x.
-    apply H1.
+    apply H2.
     not_in_L x.
-    apply H3.
+    apply H6.
     not_in_L x.
+    auto.
     apply usub_lc in HusubAB; apply USTop; destruct HusubAB; auto.
   - dependent induction HusubCD; subst; auto.
     apply usub_lc in HusubAB; apply USTop; destruct HusubAB; auto.
@@ -1473,7 +1479,7 @@ Proof.
     not_in_L x.
     apply H4.
     not_in_L x.
-    apply H2.
+    apply H6.
     not_in_L x.
   - pose (usub_trans _ _ _ HWFty H0 HSub).
     apply OVar with (A := A) ; auto.
@@ -1547,6 +1553,8 @@ Lemma usub_subst :
 Proof.
   intros A B z u HSub HWFu.
   induction HSub; intros; simpl; eauto.
+  - apply USAnd2; auto; now apply subst_source_lc.
+  - apply USAnd3; auto; now apply subst_source_lc.
   - destruct eqb; auto.
     eapply usub_refl; apply HWFu.
   - apply_fresh USForAll as x.
@@ -1555,6 +1563,7 @@ Proof.
     not_in_L x.
     not_in_L x.
     not_in_L x.
+    now apply subst_source_lc.
   - apply USTop.
     apply subst_source_lc; auto.
 Qed.
@@ -1855,8 +1864,11 @@ Proof.
     unfold extend.
     apply WFType_Var.
     apply Ok_push.
-    admit.
-Admitted.
+    apply wfenv_to_ok in H; auto.
+    unfold conv_context; rewrite <- dom_map_id.
+    not_in_L x.
+    left; auto.
+Qed.
 
 Hint Resolve WFTyp_to_WFType.
 

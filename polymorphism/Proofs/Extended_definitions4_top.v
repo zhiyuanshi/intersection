@@ -97,8 +97,8 @@ Inductive Atomic : PTyp -> Prop :=
   | AInt : Atomic PInt
   | AFun : forall t1 t2, Atomic (Fun t1 t2)
   | AVar : forall v, Atomic (PFVarT v)
-  | AForAll : forall d t, Atomic (ForAll d t)
-  | ATop : Atomic Top.
+  | AForAll : forall d t, Atomic (ForAll d t).
+(*  | ATop : Atomic Top. *)
                                        
 (* Subtyping relation *)
 
@@ -106,33 +106,61 @@ Inductive usub : PTyp -> PTyp -> Prop :=
   | USInt : usub PInt PInt
   | USFun : forall o1 o2 o3 o4, usub o3 o1 -> usub o2 o4 -> usub (Fun o1 o2) (Fun  o3 o4) 
   | USAnd1 : forall t t1 t2, usub t t1 -> usub t t2 -> usub t (And  t1 t2) 
-  | USAnd2 : forall t t1 t2 , usub t1 t -> usub (And t1 t2) t 
-  | USAnd3 : forall t t1 t2, usub t2 t -> usub (And t1 t2) t
+  | USAnd2 : forall t t1 t2 , usub t1 t -> PType t2 -> usub (And t1 t2) t 
+  | USAnd3 : forall t t1 t2, usub t2 t -> PType t1 -> usub (And t1 t2) t
   | USVar   : forall v, usub (PFVarT v) (PFVarT v) 
   | USForAll : forall L d t1 t2,
                  (forall x, not (In x L) -> usub (open_typ_source t1 (PFVarT x))
                                            (open_typ_source t2 (PFVarT x))) ->
+                 PType d ->
                  usub (ForAll d t1) (ForAll d t2)
   | USTop : forall t, PType t -> usub t Top.
 
+Fixpoint and_coercion (t : PTyp) (e : SExp var) {struct t} : sum (SExp var) (SExp var) :=
+  match t with
+    | PInt    => inr e
+    | Fun _ B => match (and_coercion B e) with
+                  | inl l => inl (STLam _ l)
+                  | inr r => inr r
+                 end 
+    | And A B => match (and_coercion A e, and_coercion B e) with
+                  | (inl l1, inl l2) =>
+                    inl (STPair _ l1 l2)
+                  | _ => inr e
+                 end
+    | TopT    => inl (STUnit _)
+  end.
+
+Definition join_sum : forall {A}, A + A -> A.
+  intros A H; destruct H as [a | a]; exact a.
+Defined.
+
 Inductive sub : PTyp -> PTyp -> (SExp var) -> Prop :=
   | SInt : sub PInt PInt (STLam _ (STBVar _ 0))
-  | SFun : forall o1 o2 o3 o4 c1 c2, sub o3 o1 c1 -> sub o2 o4 c2 -> 
-     sub (Fun o1 o2) (Fun o3 o4) (STLam _ (STLam _ (STApp _ c2 (STApp _ (STBVar _ 1) (STApp _ c1 (STBVar _ 0))))))
-  | SAnd1 : forall t t1 t2 c1 c2, sub t t1 c1 -> sub t t2 c2 -> 
-     sub t (And  t1 t2) (STLam _
-       (STPair _ (STApp _ c1 (STBVar _ 0)) (STApp _ c2 (STBVar _ 0))))
-  | SAnd2 : forall t t1 t2 c, sub t1 t c -> Atomic t ->
-     sub (And  t1 t2) t (STLam _ 
-       ((STApp _ c (STProj1 _ (STBVar _ 0)))))
-  | SAnd3 : forall t t1 t2 c, sub t2 t c -> Atomic t ->
-     sub (And  t1 t2) t (STLam _ 
-       ((STApp _ c (STProj2 _ (STBVar _ 0)))))
+  | SFun : forall o1 o2 o3 o4 c1 c2,
+             sub o3 o1 c1 ->
+             sub o2 o4 c2 -> 
+             sub (Fun o1 o2) (Fun o3 o4) (STLam _ (STLam _ (STApp _ c2 (STApp _ (STBVar _ 1) (STApp _ c1 (STBVar _ 0))))))
+  | SAnd1 : forall t t1 t2 c1 c2,
+              sub t t1 c1 ->
+              sub t t2 c2 -> 
+              sub t (And t1 t2) (STLam _ (STPair _ (STApp _ c1 (STBVar _ 0)) (STApp _ c2 (STBVar _ 0))))
+  | SAnd2 : forall t t1 t2 c,
+              sub t1 t c ->
+              Atomic t ->
+              PType t2 ->
+              sub (And t1 t2) t (STLam _ (join_sum (and_coercion t ((STApp _ c (STProj1 _ (STBVar _ 0)))))))
+  | SAnd3 : forall t t1 t2 c,
+              sub t2 t c ->
+              Atomic t ->
+              PType t1 ->
+              sub (And t1 t2) t (STLam _ (join_sum (and_coercion t ((STApp _ c (STProj2 _ (STBVar _ 0)))))))
   | SVar : forall v, sub (PFVarT v) (PFVarT v) (STLam _ (STBVar _ 0))
   | SForAll : forall L d t1 t2 c,
                 (forall x, not (In x L) -> sub (open_typ_source t1 (PFVarT x))
                                          (open_typ_source t2 (PFVarT x))
                                          (open_typ_term c (STFVarT x))) ->
+                PType d ->
                 sub (ForAll d t1) (ForAll d t2)
                     (STLam _ (STTLam _ (STApp _ c (STTApp _ (STBVar _ 0) (STBVarT 0)))))
   | STop : forall t, PType t -> sub t Top (STLam _ (STUnit _)).
@@ -140,8 +168,32 @@ Inductive sub : PTyp -> PTyp -> (SExp var) -> Prop :=
 Hint Constructors Atomic sub usub.
 
 Definition Sub (t1 t2 : PTyp) : Prop := exists (e:SExp var), sub t1 t2 e.
-  
+
+Lemma sub_lc : forall t1 t2, Sub t1 t2 -> PType t1 /\ PType t2.
+Proof.
+  intros t1 t2 HSub.
+  destruct HSub.
+  induction H; eauto.
+  - destruct IHsub1, IHsub2; auto.
+  - destruct IHsub1, IHsub2; auto.
+  - destruct IHsub; auto.
+  - destruct IHsub; auto.
+  - split.
+    apply_fresh PType_ForAll as x; auto.
+    assert (Ha : ~ In x L) by not_in_L x.
+    apply H0 in Ha; now destruct Ha.
+    apply_fresh PType_ForAll as x; auto.
+    assert (Ha : ~ In x L) by not_in_L x.
+    apply H0 in Ha; now destruct Ha.
+Qed.
+
+Hint Resolve sub_lc.
+
 (* Smart constructors for Sub *)
+
+Definition stop : forall t, PType t -> Sub t Top.
+unfold Sub; eauto.
+Defined.
 
 Definition sint : Sub PInt PInt.
 unfold Sub. exists (STLam _ (STBVar _ 0)). 
@@ -163,87 +215,76 @@ apply SAnd1. auto. auto.
 Defined.
 
 Definition sand2_atomic :
-  forall t t1 t2, Sub t1 t -> Atomic t -> Sub (And  t1 t2) t.
-  unfold Sub. intros t t1 t2 H H0. destruct t; try (now inversion H0).
-  - destruct H.
-    exists (STLam _ ((STApp _ x (STProj1 _ (STBVar _ 0))))).
-    apply SAnd2; auto.
-  - destruct H.
-    exists (STLam _ ((STApp _ x (STProj1 _ (STBVar _ 0))))).
-    apply SAnd2; auto.
-  - destruct H.
-    exists (STLam _ ((STApp _ x (STProj1 _ (STBVar _ 0))))).
-    apply SAnd2; auto.
-  - destruct H.
-    exists (STLam _ ((STApp _ x (STProj1 _ (STBVar _ 0))))).
-    apply SAnd2; auto.
-  - destruct H.
-    exists (STLam _ ((STApp _ x (STProj1 _ (STBVar _ 0))))).
-    apply SAnd2; auto.
+  forall t t1 t2, Sub t1 t -> Atomic t -> PType t2 -> Sub (And  t1 t2) t.
+  unfold Sub; intros t t1 t2 H H1 H0;
+  destruct t; try (now inversion H1); destruct H; eauto.
 Defined.
 
-Definition sand2 : forall t t1 t2, Sub t1 t -> Sub (And t1 t2) t.
+Definition sand2 : forall t t1 t2, Sub t1 t -> PType t2 -> Sub (And t1 t2) t.
   intro t.
   induction t; intros.
   (* Case PInt *)
-  - apply sand2_atomic. auto. apply AInt. 
+  - apply sand2_atomic; auto.
   (* Case Fun *)
-  - apply sand2_atomic. auto. apply AFun.
+  - apply sand2_atomic; auto.
   (* Case And *)
   - unfold Sub. unfold Sub in H. destruct H. inversion H.
     assert (Sub (And t0 t3) t1). apply IHt1.
     unfold Sub. exists c1; auto. auto.
     assert (Sub (And t0 t3) t2). apply IHt2.
     unfold Sub. exists c2. auto. auto.
-    unfold Sub in H6. destruct H6.
     unfold Sub in H7. destruct H7.
+    unfold Sub in H8. destruct H8.
     exists (STLam _ (STPair _ (STApp _ x0 (STBVar _ 0)) (STApp _ x1 (STBVar _ 0)))).
     apply SAnd1. auto. auto.
-    inversion H1.
-    inversion H1.
+    inversion H2.
+    inversion H2.
   (* Case BVar *)
-  - inversion H. inversion H0. inversion H2. inversion H2.
+  - inversion H. inversion H1; inversion H3.
   (* Case FVar *)
   - apply sand2_atomic; auto.
   (* Case ForAll *)
   - apply sand2_atomic; auto; apply AForAll.
   (* Case Top *)
-  - apply sand2_atomic; auto; apply ATop.
+  - apply stop; auto.
+    apply PType_And; auto.
+    apply sub_lc in H; now destruct H.
 Qed.
 
 Definition sand3_atomic :
-  forall t t1 t2, Sub t2 t -> Atomic t -> Sub (And t1 t2) t.
-  unfold Sub; intros t t1 t2 H H0.
-  destruct t; try (now inversion H0);
-  destruct H; exists (STLam _ ((STApp _ x (STProj2 _ (STBVar _ 0))))); apply SAnd3; auto. 
+  forall t t1 t2, Sub t2 t -> Atomic t -> PType t1 -> Sub (And t1 t2) t.
+  unfold Sub; intros t t1 t2 H H1 H0.
+  destruct t; try (now inversion H1); destruct H; eauto.
 Defined.
 
-Definition sand3 : forall t t1 t2, Sub t2 t -> Sub (And t1 t2) t.
+Definition sand3 : forall t t1 t2, Sub t2 t -> PType t1 -> Sub (And t1 t2) t.
   intros t; induction t; intros.
   (* Case PInt *)
-  - apply sand3_atomic. auto. apply AInt.
+  - apply sand3_atomic; auto.
   (* Case Fun *)
-  - apply sand3_atomic. auto. apply AFun.
+  - apply sand3_atomic; auto.
   (* Case And *)
   - unfold Sub. unfold Sub in H. destruct H. inversion H.
     assert (Sub (And t0 t3) t1). apply IHt1.
     unfold Sub. exists c1. auto. auto.
     assert (Sub (And t0 t3) t2). apply IHt2.
     unfold Sub. exists c2. auto. auto.
-    unfold Sub in H6. destruct H6.
     unfold Sub in H7. destruct H7.
+    unfold Sub in H8. destruct H8.
     exists (STLam _ (STPair _ (STApp _ x0 (STBVar _ 0)) (STApp _ x1 (STBVar _ 0)))).
     apply SAnd1. auto. auto.
-    inversion H1.
-    inversion H1.
+    inversion H2.
+    inversion H2.
   (* Case BVar *)
-  - inversion H; inversion H0; inversion H2.
+  - inversion H; inversion H1; inversion H3.
   (* Case FVar *)
   - apply sand3_atomic; auto.
   (* Case ForAll *)
   - apply sand3_atomic; auto; apply AForAll.
   (* Case Top *)
-  - apply sand3_atomic; auto; apply ATop.
+  - apply stop; auto.
+    apply PType_And; auto.
+    apply sub_lc in H; now destruct H.
 Qed.
 
 Definition svar : forall v, Sub (PFVarT v) (PFVarT v).
@@ -643,7 +684,7 @@ Proof.
   intros; induction H; auto.
   - unfold Sub.
     eexists.
-    apply_fresh SForAll as x.
+    apply_fresh SForAll as x; auto.
     admit.
   - eexists; eauto. 
 Admitted.
@@ -654,6 +695,7 @@ Proof.
   - apply_fresh USForAll as x.
     apply H0.
     not_in_L x.
+    auto.
 Qed.  
 
 End Definitions4.
