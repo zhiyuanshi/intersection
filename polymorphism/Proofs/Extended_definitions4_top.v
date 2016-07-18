@@ -39,7 +39,7 @@ Fixpoint ptyp2styp (t : PTyp) : STyp :=
     | PBVarT n => STBVarT n
     | PFVarT v => STFVarT v
     | ForAll _ t => STForAll (ptyp2styp t)
-    | Top => STForAll (STBVarT 0)
+    | Top => STUnitT
   end.
 
 Notation "'|' t '|'" := (ptyp2styp t) (at level 60).
@@ -116,9 +116,10 @@ Inductive usub : PTyp -> PTyp -> Prop :=
                  usub (ForAll d t1) (ForAll d t2)
   | USTop : forall t, PType t -> usub t Top.
 
-Fixpoint and_coercion (t : PTyp) (e : SExp var) {struct t} : sum (SExp var) (SExp var) :=
+Fixpoint and_coercion (t : PTyp) (e : SExp var) {struct t} : sum (SExp var) (SExp var).
+refine(
   match t with
-    | PInt    => inr e
+    | PInt => inr e
     | Fun _ B => match (and_coercion B e) with
                   | inl l => inl (STLam _ l)
                   | inr r => inr r
@@ -127,9 +128,19 @@ Fixpoint and_coercion (t : PTyp) (e : SExp var) {struct t} : sum (SExp var) (SEx
                   | (inl l1, inl l2) =>
                     inl (STPair _ l1 l2)
                   | _ => inr e
-                 end
+                end
+    | PBVarT _  => inr e
+    | PFVarT _ => inr e
+    | ForAll d A => inr e
     | TopT    => inl (STUnit _)
-  end.
+  end).
+Defined.
+(*
+pick_fresh x.
+destruct (and_coercion (open_typ_source A (PFVarT x)) e).
+apply (inl (STTLam _ s)).
+apply (inr s).
+Admitted. *)
 
 Definition join_sum : forall {A}, A + A -> A.
   intros A H; destruct H as [a | a]; exact a.
@@ -412,6 +423,7 @@ Hint Resolve sint sfun sand1 sand2 sand3 svar SInt SFun SAnd1 SAnd2 SAnd3 SVar S
 
 (* Our source language *)
 Inductive PExp :=
+  | PUnit  : PExp
   | PFVar  : var -> PExp
   | PBVar  : nat -> PExp                   
   | PLit   : nat -> PExp
@@ -427,6 +439,7 @@ Inductive PExp :=
 (** Source language **)
 Fixpoint fv_source (pExp : PExp) : vars :=
   match pExp with
+    | PUnit => empty
     | PFVar v => singleton v
     | PBVar _ => empty
     | PLit _ => empty
@@ -464,6 +477,7 @@ Tactic Notation "apply_fresh" constr(T) "as" ident(x) :=
 (** Source language **)
 Fixpoint open_rec_source (k : nat) (u : PExp) (t : PExp) {struct t} : PExp  :=
   match t with
+  | PUnit        => PUnit
   | PBVar i      => if Nat.eqb k i then u else (PBVar i)
   | PFVar x      => PFVar x
   | PLit x       => PLit x                     
@@ -477,6 +491,7 @@ Fixpoint open_rec_source (k : nat) (u : PExp) (t : PExp) {struct t} : PExp  :=
 
 Fixpoint open_rec_typ_term_source (k : nat) (u : PTyp) (t : PExp) {struct t} : PExp :=
   match t with
+  | PUnit        => PUnit
   | PBVar i      => PBVar i
   | PFVar x      => PFVar x
   | PLit x       => PLit x                     
@@ -508,6 +523,8 @@ Definition conv_context (env : context TyEnvSource) : context (TyEnv STyp) :=
 Notation "'∥' t '∥'" := (conv_context t) (at level 60).
 
 Inductive PTerm : PExp -> Prop :=
+  | PTerm_Unit :
+      PTerm PUnit
   | PTerm_Var : forall x,
       PTerm (PFVar x)
   | PTerm_Lit : forall n,
@@ -551,6 +568,7 @@ https://www.andres-loeh.de/LambdaPi/LambdaPi.pdf
 
 Inductive has_type_source_alg : context TyEnvSource -> PExp -> Dir -> PTyp -> (SExp var) -> Prop :=
   (* Inference rules *)
+  | ATyTop : forall Gamma, WFEnv Gamma -> has_type_source_alg Gamma PUnit Inf Top (STUnit _)
   | ATyVar : forall Gamma x ty, WFEnv Gamma -> List.In (x,TermV ty) Gamma -> WFTyp Gamma ty ->
                       has_type_source_alg Gamma (PFVar x) Inf ty (STFVar _ x) 
   | ATyLit : forall Gamma x, WFEnv Gamma -> has_type_source_alg Gamma (PLit x) Inf PInt (STLit _ x)
@@ -601,7 +619,6 @@ Proof.
   left; apply beq_nat_true in H; auto.
   right; apply beq_nat_false in H.
   unfold not; intros H1; inversion H1; contradiction.
-
   apply VarTyp.eq_dec.
 Qed.
 

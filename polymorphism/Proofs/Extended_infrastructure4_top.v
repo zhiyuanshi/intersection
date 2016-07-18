@@ -498,6 +498,7 @@ Lemma open_rec_term_source_core :forall t j v i u, i <> j ->
 Proof.
   intro t; induction t; intros; simpl.
   - reflexivity.
+  - reflexivity.
   - simpl in *.
     case_eq (Nat.eqb i n); intros.
     case_eq (Nat.eqb j n); intros.
@@ -1537,10 +1538,6 @@ Proof.
     assert (Ha : not (In x L)) by not_in_L x.
     apply H0 in Ha.
     unfold open_typ_source in Ha; now rewrite open_rec_typ_eq_source in Ha.
-  - apply_fresh STType_ForAll as x.
-    unfold open_typ.
-    simpl.
-    auto.
 Qed.
 
 (* Properties concerning substitution and sub/ortho/wf *)
@@ -1858,16 +1855,6 @@ Proof.
     unfold extend; simpl.
     unfold open_typ_source in Ha.
     now rewrite open_rec_typ_eq_source in Ha.
-  - apply_fresh WFType_ForAll as x.
-    unfold open_typ.
-    simpl in *.
-    unfold extend.
-    apply WFType_Var.
-    apply Ok_push.
-    apply wfenv_to_ok in H; auto.
-    unfold conv_context; rewrite <- dom_map_id.
-    not_in_L x.
-    left; auto.
 Qed.
 
 Hint Resolve WFTyp_to_WFType.
