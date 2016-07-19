@@ -82,39 +82,103 @@ Inductive and_coercion (e : SExp var) : PTyp -> sum (SExp var) (SExp var) -> Pro
 
 Hint Constructors and_coercion.
 
+(* Some properties about and_coercion *)
+
 Lemma ac_inr_inv : forall t e e', and_coercion e t (inr e') -> and_coercion e t (inr e).
 Proof.
   intros.
   dependent induction H; eauto.
 Qed.
 
+Lemma ac_inr_inv_eq : forall t e e', and_coercion e t (inr e') -> e = e'.
+Proof.
+  intros.
+  dependent induction H; eauto.
+Qed.
+
+Lemma ac_subst :
+  forall t, PType t ->
+       forall e c y x,
+         x <> y ->
+         and_coercion e t c ->
+         and_coercion e (subst_typ_source y (PFVarT x) t) c.
+Proof.
+  intros t Ht.
+  induction Ht; intros; eauto.
+  - destruct c. inversion H0.
+    simpl in *; apply ac_inr_inv_eq in H0; subst.
+    destruct (eqb x y); auto.
+  - simpl in *.
+    destruct c.
+    inversion H0; subst.
+    apply ACFunL; auto.
+    assert (Ha : and_coercion e (Fun t1 t2) (inr s)) by assumption.
+    apply ac_inr_inv_eq in Ha; subst.
+    inversion H0; subst; auto.
+  - simpl in *; destruct c.
+    inversion H0; subst.
+    apply ACAndL; auto.
+    assert (Ha : and_coercion e (And t1 t2) (inr s)) by assumption.
+    apply ac_inr_inv_eq in Ha; subst.
+    inversion 0; subst; destruct X; eauto.
+  - simpl in *.
+    destruct c.
+    inversion H2; subst.
+    eapply ACForAllL with (L := union L0 (union L (singleton y))); intros z H3.
+    rewrite subst_typ_source_open_source_var.
+    apply H0.
+    not_in_L z.
+    assumption.
+    apply H4.
+    not_in_L z.
+    not_in_L z.
+    auto.
+    assert (Ha : and_coercion e (ForAll d t0) (inr s)) by assumption.
+    apply ac_inr_inv_eq in H2; subst.
+    inversion Ha; subst.
+    eapply ACForAllR with (L := union L0 (union L (singleton y))); intros z H4.
+    rewrite subst_typ_source_open_source_var.
+    apply H0.
+    not_in_L z.    
+    assumption.
+    apply H3.
+    not_in_L z.
+    not_in_L z.
+    auto.
+Qed.    
+    
 Lemma ac_rename :
-  forall L t e c, forall y,
+  forall L t e c, forall y, PType (open_typ_source t (PFVarT y)) ->
     ~ In y (union L (fv_ptyp t)) -> and_coercion e (open_typ_source t (PFVarT y)) c ->
     (forall x : elt, ~ In x L -> and_coercion e (open_typ_source t (PFVarT x)) c).
 Proof.
   intros.
   destruct (VarTyp.eq_dec x y).
   subst; auto.
-Admitted.
+  rewrite subst_typ_source_intro with (x := y); auto.
+  apply ac_subst; auto.
+  not_in_L y.
+Qed.
   
 Lemma ac_ex : forall L e t,
+  (forall x, ~ In x L -> PType (open_typ_source t (PFVarT x))) ->
   (forall x, ~ In x L -> exists c, and_coercion e (open_typ_source t (PFVarT x)) c) ->
   exists c, forall x, ~ In x L -> and_coercion e (open_typ_source t (PFVarT x)) c.
 Proof.
-  intros L e t H.
+  intros L e t H0 H.
   pick_fresh x.
   assert (Ha : ~ In x L) by not_in_L x.
   apply H in Ha.
   destruct Ha as [c HAC].
   exists c.
   intros.
-  apply ac_rename with (y := x) (L := L).
+  apply ac_rename with (y := x) (L := L); auto.
+  apply H0.
   not_in_L x.
-  admit.
-Admitted.
+  not_in_L x.
+Qed.
 
-Lemma foo : forall t e, PType t -> exists x, and_coercion e t x.
+Lemma ac_ptype : forall t e, PType t -> exists x, and_coercion e t x.
 Proof.
   intros t e Ht.
   induction Ht; eauto.
@@ -122,7 +186,7 @@ Proof.
     destruct x, x0; eauto; apply ac_inr_inv in H0; eauto.
   - destruct IHHt1, IHHt2.
     destruct x, x0; eauto.
-  - apply ac_ex in H0.
+  - apply (ac_ex _ _ _ H) in H0.
     destruct IHHt.
     destruct H0.
     destruct x0.
