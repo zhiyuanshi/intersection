@@ -65,10 +65,10 @@ Inductive and_coercion (e : SExp var) : PTyp -> sum (SExp var) (SExp var) -> Pro
   | ACAndL : forall A B e1 e2, and_coercion e A (inl e1) ->
                           and_coercion e B (inl e2) ->
                           and_coercion e (And A B) (inl (STPair _ e1 e2))
-  | ACAndR : forall A B e1 e2, and_coercion e A e1 ->
-                          and_coercion e B e2 ->
-                          sum (Is_inr e1) (Is_inr e2) -> 
-                          and_coercion e (And A B) (inr e)
+  | ACAndR1 : forall A B, and_coercion e A (inr e) ->
+                     and_coercion e (And A B) (inr e)
+  | ACAndR2 : forall A B, and_coercion e B (inr e) ->
+                     and_coercion e (And A B) (inr e)
   | ACVar : forall x, and_coercion e (PFVarT x) (inr e)
   | ACForAllL : forall L A d e1,
                   (forall x, not (In x L) ->
@@ -89,6 +89,8 @@ Proof.
   intros.
   dependent induction H; eauto.
 Qed.
+
+Hint Resolve ac_inr_inv.
 
 Lemma ac_inr_inv_eq : forall t e e', and_coercion e t (inr e') -> e = e'.
 Proof.
@@ -120,7 +122,7 @@ Proof.
     apply ACAndL; auto.
     assert (Ha : and_coercion e (And t1 t2) (inr s)) by assumption.
     apply ac_inr_inv_eq in Ha; subst.
-    inversion 0; subst; destruct X; eauto.
+    inversion H0; subst; eauto.
   - simpl in *.
     destruct c.
     inversion H2; subst.
@@ -245,20 +247,21 @@ Inductive sub : PTyp -> PTyp -> (SExp var) -> Prop :=
               sub t t1 c1 ->
               sub t t2 c2 -> 
               sub t (And t1 t2) (STLam _ (STPair _ (STApp _ c1 (STBVar _ 0)) (STApp _ c2 (STBVar _ 0))))
-  | SAnd2 : forall t t1 t2 c,
+  | SAnd2 : forall t t1 t2 c ac,
               sub t1 t c ->
               Atomic t ->
               PType t2 ->
-              (* and_coercion ((STApp _ c (STProj1 _ (STBVar _ 0)))) t ac -> 
-              sub (And t1 t2) t (STLam _ (join_sum ac)) *)
-              sub (And t1 t2) t (STLam _ (join_sum (and_coercion' t ((STApp _ c (STProj1 _ (STBVar _ 0)))))))
-  | SAnd3 : forall t t1 t2 c,
+              and_coercion ((STApp _ c (STProj1 _ (STBVar _ 0)))) t ac -> 
+              sub (And t1 t2) t (STLam _ (join_sum ac))
+              (*
+              sub (And t1 t2) t (STLam _ (join_sum (and_coercion' t ((STApp _ c (STProj1 _ (STBVar _ 0))))))) *)
+  | SAnd3 : forall t t1 t2 c ac,
               sub t2 t c ->
               Atomic t ->
               PType t1 ->
-              sub (And t1 t2) t (STLam _ (join_sum (and_coercion' t ((STApp _ c (STProj2 _ (STBVar _ 0)))))))
-              (* and_coercion ((STApp _ c (STProj2 _ (STBVar _ 0)))) t ac -> 
-              sub (And t1 t2) t (STLam _ (join_sum ac)) *)
+              (* sub (And t1 t2) t (STLam _ (join_sum (and_coercion' t ((STApp _ c (STProj2 _ (STBVar _ 0))))))) *)
+              and_coercion ((STApp _ c (STProj2 _ (STBVar _ 0)))) t ac -> 
+              sub (And t1 t2) t (STLam _ (join_sum ac))
   | SVar : forall v, sub (PFVarT v) (PFVarT v) (STLam _ (STBVar _ 0))
   | SForAll : forall L d t1 t2 c,
                 (forall x, not (In x L) -> sub (open_typ_source t1 (PFVarT x))
@@ -319,9 +322,17 @@ apply SAnd1. auto. auto.
 Defined.
 
 Definition sand2_atomic :
-  forall t t1 t2, Sub t1 t -> Atomic t -> PType t2 -> Sub (And  t1 t2) t.
-  unfold Sub; intros t t1 t2 H H1 H0;
-  destruct t; try (now inversion H1); destruct H; eauto.
+  forall t t1 t2, Sub t1 t -> Atomic t -> PType t2 -> Sub (And t1 t2) t.
+  unfold Sub; intros t t1 t2 H H1 H0.
+  destruct H; destruct t; try (now inversion H1); eauto.
+  - assert (Ha : Sub t1 (Fun t3 t4)) by (unfold Sub; eauto).
+    apply sub_lc in Ha; destruct Ha.
+    eapply ac_ptype in H3.
+    destruct H3; eauto.
+  - assert (Ha : Sub t1 (ForAll t3 t4)) by (unfold Sub; eauto).
+    apply sub_lc in Ha; destruct Ha.
+    eapply ac_ptype in H3.
+    destruct H3; eauto.
 Defined.
 
 Definition sand2 : forall t t1 t2, Sub t1 t -> PType t2 -> Sub (And t1 t2) t.
@@ -353,12 +364,20 @@ Definition sand2 : forall t t1 t2, Sub t1 t -> PType t2 -> Sub (And t1 t2) t.
   - apply stop; auto.
     apply PType_And; auto.
     apply sub_lc in H; now destruct H.
-Qed.
+Defined.
 
 Definition sand3_atomic :
   forall t t1 t2, Sub t2 t -> Atomic t -> PType t1 -> Sub (And t1 t2) t.
   unfold Sub; intros t t1 t2 H H1 H0.
   destruct t; try (now inversion H1); destruct H; eauto.
+  - assert (Ha : Sub t2 (Fun t3 t4)) by (unfold Sub; eauto).
+    apply sub_lc in Ha; destruct Ha.
+    eapply ac_ptype in H3.
+    destruct H3; eauto.
+  - assert (Ha : Sub t2 (ForAll t3 t4)) by (unfold Sub; eauto).
+    apply sub_lc in Ha; destruct Ha.
+    eapply ac_ptype in H3.
+    destruct H3; eauto.
 Defined.
 
 Definition sand3 : forall t t1 t2, Sub t2 t -> PType t1 -> Sub (And t1 t2) t.
@@ -416,12 +435,77 @@ Definition sforall : forall L t1 t2 c,
 Hint Constructors sub.
 Hint Resolve stop sint sfun sand1 sand2 sand3 svar.
 
+Lemma sub_inv :
+  forall t1 t2 e x, sub (open_typ_source t1 (PFVarT x)) (open_typ_source t2 (PFVarT x)) e ->
+               exists e', e = open e' (STFVar _ x).
+Proof.
+  intros t1 t2 e x.
+Admitted.
+           
+
+Lemma sub_rename :
+  forall L t1 t2 c, forall y,
+    PType (open_typ_source t1 (PFVarT y)) ->
+    PType (open_typ_source t2 (PFVarT y)) ->
+    ~ In y (union L (union (fv_ptyp t1) (fv_ptyp t2))) ->
+    sub (open_typ_source t1 (PFVarT y))
+        (open_typ_source t2 (PFVarT y))
+        (open c (STFVar _ y)) ->
+    (forall x : elt, ~ In x L -> sub (open_typ_source t1 (PFVarT x))
+                               (open_typ_source t2 (PFVarT x))
+                               (open c (STFVar _ x))).
+Proof.
+  intros.
+  destruct (VarTyp.eq_dec x y).
+  subst; auto.
+  rewrite subst_typ_source_intro with (x := y); auto.
+  rewrite subst_typ_source_intro with (x := y) (t := t2); auto.
+  admit.
+  not_in_L y.
+  not_in_L y.
+Admitted.
+
+Lemma sub_ex : forall L t1 t2,
+  (forall x, ~ In x L -> PType (open_typ_source t1 (PFVarT x))) ->
+  (forall x, ~ In x L -> PType (open_typ_source t2 (PFVarT x))) ->              
+  (forall x, ~ In x L -> exists c, sub (open_typ_source t1 (PFVarT x))
+                            (open_typ_source t2 (PFVarT x))
+                            (open c (STFVar _ x))) ->
+  exists c, forall x, ~ In x L -> sub (open_typ_source t1 (PFVarT x))
+                           (open_typ_source t2 (PFVarT x))
+                           (open c (STFVar _ x)).
+Proof.
+  intros L t1 t2 H1 H2 H.
+  pick_fresh x.
+  assert (Ha : ~ In x L) by not_in_L x.
+  apply H in Ha.
+  destruct Ha as [c HAC].
+  exists c.
+  intros.
+  apply sub_rename with (y := x) (L := L); auto.
+  apply H1; not_in_L x.
+  apply H2; not_in_L x.
+  not_in_L x.
+Qed.
+
 Lemma sound_sub : forall t1 t2, usub t1 t2 -> Sub t1 t2.
   intros; induction H; auto.
-  - unfold Sub.
-    eexists.
-    apply_fresh SForAll as x; auto.
-    admit.
+  - unfold Sub in *.
+    assert (Ha : forall x : elt,
+       ~ In x L ->
+       exists e : SExp var,
+         sub (open_typ_source t1 (PFVarT x)) (open_typ_source t2 (PFVarT x))
+             (open e (STFVar _ x))).
+    intros.
+    apply H0 in H2.
+    destruct H2.
+    assert (H3 : sub (open_typ_source t1 (PFVarT x)) (open_typ_source t2 (PFVarT x)) x0) by assumption.
+    apply sub_inv in H2.
+    destruct H2; subst.
+    eauto.
+    clear H0.
+    apply sub_ex in Ha.
+    admit. (* this should be provable now *)
 Admitted.
 
 Lemma complete_sub : forall t1 t2, Sub t1 t2 -> usub t1 t2.

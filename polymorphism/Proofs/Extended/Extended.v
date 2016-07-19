@@ -268,9 +268,9 @@ Proof.
   generalize dependent C.
   dependent induction HOrtho; intros.
   - induction C;
-    try now inversion WFA; subst;
-    inversion HSubA; inversion H; subst; [ eapply IHHOrtho1 | eapply IHHOrtho2 ];
-    unfold Sub; eauto.
+    try now inversion WFA;
+    inversion HSubA; inversion H5; subst; [ eapply IHHOrtho1 | eapply IHHOrtho2 ];
+    eauto; unfold Sub; eauto.
     + inversion HSubA; inversion H; subst.
       inversion HSubB; inversion H0; subst.
       assert (Ha : ~ TopLike C1 \/ ~ TopLike C2).
@@ -288,7 +288,7 @@ Proof.
   - induction C;
     try now inversion WFB; subst;
     inversion HSubB; inversion H; subst; [ eapply IHHOrtho1 | eapply IHHOrtho2 ];
-    unfold Sub; eauto.
+    eauto; unfold Sub; eauto.
     + inversion HSubA; inversion H; subst.
       inversion HSubB; inversion H0; subst.
       assert (Ha : ~ TopLike C1 \/ ~ TopLike C2).
@@ -429,6 +429,25 @@ Qed.
 
 (* and_coercion lemmas *)
 
+Lemma and_coercion_inl_term : 
+  forall {t e},
+    TopLike t ->
+    exists r, and_coercion e t (inl r) /\ STTerm r.
+Proof.
+  intros.
+  induction H.
+  - exists (STUnit _); auto.
+  - destruct IHTopLike1, IHTopLike2, H1, H2; eauto.
+  - inversion IHTopLike.
+    exists (STLam _ x).
+    inversion H0.
+    split; auto.
+    apply_fresh STTerm_Lam as x.
+    unfold open; rewrite <- open_rec_term; auto.
+  - admit. (* looks provable *)
+Admitted.
+
+(*
 Lemma and_coercion_inl_term :
   forall {t e},
     TopLike t ->
@@ -456,6 +475,7 @@ Proof.
     (* it looks like we are going to have the same problem with sfun *)
     admit.
 Admitted.
+*)
 
 Ltac wftyp_to_ok :=
   match goal with
@@ -465,6 +485,42 @@ Ltac wftyp_to_ok :=
 
 Ltac env_resolve := auto; now wftyp_to_ok.
 
+Lemma and_coercion_inl_typing :
+  forall {t e Gamma},
+    WFTyp Gamma t ->
+    TopLike t ->
+    exists r, and_coercion e t (inl r) /\ has_type_st (∥ Gamma ∥) r (|t|).  
+Proof.
+  intros.
+  induction H0.
+  - exists (STUnit _); split; auto.
+    apply STTyUnit.
+    env_resolve.
+  - inversion H; destruct IHTopLike1, IHTopLike2; subst; auto.
+    destruct H6, H7.
+    exists (STPair _ x x0).
+    split; simpl; eauto.
+  - inversion H; destruct IHTopLike; subst; auto.
+    exists (STLam _ x).
+    simpl.
+    destruct H6.
+    split; eauto.
+    apply_fresh STTyLam as v.
+    unfold open.
+    rewrite <- open_rec_term.
+    rewrite <- app_nil_l with (l := extend v (TermVar STyp (| t1 |)) (∥ Gamma ∥)).
+    apply typing_weaken; rewrite app_nil_l.
+    apply H2.
+    apply Ok_push.
+    env_resolve.
+    unfold conv_context; rewrite <- dom_map_id; not_in_L v.
+    now apply typing_gives_terms in H2.
+    env_resolve.
+  - inversion H; subst.
+    admit. (* existential quantification problem, again... *)
+Admitted.
+
+(*
 Lemma and_coercion_inl_typing :
   forall {t e Gamma},
     WFTyp Gamma t ->
@@ -503,7 +559,36 @@ Proof.
   - inversion H; subst.
     admit. (* existential quantification problem, again... *)
 Admitted.
+ *)
 
+Lemma and_coercion_inr :
+  forall {t e},
+    PType t ->
+    not (TopLike t) ->
+    and_coercion e t (inr e).
+Proof.
+  intros.
+  generalize dependent e.
+  induction H; try simpl; auto.
+  - intros; auto 10.
+  - intros.
+    assert (Ha : ~ TopLike t1 \/ ~ TopLike t2) by
+        (apply Classical_Prop.not_and_or; unfold not; intros; apply H0; now apply TLAnd).
+    destruct Ha; eauto.
+  - intros.
+    apply ACForAllR with (L := union L (fv_ptyp t0)).
+    intros.
+    apply H2.
+    not_in_L x.
+    unfold not; intros; apply H0.
+    apply_fresh TLForAll as x.
+    apply fresh_top with (x := x); auto.
+    not_in_L x.
+    not_in_L y.
+  - intros; exfalso; apply H0; apply TLTop.
+Qed.
+
+(*
 Lemma and_coercion_inr :
   forall {t e},
     PType t ->
@@ -525,7 +610,7 @@ Proof.
   - intros.
     admit.
   - intros; exfalso; apply H0; apply TLTop.
-Admitted.
+Admitted. *)
 
 Lemma and_coercion_proj1_term :
   forall t0 (c : SExp var),
