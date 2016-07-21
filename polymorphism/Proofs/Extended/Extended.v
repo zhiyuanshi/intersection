@@ -427,55 +427,110 @@ Proof.
     + now apply HNotTL.
 Qed.
 
-(* and_coercion lemmas *)
+(*** Move to SystemF ***)
 
-Lemma and_coercion_inl_term : 
-  forall {t e},
-    TopLike t ->
-    exists r, and_coercion e t (inl r) /\ STTerm r.
+Lemma open_rec_typ_term_term :
+  forall t u, STTerm t -> forall k, t = open_rec_typ_term k u t.
 Proof.
-  intros.
-  induction H.
-  - exists (STUnit _); auto.
-  - destruct IHTopLike1, IHTopLike2, H1, H2; eauto.
-  - inversion IHTopLike.
-    exists (STLam _ x).
-    inversion H0.
-    split; auto.
-    apply_fresh STTerm_Lam as x.
-    unfold open; rewrite <- open_rec_term; auto.
-  - admit. (* looks provable *)
+  intros t u HT.
+  induction HT; intros; simpl; auto.
+  - unfold open in *.
+    apply f_equal.
+    admit.
+  - rewrite <- IHHT1; rewrite <- IHHT2; auto.
+  - rewrite <- IHHT1; rewrite <- IHHT2; auto.
+  - rewrite <- IHHT; auto.
+  - rewrite <- IHHT; auto.
+  - apply f_equal.
+    admit.
+  - rewrite <- IHHT; auto.
+    rewrite <- open_rec_type; auto.
 Admitted.
+ 
+Definition body_typ_term t :=
+  exists L, forall x, ~ In x L -> STTerm (open_typ_term t (STFVarT x)).
 
-(*
-Lemma and_coercion_inl_term :
-  forall {t e},
-    TopLike t ->
-    exists r, and_coercion' t e = inl r /\ STTerm r.  
+Lemma term_abs_to_body_typ_term : forall t1, 
+  STTerm (STTLam _ t1) -> body_typ_term t1.
+Proof. intros. unfold body_typ_term. inversion H; subst. eauto. Qed.
+
+Lemma body_typ_term_to_term_abs : forall t1, 
+  body_typ_term t1 -> STTerm (STTLam _ t1).
+Proof. intros. inversion H. eapply STTerm_TLam. apply H0. Qed.
+
+Lemma ac_inl_term : forall e t r, and_coercion e t (inl r) -> STTerm r.
 Proof.
   intros.
-  induction H.
-  - exists (STUnit _); auto.
-  - destruct IHTopLike1, IHTopLike2, H1, H2.
-    simpl; rewrite H1, H2.
-    exists (STPair _ x x0); auto.
-  - inversion IHTopLike.
-    exists (STLam _ x).
-    inversion H0.
-    split.
-    simpl.
-    rewrite H1.
-    reflexivity.
-    apply_fresh STTerm_Lam as x.
+  dependent induction H; auto.
+  - apply_fresh STTerm_Lam as x.
     unfold open; rewrite <- open_rec_term; auto.
   - pick_fresh x.
-    assert (Ha : ~ (In x L)) by not_in_L x.
+    assert (Ha : ~ In x L) by not_in_L x.
     apply H0 in Ha.
-    destruct Ha as [c [Ha1 Ha2]].
-    (* it looks like we are going to have the same problem with sfun *)
+    apply body_typ_term_to_term_abs.
+    unfold body_typ_term.
+    exists (fv e1).
+    intros.
     admit.
 Admitted.
-*)
+
+(* and_coercion lemmas *)
+
+Lemma ac_inr_term : forall e t r, STTerm e -> and_coercion e t (inr r) -> STTerm r.
+Proof. intros; apply ac_inr_inv_eq in H0; now subst. Qed.
+  
+Lemma and_coercion_proj1_term :
+  forall t0 (c : SExp var) c',
+    PType t0 ->
+    STTerm c ->
+    and_coercion ((STApp _ c (STProj1 _ (STBVar _ 0)))) t0 c' ->
+    STTerm (STLam _ (join_sum c')).
+Proof.
+  intros.
+  apply_fresh STTerm_Lam as x; unfold open; simpl.
+  destruct c'; simpl.
+  apply ac_inl_term in H1.
+  rewrite <- open_rec_term; auto.
+  apply ac_inr_inv_eq in H1.
+  rewrite <- H1.
+  simpl.
+  apply STTerm_App; auto.
+  rewrite <- open_rec_term; auto.
+Qed.
+
+Lemma and_coercion_proj2_term :
+  forall t0 (c : SExp var) c',
+    PType t0 ->
+    STTerm c ->
+    and_coercion ((STApp _ c (STProj2 _ (STBVar _ 0)))) t0 c' ->
+    STTerm (STLam _ (join_sum c')).
+Proof.
+  intros.
+  apply_fresh STTerm_Lam as x; unfold open; simpl.
+  destruct c'; simpl.
+  apply ac_inl_term in H1.
+  rewrite <- open_rec_term; auto.
+  apply ac_inr_inv_eq in H1.
+  rewrite <- H1.
+  simpl.
+  apply STTerm_App; auto.
+  rewrite <- open_rec_term; auto.
+Qed.
+
+Lemma and_coercion_inl : 
+  forall {t e},
+    TopLike t ->
+    exists r, and_coercion e t (inl r).
+Proof.
+  intros.
+  induction H.
+  - exists (STUnit _); auto.
+  - destruct IHTopLike1, IHTopLike2; eauto.
+  - inversion IHTopLike.
+    exists (STLam _ x).
+    auto.
+  - admit. (* looks provable *)
+Admitted.
 
 Ltac wftyp_to_ok :=
   match goal with
@@ -486,83 +541,45 @@ Ltac wftyp_to_ok :=
 Ltac env_resolve := auto; now wftyp_to_ok.
 
 Lemma and_coercion_inl_typing :
-  forall {t e Gamma},
-    WFTyp Gamma t ->
+  forall {t e Gamma r},
     TopLike t ->
-    exists r, and_coercion e t (inl r) /\ has_type_st (∥ Gamma ∥) r (|t|).  
+    and_coercion e t (inl r) ->
+    WFTyp Gamma t ->
+    has_type_st (∥ Gamma ∥) r (|t|).  
 Proof.
   intros.
-  induction H0.
-  - exists (STUnit _); split; auto.
-    apply STTyUnit.
-    env_resolve.
-  - inversion H; destruct IHTopLike1, IHTopLike2; subst; auto.
-    destruct H6, H7.
-    exists (STPair _ x x0).
-    split; simpl; eauto.
-  - inversion H; destruct IHTopLike; subst; auto.
-    exists (STLam _ x).
-    simpl.
-    destruct H6.
-    split; eauto.
-    apply_fresh STTyLam as v.
+  generalize dependent Gamma.
+  dependent induction H0; intros; try (now simpl; eauto).
+  - simpl; inversion H; inversion H1; subst.
+    apply_fresh STTyLam as x.
+    apply (IHand_coercion H3) in H9.
     unfold open.
     rewrite <- open_rec_term.
-    rewrite <- app_nil_l with (l := extend v (TermVar STyp (| t1 |)) (∥ Gamma ∥)).
-    apply typing_weaken; rewrite app_nil_l.
-    apply H2.
-    apply Ok_push.
+    apply typing_weaken_extend; auto.
+    unfold conv_context; rewrite <- dom_map_id; not_in_L x.
+    now apply ac_inl_term in H0.
     env_resolve.
-    unfold conv_context; rewrite <- dom_map_id; not_in_L v.
-    now apply typing_gives_terms in H2.
-    env_resolve.
-  - inversion H; subst.
-    admit. (* existential quantification problem, again... *)
-Admitted.
-
-(*
-Lemma and_coercion_inl_typing :
-  forall {t e Gamma},
-    WFTyp Gamma t ->
-    TopLike t ->
-    exists r, and_coercion' t e = inl r /\ has_type_st (∥ Gamma ∥) r (|t|).  
-Proof.
-  intros.
-  induction H0.
-  - exists (STUnit _); split; auto.
-    apply STTyUnit.
-    env_resolve.
-  - inversion H; destruct IHTopLike1, IHTopLike2; subst; auto.
-    destruct H6, H7.
-    exists (STPair _ x x0).
-    split; simpl.
-    now rewrite H0, H3.
-    auto.
-  - inversion H; destruct IHTopLike; subst; auto.
-    exists (STLam _ x).
-    simpl.
-    destruct H6.
-    rewrite H1.
-    split.
-    reflexivity.
-    apply_fresh STTyLam as v.
-    unfold open.
-    rewrite <- open_rec_term.
-    rewrite <- app_nil_l with (l := extend v (TermVar STyp (| t1 |)) (∥ Gamma ∥)).
-    apply typing_weaken; rewrite app_nil_l.
-    apply H2.
-    apply Ok_push.
-    env_resolve.
-    unfold conv_context; rewrite <- dom_map_id; not_in_L v.
-    now apply typing_gives_terms in H2.
-    env_resolve.
-  - inversion H; subst.
-    admit. (* existential quantification problem, again... *)
-Admitted.
- *)
+  - inversion H; inversion H1; subst; simpl; auto.
+  - inversion H; inversion H2; subst; simpl.
+    apply_fresh STTyTLam as x.
+    unfold open_typ_source in H0.
+    assert (Ha : has_type_st (∥ (extend x (TyDis d) Gamma) ∥) e1 (| open_rec_typ_source 0 (PFVarT x) A |)).
+    apply H0.
+    not_in_L x.
+    apply H4.
+    not_in_L x.
+    apply H9.
+    not_in_L x.
+    rewrite open_rec_typ_eq_source in Ha.
+    simpl in Ha; unfold extend; unfold open_typ; simpl.
+    unfold open_typ_term; rewrite <- open_rec_typ_term_term; auto.
+    assert (Ha1 : ~ In x L) by not_in_L x.
+    apply H1 in Ha1.
+    now apply ac_inl_term in Ha1.
+Qed.
 
 Lemma and_coercion_inr :
-  forall {t e},
+  forall {t} e,
     PType t ->
     not (TopLike t) ->
     and_coercion e t (inr e).
@@ -588,86 +605,89 @@ Proof.
   - intros; exfalso; apply H0; apply TLTop.
 Qed.
 
+Lemma same_coercion :
+  forall A, PType A ->
+       forall e c1 c2, and_coercion e A c1 -> and_coercion e A c2 -> c1 = c2.
+Proof.
+  intros A HPT.
+  induction HPT; intros.
+  - now inversion H; inversion H0.
+  - now inversion H; inversion H0.
+  - inversion H; inversion H0; subst; eauto.
+    + apply f_equal.
+      now apply (IHHPT2 _ _ _ H4) in H8; inversion H8.
+    + now apply (IHHPT2 _ _ _ H4) in H8; inversion H8.
+    + now apply (IHHPT2 _ _ _ H4) in H8; inversion H8.
+  - inversion H; inversion H0; subst; eauto.
+    + apply f_equal.
+      apply (IHHPT1 _ _ _ H3) in H8.
+      apply (IHHPT2 _ _ _ H5) in H10.
+      inversion H8; inversion H10; now subst.
+    + apply (IHHPT1 _ _ _ H3) in H9; inversion H9.
+    + apply (IHHPT2 _ _ _ H5) in H9; inversion H9.
+    + apply (IHHPT1 _ _ _ H4) in H7; inversion H7.
+    + apply (IHHPT2 _ _ _ H4) in H9; inversion H9.
+  - inversion H1; inversion H2; subst; eauto.
+    + admit.
+    + admit.
+    + admit.
+  - inversion H; inversion H0; subst; auto;
+    apply (IHHTL _ _ _ H4) in H8; now inversion H8.
+Admitted.
+
+
+Lemma change_coercion_toplike :
+  forall A e1 e2 c, TopLike A -> and_coercion e1 A c -> and_coercion e2 A c.
+Proof.
+  intros A e1 e2 c HTL HAC.
+  generalize dependent e2.
+  induction HAC; intros; try now inversion HTL.
+  - inversion HTL; subst; auto.
+  - inversion HTL; subst.
+    apply IHHAC with (e2 := e2) in H0.
+    apply ac_inr_inv_eq in H0.
+    subst; auto.
+  - inversion HTL; subst.
+    apply IHHAC1 with (e2 := e3) in H1.
+    apply IHHAC2 with (e3 := e3) in H2.
+    auto.
+  - inversion HTL; subst.
+    apply IHHAC with (e2 := e2) in H1.
+    apply ac_inr_inv_eq in H1.
+    subst; auto.
+  - inversion HTL; subst.
+    apply IHHAC with (e2 := e2) in H2.
+    apply ac_inr_inv_eq in H2.
+    subst; auto.
+  - inversion HTL; subst.
+    eapply ACForAllL with (L := union L L0).
+    intros x HNotIn.
+    apply H0.
+    not_in_L x.
+    apply H2.
+    not_in_L x.
+  - inversion HTL; subst.
+    pick_fresh x.
+    assert (Ha : ~ In x L) by not_in_L x.
+    assert (Ha1 : ~ In x L0) by not_in_L x.
+    apply H2 in Ha1.
+    apply (H0 _ Ha) with (e2 := e2) in Ha1.
+    apply ac_inr_inv_eq in Ha1; subst.
+    eapply ACForAllR with (L := union L L0).
+    intros y H3.
+    apply H0.
+    not_in_L y.
+    apply H2.
+    not_in_L y.
+Qed.
+
 (*
-Lemma and_coercion_inr :
-  forall {t e},
-    PType t ->
-    not (TopLike t) ->
-    and_coercion' t e = inr e.
-Proof.
-  intros.
-  generalize dependent e.
-  induction H; try simpl; auto.
-  - intros.
-    rewrite IHPType2; auto.
-  - intros.
-    assert (Ha : ~ TopLike t1 \/ ~ TopLike t2) by
-        (apply Classical_Prop.not_and_or; unfold not; intros; apply H0; now apply TLAnd).
-    destruct Ha.
-    rewrite IHPType1; auto.
-    rewrite IHPType2; auto.
-    now destruct (and_coercion' t1 e).
-  - intros.
-    admit.
-  - intros; exfalso; apply H0; apply TLTop.
-Admitted. *)
-
-Lemma and_coercion_proj1_term :
-  forall t0 (c : SExp var),
-    PType t0 ->
-    STTerm c ->
-    STTerm (STLam _ (join_sum (and_coercion' t0 ((STApp _ c (STProj1 _ (STBVar _ 0))))))).
-Proof.
-  intros.
-  apply_fresh STTerm_Lam as x; unfold open; simpl.
-  pose (toplike_dec t0 H).
-  destruct o.
-  assert (exists r : SExp var, and_coercion' t0 (STApp _ c (STProj1 _ (STBVar _ 0))) = inl r /\ STTerm r).
-  apply and_coercion_inl_term; auto.
-  inversion H2.
-  inversion H3.
-  rewrite H4.
-  simpl.
-  rewrite <- open_rec_term; auto.
-  eapply and_coercion_inr in H1.
-  rewrite H1.
-  simpl.
-  apply STTerm_App; auto.
-  rewrite <- open_rec_term; auto.
-  auto.
-Qed.
- 
-Lemma and_coercion_proj2_term :
-  forall t0 (c : SExp var),
-    PType t0 ->
-    STTerm c ->
-    STTerm (STLam _ (join_sum (and_coercion' t0 (STApp _ c (STProj2 _ (STBVar _ 0)))))).
-Proof.
-  intros.
-  apply_fresh STTerm_Lam as x; unfold open; simpl.
-  pose (toplike_dec t0 H).
-  inversion o; clear o.
-   assert (exists r : SExp var, and_coercion' t0 (STApp _ c (STProj2 _ (STBVar _ 0))) = inl r /\ STTerm r).
-  apply and_coercion_inl_term; auto.
-  inversion H2.
-  inversion H3.
-  rewrite H4.
-  simpl.
-  rewrite <- open_rec_term; auto.
-  eapply and_coercion_inr in H1.
-  rewrite H1.
-  simpl.
-  apply STTerm_App; auto.
-  rewrite <- open_rec_term; auto.
-  auto.
-Qed.
-
 Lemma toplike_produces_coercion :
   forall A, TopLike A -> forall e1, exists e2, and_coercion' A e1 = inl e2.
 Proof.
 Admitted.
 
-Lemma same_coercion :
+Lemma same_coercion' :
   forall A, TopLike A -> forall e1 e2, and_coercion' A e1 = and_coercion' A e2.
   intros A T. induction T; simpl; intros; auto. rewrite (IHT1 e1 e2). rewrite (IHT2 e1 e2).
   pose (toplike_produces_coercion _ T1 e2). destruct e. rewrite H.
@@ -675,6 +695,7 @@ Lemma same_coercion :
   rewrite (IHT e1 e2). auto.
   admit.
 Admitted.
+ *)
 
 (* Coercive subtyping is coeherent: Lemma 3 *)
 
@@ -704,36 +725,52 @@ Proof.
     now subst.
     now subst.
   (* Case: And t1 t2 <: t (first) *)
-  - inversion H2; subst.
-    inversion H4; subst.
-    inversion H.
-    assert (c = c0). apply IHsub with (Gamma := Gamma); auto.
-    now subst.
-    destruct (toplike_dec t0).
-    now apply wf_gives_types_source with (Gamma := Gamma).
-    erewrite same_coercion.
-    reflexivity.
-    auto.
-    assert (HSub : Sub (And t1 t2) t0) by (apply sand2; unfold Sub; eauto).
-    assert (Ha := uniquesub _ t1 t2 t0 H7 H9 H5 H10 HSub).
-    exfalso; apply Ha.
-    split; unfold Sub; eauto.
-    inversion H.
-  - inversion H2; subst.
-    inversion H4; subst.
-    inversion H.
-    destruct (toplike_dec t0).
-    now apply wf_gives_types_source with (Gamma := Gamma).
-    erewrite same_coercion.
-    reflexivity.
-    auto.
-    assert (HSub : Sub (And t1 t2) t0) by (apply sand3; unfold Sub; eauto).
-    assert (Ha := uniquesub _ t1 t2 t0 H7 H9 H5 H10 HSub).
-    exfalso; apply Ha.
-    split; unfold Sub; eauto.
-    assert (c = c0). apply IHsub with (Gamma := Gamma); auto.
-    now subst.
-    now subst.
+  - inversion H3; subst.
+    inversion H5; subst.
+    + inversion H.
+    + assert (c = c0). apply IHsub with (Gamma := Gamma); auto.
+      subst.
+      assert (ac0 = ac).
+      eapply same_coercion with (A := t0).
+      now apply wf_gives_types_source with (Gamma := Gamma).
+      apply H16. apply H2.
+      now subst.
+    + destruct (toplike_dec t0).
+      now apply wf_gives_types_source with (Gamma := Gamma).
+      apply change_coercion_toplike with
+      (e2 := (STApp var c (STProj1 var (STBVar var 0)))) in H16; auto.
+      repeat apply f_equal.
+      rewrite same_coercion with (e := (STApp var c (STProj1 var (STBVar var 0))))
+                                   (c2 := ac) (A := t0); auto.
+      now apply wf_gives_types_source with (Gamma := Gamma).
+      assert (HSub : Sub (And t1 t2) t0) by (apply sand2; unfold Sub; eauto).
+      assert (Ha := uniquesub _ t1 t2 t0 H8 H10 H6 H11 HSub).
+      exfalso; apply Ha.
+      split; unfold Sub; eauto.
+    + inversion H.
+  - inversion H3; subst.
+    inversion H5; subst.
+    + inversion H.
+    + destruct (toplike_dec t0).
+      now apply wf_gives_types_source with (Gamma := Gamma).
+      apply change_coercion_toplike with
+      (e2 := (STApp var c (STProj2 var (STBVar var 0)))) in H16; auto.
+      repeat apply f_equal.
+      rewrite same_coercion with (e := (STApp var c (STProj2 var (STBVar var 0))))
+                                   (c2 := ac) (A := t0); auto.
+      now apply wf_gives_types_source with (Gamma := Gamma).
+      assert (HSub : Sub (And t1 t2) t0) by (apply sand2; unfold Sub; eauto).
+      assert (Ha := uniquesub _ t1 t2 t0 H8 H10 H6 H11 HSub).
+      exfalso; apply Ha.
+      split; unfold Sub; eauto.
+    + assert (c = c0). apply IHsub with (Gamma := Gamma); auto.
+      subst.
+      assert (ac0 = ac).
+      eapply same_coercion with (A := t0).
+      now apply wf_gives_types_source with (Gamma := Gamma).
+      apply H16. apply H2.
+      now subst.
+    + inversion H.
   - now inversion H2.
   - inversion H2; subst.
     inversion H3; subst.
@@ -983,11 +1020,11 @@ Proof.
     apply STTerm_App; repeat rewrite <- open_rec_term; auto.
     rewrite <- open_rec_term; auto.
   (* Case SAnd2 *)
-  - apply and_coercion_proj1_term; auto.
+  - apply and_coercion_proj1_term with (t0 := t0) (c := c); auto.
     assert (Ha : Sub t1 t0) by (unfold Sub; eauto).
     now apply sub_lc in Ha as [Ha1 Ha2].
   (* Case SAnd3 *)
-  - apply and_coercion_proj2_term; auto.
+  - apply and_coercion_proj2_term with (t0 := t0) (c := c); auto.
     assert (Ha : Sub t2 t0) by (unfold Sub; eauto).
     now apply sub_lc in Ha as [Ha1 Ha2].
   (* Case SVar *)
@@ -1137,42 +1174,41 @@ Proof.
     assert (Ha : PType t0) by (apply sub_lc in Ha1; now destruct Ha1).
     pose (toplike_dec t0 Ha).
     inversion o; clear o.
-    assert (Ha2 : exists r, and_coercion' t0 (STApp _ c (STProj1 _ (STBVar _ 0))) = inl r /\ has_type_st (∥ Gamma ∥) r (|t0|)) by (apply and_coercion_inl_typing; auto).
-    destruct Ha2 as [r [HCoerce HHasTy]].
+    change (STFun (| And t1 t2 |) (| t0 |)) with
+    (| Fun (And t1 t2) t0 |).
+    eapply and_coercion_inl_typing; auto.
+    apply ACFunL.
+    eapply and_coercion_inl in H6.
+    destruct H6.
+    assert (Ha2 : ac = inl x).
+    eapply same_coercion with (A := t0); auto.
+    apply H2. apply H6.
+    subst.
+    unfold join_sum; simpl.
+    apply H6.
     apply_fresh STTyLam as x.
-    simpl; unfold open; rewrite <- open_rec_term.
-    rewrite <- app_nil_l with (l := (extend x (TermVar STyp (STTuple (| t1 |) (| t2 |))) (∥ Gamma ∥))).
-    apply typing_weaken; rewrite app_nil_l.
-    now rewrite HCoerce; simpl.
-    apply Ok_push; auto.
-    unfold conv_context; rewrite <- dom_map_id; not_in_L x.
-    rewrite HCoerce; simpl.
-    now apply typing_gives_terms in HHasTy.
-    env_resolve.
-    eapply and_coercion_inr in H5.
-    rewrite H5; simpl.
-    apply_fresh STTyLam as x; cbn.
-    eapply STTyApp.
+    apply and_coercion_inr with (e := (STApp var c (STProj1 var (STBVar var 0)))) in H6.
+    assert (Ha2 : ac = (inr (STApp var c (STProj1 var (STBVar var 0))))).
+    eapply same_coercion with (A := t0); auto.
+    apply H2. apply H6. subst.
+    unfold join_sum, open; simpl.
     rewrite <- open_rec_term.
-    apply typing_weaken_extend.
+    eapply STTyApp. Print TyEnvSource.
+    change (extend x (TermVar STyp (STTuple (| t1 |) (| t2 |))) (∥ Gamma ∥)) with
+    (∥ extend x (TermV (And t1 t2)) Gamma ∥).    
     apply IHsub.
-    assumption.
-    now inversion H3.
-    assumption.
-    unfold conv_context; rewrite <- dom_map_id; not_in_L x.
-    now apply coercions_produce_terms in H.
+    apply WFPushT; auto; not_in_L x.
+    admit. (* change lemmas with WFEnv and add them to env_resolve *)
+    admit. (* same *)
     eapply STTyProj1.
     apply STTyVar.
-    apply wf_weaken_extend.
-    Focus 4.
+    admit.
+    apply Ok_push.
+    env_resolve.
+    unfold conv_context; rewrite <- dom_map_id; not_in_L x.
     left; reflexivity.
-    change (STTuple (| t1 |) (| t2 |)) with (| And t1 t2 |).
-    env_resolve.
-    unfold conv_context; rewrite <- dom_map_id; not_in_L x.
-    apply Ok_push; auto.
-    unfold conv_context; rewrite <- dom_map_id; not_in_L x.
-    change (STTuple (| t1 |) (| t2 |)) with (| And t1 t2 |).
-    env_resolve.
+    now apply coercions_produce_terms in H.
+    auto.
     auto.
   (* Case SAnd3 *)
   - assert (Ha1 : Sub t2 t0) by (unfold Sub; eauto).
