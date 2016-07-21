@@ -934,6 +934,128 @@ Qed.
 
 Hint Resolve open_rec_term.
 
+Lemma open_rec_type_term_core2 :
+  forall (t : SExp var) (j : nat) (v : STyp) (i : nat) (u : SExp var),
+  open_rec_typ_term j v t = open_rec_typ_term j v ({i ~> u} t) ->
+  t = {i ~> u} t.
+Proof.
+  intro t; induction t; intros; simpl in *; auto.
+  - destruct (i =? n).
+    destruct u; simpl in *; auto; now inversion H.
+    reflexivity.
+  - inversion H; apply IHt in H1; now rewrite <- H1.
+  - inversion H; apply IHt1 in H1; apply IHt2 in H2; rewrite <- H1; rewrite <- H2;
+    reflexivity.
+  - inversion H; apply IHt1 in H1; apply IHt2 in H2; rewrite <- H1; rewrite <- H2;
+    reflexivity.
+  - inversion H; apply IHt in H1; now rewrite <- H1.
+  - inversion H; apply IHt in H1; now rewrite <- H1.
+  - inversion H; apply IHt in H1; now rewrite <- H1.
+  - inversion H; apply IHt in H1; now rewrite <- H1.
+Qed.
+
+Lemma open_rec_type_term_core3 :
+  forall t n m u x,
+    {m ~> STFVar elt x} t = open_rec_typ_term n u ({m ~> STFVar elt x} t) ->
+    t = open_rec_typ_term n u t.
+Proof.
+  intro t; induction t; intros; simpl in *; auto.
+  - inversion H; apply IHt in H1; rewrite <- H1; auto.
+  - inversion H; apply IHt1 in H1; apply IHt2 in H2;
+    rewrite <- H1; rewrite <- H2; auto.
+  - inversion H; apply IHt1 in H1; apply IHt2 in H2;
+    rewrite <- H1; rewrite <- H2; auto.
+  - inversion H; apply IHt in H1; rewrite <- H1; auto.
+  - inversion H; apply IHt in H1; rewrite <- H1; auto.
+  - inversion H; apply IHt in H1; rewrite <- H1; auto.
+  - inversion H; apply IHt in H1; rewrite <- H1; rewrite <- H2; rewrite <- H2; auto.
+Qed.
+
+Lemma open_rec_typ_term_core4 : forall t j v i u, i <> j ->
+  open_rec_typ_term j v t = open_rec_typ_term i u (open_rec_typ_term j v t) ->
+  t = open_rec_typ_term i u t.
+Proof.
+  intro t; induction t; intros; simpl; auto.
+  - simpl in H0; inversion H0.
+    erewrite <- IHt; eauto.
+  - simpl in H0; inversion H0.
+    erewrite <- IHt1.
+    erewrite <- IHt2.
+    reflexivity.
+    apply H.
+    apply H3.
+    apply H.
+    apply H2.
+  - simpl in H0; inversion H0.
+    erewrite <- IHt1.
+    erewrite <- IHt2.
+    reflexivity.
+    apply H.
+    apply H3.
+    apply H.
+    apply H2.
+  - simpl in H0; inversion H0.
+    erewrite <- IHt.
+    reflexivity.
+    apply H.
+    apply H2.
+  - simpl in H0; inversion H0.
+    erewrite <- IHt.
+    reflexivity.
+    apply H.
+    apply H2.
+  - simpl in H0; inversion H0.
+    erewrite <- IHt.
+    reflexivity.
+    apply not_eq_S.
+    apply H.
+    apply H2.
+  - simpl in H0; inversion H0.
+    erewrite <- IHt.
+    apply open_rec_typ_core in H3.
+    now rewrite <- H3.
+    auto.
+    apply H.
+    apply H2.
+Qed.
+
+Lemma open_rec_typ_term_term :
+  forall t u, STTerm t -> forall k, t = open_rec_typ_term k u t.
+Proof.
+  intros t u HT.
+  induction HT; intros; simpl; auto.
+  - unfold open in *.
+    pick_fresh x.
+    assert (Ha : ~ In x L) by not_in_L x.
+    apply H0 with (k := k) in Ha.
+    apply open_rec_type_term_core3 in Ha.
+    now rewrite <- Ha.
+  - rewrite <- IHHT1; rewrite <- IHHT2; auto.
+  - rewrite <- IHHT1; rewrite <- IHHT2; auto.
+  - rewrite <- IHHT; auto.
+  - rewrite <- IHHT; auto.
+  - pick_fresh x.
+    assert (Ha : ~ In x L) by not_in_L x.
+    apply H0 with (k := S k) in Ha.
+    unfold open_typ_term in *.
+    apply open_rec_typ_term_core4 in Ha.
+    now rewrite <- Ha.
+    auto.
+  - rewrite <- IHHT; auto.
+    rewrite <- open_rec_type; auto.
+Qed.
+ 
+Definition body_typ_term t :=
+  exists L, forall x, ~ In x L -> STTerm (open_typ_term t (STFVarT x)).
+
+Lemma term_abs_to_body_typ_term : forall t1, 
+  STTerm (STTLam _ t1) -> body_typ_term t1.
+Proof. intros. unfold body_typ_term. inversion H; subst. eauto. Qed.
+
+Lemma body_typ_term_to_term_abs : forall t1, 
+  body_typ_term t1 -> STTerm (STTLam _ t1).
+Proof. intros. inversion H. eapply STTerm_TLam. apply H0. Qed.
+
 Lemma open_app_eq : forall x E n F,
   not (In x (fv E)) ->
   not (In x (fv F)) ->

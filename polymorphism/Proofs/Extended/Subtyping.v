@@ -3,14 +3,14 @@ Require Import Coq.Structures.Equalities.
 Require Import Coq.MSets.MSetInterface.
 Require Import Arith.
 Require Import Setoid.
-Require Import SystemF.
 Require Import Coq.Program.Equality.
-Require Export Infrastructure.
+Require Import SystemF.
+Require Import Infrastructure.
 
 Module MSubtyping
        (Import VarTyp : UsualDecidableTypeFull)
        (Import set : MSetInterface.S).
-  
+
 Module MInfrastructure := MInfrastructure(VarTyp)(set).
 Export MInfrastructure.
 
@@ -83,6 +83,10 @@ Inductive and_coercion (e : SExp var) : PTyp -> sum (SExp var) (SExp var) -> Pro
 Hint Constructors and_coercion.
 
 (* Some properties about and_coercion *)
+
+Definition join_sum : forall {A}, A + A -> A.
+  intros A H; destruct H as [a | a]; exact a.
+Defined.
 
 Lemma ac_inr_inv : forall t e e', and_coercion e t (inr e') -> and_coercion e t (inr e).
 Proof.
@@ -204,6 +208,113 @@ Proof.
     now apply ac_inr_inv in H2.
 Qed.
 
+(* and_coercion lemmas *)
+
+Lemma ac_inl_term : forall e t r, and_coercion e t (inl r) -> STTerm r.
+Proof.
+  intros.
+  dependent induction H; auto.
+  - apply_fresh STTerm_Lam as x.
+    unfold open; rewrite <- open_rec_term; auto.
+  - pick_fresh x.
+    assert (Ha : ~ In x L) by not_in_L x.
+    apply H0 in Ha.
+    apply body_typ_term_to_term_abs.
+    unfold body_typ_term.
+    exists (fv e1).
+    intros; unfold open_typ_term; rewrite <- open_rec_typ_term_term; auto.
+Qed.
+
+Lemma ac_inr_term : forall e t r, STTerm e -> and_coercion e t (inr r) -> STTerm r.
+Proof. intros; apply ac_inr_inv_eq in H0; now subst. Qed.
+  
+Lemma and_coercion_proj1_term :
+  forall t0 (c : SExp var) c',
+    PType t0 ->
+    STTerm c ->
+    and_coercion ((STApp _ c (STProj1 _ (STBVar _ 0)))) t0 c' ->
+    STTerm (STLam _ (join_sum c')).
+Proof.
+  intros.
+  apply_fresh STTerm_Lam as x; unfold open; simpl.
+  destruct c'; simpl.
+  apply ac_inl_term in H1.
+  rewrite <- open_rec_term; auto.
+  apply ac_inr_inv_eq in H1.
+  rewrite <- H1.
+  simpl.
+  apply STTerm_App; auto.
+  rewrite <- open_rec_term; auto.
+Qed.
+
+Lemma and_coercion_proj2_term :
+  forall t0 (c : SExp var) c',
+    PType t0 ->
+    STTerm c ->
+    and_coercion ((STApp _ c (STProj2 _ (STBVar _ 0)))) t0 c' ->
+    STTerm (STLam _ (join_sum c')).
+Proof.
+  intros.
+  apply_fresh STTerm_Lam as x; unfold open; simpl.
+  destruct c'; simpl.
+  apply ac_inl_term in H1.
+  rewrite <- open_rec_term; auto.
+  apply ac_inr_inv_eq in H1.
+  rewrite <- H1.
+  simpl.
+  apply STTerm_App; auto.
+  rewrite <- open_rec_term; auto.
+Qed.
+
+Lemma same_coercion :
+  forall A, PType A ->
+       forall e c1 c2, and_coercion e A c1 -> and_coercion e A c2 -> c1 = c2.
+Proof.
+  intros A HPT.
+  induction HPT; intros.
+  - now inversion H; inversion H0.
+  - now inversion H; inversion H0.
+  - inversion H; inversion H0; subst; eauto.
+    + apply f_equal.
+      now apply (IHHPT2 _ _ _ H4) in H8; inversion H8.
+    + now apply (IHHPT2 _ _ _ H4) in H8; inversion H8.
+    + now apply (IHHPT2 _ _ _ H4) in H8; inversion H8.
+  - inversion H; inversion H0; subst; eauto.
+    + apply f_equal.
+      apply (IHHPT1 _ _ _ H3) in H8.
+      apply (IHHPT2 _ _ _ H5) in H10.
+      inversion H8; inversion H10; now subst.
+    + apply (IHHPT1 _ _ _ H3) in H9; inversion H9.
+    + apply (IHHPT2 _ _ _ H5) in H9; inversion H9.
+    + apply (IHHPT1 _ _ _ H4) in H7; inversion H7.
+    + apply (IHHPT2 _ _ _ H4) in H9; inversion H9.
+  - inversion H1; inversion H2; subst; eauto.
+    + pick_fresh x.
+      assert (Ha : @inl _ (SExp var) e1 = inl e0).
+      eapply H0 with (x := x).
+      not_in_L x.
+      apply H6; not_in_L x.
+      apply H10; not_in_L x.
+      inversion Ha; now subst.
+    + pick_fresh x.
+      assert (Ha : inl e1 = inr e).
+      eapply H0 with (x := x).
+      not_in_L x.
+      apply H6; not_in_L x.
+      apply H10; not_in_L x.
+      inversion Ha.
+    + pick_fresh x.
+      assert (Ha : inl e1 = inr e).
+      eapply H0 with (x := x).
+      not_in_L x.
+      apply H10; not_in_L x.
+      apply H6; not_in_L x.
+      inversion Ha.
+  - inversion H; inversion H0; subst; auto;
+    apply (IHHTL _ _ _ H4) in H8; now inversion H8.
+Qed.
+
+
 Fixpoint and_coercion' (t : PTyp) (e : SExp var) {struct t} : sum (SExp var) (SExp var).
 refine(
   match t with
@@ -232,10 +343,6 @@ destruct (and_coercion (open_typ_source A (PFVarT x)) e).
 apply (inl (STTLam _ s)).
 apply (inr s).
 Admitted. *)
-
-Definition join_sum : forall {A}, A + A -> A.
-  intros A H; destruct H as [a | a]; exact a.
-Defined.
 
 Inductive sub : PTyp -> PTyp -> (SExp var) -> Prop :=
   | SInt : sub PInt PInt (STLam _ (STBVar _ 0))
@@ -435,11 +542,99 @@ Definition sforall : forall L t1 t2 c,
 Hint Constructors sub.
 Hint Resolve stop sint sfun sand1 sand2 sand3 svar.
 
+Lemma coercions_produce_terms :
+  forall E A B, sub A B E -> STTerm E.
+Proof.
+  intros.
+  induction H.
+  (* Case SInt *)
+  - apply_fresh STTerm_Lam as x; cbn; auto.
+  (* Case SFun *)
+  - apply_fresh STTerm_Lam as x; cbn.
+    apply_fresh STTerm_Lam as y; cbn.
+    apply STTerm_App.
+    repeat rewrite <- open_rec_term; assumption.
+    apply STTerm_App.
+    apply STTerm_Var.
+    apply STTerm_App; [ repeat rewrite <- open_rec_term; auto | apply STTerm_Var ].
+  (* Case SAnd1 *)
+  - apply_fresh STTerm_Lam as x; cbn.
+    apply STTerm_Pair.
+    apply STTerm_App; repeat rewrite <- open_rec_term; auto.
+    rewrite <- open_rec_term; auto.
+  (* Case SAnd2 *)
+  - apply and_coercion_proj1_term with (t0 := t0) (c := c); auto.
+    assert (Ha : Sub t1 t0) by (unfold Sub; eauto).
+    now apply sub_lc in Ha as [Ha1 Ha2].
+  (* Case SAnd3 *)
+  - apply and_coercion_proj2_term with (t0 := t0) (c := c); auto.
+    assert (Ha : Sub t2 t0) by (unfold Sub; eauto).
+    now apply sub_lc in Ha as [Ha1 Ha2].
+  (* Case SVar *)
+  - apply_fresh STTerm_Lam as x; cbn; auto.
+  (* Case SForAll *)
+  - apply_fresh STTerm_Lam as x; cbn.
+    apply_fresh STTerm_TLam as y; cbn.
+    apply STTerm_App; auto.
+    assert (Ha : not (In y L)) by (not_in_L y).
+    apply H0 in Ha.
+    rewrite open_comm_open_typ_term.
+    rewrite <- open_rec_term; auto.
+  (* Case STop *)
+  - apply_fresh STTerm_Lam as x; cbn; auto.
+Qed.
+    
+
 Lemma sub_inv :
   forall t1 t2 e x, sub (open_typ_source t1 (PFVarT x)) (open_typ_source t2 (PFVarT x)) e ->
-               exists e', e = open e' (STFVar _ x).
+               exists e', e = open_typ_term e' (STFVarT x).
 Proof.
-  intros t1 t2 e x.
+  intros t1 t2 e x H.
+  unfold open.
+  dependent induction H; subst.
+  - exists (STLam var (STBVar var 0)); now simpl.
+  - exists (STLam var
+       (STLam var
+          (STApp var c2
+                 (STApp var (STBVar var 1) (STApp var c1 (STBVar var 0)))))).
+    unfold open_typ_term; simpl.
+    apply coercions_produce_terms in H; apply coercions_produce_terms in H0.
+    repeat rewrite <- open_rec_typ_term_term; auto.
+  - exists (STLam var
+       (STPair var (STApp var c1 (STBVar var 0))
+               (STApp var c2 (STBVar var 0)))).
+    simpl.
+    unfold open_typ_term; simpl.
+    apply coercions_produce_terms in H; apply coercions_produce_terms in H0.
+    repeat rewrite <- open_rec_typ_term_term; auto.
+  - exists (STLam var (join_sum ac)).
+    unfold open_typ_term; simpl.      
+    destruct ac; simpl.
+    apply ac_inl_term in H2.
+    rewrite <- open_rec_typ_term_term; auto.
+    apply ac_inr_inv_eq in H2.
+    subst; simpl.
+    apply coercions_produce_terms in H.
+    rewrite <- open_rec_typ_term_term; auto.
+  - exists (STLam var (join_sum ac)).
+    unfold open_typ_term; simpl.
+    destruct ac; simpl.
+    apply ac_inl_term in H2.
+    rewrite <- open_rec_typ_term_term; auto.
+    apply ac_inr_inv_eq in H2.
+    subst; simpl.
+    apply coercions_produce_terms in H.
+    rewrite <- open_rec_typ_term_term; auto.
+  - exists (STLam var (STBVar var 0)); now simpl.
+  - exists (STLam var
+             (STTLam var (STApp var c (STTApp var (STBVar var 0) (STBVarT 0))))).
+    unfold open_typ_term; simpl.
+    pick_fresh y.
+    assert (Ha : ~ In y L) by not_in_L y.
+    apply H in Ha.
+    apply coercions_produce_terms in Ha.
+    admit. (* should be provable via Ha *)
+  - exists (STLam var (STUnit var)); now simpl.
 Admitted.
            
 
@@ -450,17 +645,18 @@ Lemma sub_rename :
     ~ In y (union L (union (fv_ptyp t1) (fv_ptyp t2))) ->
     sub (open_typ_source t1 (PFVarT y))
         (open_typ_source t2 (PFVarT y))
-        (open c (STFVar _ y)) ->
+        (open_typ_term c (STFVarT y)) ->
     (forall x : elt, ~ In x L -> sub (open_typ_source t1 (PFVarT x))
                                (open_typ_source t2 (PFVarT x))
-                               (open c (STFVar _ x))).
+                               (open_typ_term c (STFVarT x))).
 Proof.
   intros.
   destruct (VarTyp.eq_dec x y).
   subst; auto.
   rewrite subst_typ_source_intro with (x := y); auto.
   rewrite subst_typ_source_intro with (x := y) (t := t2); auto.
-  admit.
+  unfold open in *.
+  admit. (* TODO we need something like our usub_subst and substitution of types on terms *)
   not_in_L y.
   not_in_L y.
 Admitted.
@@ -470,10 +666,10 @@ Lemma sub_ex : forall L t1 t2,
   (forall x, ~ In x L -> PType (open_typ_source t2 (PFVarT x))) ->              
   (forall x, ~ In x L -> exists c, sub (open_typ_source t1 (PFVarT x))
                             (open_typ_source t2 (PFVarT x))
-                            (open c (STFVar _ x))) ->
+                            (open_typ_term c (STFVarT x))) ->
   exists c, forall x, ~ In x L -> sub (open_typ_source t1 (PFVarT x))
                            (open_typ_source t2 (PFVarT x))
-                           (open c (STFVar _ x)).
+                           (open_typ_term c (STFVarT x)).
 Proof.
   intros L t1 t2 H1 H2 H.
   pick_fresh x.
@@ -495,7 +691,7 @@ Lemma sound_sub : forall t1 t2, usub t1 t2 -> Sub t1 t2.
        ~ In x L ->
        exists e : SExp var,
          sub (open_typ_source t1 (PFVarT x)) (open_typ_source t2 (PFVarT x))
-             (open e (STFVar _ x))).
+             (open_typ_term e (STFVarT x))).
     intros.
     apply H0 in H2.
     destruct H2.
@@ -505,8 +701,22 @@ Lemma sound_sub : forall t1 t2, usub t1 t2 -> Sub t1 t2.
     eauto.
     clear H0.
     apply sub_ex in Ha.
-    admit. (* this should be provable now *)
-Admitted.
+    destruct Ha.
+    eexists.
+    apply_fresh SForAll as x; auto.
+    apply H0.
+    not_in_L y.
+    intros.
+    apply Ha in H0; destruct H0.
+    assert (HSub : Sub (open_typ_source t1 (PFVarT x)) (open_typ_source t2 (PFVarT x))).
+    unfold Sub; eauto.
+    apply sub_lc in HSub; now destruct HSub.
+    intros.
+    apply Ha in H0; destruct H0.
+    assert (HSub : Sub (open_typ_source t1 (PFVarT x)) (open_typ_source t2 (PFVarT x))).
+    unfold Sub; eauto.
+    apply sub_lc in HSub; now destruct HSub.
+Qed.
 
 Lemma complete_sub : forall t1 t2, Sub t1 t2 -> usub t1 t2.
 Proof.

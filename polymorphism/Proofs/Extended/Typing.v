@@ -264,7 +264,7 @@ Proof.
   now rewrite app_nil_l in H.
 Qed. 
   
-Lemma wf_weaken_extend_source : forall ty x v Gamma,
+Lemma wf_weaken_extend_source_tydis : forall ty x v Gamma,
    WFTyp Gamma ty ->
    not (M.In x (union (dom Gamma) (fv_ptyp v))) ->                            
    WFTyp ((x,TyDis v) :: Gamma) ty.
@@ -301,6 +301,43 @@ Proof.
   - apply WFTop.
     apply WFPushV; auto.
     not_in_L x.
+    not_in_L x.
+Qed.
+
+Lemma wf_weaken_extend_source_termv : forall ty x v Gamma,
+   WFTyp Gamma ty ->
+   not (M.In x (union (dom Gamma) (fv_ptyp v))) ->                            
+   WFTyp ((x,TermV v) :: Gamma) ty.
+Proof.
+  intros.
+  induction H; eauto.
+  - apply WFInt.
+    apply WFPushT; auto.
+    not_in_L x.
+  - apply WFAnd; auto.
+    rewrite <- app_nil_l with (l := ((x, TermV v) :: Gamma)).
+    change ((x, TermV v) :: Gamma) with (((x, TermV v) :: nil) ++ Gamma).
+    apply ortho_weaken.
+    now rewrite app_nil_l.
+  - eapply WFVar.
+    apply in_cons; apply H.
+    apply WFPushT; auto.
+    not_in_L x.
+  - apply_fresh WFForAll as x; cbn.
+    unfold extend in H1.
+    intros.
+    apply wf_env_comm_extend_source.
+    apply H1.
+    not_in_L y.
+    simpl; not_in_L x.
+    apply MSetProperties.Dec.F.add_iff in H0.
+    destruct H0.
+    not_in_L y.
+    not_in_L x.
+    apply IHWFTyp.
+    not_in_L x.
+  - apply WFTop.
+    apply WFPushT; auto.
     not_in_L x.
 Qed.
 
@@ -341,7 +378,7 @@ Proof.
     unfold not; intros HH; apply fv_subst_source in HH;
     rewrite union_spec in HH; destruct HH as [HH | HH]; not_in_L x.
     rewrite dom_subst_id; not_in_L x.
-    apply wf_weaken_extend_source; auto.
+    apply wf_weaken_extend_source_tydis; auto.
     not_in_L x.
     unfold not; intros HH; apply fv_open_rec_typ_source in HH; simpl in *.
     rewrite union_spec in HH; destruct HH as [HH | HH].
@@ -393,7 +430,7 @@ Proof.
     rewrite <- app_nil_l with (l := (extend x (TyDis d0) Gamma)).
     apply ortho_weaken.
     now simpl.
-    apply wf_weaken_extend_source.
+    apply wf_weaken_extend_source_tydis.
     now apply wf_gives_wfenv in HWFt.
     not_in_L x.
     not_in_L x.
@@ -439,7 +476,7 @@ Proof.
   now apply wf_gives_wfenv in Ha.
   apply ortho_weaken.
   auto.
-  apply wf_weaken_extend_source; auto.
+  apply wf_weaken_extend_source_tydis; auto.
   not_in_L y.
   not_in_L y.
 Qed.
