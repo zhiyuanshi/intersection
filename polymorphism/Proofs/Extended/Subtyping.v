@@ -586,57 +586,56 @@ Qed.
     
 
 Lemma sub_inv :
-  forall t1 t2 e x, sub (open_typ_source t1 (PFVarT x)) (open_typ_source t2 (PFVarT x)) e ->
-               exists e', e = open_typ_term e' (STFVarT x).
+  forall t1 t2 e x n,
+    sub (open_rec_typ_source n (PFVarT x) t1) (open_rec_typ_source n (PFVarT x) t2) e ->
+    exists e', e = open_rec_typ_term n (STFVarT x) e'.
 Proof.
-  intros t1 t2 e x H.
+  intros t1 t2 e x n H.
   unfold open.
-  dependent induction H; subst.
+  inversion H; intros.
   - exists (STLam var (STBVar var 0)); now simpl.
   - exists (STLam var
        (STLam var
           (STApp var c2
                  (STApp var (STBVar var 1) (STApp var c1 (STBVar var 0)))))).
     unfold open_typ_term; simpl.
-    apply coercions_produce_terms in H; apply coercions_produce_terms in H0.
+    apply coercions_produce_terms in H2; apply coercions_produce_terms in H3.
     repeat rewrite <- open_rec_typ_term_term; auto.
   - exists (STLam var
        (STPair var (STApp var c1 (STBVar var 0))
                (STApp var c2 (STBVar var 0)))).
     simpl.
     unfold open_typ_term; simpl.
-    apply coercions_produce_terms in H; apply coercions_produce_terms in H0.
+    apply coercions_produce_terms in H1; apply coercions_produce_terms in H3.
     repeat rewrite <- open_rec_typ_term_term; auto.
   - exists (STLam var (join_sum ac)).
     unfold open_typ_term; simpl.      
     destruct ac; simpl.
-    apply ac_inl_term in H2.
+    apply ac_inl_term in H4.
     rewrite <- open_rec_typ_term_term; auto.
-    apply ac_inr_inv_eq in H2.
+    apply ac_inr_inv_eq in H4.
     subst; simpl.
-    apply coercions_produce_terms in H.
+    apply coercions_produce_terms in H1.
     rewrite <- open_rec_typ_term_term; auto.
   - exists (STLam var (join_sum ac)).
     unfold open_typ_term; simpl.
     destruct ac; simpl.
-    apply ac_inl_term in H2.
+    apply ac_inl_term in H4.
     rewrite <- open_rec_typ_term_term; auto.
-    apply ac_inr_inv_eq in H2.
+    apply ac_inr_inv_eq in H4.
     subst; simpl.
-    apply coercions_produce_terms in H.
+    apply coercions_produce_terms in H1.
     rewrite <- open_rec_typ_term_term; auto.
   - exists (STLam var (STBVar var 0)); now simpl.
   - exists (STLam var
              (STTLam var (STApp var c (STTApp var (STBVar var 0) (STBVarT 0))))).
-    unfold open_typ_term; simpl.
-    pick_fresh y.
-    assert (Ha : ~ In y L) by not_in_L y.
-    apply H in Ha.
-    apply coercions_produce_terms in Ha.
-    admit. (* should be provable via Ha *)
+    rewrite <- open_rec_typ_term_term.
+    auto.
+    rewrite <- H4 in H.
+    apply coercions_produce_terms in H.
+    apply H.
   - exists (STLam var (STUnit var)); now simpl.
-Admitted.
-           
+Qed.           
 
 Lemma sub_rename :
   forall L t1 t2 c, forall y,
