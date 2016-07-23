@@ -41,20 +41,12 @@ Inductive usub : PTyp -> PTyp -> Prop :=
   | USAnd2 : forall t t1 t2 , usub t1 t -> PType t2 -> usub (And t1 t2) t 
   | USAnd3 : forall t t1 t2, usub t2 t -> PType t1 -> usub (And t1 t2) t
   | USVar   : forall v, usub (PFVarT v) (PFVarT v) 
-  | USForAll : forall L d t1 t2,
+  | USForAll : forall L d1 d2 t1 t2,
                  (forall x, not (In x L) -> usub (open_typ_source t1 (PFVarT x))
                                            (open_typ_source t2 (PFVarT x))) ->
-                 PType d ->
-                 usub (ForAll d t1) (ForAll d t2)
+                 usub d2 d1 ->
+                 usub (ForAll d1 t1) (ForAll d2 t2)
   | USTop : forall t, PType t -> usub t Top.
-
-Definition Is_inr {A B} (x : sum A B) : Type :=
-  match x with
-    | inr _ => True
-    | inl _ => False
-  end.
-
-Hint Unfold Is_inr.
 
 Inductive and_coercion (e : SExp var) : PTyp -> sum (SExp var) (SExp var) -> Prop :=
   | ACInt : and_coercion e PInt (inr e)
@@ -370,12 +362,12 @@ Inductive sub : PTyp -> PTyp -> (SExp var) -> Prop :=
               and_coercion ((STApp _ c (STProj2 _ (STBVar _ 0)))) t ac -> 
               sub (And t1 t2) t (STLam _ (join_sum ac))
   | SVar : forall v, sub (PFVarT v) (PFVarT v) (STLam _ (STBVar _ 0))
-  | SForAll : forall L d t1 t2 c,
+  | SForAll : forall L d1 d2 t1 t2 c c',
                 (forall x, not (In x L) -> sub (open_typ_source t1 (PFVarT x))
                                          (open_typ_source t2 (PFVarT x))
                                          (open_typ_term c (STFVarT x))) ->
-                PType d ->
-                sub (ForAll d t1) (ForAll d t2)
+                sub d2 d1 c' ->
+                sub (ForAll d1 t1) (ForAll d2 t2)
                     (STLam _ (STTLam _ (STApp _ c (STTApp _ (STBVar _ 0) (STBVarT 0)))))
   | STop : forall t, PType t -> sub t Top (STLam _ (STUnit _)).
 
@@ -392,7 +384,7 @@ Proof.
   - destruct IHsub1, IHsub2; auto.
   - destruct IHsub; auto.
   - destruct IHsub; auto.
-  - split.
+  - destruct IHsub; split.
     apply_fresh PType_ForAll as x; auto.
     assert (Ha : ~ In x L) by not_in_L x.
     apply H0 in Ha; now destruct Ha.
@@ -766,7 +758,8 @@ Admitted.
 
 Lemma sound_sub : forall t1 t2, usub t1 t2 -> Sub t1 t2.
   intros; induction H; auto.
-  - unfold Sub in *.
+  - destruct IHusub as [c Hsub].
+    unfold Sub in *.
     assert (Ha : forall x : elt,
        ~ In x L ->
        exists e : SExp var,
@@ -786,6 +779,7 @@ Lemma sound_sub : forall t1 t2, usub t1 t2 -> Sub t1 t2.
     apply_fresh SForAll as x; auto.
     apply H0.
     not_in_L y.
+    eauto.
     intros.
     apply Ha in H0; destruct H0.
     assert (HSub : Sub (open_typ_source t1 (PFVarT x)) (open_typ_source t2 (PFVarT x))).
