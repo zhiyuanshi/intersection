@@ -34,11 +34,11 @@ Inductive Ortho : context TyEnvSource -> PTyp -> PTyp -> Prop :=
   | OAnd1 : forall Gamma t1 t2 t3, Ortho Gamma t1 t3 -> Ortho Gamma t2 t3 -> Ortho Gamma (And t1 t2) t3
   | OAnd2 : forall Gamma t1 t2 t3, Ortho Gamma t1 t2 -> Ortho Gamma t1 t3 -> Ortho Gamma t1 (And t2 t3)
   | OFun  : forall Gamma t1 t2 t3 t4, Ortho Gamma t2 t4 -> Ortho Gamma (Fun t1 t2) (Fun t3 t4)
-  | OForAll : forall L Gamma d t1 t2,
-                (forall x, not (In x L) -> Ortho (extend x (TyDis d) Gamma)
+  | OForAll : forall L Gamma d1 d2 t1 t2,
+                (forall x, not (In x L) -> Ortho (extend x (TyDis (And d1 d2)) Gamma)
                                            (open_typ_source t1 (PFVarT x))
                                            (open_typ_source t2 (PFVarT x))) ->
-                Ortho Gamma (ForAll d t1) (ForAll d t2)
+                Ortho Gamma (ForAll d1 t1) (ForAll d2 t2)
   | OVar : forall Gamma x ty A, List.In (x,TyDis A) Gamma ->
                        usub A ty ->
                        PType ty ->

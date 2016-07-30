@@ -524,20 +524,20 @@ Definition svar : forall v, Sub (PFVarT v) (PFVarT v).
   apply SVar.
 Defined.
 
-(*
-Definition sforall : forall L t1 t2 c,
-                (forall x, not (In x L) -> sub (open_ptyp t1 (PFVar x))
-                                         (open_ptyp t2 (PFVar x))
+
+Definition sforall : forall L t1 t2 c d,
+                (forall x, not (In x L) -> sub (open_typ_source t1 (PFVarT x))
+                                         (open_typ_source t2 (PFVarT x))
                                          (open_typ_term c (STFVarT x))) ->
-                Sub (ForAll t1) (ForAll t2).
+                PType d -> 
+                Sub (ForAll d t1) (ForAll d t2).
   intros.
   unfold Sub.
   eexists.
   eapply SForAll.
   intros.
-  
-  pick_fresh.
- *)
+Admitted.
+
 
 Hint Constructors sub.
 Hint Resolve stop sint sfun sand1 sand2 sand3 svar.
@@ -715,7 +715,31 @@ Proof.
   apply EqFacts.eqb_neq in H1; exfalso; apply H1; reflexivity.
   auto. auto.
 Qed.  
-    
+
+Lemma sub_subst :
+  forall A B z x c,
+    sub A B c ->
+    sub (subst_typ_source z (PFVarT x) A) (subst_typ_source z (PFVarT x) B)
+        (subst_typ_term z (STFVarT x) c).
+Proof.
+  intros A B z x c HSub.
+  induction HSub; intros; simpl; eauto.
+  - admit. (* apply sand2. [ apply IHsub | now apply subst_source_lc ]. *)
+  - admit. (* apply sand3; [ apply IHsub | now apply subst_source_lc ]. *)
+  - destruct eqb; auto.
+  - apply_fresh SForAll as y.
+    rewrite subst_typ_source_open_source_var; auto.
+    rewrite subst_typ_source_open_source_var; auto.
+    rewrite subst_typ_open_var; auto.
+    apply H0.
+    not_in_L y.
+    not_in_L y.
+    not_in_L y.
+    not_in_L y.
+    now apply subst_source_lc.
+  - apply STop; now apply subst_source_lc.
+Admitted.
+
 Lemma sub_rename :
   forall L t1 t2 c, forall y,
     PType (open_typ_source t1 (PFVarT y)) ->
@@ -734,13 +758,76 @@ Proof.
   rewrite subst_typ_source_intro with (x := y); auto.
   rewrite subst_typ_source_intro with (x := y) (t := t2); auto.
   rewrite subst_typ_term_intro with (x := y).
-  admit. (* TODO we need something like our usub_subst and substitution of types on terms *)
+  now apply sub_subst.
   not_in_L y.
   auto.
   not_in_L y.
   not_in_L y.
+Qed.
+
+Lemma foo : forall x t1 t2 c,
+              PType  (open_typ_source t1 (PFVarT x)) ->
+              PType  (open_typ_source t2 (PFVarT x)) ->
+              ~ In x (union (fv_ptyp t1) (fv_ptyp t2)) ->
+              sub (open_typ_source t1 (PFVarT x)) (open_typ_source t2 (PFVarT x))
+                  (open_typ_term c (STFVarT x)) -> ~ In x (fv c).
+Proof.
+  intros.
+  inversion H2; subst.
 Admitted.
 
+Lemma fv_open_rec_typ_term':
+  forall (t1 : SExp var) (t2 : STyp) (x : elt) (n : nat),
+  In x (union (fv t1) (fv_typ t2)) -> In x (fv (open_rec_typ_term n t2 t1)).
+Proof.
+  intros t1.
+  induction t1; intros; simpl; auto.
+  - admit.
+  - admit.
+  - admit.
+  - admit.
+  - admit.
+  - admit.
+  - admit.
+Admitted.
+    
+Lemma bar : forall x t1 t2 c, sub t1 t2 c ->  ~ In x (fv_ptyp t1) -> ~ In x (fv_ptyp t2) ->
+                         ~ In x (fv c).
+Proof.
+  intros.
+  induction H; simpl in *; auto.
+  - not_in_L x; auto.
+    apply (IHsub2 H5) in H4; contradiction.
+    apply (IHsub1 H3) in H1; contradiction.
+  - not_in_L x; auto.
+    apply (IHsub1 H0) in H3; contradiction.
+    apply (IHsub2 H0) in H4; contradiction.    
+  - not_in_L x; auto.
+    apply (IHsub H5) in H1.
+    admit. (* and_coercion case *)
+  - not_in_L x; auto.
+    apply (IHsub H6) in H1.
+    admit. (* and_coercion case *)
+  - not_in_L x.
+  - not_in_L x.
+    pick_fresh y.
+    assert (Ha : ~ In y L) by not_in_L y.
+    apply H2 in Ha.
+    unfold open_typ_term in Ha.
+    exfalso; apply Ha. apply fv_open_rec_typ_term'.
+    not_in_L x; auto.
+    unfold not; intros H10.
+    apply fv_open_rec_typ_source in H10; rewrite union_spec in H10; inversion H10.
+    contradiction. simpl in H7. not_in_L y.
+    apply H15; apply MSetProperties.Dec.F.singleton_iff in H7; subst.
+    now apply MSetProperties.Dec.F.singleton_iff.
+    unfold not; intros H10.
+    apply fv_open_rec_typ_source in H10; rewrite union_spec in H10; inversion H10.
+    contradiction. simpl in H7. not_in_L y.
+    apply H15; apply MSetProperties.Dec.F.singleton_iff in H7; subst.
+    now apply MSetProperties.Dec.F.singleton_iff.
+Admitted.
+     
 Lemma sub_ex : forall L t1 t2,
   (forall x, ~ In x L -> PType (open_typ_source t1 (PFVarT x))) ->
   (forall x, ~ In x L -> PType (open_typ_source t2 (PFVarT x))) ->              
@@ -758,9 +845,28 @@ Proof.
   destruct Ha as [c HAC].
   exists c.
   intros.
+
+  (*
+  pick_fresh y.
+  assert (Ha : ~ In y L) by not_in_L y.
+  apply H in Ha.
+  destruct Ha as [c1 HAC1].
+  *)
+  
+  (*
+  assert (Ha : sub (ForAll Top t1) (ForAll Top t2) (STLam var
+                   (STTLam var
+                           (STApp var c (STTApp var (STBVar var 0) (STBVarT 0)))))).
+  apply_fresh SForAll as y.
+  *)
+
+  (*
+  apply sub_subst with (z := x) (x := x0) in HAC.
+  *)
+  
   apply sub_rename with (y := x) (L := L); auto.
   apply H1; not_in_L x.
-  apply H2; not_in_L x.
+  apply H2; not_in_L x.  
   admit.
 Admitted.
 
@@ -779,7 +885,7 @@ Lemma sound_sub : forall t1 t2, usub t1 t2 -> Sub t1 t2.
     apply sub_inv in H2.
     destruct H2; subst.
     eauto.
-    clear H0.
+    clear H0.    
     apply sub_ex in Ha.
     destruct Ha.
     eexists.
