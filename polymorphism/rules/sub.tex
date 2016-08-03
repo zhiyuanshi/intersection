@@ -6,7 +6,14 @@
 \newcommand{\rulesubint}{
   \inferrule* [right=\labelsubint]
     { }
-    {\code{Int} \subtype \code{Int} \yields {\lamty x {\im \alpha} x}}
+    {\tyint \subtype \tyint \yields {\lamty x {\im \alpha} x}}
+}
+
+\newcommand{\labelsubtop}{\makelabelsub Top}
+\newcommand{\rulesubtop}{
+  \inferrule* [right=\labelsubtop]
+    { }
+    {A \subtype \top \yields {\lamty x {\im A} \unit}}
 }
 
 \newcommand{\labelsubvar}{\makelabelsub Var}
@@ -80,7 +87,7 @@
 
 \newcommand{\rulesubinterldis}{
 \inferrule* [right=\labelsubinterl]
-    {{A_1} \subtype {A_3} \yields E \\ \highlight{$\jatomic {A_3}$}}
+    {{A_1} \subtype {A_3} \yields E \\ \jatomic {A_3}}
     {{A_1 \inter A_2} \subtype {A_3}
       \yields
         {\lamty x {\im {A_1 \inter A_2}}
@@ -99,7 +106,7 @@
 
 \newcommand{\rulesubinterrdis}{
   \inferrule* [right=\labelsubinterr]
-    {{A_2} \subtype {A_3} \yields E \\ \highlight{$\jatomic {A_3}$}}
+    {{A_2} \subtype {A_3} \yields E \\ \jatomic {A_3}}
     {{A_1 \inter A_2} \subtype {A_3}
       \yields
         {\lamty x {\im {A_1 \inter A_2}}

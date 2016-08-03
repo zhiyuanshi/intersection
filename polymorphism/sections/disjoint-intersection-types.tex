@@ -175,7 +175,7 @@ types and the typing rule for merges.
 
     \inferrule*{}{\jatomic \alpha}
 
-    \inferrule*{}{\jatomic {\fordis \alpha B A}}
+    \inferrule*{}{\jatomic {\for \alpha A}}
   \end{mathpar}
 
   \begin{mathpar}
@@ -187,9 +187,18 @@ types and the typing rule for merges.
     \formwf \\ \rulewfint \and \rulewfvar \and \rulewffun \and \rulewfforall \and \rulewfinter
   \end{mathpar}
 
+%  \begin{mathpar}
+%    \formt \\ \ruletvar \and \ruletlam \and \ruletapp \and
+%    \ruletblam \and \rulettapp \and \ruletmergedis 
+%  \end{mathpar}
+
   \begin{mathpar}
-    \formt \\ \ruletvar \and \ruletlam \and \ruletapp \and
-    \ruletblam \and \rulettapp \and \ruletmergedis 
+    \formbi \\ \bruletint \and \bruletvar \and \bruletapp \and
+    \brulettapp \and \bruletmergedis 
+  \end{mathpar}
+
+  \begin{mathpar}
+    \formbc \\ \bruletlam \and  \bruletblam \and \bruletsub
   \end{mathpar}
 
   \caption{Rules for Naive system.}
@@ -199,18 +208,20 @@ types and the typing rule for merges.
 \begin{figure*}
   \begin{mathpar}
     \framebox{$\jatomic A$} \\
+
+    \inferrule*{}{\jatomic {\fordis \alpha B A}}
   \end{mathpar}
 
   \begin{mathpar}
-    \formsub \\ \rulesubforalldis
+    \formsub \\ \rulesubtop \and \rulesubforalldis
   \end{mathpar}
 
   \begin{mathpar}
-    \formwf \\ \rulewfvardis \and \rulewfforalldis 
+    \formwf \\ \rulewftop \and \rulewfvardis \and \rulewfforalldis 
   \end{mathpar}
 
   \begin{mathpar}
-    \formt \\ \ruletblamdis \and \rulettappdis 
+    \formt \\ \brulettop \and \bruletblamdis \and \brulettappdis 
   \end{mathpar}
 
   \caption{Changes for Extended systems.}

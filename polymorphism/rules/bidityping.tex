@@ -23,7 +23,7 @@ $ \jcheck \Gamma e A \yields E\\e$ checks against given type $A$
 \newcommand{\bruletint} {
 \inferrule* [right=\labeltint]
   { }
-  {\jinfer \Gamma i {\code{Int}} \yields i}
+  {\jinfer \Gamma i \tyint \yields i}
 }
 
 \newcommand{\bruletlam} {
@@ -42,34 +42,33 @@ $ \jcheck \Gamma e A \yields E\\e$ checks against given type $A$
 
 \newcommand{\bruletblam}{
 \inferrule* [right=\labeltblam]
-  {\jtype {\Gamma, \alpha} e A \yields E \\
-   \jwf \Gamma B \\
+  {\jcheck {\Gamma, \alpha} e A \yields E \\
    \alpha \not \in \ftv \Gamma}
-  {\jtype \Gamma {\blam {\alpha} e} {\for {\alpha} A} \yields {\blam \alpha E}}
+  {\jcheck \Gamma {\blam {\alpha} e} {\for {\alpha} A} \yields {\blam \alpha E}}
 }
 
 \newcommand{\bruletblamdis}{
 \inferrule* [right=\labeltblam]
   {\jwf \Gamma A \\
-   \jtype {\Gamma,\alpha \disjoint A} e B \yields E \\
+   \jcheck {\Gamma,\alpha \disjoint A} e B \yields E \\
    \alpha \not \in \ftv \Gamma}
-  {\jtype \Gamma {\blamdis \alpha A e} {\fordis \alpha A B}
+  {\jcheck \Gamma {\blamdis \alpha A e} {\fordis \alpha A B}
     \yields {\blam \alpha E}}
 }
 
 \newcommand{\brulettapp}{
 \inferrule* [right=\labelttapp]
-  {\jtype \Gamma e {\for \alpha B} \yields E \\
+  {\jinfer \Gamma e {\for \alpha B} \yields E \\
    \jwf \Gamma A}
-  {\jtype \Gamma {\tapp e A} {\subst A \alpha B} \yields {\tapp E {\im A}}}
+  {\jinfer \Gamma {\tapp e A} {\subst A \alpha B} \yields {\tapp E {\im A}}}
 }
 
 \newcommand{\brulettappdis}{
 \inferrule* [right=\labelttapp]
-  {\jtype \Gamma e {\for {\alpha \disjoint B} C} \yields E \\
+  {\jinfer \Gamma e {\for {\alpha \disjoint B} C} \yields E \\
    \jwf \Gamma A \\
    \jdis \Gamma A B}
-  {\jtype \Gamma {\tapp e A} {\subst A \alpha C} \yields {\tapp E {\im A}}}
+  {\jinfer \Gamma {\tapp e A} {\subst A \alpha C} \yields {\tapp E {\im A}}}
 }
 
 \newcommand{\brulettprod}{

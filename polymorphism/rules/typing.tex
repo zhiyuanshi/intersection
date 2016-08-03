@@ -9,6 +9,14 @@
   {\jtype \Gamma i \text{Int} \yields i}
 }
 
+\newcommand{\labelttop}{\makelabelt Top}
+\newcommand{\rulettop} {
+\inferrule* [right=\labelttop]
+  {}
+  {\jtype \Gamma \unit \top \yields \unit}
+}
+
+
 \newcommand{\labeltvar}{\makelabelt Var}
 \newcommand{\ruletvar} {
 \inferrule* [right=\labeltvar]
