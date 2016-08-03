@@ -120,17 +120,16 @@ $\commonsuper$:
 
 \subsection{Algorithmic Rules}
 
-%TODO missing Integers
 \begin{figure*}[h]
   \begin{mathpar}
     \formdis \\
     \ruledisfun \and \ruledisforall \and
-    \ruledisinterl \and \ruledisinterr \and \ruledisatomic
+    \ruledisinterl \and \ruledisinterr \and \ruledisforall \and \ruledisatomic
   \end{mathpar}
 
   \begin{mathpar}
     \formax \\
-    \ruleaxfunforall \and \ruleaxsym
+    \ruleaxintfun \and \ruleaxintforall \and \ruleaxfunforall \and \ruleaxsym
   \end{mathpar}
 
   \caption{Algorithmic Disjointness.}
@@ -140,17 +139,13 @@ $\commonsuper$:
 \begin{figure*}[h]
   \begin{mathpar}
     \formdis \\
+    \ruledistop \and \ruledistopsym \and 
     \ruledisvar \and \ruledissym \and
     \ruledisforalldis 
   \end{mathpar}
 
-  \begin{mathpar}
-    \formax \\
-    \ruleaxsym
-  \end{mathpar}
-
   \caption{Added rules for Extended system.}
-  \label{fig:disjointness}
+  \label{fig:disjointness-ext}
 \end{figure*}
 
 \begin{figure*}[h]
@@ -159,10 +154,8 @@ $\commonsuper$:
   \end{mathpar}
 
   \caption{Added rules for Extended system.}
-  \label{fig:disjointness}
+  \label{fig:disjointness-ext2}
 \end{figure*}
-
-
 
 The rules for the disjointness judgement are shown in
 Figure~\ref{fig:disjointness}, which consists of two judgements.

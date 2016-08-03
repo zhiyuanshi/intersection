@@ -2,18 +2,32 @@
 
 \newcommand{\makelabeldis}[1]{Dis\_#1}
 
+\newcommand{\labeldistop}{\makelabeldis Top}
+\newcommand{\ruledistop}{
+  \inferrule* [right=\labeldistop]
+    {}
+    {\jdisimpl \Gamma \top A}
+}
+
+\newcommand{\labeldistopsym}{\makelabeldis TopSym}
+\newcommand{\ruledistopsym}{
+  \inferrule* [right=\labeldistopsym]
+    {}
+    {\jdisimpl \Gamma A \top}
+}
+
 \newcommand{\labeldisvar}{\makelabeldis Var}
 \newcommand{\ruledisvar}{
   \inferrule* [right=\labeldisvar]
-    {\alpha \disjoint A \in \Gamma}
-    {\jdisimpl \Gamma \alpha A}
+    {\alpha \disjoint A \in \Gamma \\ A \subtype B}
+    {\jdisimpl \Gamma \alpha B}
 }
 
-\newcommand{\labeldissym}{\makelabeldis Sym}
+\newcommand{\labeldissym}{\makelabeldis VarSym}
 \newcommand{\ruledissym}{
   \inferrule* [right=\labeldissym]
-    {\alpha \disjoint A \in \Gamma}
-    {\jdisimpl \Gamma A \alpha}
+    {\alpha \disjoint A \in \Gamma \\ A \subtype B}
+    {\jdisimpl \Gamma B \alpha}
 }
 
 \newcommand{\labeldisinterl}{\makelabeldis {Inter\_1}}
@@ -67,6 +81,20 @@
 \newcommand{\formax}{\framebox{$ A \disjointax B$}}
 
 \newcommand{\makelabelax}[1]{DisAx\_#1}
+
+\newcommand{\labelaxintforall}{\makelabelax Int\_Forall}
+\newcommand{\ruleaxintforall}{
+  \inferrule* [right=\labelaxintforall]
+    {}
+    {\code{Int} \disjointax \fordis \alpha {B_1} {B_2}}
+}
+
+\newcommand{\labelaxintfun}{\makelabelax Int\_Fun}
+\newcommand{\ruleaxintfun}{
+  \inferrule* [right=\labelaxintfun]
+    {}
+    {\code{Int} \disjointax {A_1} \to {A_2}}
+}
 
 \newcommand{\labelaxfunforall}{\makelabelax Fun\_Forall}
 \newcommand{\ruleaxfunforall}{

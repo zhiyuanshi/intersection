@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-task :default => :paperna
+task :default => :paper
 
 def latexmk_cmd(target, options = nil)
   # "Since minted makes calls to the outside world (i.e. Pygments), you need to

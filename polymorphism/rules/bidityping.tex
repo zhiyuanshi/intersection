@@ -1,0 +1,132 @@
+% \renewcommand{\yields}[1]{}
+
+\newcommand{\formbi}{
+\framebox{
+$ \jinfer \Gamma e A \yields E\\e$ synthesizes type $A$}
+}
+
+\newcommand{\formbc}{
+\framebox{
+$ \jcheck \Gamma e A \yields E\\e$ checks against given type $A$
+}
+}
+
+%$ \jtype \Gamma e A \Leftarrow E~~~~~
+%e$ checks againts known type $A$}}
+
+\newcommand{\bruletvar} {
+\inferrule* [right=\labeltvar]
+  {x \oftype A \in \Gamma}
+  {\jinfer \Gamma x A \yields x}
+}
+
+\newcommand{\bruletint} {
+\inferrule* [right=\labeltint]
+  { }
+  {\jinfer \Gamma i {\code{Int}} \yields i}
+}
+
+\newcommand{\bruletlam} {
+\inferrule* [right=\labeltlam]
+  {\jwf \Gamma A \\ \jcheck {\Gamma, x \oftype A} e B \yields E}
+  {\jcheck \Gamma {\lamty x A e} {A \to B} \yields {\lamty x {\im A} E}}
+}
+
+\newcommand{\bruletapp}{
+\inferrule* [right=\labeltapp]
+  {\jinfer \Gamma {e_1} {A_{1} \to A_{2}} \yields {E_1} \\
+   \jcheck \Gamma {e_2} {A_{1}} \yields {E_2}}
+%%   {A_3} \subtype {A_1} \yields {E}}
+  {\jinfer \Gamma {\app {e_1} {e_2}} {A_{2}} \yields {\app {E_1} E_2}}
+}
+
+\newcommand{\bruletblam}{
+\inferrule* [right=\labeltblam]
+  {\jtype {\Gamma, \alpha} e A \yields E \\
+   \jwf \Gamma B \\
+   \alpha \not \in \ftv \Gamma}
+  {\jtype \Gamma {\blam {\alpha} e} {\for {\alpha} A} \yields {\blam \alpha E}}
+}
+
+\newcommand{\bruletblamdis}{
+\inferrule* [right=\labeltblam]
+  {\jwf \Gamma A \\
+   \jtype {\Gamma,\alpha \disjoint A} e B \yields E \\
+   \alpha \not \in \ftv \Gamma}
+  {\jtype \Gamma {\blamdis \alpha A e} {\fordis \alpha A B}
+    \yields {\blam \alpha E}}
+}
+
+\newcommand{\brulettapp}{
+\inferrule* [right=\labelttapp]
+  {\jtype \Gamma e {\for \alpha B} \yields E \\
+   \jwf \Gamma A}
+  {\jtype \Gamma {\tapp e A} {\subst A \alpha B} \yields {\tapp E {\im A}}}
+}
+
+\newcommand{\brulettappdis}{
+\inferrule* [right=\labelttapp]
+  {\jtype \Gamma e {\for {\alpha \disjoint B} C} \yields E \\
+   \jwf \Gamma A \\
+   \jdis \Gamma A B}
+  {\jtype \Gamma {\tapp e A} {\subst A \alpha C} \yields {\tapp E {\im A}}}
+}
+
+\newcommand{\brulettprod}{
+\inferrule* [right=\labeltprod]
+  {\jinfer \Gamma {e_1} A \yields {E_1} \\
+   \jinfer \Gamma {e_2} B \yields {E_2}}
+  {\jinfer \Gamma {\pair {e_1} {e_2}} {\tpair A B} \yields {\pair {E_1} {E_2}}}
+}
+
+\newcommand{\brulettproj}{
+\inferrule* [right=\labeltproj]
+  {\jinfer \Gamma {e} {\tpair {A_1} {A_2}} \yields {E}}
+  {\jinfer \Gamma {\proj k e} {A_k} \yields {\proj k E}}
+}
+
+\newcommand{\brulettprojl}{
+\inferrule* [right=\labeltprojl]
+  {\jinfer \Gamma {e} {\tpair A B} \yields {E}}
+  {\jinfer \Gamma {\proj 1 e} A \yields {\proj 1 E}}
+}
+
+\newcommand{\brulettprojr}{
+\inferrule* [right=\labeltprojr]
+  {\jinfer \Gamma {e} {\tpair A B} \yields {E}}
+  {\jinfer \Gamma {\proj 2 e} B \yields {\proj 2 E}}
+}
+
+\newcommand{\bruletmerge}{
+\inferrule* [right=\labeltmerge]
+  {\jinfer \Gamma {e_1} A \yields {E_1} \\
+   \jinfer \Gamma {e_2} B \yields {E_2}}
+  {\jinfer \Gamma {e_1 \mergeop e_2} {A \inter B} \yields {\pair {E_1} {E_2}}}
+}
+
+\newcommand{\bruletsub}{
+\inferrule* [right=\labeltsub]
+  {\jinfer \Gamma {e} A \yields {E} \\ {A} \subtype {B} \yields {E_{sub}}}
+  {\jcheck \Gamma {e} {B} \yields {\tapp {E_{sub}} E}}
+}
+
+\newcommand{\bruletmergedis}{
+\inferrule* [right=\labeltmerge]
+  {\jinfer \Gamma {e_1} A \yields {E_1} \\
+   \jinfer \Gamma {e_2} B \yields {E_2} \\
+   \framebox{$\jdis \Gamma A B$}}
+  {\jinfer \Gamma {e_1 \mergeop e_2} {A \inter B} \yields {\pair {E_1} {E_2}}}
+}
+
+\newcommand{\brulettop}{
+\inferrule* [right=\labelttop]
+  { }
+  {\jinfer \Gamma \top \top \yields \unit}
+}
+
+\newcommand{\labeltann}{\makelabelt Ann}
+\newcommand{\bruletann}{
+\inferrule* [right=\labeltann]
+  {\jcheck \Gamma {e} A \yields {E}}
+  {\jinfer \Gamma {e : A} {A} \yields {E}}
+}

@@ -2,6 +2,13 @@
 
 \newcommand{\makelabelt}[1]{F\_Ty\_#1}
 
+\newcommand{\labeltint}{\makelabelt Int}
+\newcommand{\ruletint} {
+\inferrule* [right=\labeltint]
+  {}
+  {\jtype \Gamma i \text{Int} \yields i}
+}
+
 \newcommand{\labeltvar}{\makelabelt Var}
 \newcommand{\ruletvar} {
 \inferrule* [right=\labeltvar]
@@ -74,4 +81,11 @@
    \jtype \Gamma {e_2} B \yields {E_2} \\
    \highlight{$\jdis \Gamma A B$}}
   {\jtype \Gamma {e_1 \mergeop e_2} {A \inter B} \yields {\pair {E_1} {E_2}}}
+}
+
+\newcommand{\labeltsub}{\makelabelt Sub}
+\newcommand{\ruletsub}{
+\inferrule* [right=\labeltsub]
+  {\jtype \Gamma {e} A \yields {E} \\ {A} \subtype {B} \yields {E_{sub}}}
+  {\jtype \Gamma {e} {B} \yields {\tapp {E_{sub}} E}}
 }
