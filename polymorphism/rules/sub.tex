@@ -112,3 +112,21 @@
         {\lamty x {\im {A_1 \inter A_2}}
           {\app E {(\proj 2 x)}}}}
 }
+
+\newcommand{\rulesubinterlcoerce}{
+  \inferrule* [right=\labelsubinterl]
+    {{A_1} \subtype {A_3} \yields E \\ \jatomic {A_3} }
+    {{A_1 \inter A_2} \subtype {A_3}
+      \yields
+        { \lamty x {\im {A_1 \inter A_2}} {\andcoerce{A_3}_{{(
+          {\app E {(\proj 1 x)}})}}}}}
+}
+
+\newcommand{\rulesubinterrcoerce}{
+  \inferrule* [right=\labelsubinterr]
+    {{A_2} \subtype {A_3} \yields E \\ \jatomic {A_3} }
+    {{A_1 \inter A_2} \subtype {A_3}
+      \yields 
+        { \lamty x {\im {A_1 \inter A_2}} {\andcoerce{A_3}_{{(
+          {\app E {(\proj 2 x)}})}}}}}
+}

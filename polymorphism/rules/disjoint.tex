@@ -86,6 +86,12 @@
 \newcommand{\ruleaxintforall}{
   \inferrule* [right=\labelaxintforall]
     {}
+    {\code{Int} \disjointax \for \alpha B}
+}
+
+\newcommand{\ruleaxintforalldis}{
+  \inferrule* [right=\labelaxintforall]
+    {}
     {\code{Int} \disjointax \fordis \alpha {B_1} {B_2}}
 }
 
@@ -98,6 +104,12 @@
 
 \newcommand{\labelaxfunforall}{\makelabelax Fun\_Forall}
 \newcommand{\ruleaxfunforall}{
+  \inferrule* [right=\labelaxfunforall]
+    {}
+    {A_1 \to A_2 \disjointax \for \alpha B}
+}
+
+\newcommand{\ruleaxfunforalldis}{
   \inferrule* [right=\labelaxfunforall]
     {}
     {A_1 \to A_2 \disjointax \fordis \alpha {B_1} {B_2}}

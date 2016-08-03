@@ -213,7 +213,8 @@ types and the typing rule for merges.
   \end{mathpar}
 
   \begin{mathpar}
-    \formsub \\ \rulesubtop \and \rulesubforalldis
+    \formsub \\ \rulesubtop \and \rulesubforalldis \and 
+    \rulesubinterlcoerce \and \rulesubinterrcoerce
   \end{mathpar}
 
   \begin{mathpar}
@@ -221,8 +222,13 @@ types and the typing rule for merges.
   \end{mathpar}
 
   \begin{mathpar}
-    \formt \\ \brulettop \and \bruletblamdis \and \brulettappdis 
+    \formbi \\ \brulettop \and \brulettappdis 
   \end{mathpar}
+
+  \begin{mathpar}
+    \formbc \\ \bruletblamdis 
+  \end{mathpar}
+
 
   \caption{Changes for Extended systems.}
   \label{fig:fi-type-extended}
@@ -235,6 +241,45 @@ types and the typing rule for merges.
 
   \caption{Rules for Extended system with improved ForAll.}
   \label{fig:fi-type-extended_forall}
+\end{figure*}
+
+\begin{figure*}[t]
+  \begin{mathpar}
+    \formtoplike \\ %\framebox{$\jatomic A$} \\
+
+    \ruletopltop \and \ruletoplinter \and \ruletoplfun \and \ruletoplforall
+  \end{mathpar}
+
+
+  \begin{center}
+    \framebox{$\andcoerce{A}_{C} = T$}
+  \end{center}
+
+  \[
+  \andcoerce{A}_{C} = 
+  \begin{cases} 
+        \toplike{A} & \andcoerce{A} \\ 
+        %A = \top & () \\
+        %A = A_1 \to A_2 \; \wedge \; \toplike{A_2} & \lam x \andcoerce{A_2}_{C} \\
+        \text{otherwise} & {C} 
+  \end{cases}
+  \]
+
+  \begin{center}
+    \framebox{$\andcoerce{A} = T$}
+  \end{center}
+
+  \[
+  \andcoerce{A} = 
+  \begin{cases} 
+        A = \top & () \\
+        A = A_1 \to A_2 & \lam x \andcoerce{A_2} \\
+        A = A_1 \inter A_2 & \pair {\andcoerce{A_1}} {\andcoerce{A_2}} \\
+        A = \fordis \alpha B A & \blam \alpha {\andcoerce{A}}
+  \end{cases}
+  \]
+  \caption{Coercion generation considering Top-like types.}
+  \label{fig:andcoercion}
 \end{figure*}
 
 

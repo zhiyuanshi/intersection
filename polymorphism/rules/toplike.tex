@@ -1,0 +1,45 @@
+\newcommand{\formtoplike}{\framebox{$ \toplike{A} $}}
+
+\newcommand{\makelabeltopl}[1]{Toplike-#1}
+
+\newcommand{\labeltopltop}{\makelabeltopl Top}
+\newcommand{\ruletopltop}{
+  \inferrule* [right=\labeltopltop]
+    { }
+    { \toplike{\top} }
+}
+
+\newcommand{\labeltoplfun}{\makelabeltopl Fun}
+\newcommand{\ruletoplfun}{
+  \inferrule* [right=\labeltoplfun]
+    { \toplike{B} }
+    { \toplike{A \to B} }
+}
+
+\newcommand{\labeltoplinterl}{\makelabeltopl Inter-1}
+\newcommand{\ruletoplinterl}{
+  \inferrule* [right=\labeltoplinterl]
+    { \toplike{A} }
+    { \toplike{A \inter B} }
+}
+
+\newcommand{\labeltoplinterr}{\makelabeltopl Inter-2}
+\newcommand{\ruletoplinterr}{
+  \inferrule* [right=\labeltoplinterr]
+    { \toplike{B} }
+    { \toplike{A \inter B} }
+}
+
+\newcommand{\labeltoplinter}{\makelabeltopl Inter}
+\newcommand{\ruletoplinter}{
+  \inferrule* [right=\labeltoplinter]
+    { \toplike{A} \\ \toplike{B}}
+    { \toplike{A \inter B} }
+}
+
+\newcommand{\labeltoplforall}{\makelabeltopl Forall}
+\newcommand{\ruletoplforall}{
+  \inferrule* [right=\labeltoplforall]
+    { \toplike{A} }
+    { \toplike{\fordis \alpha B A} }
+}
