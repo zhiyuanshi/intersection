@@ -351,11 +351,101 @@ Proof.
 Qed.
 
 Lemma ortho_weaken_sub :
-  forall Gamma x t1 t2 d1 d2, Ortho (extend x (TyDis d1) Gamma) t1 t2 ->
-                     usub d2 d1  ->
+  forall E G x t1 t2 d1 d2,
+    ~ (In x (union (dom E) (dom G))) ->
+    Ortho (E ++ extend x (TyDis d1) G) t1 t2 ->
+    usub d2 d1  ->
+    Ortho (E ++ extend x (TyDis d2) G) t1 t2.
+Proof.
+  intros E G x t1 t2 d1 d2 HNotIn HOrtho Husub.
+  remember (E ++ extend x (TyDis d1) G) as Gamma.
+  generalize dependent HeqGamma.
+  generalize dependent E.
+  induction HOrtho; intros; subst; eauto.
+  - apply_fresh OForAll as x.
+    assert (extend y (TyDis (And d0 d3)) (E ++ extend x (TyDis d2) G) =
+            (extend y (TyDis (And d0 d3)) E) ++ extend x (TyDis d2) G) by
+        (unfold extend; now simpl).
+    rewrite H2.
+    apply H0.
+    not_in_L y.
+    simpl.
+    unfold not; intros; apply HNotIn.
+    rewrite MSetProperties.union_add in H3.
+    assert (Ha : x <> y).
+    not_in_L y; unfold not; intros; subst; apply H16.
+    now apply MSetProperties.Dec.F.singleton_iff.
+    apply MSetProperties.Dec.F.add_iff in H3.
+    destruct H3; auto.
+    symmetry in H3; contradiction.
+    now simpl.
+    auto.
+  - destruct (VarTyp.eq_dec x x0); subst.
+    assert (Ha : A = d1).
+    apply in_app_or in H.
+    destruct H.
+    not_in_L x0.
+    exfalso; apply H2; now apply list_impl_m in H.
+    not_in_L x0.
+    apply in_app_or in H.
+    destruct H.
+    inversion H; now inversion H4.
+    exfalso; apply H3; now apply list_impl_m in H.
+    subst.
+    apply OVar with (A := d2); auto.
+    apply in_or_app.
+    right.
+    now left.
+    apply usub_trans with (B := d1); auto.
+    apply OVar with (A := A); auto.
+    apply in_app_or in H.
+    destruct H; auto.
+    apply in_app_or in H.
+    destruct H.
+    simpl in H; destruct H.
+    inversion H; subst; exfalso; now apply n.
+    inversion H.
+    apply in_or_app; right.
+    apply in_or_app; auto.
+  - destruct (VarTyp.eq_dec x x0); subst.
+    assert (Ha : A = d1).
+    apply in_app_or in H.
+    destruct H.
+    not_in_L x0.
+    exfalso; apply H2; now apply list_impl_m in H.
+    not_in_L x0.
+    apply in_app_or in H.
+    destruct H.
+    inversion H; now inversion H4.
+    exfalso; apply H3; now apply list_impl_m in H.
+    subst.
+    apply OVarSym with (A := d2); auto.
+    apply in_or_app.
+    right.
+    now left.
+    apply usub_trans with (B := d1); auto.
+    apply OVarSym with (A := A); auto.
+    apply in_app_or in H.
+    destruct H; auto.
+    apply in_app_or in H.
+    destruct H.
+    simpl in H; destruct H.
+    inversion H; subst; exfalso; now apply n.
+    inversion H.
+    apply in_or_app; right.
+    apply in_or_app; auto.
+Qed.
+
+Lemma ortho_weaken_sub_extend :
+  forall Gamma x t1 t2 d1 d2, ~ In x (dom Gamma) ->
+                     Ortho (extend x (TyDis d1) Gamma) t1 t2 ->
+                     usub d2 d1 ->
                      Ortho (extend x (TyDis d2) Gamma) t1 t2.
 Proof.
-Admitted.
+  intros Gamma x t1 t2 d1 d2 HNotIn HOrtho Husub.
+  change (extend x (TyDis d2) Gamma) with (nil ++ extend x (TyDis d2) Gamma).
+  apply ortho_weaken_sub with (d1 := d1); auto.
+Qed.
   
 Lemma Ortho_sym : forall Gamma t1 t2, Ortho Gamma t1 t2 -> Ortho Gamma t2 t1.
 Proof.
@@ -363,7 +453,8 @@ Proof.
   induction HOrtho; eauto.
   - inversion H1; subst.
     apply_fresh OForAll as x.
-    apply ortho_weaken_sub with (d1 := And d1 d2).
+    apply ortho_weaken_sub_extend with (d1 := And d1 d2).
+    not_in_L x.
     apply H0.
     not_in_L x.
     apply USAnd1.
@@ -399,7 +490,8 @@ Proof.
     inversion HWFty; subst.
     inversion HSub; subst.
     apply_fresh OForAll as x.
-    apply ortho_weaken_sub with (d1 := And d1 d2).
+    apply ortho_weaken_sub_extend with (d1 := And d1 d2).
+    not_in_L x.
     apply H0.
     not_in_L x.
     apply H7.
