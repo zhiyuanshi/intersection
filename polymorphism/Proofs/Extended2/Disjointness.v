@@ -38,6 +38,7 @@ Inductive Ortho : context TyEnvSource -> PTyp -> PTyp -> Prop :=
                 (forall x, not (In x L) -> Ortho (extend x (TyDis (And d1 d2)) Gamma)
                                            (open_typ_source t1 (PFVarT x))
                                            (open_typ_source t2 (PFVarT x))) ->
+                PType (And d1 d2) ->
                 Ortho Gamma (ForAll d1 t1) (ForAll d2 t2)
   | OVar : forall Gamma x ty A, List.In (x,TyDis A) Gamma ->
                        usub A ty ->
@@ -100,6 +101,7 @@ Proof.
     not_in_L x.
     rewrite <- app_comm_cons.
     unfold extend; simpl; reflexivity.
+    auto.
   - apply OVar with (A := A); auto.
     apply in_app_or in H; inversion H; apply in_or_app; auto.
     right; apply in_or_app; auto.
@@ -141,8 +143,7 @@ Proof.
     apply MSetProperties.Dec.F.union_3.
     assumption.
     not_in_L x.
-    apply H14.
-    not_in_L z.
+    apply H16.
     apply MSetProperties.Dec.F.singleton_2.
     apply MSetProperties.Dec.F.singleton_1 in HH.
     now symmetry.
@@ -153,12 +154,12 @@ Proof.
     apply MSetProperties.Dec.F.union_3.
     assumption.
     not_in_L x.
-    apply H14.
-    not_in_L z.
+    apply H16.
     apply MSetProperties.Dec.F.singleton_2.
     apply MSetProperties.Dec.F.singleton_1 in HH.
     now symmetry.
     unfold extend; now simpl.
+    auto.
   - subst.
     apply OVar with (A := A); auto.
     apply in_or_app.
@@ -194,11 +195,12 @@ Proof.
   dependent induction HOrtho; intros; subst; auto.
   - apply_fresh OForAll as x.
     unfold extend; simpl.
-    change ((y, TyDis d) :: F ++ (x, v) :: E) with
-           (((y, TyDis d) :: F) ++ ((x, v) :: nil) ++ E).
+    change ((y, TyDis (And d1 d2)) :: F ++ (x, v) :: E) with
+           (((y, TyDis (And d1 d2)) :: F) ++ ((x, v) :: nil) ++ E).
     apply H0.
     not_in_L y.
     unfold extend; now simpl.
+    auto.
   - apply OVar with (A := A); auto.
     apply in_or_app; rewrite app_comm_cons.
     repeat (apply in_app_or in H; destruct H as [H | H]).
@@ -226,11 +228,12 @@ Proof.
   dependent induction HOrtho; intros; subst; auto.
   - apply_fresh OForAll as x.
     unfold extend; simpl.
-    change ((y, TyDis d) :: F ++ E ++ (x, v) :: nil) with
-           (((y, TyDis d) :: F) ++ E ++ (x, v) :: nil).
+    change ((y, TyDis (And d1 d2)) :: F ++ E ++ (x, v) :: nil) with
+           (((y, TyDis (And d1 d2)) :: F) ++ E ++ (x, v) :: nil).
     apply H0.
     not_in_L y.
     unfold extend; now simpl.
+    auto.
   - apply OVar with (A := A); auto.
     rewrite app_comm_cons in H.
     apply in_or_app.
@@ -259,14 +262,15 @@ Proof.
   - apply_fresh OForAll as x.
     unfold extend; simpl.
     assert (Ha : not (In x L)) by not_in_L x.
-    apply H0 with (F0 := extend x (TyDis d) F) (E0 := E) in Ha.
+    apply H0 with (F0 := extend x (TyDis (And d1 d2)) F) (E0 := E) in Ha.
     apply ortho_extend_comm' in Ha.
-    change ((x, TyDis d) :: E ++ F) with (nil ++ (x, TyDis d) :: E ++ F).
+    change ((x, TyDis (And d1 d2)) :: E ++ F) with (nil ++ (x, TyDis (And d1 d2)) :: E ++ F).
     apply ortho_extend_comm with (E := E ++ F).
     simpl in *.
     rewrite <- app_assoc.
     apply Ha.
     unfold extend; now simpl.
+    auto.
   - apply OVar with (A := A); auto.
     apply in_or_app.
     apply in_app_or in H; destruct H; auto.
@@ -339,19 +343,39 @@ Proof.
     unfold extend; simpl; rewrite app_comm_cons; apply H1.
     not_in_L x.
     reflexivity.
+    auto.
   - apply OVar with (A := A); auto.
     repeat (apply in_app_or in H0; destruct H0); auto 10.
   - apply OVarSym with (A := A); auto.
     repeat (apply in_app_or in H0; destruct H0); auto 10.
 Qed.
 
+Lemma ortho_weaken_sub :
+  forall Gamma x t1 t2 d1 d2, Ortho (extend x (TyDis d1) Gamma) t1 t2 ->
+                     usub d2 d1  ->
+                     Ortho (extend x (TyDis d2) Gamma) t1 t2.
+Proof.
+Admitted.
+  
 Lemma Ortho_sym : forall Gamma t1 t2, Ortho Gamma t1 t2 -> Ortho Gamma t2 t1.
 Proof.
   intros Gamma t1 t2 HOrtho.
   induction HOrtho; eauto.
-  apply OAx; auto.
-  destruct H as [H1 [H2 H3]].
-  unfold OrthoAx; auto.
+  - inversion H1; subst.
+    apply_fresh OForAll as x.
+    apply ortho_weaken_sub with (d1 := And d1 d2).
+    apply H0.
+    not_in_L x.
+    apply USAnd1.
+    apply USAnd3; auto.
+    apply usub_refl; auto.
+    apply USAnd2.
+    apply usub_refl; auto.
+    auto.
+    auto.
+  - apply OAx; auto.
+    destruct H as [H1 [H2 H3]].
+    unfold OrthoAx; auto.
 Qed.
 
 Lemma Ortho_usub_trans :
@@ -370,15 +394,23 @@ Proof.
     inversion HWFty; inversion HSub; subst; auto.
   - induction ty; try now (inversion HSub; subst; auto);
     inversion HWFty; inversion HSub; subst; auto.
+    inversion H1; subst.
+    clear IHty1 IHty2.
     inversion HWFty; subst.
     inversion HSub; subst.
     apply_fresh OForAll as x.
+    apply ortho_weaken_sub with (d1 := And d1 d2).
     apply H0.
     not_in_L x.
-    apply H4.
+    apply H7.
     not_in_L x.
-    apply H6.
+    apply H9.
     not_in_L x.
+    apply USAnd1.
+    apply USAnd2; auto.
+    apply usub_refl; auto.
+    apply USAnd3; auto.
+    auto.
   - pose (usub_trans _ _ _ HWFty H0 HSub).
     apply OVar with (A := A) ; auto.
   - induction ty0; try (now inversion HSub).
@@ -411,18 +443,22 @@ Proof.
   - apply OAnd2; [ apply IHHOrtho1 | apply IHHOrtho2 ]; auto; not_in_L z;
     now inversion HWFt2.
   - apply OFun; apply IHHOrtho; auto; not_in_L z. 
-  - assert (Ha : Ortho (subst_env Gamma z u) (ForAll (subst_typ_source z u d) t1)
-                       (ForAll (subst_typ_source z u d) t2)).
-    apply_fresh OForAll as x; apply H0. not_in_L x.
+  - assert (Ha : Ortho (subst_env Gamma z u) (ForAll (subst_typ_source z u d1) t1)
+                       (ForAll (subst_typ_source z u d2) t2)).
+    apply_fresh OForAll as x. apply H0. not_in_L x.
     unfold not; intros HH; rewrite union_spec in HH; destruct HH as [HH | HH];
     apply fv_open_rec_typ_source in HH; simpl in HH; rewrite union_spec in HH;
     destruct HH as [HH | HH]; try (now not_in_L z);
-    not_in_L x; apply H9; apply MSetProperties.Dec.F.singleton_iff;
+    not_in_L x; apply H11; apply MSetProperties.Dec.F.singleton_iff;
     apply MSetProperties.Dec.F.singleton_iff in HH; auto.
-    assert (Ha1 : d = subst_typ_source z u d).
-    rewrite subst_typ_source_fresh; auto.
-    not_in_L z.
-    now rewrite Ha1.
+    apply PType_And.
+    apply subst_source_lc; inversion H1; subst; auto.
+    apply subst_source_lc; inversion H1; subst; auto.
+    assert (Ha1 : d1 = subst_typ_source z u d1) by
+        (rewrite subst_typ_source_fresh; auto; not_in_L z).
+    assert (Ha2 : d2 = subst_typ_source z u d2) by
+        (rewrite subst_typ_source_fresh; auto; not_in_L z).
+    now rewrite Ha1, Ha2.
   - apply OVar with (A := subst_typ_source z u A); auto.
     apply in_persists_subst_env; auto.
     apply usub_subst_not_in; auto.
@@ -458,23 +494,27 @@ Proof.
     apply H0.
     not_in_L x.
     apply WFPushV; auto.
-    unfold not; intro HH; apply fv_subst_source in HH;
-    rewrite union_spec in HH; destruct HH; not_in_L x.
+    simpl.
+    not_in_L x.
+    apply fv_subst_source in H6; rewrite union_spec in H6; destruct H6; not_in_L x.
+    apply fv_subst_source in H6; rewrite union_spec in H6; destruct H6; not_in_L x.
     rewrite dom_subst_id; not_in_L x.
     apply WFPushV; auto; not_in_L x.
+    simpl in H6; rewrite union_spec in H6; destruct H6; not_in_L x.
     apply MapsTo_extend; auto.
     not_in_L x.
-    rewrite <- app_nil_l with (l := (extend x (TyDis d0) Gamma)).
+    rewrite <- app_nil_l with (l := (extend x (TyDis (And d1 d2)) Gamma)).
     apply ortho_weaken.
     now simpl.
-    apply H4.
+    apply H5.
     not_in_L x.
-    apply H8.
+    apply H9.
     not_in_L x.
-    not_in_L x.
-    assumption.
     not_in_L x.
     assumption.
+    not_in_L x.
+    assumption.
+    apply PType_And; apply subst_source_lc; auto.
   - assert (Ha : sumbool (x = z) (not (x = z))) by apply VarTyp.eq_dec.
     destruct Ha as [Ha | Ha].
     + assert (HWFEnv' : WFEnv Gamma) by assumption.

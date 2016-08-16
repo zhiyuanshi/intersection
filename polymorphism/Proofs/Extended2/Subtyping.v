@@ -875,9 +875,9 @@ Proof.
     apply_fresh USForAll as x.
     apply H0 with (x := x).
     not_in_L x.
-    apply H2.
+    apply H1.
     not_in_L x.
-    apply H6.
+    apply H3.
     not_in_L x.
     auto.
     apply usub_lc in HusubAB; apply USTop; destruct HusubAB; auto.
@@ -915,7 +915,7 @@ Proof.
     not_in_L x.
     not_in_L x.
     not_in_L x.
-    now apply subst_source_lc.
+    auto.
   - apply USTop.
     apply subst_source_lc; auto.
 Qed.

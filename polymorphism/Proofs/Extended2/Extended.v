@@ -41,15 +41,16 @@ Proof.
   auto.
 Qed.
 
+(*
 Lemma ortho_sym : forall Gamma A B, Ortho Gamma A B -> Ortho Gamma B A.
 Proof.
   intros Gamma A B HOrtho.
   induction HOrtho; auto.
-  - apply_fresh OForAll as x; apply H0; not_in_L x.
+  - apply_fresh OForAll as x. admit. (* apply H0; not_in_L x. *)
   - apply OVarSym with (A := A); auto.
   - apply OVar with (A := A); auto.
   - apply ortho_ax_sym in H; now apply OAx.
-Qed.
+Admitted. *)
   
 Lemma ortho_and_l : forall Gamma t1 t2 t0, Ortho Gamma (And t1 t2) t0 -> Ortho Gamma t1 t0.
 Proof.
@@ -185,6 +186,20 @@ Proof.
   - left; apply TLTop.
 Qed.
 
+Lemma wf_weaken_sub_andl :
+  forall Gamma x d1 d2 t, WFTyp (extend x (TyDis d1) Gamma) t ->
+                 WFTyp (extend x (TyDis (And d1 d2)) Gamma) t.
+Proof.
+  intros.
+Admitted.
+
+Lemma wf_weaken_sub_andr :
+  forall Gamma x d1 d2 t, WFTyp (extend x (TyDis d2) Gamma) t ->
+                 WFTyp (extend x (TyDis (And d1 d2)) Gamma) t.
+Proof.
+  intros.
+Admitted.
+
 Lemma ortho_no_sub :
   forall Gamma A B, WFTyp Gamma A -> WFTyp Gamma B -> Ortho Gamma A B -> ~ TopLike B -> not (Sub A B).
 Proof.
@@ -206,14 +221,14 @@ Proof.
     destruct Ha.
     apply IHsub1 with (Gamma := Gamma); auto.
     eexists; apply H.
-    apply ortho_sym.
+    apply Ortho_sym.
     apply ortho_and_l with (t2 := t2); auto.
-    now apply ortho_sym.
+    now apply Ortho_sym.
     apply IHsub2 with (Gamma := Gamma); auto.
     eexists; apply H0.
-    apply ortho_sym.
+    apply Ortho_sym.
     apply ortho_and_r with (t1 := t1); auto.
-    now apply ortho_sym.    
+    now apply Ortho_sym.    
   - inversion WFA; subst; apply IHsub with (Gamma := Gamma); auto.
     eexists; apply H.
     apply ortho_and_l with (t2 := t2); auto.
@@ -241,13 +256,16 @@ Proof.
     not_in_L x.
     assumption.
     not_in_L y.
-    eexists; apply H8.
+    eexists; apply H12.
     not_in_L x.
+    Focus 3.
+    apply H9.
+    not_in_L x.
+    apply wf_weaken_sub_andl.
     apply H5.
     not_in_L x.
+    apply wf_weaken_sub_andr.
     apply H10.
-    not_in_L x.
-    apply H7.
     not_in_L x.
     destruct H3 as [a [b HH]]; now apply HH.
   - auto.
@@ -324,8 +342,8 @@ Proof.
       apply sand2; unfold Sub; eauto.
     + now apply HNotTL.
   - induction C; try (now (inversion HSubA as [x HInv]; inversion HInv)).
-    + inversion HSubA; inversion H1; subst.
-      inversion HSubB; inversion H2; subst.
+    + inversion HSubA; inversion H2; subst.
+      inversion HSubB; inversion H3; subst.
       assert (Ha : ~ TopLike C1 \/ ~ TopLike C2).
       apply Classical_Prop.not_and_or; unfold not; intros HH; destruct HH; eauto.
       destruct Ha.
@@ -333,27 +351,29 @@ Proof.
       apply sand2; unfold Sub; eauto.
       apply IHC2; unfold Sub; eauto.
       apply sand2; unfold Sub; eauto.      
-    + inversion HSubA; inversion H1; subst.
-      inversion HSubB; inversion H2; subst.
+    + inversion HSubA; inversion H2; subst.
+      inversion HSubB; inversion H3; subst.
       inversion WFA; inversion WFB; subst.
       pick_fresh x.
       clear IHC1; clear IHC2; clear HSubAnd.
       eapply H0 with (x := x) (C := open_typ_source C2 (PFVarT x)).
       not_in_L x; apply H7.
-      apply H9; not_in_L x.
-      apply H15; not_in_L x. 
+      apply wf_weaken_sub_andl.
+      apply H7; not_in_L x.
+      apply wf_weaken_sub_andr.
+      apply H16; not_in_L x.
       unfold not; intros; apply HNotTL.
       apply_fresh TLForAll as y.
       apply fresh_top with (x := x); auto.
       not_in_L x.
       not_in_L y.
       apply sand2.
-      eexists; apply H7.
+      eexists; apply H8.
       not_in_L x.
-      apply wf_gives_types_source with (Gamma := (extend x (TyDis C1) Gamma)).
-      apply H15; not_in_L x.
-      eexists; apply H7; not_in_L x.
-      eexists; apply H6; not_in_L x.
+      apply wf_gives_types_source with (Gamma := (extend x (TyDis d2) Gamma)).
+      apply H16; not_in_L x.
+      eexists; apply H8; not_in_L x.
+      eexists; apply H11; not_in_L x.
     + now apply HNotTL.
   - induction C; try (now (inversion HSubA as [z HInv]; inversion HInv)).
     + destruct HSubA as [c HsubA]; inversion HsubA; subst.
@@ -664,13 +684,15 @@ Proof.
     pick_fresh x.
     assert (Ha : (open_typ_term c (STFVarT x)) = (open_typ_term c0 (STFVarT x))).
     assert (ty := Top).
-    eapply H0 with (Gamma := extend x (TyDis d) Gamma).
+    eapply H0 with (Gamma := extend x (TyDis (And d1 d2)) Gamma).
     not_in_L x.
+    apply wf_weaken_sub_andl.
     apply H8.
     not_in_L x.
+    apply wf_weaken_sub_andr.
     apply H10.
     not_in_L x.
-    apply H12.
+    apply H14.
     not_in_L x.
     assert (c = c0).
     eapply open_typ_term_app_eq with (x := x) (n := 0).
@@ -1181,7 +1203,7 @@ Proof.
     unfold open_typ_source in H0; simpl in H0.
     change (extend y (TyVar STyp)
                    (extend x (TermVar STyp (STForAll (| t1 |))) (∥ Gamma ∥))) with
-    (∥ (extend y (TyDis d)
+    (∥ (extend y (TyDis (And d1 d2))
                (extend x (TermV (ForAll d t1)) Gamma)) ∥).
     change (STFVarT y) with (| PFVarT y |).
     rewrite <- open_rec_typ_eq_source.
@@ -1192,39 +1214,44 @@ Proof.
     apply WFPushT.
     auto.
     not_in_L x.
+    simpl.
     not_in_L y.
     simpl.
     unfold not; intro HH.
     apply MSetProperties.Dec.F.add_iff in HH.
     destruct HH; subst.
     not_in_L y.
-    exfalso; apply H25; now apply MSetProperties.Dec.F.singleton_2.
+    exfalso; apply H27; now apply MSetProperties.Dec.F.singleton_2.
     not_in_L y.
     unfold extend.
     apply wf_weaken_source.
     subst.
+    apply wf_weaken_sub_andl.
     apply H8.
     not_in_L y.
     apply WFPushV.
     apply WFPushT.
     auto.
     not_in_L x.
+    simpl.
     not_in_L y.
     simpl.
     unfold not; intro HH.
     apply MSetProperties.Dec.F.add_iff in HH.
     destruct HH; subst.
     not_in_L y.
-    exfalso; apply H25; now apply MSetProperties.Dec.F.singleton_2.
+    exfalso; apply H27; now apply MSetProperties.Dec.F.singleton_2.
     not_in_L y.
     apply wf_weaken_source.
     subst.
+    apply wf_weaken_sub_andr.
     apply H13.
     not_in_L y.
     apply WFPushV.
     apply WFPushT.
     auto.
     not_in_L x.
+    simpl.
     not_in_L y.
     not_in_L y.
     not_in_L x.
@@ -1244,7 +1271,7 @@ Proof.
     left; auto.
     apply STTyVar.
     repeat apply wf_weaken_extend.
-    change (STForAll (| t1 |)) with (| ForAll d t1 |).
+    change (STForAll (| t1 |)) with (| ForAll d1 t1 |).
     env_resolve.
     unfold conv_context; rewrite <- dom_map_id; not_in_L x.
     unfold extend; not_in_L y.

@@ -4,34 +4,34 @@ all: coq
 
 coq: systemf language infrastructure subtyping disjointness typing extended 
 
-systemf: SystemF.vio 
-language: Language.vio
-infrastructure: Infrastructure.vio
-subtyping: Subtyping.vio 
-disjointness: Disjointness.vio 
-typing: Typing.vio
-extended: Extended.vio
+systemf: SystemF.vo 
+language: Language.vo
+infrastructure: Infrastructure.vo
+subtyping: Subtyping.vo 
+disjointness: Disjointness.vo 
+typing: Typing.vo
+extended: Extended.vo
 
-SystemF.vio: SystemF.v
-	coqc -quick SystemF.v
+SystemF.vo: SystemF.v
+	coqc SystemF.v
 
-Language.vio: SystemF.vio Language.v
-	coqc -quick Language.v
+Language.vo: SystemF.vo Language.v
+	coqc Language.v
 
-Infrastructure.vio: Language.vio Infrastructure.v
-	coqc -quick Infrastructure.v
+Infrastructure.vo: Language.vo Infrastructure.v
+	coqc Infrastructure.v
 
-Subtyping.vio: Infrastructure.vio Subtyping.v
-	coqc -quick Subtyping.v
+Subtyping.vo: Infrastructure.vo Subtyping.v
+	coqc Subtyping.v
 
-Disjointness.vio: Subtyping.vio Disjointness.v
-	coqc -quick Disjointness.v
+Disjointness.vo: Subtyping.vo Disjointness.v
+	coqc Disjointness.v
 
-Typing.vio: Disjointness.vio Typing.v
-	coqc -quick Typing.v
+Typing.vo: Disjointness.vo Typing.v
+	coqc Typing.v
 
-Extended.vio: Typing.vio Extended.v
-	coqc -quick Extended.v
+Extended.vo: Typing.vo Extended.v
+	coqc Extended.v
 
 clean:
 	rm -f *.vo *.vio *.glob
