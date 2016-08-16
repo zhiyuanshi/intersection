@@ -40,17 +40,6 @@ Proof.
   unfold OrthoAx.
   auto.
 Qed.
-
-(*
-Lemma ortho_sym : forall Gamma A B, Ortho Gamma A B -> Ortho Gamma B A.
-Proof.
-  intros Gamma A B HOrtho.
-  induction HOrtho; auto.
-  - apply_fresh OForAll as x. admit. (* apply H0; not_in_L x. *)
-  - apply OVarSym with (A := A); auto.
-  - apply OVar with (A := A); auto.
-  - apply ortho_ax_sym in H; now apply OAx.
-Admitted. *)
   
 Lemma ortho_and_l : forall Gamma t1 t2 t0, Ortho Gamma (And t1 t2) t0 -> Ortho Gamma t1 t0.
 Proof.
@@ -186,19 +175,118 @@ Proof.
   - left; apply TLTop.
 Qed.
 
+Lemma wf_weaken_sub :
+  forall E G x t d1 d2, ~ In x (fv_ptyp d2) ->
+                   WFTyp (E ++ extend x (TyDis d1) G) t ->
+                   usub d2 d1 ->
+                   WFTyp (E ++ extend x (TyDis d2) G) t.
+Proof.
+  intros E G x t d1 d2 HNotIn HWFTyp Husub.
+  remember (E ++ extend x (TyDis d1) G) as Gamma.
+  generalize dependent HeqGamma.
+  generalize dependent E.
+  induction HWFTyp; intros; subst; eauto.
+  - apply WFInt.
+    apply wfenv_app_comm; apply wfenv_app_comm in H.
+    unfold extend in *; rewrite <- app_assoc; rewrite <- app_assoc in H.
+    inversion H; subst; apply WFPushV; auto.
+  - apply WFAnd; auto.
+    apply ortho_weaken_sub with (d1 := d1); auto.
+    apply wf_gives_wfenv in HWFTyp1.
+    apply wfenv_app_comm in HWFTyp1.
+    unfold extend in HWFTyp1; rewrite <- app_assoc in HWFTyp1.
+    inversion HWFTyp1; subst.
+    not_in_L x.
+  - apply wfenv_app_comm in H0.
+    unfold extend in H0; rewrite <- app_assoc in H0.
+    inversion H0; subst.
+    destruct (VarTyp.eq_dec x x0); subst.
+    assert (Ha : ty = d1).
+    apply in_app_or in H.
+    destruct H.
+    apply list_impl_m in H.
+    not_in_L x0.
+    apply in_app_or in H.
+    destruct H.
+    inversion H; now inversion H1.
+    apply list_impl_m in H.
+    not_in_L x0.    
+    subst.
+    apply WFVar with (ty := d2); auto.
+    apply in_or_app.
+    right.
+    now left.
+    apply wfenv_app_comm; unfold extend; rewrite <- app_assoc.
+    apply WFPushV; auto.
+    apply WFVar with (ty := ty); auto.
+    apply in_app_or in H.
+    destruct H; auto.
+    apply in_app_or in H.
+    destruct H.
+    simpl in H; destruct H.
+    inversion H; subst; exfalso; now apply n.
+    inversion H.
+    apply in_or_app; right.
+    apply in_or_app; auto.
+    apply wfenv_app_comm; unfold extend; rewrite <- app_assoc.
+    apply WFPushV; auto.    
+  - apply_fresh WFForAll as x.
+    change (extend y (TyDis d) (E ++ extend x (TyDis d2) G)) with
+           ((extend y (TyDis d) E) ++ extend x (TyDis d2) G).    
+    apply H0; auto.
+    not_in_L y.
+    apply IHHWFTyp; auto.
+  - apply WFTop.
+    apply wfenv_app_comm in H; unfold extend in H; rewrite <- app_assoc in H.
+    apply wfenv_app_comm; unfold extend; rewrite <- app_assoc.
+    inversion H; subst.
+    apply WFPushV; auto.
+Qed.
+
+Lemma wf_weaken_sub_extend :
+  forall Gamma x d1 d2 t, ~ In x (fv_ptyp d2) ->
+                 WFTyp (extend x (TyDis d1) Gamma) t ->
+                 usub d2 d1 ->
+                 WFTyp (extend x (TyDis d2) Gamma) t.
+Proof.
+  intros.
+  change (extend x (TyDis d2) Gamma) with (nil ++ (extend x (TyDis d2) Gamma)).
+  apply wf_weaken_sub with (d1 := d1); auto.
+Qed.
+
 Lemma wf_weaken_sub_andl :
-  forall Gamma x d1 d2 t, WFTyp (extend x (TyDis d1) Gamma) t ->
+  forall Gamma x d1 d2 t, ~ In x (fv_ptyp d2) ->
+                 PType (And d1 d2) ->
+                 WFTyp (extend x (TyDis d1) Gamma) t ->
                  WFTyp (extend x (TyDis (And d1 d2)) Gamma) t.
 Proof.
   intros.
-Admitted.
+  apply wf_weaken_sub_extend with (d1 := d1); auto.
+  apply wf_gives_wfenv in H1; inversion H1; subst.
+  simpl; not_in_L x.
+  inversion H0; subst.
+  apply USAnd2.
+  apply usub_refl.
+  auto.
+  auto.
+Qed.
 
 Lemma wf_weaken_sub_andr :
-  forall Gamma x d1 d2 t, WFTyp (extend x (TyDis d2) Gamma) t ->
+  forall Gamma x d1 d2 t, ~ In x (fv_ptyp d1) ->
+                 PType (And d1 d2) ->
+                 WFTyp (extend x (TyDis d2) Gamma) t ->
                  WFTyp (extend x (TyDis (And d1 d2)) Gamma) t.
 Proof.
   intros.
-Admitted.
+  apply wf_weaken_sub_extend with (d1 := d2); auto.
+  apply wf_gives_wfenv in H1; inversion H1; subst.
+  simpl; not_in_L x.
+  inversion H0; subst.
+  apply USAnd3.
+  apply usub_refl.
+  auto.
+  auto.
+Qed.
 
 Lemma ortho_no_sub :
   forall Gamma A B, WFTyp Gamma A -> WFTyp Gamma B -> Ortho Gamma A B -> ~ TopLike B -> not (Sub A B).
@@ -262,9 +350,13 @@ Proof.
     apply H9.
     not_in_L x.
     apply wf_weaken_sub_andl.
+    not_in_L x.
+    auto.
     apply H5.
     not_in_L x.
     apply wf_weaken_sub_andr.
+    not_in_L x.
+    auto.
     apply H10.
     not_in_L x.
     destruct H3 as [a [b HH]]; now apply HH.
@@ -359,8 +451,12 @@ Proof.
       eapply H0 with (x := x) (C := open_typ_source C2 (PFVarT x)).
       not_in_L x; apply H7.
       apply wf_weaken_sub_andl.
+      not_in_L x.
+      auto.
       apply H7; not_in_L x.
       apply wf_weaken_sub_andr.
+      not_in_L x.
+      auto.
       apply H16; not_in_L x.
       unfold not; intros; apply HNotTL.
       apply_fresh TLForAll as y.
@@ -687,9 +783,15 @@ Proof.
     eapply H0 with (Gamma := extend x (TyDis (And d1 d2)) Gamma).
     not_in_L x.
     apply wf_weaken_sub_andl.
+    not_in_L x.
+    assert (Ha : Sub d2 d1) by (unfold Sub; eauto).
+    apply sub_lc in Ha; destruct Ha; auto.
     apply H8.
     not_in_L x.
     apply wf_weaken_sub_andr.
+    not_in_L x.
+    assert (Ha : Sub d2 d1) by (unfold Sub; eauto).
+    apply sub_lc in Ha; destruct Ha; auto.
     apply H10.
     not_in_L x.
     apply H14.
@@ -1227,6 +1329,9 @@ Proof.
     apply wf_weaken_source.
     subst.
     apply wf_weaken_sub_andl.
+    not_in_L y.
+    assert (Ha : Sub d2 d1) by (unfold Sub; eauto).
+    apply sub_lc in Ha; destruct Ha; auto.
     apply H8.
     not_in_L y.
     apply WFPushV.
@@ -1245,6 +1350,9 @@ Proof.
     apply wf_weaken_source.
     subst.
     apply wf_weaken_sub_andr.
+    not_in_L y.
+    assert (Ha : Sub d2 d1) by (unfold Sub; eauto).
+    apply sub_lc in Ha; destruct Ha; auto.
     apply H13.
     not_in_L y.
     apply WFPushV.
