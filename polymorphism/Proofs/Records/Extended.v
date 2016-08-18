@@ -7,7 +7,7 @@ Require Import Coq.Program.Equality.
 Require Import SystemF.
 Require Import Typing.
 
-Module Extended
+Module MExtended
        (Import VarTyp : UsualDecidableTypeFull)
        (Import set : MSetInterface.S).
 
@@ -887,6 +887,7 @@ Proof.
   - inversion IHhas_type_source_alg; subst.
     apply open_body_wf_type with (d := d); auto.
     unfold body_wf_typ; eauto.
+  - now inversion IHhas_type_source_alg.
   - pick_fresh x.
     assert (Ha : not (M.In x L)) by (not_in_L x).
     apply WFFun.
@@ -980,6 +981,7 @@ induction H; intros; unfold almost_unique; auto.
 (* Case Rec *)
 - inversion H0; subst; apply IHhas_type_source_alg in H3; simpl in H3.
   now subst.
+- inversion H0; subst; apply IHhas_type_source_alg in H3; simpl in H3; now inversion H3.
 Qed.
 
 (* Theorem 5. Type inference always gives unique types *)
@@ -1026,6 +1028,8 @@ induction H; intros.
   now subst.
 (* Case Rec *)
 - inversion H0; subst; now apply IHhas_type_source_alg in H5.
+(* Case ProjR *)
+- inversion H0; subst; now apply IHhas_type_source_alg in H3.
 (* Case Lam *)
 - inversion H2; subst.
   apply f_equal.
@@ -1519,5 +1523,5 @@ Proof.
     apply H1.
     not_in_L x.
 Qed.
-
-End Extended.
+  
+End MExtended.

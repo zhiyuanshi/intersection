@@ -31,7 +31,7 @@ Inductive PTyp : Type :=
   | PFVarT : var -> PTyp
   | ForAll : PTyp -> PTyp -> PTyp (* disjoint constraint *)
   | Top : PTyp
-  | Rec : var -> PTyp -> PTyp. (* record type *)
+  | Rec : var -> PTyp -> PTyp (* record type *).
 
 Fixpoint ptyp2styp (t : PTyp) : STyp :=
   match t with
@@ -114,7 +114,8 @@ Inductive PExp :=
   | PAnn   : PExp -> PTyp -> PExp (* only for the algorithmic version *)
   | PTLam  : PTyp -> PExp -> PExp
   | PTApp  : PExp -> PTyp -> PExp
-  | PRec   : var -> PExp -> PExp.
+  | PRec   : var -> PExp -> PExp
+  | PProjR : PExp -> var -> PExp.
 
 (* Free variables *)      
 
@@ -132,6 +133,7 @@ Fixpoint fv_source (pExp : PExp) : vars :=
     | PTLam tydis t => union (fv_ptyp tydis) (fv_source t)
     | PTApp t ty => union (fv_source t) (fv_ptyp ty)
     | PRec l t => union (singleton l) (fv_source t)
+    | PProjR t l => union (fv_source t) (singleton l)
   end.
 
 (** Environment definitions **)
@@ -208,6 +210,7 @@ Fixpoint open_rec_source (k : nat) (u : PExp) (t : PExp) {struct t} : PExp  :=
   | PTLam ty t   => PTLam ty (open_rec_source k u t)
   | PTApp t ty   => PTApp (open_rec_source k u t) ty
   | PRec l t     => PRec l (open_rec_source k u t)
+  | PProjR t l   => PProjR (open_rec_source k u t) l
   end.
 
 Fixpoint open_rec_typ_term_source (k : nat) (u : PTyp) (t : PExp) {struct t} : PExp :=
@@ -226,6 +229,7 @@ Fixpoint open_rec_typ_term_source (k : nat) (u : PTyp) (t : PExp) {struct t} : P
   | PTApp t ty   => PTApp (open_rec_typ_term_source k u t)
                          (open_rec_typ_source k u ty)
   | PRec l t     => PRec l (open_rec_typ_term_source k u t)
+  | PProjR t l   => PProjR (open_rec_typ_term_source k u t) l
   end.
 
 Definition open_source t u := open_rec_source 0 u t.
@@ -272,9 +276,12 @@ Inductive PTerm : PExp -> Prop :=
       PTerm t ->
       PType ty ->
       PTerm (PTApp t ty)
-  | PTerm_TRec : forall l t,
+  | PTerm_Rec : forall l t,
       PTerm t ->
-      PTerm (PRec l t).
+      PTerm (PRec l t)
+  | PTerm_ProjR : forall l t,
+      PTerm t ->
+      PTerm (PProjR t l).
 
 Hint Constructors PTerm.
 

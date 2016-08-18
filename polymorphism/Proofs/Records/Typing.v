@@ -68,6 +68,9 @@ Inductive has_type_source_alg : context TyEnvSource -> PExp -> Dir -> PTyp -> (S
   | ATyRec : forall Gamma l t A E,
                has_type_source_alg Gamma t Inf A E ->
                has_type_source_alg Gamma (PRec l t) Inf (Rec l A) E
+  | ATyProjR : forall Gamma l t A E,
+                 has_type_source_alg Gamma t Inf (Rec l A) E ->
+                 has_type_source_alg Gamma (PProjR t l) Inf A E
   (* Checking rules *)
   | ATyLam : forall L Gamma t A B E,
                (forall x, not (In x L) -> 

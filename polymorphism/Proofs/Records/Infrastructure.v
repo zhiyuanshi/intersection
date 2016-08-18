@@ -389,6 +389,12 @@ Proof.
     eapply IHt1. apply H0.
     rewrite union_spec in Ha.
     inversion Ha. auto. auto.
+  - rewrite union_spec.
+    inversion H.
+    assert (Ha : In x (union (fv_source t1) (fv_source t2))).
+    eapply IHt1. apply H0.
+    rewrite union_spec in Ha.
+    inversion Ha. auto. auto. auto.
 Qed.
 
 (* fv_typ_source distributes over the open_typ_source operator *)
@@ -454,6 +460,10 @@ Proof.
     apply fv_open_rec_typ_source in H0.
     rewrite union_spec in H0.
     inversion H0; auto.
+  - rewrite union_spec in H.
+    repeat rewrite union_spec.
+    inversion H; auto.
+    apply IHt1 in H0; rewrite union_spec in H0; inversion H0; auto.
   - rewrite union_spec in H.
     repeat rewrite union_spec.
     inversion H; auto.
@@ -555,6 +565,7 @@ Proof.
   - inversion H0; erewrite <- IHt; [ reflexivity | apply H | apply H2 ].
   - inversion H0; erewrite <- IHt; [ reflexivity | apply H | apply H2 ].
   - inversion H0; erewrite <- IHt; eauto.
+  - inversion H0; erewrite <- IHt; eauto.
 Qed.
 
 Lemma open_rec_type_term_source_core :
@@ -588,6 +599,7 @@ Proof.
     erewrite <- IHt.
     reflexivity.
     apply H1.
+  - inversion H; erewrite <- IHt; [ reflexivity | apply H1 ].
   - inversion H; erewrite <- IHt; [ reflexivity | apply H1 ].
   - inversion H; erewrite <- IHt; [ reflexivity | apply H1 ].  
 Qed.
@@ -637,6 +649,7 @@ Proof.
     apply H0 with (k := k) in Ha.
     simpl; apply f_equal.
     now apply open_rec_type_term_source_core in Ha.
+  - simpl; rewrite <- IHPTerm; reflexivity.
   - simpl; rewrite <- IHPTerm; reflexivity.
   - simpl; rewrite <- IHPTerm; reflexivity.
 Qed.
@@ -870,12 +883,8 @@ Lemma fv_ptyp_open_rec_typ_source :
     In x (fv_ptyp t1) ->
     In x (fv_ptyp (open_rec_typ_source n t2 t1)).
 Proof.
-  intro t1; induction t1; intros; try (simpl in *; rewrite union_spec in *); auto.
-  - destruct H; auto.
-  - destruct H; auto.
-  - inversion H.
-  - destruct H; auto.
-  - destruct H; auto.
+  intro t1; induction t1; intros; try (simpl in *; rewrite union_spec in *); auto;
+  try now (destruct H; auto). inversion H.
 Qed.
 
 (** More properties on open **)
@@ -900,12 +909,11 @@ Lemma open_rec_typ_eq_source :
   forall ty n A, | open_rec_typ_source n A ty | = open_rec_typ n (| A |) (| ty |).
 Proof.
   intro t.
-  induction t; intros; auto.
-  - simpl; rewrite IHt1; rewrite IHt2; auto.
-  - simpl; rewrite IHt1; rewrite IHt2; auto.
-  - simpl; case_eq (n0 =? n); intros; simpl; auto.
-  - simpl; rewrite IHt2; auto.
-  - simpl; now rewrite IHt.
+  induction t; intros; simpl; auto.
+  - rewrite IHt1; rewrite IHt2; auto.
+  - rewrite IHt1; rewrite IHt2; auto.
+  - case_eq (n0 =? n); intros; simpl; auto.
+  - rewrite IHt2; auto.  
 Qed.
 
 Lemma type_source_gives_type_target :

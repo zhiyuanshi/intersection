@@ -27,7 +27,7 @@ Inductive Atomic : PTyp -> Prop :=
   | AFun : forall t1 t2, Atomic (Fun t1 t2)
   | AVar : forall v, Atomic (PFVarT v)
   | AForAll : forall d t, Atomic (ForAll d t)
-  | ARec : forall l t, Atomic (Rec l t).                          
+  | ARec : forall l t, Atomic (Rec l t).
 (*  | ATop : Atomic Top. *)
 
 Hint Constructors Atomic.
