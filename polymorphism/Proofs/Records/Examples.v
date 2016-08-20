@@ -51,4 +51,51 @@ Theorem ex3 :
   apply ATyMerge; eauto.
 Defined.
 
+(*** Daan Leijen's Extensible Records ***)
+
+(* Polymorphic records *)
+
+Notation "{{ l = t }}" := (PRec l t) (at level 0, l at next level, t at next level).
+Notation "t.l" := (PProjR t x).
+Notation "A ,, B" := (PMerge A B) (at level 80, right associativity).
+
+Notation "{{ l :: A }}" := (Rec l A) (at level 0, l at next level, A at next level).
+Notation "A & B" := (And A B) (at level 80, right associativity).
+
+Check (Rec x Top).
+
+Print Rec.
+Print Grammar constr.
+
+Parameter id : var.
+Parameter const : var.
+Axiom diff : id <> const.
+
+Hint Resolve diff.
+
+Definition idTyp : PTyp := ForAll Top (Fun (PBVarT 0) (PBVarT 0)).
+Definition constTyp : PTyp := ForAll Top (ForAll Top (Fun (PBVarT 1)
+                                                         (Fun (PBVarT 0) (PBVarT 1)))).
+Definition PreludeTyp : PTyp := {{ id :: idTyp }} & {{ const :: constTyp }}.
+
+Definition idImpl : PExp := PTLam Top (PLam (PBVar 0)).
+Definition constImpl : PExp := PTLam Top (PTLam Top (PLam (PLam (PBVar 1)))).
+Definition Prelude : PExp := {{ id = (PAnn idImpl idTyp) }} ,, {{ const = constImpl }}.
+
+Theorem foo :
+  exists c, has_type_source_alg nil Prelude Inf PreludeTyp c.
+Proof.
+  eexists; unfold Prelude, PreludeTyp, idImpl, constImpl.
+  apply ATyMerge; auto.
+  (* id *)
+  - apply ATyRec.
+    apply ATyAnn.
+    apply_fresh ATyTLam as x; auto. 
+    unfold open_typ_term_source, open_typ_source, open_typ_term; simpl.
+    apply ATyLam.
+    
+  admit. (* needs annotation *)
+  admit. (* needs annotation *)
+
+                                       
 End MExamples.

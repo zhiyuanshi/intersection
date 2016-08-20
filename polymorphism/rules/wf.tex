@@ -1,8 +1,8 @@
 \newcommand{\formwf}{\framebox{$ \jwf \Gamma A $}}
 
-\newcommand{\makelabelwf}[1]{F\_WF\_#1}
+\newcommand{\makelabelwf}[1]{WF$#1$}
 
-\newcommand{\labelwfvar}{\makelabelwf Var}
+\newcommand{\labelwfvar}{\makelabelwf \alpha}
 \newcommand{\rulewfvar}{
   \inferrule* [right=\labelwfvar]
     {\alpha \in \Gamma}
@@ -15,28 +15,28 @@
     {\jwf \Gamma \alpha}
 }
 
-\newcommand{\labelwftop}{\makelabelwf Top}
+\newcommand{\labelwftop}{\makelabelwf \top}
 \newcommand{\rulewftop}{
   \inferrule* [right=\labelwftop]
     { }
     {\jwf \Gamma \top}
 }
 
-\newcommand{\labelwfint}{\makelabelwf Int}
+\newcommand{\labelwfint}{\makelabelwf {\mathbb{Z}}}
 \newcommand{\rulewfint}{
   \inferrule* [right=\labelwfint]
     { }
     {\jwf \Gamma {\code{Int}}}
 }
 
-\newcommand{\labelwffun}{\makelabelwf Fun}
+\newcommand{\labelwffun}{\makelabelwf \rightarrow}
 \newcommand{\rulewffun}{
   \inferrule* [right=\labelwffun]
     {\jwf \Gamma A \\ \jwf \Gamma B}
     {\jwf \Gamma {A \to B}}
 }
 
-\newcommand{\labelwfforall}{\makelabelwf Forall}
+\newcommand{\labelwfforall}{\makelabelwf \forall}
 \newcommand{\rulewfforall}{
   \inferrule* [right=\labelwfforall]
     {\jwf {\Gamma, \alpha} A}
@@ -49,7 +49,7 @@
     {\jwf \Gamma {\fordis \alpha A B}}
 }
 
-\newcommand{\labelwfinter}{\makelabelwf Inter}
+\newcommand{\labelwfinter}{\makelabelwf \inter}
 \newcommand{\rulewfinter}{
   \inferrule* [right=\labelwfinter]
     {\jwf \Gamma A \\ \jwf \Gamma B}

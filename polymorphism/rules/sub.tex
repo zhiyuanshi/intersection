@@ -1,29 +1,29 @@
 \newcommand{\formsub}{\framebox{$ A \subtype B \yields E $}}
 
-\newcommand{\makelabelsub}[1]{Sub\_#1}
+\newcommand{\makelabelsub}[1]{S$#1$}
 
-\newcommand{\labelsubint}{\makelabelsub Int}
+\newcommand{\labelsubint}{\makelabelsub {\mathbb{Z}}}
 \newcommand{\rulesubint}{
   \inferrule* [right=\labelsubint]
     { }
     {\tyint \subtype \tyint \yields {\lamty x {\im \alpha} x}}
 }
 
-\newcommand{\labelsubtop}{\makelabelsub Top}
+\newcommand{\labelsubtop}{\makelabelsub \top}
 \newcommand{\rulesubtop}{
   \inferrule* [right=\labelsubtop]
     { }
     {A \subtype \top \yields {\lamty x {\im A} \unit}}
 }
 
-\newcommand{\labelsubvar}{\makelabelsub Var}
+\newcommand{\labelsubvar}{\makelabelsub \alpha}
 \newcommand{\rulesubvar}{
   \inferrule* [right=\labelsubvar]
     { }
     {\alpha \subtype \alpha \yields {\lamty x {\im \alpha} x}}
 }
 
-\newcommand{\labelsubfun}{\makelabelsub Fun}
+\newcommand{\labelsubfun}{\makelabelsub \rightarrow}
 \newcommand{\rulesubfun}{
   \inferrule* [right=\labelsubfun]
     {{B_1} \subtype {A_1} \yields {E_1} \\
@@ -35,7 +35,7 @@
             {\app {E_2} {(\app f {(\app {E_1} x)})}}}}}
 }
 
-\newcommand{\labelsubforall}{\makelabelsub Forall}
+\newcommand{\labelsubforall}{\makelabelsub \forall}
 \newcommand{\rulesubforall}{
   \inferrule* [right=\labelsubforall]
     {{A_1} \subtype {A_2} \yields E}
@@ -64,7 +64,7 @@
           {\blam \alpha {\app E {(\app f \alpha)}}}}}
 }
 
-\newcommand{\labelsubinter}{\makelabelsub Inter}
+\newcommand{\labelsubinter}{\makelabelsub {\inter R}}
 \newcommand{\rulesubinter}{
   \inferrule* [right=\labelsubinter]
     {{A_1} \subtype {A_2} \yields {E_1} \\
@@ -75,7 +75,7 @@
           {\pair {\app {E_1} x} {\app {E_2} x}}}}
 }
 
-\newcommand{\labelsubinterl}{\makelabelsub {Inter\_1}}
+\newcommand{\labelsubinterl}{\makelabelsub {\inter L_1}}
 \newcommand{\rulesubinterl}{
   \inferrule* [right=\labelsubinterl]
     {{A_1} \subtype {A_3} \yields E}
@@ -94,7 +94,7 @@
           {\app E {(\proj 1 x)}}}}
 }
 
-\newcommand{\labelsubinterr}{\makelabelsub {Inter\_2}}
+\newcommand{\labelsubinterr}{\makelabelsub {\inter L_2}}
 \newcommand{\rulesubinterr}{
   \inferrule* [right=\labelsubinterr]
     {{A_2} \subtype {A_3} \yields E}

@@ -2,39 +2,48 @@
 \label{sec:fi}
 
 This section presents the syntax, subtyping, typing, as well as the
-(incoherent) semantics of \name: a calculus with intersection types,
-parametric polymorphism and a merge
-operator. This calculus borrows key ideas from Dunfield's
-calculus~\cite{dunfield2014elaborating}, but is extended with parametric polymorphism. Like Dunfield calculus
-\name is type-safe, but it has an incoherent semantics.
-Section~\ref{sec:disjoint} introduces \namedis, which shows the necessary changes
-for supporting disjoint intersection types and disjoint
-quantification and ensuring coherence.
+semantics of \name: a calculus with intersection types,
+parametric polymorphism and a merge operator. 
+This calculus is an extension of \oldname, which in its turn is heavily based
+on Dunfield's calculus~\cite{dunfield2014elaborating}. 
+We will show that \name is type-safe and it preserves the coherent semantics of
+\oldname.
+%Section~\ref{sec:disjoint} introduces \namedis, which shows the necessary changes
+%for supporting disjoint intersection types and disjoint
+%quantification and ensuring coherence.
+Section~\ref{sec:disjoint} introduces the necessary changes to the disjointness
+concept in order to retain coherence.
+
+All the meta-theory has been mechanized in Coq, which we refer to the supplementary
+materials submitted with the paper.
 
 \subsection{Syntax}
 
-Figure~\ref{fig:fi-syntax} shows the syntax of \name. The differences to
-System $F$, highlighted in gray, are intersection types $A \inter B$ at the
-type-level and the ``merges'' $e_1 \mergeop e_2$ at the term level.
+Figure~\ref{fig:fi-syntax} shows the syntax of \name. 
+The differences to \oldname are highlighted in gray.
+%are intersection types $A \inter B$ at the
+%type-level and the ``merges'' $e_1 \mergeop e_2$ at the term level.
 
+%TODO merge this figure with figure 5 (text too)
 \begin{figure}
   \[
     \begin{array}{l}
       \begin{array}{llrll}
         \text{Types}
-        & A, B, C & \Coloneqq & \alpha    & \\
+        & A, B & \Coloneqq & \top & \\
         &      & \mid & A \to B        & \\
-        &      & \mid & \for \alpha A  & \\
-        &      & \mid & \highlight{$A \inter B$}  & \\
+        &      & \mid & A \inter B  & \\
+        &      & \mid & \alpha & \\
+        &      & \mid & \highlight{$\for \alpha A$}  & \\
 
         \\
         \text{Terms}
         & e & \Coloneqq & x            & \\
         &   & \mid & \lamty x A e      & \\
         &   & \mid & \app {e_1} {e_2}  & \\
-        &   & \mid & \blam \alpha e    & \\
-        &   & \mid & \tapp e A         & \\
-        &   & \mid & \highlight{$e_1 \mergeop e_2$}  & \\
+        &   & \mid & e_1 \mergeop e_2  & \\
+        &   & \mid & \highlight{$\blam \alpha e$} & \\
+        &   & \mid & \highlight{$\tapp e A$} & \\
 
         \\
         \text{Contexts}
@@ -49,20 +58,26 @@ type-level and the ``merges'' $e_1 \mergeop e_2$ at the term level.
   \label{fig:fi-syntax}
 \end{figure}
 
-\paragraph{Types.} Metavariables $A$, $B$ range over types. Types include
-standard constructs in System $F$: type variables $\alpha$; function types $A
-\to B$; and type abstraction $\for \alpha A$. $A \inter B$ denotes the
-intersection of types $A$ and $B$.
+\paragraph{Types.} 
+Metavariables $A$, $B$ range over types. 
+Types include all constructs in \name: a top type $\top$; 
+the type of integers $\tyint$;
+function types $A \to B$; and intersection types $A \inter B$.
+This calculus is extended with two standard constructs in System $F$: 
+type variables $\alpha$ and type abstraction $\for \alpha A$. 
 
-\paragraph{Terms.} Metavariables $e$ range over terms.  Terms include standard
-constructs in System $F$: variables $x$; abstraction of terms over variables of
+\paragraph{Terms.} 
+Metavariables $e$ range over terms.  
+Terms include all constructs in \name: a unit type $\unit$; an integer literal $i$; 
+abstraction of terms over variables of
 a given type $\lamty x A e$; application of terms $e_1$ to terms $e_2$, written
-$\app {e_1} {e_2}$; abstraction of type variables over terms $\blam \alpha e$;
-and application of terms to types $\tapp e A$. The expression $e_1 \mergeop e_2$ is the
-\emph{merge} of two terms $e_1$ and $e_2$.
+$\app {e_1} {e_2}$; and the \emph{merge} of terms $e_1$ and $e_2 $ denoted as 
+$e1 \merge e2$, corresponding to intersections of types $A \inter B$.
+This calculus is extended with two standard constructs in System $F$:
+abstraction of type variables over terms $\blam \alpha e$; and
+and application of terms to types $\tapp e A$. 
 %If one regards $e_1$ and $e_2$ as objects, their merge will respond to
 %every method that one or both of them have.
-Merges of terms correspond to intersections of types $A \inter B$.
 
 \paragraph{Contexts.} Typing contexts $ \Gamma $ track bound type variables
 $\alpha$ and variables $x$ with their type $A$. We use $\subst {A} \alpha {B}$
@@ -71,8 +86,9 @@ $\ftv \cdot$ for sets of free type variables.
 
 In order to focus on the key features that make this language interesting, we do
 not include other forms such as type constants
-and fixpoints here. However they can be included in the formalization in
-standard ways and we are using them in discussions and examples.
+and fixpoints here. 
+However they can be included in the formalization in
+standard ways and we are using them in discussions and examples. %TODO are we?
 
 % \paragraph{Discussion.} A natural question the reader might ask is that why we
 % have excluded union types from the language. The answer is we found that
@@ -88,7 +104,9 @@ standard ways and we are using them in discussions and examples.
 % numbers being a subtype of integers. The other is nominal subtyping relations
 % that are explicitly declared by the programmer.
 
-\begin{figure*}
+
+
+\begin{figure}
   \begin{mathpar}
     \formsub \\
     \rulesubvar \and \rulesubfun \and \rulesubforall \and \rulesubinter \and
@@ -100,8 +118,6 @@ standard ways and we are using them in discussions and examples.
     \rulewfvar \and \rulewffun \and \rulewfforall \and \rulewfinter
   \end{mathpar}
 
-  \footnote{miss a rule for $\bot$?}
-
   \begin{mathpar}
     \formt \\
     \ruletvar \and \ruletlam \and \ruletapp \and \ruletblam \and \rulettapp \and
@@ -110,7 +126,7 @@ standard ways and we are using them in discussions and examples.
 
   \caption{The type system of \name.}
   \label{fig:fi-type}
-\end{figure*}
+\end{figure}
 
 % Intersection types introduce natural subtyping relations among types. For
 % example, $ \tyint \inter \tybool $ should be a subtype of $ \tyint $, since the former
@@ -142,7 +158,7 @@ sets. Under this interpretation, for example, the rule \reflabel{\labelsubinter}
 says that if $A_1$ is both the subset of $A_2$ and the subset of $A_3$, then
 $A_1$ is also the subset of the intersection of $A_2$ and $A_3$.
 
-\paragraph{Metatheory.} As other sane subtyping relations, we can show that
+\paragraph{Metatheory.} As other standard subtyping relations, we can show that
 subtyping defined by $\subtype$ is also reflexive and transitive.
 
 \begin{lemma}[Subtyping is reflexive] \label{lemma:sub-refl}
@@ -153,9 +169,6 @@ subtyping defined by $\subtype$ is also reflexive and transitive.
   If $ A_1 \subtype A_2 $ and $ A_2 \subtype A_3 $,
   then $ A_1 \subtype A_3 $.
 \end{lemma}
-
-For the corresponding mechanized proofs in Coq, we refer to the supplementary
-materials submitted with the paper.
 
 \subsection{Typing}
 
@@ -242,7 +255,7 @@ contexts $\Gamma$ to target language contexts $G$.
 
   \begin{align*}
     \im \alpha           &= \alpha \\
-    \im \bot             &= () \\
+    \im \top             &= () \\
     \im {A_1 \to A_2}    &= \im {A_1} \to \im {A_2} \\
     \im {\for \alpha A}  &= \for \alpha \im A \\
     \im {A_1 \inter A_2} &= \pair {\im {A_1}} {\im {A_2}} \\
