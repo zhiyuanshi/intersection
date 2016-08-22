@@ -65,9 +65,9 @@ $ \jcheck \Gamma e A \yields E\\e$ checks against given type $A$
 
 \newcommand{\brulettappdis}{
 \inferrule* [right=\labelttapp]
-  {\jinfer \Gamma e {\for {\alpha \disjoint B} C} \yields E \\
+  {\jinfer \Gamma e {\fordis \alpha B C} \yields E \\
    \jwf \Gamma A \\
-   \jdis \Gamma A B}
+   \framebox{$\jdis \Gamma A B$}}
   {\jinfer \Gamma {\tapp e A} {\subst A \alpha C} \yields {\tapp E {\im A}}}
 }
 
@@ -113,7 +113,7 @@ $ \jcheck \Gamma e A \yields E\\e$ checks against given type $A$
 \inferrule* [right=\labeltmerge]
   {\jinfer \Gamma {e_1} A \yields {E_1} \\
    \jinfer \Gamma {e_2} B \yields {E_2} \\
-   \framebox{$\jdis \Gamma A B$}}
+   \jdis \Gamma A B}
   {\jinfer \Gamma {e_1 \mergeop e_2} {A \inter B} \yields {\pair {E_1} {E_2}}}
 }
 
