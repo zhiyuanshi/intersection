@@ -18,30 +18,19 @@ target language is shown in Figure~\ref{fig:f-syntax}. The highlighted part
 shows its difference with the standard System $F$. The typing rules can be found
 in the appendix.
 
-%TODO move this to overview and show here example with polymorphism?
-\paragraph{Key idea of the translation.}
-This translation turns merges into usual pairs, similar to Dunfield's
-elaboration approach~\cite{dunfield2014elaborating}.
-For example, \[ 1 \mergeop \code{"one"} \] becomes \pair 1
-{\code{"one"}}. In usage, the pair will be coerced according to type
-information. For example, consider the function application: \[ \app {(\lamty x
-\tystring x)} {(1 \mergeop \code{"one"})} \] This expression will be translated to \[ \app
-{(\lamty x \tystring x)} {(\app {(\lamty x {\pair \tyint \tystring} {\proj 2 x})}
-{\pair 1 {\code{"one"}}})} \] The coercion in this case is $(\lamty x {\pair
-\tyint \tystring} {\proj 2 x})$. It extracts the second item from the pair, since
-the function expects a $\tystring$ but the translated argument is of type $\pair
-\tyint \tystring$.
-
 
 \begin{figure}[h]
   \[
     \begin{array}{llrl}
       \text{Types}    & T & \Coloneqq & \alpha \\
                       &   & \mid      & \highlight {$ () $} \\
+                      &   & \mid      & \tyint \\
                       &   & \mid      & {T_1} \to {T_2} \\
                       &   & \mid      & \for \alpha T \\
                       &   & \mid      & \highlight {$ \pair {T_1} {T_2} $} \\
       \text{Terms}    & E & \Coloneqq & x \\
+                      &   & \mid      & \highlight {$ () $} \\
+                      &   & \mid      & i \\
                       &   & \mid      & \lamty x T E \\
                       &   & \mid      & \app {E_1} {E_2} \\
                       &   & \mid      & \blam \alpha E \\
@@ -66,11 +55,11 @@ contexts $\Gamma$ to target language contexts $G$.
   \framebox{$\im A = T$}
 
   \begin{align*}
-    \im \alpha           &= \alpha \\
-    \im \top             &= () \\
-    \im {A_1 \to A_2}    &= \im {A_1} \to \im {A_2} \\
-    \im {\for \alpha A}  &= \for \alpha \im A \\
-    \im {A_1 \inter A_2} &= \pair {\im {A_1}} {\im {A_2}} \\
+    \im \alpha                &= \alpha \\
+    \im \top                  &= () \\
+    \im {A_1 \to A_2}         &= \im {A_1} \to \im {A_2} \\
+    \im {\fordis \alpha A B}  &= \for \alpha \im B \\
+    \im {A_1 \inter A_2}      &= \pair {\im {A_1}} {\im {A_2}} \\
   \end{align*}
 
   \framebox{$\im \Gamma = G$}
@@ -89,13 +78,13 @@ contexts $\Gamma$ to target language contexts $G$.
 % Section~\ref{sec:fi}, except for the light blue part. The translation consists
 % of four sets of rules, which are explained below:
 
-\subsection{Coercive Subtyping and Coherence}
-
-\paragraph{Top-like types}
+\subsection{Top-like types and their coercions}
 
 TODO
 
-\paragraph{Coercive subtyping.}
+\paragraph{Coercions}
+
+TODO
 
 \begin{figure}[t]
   \begin{mathpar}
@@ -105,9 +94,9 @@ TODO
   \end{mathpar}
 
 
-  \begin{center}
+  %\begin{center}
     \framebox{$\andcoerce{A}_{C} = T$}
-  \end{center}
+  %\end{center}
 
   \[
   \andcoerce{A}_{C} = 
@@ -119,9 +108,9 @@ TODO
   \end{cases}
   \]
 
-  \begin{center}
+  %\begin{center}
     \framebox{$\andcoerce{A} = T$}
-  \end{center}
+  %\end{center}
 
   \[
   \andcoerce{A} = 
@@ -132,10 +121,13 @@ TODO
         A = \fordis \alpha B A & \blam \alpha {\andcoerce{A}}
   \end{cases}
   \]
-  \caption{Coercion generation considering Top-like types.}
+  \caption{Top-like types and respective coercions.}
   \label{fig:andcoercion}
 \end{figure}
 
+\subsection{Coercive Subtyping and Coherence}
+
+\paragraph{Coercive subtyping.}
 
 The judgement
 \[
@@ -180,420 +172,10 @@ is used. Finally, all rules produce type-correct coercions:
   By a straightforward induction on the derivation\footnote{The proofs of major lemmata and theorems can be found in the appendix.}.
 \end{proof}
 
-\paragraph{The translation judgement.} The translation judgement $\jtype \Gamma e
-A \yields E$ extends the typing judgement with an elaborated term on the right
-hand side of $\yields {}$. The translation ensures that $E$ has type $\im A$. In
-\name, one may pass more information to a function than what is required; but
-not in System $F$. To account for this difference, in \reflabel{\labeltapp}, the
-coercion $E$ from the subtyping relation is applied to the argument.
-\reflabel{\labeltmerge} straighforwardly translates merges into pairs.
-
-The type-directed translation is type-safe. This property is captured
-by the following two theorems.
-
-\begin{restatable}[Type preservation]{theorem}{typepreservation}
-  \label{theorem:type-preservation}
-
-  If $ \jtype \Gamma e A \yields E $,
-  then $ \jtype {\im \Gamma} E {\im A} $.
-\end{restatable}
-
-\begin{proof}
-  (Sketch) By structural induction on the term and the corresponding
-  inference rule.
-\end{proof}
-
-\begin{theorem}[Type safety]
-  If $e$ is a well-typed \name term, then $e$ evaluates to some System $F$
-  value $v$.
-\end{theorem}
-
-\begin{proof}
-  Since we define the dynamic semantics of \name in terms of the composition of
-  the type-directed translation and the dynamic semantics of System $F$, type safety follows immediately.
-\end{proof}
-
-Although the system shown in the Section~\ref{sec:fi} is type-safe, it is not
-coherent. This section shows how to modify \name so that it guarantees coherence
-as well as type soundness. The result is a calculus named \namedis. The keys
-aspects are the notion of disjoint intersections, and disjoint quantification
-for polymorphic types.
-
-%From the theoretical point-of-view, the end goal of this section is to show that the resulting system has
-%a coherent (or unique) elaboration semantics:
-%\begin{restatable}[Unique elaboration]{theorem}{uniqueelaboration}
-%  \label{theorem:unique-elaboration}
-%
-%  If $\jtype \Gamma e {A_1} \yields {E_1}$ and $\jtype \Gamma e {A_2} \yields
-%  {E_2}$, then $E_1 \equiv E_2$. (``$\equiv$'' means syntactical equality, up to
-%  $\alpha$-equality.)
-%
-%\end{restatable}
-%
-%\noindent In other words, given a source term $e$, elaboration always produces
-%the same target term $E$. The most important hurdle we need to overcome is that
-%if $A \inter B \subtype C$, then either $A$ or $B$ contributes to that subtyping
-%relation, resulting in two possible coercions.
-
-\subsection{Disjointness} Throughout the paper we already presented an intuitive
-definition for disjoiness. Here such definition is made a bit more precise, and
-well-suited to \namedis.
-
-\begin{definition}[Disjoint types]
-
-  Given a context $\Gamma$, two types $A$ and $B$ are said to be disjoint
-  (written $\jdis \Gamma A B$) if they do not share a common supertype. That is,
-  there does not exist a type $C$ such that $A \subtype C$ and that $B \subtype
-  C$. Note that we assume that all free type variables in $A$,
-    $B$ and $C$ are bound in $\Gamma$.
-
-  \[\jdis \Gamma A B \equiv \not \exists C.~A \subtype C \wedge B \subtype C\]
-
-\end{definition}
-
-To see this definition in action, $\tyint$ and $\tychar$ are disjoint,
-because there is
-no type that is a supertype of the both. On the other hand, $\tyint$ is not
-disjoint with itself, because $\tyint \subtype \tyint$. This implies that
-disjointness is not reflexive as subtyping is. Two types with different shapes
-are always disjoint, unless one of them is an intersection type. For example, a function
-type and a universally quantified type must be disjoint. But a function type and an intersection
-type may not be. Consider:
-\[ \tyint \to \tyint \quad \text{and} \quad (\tyint \to \tyint) \inter (\tystring \to \tystring) \]
-Those two types are not disjoint since $\tyint \to \tyint$ is their common supertype.
-
-\subsection{Syntax}
-
-\begin{figure}
-  \[
-    \begin{array}{l}
-      \begin{array}{llrll}
-        \text{Types}
-        & A, B & \Coloneqq & \alpha                  & \\
-        &      & \mid & \highlight {$\bot$}          & \\
-        &      & \mid & A \to B                      & \\
-        &      & \mid & \for {(\alpha \highlight {$\disjoint A$})} B  & \\
-        &      & \mid & A \inter B                   & \\
-
-        \\
-        \text{Terms}
-        & e & \Coloneqq & x                        & \\
-        &   & \mid & \lam {(x \oftype A)} e          & \\
-        &   & \mid & \app {e_1} {e_2}              & \\
-        &   & \mid & \blam {(\alpha \highlight {$\disjoint A$})} e  & \\
-        &   & \mid & \tapp e A                     & \\
-        &   & \mid & e_1 \mergeop e_2              & \\
-
-        \\
-        \text{Contexts}
-        & \Gamma & \Coloneqq & \cdot
-                   \mid \Gamma, \alpha \highlight {$\disjoint A$}
-                   \mid \Gamma, x \oftype A  & \\
-
-        \text{Syntactic sugar} & \blam \alpha e & \equiv & \blamdis \alpha \bot e & \\
-                               & \forall \alpha.~A & \equiv & \forall (\alpha * \bot)~.~A & \\
-      \end{array}
-    \end{array}
-  \]
-
-  \caption{Amendments of the rules.}
-  \label{fig:fi-syntax-dis}
-\end{figure}
-
-\begin{figure}
-  \framebox{$\im A = T$}
-
-  \begin{align*}
-    \im \bot                  &= () \\
-    \im {\fordis \alpha A B}  &= \for \alpha \im B \\
-  \end{align*}
-
-  \framebox{$\im \Gamma = G$}
-
-  \begin{align*}
-    \im {\Gamma, \alpha \disjoint A} &= \im \Gamma, \alpha \\
-  \end{align*}
-
-  \caption{Additional type and context translation.}
-  \label{fig:additional-type-and-context-translation}
-\end{figure}
-
-% \george{May also note on the scoping of type variables inside contexts.}
-
-Figure~\ref{fig:fi-syntax-dis} shows the updated syntax with the
-changes highlighted and Figure~\ref{fig:additional-type-and-context-translation}
-shows type and context translations for the new constructs.
-Note how similar the changes are to those needed
-to extend System $F$ with bounded quantification. First, type
-variables are now always associated with their disjointness
-constraints (like $\alpha \disjoint A$) in types, terms, and
-contexts. Second, the bottom type ($\bot$) is introduced so that
-universal quantification becomes a special case of disjoint
-quantification: $\blam \alpha e$ is really a syntactic sugar for
-$\blamdis \alpha \bot e$. The underlying idea is that any type is
-disjoint with the bottom type.  Note the analogy with bounded
-quantification, where the top type is the trivial upper bound in
-bounded quantification, while the bottom type is the trivial
-disjointness constraint in disjoint quantification.
-
-%Indeed, \bruno{unfinidhed sentence}\george{Mabe show a diagram here to contrast
-%with bounded polymorphism.}
-
-\subsection{Typing}
-Figure~\ref{fig:fi-type-patch} shows modifications to Figure~\ref{fig:fi-type} in
-order to support disjoint intersection types and disjoint
-quantification. Only new rules or rules that different are shown.
-Importantly, the disjointness judgement appears in the well-formedness rule for intersection
-types and the typing rule for merges.
-
-\begin{figure}
-  \begin{mathpar}
-    \framebox{$\jatomic A$} \\
-
-    \inferrule*
-    {}
-    {\jatomic \bot}
-
-    \inferrule*
-    {}
-    {\jatomic {A \to B}}
-
-    \inferrule*
-    {}
-    {\jatomic {\fordis \alpha B A}}
-  \end{mathpar}
-
-  \begin{mathpar}
-    \formsub \\ \rulesubinterldis \and \rulesubinterrdis \and \rulesubforalldis
-  \end{mathpar}
-
-  \begin{mathpar}
-    \formwf \\ \rulewfforalldis \and \rulewfinterdis
-  \end{mathpar}
-
-  \begin{mathpar}
-    \formt \\ \ruletblamdis \and \rulettappdis \and \ruletmergedis
-  \end{mathpar}
-
-  \caption{Affected rules.}
-  \label{fig:fi-type-patch}
-\end{figure}
-
-\begin{figure}
-  \begin{mathpar}
-    \framebox{$\jatomic A$} \\
-
-    \inferrule*{}{\jatomic {A \to B}}
-
-    \inferrule*{}{\jatomic \alpha}
-
-    \inferrule*{}{\jatomic {\for \alpha A}}
-  \end{mathpar}
-
-  \begin{mathpar}
-    \formsub \\ \rulesubint \and \rulesubvar \and \rulesubfun \and \rulesubforall
-    \and \rulesubinter  \and \rulesubinterldis \and \rulesubinterrdis 
-  \end{mathpar}
-
-  \begin{mathpar}
-    \formwf \\ \rulewfint \and \rulewfvar \and \rulewffun \and \rulewfforall \and \rulewfinter
-  \end{mathpar}
-
-%  \begin{mathpar}
-%    \formt \\ \ruletvar \and \ruletlam \and \ruletapp \and
-%    \ruletblam \and \rulettapp \and \ruletmergedis 
-%  \end{mathpar}
-
-  \begin{mathpar}
-    \formbi \\ \bruletint \and \bruletvar \and \bruletapp \and
-    \brulettapp \and \bruletmergedis \and \bruletann 
-  \end{mathpar}
-
-  \begin{mathpar}
-    \formbc \\ \bruletlam \and  \bruletblam \and \bruletsub
-  \end{mathpar}
-
-  \caption{Rules for Naive system.}
-  \label{fig:fi-type-naive}
-\end{figure}
-
-\begin{figure}
-  \begin{mathpar}
-    \framebox{$\jatomic A$} \\
-
-    \inferrule*{}{\jatomic {\fordis \alpha B A}}
-  \end{mathpar}
-
-  \begin{mathpar}
-    \formsub \\ \rulesubtop \and \rulesubforalldis \and 
-    \rulesubinterlcoerce \and \rulesubinterrcoerce
-  \end{mathpar}
-
-  \begin{mathpar}
-    \formwf \\ \rulewftop \and \rulewfvardis \and \rulewfforalldis 
-  \end{mathpar}
-
-  \begin{mathpar}
-    \formbi \\ \brulettop \and \brulettappdis 
-  \end{mathpar}
-
-  \begin{mathpar}
-    \formbc \\ \bruletblamdis 
-  \end{mathpar}
-
-
-  \caption{Changes for Extended systems.}
-  \label{fig:fi-type-extended}
-\end{figure}
-
-\begin{figure}
-  \begin{mathpar}
-    \formsub \\ \rulesubforallext
-  \end{mathpar}
-
-  \caption{Rules for Extended system with improved ForAll.}
-  \label{fig:fi-type-extended_forall}
-\end{figure}
-
-\begin{figure}[t]
-  \begin{mathpar}
-    \formtoplike \\ %\framebox{$\jatomic A$} \\
-
-    \ruletopltop \and \ruletoplinter \and \ruletoplfun \and \ruletoplforall
-  \end{mathpar}
-
-
-  \begin{center}
-    \framebox{$\andcoerce{A}_{C} = T$}
-  \end{center}
-
-  \[
-  \andcoerce{A}_{C} = 
-  \begin{cases} 
-        \toplike{A} & \andcoerce{A} \\ 
-        %A = \top & () \\
-        %A = A_1 \to A_2 \; \wedge \; \toplike{A_2} & \lam x \andcoerce{A_2}_{C} \\
-        \text{otherwise} & {C} 
-  \end{cases}
-  \]
-
-  \begin{center}
-    \framebox{$\andcoerce{A} = T$}
-  \end{center}
-
-  \[
-  \andcoerce{A} = 
-  \begin{cases} 
-        A = \top & () \\
-        A = A_1 \to A_2 & \lam x \andcoerce{A_2} \\
-        A = A_1 \inter A_2 & \pair {\andcoerce{A_1}} {\andcoerce{A_2}} \\
-        A = \fordis \alpha B A & \blam \alpha {\andcoerce{A}}
-  \end{cases}
-  \]
-  \caption{Coercion generation considering Top-like types.}
-  \label{fig:andcoercion}
-\end{figure}
-
-
-
-%\paragraph{Atomic Types.} The new system introduces atomic types. Essentially a type
-%is atomic if it is any type, which is not an intersection type.
-%The notion of atomic
-%type will be helpful
-
-\paragraph{Well-formedness.}
-We require that the two types of an intersection must be disjoint in their
-context, and that the disjointness constraint in a universal type is well-formed.
-Under the new rules, intersection types such as $\tyint \inter \tyint$ are no
-longer well-formed because the two types are not disjoint.
-
-\paragraph{Disjoint quantification.} A disjoint quantification is introduced by
-the big lambda $\blamdis \alpha A e$ and eliminated by the usual type
-application $\tapp e A$. The constraint is added to the context with this rule.
-During a type application, the type system makes sure that the type argument
-satisfies the disjointness constraint.
-
-\paragraph{Metatheory.}
-
-Since in this section we only restrict the type system in the previous section,
-it is easy to see that type preservation and type-safety still holds.
-Additionally, we can show that typing always produces a well-formed type by
-proving the following results.
-
-\begin{restatable}[Instantiation]{lemma}{instantiation}
-  \label{lemma:instantiation}
-
-  If $\jwf {\Gamma, \alpha \disjoint B} C$, $\jwf \Gamma A$, $\jdis \Gamma A B$
-  then $\jwf \Gamma {\subst A \alpha C}$.
-\end{restatable}
-
-\begin{restatable}[Well-formed typing]{lemma}{wellformedtyping}
-  \label{lemma:wellformed-typing}
-
-  If $\jtype \Gamma e A$, then $\jwf \Gamma A$.
-\end{restatable}
-
-\begin{proof}
-  By induction on the derivation that leads to $\jtype \Gamma e A$ and applying
-  Lemma~\ref{lemma:instantiation} in the case of \reflabel{\labelttapp}.
-\end{proof}
-
-With our new definition of well-formed types, this result is nontrivial.
-In general, disjointness judgements are not invariant with respect to
-free-variable substitution. In other words, a careless substitution can violate
-the disjoint constraint in the context. For example, in the context $\alpha
-\disjoint \tyint$, $\alpha$ and $\tyint$ are disjoint:
-\[ \jdis {\alpha \disjoint \tyint} \alpha \tyint \]
-But after the substitution of $\tyint$ for $\alpha$ on the two types, the sentence
-\[ \jdis {\alpha \disjoint \tyint} \tyint \tyint \]
-is longer true since $\tyint$ is clearly not disjoint with itself.
-
-\subsection{Subtyping}
-
 % \george{Explain \reflabel{\labelsubforall} and distinction of kernel and all version.}
 
-The subtyping rules need some adjustment.
-Note that the $\bot$ type does not participate in subtyping since it holds no value.
-An important
-problem with the subtyping rules in Figure~\ref{fig:fi-type} is that the all three rules
-dealing with intersection types
-(\reflabel{\labelsubinterl} and \reflabel{\labelsubinterr} and \reflabel{\labelsubinter})
-overlap. Unfortunatelly,
-this means that different coercions may be given when checking the subtyping
-between two types, depending on which derivation is chosen. This is ultimately the reason
-for incoherence.
-There are two important types of overlap:
-
-\begin{enumerate}
-
-\item The left decomposition rules for intersections (\reflabel{\labelsubinterl} and \reflabel{\labelsubinterr}) overlap with each other.
-
-\item The left decomposition rules for intersections (\reflabel{\labelsubinterl} and \reflabel{\labelsubinterr})
-overlap with the right decomposition rules for intersections (\reflabel{\labelsubinter}).
-
-\end{enumerate}
-
-\noindent Fortunately, disjoint intersections (which are enforced by well-formedness)
-deal with problem 1): only one of the two left decomposition rules
-can be chosen for a disjoint intersection type. Since the two types in the intersection
-are disjoint it is impossible that both of the preconditions of the left decompositions are satisfied
-at the same time. More formally, with disjoint intersections, we have the following theorem:
-
-\begin{lemma}[Unique subtype contributor]
-  \label{lemma:unique-subtype-contributor}
-
-  If $A_1 \inter A_2 \subtype B$, where $A_1 \inter A_2$ and $B$ are well-formed types,
-  then it is not possible that the following holds at the same time:
-  \begin{enumerate}
-    \item $A_1 \subtype B$
-    \item $A_2 \subtype B$
-  \end{enumerate}
-\end{lemma}
-
-Unfortunatelly, disjoint intersections alone are insufficient to deal with problem 2).
-In order to deal with problem 2), we introduce a distinction between types, and atomic types.
-
-\paragraph{Atomic types.} Atomic types are just those which are not intersection
+\paragraph{Ordinary types}
+Atomic types are just those which are not intersection
 types, and are asserted by the judgement \[ \jatomic A \]
 
 In the left decomposition rules for intersections we introduce a requirement that
@@ -601,7 +183,57 @@ $A_3$ is atomic. The consequence of this requirement is that when $A_3$ is an in
 the only rule that can be applied is \reflabel{\labelsubinter}.
 With the atomic constraint, one can guarantee that at any moment during the
 derivation of a subtyping relation, at most one rule can be used.
-Consequently, the coercion of a subtyping relation $A \subtype B$ is uniquely determined.
+
+\paragraph{Unique coercions}
+
+%The subtyping rules need some adjustment.
+%Note that the $\bot$ type does not participate in subtyping since it holds no value.
+%An important
+%problem with the subtyping rules in Figure~\ref{fig:fi-type} is that the all three rules
+%dealing with intersection types
+%(\reflabel{\labelsubinterl} and \reflabel{\labelsubinterr} and \reflabel{\labelsubinter})
+%overlap. Unfortunatelly,
+%this means that different coercions may be given when checking the subtyping
+%between two types, depending on which derivation is chosen. This is ultimately the reason
+%for incoherence.
+%There are two important types of overlap:
+%
+%\begin{enumerate}
+%
+%\item The left decomposition rules for intersections (\reflabel{\labelsubinterl} and \reflabel{\labelsubinterr}) overlap with each other.
+%
+%\item The left decomposition rules for intersections (\reflabel{\labelsubinterl} and \reflabel{\labelsubinterr})
+%overlap with the right decomposition rules for intersections (\reflabel{\labelsubinter}).
+%
+%\end{enumerate}
+%
+%\noindent Fortunately, disjoint intersections (which are enforced by well-formedness)
+%deal with problem 1): only one of the two left decomposition rules
+%can be chosen for a disjoint intersection type. Since the two types in the intersection
+%are disjoint it is impossible that both of the preconditions of the left decompositions are satisfied
+%at the same time. 
+TODO
+More formally, as also shown in ..., with disjoint intersections 
+the following theorem holds:
+
+\begin{lemma}[Unique subtype contributor]
+  \label{lemma:unique-subtype-contributor}
+
+  If $A_1 \inter A_2 \subtype B$, 
+  where $A_1 \inter A_2$ and $B$ are well-formed types, and
+  $B$ is not top-like,
+  then it is not possible that the following holds at the same time:
+  \begin{enumerate}
+    \item $A_1 \subtype B$
+    \item $A_2 \subtype B$
+  \end{enumerate}
+\end{lemma}
+
+%Unfortunately, disjoint intersections alone are insufficient to deal with problem 2).
+%In order to deal with problem 2), we introduce a distinction between types, and atomic types.
+
+Finally, we can show that the coercion of a subtyping relation $A \subtype B$ 
+is uniquely determined.
 This fact is captured by the following lemma:
 
 \begin{restatable}[Unique coercion]{lemma}{uniquecoercion}
@@ -658,6 +290,398 @@ This result is captured more formally by the following lemma:
 
 % \george{Two points are being made here: 1) nondisjoint intersections, 2) atomic
 % types. Show an offending example for each?}
+
+
+\subsection{Disjointness} Throughout the paper we already presented an intuitive
+definition for disjoiness. Here such definition is made a bit more precise, and
+well-suited to \namedis.
+
+\begin{definition}[Disjoint types]
+
+  Given a context $\Gamma$, two types $A$ and $B$ are said to be disjoint
+  (written $\jdis \Gamma A B$) if they do not share a common supertype. That is,
+  there does not exist a type $C$ such that $A \subtype C$ and that $B \subtype
+  C$. Note that we assume that all free type variables in $A$,
+    $B$ and $C$ are bound in $\Gamma$.
+
+  \[\jdis \Gamma A B \equiv \not \exists C.~A \subtype C \wedge B \subtype C\]
+
+\end{definition}
+
+To see this definition in action, $\tyint$ and $\tychar$ are disjoint,
+because there is
+no type that is a supertype of the both. On the other hand, $\tyint$ is not
+disjoint with itself, because $\tyint \subtype \tyint$. This implies that
+disjointness is not reflexive as subtyping is. Two types with different shapes
+are always disjoint, unless one of them is an intersection type. For example, a function
+type and a universally quantified type must be disjoint. But a function type and an intersection
+type may not be. Consider:
+\[ \tyint \to \tyint \quad \text{and} \quad (\tyint \to \tyint) \inter (\tystring \to \tystring) \]
+Those two types are not disjoint since $\tyint \to \tyint$ is their common supertype.
+
+%\subsection{Syntax}
+%
+%\begin{figure}
+%  \[
+%    \begin{array}{l}
+%      \begin{array}{llrll}
+%        \text{Types}
+%        & A, B & \Coloneqq & \alpha                  & \\
+%        &      & \mid & \highlight {$\bot$}          & \\
+%        &      & \mid & A \to B                      & \\
+%        &      & \mid & \for {(\alpha \highlight {$\disjoint A$})} B  & \\
+%        &      & \mid & A \inter B                   & \\
+%
+%        \\
+%        \text{Terms}
+%        & e & \Coloneqq & x                        & \\
+%        &   & \mid & \lam {(x \oftype A)} e          & \\
+%        &   & \mid & \app {e_1} {e_2}              & \\
+%        &   & \mid & \blam {(\alpha \highlight {$\disjoint A$})} e  & \\
+%        &   & \mid & \tapp e A                     & \\
+%        &   & \mid & e_1 \mergeop e_2              & \\
+%
+%        \\
+%        \text{Contexts}
+%        & \Gamma & \Coloneqq & \cdot
+%                   \mid \Gamma, \alpha \highlight {$\disjoint A$}
+%                   \mid \Gamma, x \oftype A  & \\
+%
+%        \text{Syntactic sugar} & \blam \alpha e & \equiv & \blamdis \alpha \bot e & \\
+%                               & \forall \alpha.~A & \equiv & \forall (\alpha * \bot)~.~A & \\
+%      \end{array}
+%    \end{array}
+%  \]
+%
+%  \caption{Amendments of the rules.}
+%  \label{fig:fi-syntax-dis}
+%\end{figure}
+%
+%\begin{figure}
+%  \framebox{$\im A = T$}
+%
+%  \begin{align*}
+%    \im \bot                  &= () \\
+%    \im {\fordis \alpha A B}  &= \for \alpha \im B \\
+%  \end{align*}
+%
+%  \framebox{$\im \Gamma = G$}
+%
+%  \begin{align*}
+%    \im {\Gamma, \alpha \disjoint A} &= \im \Gamma, \alpha \\
+%  \end{align*}
+%
+%  \caption{Additional type and context translation.}
+%  \label{fig:additional-type-and-context-translation}
+%\end{figure}
+%
+%% \george{May also note on the scoping of type variables inside contexts.}
+%
+%Figure~\ref{fig:fi-syntax-dis} shows the updated syntax with the
+%changes highlighted and Figure~\ref{fig:additional-type-and-context-translation}
+%shows type and context translations for the new constructs.
+%Note how similar the changes are to those needed
+%to extend System $F$ with bounded quantification. First, type
+%variables are now always associated with their disjointness
+%constraints (like $\alpha \disjoint A$) in types, terms, and
+%contexts. Second, the bottom type ($\bot$) is introduced so that
+%universal quantification becomes a special case of disjoint
+%quantification: $\blam \alpha e$ is really a syntactic sugar for
+%$\blamdis \alpha \bot e$. The underlying idea is that any type is
+%disjoint with the bottom type.  Note the analogy with bounded
+%quantification, where the top type is the trivial upper bound in
+%bounded quantification, while the bottom type is the trivial
+%disjointness constraint in disjoint quantification.
+
+%Indeed, \bruno{unfinidhed sentence}\george{Mabe show a diagram here to contrast
+%with bounded polymorphism.}
+
+\subsection{Well-formedness and substitution}
+
+TODO
+
+\subsection{Bi-directional type-system with Elaboration}
+
+TODO: talk about bi-directional type-system.
+
+%TODO move this to overview and show here example with polymorphism?
+\paragraph{Key idea of the translation.}
+This translation turns merges into usual pairs, similar to Dunfield's
+elaboration approach~\cite{dunfield2014elaborating}.
+For example, \[ 1 \mergeop \code{"one"} \] becomes \pair 1
+{\code{"one"}}. In usage, the pair will be coerced according to type
+information. For example, consider the function application: \[ \app {(\lamty x
+\tystring x)} {(1 \mergeop \code{"one"})} \] This expression will be translated to \[ \app
+{(\lamty x \tystring x)} {(\app {(\lamty x {\pair \tyint \tystring} {\proj 2 x})}
+{\pair 1 {\code{"one"}}})} \] The coercion in this case is $(\lamty x {\pair
+\tyint \tystring} {\proj 2 x})$. It extracts the second item from the pair, since
+the function expects a $\tystring$ but the translated argument is of type $\pair
+\tyint \tystring$.
+
+\paragraph{The translation judgement.} The translation judgement $\jtype \Gamma e
+A \yields E$ extends the typing judgement with an elaborated term on the right
+hand side of $\yields {}$. The translation ensures that $E$ has type $\im A$. In
+\name, one may pass more information to a function than what is required; but
+not in System $F$. To account for this difference, in \reflabel{\labeltapp}, the
+coercion $E$ from the subtyping relation is applied to the argument.
+\reflabel{\labeltmerge} straighforwardly translates merges into pairs.
+
+The type-directed translation is type-safe. This property is captured
+by the following two theorems.
+
+\begin{restatable}[Type preservation]{theorem}{typepreservation}
+  \label{theorem:type-preservation}
+
+  If $ \jtype \Gamma e A \yields E $,
+  then $ \jtype {\im \Gamma} E {\im A} $.
+\end{restatable}
+
+\begin{proof}
+  (Sketch) By structural induction on the term and the corresponding
+  inference rule.
+\end{proof}
+
+\begin{theorem}[Type safety]
+  If $e$ is a well-typed \name term, then $e$ evaluates to some System $F$
+  value $v$.
+\end{theorem}
+
+\begin{proof}
+  Since we define the dynamic semantics of \name in terms of the composition of
+  the type-directed translation and the dynamic semantics of System $F$, type safety follows immediately.
+\end{proof}
+
+Although the system shown in the Section~\ref{sec:fi} is type-safe, it is not
+coherent. This section shows how to modify \name so that it guarantees coherence
+as well as type soundness. The result is a calculus named \namedis. The keys
+aspects are the notion of disjoint intersections, and disjoint quantification
+for polymorphic types.
+
+%From the theoretical point-of-view, the end goal of this section is to show that the resulting system has
+%a coherent (or unique) elaboration semantics:
+%\begin{restatable}[Unique elaboration]{theorem}{uniqueelaboration}
+%  \label{theorem:unique-elaboration}
+%
+%  If $\jtype \Gamma e {A_1} \yields {E_1}$ and $\jtype \Gamma e {A_2} \yields
+%  {E_2}$, then $E_1 \equiv E_2$. (``$\equiv$'' means syntactical equality, up to
+%  $\alpha$-equality.)
+%
+%\end{restatable}
+%
+%\noindent In other words, given a source term $e$, elaboration always produces
+%the same target term $E$. The most important hurdle we need to overcome is that
+%if $A \inter B \subtype C$, then either $A$ or $B$ contributes to that subtyping
+%relation, resulting in two possible coercions.
+
+
+
+%Figure~\ref{fig:fi-type-patch} shows modifications to Figure~\ref{fig:fi-type} in
+%order to support disjoint intersection types and disjoint
+%quantification. Only new rules or rules that different are shown.
+%Importantly, the disjointness judgement appears in the well-formedness rule for intersection
+%types and the typing rule for merges.
+
+%\begin{figure}
+%  \begin{mathpar}
+%    \framebox{$\jatomic A$} \\
+%
+%    \inferrule*
+%    {}
+%    {\jatomic \bot}
+%
+%    \inferrule*
+%    {}
+%    {\jatomic {A \to B}}
+%
+%    \inferrule*
+%    {}
+%    {\jatomic {\fordis \alpha B A}}
+%  \end{mathpar}
+%
+%  \begin{mathpar}
+%    \formsub \\ \rulesubinterldis \and \rulesubinterrdis \and \rulesubforalldis
+%  \end{mathpar}
+%
+%  \begin{mathpar}
+%    \formwf \\ \rulewfforalldis \and \rulewfinterdis
+%  \end{mathpar}
+%
+%  \begin{mathpar}
+%    \formt \\ \ruletblamdis \and \rulettappdis \and \ruletmergedis
+%  \end{mathpar}
+%
+%  \caption{Affected rules.}
+%  \label{fig:fi-type-patch}
+%\end{figure}
+
+%\begin{figure}
+%  \begin{mathpar}
+%    \framebox{$\jatomic A$} \\
+%
+%    \inferrule*{}{\jatomic {A \to B}}
+%
+%    \inferrule*{}{\jatomic \alpha}
+%
+%    \inferrule*{}{\jatomic {\for \alpha A}}
+%  \end{mathpar}
+%
+%  \begin{mathpar}
+%    \formsub \\ \rulesubint \and \rulesubvar \and \rulesubfun \and \rulesubforall
+%    \and \rulesubinter  \and \rulesubinterldis \and \rulesubinterrdis 
+%  \end{mathpar}
+%
+%  \begin{mathpar}
+%    \formwf \\ \rulewfint \and \rulewfvar \and \rulewffun \and \rulewfforall \and \rulewfinter
+%  \end{mathpar}
+%
+%%  \begin{mathpar}
+%%    \formt \\ \ruletvar \and \ruletlam \and \ruletapp \and
+%%    \ruletblam \and \rulettapp \and \ruletmergedis 
+%%  \end{mathpar}
+%
+%  \begin{mathpar}
+%    \formbi \\ \bruletint \and \bruletvar \and \bruletapp \and
+%    \brulettapp \and \bruletmergedis \and \bruletann 
+%  \end{mathpar}
+%
+%  \begin{mathpar}
+%    \formbc \\ \bruletlam \and  \bruletblam \and \bruletsub
+%  \end{mathpar}
+%
+%  \caption{Rules for Naive system.}
+%  \label{fig:fi-type-naive}
+%\end{figure}
+
+%\begin{figure}
+%  \begin{mathpar}
+%    \framebox{$\jatomic A$} \\
+%
+%    \inferrule*{}{\jatomic {\fordis \alpha B A}}
+%  \end{mathpar}
+%
+%  \begin{mathpar}
+%    \formsub \\ \rulesubtop \and \rulesubforalldis \and 
+%    \rulesubinterlcoerce \and \rulesubinterrcoerce
+%  \end{mathpar}
+%
+%  \begin{mathpar}
+%    \formwf \\ \rulewftop \and \rulewfvardis \and \rulewfforalldis 
+%  \end{mathpar}
+%
+%  \begin{mathpar}
+%    \formbi \\ \brulettop \and \brulettappdis 
+%  \end{mathpar}
+%
+%  \begin{mathpar}
+%    \formbc \\ \bruletblamdis 
+%  \end{mathpar}
+%
+%
+%  \caption{Changes for Extended systems.}
+%  \label{fig:fi-type-extended}
+%\end{figure}
+
+%\begin{figure}
+%  \begin{mathpar}
+%    \formsub \\ \rulesubforallext
+%  \end{mathpar}
+%
+%  \caption{Rules for Extended system with improved ForAll.}
+%  \label{fig:fi-type-extended_forall}
+%\end{figure}
+
+%\begin{figure}[t]
+%  \begin{mathpar}
+%    \formtoplike \\ %\framebox{$\jatomic A$} \\
+%
+%    \ruletopltop \and \ruletoplinter \and \ruletoplfun \and \ruletoplforall
+%  \end{mathpar}
+%
+%
+%  \begin{center}
+%    \framebox{$\andcoerce{A}_{C} = T$}
+%  \end{center}
+%
+%  \[
+%  \andcoerce{A}_{C} = 
+%  \begin{cases} 
+%        \toplike{A} & \andcoerce{A} \\ 
+%        %A = \top & () \\
+%        %A = A_1 \to A_2 \; \wedge \; \toplike{A_2} & \lam x \andcoerce{A_2}_{C} \\
+%        \text{otherwise} & {C} 
+%  \end{cases}
+%  \]
+%
+%  \begin{center}
+%    \framebox{$\andcoerce{A} = T$}
+%  \end{center}
+%
+%  \[
+%  \andcoerce{A} = 
+%  \begin{cases} 
+%        A = \top & () \\
+%        A = A_1 \to A_2 & \lam x \andcoerce{A_2} \\
+%        A = A_1 \inter A_2 & \pair {\andcoerce{A_1}} {\andcoerce{A_2}} \\
+%        A = \fordis \alpha B A & \blam \alpha {\andcoerce{A}}
+%  \end{cases}
+%  \]
+%  \caption{Coercion generation considering Top-like types.}
+%  \label{fig:andcoercion}
+%\end{figure}
+
+
+
+%\paragraph{Atomic Types.} The new system introduces atomic types. Essentially a type
+%is atomic if it is any type, which is not an intersection type.
+%The notion of atomic
+%type will be helpful
+
+\paragraph{Well-formedness.}
+We require that the two types of an intersection must be disjoint in their
+context, and that the disjointness constraint in a universal type is well-formed.
+Under the new rules, intersection types such as $\tyint \inter \tyint$ are no
+longer well-formed because the two types are not disjoint.
+
+\paragraph{Disjoint quantification.} A disjoint quantification is introduced by
+the big lambda $\blamdis \alpha A e$ and eliminated by the usual type
+application $\tapp e A$. The constraint is added to the context with this rule.
+During a type application, the type system makes sure that the type argument
+satisfies the disjointness constraint.
+
+\paragraph{Metatheory.}
+
+Since in this section we only restrict the type system in the previous section,
+it is easy to see that type preservation and type-safety still holds.
+Additionally, we can show that typing always produces a well-formed type by
+proving the following results.
+
+\begin{restatable}[Instantiation]{lemma}{instantiation}
+  \label{lemma:instantiation}
+
+  If $\jwf {\Gamma, \alpha \disjoint B} C$, $\jwf \Gamma A$, $\jdis \Gamma A B$
+  then $\jwf \Gamma {\subst A \alpha C}$.
+\end{restatable}
+
+\begin{restatable}[Well-formed typing]{lemma}{wellformedtyping}
+  \label{lemma:wellformed-typing}
+
+  If $\jtype \Gamma e A$, then $\jwf \Gamma A$.
+\end{restatable}
+
+\begin{proof}
+  By induction on the derivation that leads to $\jtype \Gamma e A$ and applying
+  Lemma~\ref{lemma:instantiation} in the case of \reflabel{\labelttapp}.
+\end{proof}
+
+With our new definition of well-formed types, this result is nontrivial.
+In general, disjointness judgements are not invariant with respect to
+free-variable substitution. In other words, a careless substitution can violate
+the disjoint constraint in the context. For example, in the context $\alpha
+\disjoint \tyint$, $\alpha$ and $\tyint$ are disjoint:
+\[ \jdis {\alpha \disjoint \tyint} \alpha \tyint \]
+But after the substitution of $\tyint$ for $\alpha$ on the two types, the sentence
+\[ \jdis {\alpha \disjoint \tyint} \tyint \tyint \]
+is longer true since $\tyint$ is clearly not disjoint with itself.
 
 \subsection{Coherence of the Elaboration}
 Combining the previous results, we are able to show the central theorem:
