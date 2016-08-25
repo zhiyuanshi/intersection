@@ -1,34 +1,12 @@
-\section{Algorithmic Disjointness} \label{sec:alg-dis}
+\section{Disjointness} \label{sec:alg-dis}
 
-Section~\ref{sec:disjoint} presented a type system with disjoint
+Section~\ref{sec:fi} presented a type system with disjoint
 intersection types and disjoint quantification that is both type-safe
-and coherent. Unfortunatelly the type system is not algorithmic
-because the specification of disjointness does not lend itself to an
-implementation directly. This is a problem, because we need an
-algorithm for checking whether two types are disjoint or not in order
-to implement the type-system.
+and coherent. 
 
-\begin{comment}
-Now that we have obtained a specification for disjointness, but the definition
-involves an existence problem. How can we implement it? One possibility is
-bidirectional subtyping, that is, we say two types, $A$ and $B$, are disjoint if
-neither $A \subtype B$ nor $B \subtype A$. However, this implementation is
-wrong. For example, $\tyint \inter \tystring$ and $\tystring \inter \tychar$ are
-not disjoint by specification since $\tystring$ is their common supertype. Yet
-by the implementation they are, since neither of them is a subtype of
-the other. \bruno{You need a concrete code example to make this point.}
-Hence the algorithmic rules are more nuanced. For now, it is enough to treat the
-disjoint judgement $\jdis \Gamma A B$ as oracle and we will come back to
-this topic in the next section.
-\end{comment}
-
-This section presents the set of rules for determining whether two
-types are disjoint. The set of rules is algorithmic and an
-implementation is easily derived from them. Therefore we solve the
-problem of finding an algorithm to compute disjointness.  The derived
-set of rules for disjointness is proved to be sound and complete with
-respect to the definition of disjointness in
-Section~\ref{sec:disjoint}.
+This section presents the set of rules for determining whether two types are disjoint. 
+The set of rules is algorithmic and an implementation is easily derived from them. 
+Therefore we solve the problem of finding an algorithm to compute disjointness.  
 
 \begin{comment}
 \subsection{Derivation of the Algorithmic Rules}
@@ -118,89 +96,61 @@ $\commonsuper$:
   drop the formulae.}
 \end{comment}
 
+\subsection{Remarks on Top}
+
+TODO should this go in the overview?
+
+\subsection{Dropping the specification}
+
+TODO should this go in the overview?
+
 \subsection{Algorithmic Rules}
 
 \begin{figure}[h]
   \begin{mathpar}
     \formdis \\
-    \ruledisfun \and \ruledisforall \and
-    \ruledisinterl \and \ruledisinterr \and \ruledisforall \and \ruledisatomic
+    \ruledistop \and \ruledistopsym \and 
+    \ruledisvar \and \ruledissym \and \ruledisforallext \and 
+    \ruledisfun \and \ruledisinterl \and \ruledisinterr \and 
+    \ruledisatomic
   \end{mathpar}
 
   \begin{mathpar}
     \formax \\
-    \ruleaxintfun \and \ruleaxintforall \and \ruleaxfunforall \and \ruleaxsym
+    \ruleaxintfun \and \ruleaxintforalldis \and \ruleaxfunforalldis \and \ruleaxsym
   \end{mathpar}
 
   \caption{Algorithmic Disjointness.}
   \label{fig:disjointness}
 \end{figure}
 
-\begin{figure}[h]
-  \begin{mathpar}
-    \formdis \\
-    \ruledistop \and \ruledistopsym \and 
-    \ruledisvar \and \ruledissym \and
-    \ruledisforalldis 
-  \end{mathpar}
-
-  \begin{mathpar}
-    \formax \\
-    \ruleaxintforalldis \and \ruleaxfunforalldis 
-  \end{mathpar}
-
-  \caption{Added/Changed rules for Extended system.}
-  \label{fig:disjointness-ext}
-\end{figure}
-
-\begin{figure}[h]
-  \begin{mathpar}
-    \formdis \\ \ruledisforallext 
-  \end{mathpar}
-
-  \caption{Changed rule for Extended system with improved ForAll rule.}
-  \label{fig:disjointness-ext2}
-\end{figure}
-
 The rules for the disjointness judgement are shown in
 Figure~\ref{fig:disjointness}, which consists of two judgements.
 
 \paragraph{Main judgement.} The judgement $\jdisimpl \Gamma A B$ says
-two types $A$ and $B$ are disjoint in a context
-$\Gamma$.
+two types $A$ and $B$ are disjoint in a context $\Gamma$.
 
-\reflabel{\labeldisvar} is the base rule and
-\reflabel{\labeldissym} is its twin rule. Both rules state that a
-type variable is disjoint to some type $A$, if $\Gamma$ contains a
-corresponding disjointness constraint. The \reflabel{\labeldissym}
-rule is needed because disjointness is a symmetric relation.
+The top five rules are novel in relation to the algorithm described in \oldname.
+\reflabel{\labeldistop} and \reflabel{\labeldistopsym} say that any type is disjoint to 
+$\top$.
+\reflabel{\labeldisvar} is the base rule and \reflabel{\labeldissym} is its twin rule. 
+Both rules state that a type variable is disjoint to some type $A$, if $\Gamma$ contains any
+subtype of the corresponding disjointness constraint. 
+This rule is a specialization of the more general lemma:
 
-The rules dealing with intersection types (\reflabel{\labeldisinterl}
-and \reflabel{\labeldisinterr}) are quite intuitive. The intuition is
-that if two types $A$ and $B$ are disjoint to some type $C$, then
-their intersection ($A\&B$) is also clearly disjoint to $C$.  The
-rules capture this intuition by inductively distributing the relation
-itself over the intersection constructor ($\inter$). The rule
-for disjoint quantification (\reflabel{\labeldisforall}) is also
-rather intuitive. It adds the constraint into $\Gamma$ and checks for
-disjointness in the bodies.
-
-The rule for functions (\reflabel{\labeldisfun}) is more interesting. It says that two function
-types are disjoint if and only if their return types are disjoint (regardless of
-their parameter types!). At first this rule may look surprising
-because the parameter types play no role in the definition of
-disjointness. To see the reason for this consider the two function types:
-\[ \tyint \to \tystring \qquad \tybool \to \tystring \]
-Even though their parameter types are disjoint, we are still able to think of a
-type which is a supertype for both of them. For example, $ \tyint \inter \tybool
-\to \tystring $. Therefore, by definition, the two function types with
-the same return type are not
-disjoint. Essentially, due to the contravariance of function types,
-functions of the form $A \to C$ and $B \to C$ always have a common
-supertype (for example $A \& B \to C$).
-The lesson from this example is that the parameter types of two
-function types do not have any influence in determining whether those two function
-types are disjoint or not: only the return types matter.
+\[ \inferrule {\jwf \Gamma {A \disjoint B} \\ B \subtype C }
+              {\jwf \Gamma {A \disjoint C}} \]
+The lemma states that if a type $A$ is disjoint to $B$ under $\Gamma$, then it is also disjoint
+to any supertype of $B$. % TODO show example here?
+The rule for disjoint quantification \reflabel{\labeldisforall} is the last novel rule. 
+It adds a constraint composed of both constraints into $\Gamma$ and checks for disjointness in 
+the bodies under that environment. % TODO another example?
+The remaining rules are identical to the original rules, and we will only briefly explain them.
+The rule for functions (\reflabel{\labeldisfun}) says that two function
+types are disjoint if and only if their return types are disjoint. 
+Finally the rules dealing with intersection types (\reflabel{\labeldisinterl}
+and \reflabel{\labeldisinterr}) say that an intersection is disjoint to some type $B$, whenever
+both of their components are also disjoint to $B$.
 
 \begin{comment}
 The rule for disjoint quantification (\reflabel{\labeldisforall}) . Consider the following two types:

@@ -1,57 +1,57 @@
 \newcommand{\formdis}{\framebox{$ \jdisimpl \Gamma A B $}}
 
-\newcommand{\makelabeldis}[1]{Dis\_#1}
+\newcommand{\makelabeldis}[1]{$\disjoint$$#1$}
 
-\newcommand{\labeldistop}{\makelabeldis Top}
+\newcommand{\labeldistop}{\makelabeldis \top}
 \newcommand{\ruledistop}{
   \inferrule* [right=\labeldistop]
     {}
     {\jdisimpl \Gamma \top A}
 }
 
-\newcommand{\labeldistopsym}{\makelabeldis TopSym}
+\newcommand{\labeldistopsym}{\makelabeldis {\top Sym}}
 \newcommand{\ruledistopsym}{
   \inferrule* [right=\labeldistopsym]
     {}
     {\jdisimpl \Gamma A \top}
 }
 
-\newcommand{\labeldisvar}{\makelabeldis Var}
+\newcommand{\labeldisvar}{\makelabeldis \alpha}
 \newcommand{\ruledisvar}{
   \inferrule* [right=\labeldisvar]
     {\alpha \disjoint A \in \Gamma \\ A \subtype B}
     {\jdisimpl \Gamma \alpha B}
 }
 
-\newcommand{\labeldissym}{\makelabeldis VarSym}
+\newcommand{\labeldissym}{\makelabeldis {\alpha Sym}}
 \newcommand{\ruledissym}{
   \inferrule* [right=\labeldissym]
     {\alpha \disjoint A \in \Gamma \\ A \subtype B}
     {\jdisimpl \Gamma B \alpha}
 }
 
-\newcommand{\labeldisinterl}{\makelabeldis {Inter\_1}}
+\newcommand{\labeldisinterl}{\makelabeldis {\inter L}}
 \newcommand{\ruledisinterl}{
   \inferrule* [right=\labeldisinterl]
     {\jdisimpl \Gamma {A_1} B \\ \jdisimpl \Gamma {A_2} B}
     {\jdisimpl \Gamma {A_1 \inter A_2} {B}}
 }
 
-\newcommand{\labeldisinterr}{\makelabeldis {Inter\_2}}
+\newcommand{\labeldisinterr}{\makelabeldis {\inter R}}
 \newcommand{\ruledisinterr}{
   \inferrule* [right=\labeldisinterr]
     {\jdisimpl \Gamma A {B_1} \\ \jdisimpl \Gamma A {B_2}}
     {\jdisimpl \Gamma {A} {B_1 \inter B_2}}
 }
 
-\newcommand{\labeldisfun}{\makelabeldis Fun}
+\newcommand{\labeldisfun}{\makelabeldis \rightarrow}
 \newcommand{\ruledisfun}{
   \inferrule* [right=\labeldisfun]
     {\jdisimpl \Gamma {A_2} {B_2}}
     {\jdisimpl \Gamma {A_1 \to A_2} {B_1 \to B_2}}
 }
 
-\newcommand{\labeldisforall}{\makelabeldis Forall}
+\newcommand{\labeldisforall}{\makelabeldis \forall}
 \newcommand{\ruledisforall}{
   \inferrule* [right=\labeldisforall]
     {\jdisimpl {\Gamma, \alpha } {B} {C}}
@@ -70,7 +70,7 @@
     {\jdisimpl \Gamma {\fordis \alpha {A_1} {B}} {\fordis \alpha {A_2} {C}}}
 }
 
-\newcommand{\labeldisax}{\makelabeldis Axiom}
+\newcommand{\labeldisax}{\makelabeldis Ax}
 \newcommand{\ruledisatomic}{
   \inferrule* [right=\labeldisax]
     {A \disjointax B}
@@ -80,29 +80,29 @@
 
 \newcommand{\formax}{\framebox{$ A \disjointax B$}}
 
-\newcommand{\makelabelax}[1]{DisAx\_#1}
+\newcommand{\makelabelax}[1]{$\disjoint \text{Ax}#1$}
 
-\newcommand{\labelaxintforall}{\makelabelax Int\_Forall}
+\newcommand{\labelaxintforall}{\makelabelax {(\mathbb{Z} \forall)}}
 \newcommand{\ruleaxintforall}{
   \inferrule* [right=\labelaxintforall]
     {}
-    {\code{Int} \disjointax \for \alpha B}
+    {\tyint \disjointax \for \alpha B}
 }
 
 \newcommand{\ruleaxintforalldis}{
   \inferrule* [right=\labelaxintforall]
     {}
-    {\code{Int} \disjointax \fordis \alpha {B_1} {B_2}}
+    {\tyint \disjointax \fordis \alpha {B_1} {B_2}}
 }
 
-\newcommand{\labelaxintfun}{\makelabelax Int\_Fun}
+\newcommand{\labelaxintfun}{\makelabelax {(\mathbb{Z} \! \rightarrow)}}
 \newcommand{\ruleaxintfun}{
   \inferrule* [right=\labelaxintfun]
     {}
-    {\code{Int} \disjointax {A_1} \to {A_2}}
+    {\tyint \disjointax {A_1} \to {A_2}}
 }
 
-\newcommand{\labelaxfunforall}{\makelabelax Fun\_Forall}
+\newcommand{\labelaxfunforall}{\makelabelax {(\rightarrow \! \forall)}}
 \newcommand{\ruleaxfunforall}{
   \inferrule* [right=\labelaxfunforall]
     {}
