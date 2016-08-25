@@ -130,3 +130,11 @@
         { \lamty x {\im {A_1 \inter A_2}} {\andcoerce{A_3}_{{(
           {\app E {(\proj 2 x)}})}}}}}
 }
+
+\newcommand{\labelsubrec}{\makelabelsub Rec}
+\newcommand{\rulesubrec}{
+  \inferrule* [right=\labelsubrec]
+    {A \subtype B \yields E}
+    {\recordType l A \subtype \recordType l B \yields E}
+}
+

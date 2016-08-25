@@ -2,7 +2,7 @@
 \label{sec:fi}
 
 This section presents the syntax, subtyping, and typing of \name: 
-a calculus with intersection types, parametric polymorphism and a merge operator. 
+a calculus with intersection types, parametric polymorphism, records and a merge operator. 
 This calculus is an extension of \oldname, which in its turn is heavily based
 on Dunfield's calculus~\cite{dunfield2014elaborating}. 
 We will show that \name is type-safe and it preserves the coherent semantics of
@@ -35,6 +35,7 @@ The differences to \oldname are highlighted in gray.
         &      & \mid & A \inter B                       & \\
         &      & \mid & \highlight{$\alpha$}             & \\
         &      & \mid & \highlight{$\fordis \alpha A B$} & \\
+        &      & \mid & \highlight{$\recordType l A$}    & \\
 
         \\
         \text{Terms}
@@ -46,11 +47,13 @@ The differences to \oldname are highlighted in gray.
         &   & \mid & e_1 \mergeop e_2                  & \\
         &   & \mid & \highlight{$\blamdis \alpha A e$} & \\
         &   & \mid & \highlight{$\tapp e A$}           & \\
+        &   & \mid & \highlight{$\recordCon l e$}      & \\
+        &   & \mid & \highlight{$\recordProj e l$}     & \\
 
         \\
         \text{Contexts}
         & \Gamma & \Coloneqq & \cdot
-                   \mid \Gamma, \alpha \highlight{\disjoint $A$}
+                   \mid \Gamma, \highlight{$\alpha \disjoint A$}
                    \mid \Gamma, x \oftype A  & \\
       \end{array}
     \end{array}
@@ -65,10 +68,12 @@ Metavariables $A$, $B$ range over types.
 Types include all constructs in \oldname: a top type $\top$; 
 the type of integers $\tyint$;
 function types $A \to B$; and intersection types $A \inter B$.
-This calculus is extended with two standard constructs in System $F$: 
-type variables $\alpha$ and type abstraction $\for \alpha A$. 
-The latter includes an extra disjointness constraint tied to the type 
-variable $\alpha$.
+This calculus is extended with two standard constructs in System-$F$: 
+type variables $\alpha$ and type abstraction $\fordis \alpha A B$. 
+The latter lifts the System-$F$'s quantification into \emph{disjoint quantification}:
+it includes an extra disjointness constraint tied to a type variable $\alpha$.
+Finally, the syntax for the singleton record at type level consists of a label $l$ and
+an associated type $A$.
 
 \paragraph{Terms.} 
 Metavariables $e$ range over terms.  
@@ -76,14 +81,17 @@ Terms include all constructs in \oldname: a unit type $\unit$; an integer litera
 a variable $x$, abstraction of terms over variables of
 a given type $\lamty x A e$; application of terms $e_1$ to terms $e_2$, written
 $\app {e_1} {e_2}$; and the \emph{merge} of terms $e_1$ and $e_2 $ denoted as 
-$e1 \merge e2$, corresponding to intersections of types $A \inter B$.
+$e1 \mergeop e2$, corresponding to intersections of types $A \inter B$.
 This calculus is extended with two standard constructs in System $F$:
-abstraction of type variables over terms $\blam \alpha e$; and
+abstraction of type variables over terms $\blamdis \alpha A e$; and
 and application of terms to types $\tapp e A$. 
-The former includes an extra disjointness constraint tied to the type 
-variable $\alpha$.
+The former also includes an extra disjointness constraint tied to the type 
+variable $\alpha$, due to disjoint quantification.
 %If one regards $e_1$ and $e_2$ as objects, their merge will respond to
 %every method that one or both of them have.
+The syntax for the singleton record at term level consists of a label $l$ and
+an associated term $e$.
+Finally, the accessor for a label $l$ in term $e$ is denoted as $\recordProj e l$.
 
 \paragraph{Contexts.} Typing contexts $ \Gamma $ track bound type variables
 $\alpha$ with disjointness cosntraint $A$; and variables $x$ with their type $A$. 
@@ -142,12 +150,14 @@ standard ways and we are using them in discussions and examples. %TODO are we?
     \inferrule*{}{\jatomic \alpha}
 
     \inferrule*{}{\jatomic {\fordis \alpha B A}}
+
+    \inferrule*{}{\jatomic {\recordType l A}}
   \end{mathpar}
 
   \begin{mathpar}
     \formsub \\ \rulesubtop \and \rulesubint \and \rulesubvar \and \rulesubfun \and
     \rulesubinter \and  \rulesubinterlcoerce \and \rulesubinterrcoerce \and
-    \rulesubforallext 
+    \rulesubforallext \and \rulesubrec
   \end{mathpar}
 
   \caption{Subtyping rules of \name.}
@@ -191,8 +201,9 @@ says that if $A_1$ is both the subset of $A_2$ and the subset of $A_3$, then
 $A_1$ is also the subset of the intersection of $A_2$ and $A_3$.
 The ordinary hypothesis are necessary to ensure coherence, as explained in ....
 We will come back to this in the next section.
-Finally, in \reflabel{\labelsubforall} a universal quantifier ($\forall$) 
+In \reflabel{\labelsubforall} a universal quantifier ($\forall$) 
 is covariant in its body, and contravariant in its disjointness constraints.
+Finally, \reflabel{\labelsubrec} says records are covariant within their fields' types.
 As with the subtyping relation defined in ..., we can show that subtyping
 defined by $\subtype$ is also reflexive and transitive.
 
@@ -215,7 +226,7 @@ defined by $\subtype$ is also reflexive and transitive.
 \begin{figure}
   \begin{mathpar}
     \formwf \\ \rulewftop \and \rulewfint \and \rulewfvardis \and \rulewffun \and 
-    \rulewfforalldis \and \rulewfinterdis
+    \rulewfforalldis \and \rulewfinterdis \and \rulewfrec
   \end{mathpar}
 
 %  \begin{mathpar}
@@ -224,8 +235,8 @@ defined by $\subtype$ is also reflexive and transitive.
 %  \end{mathpar}
 
   \begin{mathpar}
-    \formbi \\ \brulettop \and \bruletint \and \bruletvar \and \bruletapp \and
-    \brulettappdis \and \bruletmergedis \and \bruletann 
+    \formbi \\ \brulettop \and \bruletint \and \bruletvar \and \bruletann \and 
+    \bruletapp \and \brulettappdis \and \bruletmergedis \and \bruletrec \and \bruletprojr 
   \end{mathpar}
 
   \begin{mathpar}
@@ -237,8 +248,7 @@ defined by $\subtype$ is also reflexive and transitive.
 \end{figure}
 
 
-The well-formedness rules are shown in the top part of
-Figure~\ref{fig:fi-type}. 
+The well-formedness rules are shown in the top part of Figure~\ref{fig:fi-type}. 
 In addition to the original rules, \reflabel{\labelwfforall} is not surprising. 
 Note how we ensure the well-formedness of the constraint. 
 %TODO couldn't we drop this constraint?
@@ -269,5 +279,9 @@ type variable introduced by the quantifier to be fresh.
 For programs with type variable shadowing, this requirement can be met 
 straighforwardly by variable renaming.
 %TODO add some discussion why
+Finally, $\reflabel{\labeltrec}$ and $\reflabel{\labeltprojr}$ deal with record types.
+The former infers a type for a record with label $l$ if it can infer a type for the
+inner expression; the latter says if one can infer a record type $\recordType l A$ 
+from an expression $e$, then it is safe to access the field $l$, and infering type $A$.
 
 

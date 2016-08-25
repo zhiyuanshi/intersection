@@ -129,3 +129,17 @@ $ \jcheck \Gamma e A \yields E\\e$ checks against given type $A$
   {\jcheck \Gamma {e} A \yields {E}}
   {\jinfer \Gamma {e : A} {A} \yields {E}}
 }
+
+\newcommand{\labeltrec}{\makelabelt Rec}
+\newcommand{\bruletrec}{
+\inferrule* [right=\labeltrec]
+  {\jinfer \Gamma e {A} \yields {E}}
+  {\jinfer \Gamma {\recordCon l e} {\recordType l A} \yields {E}}
+}
+
+\newcommand{\labeltprojr}{\makelabelt RecAcc}
+\newcommand{\bruletprojr}{
+\inferrule* [right=\labeltprojr]
+  {\jinfer \Gamma e {\recordType l A} \yields {E}}
+  {\jinfer \Gamma {\recordProj e l} {A} \yields {E}}
+}

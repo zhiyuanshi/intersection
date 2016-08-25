@@ -63,3 +63,10 @@
      \jdis \Gamma A B}
     {\jwf \Gamma {A \inter B}}
 }
+
+\newcommand{\labelwfrec}{\makelabelwf Rec}
+\newcommand{\rulewfrec}{
+  \inferrule* [right=\labelwfrec]
+    {\jwf \Gamma A}
+    {\jwf \Gamma {\recordType l A}}
+}
