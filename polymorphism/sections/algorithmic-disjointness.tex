@@ -96,13 +96,12 @@ $\commonsuper$:
   drop the formulae.}
 \end{comment}
 
-\subsection{Remarks on Top}
+\subsection{Disjointness specification}
 
 TODO should this go in the overview?
 
-\subsection{Dropping the specification}
-
-TODO should this go in the overview?
+A fundamental difference in comparison to the \oldname system, is the changing and 
+subsequent dropping of the specification.
 
 \subsection{Algorithmic Rules}
 
@@ -126,10 +125,9 @@ TODO should this go in the overview?
 
 The rules for the disjointness judgement are shown in
 Figure~\ref{fig:disjointness}, which consists of two judgements.
-
+ 
 \paragraph{Main judgement.} The judgement $\jdisimpl \Gamma A B$ says
 two types $A$ and $B$ are disjoint in a context $\Gamma$.
-
 The top five rules are novel in relation to the algorithm described in \oldname.
 \reflabel{\labeldistop} and \reflabel{\labeldistopsym} say that any type is disjoint to 
 $\top$.
@@ -143,78 +141,31 @@ This rule is a specialization of the more general lemma:
 The lemma states that if a type $A$ is disjoint to $B$ under $\Gamma$, then it is also disjoint
 to any supertype of $B$. % TODO show example here?
 The rule for disjoint quantification \reflabel{\labeldisforall} is the last novel rule. 
+ % TODO another example?
+The rule for disjoint quantification (\reflabel{\labeldisforall}) is the last novel rule. 
 It adds a constraint composed of both constraints into $\Gamma$ and checks for disjointness in 
-the bodies under that environment. % TODO another example?
-The remaining rules are identical to the original rules, and we will only briefly explain them.
-The rule for functions (\reflabel{\labeldisfun}) says that two function
-types are disjoint if and only if their return types are disjoint. 
-Finally the rules dealing with intersection types (\reflabel{\labeldisinterl}
-and \reflabel{\labeldisinterr}) say that an intersection is disjoint to some type $B$, whenever
-both of their components are also disjoint to $B$.
-
-\begin{comment}
-The rule for disjoint quantification (\reflabel{\labeldisforall}) . Consider the following two types:
+the bodies under that environment.
+To illustrate this rule, consider the following two types:
 \[ (\forall (\alpha * \tyint).~\tyint \& \alpha) \qquad (\forall (\alpha * \tychar). ~\tychar \& \alpha) \]
 The question is under which conditions are those two types disjoint.
 In the first type $\alpha$ cannot be instantiated with $\tyint$ and in
 the second case $\alpha$ cannot be instantiated with $\tychar$.
-Therefore we can see that for the two bodies to be considered
-disjoint, $\alpha$ cannot be instantiated with either $\tyint$ or
-$\tychar$. The rule for disjoint quantification captures this fact by
-requiring the bodies of disjoint quantification to be checked for
-disjointness under both constraints.
-\end{comment}
-
+Therefore for the two bodies to be considered disjoint, $\alpha$ cannot be instantiated with either $\tyint$ 
+or $\tychar$. 
+The rule for disjoint quantification captures this fact by requiring the bodies of disjoint quantification 
+to be checked for disjointness under both constraints.
+The remaining rules are identical to the original rules, and we will only briefly explain them.
+The rule for functions \reflabel{\labeldisfun} says that two function
+types are disjoint if and only if their return types are disjoint. 
+The rules dealing with intersection types (\reflabel{\labeldisinterl}
+and \reflabel{\labeldisinterr}) say that an intersection is disjoint to some type $B$, whenever
+both of their components are also disjoint to $B$.
 Finally, the rule \reflabel{\labeldisax} says two types are considered disjoint if they are
 judged to be disjoint by the axiom rules, which are explained below.
 
-\paragraph{Axioms.} Up till now, the rules of $ \jdisimpl \Gamma A B $ have only
-taken care of two types with the same language constructs. But how can be the fact that
-$\tyint$ and $\tyint \to \tyint$ are disjoint be decided? That is exactly the
-place where the judgement $ A \disjointax B $ comes in handy. It provides the
-axioms for disjointness. What is captured by the set of rules is that $ A
-\disjointax B $ holds for all two types of different constructs unless any of
-them is an intersection type. That is because for example, $ \tyint \inter
-(\tychar \to \tychar) $ and $ \tychar \to \tychar $ use different constructs
-and yet are not disjoint. There are two points worth noting. One is
-that the only type that is disjoint with itself is $\bot$: the type
-which has no values. The other point is that all rules need a dual
-form to ensure symmetry. The rule \reflabel{\labelaxsym} takes care of that.
+\paragraph{Axioms.} Axiom rules take care of two types with different language constructs.
+Just as in ..., these rules capture the set of rules is that $A \disjointax B$ holds for all 
+two types of different constructs unless any of them is an intersection type.
+Note that disjointness with the $\top$ type is already captured by {\reflabel{\labeldistop}}
+and {\reflabel{\labeldistopsym}}.
 
-\subsection{Metatheory}
-
-The algorithmic rules for disjointness are sound and complete.
-
-% \begin{lemma}{Symmetry of disjointness} \label{lemma:symmetry-of-disjointness}
-%   If $\jdis \Gamma A B$, then $\jdis \Gamma B A$.
-% \end{lemma}
-%
-% \begin{theorem} \label{lemma:disjoint-intersect}
-%   If $\jdis \Gamma A C$ and $\jdis \Gamma B C$,
-%   then $\jdis \Gamma {A \inter B} {C}$.
-% \end{theorem}
-%
-% \begin{lemma} \label{lemma:common-supertype}
-%   If $A_1 \to A_2 \subtype D$ and $B_1 \to B_2 \subtype D$,
-%   then there exists a $C$ such that $A_2 \subtype C$ and $B_2 \subtype C$.
-% \end{lemma}
-
-\begin{restatable}[Soundness of algorithmic disjointness]{theorem}{algodissoundness}
-  \label{theorem:soundness}
-
-  For any two types $A$ and $B$, $\jdisimpl \Gamma A B$ implies $\jdis \Gamma A B$.
-\end{restatable}
-
-\begin{proof}
-  By induction on the derivation of $\jdisimpl \Gamma A B$.
-\end{proof}
-
-\begin{restatable}[Completeness of algorithmic disjointness]{theorem}{algodiscompleteness}
-  \label{theorem:completeness}
-
-  For any two types $A$, $B$, $\jdis \Gamma A B$ implies $\jdisimpl \Gamma A B$.
-\end{restatable}
-
-\begin{proof}
-  By a case analysis on the shape of $A$ and $B$.
-\end{proof}

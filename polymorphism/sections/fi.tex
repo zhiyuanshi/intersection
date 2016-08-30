@@ -236,7 +236,8 @@ defined by $\subtype$ is also reflexive and transitive.
 
   \begin{mathpar}
     \formbi \\ \brulettop \and \bruletint \and \bruletvar \and \bruletann \and 
-    \bruletapp \and \brulettappdis \and \bruletmergedis \and \bruletrec \and \bruletprojr 
+    \bruletapp \and \brulettappdis \and \bruletmergedis \and \bruletrec \and 
+    \bruletprojr 
   \end{mathpar}
 
   \begin{mathpar}
@@ -247,10 +248,23 @@ defined by $\subtype$ is also reflexive and transitive.
   \label{fig:fi-type}
 \end{figure}
 
-
+\paragraph{Well-formedness}
 The well-formedness rules are shown in the top part of Figure~\ref{fig:fi-type}. 
-In addition to the original rules, \reflabel{\labelwfforall} is not surprising. 
-Note how we ensure the well-formedness of the constraint. 
+In addition to the original rules, we introduced both \reflabel{\labelwfvar} and
+\reflabel{\labelwfforall}. 
+Their definition is quite straightforward, but note how we ensure the well-formedness 
+of the constraint in the latter. 
+
+\paragraph{Disjoint quantification.} A disjoint quantification is introduced by
+the big lambda $\blamdis \alpha A e$ and eliminated by the usual type application 
+$\tapp e A$. 
+The constraint is added to the context with this rule. 
+During a type application, the type system makes sure that the type argument
+satisfies the disjointness constraint.
+We will explain next the rules that compose the type-system.
+
+
+\paragraph{Typing rules}
 %TODO couldn't we drop this constraint?
 The typing rules are shown in the bottom part of the figure. 
 Again, the reader is advised to ignore the
@@ -270,8 +284,7 @@ type application \reflabel{\labelttapp}, and the infer rule for type abstraction
 \reflabel{\labeltblam}.
 The former is no different from the standard rule for type application while
 the latter has an extra hypothesis ensuring that the type to be instantiated is
-compatible (i.e. disjoint) with the constraint associated with the abstracted 
-variable.
+compatible (i.e. disjoint) with the constraint associated with the abstracted variable.
 This is extremely important, as it will retain the desired coherence of our 
 type-system.
 For the ease of discussion, also in \reflabel{\labeltblam}, we require the 

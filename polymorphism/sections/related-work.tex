@@ -233,37 +233,39 @@ extensibility.
 % Intersection types have been shown to be useful in designing languages that
 % support modularity.~\cite{nystrom2006j}
 
-% \paragraph{Extensible records.}
+\paragraph{Extensible records.}
 
-%\george{Record field deletion is also possible.}
+\george{Record field deletion is also possible.}
 
-% http://elm-lang.org/learn/Records.elm
+%http://elm-lang.org/learn/Records.elm
 
-% Encoding records using intersection types appeared in
-% Reynolds~\cite{reynolds1997design} and Castagna et
-% al.~\cite{castagna1995calculus}. Although Dunfield also discussed this idea in
-% his paper \cite{dunfield2014elaborating}, he only provided an implementation but
-% not a formalization. Very similar to our treatment of elaborating records is
-% Cardelli's work~\cite{cardelli1992extensible} on translating a calculus, named
-% $ F_{\subtype \rho}$, with extensible records to a simpler calculus that without
-% records primitives (in which case is $ F_{\subtype} $). But he did not consider
-% encoding multi-field records as intersections; hence his translation is more
-% heavyweight. Crary~\cite{crary1998simple} used intersection types and
-% existential types to address the problem that arises when interpreting method
-% dispatch as self-application. But in his paper, intersection types are not used
-% to encode multi-field records.
+Encoding records using intersection types appeared in
+Reynolds~\cite{reynolds1997design} and Castagna et al.~\cite{castagna1995calculus}. 
+Although Dunfield also discussed this idea in his paper \cite{dunfield2014elaborating}, 
+he only provided an implementation but not a formalization. 
+Very similar to our treatment of elaborating records is
+Cardelli's work~\cite{cardelli1992extensible} on translating a calculus, named
+$ F_{\subtype \rho}$, with extensible records to a simpler calculus that without
+records primitives (in which case is $ F_{\subtype} $). 
+But he did not consider encoding multi-field records as intersections; hence his translation is more
+heavyweight. 
+Crary~\cite{crary1998simple} used intersection types and
+existential types to address the problem that arises when interpreting method
+dispatch as self-application. 
+But in his paper, intersection types are not used to encode multi-field records.
 
-% Wand~\cite{wand1987complete} started the work on extensible records and proposed
-% row types~\cite{wand1989type} for records. Cardelli and
-% Mitchell~\cite{cardelli1990operations} defined three primitive operations on
-% records that are similar to ours: \emph{selection}, \emph{restriction}, and
-% \emph{extension}. The merge operator in \namedis plays the same role as extension.
-% Following Cardelli and Mitchell's approach,
-% of restriction and extension. Both Leijen's systems~\cite{leijen2004first,leijen2005extensible}
-% and ours allow records that contain
-% duplicate labels. Leijen's system is more sophisticated. For example, it supports
-% passing record labels as arguments to functions. He also showed an encoding of
-% intersection types using first-class labels.
+Wand~\cite{wand1987complete} started the work on extensible records and proposed
+row types~\cite{wand1989type} for records. 
+Cardelli and Mitchell~\cite{cardelli1990operations} defined three primitive operations on
+records that are similar to ours: \emph{selection}, \emph{restriction}, and
+\emph{extension}. 
+The merge operator in \name plays the same role as extension.
+Following Cardelli and Mitchell's approach, of restriction and extension. 
+Both Leijen's systems~\cite{leijen2004first,leijen2005extensible} and ours allow records that contain
+duplicate labels. 
+Leijen's system is more sophisticated. 
+For example, it supports passing record labels as arguments to functions. 
+He also showed an encoding of intersection types using first-class labels.
 
 % Chlipala's
 % \texttt{Ur}~\cite{chlipala2010ur} explains record as type level
@@ -292,3 +294,96 @@ extensibility.
 % Dunfield~\cite{dunfield2014elaborating}.
 %
 % R{\'e}my~\cite{remy1989type}
+
+\subsection{Extensible records}
+\joao{See how to combine this seciton with the previous paragraph}
+Our system can be used to encode records, similarly to way as discussed in 
+\cite{dunfield2014elaborating}. 
+However, describing and implementing records within programming languages is certainly not novel 
+and has been extensively studied in the past.
+Most of the systems are entirely focused on concrete aspects of records 
+(i.e. expressiveness, compilation, etc), while ours piggybacks on the more general notion of  
+intersection types.
+In this section we aim at comparing our approach with other systems in terms of expressiveness.
+
+Systems with records usually rely on 3 basic operations: selection, restriction and 
+extension/concatenation. 
+As noted in~\cite{leijen2004first}, systems typically can be categorized into two distinct groups:
+the strict and the free.
+The former does not allow field overriding when extending a record (i.e. one can only extend a 
+record with a field that is not present in it); while the latter does account for field overriding.
+Our system can be seen as hybrid of these two kinds of systems.
+This will become clear when showing how to encode extension in our system.
+
+\paragraph{Selection}
+
+TODO
+
+\paragraph{Restriction}
+
+\begin{align*}
+&\text{remove} :: \fordis \alpha \top {\fordis \beta \top {\fordis r {\recordType l \alpha} 
+{({\recordType l \alpha \inter r) \rightarrow r}}}} \\ 
+&\text{remove} \, = \blamdis \alpha \top {\blamdis r {\recordType l \alpha} {\lam x {x}}} 
+\end{align*}
+
+\paragraph{Extension}
+
+Extension, in a strict system like ..., (polymorphic) extension is achieved in the following manner:
+
+TODO
+
+In ... (SPJ \& MJ) -- a strict system -- an example of a function that makes use of record types 
+is the following:
+\begin{align*}
+&\text{average}_1 :: (r \backslash y, r \backslash x) \Rightarrow \{r | x :: \tyint, y :: \tyint\} \rightarrow \tyint \\
+&\text{average}_1 \, r = (r.x + r.y) / 2
+\end{align*}
+
+The type signature says that for any record with type $r$, that lacks both $x$ $y$, can be accepted
+as parameter extended with $x$ $y$, returning an integer.
+Note how the bounded polymorphism is essential to ensure that $r$ does not contain $x$ nor $y$.
+On the other hand, in a system with free extension as in~\cite{leijen2005extensible}, 
+the more general program would be accepted:
+
+\begin{align*}
+&\text{average}_2 :: \forall x \; y, \{ x :: \tyint, y :: \tyint | r \} \rightarrow \tyint \\
+&\text{average}_2 \, r = (r.x + r.y) / 2
+\end{align*}
+
+In this case, if $r$ contains either field $x$ or field $y$, they would be shadowed by the labels present in the
+type signature.
+In other words, if a record with multiple $x$ fields, the most recent (i.e. left-most) would be used in 
+any function which accesses $x$.
+
+\joao{add example of a system using subtyping}
+
+In \name, such function could be re-written as
+\footnote{We do not support exactly this function definition style; 
+however the type signature and expression (module infix operators) are exactly as one would write them
+in \name}:
+
+\begin{align*}
+&\text{average}_3 :: \fordis y \top {\fordis r {\recordType y \tyint} {\recordType y \tyint \inter r \rightarrow \tyint}} \\
+&\text{average}_3 = \fordis y \top {\blamdis r {\recordType y \tyint} {(r.x + r.y) / 2}}
+\end{align*}
+
+Thus more types are accepted this function than in the first system, but less than the second. 
+Since our encoding of records piggybacks on the notion of disjointness, another major difference between
+\name and the two other mentioned systems, is the ability to combine records with arbitrary types.
+Our system does not account for well-formedness of record types as the other two systems do,
+
+It is also worth noting that systems using subtyping may suffer from the so-called \emph{update} problem.
+\joao{show example}
+
+\name does not suffer from this problem.
+We may illustrate by defining a suitable update function, similar to the one in~\cite{leijen2005extensible}:
+
+\begin{align*}
+&\text{update} :: \fordis \alpha \top {\fordis r {\recordType l \alpha} 
+{{\recordType l \alpha \inter r \rightarrow \recordType l \beta \inter r}}} \\ 
+&\text{update} \, = \blamdis \alpha \top {\blamdis r {\recordType l \alpha} {\lam x {x}}} 
+\end{align*}
+
+\joao{talk about concatenation}
+

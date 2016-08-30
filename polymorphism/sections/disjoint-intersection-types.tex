@@ -80,12 +80,6 @@ contexts $\Gamma$ to target language contexts $G$.
 
 \subsection{Top-like types and their coercions}
 
-TODO
-
-\paragraph{Coercions}
-
-TODO
-
 \begin{figure}[t]
   \begin{mathpar}
     \formtoplike \\ %\framebox{$\jatomic A$} \\
@@ -121,9 +115,21 @@ TODO
         A = \fordis \alpha B A & \blam \alpha {\andcoerce{A}}
   \end{cases}
   \]
-  \caption{Top-like types and respective coercions.}
+  \caption{Top-like types and their coercions.}
   \label{fig:andcoercion}
 \end{figure}
+
+Our definition of top-like types is more liberal (i.e. more types are accepted as top-like) 
+in comparsion with \oldname, due to our modified version of disjointness.
+The new rules that compose this unary relation, denoted as $\toplike{ . }$,are presented at the top of 
+Figure~\ref{fig:disjointness}. 
+
+
+
+\paragraph{Coercions}
+
+TODO
+
 
 \subsection{Coercive Subtyping and Coherence}
 
@@ -292,32 +298,32 @@ This result is captured more formally by the following lemma:
 % types. Show an offending example for each?}
 
 
-\subsection{Disjointness} Throughout the paper we already presented an intuitive
-definition for disjoiness. Here such definition is made a bit more precise, and
-well-suited to \namedis.
-
-\begin{definition}[Disjoint types]
-
-  Given a context $\Gamma$, two types $A$ and $B$ are said to be disjoint
-  (written $\jdis \Gamma A B$) if they do not share a common supertype. That is,
-  there does not exist a type $C$ such that $A \subtype C$ and that $B \subtype
-  C$. Note that we assume that all free type variables in $A$,
-    $B$ and $C$ are bound in $\Gamma$.
-
-  \[\jdis \Gamma A B \equiv \not \exists C.~A \subtype C \wedge B \subtype C\]
-
-\end{definition}
-
-To see this definition in action, $\tyint$ and $\tychar$ are disjoint,
-because there is
-no type that is a supertype of the both. On the other hand, $\tyint$ is not
-disjoint with itself, because $\tyint \subtype \tyint$. This implies that
-disjointness is not reflexive as subtyping is. Two types with different shapes
-are always disjoint, unless one of them is an intersection type. For example, a function
-type and a universally quantified type must be disjoint. But a function type and an intersection
-type may not be. Consider:
-\[ \tyint \to \tyint \quad \text{and} \quad (\tyint \to \tyint) \inter (\tystring \to \tystring) \]
-Those two types are not disjoint since $\tyint \to \tyint$ is their common supertype.
+%\subsection{Disjointness} Throughout the paper we already presented an intuitive
+%definition for disjoiness. Here such definition is made a bit more precise, and
+%well-suited to \namedis.
+%
+%\begin{definition}[Disjoint types]
+%
+%  Given a context $\Gamma$, two types $A$ and $B$ are said to be disjoint
+%  (written $\jdis \Gamma A B$) if they do not share a common supertype. That is,
+%  there does not exist a type $C$ such that $A \subtype C$ and that $B \subtype
+%  C$. Note that we assume that all free type variables in $A$,
+%    $B$ and $C$ are bound in $\Gamma$.
+%
+%  \[\jdis \Gamma A B \equiv \not \exists C.~A \subtype C \wedge B \subtype C\]
+%
+%\end{definition}
+%
+%To see this definition in action, $\tyint$ and $\tychar$ are disjoint,
+%because there is
+%no type that is a supertype of the both. On the other hand, $\tyint$ is not
+%disjoint with itself, because $\tyint \subtype \tyint$. This implies that
+%disjointness is not reflexive as subtyping is. Two types with different shapes
+%are always disjoint, unless one of them is an intersection type. For example, a function
+%type and a universally quantified type must be disjoint. But a function type and an intersection
+%type may not be. Consider:
+%\[ \tyint \to \tyint \quad \text{and} \quad (\tyint \to \tyint) \inter (\tystring \to \tystring) \]
+%Those two types are not disjoint since $\tyint \to \tyint$ is their common supertype.
 
 %\subsection{Syntax}
 %
@@ -450,12 +456,6 @@ by the following two theorems.
   Since we define the dynamic semantics of \name in terms of the composition of
   the type-directed translation and the dynamic semantics of System $F$, type safety follows immediately.
 \end{proof}
-
-Although the system shown in the Section~\ref{sec:fi} is type-safe, it is not
-coherent. This section shows how to modify \name so that it guarantees coherence
-as well as type soundness. The result is a calculus named \namedis. The keys
-aspects are the notion of disjoint intersections, and disjoint quantification
-for polymorphic types.
 
 %From the theoretical point-of-view, the end goal of this section is to show that the resulting system has
 %a coherent (or unique) elaboration semantics:
@@ -635,18 +635,6 @@ for polymorphic types.
 %is atomic if it is any type, which is not an intersection type.
 %The notion of atomic
 %type will be helpful
-
-\paragraph{Well-formedness.}
-We require that the two types of an intersection must be disjoint in their
-context, and that the disjointness constraint in a universal type is well-formed.
-Under the new rules, intersection types such as $\tyint \inter \tyint$ are no
-longer well-formed because the two types are not disjoint.
-
-\paragraph{Disjoint quantification.} A disjoint quantification is introduced by
-the big lambda $\blamdis \alpha A e$ and eliminated by the usual type
-application $\tapp e A$. The constraint is added to the context with this rule.
-During a type application, the type system makes sure that the type argument
-satisfies the disjointness constraint.
 
 \paragraph{Metatheory.}
 
