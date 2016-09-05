@@ -302,39 +302,101 @@ Our system can be used to encode records, similarly to way as discussed in
 However, describing and implementing records within programming languages is certainly not novel 
 and has been extensively studied in the past.
 Most of the systems are entirely focused on concrete aspects of records 
-(i.e. expressiveness, compilation, etc), while ours piggybacks on the more general notion of  
+(i.e. expressiveness, compilation, etc), while ours will specialize the more general notion of  
 intersection types.
-In this section we aim at comparing our approach with other systems in terms of expressiveness.
+In this section we aim at comparing our approach with such systems. 
 
 Systems with records usually rely on 3 basic operations: selection, restriction and 
 extension/concatenation. 
-As noted in~\cite{leijen2004first}, systems typically can be categorized into two distinct groups:
-the strict and the free.
-The former does not allow field overriding when extending a record (i.e. one can only extend a 
-record with a field that is not present in it); while the latter does account for field overriding.
-Our system can be seen as hybrid of these two kinds of systems.
-This will become clear when showing how to encode extension in our system.
+We will first introduce these basic operations in the context of \name.
 
 \paragraph{Selection}
 
-TODO
+The select operator is directly embedded in our language. 
+It follows the usual syntax of $e.l$, where $e$ is an expression of type $\recordType l \alpha$ and 
+$l$ is a label.
+A polymorphic function which extracts any record that include the label $l$ of type
+$\alpha$ could be written as:
+
+\begin{align*}
+&\text{select} :: \fordis \alpha \top {\recordType l \alpha \rightarrow \alpha} \\
+&\text{select} \, = \blamdis \alpha \top {\lam x {x.l}}
+\end{align*}
+
+Note how, through the use of subtyping, this function will accept any intersection type that contains
+the single recorld $\recordType l \alpha$.
+This resembles other systems ..., although it is slightly more general, as any it is not 
+restricted only to record types. \joao{references}
 
 \paragraph{Restriction}
 
+In constrast with most systems, restriction is not directly embedded on our language.
+Instead, we can make use of subtyping to define such operator: 
+
 \begin{align*}
-&\text{remove} :: \fordis \alpha \top {\fordis \beta \top {\fordis r {\recordType l \alpha} 
-{({\recordType l \alpha \inter r) \rightarrow r}}}} \\ 
+&\text{remove} :: \fordis \alpha \top {\fordis r {\recordType l \alpha} 
+{({\recordType l \alpha \inter r) \rightarrow r}}} \\ 
 &\text{remove} \, = \blamdis \alpha \top {\blamdis r {\recordType l \alpha} {\lam x {x}}} 
 \end{align*}
 
-\paragraph{Extension}
+\paragraph{Extension/Concatenation}
 
-Extension, in a strict system like ..., (polymorphic) extension is achieved in the following manner:
+The most usual operators for combining records are extension and concatenation.
+Even though that in some systems, the latter is defined in terms of the former, languages that
+opt to include concatenation usually rely on specific semantics for it. \joao{add references}
+Our system is suitable for encoding both of these operations, but we argue that concatenation is
+the natural primitive operator, due to the resemblance with our merge operator.
+Indeed, (Harper \& Pierce) also define a \emph{merge} operator, which is quite similar to
+our \emph{merge} for intersection types, except it envoles only record types.
+For instance, a function which concatenates a single record with field $l$ of type $\tyint$
+with another record that lacks this field, is the following (slightly modified in terms of 
+notation):
 
-TODO
+\begin{align*}
+&\text{addL}_1 :: \forall \alpha\#l. \alpha \rightarrow (\alpha || \recordType l \tyint) \\ 
+&\text{addL}_1 \, = ...
+\end{align*}
+The reader might notice the resemblance with our system:
 
-In ... (SPJ \& MJ) -- a strict system -- an example of a function that makes use of record types 
-is the following:
+\begin{align*}
+&\text{addL}_2 :: \fordis \alpha {\recordType l \tyint} {
+\alpha \rightarrow (\alpha \inter \recordType l \tyint)} \\
+&\text{addL}_2 \, = ...
+\end{align*}
+This shows that one can use disjoint quantification to express negative field information.
+It is very close to what (Harper \& Pierce) describe in their system.  
+Note how we have to explicitly state the type of the constraint in $\text{addL}_2$, whereas 
+$\text{addL}_1$ does not require this.
+The same generality of disjoint intersection types that allows one to encode record types is the
+one that forces us to add this extra type in the constraint.
+However, there is a slight gain with this approach: $\text{addL}_2$ accepts more types than
+$\text{addL}_1$.
+Namely, all (intersection) types that contain label $l$, with a field type \emph{disjoint} to
+$\tyint$.
+
+Had one meant to forbid records with \emph{any} $l$ fields, then one could write:
+
+\joao{how about this? fresh beta vs bottom?}
+\begin{align*}
+&\text{addL}_3 :: \fordis \beta \top {\fordis \alpha {\recordType l \beta} {
+\alpha \rightarrow (\alpha \inter \recordType l \beta)}} \\
+&\text{addL}_3 \, = ...
+\end{align*}
+
+Other systems with record concatenation usually define predicates, in terms of field absence or 
+presence (with a type $\alpha$). 
+This rises the question: how would one classify our system in terms of extension? 
+As noted in~\cite{leijen2004first}, systems typically can be categorized into two distinct groups
+in what concerns extension: the strict and the free.
+The former does not allow field overriding when extending a record (i.e. one can only extend a 
+record with a field that is not present in it); while the latter does account for field overriding.
+Our system can be seen as hybrid of these two kinds of systems.
+Next we will show a comparison in terms of expressability between \name and other systems 
+with records that hopefully will enlighten the reader on this matter.
+
+\paragraph{Expressibility}
+In ... (SPJ \& MJ) -- a strict system with extension -- an example of a function that uses 
+record types is the following:
 \begin{align*}
 &\text{average}_1 :: (r \backslash y, r \backslash x) \Rightarrow \{r | x :: \tyint, y :: \tyint\} \rightarrow \tyint \\
 &\text{average}_1 \, r = (r.x + r.y) / 2
@@ -351,12 +413,12 @@ the more general program would be accepted:
 &\text{average}_2 \, r = (r.x + r.y) / 2
 \end{align*}
 
-In this case, if $r$ contains either field $x$ or field $y$, they would be shadowed by the labels present in the
-type signature.
-In other words, if a record with multiple $x$ fields, the most recent (i.e. left-most) would be used in 
-any function which accesses $x$.
+In this case, if $r$ contains either field $x$ or field $y$, they would be shadowed by the labels 
+present in the type signature.
+In other words, if a record with multiple $x$ fields, the most recent (i.e. left-most) would be used 
+in any function which accesses $x$.
 
-\joao{add example of a system using subtyping}
+\joao{add example of a system using subtyping?}
 
 In \name, such function could be re-written as
 \footnote{We do not support exactly this function definition style; 
@@ -364,26 +426,32 @@ however the type signature and expression (module infix operators) are exactly a
 in \name}:
 
 \begin{align*}
-&\text{average}_3 :: \fordis y \top {\fordis r {\recordType y \tyint} {\recordType y \tyint \inter r \rightarrow \tyint}} \\
-&\text{average}_3 = \fordis y \top {\blamdis r {\recordType y \tyint} {(r.x + r.y) / 2}}
+&\text{average}_3 :: \fordis r 
+{\recordType x \tyint \inter \recordType y \tyint} 
+{\recordType x \tyint \inter \recordType y \tyint \inter r \rightarrow \tyint} \\
+&\text{average}_3 = 
+{\blamdis t {\recordType x \tyint \inter \recordType y \tyint} {\lam r {(r.x + r.y) / 2}}}
 \end{align*}
 
 Thus more types are accepted this function than in the first system, but less than the second. 
-Since our encoding of records piggybacks on the notion of disjointness, another major difference between
-\name and the two other mentioned systems, is the ability to combine records with arbitrary types.
-Our system does not account for well-formedness of record types as the other two systems do,
+Another major difference between \name and the two other mentioned systems, is the ability to 
+combine records with arbitrary types.
+Our system does not account for well-formedness of record types as the other two systems do 
+(i.e. using a special \emph{row} kind), since our encoding of records piggybacks on the more
+general notion of disjoint intersection types. 
 
-It is also worth noting that systems using subtyping may suffer from the so-called \emph{update} problem.
+Finally, it is also worth noting that systems using subtyping may suffer from the so-called 
+\emph{update} problem.
 \joao{show example}
-
-\name does not suffer from this problem.
-We may illustrate by defining a suitable update function, similar to the one in~\cite{leijen2005extensible}:
+\name does not suffer from this problem. \joao{how come?}
+We may illustrate by defining a suitable update function, in a similar fashion 
+to~\cite{leijen2005extensible}:
 
 \begin{align*}
 &\text{update} :: \fordis \alpha \top {\fordis r {\recordType l \alpha} 
-{{\recordType l \alpha \inter r \rightarrow \recordType l \beta \inter r}}} \\ 
-&\text{update} \, = \blamdis \alpha \top {\blamdis r {\recordType l \alpha} {\lam x {x}}} 
+{{\recordType l \alpha \inter r \rightarrow \beta \rightarrow \recordType l \beta \inter r}}} \\ 
+&\text{update} \, = \blamdis \alpha \top {\blamdis r {\recordType l \alpha} {\lam x {\lam v {
+\recordCon l v \mergeop (\text{remove } \alpha \; r \; x)}}}} 
 \end{align*}
 
-\joao{talk about concatenation}
 
