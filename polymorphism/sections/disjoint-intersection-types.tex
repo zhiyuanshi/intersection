@@ -19,7 +19,7 @@ shows its difference with the standard System $F$. The typing rules can be found
 in the appendix.
 
 
-\begin{figure}[t]
+\begin{figure}[!t]
   \[
     \begin{array}{llrl}
       \text{Types}    & T & \Coloneqq & \alpha \\
@@ -51,7 +51,7 @@ function $\im \cdot$ from \name types $A$ to target language types $T$. The
 notation $\im \cdot$ is also overloaded for context translation from \name
 contexts $\Gamma$ to target language contexts $G$.
 
-\begin{figure}[t]
+\begin{figure}[!t]
   \framebox{$\im A = T$}
 
   \begin{align*}
@@ -78,9 +78,53 @@ contexts $\Gamma$ to target language contexts $G$.
 % Section~\ref{sec:fi}, except for the light blue part. The translation consists
 % of four sets of rules, which are explained below:
 
+\subsection{Well-formedness and substitution}
+As mentioned previously, the disjointness of a type variable is deferred until its sanity 
+check occurs at type instantation.
+Because of this, our system needs to ensure that well-formed types are stable under substitution,
+as this will play a crucial role in retaining coherence.
+
+Typically, in polymorphic systems with explicit instantiation it is necessary to show that
+types are stable under substitution, in order to avoid ill-formed types.
+In the presence of disjoint quantification, we cannot prove such property.
+However, a weaker version of that property -- but strong enough for our type-system's metatheory -- 
+can be proven, namely:
+
+\joao{missing talking about wellformedness of contexts}
+\begin{lemma}[Types are stable under substitution]
+  \label{lemma:wfsubst}
+
+  If $\jwf \Gamma A$ and $\jwf \Gamma B$ and $(x \disjoint C) \in \Gamma$ 
+  and $\jdisimpl \Gamma B C$, then $\jwf {\Gamma \subst x B} {A \subst x B}$.
+\end{lemma}
+
+%\begin{restatable}[Instantiation]{lemma}{instantiation}
+%  \label{lemma:instantiation}
+%
+%  If $\jwf {\Gamma, \alpha \disjoint B} C$, $\jwf \Gamma A$, $\jdis \Gamma A B$
+%  then $\jwf \Gamma {\subst A \alpha C}$.
+%\end{restatable}
+\joao{add proof}
+
+This lemma enables us to show that all types produced by the type-system are well-typed.
+More formally, we have that:
+
+\begin{restatable}[Well-formed typing]{lemma}{wellformedtyping}
+  \label{lemma:wellformed-typing}
+
+  If $\jcheck \Gamma e A$, then $\jwf \Gamma A$. 
+
+  If $\jinfer \Gamma e A$, then $\jwf \Gamma A$.
+\end{restatable}
+
+\begin{proof}
+  By induction on the derivation and applying
+  Lemma~\ref{lemma:wfsubst} in the case of \reflabel{\labelttapp}.
+\end{proof}
+
 \subsection{Top-like types and their coercions}
 
-\begin{figure}[t]
+\begin{figure}[!t]
   \begin{mathpar}
     \formtoplike \\ %\framebox{$\jatomic A$} \\
 
@@ -179,7 +223,7 @@ is used. Finally, all rules produce type-correct coercions:
 \end{restatable}
 
 \begin{proof}
-  By a straightforward induction on the derivation\footnote{The proofs of major lemmata and theorems can be found in the appendix.}.
+  By a straightforward induction on the derivation.
 \end{proof}
 
 % \george{Explain \reflabel{\labelsubforall} and distinction of kernel and all version.}
@@ -406,8 +450,8 @@ This result is captured more formally by the following lemma:
 %Indeed, \bruno{unfinidhed sentence}\george{Mabe show a diagram here to contrast
 %with bounded polymorphism.}
 
-\subsection{Bi-directional type-system with Elaboration}
-\joao{I'll move this with the previous section}
+
+\subsection{Elaboration of type-system and coherence} 
 In order to prove the coherence result, we refer to the previously introduced bidirectional 
 type-system.
 The bidirectional type-system is elaborating, producing a term in the target language while
@@ -435,60 +479,21 @@ not in System $F$. To account for this difference, in \reflabel{\labeltapp}, the
 coercion $E$ from the subtyping relation is applied to the argument.
 \reflabel{\labeltmerge} straighforwardly translates merges into pairs.
 
-\paragraph{Well-formedness and substitution}
-As mentioned previously, the disjointness of a type variable is deferred until its sanity 
-check occurs at type instantation.
-Because of this, our system needs to ensure that types are well-formed under substitution
-More formally, the following lemma should hold:
-
-\joao{missing talking about wellformedness of contexts}
-\begin{lemma}[Well-formedness is stable under substitution]
-  \label{lemma:wfsubst}
-
-  If $\jwf \Gamma A$ and $\jwf \Gamma B$ and $(x \disjoint C) \in \Gamma$ 
-  and $\jdisimpl \Gamma B C$, then $\jwf {\Gamma \subst x B} {A \subst x B}$.
-\end{lemma}
-
-%\begin{restatable}[Instantiation]{lemma}{instantiation}
-%  \label{lemma:instantiation}
-%
-%  If $\jwf {\Gamma, \alpha \disjoint B} C$, $\jwf \Gamma A$, $\jdis \Gamma A B$
-%  then $\jwf \Gamma {\subst A \alpha C}$.
-%\end{restatable}
-
-\begin{restatable}[Well-formed typing]{lemma}{wellformedtyping}
-  \label{lemma:wellformed-typing}
-
-  If $\jtype \Gamma e A$, then $\jwf \Gamma A$.
-\end{restatable}
-
-\begin{proof}
-  By induction on the derivation that leads to $\jtype \Gamma e A$ and applying
-  Lemma~\ref{lemma:instantiation} in the case of \reflabel{\labelttapp}.
-\end{proof}
-
-\joao{maybe move this to the overview?}
-With our new definition of well-formed types, this result is nontrivial.
-In general, disjointness judgements are not invariant with respect to
-free-variable substitution. In other words, a careless substitution can violate
-the disjoint constraint in the context. For example, in the context $\alpha
-\disjoint \tyint$, $\alpha$ and $\tyint$ are disjoint:
-\[ \jdis {\alpha \disjoint \tyint} \alpha \tyint \]
-But after the substitution of $\tyint$ for $\alpha$ on the two types, the sentence
-\[ \jdis {\alpha \disjoint \tyint} \tyint \tyint \]
-is longer true since $\tyint$ is clearly not disjoint with itself.
-
 \paragraph{Type-safety}
 
 The type-directed translation is type-safe. This property is captured
 by the following two theorems.
 
-\joao{change this to bidi. typing and add proof sketch}
 \begin{restatable}[Type preservation]{theorem}{typepreservation}
   \label{theorem:type-preservation}
+  We have that:
+  \begin{itemize}
+  \item If $ \jinfer \Gamma e A \yields E $, 
+        then $ \jtype {\im \Gamma} E {\im A} \,$.
+  \item If $ \jcheck \Gamma e A \yields E $, 
+        then $ \jtype {\im \Gamma} E {\im A} $.
+  \end{itemize}
 
-  If $ \jtype \Gamma e A \yields E $,
-  then $ \jtype {\im \Gamma} E {\im A} $.
 \end{restatable}
 
 \begin{proof}
@@ -688,16 +693,21 @@ by the following two theorems.
 \paragraph{Coherency of Elaboration}
 Combining the previous results, we are finally able to show the central theorem:
 
-\joao{change this to bidi. typing}
 \begin{restatable}[Unique elaboration]{theorem}{uniqueelaboration}
   \label{theorem:unique-elaboration}
-
-  If $\jtype \Gamma e {A_1} \yields {E_1}$ and $\jtype \Gamma e {A_2} \yields
-  {E_2}$, then $E_1 \equiv E_2$. (``$\equiv$'' means syntactical equality, up to
+  We have that:
+  \begin{itemize*}
+    \item If $\jinfer \Gamma e {A_1} \yields {E_1}$ and $\jinfer \Gamma e {A_2} \yields
+          {E_2}$, then $E_1 \equiv E_2$. 
+    \item If $\jcheck \Gamma e {A_1} \yields {E_1}$ and $\jcheck \Gamma e {A_2} \yields
+          {E_2}$, then $E_1 \equiv E_2$.
+  \end{itemize*}(``$\equiv$'' means syntactical equality, up to
   $\alpha$-equality.)
+  
 
 \end{restatable}
 
+\joao{review this proof, i.e. should we also mention (and show) uniqueness of type inference?}
 \begin{proof}
   Note that the typing rules are already syntax-directed but the case of
   \reflabel{\labeltapp} (copied below) still needs special attention since we

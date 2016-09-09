@@ -56,12 +56,12 @@
 
 \newcommand{\rulesubforallext}{
   \inferrule* [right=\labelsubforall]
-    {{B_1} \subtype {B_2} \yields E \\
-     {A_2} \subtype {A_1} \yields {E_d}}
+    {{B_1} \subtype {B_2} \yields {E_1} \\
+     {A_2} \subtype {A_1} \yields {E_2}}
     {\fordis {\alpha} {A_1} {B_1} \subtype \fordis {\alpha} {A_2} {B_2}
       \yields
         {\lamty f {\im {\for {\alpha} {B_1}}}
-          {\blam \alpha {\app E {(\app f \alpha)}}}}}
+          {\blam \alpha {\app {E_1} {(\app f \alpha)}}}}}
 }
 
 \newcommand{\labelsubinter}{\makelabelsub {\inter R}}

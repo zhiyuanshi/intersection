@@ -1,12 +1,14 @@
 \section{Disjointness} \label{sec:alg-dis}
 
 Section~\ref{sec:fi} presented a type system with disjoint
-intersection types and disjoint quantification that is both type-safe
-and coherent. 
-
-This section presents the set of rules for determining whether two types are disjoint. 
+intersection types and disjoint quantification that we will prove to be
+both type-safe and coherent. 
+However, before we can prove such properties, it is necessary to introduce our
+new version of disjointness, considering polymorphism and disjointness quantificaton.
+In constrast with \oldname, we no longer use a specification for disjointness, as
+that would require variable unification.
+Thus, this section presents the set of rules for determining whether two types are disjoint. 
 The set of rules is algorithmic and an implementation is easily derived from them. 
-Therefore we solve the problem of finding an algorithm to compute disjointness.  
 
 \begin{comment}
 \subsection{Derivation of the Algorithmic Rules}
@@ -96,16 +98,9 @@ $\commonsuper$:
   drop the formulae.}
 \end{comment}
 
-\subsection{Disjointness specification}
-
-TODO should this go in the overview?
-
-A fundamental difference in comparison to the \oldname system, is the changing and 
-subsequent dropping of the specification.
-
 \subsection{Algorithmic Rules}
 
-\begin{figure}[h]
+\begin{figure}[!t]
   \begin{mathpar}
     \formdis \\
     \ruledistop \and \ruledistopsym \and 
@@ -122,6 +117,8 @@ subsequent dropping of the specification.
   \caption{Algorithmic Disjointness.}
   \label{fig:disjointness}
 \end{figure}
+
+\joao{how about quickly recalling the old specification here?}
 
 The rules for the disjointness judgement are shown in
 Figure~\ref{fig:disjointness}, which consists of two judgements.
@@ -142,18 +139,18 @@ The lemma states that if a type $A$ is disjoint to $B$ under $\Gamma$, then it i
 to any supertype of $B$. % TODO show example here?
 The rule for disjoint quantification \reflabel{\labeldisforall} is the last novel rule. 
  % TODO another example?
-The rule for disjoint quantification (\reflabel{\labeldisforall}) is the last novel rule. 
 It adds a constraint composed of both constraints into $\Gamma$ and checks for disjointness in 
 the bodies under that environment.
 To illustrate this rule, consider the following two types:
-\[ (\forall (\alpha * \tyint).~\tyint \& \alpha) \qquad (\forall (\alpha * \tychar). ~\tychar \& \alpha) \]
+\[ (\forall (\alpha * \tyint).~\tyint \& \alpha) \qquad 
+(\forall (\alpha * \tychar). ~\tychar \& \alpha) \]
 The question is under which conditions are those two types disjoint.
 In the first type $\alpha$ cannot be instantiated with $\tyint$ and in
 the second case $\alpha$ cannot be instantiated with $\tychar$.
-Therefore for the two bodies to be considered disjoint, $\alpha$ cannot be instantiated with either $\tyint$ 
+Therefore for both bodies to be disjoint, $\alpha$ cannot be instantiated with either $\tyint$ 
 or $\tychar$. 
-The rule for disjoint quantification captures this fact by requiring the bodies of disjoint quantification 
-to be checked for disjointness under both constraints.
+The rule for disjoint quantification captures this fact by requiring the bodies of disjoint 
+quantification to be checked for disjointness under both constraints.
 The remaining rules are identical to the original rules, and we will only briefly explain them.
 The rule for functions \reflabel{\labeldisfun} says that two function
 types are disjoint if and only if their return types are disjoint. 
@@ -168,4 +165,17 @@ Just as in ..., these rules capture the set of rules is that $A \disjointax B$ h
 two types of different constructs unless any of them is an intersection type.
 Note that disjointness with the $\top$ type is already captured by {\reflabel{\labeldistop}}
 and {\reflabel{\labeldistopsym}}.
+
+\joao{mention here disjointness is stable by substitution (copy ortho\_subst)}
+With our new definition of well-formed types, this result is nontrivial.
+In general, disjointness judgements are not invariant with respect to
+free-variable substitution. In other words, a careless substitution can violate
+the disjoint constraint in the context. For example, in the context $\alpha
+\disjoint \tyint$, $\alpha$ and $\tyint$ are disjoint:
+\[ \jdis {\alpha \disjoint \tyint} \alpha \tyint \]
+But after the substitution of $\tyint$ for $\alpha$ on the two types, the sentence
+\[ \jdis {\alpha \disjoint \tyint} \tyint \tyint \]
+is longer true since $\tyint$ is clearly not disjoint with itself.
+
+
 

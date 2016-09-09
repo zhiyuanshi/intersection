@@ -20,38 +20,29 @@ the supplementary materials submitted with the paper.
 
 \subsection{Syntax}
 
+
 Figure~\ref{fig:fi-syntax} shows the syntax of \name. 
 The differences to \oldname are highlighted in gray.
 %are intersection types $A \inter B$ at the
 %type-level and the ``merges'' $e_1 \mergeop e_2$ at the term level.
 
 %TODO merge this figure with figure 5 (text too)
-\begin{figure}[t]\bruno{too much space waisted in having one construct
-  per line}
+\begin{figure}[!t]
   \[
     \begin{array}{l}
       \begin{array}{llrll}
         \text{Types}
-        & A, B & \Coloneqq & \top                        & \\
-        &      & \mid & \tyint                           & \\
-        &      & \mid & A \to B                          & \\
-        &      & \mid & A \inter B                       & \\
-        &      & \mid & \highlight{$\alpha$}             & \\
-        &      & \mid & \highlight{$\fordis \alpha A B$} & \\
-        &      & \mid & \highlight{$\recordType l A$}    & \\
+        & A, B & \Coloneqq & \top \mid \tyint \mid A \to B \mid A \inter B & \\ 
+        &      & \mid &
+                 \highlight{$\alpha$} \mid \highlight{$\fordis \alpha A B$} 
+                 \mid \highlight{$\recordType l A$} & \\
 
         \\
         \text{Terms}
-        & e & \Coloneqq & ()                           & \\
-        &   & \mid & i                                 & \\
-        &   & \mid & x                                 & \\
-        &   & \mid & \lamty x A e                      & \\
-        &   & \mid & \app {e_1} {e_2}                  & \\
-        &   & \mid & e_1 \mergeop e_2                  & \\
-        &   & \mid & \highlight{$\blamdis \alpha A e$} & \\
-        &   & \mid & \highlight{$\tapp e A$}           & \\
-        &   & \mid & \highlight{$\recordCon l e$}      & \\
-        &   & \mid & \highlight{$\recordProj e l$}     & \\
+        & e & \Coloneqq & \top \mid i \mid x \mid \lamty x A e \mid \app {e_1} {e_2} 
+              \mid e_1 \mergeop e_2 & \\
+        &   & \mid & \highlight{$\blamdis \alpha A e$} \mid \highlight{$\tapp e A$} \mid 
+              \highlight{$\recordCon l e$} \mid \highlight{$\recordProj e l$}     & \\
 
         \\
         \text{Contexts}
@@ -144,7 +135,7 @@ standard ways and we are using them in discussions and examples. %TODO are we?
 %  \label{fig:fi-type}
 %\end{figure}
 
-\begin{figure}[t]\bruno{Space can be better used. SRec and SAlpha can be side-by-side.}
+\begin{figure}[!t]
   \begin{mathpar}
     \framebox{$\jatomic A$} \\
 
@@ -158,17 +149,15 @@ standard ways and we are using them in discussions and examples. %TODO are we?
   \end{mathpar}
 
   \begin{mathpar}
-    \formsub \\ \rulesubtop \and \rulesubint \and \rulesubvar \and \rulesubfun \and
+    \formsub \\ \rulesubtop \and \rulesubint \and \rulesubvar \and \rulesubrec 
+    \and \rulesubfun \and
     \rulesubinter \and  \rulesubinterlcoerce \and \rulesubinterrcoerce \and
-    \rulesubforallext \and \rulesubrec
+    \rulesubforallext 
   \end{mathpar}
 
   \caption{Subtyping rules of \name.}
   \label{fig:fi-subtype}
-\end{figure}\bruno{Be consistent with the names for the various
-  variables used. In S$\forall$, you are using $E$ and $E_{d}$, which is
-  not consistent. Just use $E_1$ and $E_2$}
-
+\end{figure}
 
 % Intersection types introduce natural subtyping relations among types. For
 % example, $ \tyint \inter \tybool $ should be a subtype of $ \tyint $, since the former
@@ -229,7 +218,7 @@ Subtyping is reflexive and transitive.\bruno{State as lemmas here,
 
 \subsection{Typing}\bruno{The TBLam is in chekc mode, why?}
 
-\begin{figure}[t]
+\begin{figure}[!t]
   \begin{mathpar}
     \formwf \\ \rulewftop \and \rulewfint \and \rulewfvardis \and \rulewffun \and 
     \rulewfforalldis \and \rulewfinterdis \and \rulewfrec
@@ -270,8 +259,10 @@ satisfies the disjointness constraint.
 We will explain next the rules that compose the type-system.
 
 
-\paragraph{Typing rules}\bruno{Mention bi-directional type-checking here.}
-%TODO couldn't we drop this constraint?
+\paragraph{Typing rules}
+Our typing rules are formulated as a bi-directional type-system. 
+Just as in \oldname, this ensures the type-system is not only syntax-directed, but
+also that there is no type ambiguity.
 The typing rules are shown in the bottom part of the figure. 
 Again, the reader is advised to ignore the
 gray-shaded part here, as these parts will be explained later. 
