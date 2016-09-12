@@ -108,7 +108,7 @@ Proof.
     + admit.
     + contradiction.
   - unfold not, extend; simpl; intros [a | b]; apply IHWFEnv.
-    inversion a. auto.
+    inversion a. auto. 
 Admitted.
 
 Inductive TopLike : PTyp -> Prop :=
@@ -428,6 +428,15 @@ Lemma usub_top : forall D, usub Top D -> TopLike D.
   intros. dependent induction H. apply TLAnd; auto. apply TLTop.
 Defined.
 
+(* TODO move this to Subtyping.v *)
+
+Definition sbot : forall t, PType t -> Sub Bot t.
+  unfold Sub; eauto.
+Defined.
+
+Hint Resolve sbot.
+Hint Unfold Sub.
+
 (* Unique subtype contributor: Lemma 2 *)
 
 Lemma uniquesub :
@@ -453,6 +462,12 @@ Proof.
       apply sand2; unfold Sub; eauto.
       inversion H2.
       inversion H2.
+      assert (Ha : ~ TopLike C1 \/ ~ TopLike C2).
+      apply Classical_Prop.not_and_or; unfold not; intros HH; destruct HH; eauto.
+      inversion H1; subst.
+      destruct Ha.
+      apply IHC1; eauto.
+      apply IHC2; eauto.
       inversion H3.
       inversion H3.
     + now apply HNotTL.
@@ -473,6 +488,15 @@ Proof.
       inversion H6.
       inversion H1.
       inversion H1.
+      assert (Ha : ~ TopLike C1 \/ ~ TopLike C2).
+      apply Classical_Prop.not_and_or; unfold not; intros HH; destruct HH; eauto.
+      inversion WFB; inversion H0; subst.
+      inversion HSubB; inversion H1; subst.
+      destruct Ha.
+      apply IHC1; eauto.      
+      apply IHC2; eauto.
+      inversion H8.
+      inversion H8.
     + now apply HNotTL.
   - induction C; try (now (inversion HSubA as [x HInv]; inversion HInv)).
     + inversion WFA; subst; inversion WFB; subst.
@@ -544,6 +568,13 @@ Proof.
       apply sand2; unfold Sub; eauto.
       inversion H3.
       inversion H3.
+      inversion H2; subst.
+      assert (Ha : ~ TopLike C1 \/ ~ TopLike C2).
+      apply Classical_Prop.not_and_or; unfold not; intros HH; destruct HH; eauto.
+      inversion H1; subst.
+      destruct Ha.
+      apply IHC1; eauto.
+      apply IHC2; eauto.
     + clear HSubAnd.
       destruct HSubA as [c HsubA]; inversion HsubA; subst.
       assert (Ha : Ortho Gamma ty (PFVarT v)).
@@ -567,6 +598,14 @@ Proof.
       apply sand2; unfold Sub; eauto.
       inversion H3.
       inversion H3.
+      inversion H2; subst.
+      assert (Ha : ~ TopLike C1 \/ ~ TopLike C2).
+      apply Classical_Prop.not_and_or; unfold not; intros HH; destruct HH; eauto.
+      inversion H1; subst.
+      destruct HSubB; inversion H3; subst.
+      destruct Ha.
+      apply IHC1; eauto.
+      apply IHC2; eauto.
     + clear HSubAnd.
       destruct HSubB as [c HsubB]; inversion HsubB; subst.
       assert (Ha : Ortho Gamma ty (PFVarT v)).
@@ -628,13 +667,16 @@ Proof.
       apply IHC1; unfold Sub; eauto.
       apply sand2; unfold Sub; eauto.
       apply IHC2; unfold Sub; eauto.
-      apply sand2; unfold Sub; eauto.      
-    + inversion HSubA as [x HsA]; inversion HsA; subst; inversion H0.
+      apply sand2; unfold Sub; eauto.
+      orthoax_inv PTypHd2. orthoax_inv PTypHd1.
+    + apply complete_sub in HSubA; apply usub_lc in HSubA; destruct HSubA;
+      inversion H0.
     + inversion HSubA as [x HsA]; inversion HsA; subst; try orthoax_inv PTypHd1.
     + inversion HSubA as [x HsA]; inversion HsA; subst; try orthoax_inv PTypHd1.
       inversion HSubB as [x HsB]; inversion HsB; subst; try orthoax_inv PTypHd2.
       apply PTypHd3; auto.
     + now apply HNotTL.
+    + inversion HSubA as [x HsA]; inversion HsA; subst; try orthoax_inv PTypHd1.
     + inversion HSubA as [x HsA]; inversion HsA; subst; try orthoax_inv PTypHd1.
       inversion HSubB as [x' HsB]; inversion HsB; subst; try orthoax_inv PTypHd2.
       apply PTypHd3; auto.
@@ -829,6 +871,7 @@ Proof.
     now subst.
     now subst.
     now subst.
+    now subst.
   (* Case: And t1 t2 <: t (first) *)
   - inversion H3; subst.
     inversion H5; subst.
@@ -909,6 +952,8 @@ Proof.
     inversion H4.
     inversion H4.
     now subst.
+    now subst.
+  - inversion H; inversion H0; inversion H2; subst.
   - inversion H; inversion H0; inversion H2; subst.
     erewrite IHsub; eauto.
 Qed.
@@ -1162,6 +1207,8 @@ Proof.
     rewrite open_comm_open_typ_term.
     rewrite <- open_rec_term; auto.
   (* Case STop *)
+  - apply_fresh STTerm_Lam as x; cbn; auto.
+  (* Case SBot *)
   - apply_fresh STTerm_Lam as x; cbn; auto.
   (* Case SRec *)
   - auto.
@@ -1518,6 +1565,7 @@ Proof.
     env_resolve.
     unfold conv_context; rewrite <- dom_map_id; not_in_L x.
     env_resolve.
+  - simpl; inversion H1; inversion H2; subst; apply IHsub; auto.
   - simpl; inversion H1; inversion H2; subst; apply IHsub; auto.
 Qed.
   
