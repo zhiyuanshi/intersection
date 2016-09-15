@@ -930,7 +930,182 @@ Proof.
     apply H1 in Ha.
     now inversion Ha.
 Qed.
-  
+
+(* TODO: move to infrastructure *)
+
+Lemma open_source_app_eq : forall x E n F,
+  not (In x (fv_source E)) ->
+  not (In x (fv_source F)) ->
+  (open_rec_source n (PFVar x) E) = (open_rec_source n (PFVar x) F) ->
+  E = F.
+Proof.
+  intros x E.
+  induction E; intros n' F HNotE HNotF HEqOpen.
+  - simpl in *.
+    induction F; try (inversion HEqOpen; auto).
+    destruct (Nat.eqb n' n); auto.
+    inversion H0.
+  - simpl in *.
+    induction F; try (inversion HEqOpen; auto).
+    destruct (Nat.eqb n' n); auto.
+    exfalso; apply HNotE.
+    apply MSetProperties.Dec.F.singleton_2; inversion H0; reflexivity.
+  - induction F; simpl in *; try (now (destruct (Nat.eqb n' n); inversion HEqOpen)).
+    destruct (Nat.eqb n' n).
+    exfalso; apply HNotF.
+    apply MSetProperties.Dec.F.singleton_2; inversion HEqOpen; reflexivity. 
+    inversion HEqOpen.
+    case_eq (Nat.eqb n' n); intros.
+    case_eq (Nat.eqb n' n0); intros.
+    apply f_equal.
+    apply beq_nat_true in H.
+    apply beq_nat_true in H0.
+    now subst.
+    rewrite H in HEqOpen.
+    rewrite H0 in HEqOpen.
+    inversion HEqOpen.
+    rewrite H in HEqOpen.
+    case_eq (Nat.eqb n' n0); intros;
+    rewrite H0 in HEqOpen; inversion HEqOpen.
+    reflexivity.
+  - induction F; simpl in *; try (now inversion HEqOpen).
+    destruct (Nat.eqb n' n0); [ inversion HEqOpen | auto ].
+  - induction F; simpl in *; try (now inversion HEqOpen).
+    destruct (Nat.eqb n' n); inversion HEqOpen.
+    inversion HEqOpen.
+    apply f_equal.
+    now apply (IHE (S n')).
+  - induction F; simpl in *; try (now inversion HEqOpen).  
+    destruct (Nat.eqb n' n); inversion HEqOpen.
+    rewrite IHE1 with (F := F1) (n := n'); try not_in_L x.
+    rewrite IHE2 with (F := F2) (n := n'); try not_in_L x.
+    reflexivity.
+    not_in_L x.
+    not_in_L x.
+    now inversion HEqOpen.
+    not_in_L x.
+    not_in_L x.
+    now inversion HEqOpen.
+  - induction F; simpl in *; try (now inversion HEqOpen).  
+    destruct (Nat.eqb n' n); inversion HEqOpen.
+    rewrite IHE1 with (F := F1) (n := n'); try not_in_L x.
+    rewrite IHE2 with (F := F2) (n := n'); try not_in_L x.
+    reflexivity.
+    not_in_L x.
+    not_in_L x.
+    now inversion HEqOpen.
+    not_in_L x.
+    not_in_L x.
+    now inversion HEqOpen.
+  - induction F; simpl in *; try (now inversion HEqOpen).
+    destruct (Nat.eqb n' n); inversion HEqOpen.
+    inversion HEqOpen.
+    rewrite IHE with (n := n') (F := F); try not_in_L x; auto.
+  - induction F; simpl in *; try (now inversion HEqOpen).  
+    destruct (Nat.eqb n' n); inversion HEqOpen.
+    inversion HEqOpen; subst.
+    apply f_equal.
+    apply IHE with (n := n'); try not_in_L x.
+    now inversion HEqOpen.
+  - induction F; simpl in *; try (now inversion HEqOpen).  
+    destruct (Nat.eqb n' n); inversion HEqOpen.
+    inversion HEqOpen; subst.
+    rewrite IHE with (n := n') (F := F); try not_in_L x; auto.
+  - induction F; simpl in *; try (now inversion HEqOpen).  
+    destruct (Nat.eqb n' n); inversion HEqOpen.
+    inversion HEqOpen; subst.
+    apply f_equal.
+    apply IHE with (n := n'); try not_in_L x; auto.
+  - induction F; simpl in *; try (now inversion HEqOpen).  
+    destruct (Nat.eqb n' n); inversion HEqOpen.
+    erewrite IHE.
+    apply f_equal.
+    now inversion HEqOpen.
+    not_in_L x.
+    not_in_L x.
+    inversion HEqOpen.
+    apply H0.
+Qed.
+
+Lemma open_typ_app_eq : forall x E n F,
+  not (In x (fv_ptyp E)) ->
+  not (In x (fv_ptyp F)) ->
+  (open_rec_typ_source n (PFVarT x) E) = (open_rec_typ_source n (PFVarT x) F) ->
+  E = F.
+Proof.
+  intros x E.
+  induction E; intros n' F HNotE HNotF HEqOpen.
+  - simpl in *.
+    induction F; try (inversion HEqOpen; auto).
+    destruct (Nat.eqb n' n); auto.
+    inversion H0.
+  - simpl in *.
+    induction F; try (inversion HEqOpen; auto).
+    rewrite IHE1 with (F := F1) (n := n'); try not_in_L x.
+    rewrite IHE2 with (F := F2) (n := n'); try not_in_L x.
+    reflexivity.
+    simpl; rewrite union_spec; auto.
+    auto.
+    simpl; rewrite union_spec; auto.
+    auto.
+    destruct (Nat.eqb n' n); inversion H0.
+  - simpl in *.
+    induction F; try (inversion HEqOpen; auto).
+    rewrite IHE1 with (F := F1) (n := n'); try not_in_L x.
+    rewrite IHE2 with (F := F2) (n := n'); try not_in_L x.
+    reflexivity.
+    simpl; rewrite union_spec; auto.
+    auto.
+    simpl; rewrite union_spec; auto.
+    auto.
+    destruct (Nat.eqb n' n); inversion H0.
+  - induction F; simpl in *; try (now (destruct (Nat.eqb n' n); inversion HEqOpen)).
+    case_eq (Nat.eqb n' n); intros.
+    case_eq (Nat.eqb n' n0); intros.
+    apply f_equal.
+    apply beq_nat_true in H.
+    apply beq_nat_true in H0.
+    now subst.
+    rewrite H in HEqOpen.
+    rewrite H0 in HEqOpen.
+    inversion HEqOpen.
+    rewrite H in HEqOpen.
+    case_eq (Nat.eqb n' n0); intros;
+    rewrite H0 in HEqOpen; inversion HEqOpen.
+    reflexivity.
+    destruct (Nat.eqb n' n).
+    exfalso; apply HNotF.
+    apply MSetProperties.Dec.F.singleton_2; inversion HEqOpen; reflexivity. 
+    inversion HEqOpen.
+  - simpl in *.
+    induction F; try (inversion HEqOpen; auto).
+    destruct (Nat.eqb n' n).
+    inversion H0; subst.
+    exfalso; apply HNotE.
+    apply MSetProperties.Dec.F.singleton_2; inversion HEqOpen; reflexivity.
+    auto.
+  - simpl in *.
+    induction F; try (inversion HEqOpen; auto).
+    destruct (Nat.eqb n' n); inversion H0.
+    rewrite IHE1 with (F := F1) (n := n'); try not_in_L x.
+    rewrite IHE2 with (F := F2) (n := S n'); try not_in_L x.
+    reflexivity.
+    simpl; rewrite union_spec; auto.
+    auto.
+    simpl; rewrite union_spec; auto.
+    auto.
+  - simpl in *.
+    induction F; try (inversion HEqOpen; auto).
+    destruct (Nat.eqb n' n); auto.
+    inversion H0.
+  - simpl in *.
+    induction F; try (inversion HEqOpen; auto).
+    destruct (Nat.eqb n' n); inversion H0.
+    inversion HEqOpen; subst.
+    simpl in HNotF.
+    rewrite IHE with (F := F) (n := n'); try not_in_L x; auto.
+Qed.    
+
 (* Ignoring the generated expressions + smart constructors *)
 
 Definition has_ty Gamma e d t := exists E, has_type_source_alg Gamma e d t E.
@@ -981,6 +1156,16 @@ induction H; intros; unfold almost_unique; auto.
 - inversion H0; subst; apply IHhas_type_source_alg in H3; simpl in H3.
   now subst.
 - inversion H0; subst; apply IHhas_type_source_alg in H3; simpl in H3; now inversion H3.
+- inversion H2; subst.
+  pick_fresh x.
+  assert (Ha1 : ~ In x L) by not_in_L x.
+  assert (Ha2 : ~ In x L0) by not_in_L x.
+  apply H7 in Ha2.
+  apply H1 with (t2 := (open_typ_source A0 (PFVarT x)))
+                  (E2 := (open_typ_term E0 (STFVarT x))) in Ha1; auto.
+  unfold almost_unique in Ha1.
+  rewrite open_typ_app_eq with (E := A) (F := A0) (n := 0) (x := x); auto;
+  not_in_L x.
 Qed.
 
 (* Theorem 5. Type inference always gives unique types *)
@@ -1055,10 +1240,8 @@ induction H; intros.
   assert (C = C0).
   apply (sub_coherent H3 H6 H0 H4).
   subst; reflexivity.
-  subst; inversion H.
 (* Case TLam *)
 - inversion H2; subst.
-  inversion H3.
   apply f_equal.
   pick_fresh x.
   apply open_typ_term_app_eq with (E := E) (F := E0) (x := x) (n := 0).
@@ -1069,6 +1252,7 @@ induction H; intros.
   apply H8.
   not_in_L x.
 Qed.
+
 
 Lemma coercions_produce_terms :
   forall E A B, sub A B E -> STTerm E.

@@ -1,18 +1,18 @@
-\newcommand{\formdis}{\framebox{$ \jdisimpl \Gamma A B $}}
+\newcommand{\formdis}{\framebox{$ \jdis \Gamma A B $}}
 
 \newcommand{\makelabeldis}[1]{$\disjoint$$#1$}
 
 \newcommand{\labeldistop}{\makelabeldis \top}
 \newcommand{\ruledistop}{
   \inferrule* [right=\labeldistop]
-    {}
+    { }
     {\jdisimpl \Gamma \top A}
 }
 
 \newcommand{\labeldistopsym}{\makelabeldis {\top Sym}}
 \newcommand{\ruledistopsym}{
   \inferrule* [right=\labeldistopsym]
-    {}
+    { }
     {\jdisimpl \Gamma A \top}
 }
 
@@ -85,33 +85,33 @@
 \newcommand{\labelaxintforall}{\makelabelax {(\mathbb{Z} \forall)}}
 \newcommand{\ruleaxintforall}{
   \inferrule* [right=\labelaxintforall]
-    {}
+    { }
     {\tyint \disjointax \for \alpha B}
 }
 
 \newcommand{\ruleaxintforalldis}{
   \inferrule* [right=\labelaxintforall]
-    {}
+    { }
     {\tyint \disjointax \fordis \alpha {B_1} {B_2}}
 }
 
 \newcommand{\labelaxintfun}{\makelabelax {(\mathbb{Z} \! \rightarrow)}}
 \newcommand{\ruleaxintfun}{
   \inferrule* [right=\labelaxintfun]
-    {}
+    { }
     {\tyint \disjointax {A_1} \to {A_2}}
 }
 
 \newcommand{\labelaxfunforall}{\makelabelax {(\rightarrow \! \forall)}}
 \newcommand{\ruleaxfunforall}{
   \inferrule* [right=\labelaxfunforall]
-    {}
+    { }
     {A_1 \to A_2 \disjointax \for \alpha B}
 }
 
 \newcommand{\ruleaxfunforalldis}{
   \inferrule* [right=\labelaxfunforall]
-    {}
+    { }
     {A_1 \to A_2 \disjointax \fordis \alpha {B_1} {B_2}}
 }
 

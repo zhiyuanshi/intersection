@@ -20,7 +20,6 @@ the supplementary materials submitted with the paper.
 
 \subsection{Syntax}
 
-
 Figure~\ref{fig:fi-syntax} shows the syntax of \name. 
 The differences to \oldname are highlighted in gray.
 %are intersection types $A \inter B$ at the
@@ -102,6 +101,30 @@ standard ways and we are using them in discussions and examples. %TODO are we?
 % have excluded union types from the language. The answer is we found that
 % intersection types alone are enough support extensible designs.
 
+\begin{figure}[!t]
+  \begin{mathpar}
+    \framebox{$\jatomic A$} \\
+
+    \inferrule*{}{\jatomic {A \to B}}
+
+    \inferrule*{}{\jatomic \alpha}
+
+    \inferrule*{}{\jatomic {\fordis \alpha B A}}
+
+    \inferrule*{}{\jatomic {\recordType l A}}
+  \end{mathpar}
+
+  \begin{mathpar}
+    \formsub \\ \rulesubtop \and \rulesubint \and \rulesubvar \and \rulesubrec 
+    \and \rulesubfun \and
+    \rulesubinter \and  \rulesubinterlcoerce \and \rulesubinterrcoerce \and
+    \rulesubforallext 
+  \end{mathpar}
+
+  \caption{Subtyping rules of \name.}
+  \label{fig:fi-subtype}
+\end{figure}
+
 \subsection{Subtyping}
 
 % In some calculi, the subtyping relation is external to the language: those
@@ -134,30 +157,6 @@ standard ways and we are using them in discussions and examples. %TODO are we?
 %  \caption{The type system of \name.}
 %  \label{fig:fi-type}
 %\end{figure}
-
-\begin{figure}[!t]
-  \begin{mathpar}
-    \framebox{$\jatomic A$} \\
-
-    \inferrule*{}{\jatomic {A \to B}}
-
-    \inferrule*{}{\jatomic \alpha}
-
-    \inferrule*{}{\jatomic {\fordis \alpha B A}}
-
-    \inferrule*{}{\jatomic {\recordType l A}}
-  \end{mathpar}
-
-  \begin{mathpar}
-    \formsub \\ \rulesubtop \and \rulesubint \and \rulesubvar \and \rulesubrec 
-    \and \rulesubfun \and
-    \rulesubinter \and  \rulesubinterlcoerce \and \rulesubinterrcoerce \and
-    \rulesubforallext 
-  \end{mathpar}
-
-  \caption{Subtyping rules of \name.}
-  \label{fig:fi-subtype}
-\end{figure}
 
 % Intersection types introduce natural subtyping relations among types. For
 % example, $ \tyint \inter \tybool $ should be a subtype of $ \tyint $, since the former
@@ -216,35 +215,24 @@ Subtyping is reflexive and transitive.\bruno{State as lemmas here,
 %  then $ A_1 \subtype A_3 $.
 %\end{lemma}
 
-\subsection{Typing}\bruno{The TBLam is in chekc mode, why?}
+\subsection{Typing}
 
 \begin{figure}[!t]
   \begin{mathpar}
     \formwf \\ \rulewftop \and \rulewfint \and \rulewfvardis \and \rulewffun \and 
     \rulewfforalldis \and \rulewfinterdis \and \rulewfrec
   \end{mathpar}
+  \label{fig:wf}
+\end{figure}
+
 
 %  \begin{mathpar}
 %    \formt \\ \ruletvar \and \ruletlam \and \ruletapp \and
 %    \ruletblam \and \rulettapp \and \ruletmergedis 
 %  \end{mathpar}
 
-  \begin{mathpar}
-    \formbi \\ \brulettop \and \bruletint \and \bruletvar \and \bruletann \and 
-    \bruletapp \and \brulettappdis \and \bruletmergedis \and \bruletrec \and 
-    \bruletprojr 
-  \end{mathpar}
-
-  \begin{mathpar}
-    \formbc \\ \bruletlam \and  \bruletblamdis \and \bruletsub
-  \end{mathpar}
-
-  \caption{Type system of \name.}
-  \label{fig:fi-type}
-\end{figure}
-
 \paragraph{Well-formedness}
-The well-formedness rules are shown in the top part of Figure~\ref{fig:fi-type}. 
+The well-formedness rules are shown in the top part of Figure~\ref{fig:wf}. 
 The new rules are \reflabel{\labelwfvar} and
 \reflabel{\labelwfforall}. 
 Their definition is quite straightforward, but note how we ensure the well-formedness 
@@ -257,6 +245,21 @@ The constraint is added to the context with this rule.
 During a type application, the type system makes sure that the type argument
 satisfies the disjointness constraint.
 We will explain next the rules that compose the type-system.
+
+\begin{figure}[!t]
+  \begin{mathpar}
+    \formbi \\ \brulettop \and \bruletint \and \bruletvar \and \bruletann \and 
+    \bruletapp \and \brulettappdis \and \bruletmergedis \and \bruletrec \and 
+    \bruletprojr \and \bruletblamdis 
+  \end{mathpar}
+
+  \begin{mathpar}
+    \formbc \\ \bruletlam \and \bruletsub
+  \end{mathpar}
+
+  \caption{Type system of \name.}
+  \label{fig:fi-type}
+\end{figure}
 
 
 \paragraph{Typing rules}

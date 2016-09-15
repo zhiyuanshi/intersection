@@ -29,7 +29,7 @@ $ \jcheck \Gamma e A \yields E\\e$ checks against given type $A$
 \newcommand{\bruletlam} {
 \inferrule* [right=\labeltlam]
   {\jwf \Gamma A \\ \jcheck {\Gamma, x \oftype A} e B \yields E}
-  {\jcheck \Gamma {\lamty x A e} {A \to B} \yields {\lamty x {\im A} E}}
+  {\jcheck \Gamma {\lam x e} {A \to B} \yields {\lam x E}}
 }
 
 \newcommand{\bruletapp}{
@@ -42,17 +42,17 @@ $ \jcheck \Gamma e A \yields E\\e$ checks against given type $A$
 
 \newcommand{\bruletblam}{
 \inferrule* [right=\labeltblam]
-  {\jcheck {\Gamma, \alpha} e A \yields E \\
+  {\jinfer {\Gamma, \alpha} e A \yields E \\
    \alpha \not \in \ftv \Gamma}
-  {\jcheck \Gamma {\blam {\alpha} e} {\for {\alpha} A} \yields {\blam \alpha E}}
+  {\jinfer \Gamma {\blam {\alpha} e} {\for {\alpha} A} \yields {\blam \alpha E}}
 }
 
 \newcommand{\bruletblamdis}{
 \inferrule* [right=\labeltblam]
   {\jwf \Gamma A \\
-   \jcheck {\Gamma,\alpha \disjoint A} e B \yields E \\
+   \jinfer {\Gamma,\alpha \disjoint A} e B \yields E \\
    \alpha \not \in \ftv \Gamma}
-  {\jcheck \Gamma {\blamdis \alpha A e} {\fordis \alpha A B}
+  {\jinfer \Gamma {\blamdis \alpha A e} {\fordis \alpha A B}
     \yields {\blam \alpha E}}
 }
 
