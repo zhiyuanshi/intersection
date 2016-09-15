@@ -1,5 +1,9 @@
 \section{Semantics and Coherence}
 \label{sec:disjoint}
+\bruno{You are repeatedily referring to our previous paper and Dunfield's paper. 
+You don't need to constantly remind the reader of this. Remove some of this repetition.}
+
+\bruno{summary is missing: why should readers read this section; what's new?}
 
 \subsection{Semantics}
 
@@ -82,7 +86,10 @@ contexts $\Gamma$ to target language contexts $G$.
 As mentioned previously, the disjointness of a type variable is deferred until its sanity 
 check occurs at type instantation.
 Because of this, our system needs to ensure that well-formed types are stable under substitution,
-as this will play a crucial role in retaining coherence.
+as this will play a crucial role in retaining coherence.\bruno{why are we separating the discussion 
+about stability of substitution into 2 different sections? The discussion should all come together, not separate. 
+Probably it makes more sense to talk about stability of substitutions in the previous section, 
+and focus on coherence and type-safety here.}
 
 Typically, in polymorphic systems with explicit instantiation it is necessary to show that
 types are stable under substitution, in order to avoid ill-formed types.
@@ -459,6 +466,8 @@ performing the typing derivation.
 
 %TODO move this to overview and show here example with polymorphism?
 \paragraph{Key idea of the translation.}
+\bruno{Don't just copy\&paste from the previous paper. 
+You should mention the new rules, which Dunfield does not have. }
 This translation turns merges into usual pairs, similar to Dunfield's
 elaboration approach~\cite{dunfield2014elaborating}.
 For example, \[ 1 \mergeop \code{"one"} \] becomes \pair 1
@@ -708,6 +717,8 @@ Combining the previous results, we are finally able to show the central theorem:
 \end{restatable}
 
 \joao{review this proof, i.e. should we also mention (and show) uniqueness of type inference?}
+\bruno{Yes, and you want to mention somewhere where the stability of substitution lemma 
+plays a role. I presume it plays a role in the coherence theorems.}
 \begin{proof}
   Note that the typing rules are already syntax-directed but the case of
   \reflabel{\labeltapp} (copied below) still needs special attention since we
