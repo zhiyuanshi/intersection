@@ -7,8 +7,12 @@ However, before we can prove such properties, it is necessary to introduce our
 new version of disjointness, considering polymorphism and disjointness quantificaton.
 %In constrast with \oldname, we no longer use a specification for disjointness, as
 %that would require variable unification.
-This section presents the set of rules for determining whether two types are disjoint. 
+This section first presents the set of rules for determining whether two types are disjoint. 
 The set of rules is algorithmic and an implementation is easily derived from them. 
+After, it will show a few important properties regarding substitution, which will turn out
+to be crucial to ensure type-safety.
+Finally, it will discuss the bounds of disjoint quantification and what implications
+they have on \name.
 
 \begin{comment}
 \subsection{Derivation of the Algorithmic Rules}
@@ -173,7 +177,36 @@ two types of different constructs unless any of them is an intersection type.
 Note that disjointness with the $\top$ type is already captured by {\reflabel{\labeldistop}}
 and {\reflabel{\labeldistopsym}}.
 
+\subsection{Metatheory}
+
+Disjointness will not only play a fundamental role in ensuring coherence, but also in 
+ensuring the type-safety of our system.
+Since the type-system is only allowed to instantiate a type variable with 
+other types which are disjoint to the variable's disjointness constraint, one might ask:
+what are the exact implications of mixing substitution with disjoint intersection types? 
+We will next dive into this question in greater detail.
+
+
 \paragraph{Stability of substitutions}
+One rule of thumb in disjoint intersection types states that, if a type $A$ is 
+disjoint to a type $B$, then the intersection $A \inter B$ is well-typed.
+However, during type instantiation (i.e. when type substitution should be stable), both types
+$A$ and $B$ can change.
+It should follow naturally that this instantiation won't produce an ill-formed type $A \inter B$,
+or, more generally, disjointness should be stable under substitution. 
+Let us illustrate with an example, showing why disjointness judgements are not invariant with
+respect to free variable substitution.
+In other words, why a careless substitution can violate the disjoint constraint in the context. 
+Consider the following judgement, where in the context $\alpha
+\disjoint \tyint$, $\alpha$ and $\tyint$ are disjoint:
+\[ \jdis {\alpha \disjoint \tyint} \alpha \tyint \]
+After the substitution of $\tyint$ for $\alpha$ on the two types, the sentence
+\[ \jdis {\alpha \disjoint \tyint} \tyint \tyint \]
+is no longer true since $\tyint$ is clearly not disjoint with itself.
+This explains the need to ensure that during type-instantiation the target of the substitution  
+is compatible with the disjointness constraint associated with the variable. 
+
+Now, more formally, we can show following lemma holds: 
 
 \joao{missing WFEnv premisses}
 \begin{lemma}[Disjointness is stable under substitution]
@@ -185,18 +218,90 @@ and {\reflabel{\labeldistopsym}}.
 
 \joao{add proof detail here}
 
-With our new definition of well-formed types, this result is nontrivial.
-In general, disjointness judgements are not invariant with respect to
-free-variable substitution. In other words, a careless substitution can violate
-the disjoint constraint in the context. For example, in the context $\alpha
-\disjoint \tyint$, $\alpha$ and $\tyint$ are disjoint:
-\[ \jdis {\alpha \disjoint \tyint} \alpha \tyint \]
-But after the substitution of $\tyint$ for $\alpha$ on the two types, the sentence
-\[ \jdis {\alpha \disjoint \tyint} \tyint \tyint \]
-is no longer true since $\tyint$ is clearly not disjoint with itself.
-This is exactly why we need to ensure that the type being instantiated in the substitution 
-is compatible with the disjointness constraint associated with the variable. 
+Even though the meta-theory is consistent with the expected results, there is still an open
+question that remains unanswered: what exactly are the bounds of disjoint quantification?
+In other words, which type(s) might be used to allow unrestricted instantiation, and which
+one(s) might be used to completely restrict instantiation?
+As one might expected, the answer is tightely related to subtyping, as we will show next.
 
 \bruno{This explanation is too brief. Firstly you want to formally state the substitution 
 lemma here, and then expand the explanation including some aspects that made the 
 proof non-trivial, and perhaps a discussion about which bounds to chose ($\top$ or $\bot$).}
+
+\paragraph{Well-formedness and substitution}
+Typically, in polymorphic systems with explicit instantiation it is necessary to show that
+types are stable under substitution, in order to avoid ill-formed types.
+In the presence of disjoint quantification, we cannot prove such property.
+However, a weaker version of that property -- but strong enough for our type-system's metatheory 
+-- can be proven, namely:
+
+\joao{missing talking about wellformedness of contexts}
+\begin{lemma}[Types are stable under substitution]
+  \label{lemma:wfsubst}
+
+  If $\jwf \Gamma A$ and $\jwf \Gamma B$ and $(x \disjoint C) \in \Gamma$ 
+  and $\jdisimpl \Gamma B C$, then $\jwf {\Gamma \subst x B} {A \subst x B}$.
+\end{lemma}
+
+%\begin{restatable}[Instantiation]{lemma}{instantiation}
+%  \label{lemma:instantiation}
+%
+%  If $\jwf {\Gamma, \alpha \disjoint B} C$, $\jwf \Gamma A$, $\jdis \Gamma A B$
+%  then $\jwf \Gamma {\subst A \alpha C}$.
+%\end{restatable}
+\joao{add proof}
+
+This lemma enables us to show that all types produced by the type-system are well-typed.
+More formally, we have that:
+
+\begin{restatable}[Well-formed typing]{lemma}{wellformedtyping}
+  \label{lemma:wellformed-typing}
+
+  If $\jcheck \Gamma e A$, then $\jwf \Gamma A$. 
+
+  If $\jinfer \Gamma e A$, then $\jwf \Gamma A$.
+\end{restatable}
+
+\begin{proof}
+  By induction on the derivation and applying
+  Lemma~\ref{lemma:wfsubst} in the case of \reflabel{\labelttapp}.
+\end{proof}
+
+\subsection{Bounds of disjoint quantification}
+As we have mentioned previously, substitution raises the question of what range of types can be 
+instantiated for a given variable, under a given context.
+
+\paragraph{Upper-bound}\joao{maybe rename this? it is the most liberal bound}
+The system we are describing must be complete with respect to System-$F$, meaning that any
+program accepted by System-$F$ should also be accepted by \name.
+Since System-$F$ does not contain disjointness quantification, it is necessary for \name to 
+include a type which is disjoint to every other type (i.e. the most liberal constraint): $\top$.
+Thus, the System-$F$'s type $\forall \alpha. {T_F}$ (where ${T_F}$ is some other type), is
+equivalent to \name's $\fordis \alpha \top {T_i}$.
+
+\paragraph{Lower-bound}
+Inversely, the most restrictive type should be $\bot$, as one might think of $\bot$ as specific 
+as the infinite intersection.
+In other words, $\bot$ is not disjoint to any type, except top-like types.
+However, introducing $\bot$ is not compatible with our disjointness definition, due to the rule
+\reflabel{\labeldisvar}.
+Notice that if $A$ is $\bot$, then it is not true that $A$ is disjoint to all super-types of
+$\bot$ (i.e. all other possible types).
+To understand why, let us recall the reader of the property of which \reflabel{\labeldisvar} is
+based on:
+
+\[ \inferrule {\jwf \Gamma {A \disjoint B} \\ B \subtype C }
+              {\jwf \Gamma {A \disjoint C}} \]
+
+If one instantiates $A$ with a variable $\alpha$ and, most importantly, $B$ with $\bot$, the
+lemma still holds, since $\alpha \disjoint \bot$ is false!
+This suggests that we should not be able to introduce $\bot$ in the environment, as we are
+constructing evidence for a false hypothesis.
+While this could be a straightforward restriction in our system, one might ask: what about
+introducing $\bot \inter \bot$ in the environment? 
+Or, more generally, introducing any \emph{bottom-like} type? 
+Since defining the lower bound is not strictly necessary to our formalization; introduces 
+substantial complexity in our system; and its practical application is not clear, we left this as 
+an open problem for future work. 
+
+

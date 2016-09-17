@@ -82,53 +82,6 @@ contexts $\Gamma$ to target language contexts $G$.
 % Section~\ref{sec:fi}, except for the light blue part. The translation consists
 % of four sets of rules, which are explained below:
 
-\subsection{Well-formedness and substitution}
-As mentioned previously, the disjointness of a type variable is deferred until its sanity 
-check occurs at type instantation.
-Because of this, our system needs to ensure that well-formed types are stable under substitution,
-as this will play a crucial role in retaining coherence.\bruno{why are we separating the discussion 
-about stability of substitution into 2 different sections? The discussion should all come together, not separate. 
-Probably it makes more sense to talk about stability of substitutions in the previous section, 
-and focus on coherence and type-safety here.}
-
-Typically, in polymorphic systems with explicit instantiation it is necessary to show that
-types are stable under substitution, in order to avoid ill-formed types.
-In the presence of disjoint quantification, we cannot prove such property.
-However, a weaker version of that property -- but strong enough for our type-system's metatheory -- 
-can be proven, namely:
-
-\joao{missing talking about wellformedness of contexts}
-\begin{lemma}[Types are stable under substitution]
-  \label{lemma:wfsubst}
-
-  If $\jwf \Gamma A$ and $\jwf \Gamma B$ and $(x \disjoint C) \in \Gamma$ 
-  and $\jdisimpl \Gamma B C$, then $\jwf {\Gamma \subst x B} {A \subst x B}$.
-\end{lemma}
-
-%\begin{restatable}[Instantiation]{lemma}{instantiation}
-%  \label{lemma:instantiation}
-%
-%  If $\jwf {\Gamma, \alpha \disjoint B} C$, $\jwf \Gamma A$, $\jdis \Gamma A B$
-%  then $\jwf \Gamma {\subst A \alpha C}$.
-%\end{restatable}
-\joao{add proof}
-
-This lemma enables us to show that all types produced by the type-system are well-typed.
-More formally, we have that:
-
-\begin{restatable}[Well-formed typing]{lemma}{wellformedtyping}
-  \label{lemma:wellformed-typing}
-
-  If $\jcheck \Gamma e A$, then $\jwf \Gamma A$. 
-
-  If $\jinfer \Gamma e A$, then $\jwf \Gamma A$.
-\end{restatable}
-
-\begin{proof}
-  By induction on the derivation and applying
-  Lemma~\ref{lemma:wfsubst} in the case of \reflabel{\labelttapp}.
-\end{proof}
-
 \subsection{Top-like types and their coercions}
 
 \begin{figure}[!t]

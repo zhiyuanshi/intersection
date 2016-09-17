@@ -399,15 +399,6 @@ Proof.
   - simpl in HNotIn; apply WFRec; apply IHHWFt; auto; not_in_L z.
 Qed.
 
-Lemma foo : forall Gamma z u, WFEnv Gamma -> ~ In z (fv_ptyp u) -> WFEnv (subst_env Gamma z u).
-Proof.
-  intros Gamma z u HWFEnv HNotIn.
-  induction HWFEnv.
-  - unfold subst_env; auto.
-  - simpl. admit.
-  - simpl. apply WFPushT; auto. rewrite dom_subst_id. auto.
-Admitted.
-  
 Lemma subst_source_wf_typ :
   forall t z u Gamma d, not (In z (fv_ptyp u)) ->
                MapsTo Gamma z d ->
