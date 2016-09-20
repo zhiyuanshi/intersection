@@ -177,7 +177,7 @@ two types of different constructs unless any of them is an intersection type.
 Note that disjointness with the $\top$ type is already captured by {\reflabel{\labeldistop}}
 and {\reflabel{\labeldistopsym}}.
 
-\subsection{Metatheory}
+\subsection{Substitution metatheory}
 
 Disjointness will not only play a fundamental role in ensuring coherence, but also in 
 ensuring the type-safety of our system.
@@ -187,7 +187,7 @@ what are the exact implications of mixing substitution with disjoint intersectio
 We will next dive into this question in greater detail.
 
 
-\paragraph{Stability of substitutions}
+\paragraph{Disjoint substitutions}
 One rule of thumb in disjoint intersection types states that, if a type $A$ is 
 disjoint to a type $B$, then the intersection $A \inter B$ is well-typed.
 However, during type instantiation (i.e. when type substitution should be stable), both types
@@ -213,34 +213,36 @@ Now, more formally, we can show following lemma holds:
   \label{lemma:orthosubst}
 
   If $(x \disjoint C) \in \Gamma$ and $\jdis \Gamma C D$, 
-  then $\jdis {\Gamma \subst C x} {A \subst C x} {B \subst C x}$.
+  then $\jdis {\Gamma \subst C x} {A \subst C x} {B \subst C x}$,
 \end{lemma}
+where $\Gamma \subst C x$ means substituting $x$ by $C$ in the co-domain of the environment.
 
-\joao{add proof detail here}
+\begin{proof}
+  By induction on the disjointness derivation of $C$ and $D$.
+  Special attention is necessary for the variable case: it was necessary to prove stability
+  of substitution for the subtyping relation.
+  It was also needed to show that, if $C$ and $D$ do not contain any variable $x$, then it is
+  safe to make a substitution in the co-domain in the environment.
+\end{proof}
 
-Even though the meta-theory is consistent with the expected results, there is still an open
-question that remains unanswered: what exactly are the bounds of disjoint quantification?
-In other words, which type(s) might be used to allow unrestricted instantiation, and which
-one(s) might be used to completely restrict instantiation?
-As one might expected, the answer is tightely related to subtyping, as we will show next.
 
 \bruno{This explanation is too brief. Firstly you want to formally state the substitution 
 lemma here, and then expand the explanation including some aspects that made the 
 proof non-trivial, and perhaps a discussion about which bounds to chose ($\top$ or $\bot$).}
 
-\paragraph{Well-formedness and substitution}
-Typically, in polymorphic systems with explicit instantiation it is necessary to show that
+\paragraph{Well-formedness substitution stability}
+Typically polymorphic systems with explicit instantiation are required to be shown that their
 types are stable under substitution, in order to avoid ill-formed types.
 In the presence of disjoint quantification, we cannot prove such property.
 However, a weaker version of that property -- but strong enough for our type-system's metatheory 
 -- can be proven, namely:
 
-\joao{missing talking about wellformedness of contexts}
+\joao{again, missing WFEnv premises}
 \begin{lemma}[Types are stable under substitution]
   \label{lemma:wfsubst}
 
   If $\jwf \Gamma A$ and $\jwf \Gamma B$ and $(x \disjoint C) \in \Gamma$ 
-  and $\jdisimpl \Gamma B C$, then $\jwf {\Gamma \subst x B} {A \subst x B}$.
+  and $\jdis \Gamma B C$, then $\jwf {\Gamma \subst x B} {A \subst x B}$.
 \end{lemma}
 
 %\begin{restatable}[Instantiation]{lemma}{instantiation}
@@ -249,7 +251,13 @@ However, a weaker version of that property -- but strong enough for our type-sys
 %  If $\jwf {\Gamma, \alpha \disjoint B} C$, $\jwf \Gamma A$, $\jdis \Gamma A B$
 %  then $\jwf \Gamma {\subst A \alpha C}$.
 %\end{restatable}
-\joao{add proof}
+
+\begin{proof}
+By induction on the well-formedness derivation of $A$.
+The intersection case requires the use of Lemma~\ref{lemma:orthosubst}.
+Also, the variable case required proving that if $x$ does not occur free in $A$, and it is safe
+to substitute it in the co-domain of $\Gamma$, then it is safe to perform the substitution.
+\end{proof}
 
 This lemma enables us to show that all types produced by the type-system are well-typed.
 More formally, we have that:
@@ -267,41 +275,42 @@ More formally, we have that:
   Lemma~\ref{lemma:wfsubst} in the case of \reflabel{\labelttapp}.
 \end{proof}
 
+Even though the meta-theory is consistent with the expected results, there is still an open
+question that remains unanswered: what exactly are the bounds of disjoint quantification?
+In other words, which type(s) might be used to allow unrestricted instantiation, and which
+one(s) might be used to completely restrict instantiation?
+As one might expected, the answer is tightely related to subtyping, as we will show next. 
+
 \subsection{Bounds of disjoint quantification}
 As we have mentioned previously, substitution raises the question of what range of types can be 
 instantiated for a given variable, under a given context.
 
-\paragraph{Upper-bound}\joao{maybe rename this? it is the most liberal bound}
+\paragraph{Most liberal bound}
 The system we are describing must be complete with respect to System-$F$, meaning that any
 program accepted by System-$F$ should also be accepted by \name.
 Since System-$F$ does not contain disjointness quantification, it is necessary for \name to 
 include a type which is disjoint to every other type (i.e. the most liberal constraint): $\top$.
 Thus, the System-$F$'s type $\forall \alpha. {T_F}$ (where ${T_F}$ is some other type), is
-equivalent to \name's $\fordis \alpha \top {T_i}$.
+equivalent to \name's $\fordis \alpha \top {T_i}$, where ${T_i}$ is an equivalent translation of
+$T_{F}$.
 
-\paragraph{Lower-bound}
+\paragraph{Most restrictive bound}
 Inversely, the most restrictive type should be $\bot$, as one might think of $\bot$ as specific 
 as the infinite intersection.
 In other words, $\bot$ is not disjoint to any type, except top-like types.
-However, introducing $\bot$ is not compatible with our disjointness definition, due to the rule
-\reflabel{\labeldisvar}.
-Notice that if $A$ is $\bot$, then it is not true that $A$ is disjoint to all super-types of
-$\bot$ (i.e. all other possible types).
-To understand why, let us recall the reader of the property of which \reflabel{\labeldisvar} is
-based on:
-
-\[ \inferrule {\jwf \Gamma {A \disjoint B} \\ B \subtype C }
-              {\jwf \Gamma {A \disjoint C}} \]
-
-If one instantiates $A$ with a variable $\alpha$ and, most importantly, $B$ with $\bot$, the
-lemma still holds, since $\alpha \disjoint \bot$ is false!
-This suggests that we should not be able to introduce $\bot$ in the environment, as we are
-constructing evidence for a false hypothesis.
-While this could be a straightforward restriction in our system, one might ask: what about
-introducing $\bot \inter \bot$ in the environment? 
-Or, more generally, introducing any \emph{bottom-like} type? 
+However, introducing $\bot$ is not compatible with our disjointness rule
+\reflabel{\labeldisvar} and well-formedness of contexts.
+Let us take a closer look, by supposing that we wish to derive $\jdis \Gamma x x$, for some variable 
+$x$, under some well-formed context $\Gamma$.
+For this end, we want to use \reflabel{\labeldisvar} with the type $A$ as a sub-type of $x$, 
+i.e. an (n-ary) intersection containing $x$.
+Well-formedness of environments guarantees that this will never happen, since $x$ is not in
+scope of itself. 
+Thus, without a $\bot$ type, a derivation for that statement does not exist. 
+However, by introducing $\bot$ we are now able to derive it, since $A$ can now be $\bot$: a valid
+sub-type of $x$ which does not contain $x$.
+In fact, introducing any \emph{bottom-like} type (i.e. $\bot \inter B$) can lead to this
+undesired behaviour.
 Since defining the lower bound is not strictly necessary to our formalization; introduces 
-substantial complexity in our system; and its practical application is not clear, we left this as 
-an open problem for future work. 
-
-
+substantial complexity in our system; and its practical application is still not clear, we left this
+as an open problem for future work. 

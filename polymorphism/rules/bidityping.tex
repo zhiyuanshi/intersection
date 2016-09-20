@@ -137,7 +137,7 @@ $ \jcheck \Gamma e A \yields E\\e$ checks against given type $A$
   {\jinfer \Gamma {\recordCon l e} {\recordType l A} \yields {E}}
 }
 
-\newcommand{\labeltprojr}{\makelabelt RecAcc}
+\newcommand{\labeltprojr}{\makelabelt {ProjR}}
 \newcommand{\bruletprojr}{
 \inferrule* [right=\labeltprojr]
   {\jinfer \Gamma e {\recordType l A} \yields {E}}
