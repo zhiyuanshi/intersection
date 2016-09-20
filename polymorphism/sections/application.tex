@@ -1,4 +1,160 @@
+\section{Application: Extensible records}
+\label{subsec:records}
 
+\joao{change syntax to the one used in overview}
+Our system can be used to encode records, similarly to way as discussed in 
+\cite{dunfield2014elaborating}. 
+However, describing and implementing records within programming languages is certainly not novel 
+and has been extensively studied in the past.
+Most of the systems are entirely focused on concrete aspects of records 
+(i.e. expressiveness, compilation, etc), while ours will specialize the more general notion of  
+intersection types.
+In this section we aim at comparing our approach with such systems. 
+
+Systems with records usually rely on 3 basic operations: selection, restriction and 
+extension/concatenation. 
+We will first introduce these basic operations in the context of \name.
+
+\subsection{Basic operations}
+\paragraph{Selection}
+
+The select operator is directly embedded in our language. 
+It follows the usual syntax of $e.l$, where $e$ is an expression of type $\recordType l \alpha$ and 
+$l$ is a label.
+A polymorphic function which extracts any record that include the label $l$ of type
+$\alpha$ could be written as:
+\begin{align*}
+&\text{select} :: \fordis \alpha \top {\recordType l \alpha \rightarrow \alpha} \\
+&\text{select} \, = \blamdis \alpha \top {\lam x {x.l}}
+\end{align*}
+
+Note how, through the use of subtyping, this function will accept any intersection type that contains
+the single recorld $\recordType l \alpha$.
+This resembles other systems ..., although it is slightly more general, as any it is not 
+restricted only to record types. \joao{references}
+
+\paragraph{Restriction}
+
+In constrast with most systems, restriction is not directly embedded on our language.
+Instead, we can make use of subtyping to define such operator: 
+\begin{align*}
+&\text{remove} :: \fordis \alpha \top {\fordis r {\recordType l \alpha} 
+{({\recordType l \alpha \inter r) \rightarrow r}}} \\ 
+&\text{remove} \, = \blamdis \alpha \top {\blamdis r {\recordType l \alpha} {\lam x {x}}} 
+\end{align*}
+
+\paragraph{Extension/Concatenation}
+
+The most usual operators for combining records are extension and concatenation.
+Even though that in some systems, the latter is defined in terms of the former, languages that
+opt to include concatenation usually rely on specific semantics for it. \joao{add references}
+Our system is suitable for encoding both of these operations, but we argue that concatenation is
+the natural primitive operator, due to the resemblance with our merge operator.
+Indeed, (Harper \& Pierce) also define a \emph{merge} operator, which is quite similar to
+our \emph{merge} for intersection types, except it envoles only record types.
+For instance, a function which concatenates a single record with field $l$ of type $\tyint$
+with another record that lacks this field, is the following (slightly modified in terms of 
+notation):
+\begin{align*}
+&\text{addL}_1 :: \forall \alpha\#l. \alpha \rightarrow (\alpha || \recordType l \tyint) \\ 
+&\text{addL}_1 \, = ...
+\end{align*}
+The reader might notice the resemblance with our system:
+\begin{align*}
+&\text{addL}_2 :: \fordis \alpha {\recordType l \tyint} {
+\alpha \rightarrow (\alpha \inter \recordType l \tyint)} \\
+&\text{addL}_2 \, = ...
+\end{align*}
+This shows that one can use disjoint quantification to express negative field information.
+It is very close to what (Harper \& Pierce) describe in their system.  
+Note how we have to explicitly state the type of the constraint in $\text{addL}_2$, whereas 
+$\text{addL}_1$ does not require this.
+The same generality of disjoint intersection types that allows one to encode record types is the
+one that forces us to add this extra type in the constraint.
+However, there is a slight gain with this approach: $\text{addL}_2$ accepts more types than
+$\text{addL}_1$.
+Namely, all (intersection) types that contain label $l$, with a field type \emph{disjoint} to
+$\tyint$.
+
+Had one meant to forbid records with \emph{any} $l$ fields, then one could write:
+
+\joao{how about this? fresh beta vs bottom?}
+\begin{align*}
+&\text{addL}_3 :: \fordis \beta \top {\fordis \alpha {\recordType l \beta} {
+\alpha \rightarrow (\alpha \inter \recordType l \beta)}} \\
+&\text{addL}_3 \, = ...
+\end{align*}
+
+Other systems with record concatenation usually define predicates, in terms of field absence or 
+presence (with a type $\alpha$). 
+This rises the question: how would one classify our system in terms of extension? 
+As noted in~\cite{leijen2004first}, systems typically can be categorized into two distinct groups
+in what concerns extension: the strict and the free.
+The former does not allow field overriding when extending a record (i.e. one can only extend a 
+record with a field that is not present in it); while the latter does account for field overriding.
+Our system can be seen as hybrid of these two kinds of systems.
+Next we will show a comparison in terms of expressability between \name and other systems 
+with records that hopefully will enlighten the reader on this matter.
+
+\subsection{Expressibility}
+In ... (SPJ \& MJ) -- a strict system with extension -- an example of a function that uses 
+record types is the following:
+\begin{align*}
+&\text{average}_1 :: (r \backslash y, r \backslash x) \Rightarrow \{r | x :: \tyint, y :: \tyint\} \rightarrow \tyint \\
+&\text{average}_1 \, r = (r.x + r.y) / 2
+\end{align*}
+
+The type signature says that for any record with type $r$, that lacks both $x$ $y$, can be accepted
+as parameter extended with $x$ $y$, returning an integer.
+Note how the bounded polymorphism is essential to ensure that $r$ does not contain $x$ nor $y$.
+On the other hand, in a system with free extension as in~\cite{leijen2005extensible}, 
+the more general program would be accepted:
+\begin{align*}
+&\text{average}_2 :: \forall x \; y, \{ x :: \tyint, y :: \tyint | r \} \rightarrow \tyint \\
+&\text{average}_2 \, r = (r.x + r.y) / 2
+\end{align*}
+
+In this case, if $r$ contains either field $x$ or field $y$, they would be shadowed by the labels 
+present in the type signature.
+In other words, if a record with multiple $x$ fields, the most recent (i.e. left-most) would be used 
+in any function which accesses $x$.
+\joao{add example of a system using subtyping?}
+
+In \name, such function could be re-written as
+\footnote{We do not support exactly this function definition style; 
+however the type signature and expression (module infix operators) are exactly as one would write them
+in \name}:
+\begin{align*}
+&\text{average}_3 :: \fordis r 
+{\recordType x \tyint \inter \recordType y \tyint} 
+{\recordType x \tyint \inter \recordType y \tyint \inter r \rightarrow \tyint} \\
+&\text{average}_3 = 
+{\blamdis t {\recordType x \tyint \inter \recordType y \tyint} {\lam r {(r.x + r.y) / 2}}}
+\end{align*}
+
+Thus more types are accepted this function than in the first system, but less than the second. 
+Another major difference between \name and the two other mentioned systems, is the ability to 
+combine records with arbitrary types.
+Our system does not account for well-formedness of record types as the other two systems do 
+(i.e. using a special \emph{row} kind), since our encoding of records piggybacks on the more
+general notion of disjoint intersection types. 
+
+Finally, it is also worth noting that systems using subtyping may suffer from the so-called 
+\emph{update} problem.
+\joao{show example (for both update problems?)}
+\name does not suffer from this problem. \joao{since we have no refinement types?}
+We may illustrate by defining a suitable update function, in a similar fashion 
+to~\cite{leijen2005extensible}:
+\begin{align*}
+&\text{update} :: \fordis \alpha \top {\fordis r {\recordType l \alpha} 
+{{\recordType l \alpha \inter r \rightarrow \beta \rightarrow \recordType l \beta \inter r}}} \\ 
+&\text{update} \, = \blamdis \alpha \top {\blamdis r {\recordType l \alpha} {\lam x {\lam v {
+\recordCon l v \mergeop (\text{remove } \alpha \; r \; x)}}}} 
+\end{align*}
+
+
+
+\begin{comment}
 \section{Application: Extensibility}
 \label{subsec:OAs}
 
@@ -20,48 +176,44 @@ parametric polymorphism and disjoint quantification) are needed to
 properly encode one important combinator~\cite{oliveira2013feature} used to compose
 multiple operations over datatypes.
 
-\begin{comment}
-The combination of parametric polymorphism, intersection types and the
-merge operator is useful to encode datatypes with subtyping and
-support extensibility in \namedis. The combination of
-polymorphism and the merge operator is essential to allow the
-composition of multiple operations over datatypes.
-In the following
-we present a step-by-step solution to the Expression Problem in \namedis,
-and illustrate how to combine multiple operations.
-\end{comment}
+%The combination of parametric polymorphism, intersection types and the
+%merge operator is useful to encode datatypes with subtyping and
+%support extensibility in \namedis. The combination of
+%polymorphism and the merge operator is essential to allow the
+%composition of multiple operations over datatypes.
+%In the following
+%we present a step-by-step solution to the Expression Problem in \namedis,
+%and illustrate how to combine multiple operations.
 
-\begin{comment}
-Oliveira and Cook~\cite{oliveira2012extensibility} proposed a design pattern that can solve the
-Expression Problem in languages like Java. An advantage of the pattern
-over previous solutions is that it is relatively lightweight in terms
-of type system features. In a latter paper, Oliveira et al.~\cite{oliveira2013feature}
-noted some limitations of the original design pattern and proposed
-some new techniques that generalized the original pattern, allowing it
-to express programs in a Feature-Oriented Programming~\cite{Prehofer97} style.
-Key to these techniques was the ability to dynamically compose object
-algebras.
-
-Unfortunatelly, dynamic composition of object algebras is
-non-trivial. At the type-level it is possible to express the resulting
-type of the composition using intersection types. Thus, it is still
-possible to solve that part problem nicely in a language like Scala (which
-has basic support for intersection types). However, the dynamic
-composition itself cannot be easily encoded in Scala. The fundamental
-issue is that Scala lacks a \lstinline{merge} operator (see the
-discussion in Section~\ref{subsec:interScala}). Although both Oliveira et al.~\cite{oliveira2013feature} and
-Rendell et al.~\cite{rendel14attributes} have shown that such a \lstinline{merge} operator can
-be encoded in Scala, the encoding fundamentally relies in low-level
-programming techniques such as dynamic proxies, reflection or
-meta-programming.
-
-Because \namedis supports a \lstinline{merge} operator natively, dynamic
-object algebra composition becomes easy to encode. The remainder of
-this section shows how object algebras and object algebra composition
-can be encoded in \namedis. We will illustrate this point
-step-by-step by solving the Expression Problem.
+%Oliveira and Cook~\cite{oliveira2012extensibility} proposed a design pattern that can solve the
+%Expression Problem in languages like Java. An advantage of the pattern
+%over previous solutions is that it is relatively lightweight in terms
+%of type system features. In a latter paper, Oliveira et al.~\cite{oliveira2013feature}
+%noted some limitations of the original design pattern and proposed
+%some new techniques that generalized the original pattern, allowing it
+%to express programs in a Feature-Oriented Programming~\cite{Prehofer97} style.
+%Key to these techniques was the ability to dynamically compose object
+%algebras.
+%
+%Unfortunatelly, dynamic composition of object algebras is
+%non-trivial. At the type-level it is possible to express the resulting
+%type of the composition using intersection types. Thus, it is still
+%possible to solve that part problem nicely in a language like Scala (which
+%has basic support for intersection types). However, the dynamic
+%composition itself cannot be easily encoded in Scala. The fundamental
+%issue is that Scala lacks a \lstinline{merge} operator (see the
+%discussion in Section~\ref{subsec:interScala}). Although both Oliveira et al.~\cite{oliveira2013feature} and
+%Rendell et al.~\cite{rendel14attributes} have shown that such a \lstinline{merge} operator can
+%be encoded in Scala, the encoding fundamentally relies in low-level
+%programming techniques such as dynamic proxies, reflection or
+%meta-programming.
+%
+%Because \namedis supports a \lstinline{merge} operator natively, dynamic
+%object algebra composition becomes easy to encode. The remainder of
+%this section shows how object algebras and object algebra composition
+%can be encoded in \namedis. We will illustrate this point
+%step-by-step by solving the Expression Problem.
 %%Prior knowledge of object algebras is not assumed.
-\end{comment}
 
 % can be cumbersome and
 % language support for intersection types would solve that problem.
@@ -259,11 +411,11 @@ if \lstinline{Exp} is indeed a subtype of \lstinline{SubExp}.
 The second type of extension is adding a new operation, such as pretty printing.
 Similarly to evaluation, the interface of the pretty printing feature
 is modeled as:
-\begin{comment}
-  \begin{lstlisting}
-    type IPrint = { print : String } in (*$ \ldots $*)
-  \end{lstlisting}
-\end{comment}
+%\begin{comment}
+%  \begin{lstlisting}
+%    type IPrint = { print : String } in (*$ \ldots $*)
+%  \end{lstlisting}
+%\end{comment}
 \begin{lstlisting}
 type IPrint = { print: String } in (*$ \ldots $*)
 \end{lstlisting}
@@ -292,16 +444,16 @@ by \lstinline{three}:
 (three.accept[IPrint] printAlg).print
 \end{lstlisting}
 
-\begin{comment}
-The result is \lstinline$"7 - 2"$. Note that the programmer is able to pass \lstinline{lit 2}, which is of type \lstinline{Exp},
-to \lstinline{sub}, which expects a \lstinline{SubExp}. The types are compatible
-because because \lstinline$Exp$ is a \emph{subtype} of \lstinline$SubExp$. Code
-reuse is achieved since we can use the constructors from \lstinline$Exp$ as the
-constructor for \lstinline$SubExp$. In Scala, we would have to define two
-literal constructors, one for \lstinline$Exp$ and another for
-\lstinline$SubExp$.
-\end{comment}
-
+%\begin{comment}
+%The result is \lstinline$"7 - 2"$. Note that the programmer is able to pass \lstinline{lit 2}, which is of type \lstinline{Exp},
+%to \lstinline{sub}, which expects a \lstinline{SubExp}. The types are compatible
+%because because \lstinline$Exp$ is a \emph{subtype} of \lstinline$SubExp$. Code
+%reuse is achieved since we can use the constructors from \lstinline$Exp$ as the
+%constructor for \lstinline$SubExp$. In Scala, we would have to define two
+%literal constructors, one for \lstinline$Exp$ and another for
+%\lstinline$SubExp$.
+%\end{comment}
+%
 \subsection{Composition of Algebras}
 The final example shows a non-trivial combinator for algebras that
 allows multiple algebras to be combined into one. A version of this
@@ -352,3 +504,4 @@ o.print ++ " = " ++ o.eval.toString()
 Note that \lstinline$o$ is a value that supports both
 evaluation and printing. The final expression uses \lstinline{o}
 for doing both printing and evaluation.
+\end{comment}
