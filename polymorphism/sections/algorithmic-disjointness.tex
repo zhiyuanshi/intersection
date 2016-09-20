@@ -12,7 +12,7 @@ The set of rules is algorithmic and an implementation is easily derived from the
 After, it will show a few important properties regarding substitution, which will turn out
 to be crucial to ensure type-safety.
 Finally, it will discuss the bounds of disjoint quantification and what implications
-they have on \name.
+they have on \name, with a special focus on the $\top$ type and an hypothetical $\bot$ type.
 
 \begin{comment}
 \subsection{Derivation of the Algorithmic Rules}
@@ -219,16 +219,11 @@ where $\Gamma \subst C x$ means substituting $x$ by $C$ in the co-domain of the 
 
 \begin{proof}
   By induction on the disjointness derivation of $C$ and $D$.
-  Special attention is necessary for the variable case: it was necessary to prove stability
+  Special attention for the variable case, where it was necessary to prove stability
   of substitution for the subtyping relation.
   It was also needed to show that, if $C$ and $D$ do not contain any variable $x$, then it is
-  safe to make a substitution in the co-domain in the environment.
+  safe to make a substitution in the co-domain of the environment.
 \end{proof}
-
-
-\bruno{This explanation is too brief. Firstly you want to formally state the substitution 
-lemma here, and then expand the explanation including some aspects that made the 
-proof non-trivial, and perhaps a discussion about which bounds to chose ($\top$ or $\bot$).}
 
 \paragraph{Well-formedness substitution stability}
 Typically polymorphic systems with explicit instantiation are required to be shown that their
@@ -282,19 +277,42 @@ one(s) might be used to completely restrict instantiation?
 As one might expected, the answer is tightely related to subtyping, as we will show next. 
 
 \subsection{Bounds of disjoint quantification}
-As we have mentioned previously, substitution raises the question of what range of types can be 
-instantiated for a given variable, under a given context.
+Substitution raises the question of what range of types can be instantiated for a given variable, 
+under a given context.
+To get a feeling about this, let us restate a previous lemma, which we used to justify the rule 
+for disjointness of variables:
 
-\paragraph{Most liberal bound}
-The system we are describing must be complete with respect to System-$F$, meaning that any
-program accepted by System-$F$ should also be accepted by \name.
-Since System-$F$ does not contain disjointness quantification, it is necessary for \name to 
-include a type which is disjoint to every other type (i.e. the most liberal constraint): $\top$.
-Thus, the System-$F$'s type $\forall \alpha. {T_F}$ (where ${T_F}$ is some other type), is
-equivalent to \name's $\fordis \alpha \top {T_i}$, where ${T_i}$ is an equivalent translation of
-$T_{F}$.
+\[ \inferrule {\jwf \Gamma {A \disjoint B} \\ B \subtype C }
+              {\jwf \Gamma {A \disjoint C}} \]
 
-\paragraph{Most restrictive bound}
+If one takes $A$ as some variable $x$, and $B$ as some type in the environment, we can 
+interpreting how many possible choices are there for the type $C$. 
+Given that the cardinality of types is infinite, we will strict $C$ to only a finite number of 
+primitive types (i.e. $\tyint$, $\tystring$, etc), disjoint intersections of these types,
+$\top$ and $\bot$.
+Having this in mind, we can immediately conclude that the number of choices for $C$ is directly 
+proportional to the number of intersections present in $B$.
+For example, taking $B$ as $\tyint$ leads $C$ to be either $\top$ or $\tyint$; whereas $B$ as 
+$\tyint \inter \tystring$ leaves $C$ as either $\top$, $\tyint$ or $\tystring$.
+However, more choices for $C$ means that there will be less choices to instantiate the variable $x$. 
+Thus the options for instantiating $x$ are inversely proportional to the number of intersections
+present in $B$.
+There are two special cases, namely $\top$ (i.e. the 0-ary intersection) and $\bot$ (i.e. the
+infinite intersection) \footnote{$\bot$ would not add anything to the hypothetical finite type 
+system, however it can be seen as the infinite intersection in \name.}.
+We will discuss them next.
+
+\paragraph{The most liberal bound}
+It is easy to see that $\top$ is the most liberal type since it is disjoint to everything. 
+This $\top$ type plays an important role in our system, since it
+must be complete with respect to System-$F$. 
+In other words, any program accepted by System-$F$ should also be accepted by \name.
+Since System-$F$ does not contain disjointness quantification, $\top$ comes in handy:
+the System-$F$'s type $\forall \alpha. {T_F}$ (where ${T_F}$ is some other type), is
+equivalent to \name's type $\fordis \alpha \top {T_i}$, where ${T_i}$ is also an equivalent 
+translation of $T_{F}$.
+
+\paragraph{The less restrictive bound}
 Inversely, the most restrictive type should be $\bot$, as one might think of $\bot$ as specific 
 as the infinite intersection.
 In other words, $\bot$ is not disjoint to any type, except top-like types.
@@ -307,7 +325,7 @@ i.e. an (n-ary) intersection containing $x$.
 Well-formedness of environments guarantees that this will never happen, since $x$ is not in
 scope of itself. 
 Thus, without a $\bot$ type, a derivation for that statement does not exist. 
-However, by introducing $\bot$ we are now able to derive it, since $A$ can now be $\bot$: a valid
+However, by introducing $\bot$ we are now able to derive it, as $A$ can now be $\bot$: a valid
 sub-type of $x$ which does not contain $x$.
 In fact, introducing any \emph{bottom-like} type (i.e. $\bot \inter B$) can lead to this
 undesired behaviour.

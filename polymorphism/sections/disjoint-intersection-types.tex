@@ -3,7 +3,10 @@
 \bruno{You are repeatedily referring to our previous paper and Dunfield's paper. 
 You don't need to constantly remind the reader of this. Remove some of this repetition.}
 
-\bruno{summary is missing: why should readers read this section; what's new?}
+This section discusses the elaboration semantics of \name and show how coherence is retained.
+We will first explain the semantics by means of the elaboration to System-$F$.
+Then, we will discuss the necessary extensions to retain coherence, namely in the coercions of 
+top-like types; coercive subtyping, and bidirectional type-system's elaboration. 
 
 \subsection{Semantics}
 
@@ -26,21 +29,12 @@ in the appendix.
 \begin{figure}[!t]
   \[
     \begin{array}{llrl}
-      \text{Types}    & T & \Coloneqq & \alpha \\
-                      &   & \mid      & \highlight {$ () $} \\
-                      &   & \mid      & \tyint \\
-                      &   & \mid      & {T_1} \to {T_2} \\
-                      &   & \mid      & \for \alpha T \\
-                      &   & \mid      & \highlight {$ \pair {T_1} {T_2} $} \\
-      \text{Terms}    & E & \Coloneqq & x \\
-                      &   & \mid      & \highlight {$ () $} \\
-                      &   & \mid      & i \\
-                      &   & \mid      & \lamty x T E \\
-                      &   & \mid      & \app {E_1} {E_2} \\
-                      &   & \mid      & \blam \alpha E \\
-                      &   & \mid      & \tapp E T \\
-                      &   & \mid      & \highlight {$ \pair {E_1} {E_2} $} \\
-                      &   & \mid      & \highlight {$ \proj k E $} \quad k \in \{ 1, 2 \} \\
+      \text{Types}    & T & \Coloneqq & \alpha \mid \tyint \mid {T_1} \to {T_2} \mid \for \alpha T\\
+                      &   & \mid      & \highlight {$()$} \mid \highlight {$\pair {T_1} {T_2}$} \\
+      \text{Terms}    & E & \Coloneqq & x \mid i \mid \lamty x T E \mid \app {E_1} {E_2} \mid 
+                                        \blam \alpha E \mid \tapp E T \\
+                      &   & \mid      & \highlight {$()$} \mid \highlight {$ \pair {E_1} {E_2} $} 
+                                        \mid \highlight {$ \proj k E $} \quad k \in \{ 1, 2 \} \\
       \text{Contexts} & G & \Coloneqq & \cdot \mid G, \alpha \mid G, x \oftype T \\
     \end{array}
   \]
