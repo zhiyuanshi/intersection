@@ -57,7 +57,8 @@
 \newcommand{\for}[2]{\forall #1.\binderspace #2}
 \newcommand{\fordis}[3]{\for {(#1 \disjoint #2)} {#3}}
 \newcommand{\lam}[2]{\lambda #1.\binderspace #2}
-\newcommand{\lamty}[3]{\lam {(#1 \oftype #2)} #3}
+%\newcommand{\lamty}[3]{\lam {(#1 \oftype #2)} #3} no longer using types in lambdas
+\newcommand{\lamty}[3]{\lam #1 #3}
 \newcommand{\blam}[2]{\Lambda #1.\binderspace #2}
 \newcommand{\blamdis}[3]{\blam {(#1 \disjoint #2)} #3}
 \newcommand{\mergeop}{,,}

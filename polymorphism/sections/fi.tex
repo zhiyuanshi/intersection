@@ -237,7 +237,7 @@ The well-formedness rules are shown in the top part of Figure~\ref{fig:wf}.
 The new rules are \reflabel{\labelwfvar} and
 \reflabel{\labelwfforall}. 
 Their definition is quite straightforward, but note how we ensure the well-formedness 
-of the constraint in the latter. 
+of the constraint in the latter. \joao{we don't need this} 
 
 \paragraph{Disjoint quantification.} A disjoint quantification is introduced by
 the big lambda $\blamdis \alpha A e$ and eliminated by the usual type application 
@@ -264,6 +264,7 @@ We will explain next the rules that compose the type-system.
 
 
 \paragraph{Typing rules}
+\joao{we can safely remove the WF A in T-BLam}
 Our typing rules are formulated as a bi-directional type-system. 
 Just as in \oldname, this ensures the type-system is not only syntax-directed, but
 also that there is no type ambiguity.

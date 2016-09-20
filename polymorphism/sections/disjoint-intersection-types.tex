@@ -4,7 +4,7 @@
 You don't need to constantly remind the reader of this. Remove some of this repetition.}
 
 This section discusses the elaboration semantics of \name and show how coherence is retained.
-We will first explain the semantics by means of the elaboration to System-$F$.
+We will first explain the semantics by means of the elaboration to System $F$.
 Then, we will discuss the necessary extensions to retain coherence, namely in the coercions of 
 top-like types; coercive subtyping, and bidirectional type-system's elaboration. 
 
@@ -63,9 +63,9 @@ contexts $\Gamma$ to target language contexts $G$.
   \framebox{$\im \Gamma = G$}
 
   \begin{align*}
-    \im \cdot                      &= \cdot \\
-    \im {\Gamma, \alpha}           &= \im \Gamma, \alpha \\
-    \im {\Gamma, \alpha \oftype A} &= \im \Gamma, \alpha \oftype \im A
+    \im \cdot                        &= \cdot \\
+    \im {\Gamma, \alpha \disjoint A} &= \im \Gamma, \alpha \\
+    \im {\Gamma, \alpha \oftype A}   &= \im \Gamma, \alpha \oftype \im A
   \end{align*}
 
   \caption{Type and context translation.}
@@ -123,13 +123,12 @@ Figure~\ref{fig:andcoercion}.
 The only new rule is \reflabel{\labeltoplforall}, which extends the notion of top-like types for
 the (disjoint) quantifier case.
 
-It is important pointing out that, despite the similarity of these rules with the simply-typed system, 
-our notion of disjointness has changed.
-Consequently, the set of well-formed top-like types has changed.
-Therefore, we also extend the meta-function $\andcoerce{A}$, as shown in the bottom of 
+It is important pointing out that, despite the similarity of these rules with the simply-typed 
+system, our notion of disjointness has changed.
+Consequently, the set of well-formed top-like types has changed and
+we also adjusted the meta-function $\andcoerce{A}$, as shown in the bottom of 
 Figure~\ref{fig:andcoercion}.
-Note that, in contrast to \oldname, not only the $\forall$ case is defined, but also the intersection 
-case.
+Note how not only the $\forall$ case is defined, but also the intersection case.
 This is extremely important as it plays a fundamental role in ensuring the coherence of subtyping, as
 we will describe next.
 
@@ -150,18 +149,23 @@ $ \im {A_1} \to \im {A_2} $ (by Lemma~\ref{lemma:sub}). For example,
 \]
 generates a coercion function with type: $\tyint \inter \tybool \to \tybool$.
 
-In rules \reflabel{\labelsubvar}, \reflabel{\labelsubforall}, coercions are just
-identity functions. In \reflabel{\labelsubfun}, we elaborate the subtyping of
+Rule \reflabel{\labelsubtop} the coercion is the constant function of the unit term.
+In rules \reflabel{\labelsubvar}, \reflabel{\labelsubint}, coercions are just
+identity functions. 
+In \reflabel{\labelsubfun}, we elaborate the subtyping of
 parameter and return types by $\eta$-expanding $f$ to $\lamty x {\im {A_3}}
-{\app f x}$, applying $E_1$ to the argument and $E_2$ to the result. Rules
-\reflabel{\labelsubinterl}, \reflabel{\labelsubinterr}, and
+{\app f x}$, applying $E_1$ to the argument and $E_2$ to the result. 
+Rules \reflabel{\labelsubinterl}, \reflabel{\labelsubinterr}, and
 \reflabel{\labelsubinter} elaborate intersection types.
-\reflabel{\labelsubinter} uses both coercions to form a pair. Rules
-\reflabel{\labelsubinterl} and \reflabel{\labelsubinterr} reuse the coercion
+\reflabel{\labelsubinter} uses both coercions to form a pair. 
+Rules \reflabel{\labelsubinterl} and \reflabel{\labelsubinterr} reuse the coercion
 from the premises and create new ones that cater to the changes of the argument
-type in the conclusions. Note that the two rules are overlapping and
-hence a program can be elaborated differently, depending on which rule
-is used. Finally, all rules produce type-correct coercions:
+type in the conclusions. 
+Rule \reflabel{\labelsubforall} elaborates disjoint quantification, reusing only the coercion of 
+subtyping between the bodies of both types. 
+Rule \reflabel{\labelsubrec} elaborates records by simply reusing the coercion generated between
+the inner types.
+Finally, all rules produce type-correct coercions:
 
 %But in the implementation one usually applies the rules sequentially with
 %pattern matching, essentially defining a deterministic order of lookup.
@@ -221,8 +225,9 @@ is used. Finally, all rules produce type-correct coercions:
 %are disjoint it is impossible that both of the preconditions of the left decompositions are satisfied
 %at the same time. 
 
-In order to ensure a coherent type-system, we should prove that our subtyping relation is also coherent.
-More formally, as also shown in ..., with disjoint intersections the following theorem holds:
+In order to ensure a coherent type-system, we should prove that our subtyping relation is also 
+coherent.
+More formally, with disjoint intersections the following theorem holds:
 
 \begin{lemma}[Unique subtype contributor]
   \label{lemma:unique-subtype-contributor}
@@ -427,16 +432,34 @@ information. For example, consider the function application: \[ \app {(\lamty x
 the function expects a $\tystring$ but the translated argument is of type $\pair
 \tyint \tystring$.
 
-\paragraph{The translation judgement.} The translation judgement $\jtype \Gamma e
-A \yields E$ extends the typing judgement with an elaborated term on the right
-hand side of $\yields {}$. The translation ensures that $E$ has type $\im A$. In
-\name, one may pass more information to a function than what is required; but
-not in System $F$. To account for this difference, in \reflabel{\labeltapp}, the
+\paragraph{The translation judgement.} 
+The translation judgement $\jtype \Gamma e A \yields E$ extends the typing judgement with an 
+elaborated term on the right hand side of $\yields {}$. 
+The translation ensures that $E$ has type $\im A$. 
+We will look into the coercions of the new rules in greater detail.
+Rule \reflabel{\labeltblam} introduces a type variable $a$ into context, and naturally does not 
+make use of the disjointness constraint.
+In \name, one may pass more information to a function than what is required; but not in System $F$. 
+To account for this difference, in \reflabel{\labeltapp}, the
 coercion $E$ from the subtyping relation is applied to the argument.
-\reflabel{\labeltmerge} straighforwardly translates merges into pairs.
+Rules \reflabel{\labeltrec} and \reflabel{\labeltprojr} are quite straightforward, since there
+are not records in the target language.
+It might also be noteworthy saying that, as usual, the rule \reflabel{\labeltmerge} translates merges 
+into pairs.
+
+
+%As an example, we show the coercion generated by the identity function:
+
+%\[
+%\cdot
+%\inferrule* [right=\labeltmerge]
+%  {...}
+%  {\jinfer \Gamma {e_1 \mergeop e_2} {A \inter B} \yields {\pair {E_1} {E_2}}}
+%}
+%\]
+%Note that we intentionally left out the annotation...
 
 \paragraph{Type-safety}
-
 The type-directed translation is type-safe. This property is captured
 by the following two theorems.
 
@@ -646,6 +669,25 @@ by the following two theorems.
 %The notion of atomic
 %type will be helpful
 
+\paragraph{Uniqueness of type-inference}
+An important property of the bidirectional type-checking is that, given an expression $e$, if
+it is possible to infer a type for it, then $e$ has a unique type.
+
+\begin{restatable}[Uniqueness of type-inference]{theorem}{uniqueinference}
+  \label{theorem:unique-inference}
+  We have that:
+  \begin{itemize*}
+    \item If $\jinfer \Gamma e {A_1} \yields {E_1}$ and $\jinfer \Gamma e {A_2} \yields
+          {E_2}$, then ${A_1} = {A_2}$. 
+  \end{itemize*}
+\end{restatable}
+
+\joao{review proof}
+\begin{proof}
+By structural induction on the term and the corresponding inference rule.
+\end{proof}
+
+
 \paragraph{Coherency of Elaboration}
 Combining the previous results, we are finally able to show the central theorem:
 
@@ -663,7 +705,7 @@ Combining the previous results, we are finally able to show the central theorem:
 
 \end{restatable}
 
-\joao{review this proof, i.e. should we also mention (and show) uniqueness of type inference?}
+\joao{review this proof}
 \bruno{Yes, and you want to mention somewhere where the stability of substitution lemma 
 plays a role. I presume it plays a role in the coherence theorems.}
 \begin{proof}
