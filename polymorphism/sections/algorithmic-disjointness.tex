@@ -131,18 +131,19 @@ The top five rules are novel in relation to the algorithm described in \oldname.
 \reflabel{\labeldistop} and \reflabel{\labeldistopsym} say that any type is disjoint to 
 $\top$.
 \reflabel{\labeldisvar} is the base rule and \reflabel{\labeldissym} is its twin rule 
-\bruno{I think we should change the names of the rules. Perhaps 
-follow the subtyping relation and use the letter ``D''. Say $D_{\top}$ for the 
-disjointness rule for top.}. 
-\joao{added lines on top of axioms, this already cleans up a bit.}
 Both rules state that a type variable is disjoint to some type $A$, if $\Gamma$ contains any
 subtype of the corresponding disjointness constraint. 
 This rule is a specialization of the more general lemma:
+\joao{can we give this a name, as it is re-stated later? i.e. covariance of disjointness?}
 
 \[ \inferrule {\jwf \Gamma {A \disjoint B} \\ B \subtype C }
               {\jwf \Gamma {A \disjoint C}} \]
 The lemma states that if a type $A$ is disjoint to $B$ under $\Gamma$, then it is also disjoint
-to any supertype of $B$. % TODO show example here?
+to any supertype of $B$. 
+Note how these two variable rules would allow one to prove $x \disjoint x$, for a given type 
+variable $x$.
+However, since we are assuming that all contexts are well-formed, it is not possible to make
+such derivation as $x$ cannot occur free in $A$. 
 The rule for disjoint quantification \reflabel{\labeldisforall} is the last novel rule. 
 It adds a constraint composed of the intersection both constraints into $\Gamma$ and checks for 
 disjointness in the bodies under that environment.
@@ -172,10 +173,12 @@ Finally, the rule \reflabel{\labeldisax} says two types are considered disjoint 
 judged to be disjoint by the axiom rules, which are explained below.
 
 \paragraph{Axioms.} Axiom rules take care of two types with different language constructs.
-Just as in ..., these rules capture the set of rules is that $A \disjointax B$ holds for all 
-two types of different constructs unless any of them is an intersection type.
-Note that disjointness with the $\top$ type is already captured by {\reflabel{\labeldistop}}
-and {\reflabel{\labeldistopsym}}.
+These rules capture the set of rules is that $A \disjointax B$ holds for all 
+two types of different constructs unless any of them is an intersection type, a type variable,
+or $\top$.
+Note that disjointness with type variables is already captured by \reflabel{\labeldisvar} and 
+\reflabel{\labeldissym}, and disjointness with the $\top$ type is already captured by 
+{\reflabel{\labeldistop}} and {\reflabel{\labeldistopsym}}.
 
 \subsection{Substitution metatheory}
 
@@ -188,7 +191,7 @@ We will next dive into this question in greater detail.
 
 
 \paragraph{Disjoint substitutions}
-One rule of thumb in disjoint intersection types states that, if a type $A$ is 
+One rule of thumb in disjoint intersection types is that, if a type $A$ is 
 disjoint to a type $B$, then the intersection $A \inter B$ is well-typed.
 However, during type instantiation (i.e. when type substitution should be stable), both types
 $A$ and $B$ can change.
@@ -208,14 +211,12 @@ is compatible with the disjointness constraint associated with the variable.
 
 Now, more formally, we can show following lemma holds: 
 
-\joao{missing WFEnv premisses}
 \begin{lemma}[Disjointness is stable under substitution]
   \label{lemma:orthosubst}
 
   If $(x \disjoint C) \in \Gamma$ and $\jdis \Gamma C D$, 
-  then $\jdis {\Gamma \subst C x} {A \subst C x} {B \subst C x}$,
+  then $\jdis {\subst C x \Gamma} {\subst C x A} {\subst C x B}$,
 \end{lemma}
-where $\Gamma \subst C x$ means substituting $x$ by $C$ in the co-domain of the environment.
 
 \begin{proof}
   By induction on the disjointness derivation of $C$ and $D$.
@@ -232,12 +233,11 @@ In the presence of disjoint quantification, we cannot prove such property.
 However, a weaker version of that property -- but strong enough for our type-system's metatheory 
 -- can be proven, namely:
 
-\joao{again, missing WFEnv premises}
 \begin{lemma}[Types are stable under substitution]
   \label{lemma:wfsubst}
 
   If $\jwf \Gamma A$ and $\jwf \Gamma B$ and $(x \disjoint C) \in \Gamma$ 
-  and $\jdis \Gamma B C$, then $\jwf {\Gamma \subst x B} {A \subst x B}$.
+  and $\jdis \Gamma B C$, then $\jwf {\subst B x \Gamma} {\subst B x A}$.
 \end{lemma}
 
 %\begin{restatable}[Instantiation]{lemma}{instantiation}
@@ -270,65 +270,77 @@ More formally, we have that:
   Lemma~\ref{lemma:wfsubst} in the case of \reflabel{\labelttapp}.
 \end{proof}
 
-Even though the meta-theory is consistent with the expected results, there is still an open
+Even though the meta-theory is consistent with the expected results, there is still a
 question that remains unanswered: what exactly are the bounds of disjoint quantification?
 In other words, which type(s) might be used to allow unrestricted instantiation, and which
 one(s) might be used to completely restrict instantiation?
-As one might expected, the answer is tightely related to subtyping, as we will show next. 
+As one might expect, the answer is tightely related to subtyping, as we will show next. 
 
 \subsection{Bounds of disjoint quantification}
 Substitution raises the question of what range of types can be instantiated for a given variable, 
 under a given context.
-To get a feeling about this, let us restate a previous lemma, which we used to justify the rule 
+To get a feeling about this, let us restate a lemma, which we used to justify the rule 
 for disjointness of variables:
 
 \[ \inferrule {\jwf \Gamma {A \disjoint B} \\ B \subtype C }
               {\jwf \Gamma {A \disjoint C}} \]
 
-If one takes $A$ as some variable $x$, and $B$ as some type in the environment, we can 
-interpreting how many possible choices are there for the type $C$. 
-Given that the cardinality of types is infinite, we will strict $C$ to only a finite number of 
+If one takes $A$ as some variable $x$, and $B$ as some disjointness constraint bound to it in 
+the environment, then we can ask how many suitable types are there to instantiate $x$ with? 
+Before we answer this, let us ask first how many options are there for $C$, depending on the 
+shape of $B$?
+Given that the cardinality of \name's types is infinite, for the sake of this example we will 
+restrict the type universe to a finite number of 
 primitive types (i.e. $\tyint$, $\tystring$, etc), disjoint intersections of these types,
 $\top$ and $\bot$.
-Having this in mind, we can immediately conclude that the number of choices for $C$ is directly 
+Having this in mind, we can answer the second question: the number of choices for $C$ is directly 
 proportional to the number of intersections present in $B$.
 For example, taking $B$ as $\tyint$ leads $C$ to be either $\top$ or $\tyint$; whereas $B$ as 
 $\tyint \inter \tystring$ leaves $C$ as either $\top$, $\tyint$ or $\tystring$.
-However, more choices for $C$ means that there will be less choices to instantiate the variable $x$. 
-Thus the options for instantiating $x$ are inversely proportional to the number of intersections
-present in $B$.
-There are two special cases, namely $\top$ (i.e. the 0-ary intersection) and $\bot$ (i.e. the
-infinite intersection) \footnote{$\bot$ would not add anything to the hypothetical finite type 
+However, as the choices for $C$ grows, the less choices we are left to instantiate 
+the variable $x$, since $x$ must be disjoint to all possible $C$'s. 
+Thus, to answer the first question, the options for instantiating $x$ are inversely proportional 
+to the number of intersections present in $B$.
+As an analogy, one might think of a disjointness constraint as a list of (forbidden) types, where 
+primitive types are the singleton list and each $\inter$ is the concatenation operator
+\footnote{Since we require constraints to be well-formed, one might consider them as set of
+forbidden types (as opposed to a list).}.
+
+We can now turn our attention to the two extreme cases, namely $\top$ 
+(i.e. the 0-ary intersection) and $\bot$ (i.e. the infinite intersection) 
+\footnote{$\bot$ would not add anything to the hypothetical finite type 
 system, however it can be seen as the infinite intersection in \name.}.
-We will discuss them next.
+Following the same logic, we may conclude that $\top$ as the associated constraint leaves $x$ with 
+the most options for instantiation whereas $\bot$ will deliver the least options.
+We will discuss their role in our system next.
 
 \paragraph{The most liberal bound}
 It is easy to see that $\top$ is the most liberal type since it is disjoint to everything. 
-This $\top$ type plays an important role in our system, since it
-must be complete with respect to System-$F$. 
-In other words, any program accepted by System-$F$ should also be accepted by \name.
-Since System-$F$ does not contain disjointness quantification, $\top$ comes in handy:
-the System-$F$'s type $\forall \alpha. {T_F}$ (where ${T_F}$ is some other type), is
+This means that the $\top$ type actually plays an important role in our system, since the latter 
+must be complete with respect to System $F$. 
+In other words, any program accepted by System $F$ should also be accepted by \name.
+Since System $F$ does not contain disjointness quantification, $\top$ comes in handy:
+the System $F$'s type $\forall \alpha. {T_F}$ (where ${T_F}$ is some other type), is
 equivalent to \name's type $\fordis \alpha \top {T_i}$, where ${T_i}$ is also an equivalent 
 translation of $T_{F}$.
+\joao{should we include here a simple example? i.e. the identity function?}
 
-\paragraph{The less restrictive bound}
-Inversely, the most restrictive type should be $\bot$, as one might think of $\bot$ as specific 
-as the infinite intersection.
-In other words, $\bot$ is not disjoint to any type, except top-like types.
+\paragraph{The most restrictive bound}
+Inversely, the most restrictive type is $\bot$, as it is not disjoint to any type, except top-like 
+types. \joao{is this true? I'm not sure about what (bot \& top) means.}
 However, introducing $\bot$ is not compatible with our disjointness rule
 \reflabel{\labeldisvar} and well-formedness of contexts.
 Let us take a closer look, by supposing that we wish to derive $\jdis \Gamma x x$, for some variable 
 $x$, under some well-formed context $\Gamma$.
-For this end, we want to use \reflabel{\labeldisvar} with the type $A$ as a sub-type of $x$, 
+In \name, we can only use \reflabel{\labeldisvar} with the type $A$ as a sub-type of $x$, 
 i.e. an (n-ary) intersection containing $x$.
 Well-formedness of environments guarantees that this will never happen, since $x$ is not in
 scope of itself. 
 Thus, without a $\bot$ type, a derivation for that statement does not exist. 
-However, by introducing $\bot$ we are now able to derive it, as $A$ can now be $\bot$: a valid
+However, by introducing $\bot$ we may now construct such derivation, as $A$ can now be $\bot$: a valid
 sub-type of $x$ which does not contain $x$.
-In fact, introducing any \emph{bottom-like} type (i.e. $\bot \inter B$) can lead to this
-undesired behaviour.
-Since defining the lower bound is not strictly necessary to our formalization; introduces 
-substantial complexity in our system; and its practical application is still not clear, we left this
+In fact, had \name included a $\bot$ type, then introducing any \emph{bottom-like} type 
+(i.e. $\bot \inter A$, for any type $A$) can lead to this undesired behaviour.
+Since defining the lower bound is not strictly necessary to the formalization; introduces 
+substantial complexity in our system; and its practical application is not clear, we left this
 as an open problem for future work. 

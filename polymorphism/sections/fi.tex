@@ -67,6 +67,9 @@ The latter lifts the System $F$'s quantification into \emph{disjoint quantificat
 it includes an extra disjointness constraint tied to a type variable $\alpha$.
 Finally, the syntax for the singleton record at type level consists of a label $l$ and
 an associated type $A$.
+We will use $\subst {A} \alpha {B}$
+to denote the capture-avoiding substitution of $A$ for $\alpha$ inside $B$ and
+$\ftv \cdot$ for sets of free type variables. 
 
 \paragraph{Terms.} 
 Metavariables $e$ range over terms.  
@@ -88,14 +91,21 @@ Finally, the accessor for a label $l$ in term $e$ is denoted as $\recordProj e l
 
 \paragraph{Contexts.} Typing contexts $ \Gamma $ track bound type variables
 $\alpha$ with disjointness constraints $A$; and variables $x$ with their type $A$. 
-We use $\subst {A} \alpha {B}$
-to denote the capture-avoiding substitution of $A$ for $\alpha$ inside $B$ and
-$\ftv \cdot$ for sets of free type variables. % TODO are we using this anywhere?
+We will use $\subst {A} \alpha {\Gamma}$
+to denote the capture-avoiding substitution of $A$ for $\alpha$ in the co-domain of
+$\Gamma$ where the domain is a type variable (i.e. substitution in all disjointness constraints).
+Throughout this paper, we will assume that all contexts are well-formed, meaning that:
+\begin{itemize}
+\item All variables must occur at most once in their domain.
+\item Type variables must not appear free within its own disjointness constraint. 
+\end{itemize}
+All substitutions performed in environments must also lead to well-formed environments.
 
-In order to focus on the key features that make this language interesting, we do
-not include other forms such as type constants and fixpoints here. 
-However they can be included in the formalization in
-standard ways and we are using them in discussions and examples. %TODO are we?
+%In order to focus on the key features that make this language interesting, we do
+%not include other forms such as type constants and fixpoints here. 
+%However they can be included in the formalization in
+%standard ways and we are using them in discussions and examples. %TODO are we?
+
 
 % \paragraph{Discussion.} A natural question the reader might ask is that why we
 % have excluded union types from the language. The answer is we found that
@@ -115,9 +125,11 @@ standard ways and we are using them in discussions and examples. %TODO are we?
   \end{mathpar}
 
   \begin{mathpar}
-    \formsub \\ \rulesubtop \and \rulesubint \and \rulesubvar \and \rulesubrec 
-    \and \rulesubfun \and
-    \rulesubinter \and  \rulesubinterlcoerce \and \rulesubinterrcoerce \and
+    \formsub \\ 
+    \rulesubtop \and \rulesubinter \and 
+    \rulesubint \and \rulesubinterlcoerce \and 
+    \rulesubvar \and \rulesubinterrcoerce \and
+    \rulesubrec  \and \rulesubfun \and 
     \rulesubforallext 
   \end{mathpar}
 
@@ -193,16 +205,31 @@ Under this interpretation, for example, the rule \reflabel{\labelsubinter}
 says that if $A_1$ is both the subset of $A_2$ and the subset of $A_3$, then
 $A_1$ is also the subset of the intersection of $A_2$ and $A_3$.
 The $ordinary$ conditions are necessary to ensure coherence~\cite{icfppaper}.
-We will come back to this in the next section.
-
 In \reflabel{\labelsubforall} a universal quantifier ($\forall$) 
 is covariant in its body, and contravariant in its disjointness constraints.
 Finally, \reflabel{\labelsubrec} says records are covariant within their fields' types.
-Subtyping is reflexive and transitive.\bruno{State as lemmas here,
-  since this is new.}
+This subtyping can be shown to be reflexive and transitive.
+
+\begin{restatable}[Subtyping reflexivity]{lemma}{subrefl}
+  \label{lemma:subrefl}
+  For any type $A$, $A \subtype A$.
+\end{restatable}
+
+\begin{proof}
+By induction on $A$.
+\end{proof}
+
+\begin{restatable}[Subtyping transitivity]{lemma}{subtrans}
+  \label{lemma:subtrans}
+  If $A \subtype B$ and $B \subtype C$, then $A \subtype C$.
+\end{restatable}
+
+\begin{proof}
+By induction on $B$. \joao{it was actually harder than that due to the shape of locally nameless}
+\end{proof}
 
 %TODO example showing contravariance in disjointness constraints goes here or in the overview 
-section?
+%section?
 
 %\paragraph{Metatheory.} As other standard subtyping relations, we can show that
 %subtyping defined by $\subtype$ is also reflexive and transitive.
@@ -220,9 +247,11 @@ section?
 
 \begin{figure}[!t]
   \begin{mathpar}
-    \formwf \\ \rulewftop \and \rulewfint \and \rulewfvardis \and \rulewffun \and 
-    \rulewfforalldis \and \rulewfinterdis \and \rulewfrec
+    \formwf \\ \rulewfint \and \rulewfvardis \and \rulewffun \and \rulewfrec \and 
+    \rulewftop \and \rulewfforalldis \and \rulewfinterdis 
   \end{mathpar}
+
+  \caption{Well-formedness rules for types of \name.}
   \label{fig:wf}
 \end{figure}
 
@@ -237,7 +266,7 @@ The well-formedness rules are shown in the top part of Figure~\ref{fig:wf}.
 The new rules are \reflabel{\labelwfvar} and
 \reflabel{\labelwfforall}. 
 Their definition is quite straightforward, but note how we ensure the well-formedness 
-of the constraint in the latter. \joao{we don't need this} 
+of the constraint in the latter.
 
 \paragraph{Disjoint quantification.} A disjoint quantification is introduced by
 the big lambda $\blamdis \alpha A e$ and eliminated by the usual type application 
@@ -264,7 +293,6 @@ We will explain next the rules that compose the type-system.
 
 
 \paragraph{Typing rules}
-\joao{we can safely remove the WF A in T-BLam}
 Our typing rules are formulated as a bi-directional type-system. 
 Just as in \oldname, this ensures the type-system is not only syntax-directed, but
 also that there is no type ambiguity.
