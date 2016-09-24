@@ -25,7 +25,7 @@ form or another.
 
 \paragraph{Intersection types.}
 The intersection of type $A$ and $B$ (denoted as \lstinline{A & B} in
-\namedis) contains exactly those values
+\name) contains exactly those values
 which can be used as either values of type $A$ or of type $B$. For instance,
 consider the following program in \namedis:
 
@@ -53,8 +53,8 @@ in the literature. Our work follows a particular formulation, where
 intersection types are introduced by a \emph{merge operator}.
 As Dunfield~\cite{dunfield2014elaborating} has argued a merge operator adds considerable
 expressiveness to a calculus. The merge operator allows
-two values to be merged in a single intersection type. For example, an
-implementation of \lstinline{x} is constructed in \namedis as follows:
+two values to be merged in a single intersection type. 
+For example, an implementation of \lstinline{x} is constructed in \name as follows:
 
 \begin{lstlisting}
 let x : Int & Char = 1,,'c' in (*$ \ldots $*)
@@ -128,12 +128,12 @@ which leads to multiple meanings of a term.
 Thus a natural option is to try to forbid such overlapping
 values of the same type in a merge.
 
-This is precisely the approach taken in \oldname. \joao{add reference here} 
-\oldname is a simply-typed calculus with intersection types and a merge operator, 
+This is precisely the approach taken in \oldname: \joao{add reference here} 
+a simply-typed calculus with intersection types and a merge operator, 
 in the same flavour of Dunfield's, but requires two types composing an intersection 
 to be \emph{disjoint}.  
-Disjointness is a binary relation between two types which tells whether they contain
-overlapping types.
+Disjointness is a binary relation between two types defined for any two types which
+do not contain any overlapping types.
 More formally, the notion of disjointness can be specified as follows:
 
 \begin{definition}[Disjointness]
@@ -144,7 +144,7 @@ More formally, the notion of disjointness can be specified as follows:
 \end{definition}
 
 With this definition of disjointness, one can now verify that there is no longer
-incoherence in the \name calculus.
+incoherence in the \oldname calculus.
 For instance, the previous example: 
 \begin{lstlisting}
 (fun (x: Int) (*$ \to $*) x) (1,,2)
@@ -157,14 +157,38 @@ disjoint with \lstinline$Int$.
 In other words, there exists a super-type of both \lstinline$Int$ and \lstinline$Int$, 
 namely \lstinline$Int$ itself.
 
-\joao{maybe show here how top was supported? since top plays a role in this calculus too}
+\oldname not only provided a specification for disjointness but also an algorithmic version
+of it, and proved that both versions are equivalent.
+This turned disjointness as a concept which is both easy to understand and easy to implement. 
+
+\subsection{Top-like types}
+The \oldname calculus also showed how to extend the type system with a type $\top$, the supertype 
+of all types.
+Since introducing $\top$ leads to a useless disjointness specification (i.e. no type is disjoint to
+any other type) and introduces some ambiguity because $\top \subtype \top \inter \top$ and
+$\top \inter \top \subtype \top$.
+Therefore, the specification was changed to the following:
+
+\begin{definition}[$\top$-disjointness]
+  Two types $A$ and $B$ are disjoint
+  (written $A \disjoint B$) if the following two conditions are satisfied:
+\begin{enumerate}
+  \item $(\text{not}~\toplike{A})~\text{and}~(\text{not}~\toplike{B}) $
+  \item $\forall C.~\text{if}~ A \subtype C~\text{and}~B \subtype C~\text{then}~\toplike{C}$
+\end{enumerate}
+\end{definition}
+The unary relation $\toplike{\cdot}$ represents the so-called top-like types, which are types that resemble 
+$\top$.
+This set of types includes $\top$ itself, intersections composed of other 
+top-like types (i.e. $\top \inter \top$), and pre-top-types, which are functions that have
+$\top$ as their co-domain (i.e. $\tyint \to \tychar \to \top$).
 
 \subsection{Adding parametric polymorphism}
-
-Let us suppose that we add parametric polymorphism to \oldname in a very straightforward 
-and naive way, by introducing a forall type, type variables, and a big lambda at term level.
-We also say that type variables are disjoint to any other type, as a starting point.
-Now consider the attempt to write the following polymorphic function in \namedis (we use
+Having covered the core concepts behind \oldname and Dunfield's calculus,
+let us now suppose that we add parametric polymorphism to \oldname in a very straightforward 
+way, by introducing a forall type, type variables, and a big lambda at term level.
+We also assume that type variables are disjoint to any other type, as a starting point.
+Now consider the attempt to write the following polymorphic function in \name (we use
 uppercase Latin letters to denote type variables):
 \begin{lstlisting}
 let fst A B (x: A & B) = (fun (z:A) (*$ \to $*) z) x in (*$ \ldots $*)
@@ -184,20 +208,20 @@ of the first argument of \lstinline{fst}.
 
 \subsection{A first conservative attempt}
 
-Naturally a first attempt at restoring coherence would be to not allow type variables inside
+Naturally a first attempt at restoring coherence forbid type variables inside
 intersections (i.e. type variables are not disjoint to any type).
 This conservative approach would solve the problem of coherence, but it would also greatly 
 restrict the expressiveness of the resulting language.
-For example, function $fst$ defined above, would no longer be accepted by our system.
+For example, the function $fst$ defined above, would no longer be accepted by our system.
 In fact, parametric polymorphism and intersection types could only be mixed in a very limited manner -
 as long as variables do not reside under intersections - and this is arguably a useful improvement
-in respect to other standard system, i.e. System $F$.
+in respect to other standard type systems, i.e. System $F$.
 
 \subsection{A more liberal attempt}
 
 Since the resulting calculus is not satisfactory, we ought to find a more liberal solution,
 which enables the combination of type variables and intersection types. 
-A possible approach would be to consider assigning constraints to each type variable, an delay the 
+A possible approach would be to assign constraints to each type variable, an delay the 
 check for disjointness until type application/instantiation. 
 
 \paragraph{Disjoint quantification}
@@ -220,29 +244,76 @@ it can only be instantiated with any type disjoint to $A$.
 This ensures that the
 merge denoted by $x$ is disjoint for all valid instantiations of $A$ and $B$.
 
-The nice thing about this solution is that many uses of \lstinline$fst$ are accepted.
+This solution ensures that only coherent uses of \lstinline$fst$ will be accepted.
 For example, the following use of \lstinline$fst$:
 \begin{lstlisting}
 fst Int Char (1,,'c')
 \end{lstlisting}
 is accepted since \lstinline$Int$ and \lstinline$Char$ are disjoint, thus satisfying the constraint
 on the second type parameter of \lstinline$fst$.
-However, problematic uses of \lstinline$fst$ are rejected. For example:
+Furthermore, problematic uses of \lstinline$fst$ are rejected. For example:
 \begin{lstlisting}
 fst Int Int (1,,2)
 \end{lstlisting}
 is rejected because \lstinline$Int$ is not disjoint with \lstinline$Int$, thus failing to satisfy the
 disjointness constraint on the second type parameter of \lstinline$fst$.
 
+\paragraph{Empty constraint}
+\joao{this is somewhat similar to what is already written on Section 5, maybe merge them here?}
+Even though disjoint quantification is solves the problem of coherence, there is still one problem
+we need to tackle. 
+The reader might have notice how, in the $fst$ function, we ommitted the disjointness constraint of 
+the type variable $A$.
+This actually means that $A$ should be associated with the empty contraint,
+which raises the question: which type should be used to represent the empty constraint?
+Or, in other words, which type is disjoint to every other type? 
+It is obvious that this type should be one of the bounds of our subtyping lattice: either $\bot$ or
+$\top$.
+
+%Let us assume two distinct interpretations for the subtyping relation.
+%Given two types $A$ and $B$, we can say relation is either:
+%\begin{enumerate}
+%\item Subset relation ($A \subseteq B$): every element of type $A$ is also of type $B$; or
+%\item Coercion ($\exists t. t : A \to B$): every element of type $A$ can be coerced into type $B$.
+%\end{enumerate}
+
+First, if we consider our subtyping lattice as unbounded (i.e. no $\top$ and no $\bot$), then we have that
+disjointness is covariant with respect to the subtyping relation.
+More formally:
+\[ \inferrule {\jwf \Gamma {A \disjoint B} \\ B \subtype C }
+              {\jwf \Gamma {A \disjoint C}} \]
+
+To illustrate this, take $A$ as $\tyint$ and $B$ as $\tybool \inter \tychar$.
+This lemma states that every supertype of $B$, namely $\tybool$, $\tychar$ and $B$ itself are also disjoint 
+with $\tyint$.
+Coming back to a bounded subtyping lattice, let us now consider both bounds. 
+If $\bot$ were to be disjoint with any other type $A$, then by the lemma above $A$ could be disjoint to
+virtually any type.
+In other words, we can think of $\bot$ as the type as specific as the infinite intersection.
+Conversely, $\top$ can be thought as the specific - or rather, as general - as the 0-ary intersection.
+This hints that $\top$ can be treated as the empty constraint.
+However, the previous specification of $\top$-disjointness does not reflect this, since it states that $\top$ 
+is not disjoint to any other type, not even to itself.
+Thus, in this paper, we slightly changed the specification of $\top$-disjointness to read instead:
+
+\begin{definition}[$\top$-disjointness]
+  Two types $A$ and $B$ are disjoint (written $A \disjoint B$) if:
+  \[\forall C.~\text{if}~ A \subtype C~\text{and}~B \subtype C~\text{then}~\toplike{C}\]
+\end{definition}
+\joao{say that we manage to retain coherence wrt to the simply typed version?}
+
 \paragraph{Dropping the specification of disjointness}
+Another issue that arises from disjoint quantification, is that the specification is actually no longer valid.
+Variables are now disjoint to some type, up until instantiation, where they might become a 
+concrete type.
+This hints that we should refer to unification in the specification. \joao{add example here?} 
+However, the specification was used partially to provide a more intuitive look at disjointness, due to its
+simplicity.
+We argue that, using unification in the specification will work against this principle, and hence
+\name will only work with the disjointness implementation. 
 
-\joao{explain why we dropped it: unification}
-
-\paragraph{Changing the notion of top-like types}
-
-\joao{in constrast with the old calculus, top is now disjoint to anything}
-
-\paragraph{The resulting calculus}
+\paragraph{Substitution}
+\joao{how should we cover this here? it is already explained in Section 5}
 
 \begin{comment}
 This section introduces \namedis and its support for intersection types,

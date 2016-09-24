@@ -1,4 +1,4 @@
-\section{Application: Extensible records}
+\section{Applications: Extensible records and Nominal type-systems}
 \label{subsec:records}
 
 \joao{change syntax to the one used in overview}
@@ -28,8 +28,14 @@ $\alpha$ could be written as:
 &\text{select} \, = \blamdis \alpha \top {\lam x {x.l}}
 \end{align*}
 
-Note how, through the use of subtyping, this function will accept any intersection type that contains
-the single recorld $\recordType l \alpha$.
+\begin{lstlisting}[mathescape=true]
+let select A (r : {l : A}) : A = r.l
+in $\ldots$ 
+\end{lstlisting}
+
+
+Note how, through the use of subtyping, this function will accept any intersection type that 
+contains the single recorld $\recordType l \alpha$.
 This resembles other systems ..., although it is slightly more general, as any it is not 
 restricted only to record types. \joao{references}
 
@@ -42,6 +48,11 @@ Instead, we can make use of subtyping to define such operator:
 {({\recordType l \alpha \inter r) \rightarrow r}}} \\ 
 &\text{remove} \, = \blamdis \alpha \top {\blamdis r {\recordType l \alpha} {\lam x {x}}} 
 \end{align*}
+
+\begin{lstlisting}[mathescape=true]
+let remove A (B * {l : A}) (x : { l : A } & r) : r = x
+in $\ldots$ 
+\end{lstlisting}
 
 \paragraph{Extension/Concatenation}
 
@@ -59,12 +70,23 @@ notation):
 &\text{addL}_1 :: \forall \alpha\#l. \alpha \rightarrow (\alpha || \recordType l \tyint) \\ 
 &\text{addL}_1 \, = ...
 \end{align*}
+\begin{lstlisting}[mathescape=true]
+let $\text{addL}_1$ (A # l) (x : A) : (a || { l : Int }) = $\ldots$ 
+in $\ldots$ 
+\end{lstlisting}
+
 The reader might notice the resemblance with our system:
 \begin{align*}
 &\text{addL}_2 :: \fordis \alpha {\recordType l \tyint} {
 \alpha \rightarrow (\alpha \inter \recordType l \tyint)} \\
 &\text{addL}_2 \, = ...
 \end{align*}
+\begin{lstlisting}[mathescape=true]
+let $\text{addL}_2$ (A * { l : Int }) (x : A) : (A & { l : Int }) = $\ldots$ 
+in $\ldots$ 
+\end{lstlisting}
+
+
 This shows that one can use disjoint quantification to express negative field information.
 It is very close to what (Harper \& Pierce) describe in their system.  
 Note how we have to explicitly state the type of the constraint in $\text{addL}_2$, whereas 
@@ -84,6 +106,10 @@ Had one meant to forbid records with \emph{any} $l$ fields, then one could write
 \alpha \rightarrow (\alpha \inter \recordType l \beta)}} \\
 &\text{addL}_3 \, = ...
 \end{align*}
+\begin{lstlisting}[mathescape=true]
+let $\text{addL}_3$ (A * { l : $\bot$ }) (x : A) : A & { l : $\bot$ } = $\ldots$ 
+in $\ldots$ 
+\end{lstlisting}
 
 Other systems with record concatenation usually define predicates, in terms of field absence or 
 presence (with a type $\alpha$). 
@@ -103,6 +129,10 @@ record types is the following:
 &\text{average}_1 :: (r \backslash y, r \backslash x) \Rightarrow \{r | x :: \tyint, y :: \tyint\} \rightarrow \tyint \\
 &\text{average}_1 \, r = (r.x + r.y) / 2
 \end{align*}
+\begin{lstlisting}[mathescape=true]
+let $\text{average}_1$ (R\y, R\y) => (r : { R | x : Int, y : Int }) : Int = (r.x + r.y) / 2 
+in $\ldots$ 
+\end{lstlisting}
 
 The type signature says that for any record with type $r$, that lacks both $x$ $y$, can be accepted
 as parameter extended with $x$ $y$, returning an integer.
@@ -110,9 +140,13 @@ Note how the bounded polymorphism is essential to ensure that $r$ does not conta
 On the other hand, in a system with free extension as in~\cite{leijen2005extensible}, 
 the more general program would be accepted:
 \begin{align*}
-&\text{average}_2 :: \forall x \; y, \{ x :: \tyint, y :: \tyint | r \} \rightarrow \tyint \\
+&\text{average}_2 :: \forall \; r \;x \; y, \{ x :: \tyint, y :: \tyint | r \} \rightarrow \tyint \\
 &\text{average}_2 \, r = (r.x + r.y) / 2
 \end{align*}
+\begin{lstlisting}[mathescape=true]
+let $\text{average}_2$ R x y (r : { x : Int, y : Int | R }) : Int = (r.x + r.y) / 2 
+in $\ldots$ 
+\end{lstlisting}
 
 In this case, if $r$ contains either field $x$ or field $y$, they would be shadowed by the labels 
 present in the type signature.
@@ -131,6 +165,10 @@ in \name}:
 &\text{average}_3 = 
 {\blamdis t {\recordType x \tyint \inter \recordType y \tyint} {\lam r {(r.x + r.y) / 2}}}
 \end{align*}
+\begin{lstlisting}[mathescape=true]
+let $\text{average}_3$ (R * { x : Int } & { y : Int }) (r : { x : Int } & { y : Int } & R) : Int = (r.x + r.y) / 2 
+in $\ldots$ 
+\end{lstlisting}
 
 Thus more types are accepted this function than in the first system, but less than the second. 
 Another major difference between \name and the two other mentioned systems, is the ability to 
@@ -151,6 +189,30 @@ to~\cite{leijen2005extensible}:
 &\text{update} \, = \blamdis \alpha \top {\blamdis r {\recordType l \alpha} {\lam x {\lam v {
 \recordCon l v \mergeop (\text{remove } \alpha \; r \; x)}}}} 
 \end{align*}
+\begin{lstlisting}[mathescape=true]
+let $\text{update}$ A B (R * { l : A }) (r : { l : A } & R) (v : B) : { l : B } & R = { l = v } ,, (remove a r x) 
+in $\ldots$ 
+\end{lstlisting}
+
+\subsection{Intersections in nominal type-systems}
+
+Recently several languages have embraced intersection types, such as Scala, Ceylon or TypeScript.
+\joao{references here?}
+
+In Scala, it is possible to define a merge-like function:
+\joao{example from Bruno's ecoop 2013 paper}
+
+
+According to TypeScript's documentation, it is also possible to define a similar function:
+\joao{example with Cat and Dog with a property Name}
+
+Note how these definitions rely on a biased choice: if the lookup of a given property is found
+on the first component then it is selected; otherwise the lookup will be made on the second 
+component.
+
+In \name, the merge combinator is directly embedded in the semantics of the language, and thus
+there is no need to define such combinators.
+In fact, the reason for introducing disjointness is an alternative to solve this problem. 
 
 
 
