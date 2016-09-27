@@ -14,6 +14,8 @@ supports them.
 
 \subsection{Intersection Types and the Merge Operator}
 %%\subsection{Intersection Types, Merge and Polymorphism in \namedis}
+\bruno{We should't simply copy and paste the text from the previous
+  paper. We should try to at least rephrase some things.}
 
 Intersection types date back as early as Coppo et
 al.'s work~\cite{coppo1981functional}. Since then various researchers have
@@ -63,7 +65,11 @@ let x : Int & Char = 1,,'c' in (*$ \ldots $*)
 \noindent In \name (following Dunfield's notation), the
 merge of two values $v_1$ and $v_2$ is denoted as $v_1 ,, v_2$.
 
-\paragraph{Merge operator and pairs.}
+\paragraph{Merge operator and pairs.}\bruno{We may be able to skip
+  this paragraph and just have a quick sentence about the relationship
+with pairs by pointing to Dunfield's paper. The important message is 
+that with intersections the elimination is implicit, and the order of
+the values is not important (with disjoint intersections).}
 The merge operator is similar to the introduction construct on pairs.
 An analogous implementation of \lstinline{x} with pairs would be:
 
@@ -109,7 +115,12 @@ If both results are accepted, we say that the semantics is
 \emph{incoherent}: there are multiple possible meanings for the same
 valid program. 
 Dunfield's calculus~\cite{dunfield2014elaborating} is incoherent and accepts the
-program above.
+program above.\bruno{Well this text needs a significant revision
+  because now our ICFP paper largely solves this problem. So you want,
+at some point, to summarise the key result of the ICFP paper: we know
+how todo coherent intersection types for a simply typed calculus. 
+Then you want to setup the problem for this paper: but how about
+polymorphism? what are the challenges, why is it hard?}
 
 \subsection{Coherence and Disjointness}
 Coherence is a desirable property for a semantics. A semantics is said
@@ -135,6 +146,9 @@ to be \emph{disjoint}.
 Disjointness is a binary relation between two types defined for any two types which
 do not contain any overlapping types.
 More formally, the notion of disjointness can be specified as follows:
+\bruno{I think we should avoid presenting the specification, since we
+  do not have one for this paper. We can refer to this in the related
+  work.}
 
 \begin{definition}[Disjointness]
   Given two types $A$ and $B$, two types are disjoint
@@ -145,7 +159,9 @@ More formally, the notion of disjointness can be specified as follows:
 
 With this definition of disjointness, one can now verify that there is no longer
 incoherence in the \oldname calculus.
-For instance, the previous example: 
+For instance, the previous example: \bruno{those are old examples (pre-ICFP) by
+  the way; and they do not work in the calculus we have (no
+  annotations on lambda's)}
 \begin{lstlisting}
 (fun (x: Int) (*$ \to $*) x) (1,,2)
 \end{lstlisting}
@@ -161,7 +177,14 @@ namely \lstinline$Int$ itself.
 of it, and proved that both versions are equivalent.
 This turned disjointness as a concept which is both easy to understand and easy to implement. 
 
-\subsection{Top-like types}
+\subsection{Top-like types}\bruno{You are spending too much time to
+  get to the point. When writting a paper you want to get to the point
+  (what's the problem) 
+as fast as possible. So you should have enough background to understand
+the paper, but keep that background minimal. Look at the ICFP paper: 
+we got to Section 2.2 (the problem) in less than a column.
+I think we don't need to
+cover top-like types here. They are not essential. }
 The \oldname calculus also showed how to extend the type system with a type $\top$, the supertype 
 of all types.
 Since introducing $\top$ leads to a useless disjointness specification (i.e. no type is disjoint to
@@ -183,7 +206,16 @@ This set of types includes $\top$ itself, intersections composed of other
 top-like types (i.e. $\top \inter \top$), and pre-top-types, which are functions that have
 $\top$ as their co-domain (i.e. $\tyint \to \tychar \to \top$).
 
-\subsection{Adding parametric polymorphism}
+\subsection{Adding parametric polymorphism}\bruno{avoid writting
+  ``we'', ``I'', ``us'', \ldots when possible. Start with a key sentence, that
+  summarizes your point. For example: 
+``Unfortunatelly, adding parametric polymorphism is non-trivial. A naive
+attempt to add polymorphism ...''
+}
+\bruno{Be consistent with the title(s) capitalization of words. Some
+  titles have lower case words, some others upper case. Use upper case
+everywhere (except for words like ``the'' ``of'', etc.}
+
 Having covered the core concepts behind \oldname and Dunfield's calculus,
 let us now suppose that we add parametric polymorphism to \oldname in a very straightforward 
 way, by introducing a forall type, type variables, and a big lambda at term level.
@@ -208,7 +240,8 @@ of the first argument of \lstinline{fst}.
 
 \subsection{A first conservative attempt}
 
-Naturally a first attempt at restoring coherence forbid type variables inside
+Naturally\bruno{words like ``Naturally'', ``Essentially'' and so on
+  rarelly add anything yo your text. Just drop them. } a first attempt at restoring coherence forbid type variables inside
 intersections (i.e. type variables are not disjoint to any type).
 This conservative approach would solve the problem of coherence, but it would also greatly 
 restrict the expressiveness of the resulting language.
@@ -216,6 +249,11 @@ For example, the function $fst$ defined above, would no longer be accepted by ou
 In fact, parametric polymorphism and intersection types could only be mixed in a very limited manner -
 as long as variables do not reside under intersections - and this is arguably a useful improvement
 in respect to other standard type systems, i.e. System $F$.
+\bruno{There was an important discussion about biased choice in the
+  draft, but this seems to have been removed. I think that's a very
+  important point as to why we coherence is important. Furthermore, 
+it is related to type substitution and why stability of subtitution
+cannot hold in general.}
 
 \subsection{A more liberal attempt}
 
