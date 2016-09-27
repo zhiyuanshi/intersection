@@ -255,14 +255,16 @@ in respect to other standard type systems, i.e. System $F$.
 it is related to type substitution and why stability of subtitution
 cannot hold in general.}
 
+\begin{comment}
 \subsection{A more liberal attempt}
 
 Since the resulting calculus is not satisfactory, we ought to find a more liberal solution,
 which enables the combination of type variables and intersection types. 
 A possible approach would be to assign constraints to each type variable, an delay the 
 check for disjointness until type application/instantiation. 
+\end{comment}
 
-\paragraph{Disjoint quantification}
+\subsection{Disjoint quantification}
 
 To avoid being overly conservative, while still retaining coherence in the
 presence of parametric polymorphism and intersection types, \name uses
@@ -341,6 +343,11 @@ Thus, in this paper, we slightly changed the specification of $\top$-disjointnes
 \joao{say that we manage to retain coherence wrt to the simply typed version?}
 
 \paragraph{Dropping the specification of disjointness}
+\bruno{I think the discussion is too technical here. Leave the more
+  technical details for latter. You want to use concrete programs as
+  examples here, rather than having a technical discussion. You want
+  to say that a type variable with no constraints is a syntactic sugar
+  for a top constraint. }
 Another issue that arises from disjoint quantification, is that the specification is actually no longer valid.
 Variables are now disjoint to some type, up until instantiation, where they might become a 
 concrete type.
@@ -348,10 +355,15 @@ This hints that we should refer to unification in the specification. \joao{add e
 However, the specification was used partially to provide a more intuitive look at disjointness, due to its
 simplicity.
 We argue that, using unification in the specification will work against this principle, and hence
-\name will only work with the disjointness implementation. 
+\name will only work with the disjointness implementation. \bruno{No
+  discussions about specification here.}
 
 \paragraph{Substitution}
-\joao{how should we cover this here? it is already explained in Section 5}
+\joao{how should we cover this here? it is already explained in
+  Section 5}
+\bruno{Connect it to the example that was in the earlier draft, which 
+illustrated that can substitution change the semantics, if we are not careful.}
+
 
 \begin{comment}
 This section introduces \namedis and its support for intersection types,
