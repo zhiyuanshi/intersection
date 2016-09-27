@@ -6,14 +6,17 @@ a calculus with intersection types, parametric polymorphism, records and a merge
 This calculus is an extension of \oldname and Dunfield's
 calculus~\cite{dunfield2014elaborating}, which are simply typed
 calculus with intersection types and a merge operator.
-%The novelty of \name is the support of coherence in the presence of
-%polymorphism. As discussed in Section~\ref{overview} retaining
+The novelty of \name is the addition of \emph{disjoint polymorphism}:
+a form of parametric polymorphism with disjointness contraints, which
+allows flexibility while at the same time retaining coherence. 
+%As discussed in Section~\ref{overview} retaining
 %coherence, while having an expressive form of polymorphism is non-trvial.
 %Section~\ref{sec:disjoint} introduces \namedis, which shows the necessary changes
 %for supporting disjoint intersection types and disjoint
 %quantification and ensuring coherence.
 Section~\ref{sec:disjoint} introduces the necessary changes to the
-definition of disjointness in order to retain coherence.
+definition of disjointness presented by Oliveira et al.~\cite{} in
+order to add disjoint polymorphism.
 
 All the meta-theory has been mechanized in Coq, which is available in
 the supplementary materials submitted with the paper.
@@ -61,11 +64,12 @@ Metavariables $A$, $B$ range over types.
 Types include all constructs in \oldname: a top type $\top$; 
 the type of integers $\tyint$;
 function types $A \to B$; and intersection types $A \inter B$.
-Types are extended with two standard constructs of System $F$: 
-type variables $\alpha$ and type abstraction $\fordis \alpha A B$. 
-The latter lifts the System $F$'s quantification into \emph{disjoint quantification}:
-it includes an extra disjointness constraint tied to a type variable $\alpha$.
-Finally, the syntax for the singleton record at type level consists of a label $l$ and
+The main novelty are two standard constructs of System $F$ used to support
+polymorphism: 
+type variables $\alpha$ and disjoint (universal) quantification $\fordis \alpha A B$. 
+Unlike traditional universal quantification, the disjoint
+quantification includes a disjointness constraint associatted to a type variable $\alpha$.
+Finally, \name also includes singleton record types, which consist of a label $l$ and
 an associated type $A$.
 We will use $\subst {A} \alpha {B}$
 to denote the capture-avoiding substitution of $A$ for $\alpha$ inside $B$ and
@@ -73,11 +77,10 @@ $\ftv \cdot$ for sets of free type variables.
 
 \paragraph{Terms.} 
 Metavariables $e$ range over terms.  
-Terms include all constructs in \oldname: a unit type $\unit$; an integer literal $i$;
-a variable $x$, abstraction of terms over variables of
-a given type $\lamty x A e$; application of terms $e_1$ to terms $e_2$, written
-$\app {e_1} {e_2}$; and the \emph{merge} of terms $e_1$ and $e_2 $ denoted as 
-$e1 \mergeop e2$, corresponding to intersections of types $A \inter B$.
+Terms include all constructs in \oldname: a canonical top value $\top$; integer literals $i$;
+variables $x$, lambda abstractions ($\lamty x A e$); applications 
+($\app {e_1} {e_2}$); and the \emph{merge} of terms $e_1$ and $e_2 $ denoted as 
+$e1 \mergeop e2$.
 Terms are extended with two standard constructs in System $F$:
 abstraction of type variables over terms $\blamdis \alpha A e$; and
 and application of terms to types $\tapp e A$. 
@@ -85,8 +88,7 @@ The former also includes an extra disjointness constraint tied to the type
 variable $\alpha$, due to disjoint quantification.
 %If one regards $e_1$ and $e_2$ as objects, their merge will respond to
 %every method that one or both of them have.
-The syntax for the singleton record at term level consists of a label $l$ and
-an associated term $e$.
+Singleton records consists of a label $l$ and an associated term $e$.
 Finally, the accessor for a label $l$ in term $e$ is denoted as $\recordProj e l$.
 
 \paragraph{Contexts.} Typing contexts $ \Gamma $ track bound type variables
@@ -94,7 +96,9 @@ $\alpha$ with disjointness constraints $A$; and variables $x$ with their type $A
 We will use $\subst {A} \alpha {\Gamma}$
 to denote the capture-avoiding substitution of $A$ for $\alpha$ in the co-domain of
 $\Gamma$ where the domain is a type variable (i.e. substitution in all disjointness constraints).
-Throughout this paper, we will assume that all contexts are well-formed, meaning that:
+Throughout this paper, we will assume that all contexts are
+well-formed\bruno{when you say well-formed here, do you mean the
+  definition in Fig 3?}, meaning that:
 \begin{itemize}
 \item All variables must occur at most once in their domain.
 \item Type variables must not appear free within its own disjointness constraint. 
@@ -190,7 +194,8 @@ All substitutions performed in environments must also lead to well-formed enviro
 % the fields.
 
 The subtyping rules of the form $A \subtype B$ are shown in 
-Figure~\ref{fig:fi-subtype}. 
+Figure~\ref{fig:fi-subtype}. \bruno{in the figure, the rules seem to
+  be in a strange order. }
 At the moment, the reader is advised to ignore the
 gray-shaded part in the rules, which will be explained later. 
 The first three rules are rather straightforward: \reflabel{\labelsubtop}
@@ -205,10 +210,16 @@ Under this interpretation, for example, the rule \reflabel{\labelsubinter}
 says that if $A_1$ is both the subset of $A_2$ and the subset of $A_3$, then
 $A_1$ is also the subset of the intersection of $A_2$ and $A_3$.
 The $ordinary$ conditions are necessary to ensure coherence~\cite{icfppaper}.
+
+\paragraph{Polymorphism and Records}
 In \reflabel{\labelsubforall} a universal quantifier ($\forall$) 
 is covariant in its body, and contravariant in its disjointness constraints.
 Finally, \reflabel{\labelsubrec} says records are covariant within their fields' types.
-This subtyping can be shown to be reflexive and transitive.
+This subtyping can be shown to be reflexive and transitive.\bruno{You
+  want to emphasize what are the new rules, and what are the rules
+  that are simply inherited from the ICFP paper. For the inherited
+  rules, you can refer to the paper. Focus on what's new (new rules;
+  changes in ordinary...)}
 
 \begin{restatable}[Subtyping reflexivity]{lemma}{subrefl}
   \label{lemma:subrefl}
@@ -225,7 +236,10 @@ By induction on $A$.
 \end{restatable}
 
 \begin{proof}
-By induction on $B$. \joao{it was actually harder than that due to the shape of locally nameless}
+By induction on $B$. \joao{it was actually harder than that due to the
+  shape of locally nameless}\bruno{I'm suspicious of your proof
+  sketch; don't you need nested induction? The details of locally
+  nameless are not relevant.}
 \end{proof}
 
 %TODO example showing contravariance in disjointness constraints goes here or in the overview 
@@ -264,7 +278,7 @@ By induction on $B$. \joao{it was actually harder than that due to the shape of 
 \paragraph{Well-formedness}
 The well-formedness rules are shown in the top part of Figure~\ref{fig:wf}. 
 The new rules are \reflabel{\labelwfvar} and
-\reflabel{\labelwfforall}. 
+\reflabel{\labelwfforall} \bruno{remove the brackets around the rule names}. 
 Their definition is quite straightforward, but note how we ensure the well-formedness 
 of the constraint in the latter.
 
