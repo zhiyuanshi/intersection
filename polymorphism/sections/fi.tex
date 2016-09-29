@@ -282,14 +282,6 @@ The new rules are \reflabel{\labelwfvar} and
 Their definition is quite straightforward, but note how we ensure the well-formedness 
 of the constraint in the latter.
 
-\paragraph{Disjoint quantification.} A disjoint quantification is introduced by
-the big lambda $\blamdis \alpha A e$ and eliminated by the usual type application 
-$\tapp e A$. 
-The constraint is added to the context with this rule. 
-During a type application, the type system makes sure that the type argument
-satisfies the disjointness constraint.
-We will explain next the rules that compose the type-system.
-
 \begin{figure}[!t]
   \begin{mathpar}
     \formbi \\ \brulettop \and \bruletint \and \bruletvar \and \bruletann \and 
@@ -310,32 +302,42 @@ We will explain next the rules that compose the type-system.
 Our typing rules are formulated as a bi-directional type-system. 
 Just as in \oldname, this ensures the type-system is not only syntax-directed, but
 also that there is no type ambiguity.
-The typing rules are shown in the bottom part of the figure. 
+The typing rules are shown in the bottom part of the
+figure\bruno{which figure? You can be precise in this case and put the
+reference to the figure here. Not a good idea to refer vaguely to a
+figure in academic papers.}. 
 Again, the reader is advised to ignore the
 gray-shaded part here, as these parts will be explained later. 
 The typing judgements are of the form: $\jcheck \Gamma e A$ and  
 $\jinfer \Gamma e A$.
-They read: ``in the typing context $\Gamma$, the term $e$ can be checked to
-type $A$' or inferred to type $A$, respectively.' 
+They read: ``in the typing context $\Gamma$, the term $e$ can be
+checked or inferred to
+type $A$'', respectively. 
 The rules that are ported from \oldname are the
 check rules for $\top$ \reflabel{\labelttop}, integers \reflabel{\labeltint}, 
 variables \reflabel{\labeltvar},  application \reflabel{\labeltapp}, merge operator  
 \reflabel{\labeltmerge}, annotations \reflabel{\labeltann}; and infer rules
 for lambda abstractions \reflabel{\labeltlam}, and the subsumption rule 
 \reflabel{\labeltsub}.
-The new rules, inspired on the standard System $F$, are the infer rules for
-type application \reflabel{\labelttapp}, and for type abstraction
-\reflabel{\labeltblam}.
-The former is no different from the standard rule for type application while
-the latter has an extra hypothesis ensuring that the type to be instantiated is
-compatible (i.e. disjoint) with the constraint associated with the abstracted variable.
-This is extremely important, as it will retain the desired coherence of our 
-type-system.
-For the ease of discussion, also in \reflabel{\labeltblam}, we require the 
-type variable introduced by the quantifier to be fresh. 
-For programs with type variable shadowing, this requirement can be met 
-straighforwardly by variable renaming.
-%TODO add some discussion why
+
+\paragraph{Disjoint quantification}
+The new rules, inspired by System $F$, are the infer rules for type
+application \reflabel{\labelttapp}, and for type abstraction
+\reflabel{\labeltblam}.  Type abstraction is introduced by the big
+lambda $\blamdis \alpha A e$, eliminated by the usual type application
+$\tapp e A$ (\reflabel{\labelttapp}).  The disjointness constraint is
+added to the context with the rule.  During a type application, the
+type system makes sure that the type argument satisfies the
+disjointness constraint.  Type application performs an extra check
+ensuring that the type to be instantiated is compatible
+(i.e. disjoint) with the constraint associated with the abstracted
+variable.  This is important, as it will retain the desired coherence
+of our type-system.  For ease of discussion, also in
+\reflabel{\labeltblam}, we require the type variable introduced by the
+quantifier to be fresh.  For programs with type variable shadowing,
+this requirement can be met straighforwardly by variable renaming.
+
+\paragraph{Records}
 Finally, $\reflabel{\labeltrec}$ and $\reflabel{\labeltprojr}$ deal with record types.
 The former infers a type for a record with label $l$ if it can infer a type for the
 inner expression; the latter says if one can infer a record type $\recordType l A$ 
