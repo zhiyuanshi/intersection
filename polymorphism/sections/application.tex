@@ -1,7 +1,7 @@
 \section{Applications: Extensible records and Nominal type-systems}
 \label{subsec:records}
 
-\joao{change syntax to the one used in overview}
+\subsection{Extensible records}
 Our system can be used to encode records, similarly to way as discussed in 
 \cite{dunfield2014elaborating}. 
 However, describing and implementing records within programming languages is certainly not novel 
@@ -13,11 +13,16 @@ In this section we aim at comparing our approach with such systems.
 
 Systems with records usually rely on 3 basic operations: selection, restriction and 
 extension/concatenation. 
-We will first introduce these basic operations in the context of \name.
+We will first introduce the basic syntax and typing of records, then the basic operations of records in the 
+context of \name and finally we will discuss their expressivity in comparison to other record systems.
 
-\subsection{Basic operations}
+\paragraph{Record terms and types}
+Our system directly encodes a term for the single record construct $\recordCon l e$, where $l$ is some
+label and $e$ is some other term.
+This term comes with its associated type, denoted as $\recordType l T$, where $T$ is a type that is attributed 
+to $e$. 
+
 \paragraph{Selection}
-
 The select operator is directly embedded in our language. 
 It follows the usual syntax of $e.l$, where $e$ is an expression of type $\recordType l \alpha$ and 
 $l$ is a label.
@@ -36,7 +41,7 @@ in $\ldots$
 
 Note how, through the use of subtyping, this function will accept any intersection type that 
 contains the single recorld $\recordType l \alpha$.
-This resembles other systems ..., although it is slightly more general, as any it is not 
+This resembles other systems with subtyping ..., although it is slightly more general, as any it is not 
 restricted only to record types. \joao{references}
 
 \paragraph{Restriction}
@@ -63,7 +68,7 @@ Our system is suitable for encoding both of these operations, but we argue that 
 the natural primitive operator, due to the resemblance with our merge operator.
 Indeed, (Harper \& Pierce) also define a \emph{merge} operator, which is quite similar to
 our \emph{merge} for intersection types, except it envoles only record types.
-For instance, a function which concatenates a single record with field $l$ of type $\tyint$
+For instance, in their system, a function which concatenates a single record with field $l$ of type $\tyint$
 with another record that lacks this field, is the following (slightly modified in terms of 
 notation):
 \begin{align*}
@@ -87,9 +92,9 @@ in $\ldots$
 \end{lstlisting}
 
 
-This shows that one can use disjoint quantification to express negative field information.
-It is very close to what (Harper \& Pierce) describe in their system.  
-Note how we have to explicitly state the type of the constraint in $\text{addL}_2$, whereas 
+This shows that one can use disjoint quantification to express negative field information, which
+is very close to what (Harper \& Pierce) describe in their system.  
+Note how one has to explicitly state the type of the constraint in $\text{addL}_2$, whereas 
 $\text{addL}_1$ does not require this.
 The same generality of disjoint intersection types that allows one to encode record types is the
 one that forces us to add this extra type in the constraint.
@@ -97,10 +102,8 @@ However, there is a slight gain with this approach: $\text{addL}_2$ accepts more
 $\text{addL}_1$.
 Namely, all (intersection) types that contain label $l$, with a field type \emph{disjoint} to
 $\tyint$.
-
 Had one meant to forbid records with \emph{any} $l$ fields, then one could write:
 
-\joao{how about this? fresh beta vs bottom?}
 \begin{align*}
 &\text{addL}_3 :: \fordis \beta \top {\fordis \alpha {\recordType l \beta} {
 \alpha \rightarrow (\alpha \inter \recordType l \beta)}} \\
@@ -110,6 +113,8 @@ Had one meant to forbid records with \emph{any} $l$ fields, then one could write
 let $\text{addL}_3$ (A * { l : $\bot$ }) (x : A) : A & { l : $\bot$ } = $\ldots$ 
 in $\ldots$ 
 \end{lstlisting}
+Unfortunately, our system does not support the $\bot$ type, so this program would not be accepted.
+We will get into the reasons for this in further detail, in Section~\ref{sec:alg-dis}.
 
 Other systems with record concatenation usually define predicates, in terms of field absence or 
 presence (with a type $\alpha$). 
@@ -122,7 +127,8 @@ Our system can be seen as hybrid of these two kinds of systems.
 Next we will show a comparison in terms of expressability between \name and other systems 
 with records that hopefully will enlighten the reader on this matter.
 
-\subsection{Expressibility}
+\paragraph{Expressibility}
+\joao{maybe the average function is too long? we can change to a type with only one field}
 In ... (SPJ \& MJ) -- a strict system with extension -- an example of a function that uses 
 record types is the following:
 \begin{align*}
@@ -154,9 +160,9 @@ In other words, if a record with multiple $x$ fields, the most recent (i.e. left
 in any function which accesses $x$.
 \joao{add example of a system using subtyping?}
 
-In \name, such function could be re-written as
+In \name, this program could be re-written as
 \footnote{We do not support exactly this function definition style; 
-however the type signature and expression (module infix operators) are exactly as one would write them
+however the type signature and expression (modulo infix operators) are exactly as one would write them
 in \name}:
 \begin{align*}
 &\text{average}_3 :: \fordis r 
@@ -195,7 +201,6 @@ in $\ldots$
 \end{lstlisting}
 
 \subsection{Intersections in nominal type-systems}
-
 Recently several languages have embraced intersection types, such as Scala, Ceylon or TypeScript.
 \joao{references here?}
 
