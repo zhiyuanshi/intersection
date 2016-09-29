@@ -121,13 +121,14 @@ Figure~\ref{fig:andcoercion}.
 The only new rule is \reflabel{\labeltoplforall}, which extends the notion of top-like types for
 the (disjoint) quantifier case.
 
-It is important pointing out that, despite the similarity of top-likes types,  
-the notion of disjointness has changed, leading to a larger set of well-formed top-like types.
+It is important pointing out that, despite the small extension in the definition of top-likes types,  
+the notion of disjointness has also changed, leading to a larger set of well-formed top-like types.
 Thus, to retain coherece, we adjusted the meta-function $\andcoerce{A}$, as shown in the bottom of 
 Figure~\ref{fig:andcoercion}.
 Note how not only the $\forall$ case is now defined, but also the intersection case (covering types such
 as $\top \inter \top$).
-This changes play a fundamental role in ensuring the coherence of subtyping, as we will show next.
+These changes are very important since they play a fundamental role in ensuring the coherence of subtyping for top-like
+types.
 
 \subsection{Coercive Subtyping and Coherence}
 
@@ -245,8 +246,8 @@ More formally, with disjoint polymorphism the following theorem holds:
 \begin{proof}
 By double induction: the first on the disjointness derivation (which follows from $A_1 \inter A_2$ being well-formed);
 the second on type $B$.
-The variable cases \joao{ref the var rules instead} needed to show that, for any two well-formed and disjoint types 
-$A$ and $B$, and $B$ is not toplike, then $A$ cannot be a subtype of $B$.
+The variable cases \reflabel{\labeldisvar} and \reflabel{\labeldissym} needed to show that, for any two well-formed 
+and disjoint types $A$ and $B$, and $B$ is not toplike, then $A$ cannot be a subtype of $B$.
 \end{proof}
 
 Finally, we can show that the coercion of a subtyping relation $A \subtype B$ 
@@ -428,6 +429,7 @@ performing the typing derivation.
 \paragraph{Key idea of the translation.}
 \bruno{Don't just copy\&paste from the previous paper. 
 You should mention the new rules, which Dunfield does not have. }
+\joao{added explanation for new rules, still need better example}
 This translation turns merges into usual pairs, similar to Dunfield's
 elaboration approach~\cite{dunfield2014elaborating}.
 For example, \[ 1 \mergeop \code{"one"} \] becomes \pair 1
@@ -452,7 +454,7 @@ To account for this difference, in \reflabel{\labeltapp}, the
 coercion $E$ from the subtyping relation is applied to the argument.
 Rules \reflabel{\labeltrec} and \reflabel{\labeltprojr} are quite straightforward, since there
 are not records in the target language.
-It might also be noteworthy saying that, as usual, the rule \reflabel{\labeltmerge} translates merges 
+It is also noteworthy pointing out that, as usual, the rule \reflabel{\labeltmerge} translates merges 
 into pairs.
 
 
@@ -689,7 +691,6 @@ it is possible to infer a type for it, then $e$ has a unique type.
   \end{itemize*}
 \end{restatable}
 
-\joao{review proof}
 \begin{proof}
 By structural induction on the term and the corresponding inference rule.
 \end{proof}
@@ -712,19 +713,31 @@ Combining the previous results, we are finally able to show the central theorem:
 
 \end{restatable}
 
-\joao{review this proof}
 \bruno{Yes, and you want to mention somewhere where the stability of substitution lemma 
 plays a role. I presume it plays a role in the coherence theorems.}
+\joao{from what I could gather we use it for type-safety, but I will double-check this}
 \begin{proof}
-  Note that the typing rules are already syntax-directed but the case of
-  \reflabel{\labeltapp} (copied below) still needs special attention since we
-  need to show that the generated coercion $E$ is unique.
+  By induction on the first derivation.
+  Note that three cases need special attention: \reflabel{\labelttapp}, \reflabel{\labeltsub} and \reflabel{\labeltapp}.
+  In the \reflabel{\labeltblam}:
   \begin{mathpar}
-    \ruletapp
+    \brulettappdis
   \end{mathpar}
-  Luckily, by Lemma~\ref{lemma:wellformed-typing}, we know that typing
-  judgements give well-formed types, and thus $\jwf \Gamma {A_1}$ and $\jwf
-  \Gamma {A_3}$. Therefore we are able to apply
-  Lemma~\ref{lemma:unique-coercion} and conclude that $E$ is unique.
-
+\noindent we need to show that the constraint $B$ is unique, using Theorem~\ref{theorem:unique-inference}, 
+in order to apply the induction hypothesis.
+For \reflabel{\labeltapp}: \joao{below same as ICFP's paper}
+\begin{mathpar}
+\bruletapp
+\end{mathpar}
+\noindent we also need to show the uniqueness of $A_1$ using
+Theorem~\ref{theorem:unique-inference}, in order to apply the
+induction hypothesis.
+  Also, in the \reflabel{\labeltsub} rule:
+\begin{mathpar}
+\bruletsub
+\end{mathpar}
+\noindent we need to show not only that $E_{sub}$ is unique (by
+  Lemma~\ref{lemma:unique-coercion}), but also that $A$ is unique (by
+Theorem~\ref{theorem:unique-inference}). 
+Uniqueness of $A$ is needed to apply the induction hypothesis. 
 \end{proof}
