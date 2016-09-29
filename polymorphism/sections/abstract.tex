@@ -3,14 +3,14 @@ and \emph{(parametric) polymorphism} enables
 important applications for programming. However such combination makes
 it hard to achieve the desirable property of a \emph{coherent
 semantics}: all valid derivations for the same expression should
-compute the same result. Recent work proposed \emph{disjoint
+compute the same value. Recent work proposed \emph{disjoint
 intersections types} as a means to ensure coherence in a simply typed
 setting. However, the addition of parametric polymorphism was not
 studied.
 
 This paper presents \name: a core calculus with a variant of
 \emph{disjoint intersection types}, \emph{parametric polymorphism} and a
-\emph{merge operator}. The semantics \name is both type-safe and
+\emph{merge operator}. \name is both type-safe and
 coherent. The key difficulty in adding polymorphism, while ensuring
 coherence, is that when a type variable occurs in an intersection
 type, it is not statically known whether the instantiated type will be
