@@ -65,52 +65,54 @@ let x : Int & Char = 1,,'c' in (*$ \ldots $*)
 \noindent In \name (following Dunfield's notation), the
 merge of two values $v_1$ and $v_2$ is denoted as $v_1 ,, v_2$.
 
-\paragraph{Merge operator and pairs.}\bruno{We may be able to skip
+\bruno{We may be able to skip
   this paragraph and just have a quick sentence about the relationship
 with pairs by pointing to Dunfield's paper. The important message is 
 that with intersections the elimination is implicit, and the order of
 the values is not important (with disjoint intersections).}
-The merge operator is similar to the introduction construct on pairs.
-An analogous implementation of \lstinline{x} with pairs would be:
-
-\begin{lstlisting}
-let xPair : (Int, Char) = (1, 'c') in (*$ \ldots $*)
-\end{lstlisting}
-
 \noindent The significant difference between intersection types with a
 merge operator and pairs is in the elimination construct. With pairs
 there are explicit eliminators (\lstinline{fst} and
 \lstinline{snd}). These eliminators must be used to extract the
-components of the right type. For example, in order to use
-\lstinline{idInt} and \lstinline{idChar} with pairs, we would need to
-write a program such as:
+components of the right type.
 
-\begin{lstlisting}
-(idInt (fst xPair), idChar (snd xPair))
-\end{lstlisting}
+%\paragraph{Merge operator and pairs.}
+%The merge operator is similar to the introduction construct on pairs.
+%An analogous implementation of \lstinline{x} with pairs would be:
 
-\noindent In contrast the elimination of intersection types is done
-implicitly, by following a type-directed process. For example,
-when a value of type \lstinline{Int} is needed, but an intersection
-of type \lstinline{Int & Char} is found, the compiler uses the
-type system to extract the corresponding value.
+%\begin{lstlisting}
+%let xPair : (Int, Char) = (1, 'c') in (*$ \ldots $*)
+%\end{lstlisting}
 
-\subsection{(In)Coherence}\label{subsec:incoherence}
-Unfortunatelly the implicit nature of elimination for intersection
+% For example, in order to use
+%\lstinline{idInt} and \lstinline{idChar} with pairs, we would need to
+%write a program such as:
+
+%\begin{lstlisting}
+%(idInt (fst xPair), idChar (snd xPair))
+%\end{lstlisting}
+
+%\noindent In contrast the elimination of intersection types is done
+%implicitly, by following a type-directed process. For example,
+%when a value of type \lstinline{Int} is needed, but an intersection
+%of type \lstinline{Int & Char} is found, the compiler uses the
+%type system to extract the corresponding value.
+
+\subsection{Coherence and Disjointness}
+\label{subsec:coherence}
+Unfortunately the implicit nature of elimination for intersection
 types built with a merge operator can lead to incoherence.
-The merge operator combines two terms, of type $A$ and $B$
-respectively, to form a term of type $A \inter B$. For example,
-$1 \mergeop `c'$ is of type $\tyint \inter \tychar$. In this case, no
-matter if $1 \mergeop `c'$ is used as $\tyint$ or $\tychar$, the result
-of evaluation is always clear. However, with overlapping types, it is
-not straightforward anymore to see the result. For example, what
-should be the result of this program, which asks for an integer out of
-a merge of two integers:
+This is due to intersections with overlapping types, as in
+$\tyint \inter \tyint$.
+For example, what should be the result of this program:
 \begin{lstlisting}
 (fun (x: Int) (*$ \to $*) x) (1,,2)
 \end{lstlisting}
 Should the result be \lstinline$1$ or \lstinline$2$?
+The \oldname \joao{add reference if not mentioned before} system solves this
+by using the concept of disjoint intersections. 
 
+\begin{comment}
 If both results are accepted, we say that the semantics is
 \emph{incoherent}: there are multiple possible meanings for the same
 valid program. 
@@ -121,8 +123,9 @@ at some point, to summarise the key result of the ICFP paper: we know
 how todo coherent intersection types for a simply typed calculus. 
 Then you want to setup the problem for this paper: but how about
 polymorphism? what are the challenges, why is it hard?}
+\end{comment}
 
-\subsection{Coherence and Disjointness}
+\paragraph{Disjoint intersections}
 Coherence is a desirable property for a semantics. A semantics is said
 to be coherent if any \emph{valid program} has exactly one
 meaning~\cite{reynolds1991coherence} (that is, the semantics is not ambiguous).
@@ -177,6 +180,7 @@ namely \lstinline$Int$ itself.
 of it, and proved that both versions are equivalent.
 This turned disjointness as a concept which is both easy to understand and easy to implement. 
 
+\begin{comment}
 \subsection{Top-like types}\bruno{You are spending too much time to
   get to the point. When writting a paper you want to get to the point
   (what's the problem) 
@@ -205,8 +209,9 @@ $\top$.
 This set of types includes $\top$ itself, intersections composed of other 
 top-like types (i.e. $\top \inter \top$), and pre-top-types, which are functions that have
 $\top$ as their co-domain (i.e. $\tyint \to \tychar \to \top$).
+\end{comment}
 
-\subsection{Adding parametric polymorphism}\bruno{avoid writting
+\subsection{Parametric Polymorphism}\bruno{avoid writting
   ``we'', ``I'', ``us'', \ldots when possible. Start with a key sentence, that
   summarizes your point. For example: 
 ``Unfortunatelly, adding parametric polymorphism is non-trivial. A naive
@@ -215,12 +220,11 @@ attempt to add polymorphism ...''
 \bruno{Be consistent with the title(s) capitalization of words. Some
   titles have lower case words, some others upper case. Use upper case
 everywhere (except for words like ``the'' ``of'', etc.}
-
-Having covered the core concepts behind \oldname and Dunfield's calculus,
-let us now suppose that we add parametric polymorphism to \oldname in a very straightforward 
-way, by introducing a forall type, type variables, and a big lambda at term level.
-We also assume that type variables are disjoint to any other type, as a starting point.
-Now consider the attempt to write the following polymorphic function in \name (we use
+Unfortunately, adding parametric polymorphism is non-trivial.
+A naive attempt to add polymorphism would consist in introducing a forall type, type variables, and a big lambda 
+at term level.
+Type variables can be assumed as disjoint to any other type, as a starting point.
+Now consider the attempt to write the following polymorphic function in such system (we will use
 uppercase Latin letters to denote type variables):
 \begin{lstlisting}
 let fst A B (x: A & B) = (fun (z:A) (*$ \to $*) z) x in (*$ \ldots $*)
@@ -238,14 +242,56 @@ fst Int Int (1,,2)
 $1$ and $2$ can be extracted from the merge and still match the type
 of the first argument of \lstinline{fst}.
 
-\subsection{A first conservative attempt}
+\paragraph{Biased choice breaks equational reasoning.} 
+At first sight, one option
+to workaround the issue incoherence would be to bias the type-based merge lookup
+to the left or to the right. %(as discussed in Section~\ref{subsec:incoherence}). 
+Unfortunately, biased choice is
+very problematic when parametric polymorphism is present in the language.
+To see the issue, suppose we chose to always pick the
+rightmost value in a merge when multiple values of same type exist.
+Intuitively, it would appear that the result of the use of
+\lstinline{fst} above is $2$. Indeed simple equational reasoning
+seems to validate such result:
+\begin{lstlisting}
+   fst Int Int (1,,2)
+(*$ \rightsquigarrow $*) (fun (z: Int) (*$ \to $*) z) (1,,2) -- (* \textnormal{By the definition of \code{fst}} *)
+(*$ \rightsquigarrow $*) (fun (z: Int) (*$ \to $*) z) 2      -- (* \textnormal{Right-biased coercion} *)
+(*$ \rightsquigarrow $*) 2                          -- (* \textnormal{By $\beta$-reduction} *)
+\end{lstlisting}
 
-Naturally\bruno{words like ``Naturally'', ``Essentially'' and so on
-  rarelly add anything yo your text. Just drop them. } a first attempt at restoring coherence forbid type variables inside
+However (assumming a straightforward implementation of right-biased
+choice) the result of the program would be 1! The reason for this has
+todo with \emph{when} the type-based lookup on the merge happens. In
+the case of \lstinline{fst}, lookup is triggered by a coercion
+function inserted in the definition of \lstinline{fst} at
+compile-time.
+In the definition of \lstinline$fst$ all it is known is that a
+value of type $A$ should be returned from a merge with an intersection
+type $A\&B$.  Clearly the only type-safe choice to coerce the value of
+type $A\&B$ into $A$ is to
+take the left component of the merge. This works perfectly for merges
+such as \lstinline$(1,,'c')$, where the types of the first and second components
+of the merge are disjoint. For the merge \lstinline$(1,,'c')$, if a integer lookup
+is needed, then \lstinline$1$ is the rightmost integer, which is consistent with the
+biased choice. Unfortunately, when given the merge \lstinline$(1,,2)$ the
+left-component (\lstinline$1$) is also picked up, even though in this case \lstinline$2$
+is the rightmost integer in the merge. Clearly this is inconsistent
+with the biased choice!
+
+Unfortunately this subtle interaction of polymorphism and type-based lookup
+ means that equational reasoning is broken!
+In the equational reasoning steps above, doing apparently correct
+substitutions lead us to a wrong result. 
+This is a major problem for biased choice and a reason to dismiss it as a possible implementation
+choice for \namedis.
+
+\subsection{A Conservative Attempt}
+A first attempt at restoring coherence can be to forbid type variables inside
 intersections (i.e. type variables are not disjoint to any type).
 This conservative approach would solve the problem of coherence, but it would also greatly 
 restrict the expressiveness of the resulting language.
-For example, the function $fst$ defined above, would no longer be accepted by our system.
+For example, the function $fst$ defined above, would no longer be accepted by the system.
 In fact, parametric polymorphism and intersection types could only be mixed in a very limited manner -
 as long as variables do not reside under intersections - and this is arguably a useful improvement
 in respect to other standard type systems, i.e. System $F$.
@@ -256,7 +302,7 @@ it is related to type substitution and why stability of subtitution
 cannot hold in general.}
 
 \begin{comment}
-\subsection{A more liberal attempt}
+\subsection{A More Liberal Attempt}
 
 Since the resulting calculus is not satisfactory, we ought to find a more liberal solution,
 which enables the combination of type variables and intersection types. 
