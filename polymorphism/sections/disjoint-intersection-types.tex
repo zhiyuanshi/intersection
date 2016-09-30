@@ -4,13 +4,12 @@
 You don't need to constantly remind the reader of this. Remove some of this repetition.}
 
 This section discusses the elaboration semantics of \name and show how coherence is retained.
-We will first explain the semantics by means of the elaboration to System $F$.
-Then, we will discuss the necessary extensions to retain coherence, namely in the coercions of 
+It will first explain the semantics by means of the elaboration to System $F$.
+Then, it will discuss the necessary extensions to retain coherence, namely in the coercions of 
 top-like types; coercive subtyping, and bidirectional type-system's elaboration. 
 
 \subsection{Semantics}
-
-We define the dynamic semantics of the call-by-value \name by means of
+The dynamic semantics of the call-by-value \name are defined by means of
 a type-directed translation to an extension of System $F$ with pairs~\footnote{
   For simplicity, we will just refer to this system as ``System $F$''
   from now on.}.
@@ -22,9 +21,9 @@ a type-directed translation to an extension of System $F$ with pairs~\footnote{
 \paragraph{Target language.}
 The syntax and typing of our target language is unsurprising. The syntax of the
 target language is shown in Figure~\ref{fig:f-syntax}. The highlighted part
-shows its difference with the standard System $F$. The typing rules can be found
-in the appendix.
-
+shows its difference with the standard System $F$. 
+The typing rules can be found in appendix.
+\joao{actually they can't, but should we include them?}
 
 \begin{figure}[!t]
   \[
@@ -43,10 +42,9 @@ in the appendix.
 \end{figure}
 
 \paragraph{Type and context translation.}
-
 Figure~\ref{fig:type-and-context-translation} defines the type translation
-function $\im \cdot$ from \name types $A$ to target language types $T$. The
-notation $\im \cdot$ is also overloaded for context translation from \name
+function $\im \cdot$ from \name types $A$ to target language types $T$. 
+The notation $\im \cdot$ is also overloaded for context translation from \name
 contexts $\Gamma$ to target language contexts $G$.
 
 \begin{figure}[!t]
@@ -123,14 +121,14 @@ Figure~\ref{fig:andcoercion}.
 The only new rule is \reflabel{\labeltoplforall}, which extends the notion of top-like types for
 the (disjoint) quantifier case.
 
-It is important pointing out that, despite the similarity of these rules with the simply-typed 
-system, our notion of disjointness has changed.
-Consequently, the set of well-formed top-like types has changed and
-we also adjusted the meta-function $\andcoerce{A}$, as shown in the bottom of 
+It is important pointing out that, despite the small extension in the definition of top-likes types,  
+the notion of disjointness has also changed, leading to a larger set of well-formed top-like types.
+Thus, to retain coherece, we adjusted the meta-function $\andcoerce{A}$, as shown in the bottom of 
 Figure~\ref{fig:andcoercion}.
-Note how not only the $\forall$ case is defined, but also the intersection case.
-This is extremely important as it plays a fundamental role in ensuring the coherence of subtyping, as
-we will describe next.
+Note how not only the $\forall$ case is now defined, but also the intersection case (covering types such
+as $\top \inter \top$).
+These changes are very important since they play a fundamental role in ensuring the coherence of subtyping for top-like
+types.
 
 \subsection{Coercive Subtyping and Coherence}
 
@@ -145,9 +143,9 @@ on the right hand side of $ \yields {} $. A coercion $ E $ is just an term
 in the target language and is ensured to have type
 $ \im {A_1} \to \im {A_2} $ (by Lemma~\ref{lemma:sub}). For example,
 \[
-\tyint \inter \tybool \subtype \tybool \yields {\lamty x {\im {\tyint \inter \tybool}} {\proj 2 x}}
+\tyint \inter \alpha \subtype \alpha \yields {\lamty x {\im {\tyint \inter \tybool}} {\proj 2 x}}
 \]
-generates a coercion function with type: $\tyint \inter \tybool \to \tybool$.
+generates a coercion function with type: $\tyint \inter \alpha \to \alpha$.
 
 Rule \reflabel{\labelsubtop} the coercion is the constant function of the unit term.
 In rules \reflabel{\labelsubvar}, \reflabel{\labelsubint}, coercions are just
@@ -227,7 +225,7 @@ Finally, all rules produce type-correct coercions:
 
 In order to ensure a coherent type-system, we should prove that our subtyping relation is also 
 coherent.
-More formally, with disjoint intersections the following theorem holds:
+More formally, with disjoint polymorphism the following theorem holds:
 
 \begin{lemma}[Unique subtype contributor]
   \label{lemma:unique-subtype-contributor}
@@ -245,6 +243,13 @@ More formally, with disjoint intersections the following theorem holds:
 %Unfortunately, disjoint intersections alone are insufficient to deal with problem 2).
 %In order to deal with problem 2), we introduce a distinction between types, and atomic types.
 
+\begin{proof}
+By double induction: the first on the disjointness derivation (which follows from $A_1 \inter A_2$ being well-formed);
+the second on type $B$.
+The variable cases \reflabel{\labeldisvar} and \reflabel{\labeldissym} needed to show that, for any two well-formed 
+and disjoint types $A$ and $B$, and $B$ is not toplike, then $A$ cannot be a subtype of $B$.
+\end{proof}
+
 Finally, we can show that the coercion of a subtyping relation $A \subtype B$ 
 is uniquely determined.
 This fact is captured by the following lemma:
@@ -255,6 +260,10 @@ This fact is captured by the following lemma:
   If $A \subtype B \yields {E_1}$ and $A \subtype B \yields {E_2}$, where $A$
   and $B$ are well-formed types, then $E_1 \equiv E_2$.
 \end{restatable}
+
+\begin{proof}
+By induction on the first derivation and case analysis \joao{or say inversion instead?} on the shape of the second. 
+\end{proof}
 
 \begin{comment}
 \paragraph{Expressiveness.}
@@ -420,6 +429,7 @@ performing the typing derivation.
 \paragraph{Key idea of the translation.}
 \bruno{Don't just copy\&paste from the previous paper. 
 You should mention the new rules, which Dunfield does not have. }
+\joao{added explanation for new rules, still need better example}
 This translation turns merges into usual pairs, similar to Dunfield's
 elaboration approach~\cite{dunfield2014elaborating}.
 For example, \[ 1 \mergeop \code{"one"} \] becomes \pair 1
@@ -444,7 +454,7 @@ To account for this difference, in \reflabel{\labeltapp}, the
 coercion $E$ from the subtyping relation is applied to the argument.
 Rules \reflabel{\labeltrec} and \reflabel{\labeltprojr} are quite straightforward, since there
 are not records in the target language.
-It might also be noteworthy saying that, as usual, the rule \reflabel{\labeltmerge} translates merges 
+It is also noteworthy pointing out that, as usual, the rule \reflabel{\labeltmerge} translates merges 
 into pairs.
 
 
@@ -476,8 +486,7 @@ by the following two theorems.
 \end{restatable}
 
 \begin{proof}
-  (Sketch) By structural induction on the term and the corresponding
-  inference rule.
+  By structural induction on the term and the corresponding inference rule.
 \end{proof}
 
 \begin{theorem}[Type safety]
@@ -682,7 +691,6 @@ it is possible to infer a type for it, then $e$ has a unique type.
   \end{itemize*}
 \end{restatable}
 
-\joao{review proof}
 \begin{proof}
 By structural induction on the term and the corresponding inference rule.
 \end{proof}
@@ -695,9 +703,9 @@ Combining the previous results, we are finally able to show the central theorem:
   \label{theorem:unique-elaboration}
   We have that:
   \begin{itemize*}
-    \item If $\jinfer \Gamma e {A_1} \yields {E_1}$ and $\jinfer \Gamma e {A_2} \yields
+    \item If $\jinfer \Gamma e A \yields {E_1}$ and $\jinfer \Gamma e A \yields
           {E_2}$, then $E_1 \equiv E_2$. 
-    \item If $\jcheck \Gamma e {A_1} \yields {E_1}$ and $\jcheck \Gamma e {A_2} \yields
+    \item If $\jcheck \Gamma e A \yields {E_1}$ and $\jcheck \Gamma e A \yields
           {E_2}$, then $E_1 \equiv E_2$.
   \end{itemize*}(``$\equiv$'' means syntactical equality, up to
   $\alpha$-equality.)
@@ -705,19 +713,31 @@ Combining the previous results, we are finally able to show the central theorem:
 
 \end{restatable}
 
-\joao{review this proof}
 \bruno{Yes, and you want to mention somewhere where the stability of substitution lemma 
 plays a role. I presume it plays a role in the coherence theorems.}
+\joao{from what I could gather we use it for type-safety, but I will double-check this}
 \begin{proof}
-  Note that the typing rules are already syntax-directed but the case of
-  \reflabel{\labeltapp} (copied below) still needs special attention since we
-  need to show that the generated coercion $E$ is unique.
+  By induction on the first derivation.
+  Note that three cases need special attention: \reflabel{\labelttapp}, \reflabel{\labeltsub} and \reflabel{\labeltapp}.
+  In the \reflabel{\labeltblam}:
   \begin{mathpar}
-    \ruletapp
+    \brulettappdis
   \end{mathpar}
-  Luckily, by Lemma~\ref{lemma:wellformed-typing}, we know that typing
-  judgements give well-formed types, and thus $\jwf \Gamma {A_1}$ and $\jwf
-  \Gamma {A_3}$. Therefore we are able to apply
-  Lemma~\ref{lemma:unique-coercion} and conclude that $E$ is unique.
-
+\noindent we need to show that the constraint $B$ is unique, using Theorem~\ref{theorem:unique-inference}, 
+in order to apply the induction hypothesis.
+For \reflabel{\labeltapp}: \joao{below same as ICFP's paper}
+\begin{mathpar}
+\bruletapp
+\end{mathpar}
+\noindent we also need to show the uniqueness of $A_1$ using
+Theorem~\ref{theorem:unique-inference}, in order to apply the
+induction hypothesis.
+  Also, in the \reflabel{\labeltsub} rule:
+\begin{mathpar}
+\bruletsub
+\end{mathpar}
+\noindent we need to show not only that $E_{sub}$ is unique (by
+  Lemma~\ref{lemma:unique-coercion}), but also that $A$ is unique (by
+Theorem~\ref{theorem:unique-inference}). 
+Uniqueness of $A$ is needed to apply the induction hypothesis. 
 \end{proof}
