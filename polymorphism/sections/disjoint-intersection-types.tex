@@ -1,8 +1,5 @@
 \section{Semantics and Coherence}
 \label{sec:disjoint}
-\bruno{You are repeatedily referring to our previous paper and Dunfield's paper. 
-You don't need to constantly remind the reader of this. Remove some of this repetition.}
-
 This section discusses the elaboration semantics of \name and show how coherence is retained.
 It will first explain the semantics by means of the elaboration to System $F$.
 Then, it will discuss the necessary extensions to retain coherence, namely in the coercions of 
@@ -425,13 +422,21 @@ type-system.
 The bidirectional type-system is elaborating, producing a term in the target language while
 performing the typing derivation.
 
-%TODO move this to overview and show here example with polymorphism?
 \paragraph{Key idea of the translation.}
-\bruno{Don't just copy\&paste from the previous paper. 
-You should mention the new rules, which Dunfield does not have. }
-\joao{added explanation for new rules, still need better example}
 This translation turns merges into usual pairs, similar to Dunfield's
 elaboration approach~\cite{dunfield2014elaborating}.
+It also translates the form of disjoint quantification and disjoint type application into regular (polymorphic) 
+quantification and type application. 
+For example, \[ \blamdis \alpha \tyint {\lam x {(x \mergeop 1)}} \] in \name will be translated into System $F$'s: 
+\[ \blam \alpha {\lam x {\pair x 1}}\]
+This is achieved by means of the type-directed translation.
+Note that, when performing type application, the type-system will ensure that the type being applied is compatible
+with the disjoint constraint, otherwise the program is rejected.
+For example, applying the term above to $\tychar$ would be accepted, and the generated term would translate this
+into System $F$'s type application.
+On the other hand, applying the term to $\tyint$ would be rejected, and hence the target term produced is meaningless.
+
+\begin{comment}
 For example, \[ 1 \mergeop \code{"one"} \] becomes \pair 1
 {\code{"one"}}. In usage, the pair will be coerced according to type
 information. For example, consider the function application: \[ \app {(\lamty x
@@ -441,6 +446,7 @@ information. For example, consider the function application: \[ \app {(\lamty x
 \tyint \tystring} {\proj 2 x})$. It extracts the second item from the pair, since
 the function expects a $\tystring$ but the translated argument is of type $\pair
 \tyint \tystring$.
+\end{comment}
 
 \paragraph{The translation judgement.} 
 The translation judgement $\jtype \Gamma e A \yields E$ extends the typing judgement with an 
@@ -715,7 +721,7 @@ Combining the previous results, we are finally able to show the central theorem:
 
 \bruno{Yes, and you want to mention somewhere where the stability of substitution lemma 
 plays a role. I presume it plays a role in the coherence theorems.}
-\joao{from what I could gather we use it for type-safety, but I will double-check this}
+\joao{from what I could gather we use it to ensure well-formed typing, which is used here (as mentioned below)}
 \begin{proof}
   By induction on the first derivation.
   Note that three cases need special attention: \reflabel{\labelttapp}, \reflabel{\labeltsub} and \reflabel{\labeltapp}.
@@ -725,7 +731,7 @@ plays a role. I presume it plays a role in the coherence theorems.}
   \end{mathpar}
 \noindent we need to show that the constraint $B$ is unique, using Theorem~\ref{theorem:unique-inference}, 
 in order to apply the induction hypothesis.
-For \reflabel{\labeltapp}: \joao{below same as ICFP's paper}
+For \reflabel{\labeltapp}: 
 \begin{mathpar}
 \bruletapp
 \end{mathpar}
@@ -736,8 +742,11 @@ induction hypothesis.
 \begin{mathpar}
 \bruletsub
 \end{mathpar}
-\noindent we need to show not only that $E_{sub}$ is unique (by
-  Lemma~\ref{lemma:unique-coercion}), but also that $A$ is unique (by
+\noindent we need to show that $E_{sub}$ is unique (by
+  Lemma~\ref{lemma:unique-coercion}), and thus to show that $A$ is well-typed 
+  (by Lemma~\ref{lemma:wellformed-typing}). 
+  We also need to show that $A$ is unique (by
 Theorem~\ref{theorem:unique-inference}). 
-Uniqueness of $A$ is needed to apply the induction hypothesis. 
+Uniqueness of $A$ is needed to apply the induction hypothesis.
+
 \end{proof}
