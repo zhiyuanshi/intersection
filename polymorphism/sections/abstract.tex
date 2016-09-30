@@ -12,14 +12,14 @@ This paper presents \name: a core calculus with a variant of
 \emph{disjoint intersection types}, \emph{parametric polymorphism} and a
 \emph{merge operator}. \name is both type-safe and
 coherent. The key difficulty in adding polymorphism, while ensuring
-coherence, is that when a type variable occurs in an intersection
+coherence is that, when a type variable occurs in an intersection
 type, it is not statically known whether the instantiated type will be
 disjoint to other components of the intersection. To address this
 problem we propose \emph{disjoint polymorphism}: a constrained form of
 parametric polymorphism, that allows programmers to specify
 disjointness constraints for type variables. With disjoint
 polymorphism the calculus remains very flexible in terms of programs
-that can be written with intersection types, while retaining
+that can be written with disjoint intersection types, while retaining
 coherence.
 
 \begin{comment}

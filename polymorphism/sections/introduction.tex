@@ -1,6 +1,67 @@
 \section{Introduction}
 \label{sec:intro}
 
+Intersection types are an incresingly popular language feature for
+many modern programming languages. Examples of languages that 
+include some form of intersection types are Microsoft's TypeScript~\cite{}, 
+Redhat's Ceylon~\cite{}, Facebook's Flow~\cite{} and
+Scala~\cite{}\footnote{Limited forms of intersection types also exist in
+recent versions of
+Java~\cite{}.}. In those languages a typical use of intersection
+types, which has been known for a long time~\cite{}, 
+is to model the subtyping aspects of some (possibly restricted) form 
+of OO-style multiple inheritance. For example, the following Scala declaration:
+
+\begin{lstlisting}
+class A extends B with C
+\end{lstlisting}
+
+\noindent says that the class \lstinline{A} implements \emph{both}
+\lstinline{B} and \lstinline{C}. The fact that \lstinline{A}
+implements two interfaces is captured by an intersection type
+between \lstinline{B} and \lstinline{C} (denoted in Scala by
+\lstinline{B with C}). Unlike a language like Java, where
+\lstinline{implements} (which plays a similar role to
+\lstinline{with}) would be a mere keyword, in Scala
+intersection types are first class. For example, it is possible to define 
+functions such as:
+
+\begin{lstlisting}
+def narrow(x : B with C) : B = x
+\end{lstlisting}
+
+\noindent whose type signature involves an intersection between 
+types \lstinline{B} and \lstinline{C}. In Java, such method cannot  
+be directly expressed. 
+
+The existence of first-class intersections has also lead to the
+discovery of other interesting applications of intersection types. 
+For example, in their documentation of intersection types\footnote{\url{https://www.typescriptlang.org/docs/handbook/advanced-types.html}}, 
+TypeScript motivates them as follows:
+
+\begin{quote}
+\emph{You will mostly see intersection types used for mixins and other
+concepts that don’t fit in the classic object-oriented mold. (There are a lot of these in JavaScript!)}
+\end{quote}
+
+\noindent There are two points worth emphasizing here. Firstly, 
+intersection types are being used to model concepts that are not
+like the classical (class-based) object-oriented programming. Indeed, 
+being a prototype-based language, Javascript has a much more dynamic 
+notion of object composition. In typical statically typed class-based languages
+composition is done at compile-time via inheritance (and the type of composed
+objects has to be statically known). In contrast, in prototype-based languages
+objects are composed at run-time, and their types are not necessarally
+(fully) statically known.  Secondly, the use of intersection types in
+TypeScript is inspired by common programming patterns in the
+(dynamically typed) JavaScript. This hints that intersection types are 
+useful to capture certain programming patterns that are not
+captured by more conventional type systems without intersection types.
+
+\begin{lstlisting}
+function extend<T, U>(first: T, second: U) : T & U {...}
+\end{lstlisting}
+
 Previous work by Dunfield~\cite{dunfield2014elaborating} has shown the power of intersection
 types and a merge operator. The presence of a merge operator in a core
 calculus provides significant expressiveness, allowing encodings for many
