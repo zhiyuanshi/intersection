@@ -14,8 +14,8 @@ supports them.
 
 \subsection{Intersection Types and the Merge Operator}
 %%\subsection{Intersection Types, Merge and Polymorphism in \namedis}
-\bruno{We should't simply copy and paste the text from the previous
-  paper. We should try to at least rephrase some things.}
+%\bruno{We should't simply copy and paste the text from the previous
+%  paper. We should try to at least rephrase some things.}
 
 Intersection types date back as early as Coppo et al.'s work~\cite{coppo1981functional}. 
 Since then various researchers have studied intersection types, and some languages have 
@@ -27,8 +27,8 @@ adopted them in one form or another.
 \paragraph{Intersection types.}
 The intersection of type $A$ and $B$ (denoted as \lstinline{A & B} in
 \name) contains exactly those values
-which can be used as either values of type $A$ or of type $B$. For instance,
-consider the following program in \namedis:
+which can be used as either values of type $A$ or of type $B$. 
+For instance, consider the following program in \name:
 
 \begin{lstlisting}
 let x : Int & Char = (*$ \ldots $*) in -- definition omitted
@@ -38,23 +38,22 @@ let idChar (y : Char) : Char = y in
 \end{lstlisting}
 
 \noindent If a value \lstinline{x} has type \lstinline{Int & Char} then
-\lstinline{x} can be used as an integer or as a character. Therefore,
-\lstinline{x} can be used as an argument to any function that takes
-an integer as an argument, or any
-function that take a character as an argument. In the program above
-the functions \lstinline{idInt} and \lstinline{idChar} are the
-identity functions on integers and characters, respectively.
-Passing \lstinline{x} as an argument to either one (or both) of the
-functions is valid.
+\lstinline{x} can be used anywhere where either values of type \lstinline{Int} or a 
+\lstinline{Char} are expected. 
+This means that, in the program above
+the functions \lstinline{idInt} and \lstinline{idChar} -- the
+identity functions on integers and characters, respectively -- 
+both accept \lstinline{x} as an argument. 
 
 \paragraph{Merge operator.}
-In the previous program we deliberately did not show how to introduce values of an
-intersection type. There are many variants of intersection types
-in the literature. Our work follows a particular formulation, where
-intersection types are introduced by a \emph{merge operator}.
+The previous program deliberately ommitted the introduction of values of an
+intersection type. 
+There are many variants of intersection types in the literature. 
+Our work follows a particular formulation, where
+intersection types are introduced by a \emph{merge operator}. \joao{add citations?}
 As Dunfield~\cite{dunfield2014elaborating} has argued a merge operator adds considerable
-expressiveness to a calculus. The merge operator allows
-two values to be merged in a single intersection type. 
+expressiveness to a calculus. 
+The merge operator allows two values to be merged in a single intersection type. 
 For example, an implementation of \lstinline{x} is constructed in \name as follows:
 
 \begin{lstlisting}
@@ -64,15 +63,14 @@ let x : Int & Char = 1,,'c' in (*$ \ldots $*)
 merge of two values $v_1$ and $v_2$ is denoted as $v_1 ,, v_2$.
 
 The significant difference between intersection types with a
-merge operator and pairs is in the elimination construct. 
+merge operator and regular pairs is in the elimination construct. 
 With pairs there are explicit eliminators (\lstinline{fst} and
 \lstinline{snd}), and these eliminators must be used to extract the
 components of the right type.
 With intersection types and a merge operator, elminators are implicit in the language,
 meaning no uses of projection functions are necessary.
-Also, with \emph{disjoint} intersection types, the order of the types in the
-intersecions becomes irrelevant.
-\joao{missing something here}
+Moreover, with \emph{disjoint} intersection types, the order of the types in the
+intersections becomes irrelevant.
 
 %\paragraph{Merge operator and pairs.}
 %The merge operator is similar to the introduction construct on pairs.
@@ -102,20 +100,18 @@ Coherence is a desirable property for a semantics.
 A semantics is said to be coherent if any \emph{valid program} has exactly one
 meaning~\cite{reynolds1991coherence} (that is, the semantics is not ambiguous).
 Unfortunately the implicit nature of elimination for intersection
-types built with a merge operator can lead to incoherence.
+types built with a merge operator can lead to incoherence,
 This is due to intersections with overlapping types, as in
 $\tyint \inter \tyint$.
-For example, what should be the result of this program: \joao{missing anotation here?}
-\begin{lstlisting}
-(fun x (*$ \to $*) x) (1,,2)
-\end{lstlisting}
-Should the result be \lstinline$1$ or \lstinline$2$?
+For example, the result of the program (\lstinline$(1,,2) : Int$)
+can be either \lstinline$1$ or \lstinline$2$, depending on the implementation 
+of the language.
 
 One option to restore coherence is to reject programs which may have
 multiple meanings.
-The \oldname \joao{add reference if not mentioned before} system, a calculus with
+The \oldname \joao{add reference} system -- a calculus with
 a simply-typed calculus with intersection types and 
-a merge operator, in the same flavour of Dunfield's; solves this problem
+a merge operator, in the same flavour of Dunfield's -- solves this problem
 by using the concept of disjoint intersections. 
 
 \begin{comment}
@@ -164,15 +160,8 @@ More formally, the notion of disjointness can be specified as follows:
 \end{definition}
 \end{comment}
 
-With this concept of disjointness in mind, it is easy to verify that there is no longer
-incoherence in the previous example, since 
-\bruno{those are old examples (pre-ICFP) by
-  the way; and they do not work in the calculus we have (no
-  annotations on lambda's)}
-\begin{lstlisting}
-(fun x (*$ \to $*) x) (1,,2)
-\end{lstlisting}
-is no longer well-typed! 
+With this concept of disjointness in mind, it is easy to verify that the previous example 
+will no longer be accepted since \lstinline$((1,,2) : Int)$ is no longer well-typed!
 The merge operator requires two types to be disjoint in order to type-check it into
 an intersection.
 In the example \lstinline$(1,,2)$ is rejected by the compiler, since \lstinline$Int$ is not
@@ -226,7 +215,7 @@ Type variables can be assumed as disjoint to any other type, as a starting point
 Now consider the attempt to write the following polymorphic function in such system (we will use
 uppercase Latin letters to denote type variables): 
 \begin{lstlisting}
-let fst A B (x: A & B) : A = (fun z (*$ \to $*) z) x in (*$ \ldots $*)
+let fst A B (x: A & B) : A = ((fun z (*$ \to $*) z) : Int (*$ \to $*) Int) x in (*$ \ldots $*)
 \end{lstlisting}
 The \code{fst} function is supposed to extract a value of type
 (\lstinline{A}) from the merge value $x$ (of type \lstinline{A&B}). 
@@ -250,13 +239,13 @@ very problematic when parametric polymorphism is present in the language.
 To see the issue, suppose we chose to always pick the
 rightmost value in a merge when multiple values of same type exist.
 Intuitively, it would appear that the result of the use of
-\lstinline{fst} above is $2$. Indeed simple equational reasoning
-seems to validate such result:
+\lstinline{fst} above is $2$. 
+Indeed simple equational reasoning seems to validate such result:
 \begin{lstlisting}
    fst Int Int (1,,2)
-(*$ \rightsquigarrow $*) (fun (z: Int) (*$ \to $*) z) (1,,2) -- (* \textnormal{By the definition of \code{fst}} *)
-(*$ \rightsquigarrow $*) (fun (z: Int) (*$ \to $*) z) 2      -- (* \textnormal{Right-biased coercion} *)
-(*$ \rightsquigarrow $*) 2                          -- (* \textnormal{By $\beta$-reduction} *)
+(*$ \rightsquigarrow $*) ((fun z (*$ \to $*) z) : Int (*$ \to $*) Int) (1,,2) -- (* \textnormal{By the definition of \code{fst}} *)
+(*$ \rightsquigarrow $*) ((fun z (*$ \to $*) z) : Int (*$ \to $*) Int) 2      -- (* \textnormal{Right-biased coercion} *)
+(*$ \rightsquigarrow $*) 2                                  -- (* \textnormal{By $\beta$-reduction} *)
 \end{lstlisting}
 
 However (assuming a straightforward implementation of right-biased
@@ -277,7 +266,7 @@ For the merge \lstinline$(1,,'c')$, if a integer lookup
 is needed, then \lstinline$1$ is the rightmost integer, which is consistent with the
 biased choice. 
 Unfortunately, when given the merge \lstinline$(1,,2)$ the
-left-component (\lstinline$1$) is also picked up, even though in this case \lstinline$2$
+left-component \lstinline$1$ is also picked up, even though in this case \lstinline$2$
 is the rightmost integer in the merge. 
 
 Unfortunately this subtle interaction of polymorphism and type-based lookup
@@ -296,11 +285,6 @@ For example, the function $fst$ defined above, would no longer be accepted by th
 In fact, parametric polymorphism and intersection types could only be mixed in a very limited manner -
 as long as variables do not reside under intersections - and this is arguably a useful improvement
 in respect to other standard type systems, i.e. System $F$.
-\bruno{There was an important discussion about biased choice in the
-  draft, but this seems to have been removed. I think that's a very
-  important point as to why we coherence is important. Furthermore, 
-it is related to type substitution and why stability of subtitution
-cannot hold in general.}
 
 \begin{comment}
 \subsection{A More Liberal Attempt}
@@ -310,7 +294,7 @@ A possible approach would be to assign constraints to each type variable, an del
 check for disjointness until type application/instantiation. 
 \end{comment}
 
-\subsection{Disjoint quantification}
+\subsection{Disjoint Quantification}
 To avoid being overly conservative, while still retaining coherence in the
 presence of parametric polymorphism and intersection types, \name uses
 an extension to universal quantification called \emph{disjoint quantification}.
@@ -320,7 +304,7 @@ allows a type variable to be constrained so that it is disjoint with a given typ
 With disjoint quantification a variant of the program $fst$, which
 is accepted by \name, would be written as:
 \begin{lstlisting}
-let fst A ((*$ \highlight {B *~A} $*)) (x: A & B) = (fun (z: A) (*$ \to $*) z) x
+let fst A ((*$ \highlight {B *~A} $*)) (x: A & B) = ((fun z (*$ \to $*) z) : Int (*$ \to $*) Int) x
 in (*$ \ldots $*)
 \end{lstlisting}
 The small change is in the declaration of the type parameter $B$. The notation
@@ -344,25 +328,25 @@ is rejected because \lstinline$Int$ is not disjoint with \lstinline$Int$, thus f
 disjointness constraint on the second type parameter of \lstinline$fst$.
 
 \paragraph{Empty constraint}
-\joao{this is somewhat similar to what is already written on Section 5, maybe merge them here?}
-Even though disjoint quantification solves the problem of coherence, there is still one problem
-we need to tackle. 
+Even though disjoint quantification solves the problem of coherence, there is still one detail 
+that needs further justification.
 The reader might have noticed how we ommitted the disjointness constraint of 
 the type variable $A$ in the \lstinline$fst$ function.
 This actually means that $A$ should be associated with the empty contraint,
-which raises the question: which type should be used to represent the empty constraint?
+which raises the question: which type should be used to represent such empty constraint?
 Or, in other words, which type is disjoint to every other type? 
 It is obvious that this type should be one of the bounds of the subtyping lattice: either $\bot$ or
 $\top$.
 
-The essential intuition here, is that the more specific a type in the subtyping relation is, the less types
+The essential intuition here is that the more specific a type in the subtyping relation is, the less types
 exist that are disjoint to it.
 For example, $\tyint$ is disjoint with all types except the intersection that contain $\tyint$, $\tyint$
 itself, and $\bot$; while $\tyint \inter \tychar$ is disjoint to all types that $\tyint$ is, plus the
 types disjoint to $\tychar$.
-Thus, the more specific a type variable is, the less options we have to instantiate it with.
+Thus, the more specific a type variable constraint is, the less options we have to instantiate it with.
 This reasoning implies that $\top$ should be treated as the empty constraint.
 Indeed, in \name, a single type variable $A$ is only syntactic sugar for $A * \top$.
+\joao{should we say anything here about this going against our previous top-disjointness formulation?}
 
 %Let us assume two distinct interpretations for the subtyping relation.
 %Given two types $A$ and $B$, we can say relation is either:
@@ -403,7 +387,24 @@ Conversely, $\top$ can be thought as specific - or rather, as general - as the 0
 %\joao{say that we manage to retain coherence wrt to the simply typed version?}
 
 \paragraph{Substitution}
-...
+After having solved the coherence issues, it is important noting that \name lacks an important property
+common amongst polymorphic type systems: types are not stable under substitution. 
+This means that if a type variable $A$ is substituted in a type $T_1$, for a type $T_2$ 
+(written $\subst {T_2} A {T_1}$), where $T_1$ and $T_2$ are well-formed, the resulting type might be ill-formed. 
+To understand why, recall the previous example: 
+\begin{lstlisting}
+fst Int Int (1,,2)
+\end{lstlisting}
+The type signature of \lstinline$fst$ may be read as $\forall_{A,B*A}. (A \inter B) \to A$.
+An application to the type $\tyint$ will lead to instantiation of the variable $A$, leading to the type
+$\forall_{B * \tyint}. (\tyint \inter B) \to \tyint$.
+Now, the second $\tyint$ application is problematic, since instantiating $B$ with $\tyint$ will lead to
+the ill-formed type $(\tyint \inter \tyint) \to \tyint$.
+However, from this example it is easy to see that all types which are not problematic are exactly the
+the ones disjoint with $A$.
+This paper shows how a weaker version of the usual type substituition stability still holds, 
+namely by requiring that the type varible's disjointness constraint is compatible
+with the type as target of the instantiation. 
 
 \begin{comment}
 This section introduces \namedis and its support for intersection types,
