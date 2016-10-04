@@ -347,6 +347,8 @@ Thus, the more specific a type variable constraint is, the less options we have 
 This reasoning implies that $\top$ should be treated as the empty constraint.
 Indeed, in \name, a single type variable $A$ is only syntactic sugar for $A * \top$.
 \joao{should we say anything here about this going against our previous top-disjointness formulation?}
+For instance, the type of the identity function in System $F$ that reads $\forall A. A \to A$ is 
+equivalent to the \name's type $\forall (A * \top). A \to A$.
 
 %Let us assume two distinct interpretations for the subtyping relation.
 %Given two types $A$ and $B$, we can say relation is either:
@@ -395,9 +397,9 @@ To understand why, recall the previous example:
 \begin{lstlisting}
 fst Int Int (1,,2)
 \end{lstlisting}
-The type signature of \lstinline$fst$ may be read as $\forall_{A,B*A}. (A \inter B) \to A$.
+The type signature of \lstinline$fst$ may be read as $\forall A, (B * A) . (A \inter B) \to A$.
 An application to the type $\tyint$ will lead to instantiation of the variable $A$, leading to the type
-$\forall_{B * \tyint}. (\tyint \inter B) \to \tyint$.
+$\forall (B * \tyint). (\tyint \inter B) \to \tyint$.
 Now, the second $\tyint$ application is problematic, since instantiating $B$ with $\tyint$ will lead to
 the ill-formed type $(\tyint \inter \tyint) \to \tyint$.
 However, from this example it is easy to see that all types which are not problematic are exactly the

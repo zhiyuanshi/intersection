@@ -127,19 +127,19 @@ Figure~\ref{fig:disjointness}, which consists of two judgements.
 two types $A$ and $B$ are disjoint in a context $\Gamma$.
 The top five rules are novel in relation to the algorithm described in \oldname.
 \reflabel{\labeldistop} and \reflabel{\labeldistopsym} say that any type is disjoint to 
-$\top$.\bruno{remove brackets from rule names} Type variables are
-dealt with two rules:
+$\top$. Type variables are dealt with two rules:
 \reflabel{\labeldisvar} is the base rule; and \reflabel{\labeldissym}
 is its twin symetrical rule. 
 Both rules state that a type variable is disjoint to some type $A$, if $\Gamma$ contains any
 subtype of the corresponding disjointness constraint. 
 This rule is a specialization of the more general lemma:
-\joao{can we give this a name, as it is re-stated later?
-  i.e. covariance of disjointness?}\bruno{Yes, covariance of
-  disjointness is a good name.}
 
-\[ \inferrule {\jwf \Gamma {A \disjoint B} \\ B \subtype C }
-              {\jwf \Gamma {A \disjoint C}} \]
+\begin{restatable}[Covariance of disjointness]{lemma}{disjointnesscovariance}
+  \label{lemma:disjointness-covariance}
+
+  If $\jwf \Gamma {A \disjoint B}$ and $B \subtype C$, then $\jwf \Gamma {A \disjoint C}$.
+\end{restatable}
+
 The lemma states that if a type $A$ is disjoint to $B$ under $\Gamma$, then it is also disjoint
 to any supertype of $B$. 
 Note how these two variable rules would allow one to prove $x \disjoint x$, for a given type 
@@ -183,17 +183,17 @@ Note that disjointness with type variables is already captured by \reflabel{\lab
 {\reflabel{\labeldistop}} and {\reflabel{\labeldistopsym}}.
 
 \subsection{Stability under Substitution}
-
 The combination of polymorphism and disjoint intersection types
 invalidates various conventional substitution lemmas related to
-well-formedness and typing.  \bruno{we probably want a quick reference
-  to some example in the overview illustrating this issue here.}
-However, under certain conditions, a weaker version of the substituion
-lemmas does hold. The conditions are guaranteed by the type-system by only
+well-formedness and typing.  
+For example, as shown in Section~\ref{sec:overview}, in the type 
+$\fordis A \tyint {(\tyint \inter A) \to \tyint}$, the type $A$ cannot be substituted by any type.
+However, under certain conditions, weaker versions of substituion lemmas do hold. 
+The conditions are guaranteed by the type-system by only
 allowing instantiations of a type variable with types disjoint to the
 variable's disjointness constraints.
 
-\paragraph{Problematic Substitutions}
+\paragraph{Problematic substitutions.}
 One rule of thumb in disjoint intersection types is that, if a type
 $A$ is disjoint to a type $B$, then the intersection $A \inter B$ is
 well-typed.  However, during type instantiation (i.e. when type
@@ -213,7 +213,7 @@ is no longer true since $\tyint$ is clearly not disjoint with itself.
 This explains the need to ensure that during type-instantiation the target of the substitution  
 is compatible with the disjointness constraint associated with the variable. 
 
-\paragraph{Disjoint Substitutions}
+\paragraph{Disjoint substitutions.}
 While disjointness cannot be preserved for general substitutions,
 if appropriate disjointness pre-conditions are met then disjoiness can
 be preserved. More formally, the following lemma holds: 
@@ -233,7 +233,7 @@ be preserved. More formally, the following lemma holds:
   safe to make a substitution in the co-domain of the environment.
 \end{proof}
 
-\paragraph{Well-formedness substitution stability}
+\paragraph{Well-formedness substitution stability.}
 Typically polymorphic systems with explicit instantiation are required to be shown that their
 types are stable under substitution, in order to avoid ill-formed types.
 In the presence of disjoint quantification, we cannot prove such property.
@@ -286,19 +286,15 @@ As one might expect, the answer is tightely related to subtyping, as we will sho
 \subsection{Bounds of Disjoint Quantification}
 Substitution raises the question of what range of types can be instantiated for a given variable, 
 under a given context.
-To get a feeling about this, let us restate a lemma, which we used to justify the rule 
-for disjointness of variables:\bruno{if you give the lemma a name, you
-can simply use the name here.}
-
-\[ \inferrule {\jwf \Gamma {A \disjoint B} \\ B \subtype C }
-              {\jwf \Gamma {A \disjoint C}} \]
-
-If one takes $A$ as some variable $x$, and $B$ has some disjointness constraint bound to it in 
-the environment, then we can ask how many suitable types are there to instantiate $x$ with? 
+To get a feeling about this, we ask the reader to recall 
+Lemma~\ref{lemma:disjointness-covariance}, which was used to justify the rule for
+disjointness of variables.
+If one takes $A$ as some variable $x$, then the lemma should read as:   
+\[ \inferrule {\jwf \Gamma {x \disjoint B} \\ B \subtype C }
+              {\jwf \Gamma {x \disjoint C}} \]
+Now we can ask: how many suitable types are there to instantiate $x$ with?
 Before we answer this, let us ask first how many options are there for $C$, depending on the 
-shape of $B$?\bruno{here you are talking about some example with x and
-B with constraint in $|gamma$. I think it is better to have a rule
-that illustrates this directly (as a special case of the rule above).}
+shape of $B$?
 Given that the cardinality of \name's types is infinite, for the sake of this example we will 
 restrict the type universe to a finite number of 
 primitive types (i.e. $\tyint$, $\tystring$, etc), disjoint intersections of these types,
@@ -320,9 +316,10 @@ We can now turn our attention to the two extreme cases, namely $\top$
 system, however it can be seen as the infinite intersection in \name.}.
 Following the same logic, we may conclude that $\top$ as the associated constraint leaves $x$ with 
 the most options for instantiation whereas $\bot$ will deliver the least options.
-We will discuss their role in our system next.
+We will briefly discuss the role of the former in our system. 
+\joao{maybe we can just refer to the overview and delete the next paragraph?}
 
-\paragraph{The most liberal bound}
+\paragraph{The most liberal bound.}
 It is easy to see that $\top$ is the most liberal type since it is disjoint to everything. 
 This means that the $\top$ type actually plays an important role in our system, since the latter 
 must be complete with respect to System $F$. 
@@ -331,28 +328,4 @@ Since System $F$ does not contain disjointness quantification, $\top$ comes in h
 the System $F$'s type $\forall \alpha. {T_F}$ (where ${T_F}$ is some other type), is
 equivalent to \name's type $\fordis \alpha \top {T_i}$, where ${T_i}$ is also an equivalent 
 translation of $T_{F}$.
-\joao{should we include here a simple example? i.e. the identity
-  function?}
-\bruno{One example can be presented in the overview, perhaps.}
-
-
-\paragraph{The most restrictive bound}\bruno{I think the discussion
-  about bottom can be done later, perhaps in future work.}
-Inversely, the most restrictive type is $\bot$, as it is not disjoint to any type, except top-like 
-types. \joao{is this true? I'm not sure about what (bot \& top) means.}
-However, introducing $\bot$ is not compatible with our disjointness rule
-\reflabel{\labeldisvar} and well-formedness of contexts.
-Let us take a closer look, by supposing that we wish to derive $\jdis \Gamma x x$, for some variable 
-$x$, under some well-formed context $\Gamma$.
-In \name, we can only use \reflabel{\labeldisvar} with the type $A$ as a sub-type of $x$, 
-i.e. an (n-ary) intersection containing $x$.
-Well-formedness of environments guarantees that this will never happen, since $x$ is not in
-scope of itself. 
-Thus, without a $\bot$ type, a derivation for that statement does not exist. 
-However, by introducing $\bot$ we may now construct such derivation, as $A$ can now be $\bot$: a valid
-sub-type of $x$ which does not contain $x$.
-In fact, had \name included a $\bot$ type, then introducing any \emph{bottom-like} type 
-(i.e. $\bot \inter A$, for any type $A$) can lead to this undesired behaviour.
-Since defining the lower bound is not strictly necessary to the formalization; introduces 
-substantial complexity in our system; and its practical application is not clear, we left this
-as an open problem for future work. 
+An example of such translation has been given in Section~\ref{sec:overview}.

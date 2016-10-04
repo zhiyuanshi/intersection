@@ -98,7 +98,7 @@ to denote the capture-avoiding substitution of $A$ for $\alpha$ in the co-domain
 $\Gamma$ where the domain is a type variable (i.e. substitution in all disjointness constraints).
 Throughout this paper, we will assume that all contexts are
 well-formed\bruno{when you say well-formed here, do you mean the
-  definition in Fig 3?}, meaning that:
+  definition in Fig 3?}\joao{no, I mean what's written next}, meaning that:
 \begin{itemize}
 \item All variables must occur at most once in their domain.
 \item Type variables must not appear free within its own disjointness constraint. 
@@ -118,6 +118,7 @@ All substitutions performed in environments must also lead to well-formed enviro
 \begin{figure}[!t]
   \begin{mathpar}
     \framebox{$\jatomic A$} \\
+    \inferrule*{}{\jatomic \tyint}
 
     \inferrule*{}{\jatomic {A \to B}}
 
@@ -195,31 +196,38 @@ All substitutions performed in environments must also lead to well-formed enviro
 
 The subtyping rules of the form $A \subtype B$ are shown in 
 Figure~\ref{fig:fi-subtype}. \bruno{in the figure, the rules seem to
-  be in a strange order. }
+  be in a strange order. } \joao{I did that to save space. should I revert that?}
 At the moment, the reader is advised to ignore the
 gray-shaded part in the rules, which will be explained later. 
-The first three rules are rather straightforward: \reflabel{\labelsubtop}
-says that every type is a subtype of $\top$; \reflabel{\labelsubint} and 
-\reflabel{\labelsubvar} define subtyping as a reflexive relation on integers and
-type variables.
-The rule \reflabel{\labelsubfun} says that a function is contravariant in 
-its parameter type and covariant in its return type. 
-The three rules dealing with intersection types are just what one would expect 
-when interpreting types as sets. 
-Under this interpretation, for example, the rule \reflabel{\labelsubinter}
-says that if $A_1$ is both the subset of $A_2$ and the subset of $A_3$, then
-$A_1$ is also the subset of the intersection of $A_2$ and $A_3$.
-The $ordinary$ conditions are necessary to ensure coherence~\cite{icfppaper}.
+The following rules are ported from \oldname: \reflabel{\labelsubtop}, 
+\reflabel{\labelsubint},
+\reflabel{\labelsubfun}, \reflabel{\labelsubinter}, \reflabel{\labelsubinterl} and
+\reflabel{\labelsubinterr}.
+
+%There are three rules which rather straightforward: \reflabel{\labelsubtop}
+%says that every type is a subtype of $\top$; \reflabel{\labelsubint} and 
+%\reflabel{\labelsubvar} define subtyping as a reflexive relation on integers and
+%type variables.
+%The rule \reflabel{\labelsubfun} says that a function is contravariant in 
+%its parameter type and covariant in its return type. 
+%The three rules dealing with intersection types are just what one would expect 
+%when interpreting types as sets. 
+%Under this interpretation, for example, the rule \reflabel{\labelsubinter}
+%says that if $A_1$ is both the subset of $A_2$ and the subset of $A_3$, then
+%$A_1$ is also the subset of the intersection of $A_2$ and $A_3$.
 
 \paragraph{Polymorphism and Records}
+The subtyping rules introduced by \name refer to polymorphic constructs and records. 
+\reflabel{\labelsubvar} defines subtyping as a reflexive relation on type variables.
 In \reflabel{\labelsubforall} a universal quantifier ($\forall$) 
 is covariant in its body, and contravariant in its disjointness constraints.
-Finally, \reflabel{\labelsubrec} says records are covariant within their fields' types.
-This subtyping can be shown to be reflexive and transitive.\bruno{You
-  want to emphasize what are the new rules, and what are the rules
-  that are simply inherited from the ICFP paper. For the inherited
-  rules, you can refer to the paper. Focus on what's new (new rules;
-  changes in ordinary...)}
+The \reflabel{\labelsubrec} rule says that records are covariant within their fields' types.
+Also, since the $ordinary$ conditions on two of the intersection rules are necessary to 
+produce unique coercions~\cite{icfppaper}, the $ordinary$ relation needed to be extended.
+As shown at the top of Figure~\ref{fig:fi-subtype}, the new types that compose this unary 
+relation are type variables, universal quantifiers and record types.
+
+The subtyping relation can be shown to be reflexive and transitive.
 
 \begin{restatable}[Subtyping reflexivity]{lemma}{subrefl}
   \label{lemma:subrefl}
@@ -236,10 +244,7 @@ By induction on $A$.
 \end{restatable}
 
 \begin{proof}
-By induction on $B$. \joao{it was actually harder than that due to the
-  shape of locally nameless}\bruno{I'm suspicious of your proof
-  sketch; don't you need nested induction? The details of locally
-  nameless are not relevant.}
+By double induction on both derivations. 
 \end{proof}
 
 %TODO example showing contravariance in disjointness constraints goes here or in the overview 
@@ -277,8 +282,7 @@ By induction on $B$. \joao{it was actually harder than that due to the
 
 \paragraph{Well-formedness}
 The well-formedness rules are shown in the top part of Figure~\ref{fig:wf}. 
-The new rules are \reflabel{\labelwfvar} and
-\reflabel{\labelwfforall} \bruno{remove the brackets around the rule names}. 
+The new rules are \reflabel{\labelwfvar} and \reflabel{\labelwfforall}. 
 Their definition is quite straightforward, but note how we ensure the well-formedness 
 of the constraint in the latter.
 
@@ -302,10 +306,7 @@ of the constraint in the latter.
 Our typing rules are formulated as a bi-directional type-system. 
 Just as in \oldname, this ensures the type-system is not only syntax-directed, but
 also that there is no type ambiguity.
-The typing rules are shown in the bottom part of the
-figure\bruno{which figure? You can be precise in this case and put the
-reference to the figure here. Not a good idea to refer vaguely to a
-figure in academic papers.}. 
+The typing rules are shown in the bottom part of Figure~\ref{fig:wf}. 
 Again, the reader is advised to ignore the
 gray-shaded part here, as these parts will be explained later. 
 The typing judgements are of the form: $\jcheck \Gamma e A$ and  
@@ -314,11 +315,11 @@ They read: ``in the typing context $\Gamma$, the term $e$ can be
 checked or inferred to
 type $A$'', respectively. 
 The rules that are ported from \oldname are the
-check rules for $\top$ \reflabel{\labelttop}, integers \reflabel{\labeltint}, 
-variables \reflabel{\labeltvar},  application \reflabel{\labeltapp}, merge operator  
-\reflabel{\labeltmerge}, annotations \reflabel{\labeltann}; and infer rules
-for lambda abstractions \reflabel{\labeltlam}, and the subsumption rule 
-\reflabel{\labeltsub}.
+check rules for $\top$ (\reflabel{\labelttop}), integers (\reflabel{\labeltint}), 
+variables (\reflabel{\labeltvar}),  application (\reflabel{\labeltapp}), merge operator  
+(\reflabel{\labeltmerge}), annotations (\reflabel{\labeltann}); and infer rules
+for lambda abstractions (\reflabel{\labeltlam}), and the subsumption rule 
+(\reflabel{\labeltsub}).
 
 \paragraph{Disjoint quantification}
 The new rules, inspired by System $F$, are the infer rules for type

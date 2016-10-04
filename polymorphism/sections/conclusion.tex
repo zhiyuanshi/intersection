@@ -35,6 +35,28 @@ notion of disjointness, since with union types there always exists
 a type $A \union B$, which is the common supertype of two
 types $A$ and $B$.
 
+\paragraph{Bottom}\bruno{I think the discussion
+  about bottom can be done later, perhaps in future work.}
+  \joao{rephrase this}
+Inversely, the most restrictive type is $\bot$, as it is not disjoint to any type, except top-like 
+types. \joao{is this true? I'm not sure about what (bot \& top) means.}
+However, introducing $\bot$ is not compatible with our disjointness rule
+\reflabel{\labeldisvar} and well-formedness of contexts.
+Let us take a closer look, by supposing that we wish to derive $\jdis \Gamma x x$, for some variable 
+$x$, under some well-formed context $\Gamma$.
+In \name, we can only use \reflabel{\labeldisvar} with the type $A$ as a sub-type of $x$, 
+i.e. an (n-ary) intersection containing $x$.
+Well-formedness of environments guarantees that this will never happen, since $x$ is not in
+scope of itself. 
+Thus, without a $\bot$ type, a derivation for that statement does not exist. 
+However, by introducing $\bot$ we may now construct such derivation, as $A$ can now be $\bot$: a valid
+sub-type of $x$ which does not contain $x$.
+In fact, had \name included a $\bot$ type, then introducing any \emph{bottom-like} type 
+(i.e. $\bot \inter A$, for any type $A$) can lead to this undesired behaviour.
+Since defining the lower bound is not strictly necessary to the formalization; introduces 
+substantial complexity in our system; and its practical application is not clear, we left this
+as an open problem for future work. 
+
 \begin{comment}
 Some immediate topics for
 further improvement of the results in this paper are discussed next.
