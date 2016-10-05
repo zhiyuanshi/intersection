@@ -1,0 +1,133 @@
+% http://tex.stackexchange.com/questions/74805/latex-error-option-clash-for-package-xcolor
+\documentclass[a4paper,landscape]{article}
+
+\usepackage[dvipsnames]{xcolor}
+
+\usepackage{amsfonts}
+\usepackage{mathpartir}
+\usepackage{mathtools}  % \Coloneqq
+
+% http://tex.stackexchange.com/questions/33401/a-version-of-colorbox-that-works-inside-math-environments
+\newcommand{\error}[1]{\colorbox{Lavender}{${#1}$}}
+
+\newcommand{\boldcdot}{\bullet}
+
+% Types
+\newcommand{\bool}{\texttt{Bool}}
+\newcommand{\integer}{\mathbb{Z}}
+\newcommand{\intersectionop}{\, \textit{\&} \,}
+
+% Terms
+\newcommand{\true}{\texttt{True}}
+\newcommand{\false}{\texttt{False}}
+\newcommand{\lam}[2]{\lambda ({#1}) \to {#2}}
+\newcommand{\app}[2]{{#1} ~ {#2}}
+\newcommand{\mergeop}{\, ,\!, \,}
+\newcommand{\increment}{+1}
+
+% Colors for sorts
+\newcommand{\typecolor}[1]{\textcolor{OliveGreen}{#1}}
+\newcommand{\contextcolor}[1]{\textcolor{CarnationPink}{#1}}
+\newcommand{\derivcolor}[1]{\textcolor{Sepia}{#1}}
+\newcommand{\blackmid}{\textcolor{black}{\; \mid \;}}
+
+% Judgements
+\newcommand{\typing}[4]{\contextcolor{#1} \textcolor{MidnightBlue}{~\triangleright~} \colorbox{SkyBlue}{${#2}$} \textcolor{MidnightBlue}{~:~} \typecolor{#3} ~ \derivcolor{\big[ \mathtt{#4} \big]}}
+
+\newcommand{\rulelabel}[1]{\textcolor{SkyBlue}{\mathtt{#1}}}
+
+\begin{document}
+
+\begin{figure}
+    \[
+        \begin{array}{rlrl}
+            \textrm{Types}     & \typecolor{\tau}      & \Coloneqq & \typecolor{\bool \blackmid \integer \blackmid \tau_1 \to \tau_2 \blackmid \tau_1 \intersectionop \tau_2} \\
+            \textrm{Terms}     & e                     & \Coloneqq & \true, \false \blackmid \ldots, -2, -1, 0, 1, 2, \ldots \blackmid x \blackmid \lam {x : \tau} {e} \blackmid \app {e_1} {e_2} \blackmid e_1 \mergeop e_2 \\
+            \textrm{Contexts}  & \contextcolor{\Gamma} & \Coloneqq & \contextcolor{\boldcdot \blackmid \Gamma, x : \tau} \\
+            \textrm{Histories} & \derivcolor{\iota}    & \Coloneqq & \derivcolor{\boldcdot \blackmid \iota(\iota_1, \ldots, \iota_n)}
+        \end{array}
+    \]
+    \caption{Syntax.}
+\end{figure}
+
+\begin{figure}
+    \begin{mathpar}
+        \inferrule* [right=$\rulelabel{bool}$]
+            { }
+            {\typing {\boldcdot} {\true, \false} {\bool} {bool}}
+
+        \inferrule* [right=$\rulelabel{int}$]
+            { }
+            {\typing {\boldcdot} {\ldots, -2, -1, 0, 1, \ldots} {\integer} {int}}
+
+        \inferrule* [right=$\rulelabel{var}$]
+            {x : \tau \in \Gamma}
+            {\typing \Gamma x \tau {var}}
+
+        \inferrule* [right=$\rulelabel{lam}$]
+            {\typing {\Gamma, x : \tau} {e} {\tau_1} {l}}
+            {\typing \Gamma {\lam {x : \tau} {e}} {\tau \to \tau_1} {lam(l)}}
+
+        \inferrule* [right=$\rulelabel{app}$]
+            {\typing \Gamma {e_1} {\tau_2 \to \tau_1} {l_1} \\
+             \typing \Gamma {e_2} {\tau_2} {l_1}}
+            {\typing \Gamma {\app {e_1} {e_2}} {\tau_1} {app(l_1, l_2)}}
+
+        \inferrule* [right=$\rulelabel{merge}$]
+            {\typing \Gamma {e_1} {\tau_1} {l_1} \\
+             \typing \Gamma {e_2} {\tau_2} {l_2}}
+            {\typing \Gamma {e_1 \mergeop e_2} {\tau_1 \intersectionop \tau_2} {merge(l_1, l_2)}}
+    \end{mathpar}
+    \caption{Type system.}
+\end{figure}
+
+\begin{figure}
+    \begin{mathpar}
+        \inferrule* [right=$\rulelabel{app}$]
+            {\inferrule* [right=$\rulelabel{inter_L}$]
+                {\inferrule* [right=$\rulelabel{merge}$]
+                    {\typing {\boldcdot} {\increment} {\integer \to \integer} {\boldcdot} \and \typing {\boldcdot} {\neg} {\bool \to \bool} {\boldcdot}}
+                    {\typing
+                        {\boldcdot}
+                        {\increment \mergeop \neg}
+                        {(\integer \to \integer) \intersectionop (\bool \to \bool)}
+                        {merge(\boldcdot, \boldcdot)}}}
+                {\typing {\boldcdot} {\increment \mergeop \neg} {\integer \to \integer} {inter_L(merge(\boldcdot, \boldcdot))}}
+            \and
+            {\inferrule* [right=$\rulelabel{inter_L}$]
+                {\inferrule* [right=$\rulelabel{merge}$]
+                    {\typing {\boldcdot} {1} {\integer} {\boldcdot} \and \typing {\boldcdot} {\true} {\bool} {\boldcdot}}
+                    {\typing {\boldcdot} {1 \mergeop \true} {\integer \intersectionop \bool} {merge(\boldcdot, \boldcdot)}}}
+                {\typing {\boldcdot} {1 \mergeop \true} {\integer} {inter_L(merge(\boldcdot, \boldcdot))}}}}
+            {\typing
+                {\boldcdot}
+                {\app {(\increment \mergeop \neg)} {(1 \mergeop \true)}}
+                {\integer}
+                {app(\error{\mathtt{inter_L}}(merge(\boldcdot, \boldcdot)),\error{\mathtt{inter_L}}(merge(\boldcdot, \boldcdot)))}}
+
+        \inferrule* [right=$\rulelabel{app}$]
+            {\inferrule* [right=$\rulelabel{inter_R}$]
+                {\inferrule* [right=$\rulelabel{merge}$]
+                    {\typing {\boldcdot} {\increment} {\integer \to \integer} {\boldcdot} \and \typing {\boldcdot} {\neg} {\bool \to \bool} {\boldcdot}}
+                    {\typing
+                        {\boldcdot}
+                        {\increment \mergeop \neg}
+                        {(\integer \to \integer) \intersectionop (\bool \to \bool)}
+                        {merge(\boldcdot, \boldcdot)}}}
+                {\typing {\boldcdot} {\increment \mergeop \neg} {\bool \to \bool} {inter_R(merge(\boldcdot, \boldcdot))}}
+            \and
+            {\inferrule* [right=$\rulelabel{inter_R}$]
+                {\inferrule* [right=$\rulelabel{merge}$]
+                    {\typing {\boldcdot} {1} {\integer} {\boldcdot} \and \typing {\boldcdot} {\true} {\bool} {\boldcdot}}
+                    {\typing {\boldcdot} {1 \mergeop \true} {\integer \intersectionop \bool} {merge(\boldcdot, \boldcdot)}}}
+                {\typing {\boldcdot} {1 \mergeop \true} {\bool} {inter_R(merge(\boldcdot, \boldcdot))}}}}
+            {\typing
+                {\boldcdot}
+                {\app {(\increment \mergeop \neg)} {(1 \mergeop \true)}}
+                {\bool}
+                {app(\error{\mathtt{inter_R}}(merge(\boldcdot, \boldcdot)),\error{\mathtt{inter_R}}(merge(\boldcdot, \boldcdot)))}}
+    \end{mathpar}
+    \caption{Incoherent application.}
+\end{figure}
+
+\end{document}

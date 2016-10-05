@@ -1,0 +1,3 @@
+task :default do
+  system("pdflatex main.tex")
+end
