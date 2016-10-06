@@ -18,7 +18,7 @@ Section~\ref{sec:disjoint} introduces the necessary changes to the
 definition of disjointness presented by Oliveira et al.~\cite{} in
 order to add disjoint polymorphism.
 
-All the meta-theory has been mechanized in Coq, which is available in
+All the meta-theory of \name has been mechanized in Coq, which is available in
 the supplementary materials submitted with the paper.
 
 \subsection{Syntax}
@@ -34,19 +34,14 @@ The differences to \oldname are highlighted in gray.
     \begin{array}{l}
       \begin{array}{llrll}
         \text{Types}
-        & A, B & \Coloneqq & \top \mid \tyint \mid A \to B \mid A \inter B & \\ 
-        &      & \mid &
-                 \highlight{$\alpha$} \mid \highlight{$\fordis \alpha A B$} 
-                 \mid \highlight{$\recordType l A$} & \\
+        & A, B & \Coloneqq & \top \mid \tyint \mid A \to B \mid A
+                             \inter B \mid \highlight{$\alpha$} \mid \highlight{$\fordis \alpha A B$} \mid \highlight{$\recordType l A$} & \\ 
 
-        \\
         \text{Terms}
         & e & \Coloneqq & \top \mid i \mid x \mid \lamty x A e \mid \app {e_1} {e_2} 
-              \mid e_1 \mergeop e_2 & \\
-        &   & \mid & \highlight{$\blamdis \alpha A e$} \mid \highlight{$\tapp e A$} \mid 
-              \highlight{$\recordCon l e$} \mid \highlight{$\recordProj e l$}     & \\
-
-        \\
+              \mid e_1 \mergeop e_2 \mid \highlight{$\blamdis \alpha A e$} \mid \highlight{$\tapp e A$} \mid 
+              \highlight{$\recordCon l e$} \mid
+                          \highlight{$\recordProj e l$} & \\
         \text{Contexts}
         & \Gamma & \Coloneqq & \cdot
                    \mid \Gamma, \highlight{$\alpha \disjoint A$}

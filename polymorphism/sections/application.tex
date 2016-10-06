@@ -1,20 +1,30 @@
-\section{Applications: Extensible records and Nominal type-systems}
+\section{Applications}
 \label{subsec:records}
 
-\subsection{Extensible records}
-Our system can be used to encode records, similarly to way as discussed in 
-\cite{dunfield2014elaborating}. 
-However, describing and implementing records within programming languages is certainly not novel 
-and has been extensively studied in the past.
-Most of the systems are entirely focused on concrete aspects of records 
-(i.e. expressiveness, compilation, etc), while ours will specialize the more general notion of  
-intersection types.
-In this section we aim at comparing our approach with such systems. 
+To illustrate the applicability of \name we show two applications. The
+first application shows how to mimic TypeScript's documentation example of 
+dynamic mixins in \name. The second application shows how \name
+enables a powerful form of polymorphic extensible records.
+\bruno{I think we should swap the order of the examples: TypeScript
+  mixins first, and extensible records second.}
 
-Systems with records usually rely on 3 basic operations: selection, restriction and 
-extension/concatenation. 
-We will first introduce the basic syntax and typing of records, then the basic operations of records in the 
-context of \name and finally we will discuss their expressivity in comparison to other record systems.
+\subsection{Extensible records}
+Our system can be used to polymorphic extensible records. Describing and
+implementing records within programming languages is certainly not
+novel and has been extensively studied in the past\bruno{references
+  here; and give names to a few approaches (row types for example)}. Most of the
+systems are entirely focused on concrete aspects of records
+(i.e. expressiveness, compilation, etc), while ours specializes
+the more general notion of intersection types.  In this section we aim
+at comparing our approach with such systems.
+
+Systems with records usually rely on 3 basic operations: selection,
+restriction and extension/concatenation.  We will first introduce the
+basic syntax and typing of records, then the basic operations of
+records in the context of \name and finally we will discuss their
+expressivity in comparison to other record systems.
+\bruno{Why do w have two versions of the code in this section? Can we
+  remove one.}
 
 \paragraph{Record terms and types}
 Our system directly encodes a term for the single record construct $\recordCon l e$, where $l$ is some
