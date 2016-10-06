@@ -77,6 +77,14 @@
             {\typing \Gamma {e_1} {\tau_1} {\iota_1} \\
              \typing \Gamma {e_2} {\tau_2} {\iota_2}}
             {\typing \Gamma {e_1 \mergeop e_2} {\tau_1 \intersectionop \tau_2} {merge(\iota_1, \iota_2)}}
+
+        \inferrule* [right=$\labelcolor{inter_L}$]
+            {\typing \Gamma e {\tau_1 \intersectionop \tau_2} \iota}
+            {\typing \Gamma e {\tau_1} {inter_L(\iota)}}
+
+        \inferrule* [right=$\labelcolor{inter_R}$]
+            {\typing \Gamma e {\tau_1 \intersectionop \tau_2} \iota}
+            {\typing \Gamma e {\tau_2} {inter_R(\iota)}}
     \end{mathpar}
     \caption{Type system.}
 \end{figure}
