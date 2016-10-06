@@ -36,6 +36,11 @@ let idInt (y : Int) : Int = y in
 let idChar (y : Char) : Char = y in
 (idInt x, idChar x)
 \end{lstlisting}
+\bruno{I had comment about not having the same text. I should have
+  perhaps have been a bit more clear and say that having the same code
+is ok, it is just the text that needs a little rewriting. In fact now
+the code examples are worst: identity functions are pretty boring and
+they don't really illustrate the point.}
 
 \noindent If a value \lstinline{x} has type \lstinline{Int & Char} then
 \lstinline{x} can be used anywhere where either values of type \lstinline{Int} or a 
@@ -62,6 +67,7 @@ let x : Int & Char = 1,,'c' in (*$ \ldots $*)
 \noindent In \name (following Dunfield's notation), the
 merge of two values $v_1$ and $v_2$ is denoted as $v_1 ,, v_2$.
 
+\paragraph{Merge vs Pairs}
 The significant difference between intersection types with a
 merge operator and regular pairs is in the elimination construct. 
 With pairs there are explicit eliminators (\lstinline{fst} and
@@ -69,8 +75,6 @@ With pairs there are explicit eliminators (\lstinline{fst} and
 components of the right type.
 With intersection types and a merge operator, elminators are implicit in the language,
 meaning no uses of projection functions are necessary.
-Moreover, with \emph{disjoint} intersection types, the order of the types in the
-intersections becomes irrelevant.
 
 %\paragraph{Merge operator and pairs.}
 %The merge operator is similar to the introduction construct on pairs.
@@ -215,10 +219,10 @@ Type variables can be assumed as disjoint to any other type, as a starting point
 Now consider the attempt to write the following polymorphic function in such system (we will use
 uppercase Latin letters to denote type variables): 
 \begin{lstlisting}
-let fst A B (x: A & B) : A = ((fun z (*$ \to $*) z) : Int (*$ \to $*) Int) x in (*$ \ldots $*)
+let fst A B (x: A & B) : A = (x : Int (*$ \to $*) Int) in (*$ \ldots $*)
 \end{lstlisting}
 The \code{fst} function is supposed to extract a value of type
-(\lstinline{A}) from the merge value $x$ (of type \lstinline{A&B}). 
+\lstinline{A} from the merge value $x$ (of type \lstinline{A&B}). 
 This function is problematic: when
 \lstinline{A} and \lstinline{B} are instantiated to non-disjoint
 types, then uses of \lstinline{fst} may lead to incoherence.
@@ -234,7 +238,7 @@ of the first argument of \lstinline{fst}.
 At first sight, one option
 to workaround the incoherence issue would be to bias the type-based merge lookup
 to the left or to the right. %(as discussed in Section~\ref{subsec:incoherence}). 
-Unfortunately, biased choice is
+However, biased choice is
 very problematic when parametric polymorphism is present in the language.
 To see the issue, suppose we chose to always pick the
 rightmost value in a merge when multiple values of same type exist.
@@ -269,7 +273,7 @@ Unfortunately, when given the merge \lstinline$(1,,2)$ the
 left-component \lstinline$1$ is also picked up, even though in this case \lstinline$2$
 is the rightmost integer in the merge. 
 
-Unfortunately this subtle interaction of polymorphism and type-based lookup
+The subtle interaction of polymorphism and type-based lookup
 means that equational reasoning is broken.
 In the equational reasoning steps above, doing apparently correct
 substitutions lead us to a wrong result. 
@@ -284,14 +288,14 @@ restrict the expressiveness of the resulting language.
 For example, the function $fst$ defined above, would no longer be accepted by the system.
 In fact, parametric polymorphism and intersection types could only be mixed in a very limited manner -
 as long as variables do not reside under intersections - and this is arguably a useful improvement
-in respect to other standard type systems, i.e. System $F$.
+in respect to other standard type systems, such as System $F$.
 
 \begin{comment}
-\subsection{A More Liberal Attempt}
-Since the resulting calculus is not satisfactory, we ought to find a more liberal solution,
-which enables the combination of type variables and intersection types. 
-A possible approach would be to assign constraints to each type variable, an delay the 
-check for disjointness until type application/instantiation. 
+\subsection{Disjoint Polymorphism}
+A more liberal solution,which enables the combination of type
+variables and intersection types, is disjoint polymorphism.
+Disjoint polymorphism assign constraints to each type variable, which
+allows delaying the check for disjointness until type application/instantiation. 
 \end{comment}
 
 \subsection{Disjoint Quantification}
@@ -304,7 +308,7 @@ allows a type variable to be constrained so that it is disjoint with a given typ
 With disjoint quantification a variant of the program $fst$, which
 is accepted by \name, would be written as:
 \begin{lstlisting}
-let fst A ((*$ \highlight {B *~A} $*)) (x: A & B) = ((fun z (*$ \to $*) z) : Int (*$ \to $*) Int) x
+let fst A ((*$ \highlight {B *~A} $*)) (x: A & B) = (x : Int (*$ \to $*) Int)
 in (*$ \ldots $*)
 \end{lstlisting}
 The small change is in the declaration of the type parameter $B$. The notation
@@ -346,7 +350,10 @@ types disjoint to $\tychar$.
 Thus, the more specific a type variable constraint is, the less options we have to instantiate it with.
 This reasoning implies that $\top$ should be treated as the empty constraint.
 Indeed, in \name, a single type variable $A$ is only syntactic sugar for $A * \top$.
-\joao{should we say anything here about this going against our previous top-disjointness formulation?}
+\joao{should we say anything here about this going against our
+  previous top-disjointness formulation?}
+\bruno{yes, but not here. We can discuss this in later sections when
+  discussing the technical details.}
 For instance, the type of the identity function in System $F$ that reads $\forall A. A \to A$ is 
 equivalent to the \name's type $\forall (A * \top). A \to A$.
 
@@ -388,16 +395,21 @@ Conversely, $\top$ can be thought as specific - or rather, as general - as the 0
 %\end{definition}
 %\joao{say that we manage to retain coherence wrt to the simply typed version?}
 
-\paragraph{Substitution}
-After having solved the coherence issues, it is important noting that \name lacks an important property
-common amongst polymorphic type systems: types are not stable under substitution. 
-This means that if a type variable $A$ is substituted in a type $T_1$, for a type $T_2$ 
+\subsection{Stability of Substitutions}
+From the technical point of view, the main challenge in the design of
+System \name is that, in general, types are not stable under
+substitution. This contrasts, for example, with System $F$ where types
+are stable under substitution. That is in System $F$ the following
+property holds: 
+\bruno{state usual property here}
+
+In \name if a type variable $A$ is substituted in a type $T_1$, for a type $T_2$ 
 (written $\subst {T_2} A {T_1}$), where $T_1$ and $T_2$ are well-formed, the resulting type might be ill-formed. 
 To understand why, recall the previous example: 
 \begin{lstlisting}
 fst Int Int (1,,2)
 \end{lstlisting}
-The type signature of \lstinline$fst$ may be read as $\forall A, (B * A) . (A \inter B) \to A$.
+The type signature of \lstinline$fst$ may be read as $\forall A. (B * A) . (A \inter B) \to A$.
 An application to the type $\tyint$ will lead to instantiation of the variable $A$, leading to the type
 $\forall (B * \tyint). (\tyint \inter B) \to \tyint$.
 Now, the second $\tyint$ application is problematic, since instantiating $B$ with $\tyint$ will lead to
