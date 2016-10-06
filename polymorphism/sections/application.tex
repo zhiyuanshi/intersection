@@ -8,6 +8,88 @@ enables a powerful form of polymorphic extensible records.
 \bruno{I think we should swap the order of the examples: TypeScript
   mixins first, and extensible records second.}
 
+\subsection{Dynamic mixins}
+
+%\subsection{Intersections in nominal type-systems}
+%Recently several languages have embraced intersection types, such as Scala, Ceylon or TypeScript.
+%\joao{references here?}
+
+%In Scala, it is possible to define a merge-like function:
+%\joao{example from Bruno's ecoop 2013 paper}
+TypeScript is a language that adds static type checking to JavaScript.
+Its type-system is structural, even though at a first glance it might resemble 
+nominal languages such as Java or C\#.
+Amongst numerous static typing constructs, TypeScript supports a form of intersection types, 
+with no merge operator. 
+However, it is possible to define a function 
+that mimics the merge operator, as some form of mixin composition:
+
+\begin{lstlisting}
+function extend<T, U>(first: T, second: U): T & U {
+  let result = <T & U>{};
+  for (let id in first) {
+    (<any>result)[id] = (<any>first)[id];
+  }
+  for (let id in second) {
+    if (!result.hasOwnProperty(id)) {
+      (<any>result)[id] = (<any>second)[id];
+    }
+  }
+  return result;
+}
+
+class Person { constructor(public name : string, public male : boolean) { } }
+interface Loggable { log() : void; }
+class ConsoleLogger implements Loggable {
+    log() {
+      // ...
+    }
+}
+var jim = extend(new Person("Jim"), new ConsoleLogger());
+var n = jim.name;
+jim.log();
+\end{lstlisting}
+
+In this example, taken from TypeScript's documentation, an \lstinline$extend$ function is defined 
+for mixin composition, and two classes \lstinline$Person$ and \lstinline$ConsoleLogger$. 
+Two instaces of those classes are then composed in a variable \lstinline$jim$ with the type of 
+the intersection of both, where it is type-safe to access both the \lstinline$name$ property
+from \lstinline$Persion$ and \lstinline$ConsoleLogger$.
+
+This definition relies essentially on biased choice.
+Let us take a closer look at the definition of \lstinline$extend$.
+Given two arguments \lstinline$first$ of type \lstinline$T$, and \lstinline$second$ of type 
+\lstinline $U$, it returns an intersection of both types represented as \lstinline$T \inter U$.
+The function starts by creating a variable \lstinline$result$ with the type of the intersection, 
+It then iterates through the \lstinline$first$'s properties and copies them to the 
+\lstinline$result$.
+Next, it iterates through the \lstinline$second$'s properties but it only copies the properties
+that \lstinline$result$ does not possess (i.e. the ones present in \lstinline$first$).
+This means that the implementation is left-biased, as the properties of left type of the intersection
+are chosen in favor of the ones present in the right.
+However, in TypeScript this may be a cause of severe problems since that, at the time of writing,
+intersections at type-level are actually right-biased!
+For example, the following code is well-typed:
+
+\begin{lstlisting}
+class Dog { constructor(public name : string, public male : string) { } }
+var fool : Dog & Person = extend(new Dog("Pluto","non-sense"),new Person("Arnold",true))
+boolean b = fool.male
+\end{lstlisting}
+Note how \lstinline$fool.male$, at run-time, will contain a value of type \lstinline$String$! 
+
+Other problematic issues regarding the semantics of intersection types can include the order of 
+the types in an intersection, or even intersections including repeated types.
+This motivates the need to define a clear meaning to the practical application of 
+intersection types.
+
+In \name, the merge combinator is directly embedded in the semantics of the language, 
+and thus there is no need to define such combinators.
+In fact, the introduction of disjoint intersection types can be seen as a type-safe 
+solution for all of the mentioned problems involving intersection types. 
+\joao{mention the diamond problem? and that two fields with same name can be composed as long as
+their types are disjoint}
+
 \subsection{Extensible records}
 Our system can be used to polymorphic extensible records. Describing and
 implementing records within programming languages is certainly not
@@ -209,25 +291,6 @@ to~\cite{leijen2005extensible}:
 let $\text{update}$ A B (R * { l : A }) (r : { l : A } & R) (v : B) : { l : B } & R = { l = v } ,, (remove a r x) 
 in $\ldots$ 
 \end{lstlisting}
-
-\subsection{Intersections in nominal type-systems}
-Recently several languages have embraced intersection types, such as Scala, Ceylon or TypeScript.
-\joao{references here?}
-
-In Scala, it is possible to define a merge-like function:
-\joao{example from Bruno's ecoop 2013 paper}
-
-
-According to TypeScript's documentation, it is also possible to define a similar function:
-\joao{example with Cat and Dog with a property Name}
-
-Note how these definitions rely on a biased choice: if the lookup of a given property is found
-on the first component then it is selected; otherwise the lookup will be made on the second 
-component.
-
-In \name, the merge combinator is directly embedded in the semantics of the language, and thus
-there is no need to define such combinators.
-In fact, the reason for introducing disjointness is an alternative to solve this problem. 
 
 
 
