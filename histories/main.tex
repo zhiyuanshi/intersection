@@ -30,11 +30,10 @@
 \newcommand{\contextcolor}[1]{\textcolor{CarnationPink}{#1}}
 \newcommand{\derivcolor}[1]{\textcolor{Sepia}{#1}}
 \newcommand{\blackmid}{\textcolor{black}{\; \mid \;}}
+\newcommand{\labelcolor}[1]{\textcolor{SkyBlue}{\mathtt{#1}}}
 
 % Judgements
-\newcommand{\typing}[4]{\contextcolor{#1} \textcolor{MidnightBlue}{~\triangleright~} \colorbox{SkyBlue}{${#2}$} \textcolor{MidnightBlue}{~:~} \typecolor{#3} ~ \derivcolor{\big[ \mathtt{#4} \big]}}
-
-\newcommand{\rulelabel}[1]{\textcolor{SkyBlue}{\mathtt{#1}}}
+\newcommand{\typing}[4]{\contextcolor{#1} \textcolor{MidnightBlue}{~\triangleright~} {#2} \textcolor{MidnightBlue}{~:~} \typecolor{#3} ~ \derivcolor{\big[ \mathtt{#4} \big]}}
 
 \begin{document}
 
@@ -42,9 +41,10 @@
     \[
         \begin{array}{rlrl}
             \textrm{Types}     & \typecolor{\tau}      & \Coloneqq & \typecolor{\bool \blackmid \integer \blackmid \tau_1 \to \tau_2 \blackmid \tau_1 \intersectionop \tau_2} \\
+            \textrm{Histories} & \derivcolor{\iota}    & \Coloneqq & \derivcolor{\boldcdot \blackmid \labelcolor{l} (\bar{\iota})} \\
             \textrm{Terms}     & e                     & \Coloneqq & \true, \false \blackmid \ldots, -2, -1, 0, 1, 2, \ldots \blackmid x \blackmid \lam {x : \tau} {e} \blackmid \app {e_1} {e_2} \blackmid e_1 \mergeop e_2 \\
             \textrm{Contexts}  & \contextcolor{\Gamma} & \Coloneqq & \contextcolor{\boldcdot \blackmid \Gamma, x : \tau} \\
-            \textrm{Histories} & \derivcolor{\iota}    & \Coloneqq & \derivcolor{\boldcdot \blackmid \iota(\iota_1, \ldots, \iota_n)}
+            \textrm{Labels}    & \labelcolor{l}        & \Coloneqq & \labelcolor{bool} \blackmid \labelcolor{int} \blackmid \labelcolor{var} \blackmid \labelcolor{lam} \blackmid \labelcolor{app} \blackmid \labelcolor{merge}
         \end{array}
     \]
     \caption{Syntax.}
@@ -52,40 +52,40 @@
 
 \begin{figure}
     \begin{mathpar}
-        \inferrule* [right=$\rulelabel{bool}$]
+        \inferrule* [right=$\labelcolor{bool}$]
             { }
-            {\typing {\boldcdot} {\true, \false} {\bool} {bool}}
+            {\typing {\boldcdot} {\true, \false} {\bool} {bool(\boldcdot)}}
 
-        \inferrule* [right=$\rulelabel{int}$]
+        \inferrule* [right=$\labelcolor{int}$]
             { }
-            {\typing {\boldcdot} {\ldots, -2, -1, 0, 1, \ldots} {\integer} {int}}
+            {\typing {\boldcdot} {\ldots, -2, -1, 0, 1, \ldots} {\integer} {int(\boldcdot)}}
 
-        \inferrule* [right=$\rulelabel{var}$]
+        \inferrule* [right=$\labelcolor{var}$]
             {x : \tau \in \Gamma}
-            {\typing \Gamma x \tau {var}}
+            {\typing \Gamma x {\tau} {var(\boldcdot)}}
 
-        \inferrule* [right=$\rulelabel{lam}$]
-            {\typing {\Gamma, x : \tau} {e} {\tau_1} {l}}
-            {\typing \Gamma {\lam {x : \tau} {e}} {\tau \to \tau_1} {lam(l)}}
+        \inferrule* [right=$\labelcolor{lam}$]
+            {\typing {\Gamma, x : \tau} {e} {\tau_1} {\iota}}
+            {\typing \Gamma {\lam {x : \tau} {e}} {\tau \to \tau_1} {lam(\iota)}}
 
-        \inferrule* [right=$\rulelabel{app}$]
-            {\typing \Gamma {e_1} {\tau_2 \to \tau_1} {l_1} \\
-             \typing \Gamma {e_2} {\tau_2} {l_1}}
-            {\typing \Gamma {\app {e_1} {e_2}} {\tau_1} {app(l_1, l_2)}}
+        \inferrule* [right=$\labelcolor{app}$]
+            {\typing \Gamma {e_1} {\tau_2 \to \tau_1} {\iota_1} \\
+             \typing \Gamma {e_2} {\tau_2} {\iota_1}}
+            {\typing \Gamma {\app {e_1} {e_2}} {\tau_1} {app(\iota_1, \iota_2)}}
 
-        \inferrule* [right=$\rulelabel{merge}$]
-            {\typing \Gamma {e_1} {\tau_1} {l_1} \\
-             \typing \Gamma {e_2} {\tau_2} {l_2}}
-            {\typing \Gamma {e_1 \mergeop e_2} {\tau_1 \intersectionop \tau_2} {merge(l_1, l_2)}}
+        \inferrule* [right=$\labelcolor{merge}$]
+            {\typing \Gamma {e_1} {\tau_1} {\iota_1} \\
+             \typing \Gamma {e_2} {\tau_2} {\iota_2}}
+            {\typing \Gamma {e_1 \mergeop e_2} {\tau_1 \intersectionop \tau_2} {merge(\iota_1, \iota_2)}}
     \end{mathpar}
     \caption{Type system.}
 \end{figure}
 
 \begin{figure}
     \begin{mathpar}
-        \inferrule* [right=$\rulelabel{app}$]
-            {\inferrule* [right=$\rulelabel{inter_L}$]
-                {\inferrule* [right=$\rulelabel{merge}$]
+        \inferrule* [right=$\labelcolor{app}$]
+            {\inferrule* [right=$\labelcolor{inter_L}$]
+                {\inferrule* [right=$\labelcolor{merge}$]
                     {\typing {\boldcdot} {\increment} {\integer \to \integer} {\boldcdot} \and \typing {\boldcdot} {\neg} {\bool \to \bool} {\boldcdot}}
                     {\typing
                         {\boldcdot}
@@ -94,8 +94,8 @@
                         {merge(\boldcdot, \boldcdot)}}}
                 {\typing {\boldcdot} {\increment \mergeop \neg} {\integer \to \integer} {inter_L(merge(\boldcdot, \boldcdot))}}
             \and
-            {\inferrule* [right=$\rulelabel{inter_L}$]
-                {\inferrule* [right=$\rulelabel{merge}$]
+            {\inferrule* [right=$\labelcolor{inter_L}$]
+                {\inferrule* [right=$\labelcolor{merge}$]
                     {\typing {\boldcdot} {1} {\integer} {\boldcdot} \and \typing {\boldcdot} {\true} {\bool} {\boldcdot}}
                     {\typing {\boldcdot} {1 \mergeop \true} {\integer \intersectionop \bool} {merge(\boldcdot, \boldcdot)}}}
                 {\typing {\boldcdot} {1 \mergeop \true} {\integer} {inter_L(merge(\boldcdot, \boldcdot))}}}}
@@ -105,9 +105,9 @@
                 {\integer}
                 {app(\error{\mathtt{inter_L}}(merge(\boldcdot, \boldcdot)),\error{\mathtt{inter_L}}(merge(\boldcdot, \boldcdot)))}}
 
-        \inferrule* [right=$\rulelabel{app}$]
-            {\inferrule* [right=$\rulelabel{inter_R}$]
-                {\inferrule* [right=$\rulelabel{merge}$]
+        \inferrule* [right=$\labelcolor{app}$]
+            {\inferrule* [right=$\labelcolor{inter_R}$]
+                {\inferrule* [right=$\labelcolor{merge}$]
                     {\typing {\boldcdot} {\increment} {\integer \to \integer} {\boldcdot} \and \typing {\boldcdot} {\neg} {\bool \to \bool} {\boldcdot}}
                     {\typing
                         {\boldcdot}
@@ -116,8 +116,8 @@
                         {merge(\boldcdot, \boldcdot)}}}
                 {\typing {\boldcdot} {\increment \mergeop \neg} {\bool \to \bool} {inter_R(merge(\boldcdot, \boldcdot))}}
             \and
-            {\inferrule* [right=$\rulelabel{inter_R}$]
-                {\inferrule* [right=$\rulelabel{merge}$]
+            {\inferrule* [right=$\labelcolor{inter_R}$]
+                {\inferrule* [right=$\labelcolor{merge}$]
                     {\typing {\boldcdot} {1} {\integer} {\boldcdot} \and \typing {\boldcdot} {\true} {\bool} {\boldcdot}}
                     {\typing {\boldcdot} {1 \mergeop \true} {\integer \intersectionop \bool} {merge(\boldcdot, \boldcdot)}}}
                 {\typing {\boldcdot} {1 \mergeop \true} {\bool} {inter_R(merge(\boldcdot, \boldcdot))}}}}
