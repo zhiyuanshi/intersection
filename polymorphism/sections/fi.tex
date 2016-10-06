@@ -228,7 +228,6 @@ The subtyping relation can be shown to be reflexive and transitive.
   \label{lemma:subrefl}
   For any type $A$, $A \subtype A$.
 \end{restatable}
-
 \begin{proof}
 By induction on $A$.
 \end{proof}
@@ -237,10 +236,11 @@ By induction on $A$.
   \label{lemma:subtrans}
   If $A \subtype B$ and $B \subtype C$, then $A \subtype C$.
 \end{restatable}
-
 \begin{proof}
 By double induction on both derivations. 
 \end{proof}
+\bruno{Too much space waisted between Lemma and proof. reduce the
+  white space.}
 
 %TODO example showing contravariance in disjointness constraints goes here or in the overview 
 %section?
@@ -259,6 +259,7 @@ By double induction on both derivations.
 
 \subsection{Typing}
 
+\begin{comment}
 \begin{figure}[!t]
   \begin{mathpar}
     \formwf \\ \rulewfint \and \rulewfvardis \and \rulewffun \and \rulewfrec \and 
@@ -268,6 +269,7 @@ By double induction on both derivations.
   \caption{Well-formedness rules for types of \name.}
   \label{fig:wf}
 \end{figure}
+\end{comment}
 
 
 %  \begin{mathpar}
@@ -277,11 +279,16 @@ By double induction on both derivations.
 
 \paragraph{Well-formedness}
 The well-formedness rules are shown in the top part of Figure~\ref{fig:wf}. 
-The new rules are \reflabel{\labelwfvar} and \reflabel{\labelwfforall}. 
+The new rules over \oldname are \reflabel{\labelwfvar} and \reflabel{\labelwfforall}. 
 Their definition is quite straightforward, but note how we ensure the well-formedness 
 of the constraint in the latter.
 
-\begin{figure}[!t]
+\begin{figure}
+  \begin{mathpar}
+    \formwf \\ \rulewfint \and \rulewfvardis \and \rulewffun \and \rulewfrec \and 
+    \rulewftop \and \rulewfforalldis \and \rulewfinterdis 
+  \end{mathpar}
+
   \begin{mathpar}
     \formbi \\ \brulettop \and \bruletint \and \bruletvar \and \bruletann \and 
     \bruletapp \and \brulettappdis \and \bruletmergedis \and \bruletrec \and 
@@ -292,15 +299,18 @@ of the constraint in the latter.
     \formbc \\ \bruletlam \and \bruletsub
   \end{mathpar}
 
-  \caption{Type system of \name.}
+  \caption{Wellformedness and type system of \name.}
   \label{fig:fi-type}
 \end{figure}
+\bruno{I think the figures are quite generous in terms of space at the
+moment. We can reduce space in between rules. Talk to Linus, he 
+has experience doing this.}
 
 
 \paragraph{Typing rules}
 Our typing rules are formulated as a bi-directional type-system. 
 Just as in \oldname, this ensures the type-system is not only syntax-directed, but
-also that there is no type ambiguity.
+also that there is no type ambiguity: that is inferred types are unique.
 The typing rules are shown in the bottom part of Figure~\ref{fig:wf}. 
 Again, the reader is advised to ignore the
 gray-shaded part here, as these parts will be explained later. 
