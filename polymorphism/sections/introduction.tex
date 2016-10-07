@@ -31,7 +31,7 @@ def narrow(x : B with C) : B = x
 \end{lstlisting}
 
 \noindent which given an argument \lstinline{x} with an intersection
-type \lstinline{B with C} weaken the type to \lstinline{B}. 
+type \lstinline{B with C} weakens the type to \lstinline{B}. 
 In Java, which does not support
 first-class intersections, such method cannot  
 be directly expressed. 
@@ -84,38 +84,41 @@ the method call.
 
 The \emph{extend} function is essentially an encoding of the
 \emph{merge operator}. The merge operator is used on some
-calculi~\cite{reynolds,castagna,dunfield2014elaborating,oliveira} as an introduction
-form for intersection types. As we have seen the merge operator is
-encodable in TypeScript using low-level features. Similar encodings 
-have been proposed for Scala to enable applications where 
-the merge operator plays a fundamental
-role~\cite{}. Unfortunatelly, the merge operator is not directly supported
-by TypeScript, Scala, Ceylon or Flow. A possible reason for this is
-that most calculi with intersection types in the literature lack the
-merge operator. While powerful, the merge operator is 
-well-known to introduce \emph{(in)coherence} problems~\cite{}. 
-If care is not taken, certain programs using the merge operator do 
-not have a unique semantics, which significantly complicates reasoning 
-about programs.   
+calculi~\cite{reynolds,castagna,dunfield2014elaborating,oliveira} as
+an introduction form for intersection types. Similar encodings to
+those in TypeScript have been proposed for Scala to enable
+applications where the merge operator also plays a fundamental
+role~\cite{}. Unfortunatelly, the merge operator is not directly
+supported by TypeScript, Scala, Ceylon or Flow. There are two possible
+reasons for such lack of support. One reason is simply that merge operator is
+not well-known: many calculi with intersection types in the literature
+do not have explicit introduction forms for intersection types. The
+other reason is that, while powerful, the merge operator is well-known
+to introduce \emph{(in)coherence} problems~\cite{}.  If care is not
+taken, certain programs using the merge operator do not have a unique
+semantics, which significantly complicates reasoning about programs.
 
-Recent work proposed using \emph{disjoint intersection types}~\cite{oliveira16disjoint} to 
+Some solutions to the problem of coherence in the presence 
+of a merge operator exist for simply typed calculi~\cite{}, but no
+work addresses polymorphism. Most recently Oliveira
+et al.~\cite{oliveira16disjoint} proposed using \emph{disjoint intersection types}~\cite{oliveira16disjoint} to 
 guarantee coherence in a calculus with intersection types and a merge 
 operator. The key idea is to allow only disjoint types in
 intersections. If two types are disjoint then there is no ambiguity in
-selecting a value of the appropriate type from an intersection, which 
-guarantees coherence. However, such work was done in a simply typed
-setting. 
+selecting a value of the appropriate type from an intersection, 
+guaranteeing coherence.
 
-Combining parametric polymorphism wiht disjoint intersection
+Combining parametric polymorphism with disjoint intersection
 types, while retaining enough flexibility for practical applications,
 is non-trivial. The key issue is that when a type variable occurs in an intersection
-type, it is not statically known whether the instantiated type will
+type it is not statically known whether the instantiated type will
 be disjoint to other components of the intersection.
 A naive way  to try to add polymorphism is to forbid 
 type variables in intersections, since they may be instantiated with 
 a type which is not disjoint to other types in an intersction.
 Unfortunatelly this is too conservative and would prevent many useful 
-programs, including the \lstinline{extend} function. 
+programs, including the \lstinline{extend} function, which uses an
+intersection of two type variables \lstinline{T} and \lstinline{U}. 
 
 %Clearly this seems to indicate that a more
 %foundational approach is lacking. What is currently missing is a
@@ -129,13 +132,28 @@ constrained form of parametric polymorphism, that allows programmers
 to specify disjointness constraints for type variables. With disjoint
 polymorphism the calculus remains very flexible in terms of programs
 that can be written with intersection types, while retaining
-coherence. In our calculus the \lstinline{extend} function trivially implemented
+coherence. In our calculus the \lstinline{extend} function is implemented
 as follows:
 
 \begin{lstlisting}
 let extend T (U * T) (first : T, second : U) : T & U = first ,, second 
-in ...
 \end{lstlisting}
+
+\noindent From the typing point of view, the difference between
+\lstinline{extend} in \name and TypeScript is that the type variable
+\lstinline{U} now has a \emph{disjointness constraint}. The notation
+\lstinline{U * T} means that the type variable U can be instantiated
+to any types which are disjoint to the type \lstinline{T}. Unlike
+TypeScript, the definition of \lstinline{extend} is trivial, type-safe
+and guarantees coherence by using the built-in merge operator (\lstinline{,,}). 
+
+\name and the proofs of coherence and type-safety are formalized in
+the Coq theorem prover. The proofs are complete except for a minor
+(and trivially true) variable renaming lemma used to prove the
+soundness between two subtyping relations used in the
+formalization. The problem arizes from the combination of the locally
+nameless and existential quantification, which prevents a Coq proof
+for that lemma.
 
 In summary, the contributions of this paper are:
 
@@ -149,16 +167,12 @@ polymorphism.
 
 \item {\bf Coq Formalization of System \name and Proof of Coherence:} An
   elaboration semantics of System \namedis into System F is
-  given. Type-soundness and coherence are proved in Coq.
+  given. Type-soundness and coherence are proved in Coq
+\footnote{{\bf Note to reviewers:} Due
+    to the anonymous submission process, the Coq formalization is submitted as supplementary material.}.
 
 \item {\bf Applications:} We show that in \namedis
  type-theoretic encodings can be combined with subtyping to provide extensibility.
-
-\item {\bf Implementation:} An implementation of an
-  extension of System \namedis, as well as the examples presented in the
-  paper, are publicly available\footnote{{\bf Note to reviewers:} Due
-    to the anonymous submission process, the code (and some machine
-    checked proofs) is submitted as supplementary material.}.
 
 \end{itemize*}
 
