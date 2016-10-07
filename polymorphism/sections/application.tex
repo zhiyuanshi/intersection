@@ -86,9 +86,11 @@ solution for all of the mentioned problems involving intersection types.
 \joao{mention the diamond problem? and that two fields with same name can be composed as long as
 their types are disjoint}
 For the previous TypeScript examples, assuming a straightforward translation from objects
-to records, then the intersection \lstinline$Person & ConsoleLogger$ would be well-typed.
-However, the intersection \lstinline$Person & Dog$ would be ill-typed, since they share the
-same field \lstinline$name$.
+to (polymorphic) records, then the intersection \lstinline$Person & ConsoleLogger$ would be 
+well-typed in \name.
+However, the intersection \lstinline$Person & Dog$ would be ill-typed, since the types share the
+same field \lstinline$name$. 
+We will next explore the enconding of polymorphic records in greater depth. 
 
 \subsection{Extensible records}
 Our system can be used to polymorphic extensible records. Describing and

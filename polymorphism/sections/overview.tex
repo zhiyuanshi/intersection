@@ -284,7 +284,7 @@ Disjoint polymorphism assign constraints to each type variable, which
 allows delaying the check for disjointness until type application/instantiation. 
 \end{comment}
 
-\subsection{Disjoint Quantification}
+\subsection{Disjoint Quantification}\label{subsec:disjoint-quantification}
 To avoid being overly conservative, while still retaining coherence in the
 presence of parametric polymorphism and intersection types, \name uses
 an extension to universal quantification called \emph{disjoint quantification}.
@@ -392,7 +392,6 @@ property holds:
   \label{lemma:subst_stable}
   For any well-formed types $A$ and $B$, and a type variable $\alpha$, the result of substituting 
   $\alpha$ for $A$ in $B$ is also a well-formed type.
-  well-formed.
 \end{restatable}
 
 In \name if a type variable $A$ is substituted in a type $T_1$, for a type $T_2$ 

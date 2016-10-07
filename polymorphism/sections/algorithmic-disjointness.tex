@@ -127,11 +127,18 @@ Figure~\ref{fig:disjointness}, which consists of two judgements.
 two types $A$ and $B$ are disjoint in a context $\Gamma$.
 The top five rules are novel in relation to the algorithm described in \oldname.
 \reflabel{\labeldistop} and \reflabel{\labeldistopsym} say that any type is disjoint to 
-$\top$\bruno{This explanation is too brief! In our previous system top
+$\top$.
+This is a major difference with \oldname, where the notion of disjointness explicitly forbids
+the presence of $\top$ types in intersections.
+It turns out that even though $\top$ overlaps with every other type,
+it does not affect coherence in any way.
+We will come back to this in Section~\ref{sec:disjoint}.
+\bruno{This explanation is too brief! In our previous system top
 was not disjoint to anything. You need to explain here why is it ok
-for top to be disjoint to everything.}. Type variables are dealt with two rules:
+for top to be disjoint to everything.}.  
+Type variables are dealt with two rules:
 \reflabel{\labeldisvar} is the base rule; and \reflabel{\labeldissym}
-is its twin symetrical rule. 
+is its twin symmetrical rule. 
 Both rules state that a type variable is disjoint to some type $A$, if $\Gamma$ contains any
 subtype of the corresponding disjointness constraint. 
 This rule is a specialization of the more general lemma:
@@ -141,7 +148,11 @@ This rule is a specialization of the more general lemma:
 
   If $\jwf \Gamma {A \disjoint B}$ and $B \subtype C$, then $\jwf \Gamma {A \disjoint C}$.
 \end{restatable}
-\bruno{Did you prove it?}
+\begin{proof}
+By double induction, first on the disjointness derivation and then on the subtyping derivation.
+The first induction case for~\reflabel{\labeldisvar} does not need the second induction as it is 
+a straightforward application of subtyping transitivity. 
+\end{proof}
 
 The lemma states that if a type $A$ is disjoint to $B$ under $\Gamma$, then it is also disjoint
 to any supertype of $B$. 
@@ -246,14 +257,9 @@ However, a weaker version of that property -- but strong enough for our type-sys
 \begin{lemma}[Types are stable under substitution]
   \label{lemma:wfsubst}
 
-  If $\jwf \Gamma A$ and $\jwf \Gamma B$ and $(x \disjoint C) \in \Gamma$ 
-  and $\jdis \Gamma B C$, then $\jwf {\subst B x \Gamma} {\subst B x A}$.
+  If $\jwf \Gamma A$ and $\jwf \Gamma B$ and $(\alpha \disjoint C) \in \Gamma$ 
+  and $\jdis \Gamma B C$, then $\jwf {\subst B \alpha \Gamma} {\subst B \alpha A}$.
 \end{lemma}
-\bruno{In several places in this section you are using $x$ as a type
-  variable, when you should instead be using $\alpha$. You need to 
-be consistent with your own notation: you defined $x$ to be a (term)
-variable and $\alpha$ to be a type-variable.}
-
 %\begin{restatable}[Instantiation]{lemma}{instantiation}
 %  \label{lemma:instantiation}
 %
@@ -264,7 +270,7 @@ variable and $\alpha$ to be a type-variable.}
 \begin{proof}
 By induction on the well-formedness derivation of $A$.
 The intersection case requires the use of Lemma~\ref{lemma:orthosubst}.
-Also, the variable case required proving that if $x$ does not occur free in $A$, and it is safe
+Also, the variable case required proving that if $\alpha$ does not occur free in $A$, and it is safe
 to substitute it in the co-domain of $\Gamma$, then it is safe to perform the substitution.
 \end{proof}
 
@@ -296,10 +302,10 @@ under a given context.
 To get a feeling about this, we ask the reader to recall 
 Lemma~\ref{lemma:disjointness-covariance}, which was used to justify the rule for
 disjointness of variables.
-If one takes $A$ as some variable $x$, then the lemma should read as:   
-\[ \inferrule {\jwf \Gamma {x \disjoint B} \\ B \subtype C }
-              {\jwf \Gamma {x \disjoint C}} \]
-Now we can ask: how many suitable types are there to instantiate $x$ with?
+If one takes $A$ as some variable $\alpha$, then the lemma should read as:   
+\[ \inferrule {\jwf \Gamma {\alpha \disjoint B} \\ B \subtype C }
+              {\jwf \Gamma {\alpha \disjoint C}} \]
+Now we can ask: how many suitable types are there to instantiate $\alpha$ with?
 Before we answer this, let us ask first how many options are there for $C$, depending on the 
 shape of $B$?
 Given that the cardinality of \name's types is infinite, for the sake of this example we will 
@@ -311,8 +317,8 @@ proportional to the number of intersections present in $B$.
 For example, taking $B$ as $\tyint$ leads $C$ to be either $\top$ or $\tyint$; whereas $B$ as 
 $\tyint \inter \tystring$ leaves $C$ as either $\top$, $\tyint$ or $\tystring$.
 However, as the choices for $C$ grows, the less choices we are left to instantiate 
-the variable $x$, since $x$ must be disjoint to all possible $C$'s. 
-Thus, to answer the first question, the options for instantiating $x$ are inversely proportional 
+the variable $\alpha$, since $\alpha$ must be disjoint to all possible $C$'s. 
+Thus, to answer the first question, the options for instantiating $\alpha$ are inversely proportional 
 to the number of intersections present in $B$.
 As an analogy, one might think of a disjointness constraint as a set of (forbidden) types, where 
 primitive types are the singleton set and each $\inter$ is the set union.
@@ -321,8 +327,16 @@ We can now turn our attention to the two extreme cases, namely $\top$
 (i.e. the 0-ary intersection) and $\bot$ (i.e. the infinite intersection) 
 \footnote{$\bot$ would not add anything to the hypothetical finite type 
 system, however it can be seen as the infinite intersection in \name.}.
-Following the same logic, we may conclude that $\top$ as the associated constraint leaves $x$ with 
+Following the same logic, we may conclude that $\top$ as the associated constraint leaves $\alpha$ with 
 the most options for instantiation whereas $\bot$ will deliver the least options.
+This also implies that $\top$ is the empty constraint, meaning that a variable associated to it
+can be instantiated to any well-formed type.
+It is a subtle but very important property, since \name is a generalization of System $F$. 
+This means that any type variable present in a type signature of System $F$, can be represented in \name
+equivalently by assigning it a $\top$ disjointness constraint
+(as seen in Section~\ref{subsec:disjoint-quantification}).
+
+\begin{comment}
 We will briefly discuss the role of the former in our system. 
 \joao{maybe we can just refer to the overview and delete the next
   paragraph?}
@@ -338,3 +352,4 @@ the System $F$'s type $\forall \alpha. {T_F}$ (where ${T_F}$ is some other type)
 equivalent to \name's type $\fordis \alpha \top {T_i}$, where ${T_i}$ is also an equivalent 
 translation of $T_{F}$.
 An example of such translation has been given in Section~\ref{sec:overview}.
+\end{comment}

@@ -40,8 +40,8 @@ The syntax of \name (with the differences to \oldname highlighted in gray) is:
         \text{Terms}
         & e & \Coloneqq & \top \mid i \mid x \mid \lamty x A e \mid \app {e_1} {e_2} 
               \mid e_1 \mergeop e_2 \mid \highlight{$\blamdis \alpha A e$} \mid \highlight{$\tapp e A$} \mid 
-              \highlight{$\recordCon l e$} \mid
-                          \highlight{$\recordProj e l$} & \\
+              \highlight{$\recordCon l e$} \\ 
+        &   &           &\mid \highlight{$\recordProj e l$} & \\
         \text{Contexts}
         & \Gamma & \Coloneqq & \cdot
                    \mid \Gamma, \highlight{$\alpha \disjoint A$}
@@ -206,7 +206,7 @@ The following rules are ported from \oldname: \reflabel{\labelsubtop},
 %says that if $A_1$ is both the subset of $A_2$ and the subset of $A_3$, then
 %$A_1$ is also the subset of the intersection of $A_2$ and $A_3$.
 
-\paragraph{Polymorphism and Records}
+\paragraph{Polymorphism and Records.}
 The subtyping rules introduced by \name refer to polymorphic constructs and records. 
 \reflabel{\labelsubvar} defines subtyping as a reflexive relation on type variables.
 In \reflabel{\labelsubforall} a universal quantifier ($\forall$) 
@@ -217,25 +217,26 @@ produce unique coercions~\cite{icfppaper}, the $ordinary$ relation needed to be 
 As shown at the top of Figure~\ref{fig:fi-subtype}, the new types that compose this unary 
 relation are type variables, universal quantifiers and record types.
 
-\paragraph{Properties of Subtyping} The subtyping relation is reflexive and transitive.
+\paragraph{Properties of Subtyping.} The subtyping relation is reflexive and transitive.
 
 \begin{restatable}[Subtyping reflexivity]{lemma}{subrefl}
   \label{lemma:subrefl}
   For any type $A$, $A \subtype A$.
-\end{restatable}
-\begin{proof}
-By induction on $A$.
-\end{proof}\bruno{too much white space between Lemma and proof}
-
+\end{restatable}%
+\noindent \emph{Proof.} By induction on $A$.
+%\begin{prf}
+%By induction on $A$.
+%\end{prf}%
 \begin{restatable}[Subtyping transitivity]{lemma}{subtrans}
   \label{lemma:subtrans}
   If $A \subtype B$ and $B \subtype C$, then $A \subtype C$.
-\end{restatable}
-\begin{proof}
-By double induction on both derivations. 
-\end{proof}
-\bruno{Too much space waisted between Lemma and proof. reduce the
-  white space.}
+\end{restatable}%
+\noindent \emph{Proof.} By double induction on both derivations.
+%\begin{prf}
+%By double induction on both derivations. 
+%\end{prf}
+%\bruno{Too much space waisted between Lemma and proof. reduce the
+%  white space.}
 
 %TODO example showing contravariance in disjointness constraints goes here or in the overview 
 %section?
