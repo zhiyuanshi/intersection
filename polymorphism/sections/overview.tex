@@ -32,9 +32,9 @@ For instance, consider the following program in \name:
 
 \begin{lstlisting}
 let x : Int & Char = (*$ \ldots $*) in -- definition omitted
-let idInt (y : Int) : Int = y in
-let idChar (y : Char) : Char = y in
-(idInt x, idChar x)
+let succ (y : Int) : Int = y+1 in
+let not (y : Bool) : Bool = if y then False else True in
+(succ x, not x)
 \end{lstlisting}
 \bruno{I had comment about not having the same text. I should have
   perhaps have been a bit more clear and say that having the same code
@@ -42,13 +42,12 @@ is ok, it is just the text that needs a little rewriting. In fact now
 the code examples are worst: identity functions are pretty boring and
 they don't really illustrate the point.}
 
-\noindent If a value \lstinline{x} has type \lstinline{Int & Char} then
-\lstinline{x} can be used anywhere where either values of type \lstinline{Int} or a 
-\lstinline{Char} are expected. 
+\noindent If a value \lstinline{x} has type \lstinline{Int & Bool} then
+\lstinline{x} can be used anywhere where either a value of type \lstinline{Int} or  
+a value of type \lstinline{Bool} is expected. 
 This means that, in the program above
-the functions \lstinline{idInt} and \lstinline{idChar} -- the
-identity functions on integers and characters, respectively -- 
-both accept \lstinline{x} as an argument. 
+the functions \lstinline{succ} and \lstinline{not} -- simple functions 
+on integers and characters, respectively -- both accept \lstinline{x} as an argument. 
 
 \paragraph{Merge operator.}
 The previous program deliberately ommitted the introduction of values of an
@@ -62,7 +61,7 @@ The merge operator allows two values to be merged in a single intersection type.
 For example, an implementation of \lstinline{x} is constructed in \name as follows:
 
 \begin{lstlisting}
-let x : Int & Char = 1,,'c' in (*$ \ldots $*)
+let x : Int & Bool = 1,,True in (*$ \ldots $*)
 \end{lstlisting}
 \noindent In \name (following Dunfield's notation), the
 merge of two values $v_1$ and $v_2$ is denoted as $v_1 ,, v_2$.
@@ -117,19 +116,6 @@ The \oldname \joao{add reference} system -- a calculus with
 a simply-typed calculus with intersection types and 
 a merge operator, in the same flavour of Dunfield's -- solves this problem
 by using the concept of disjoint intersections. 
-
-\begin{comment}
-If both results are accepted, we say that the semantics is
-\emph{incoherent}: there are multiple possible meanings for the same
-valid program. 
-Dunfield's calculus~\cite{dunfield2014elaborating} is incoherent and accepts the
-program above.\bruno{Well this text needs a significant revision
-  because now our ICFP paper largely solves this problem. So you want,
-at some point, to summarise the key result of the ICFP paper: we know
-how todo coherent intersection types for a simply typed calculus. 
-Then you want to setup the problem for this paper: but how about
-polymorphism? what are the challenges, why is it hard?}
-\end{comment}
 
 \paragraph{Disjoint intersections}
 %Of course, when rejecting programs it is important
@@ -397,14 +383,21 @@ Conversely, $\top$ can be thought as specific - or rather, as general - as the 0
 
 \subsection{Stability of Substitutions}
 From the technical point of view, the main challenge in the design of
-System \name is that, in general, types are not stable under
+\name is that, in general, types are not stable under
 substitution. This contrasts, for example, with System $F$ where types
 are stable under substitution. That is in System $F$ the following
 property holds: 
-\bruno{state usual property here}
+
+\begin{restatable}[Subtyping reflexivity]{lemma}{subrefl}
+  \label{lemma:subst_stable}
+  For any well-formed types $A$ and $B$, and a type variable $\alpha$, the result of substituting 
+  $\alpha$ for $A$ in $B$ is also a well-formed type.
+  well-formed.
+\end{restatable}
 
 In \name if a type variable $A$ is substituted in a type $T_1$, for a type $T_2$ 
-(written $\subst {T_2} A {T_1}$), where $T_1$ and $T_2$ are well-formed, the resulting type might be ill-formed. 
+(written $\subst {T_2} A {T_1}$), where $T_1$ and $T_2$ are well-formed, the resulting type might be 
+ill-formed. 
 To understand why, recall the previous example: 
 \begin{lstlisting}
 fst Int Int (1,,2)

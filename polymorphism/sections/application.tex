@@ -5,15 +5,11 @@ To illustrate the applicability of \name we show two applications. The
 first application shows how to mimic TypeScript's documentation example of 
 dynamic mixins in \name. The second application shows how \name
 enables a powerful form of polymorphic extensible records.
-\bruno{I think we should swap the order of the examples: TypeScript
-  mixins first, and extensible records second.}
 
 \subsection{Dynamic mixins}
-
 %\subsection{Intersections in nominal type-systems}
 %Recently several languages have embraced intersection types, such as Scala, Ceylon or TypeScript.
 %\joao{references here?}
-
 %In Scala, it is possible to define a merge-like function:
 %\joao{example from Bruno's ecoop 2013 paper}
 TypeScript is a language that adds static type checking to JavaScript.
@@ -89,13 +85,17 @@ In fact, the introduction of disjoint intersection types can be seen as a type-s
 solution for all of the mentioned problems involving intersection types. 
 \joao{mention the diamond problem? and that two fields with same name can be composed as long as
 their types are disjoint}
+For the previous TypeScript examples, assuming a straightforward translation from objects
+to records, then the intersection \lstinline$Person & ConsoleLogger$ would be well-typed.
+However, the intersection \lstinline$Person & Dog$ would be ill-typed, since they share the
+same field \lstinline$name$.
 
 \subsection{Extensible records}
 Our system can be used to polymorphic extensible records. Describing and
 implementing records within programming languages is certainly not
 novel and has been extensively studied in the past\bruno{references
-  here; and give names to a few approaches (row types for example)}. Most of the
-systems are entirely focused on concrete aspects of records
+  here; and give names to a few approaches (row types for example)}. 
+Most of the systems are entirely focused on concrete aspects of records
 (i.e. expressiveness, compilation, etc), while ours specializes
 the more general notion of intersection types.  In this section we aim
 at comparing our approach with such systems.
@@ -105,8 +105,6 @@ restriction and extension/concatenation.  We will first introduce the
 basic syntax and typing of records, then the basic operations of
 records in the context of \name and finally we will discuss their
 expressivity in comparison to other record systems.
-\bruno{Why do w have two versions of the code in this section? Can we
-  remove one.}
 
 \paragraph{Record terms and types}
 Our system directly encodes a term for the single record construct $\recordCon l e$, where $l$ is some
@@ -120,16 +118,14 @@ It follows the usual syntax of $e.l$, where $e$ is an expression of type $\recor
 $l$ is a label.
 A polymorphic function which extracts any record that include the label $l$ of type
 $\alpha$ could be written as:
-\begin{align*}
-&\text{select} :: \fordis \alpha \top {\recordType l \alpha \rightarrow \alpha} \\
-&\text{select} \, = \blamdis \alpha \top {\lam x {x.l}}
-\end{align*}
+%\begin{align*}
+%&\text{select} :: \fordis \alpha \top {\recordType l \alpha \rightarrow \alpha} \\
+%&\text{select} \, = \blamdis \alpha \top {\lam x {x.l}}
+%\end{align*}
 
 \begin{lstlisting}[mathescape=true]
-let select A (r : {l : A}) : A = r.l
-in $\ldots$ 
+let select A (r : {l : A}) : A = r.l in $\ldots$ 
 \end{lstlisting}
-
 
 Note how, through the use of subtyping, this function will accept any intersection type that 
 contains the single recorld $\recordType l \alpha$.
@@ -140,15 +136,14 @@ restricted only to record types. \joao{references}
 
 In constrast with most systems, restriction is not directly embedded on our language.
 Instead, we can make use of subtyping to define such operator: 
-\begin{align*}
-&\text{remove} :: \fordis \alpha \top {\fordis r {\recordType l \alpha} 
-{({\recordType l \alpha \inter r) \rightarrow r}}} \\ 
-&\text{remove} \, = \blamdis \alpha \top {\blamdis r {\recordType l \alpha} {\lam x {x}}} 
-\end{align*}
-
+%\begin{align*}
+%&\text{remove} :: \fordis \alpha \top {\fordis r {\recordType l \alpha} 
+%{({\recordType l \alpha \inter r) \rightarrow r}}} \\ 
+%&\text{remove} \, = \blamdis \alpha \top {\blamdis r {\recordType l \alpha} {\lam x {x}}} 
+%\end{align*}
+%
 \begin{lstlisting}[mathescape=true]
-let remove A (B * {l : A}) (x : { l : A } & r) : r = x
-in $\ldots$ 
+let remove A (B * {l : A}) (x : { l : A } & r) : r = x in $\ldots$ 
 \end{lstlisting}
 
 \paragraph{Extension/Concatenation}
@@ -163,24 +158,22 @@ our \emph{merge} for intersection types, except it envoles only record types.
 For instance, in their system, a function which concatenates a single record with field $l$ of type $\tyint$
 with another record that lacks this field, is the following (slightly modified in terms of 
 notation):
-\begin{align*}
-&\text{addL}_1 :: \forall \alpha\#l. \alpha \rightarrow (\alpha || \recordType l \tyint) \\ 
-&\text{addL}_1 \, = ...
-\end{align*}
+%\begin{align*}
+%&\text{addL}_1 :: \forall \alpha\#l. \alpha \rightarrow (\alpha || \recordType l \tyint) \\ 
+%&\text{addL}_1 \, = ...
+%\end{align*}
 \begin{lstlisting}[mathescape=true]
-let $\text{addL}_1$ (A # l) (x : A) : (a || { l : Int }) = $\ldots$ 
-in $\ldots$ 
+let $\text{addL}_1$ (A # l) (x : A) : (a || { l : Int }) = $\ldots$ in $\ldots$ 
 \end{lstlisting}
 
 The reader might notice the resemblance with our system:
-\begin{align*}
-&\text{addL}_2 :: \fordis \alpha {\recordType l \tyint} {
-\alpha \rightarrow (\alpha \inter \recordType l \tyint)} \\
-&\text{addL}_2 \, = ...
-\end{align*}
+%\begin{align*}
+%&\text{addL}_2 :: \fordis \alpha {\recordType l \tyint} {
+%\alpha \rightarrow (\alpha \inter \recordType l \tyint)} \\
+%&\text{addL}_2 \, = ...
+%\end{align*}
 \begin{lstlisting}[mathescape=true]
-let $\text{addL}_2$ (A * { l : Int }) (x : A) : (A & { l : Int }) = $\ldots$ 
-in $\ldots$ 
+let $\text{addL}_2$ (A * { l : Int }) (x : A) : (A & { l : Int }) = $\ldots$ in $\ldots$ 
 \end{lstlisting}
 
 
@@ -196,22 +189,21 @@ Namely, all (intersection) types that contain label $l$, with a field type \emph
 $\tyint$.
 Had one meant to forbid records with \emph{any} $l$ fields, then one could write:
 
-\begin{align*}
-&\text{addL}_3 :: \fordis \beta \top {\fordis \alpha {\recordType l \beta} {
-\alpha \rightarrow (\alpha \inter \recordType l \beta)}} \\
-&\text{addL}_3 \, = ...
-\end{align*}
+%\begin{align*}
+%&\text{addL}_3 :: \fordis \beta \top {\fordis \alpha {\recordType l \beta} {
+%\alpha \rightarrow (\alpha \inter \recordType l \beta)}} \\
+%&\text{addL}_3 \, = ...
+%\end{align*}
 \begin{lstlisting}[mathescape=true]
-let $\text{addL}_3$ (A * { l : $\bot$ }) (x : A) : A & { l : $\bot$ } = $\ldots$ 
-in $\ldots$ 
+let $\text{addL}_3$ (A * { l : $\bot$ }) (x : A) : A & { l : $\bot$ } = $\ldots$ in $\ldots$ 
 \end{lstlisting}
 Unfortunately, our system does not support the $\bot$ type, so this program would not be accepted.
 We will get into the reasons for this in further detail, in Section~\ref{sec:alg-dis}.
 
 Other systems with record concatenation usually define predicates, in terms of field absence or 
 presence (with a type $\alpha$). 
-This rises the question: how would one classify our system in terms of extension? 
-As noted in~\cite{leijen2004first}, systems typically can be categorized into two distinct groups
+This raises the question: how would one classify our system in terms of extension? 
+As noted in~\cite{leijen2004extensible}, systems typically can be categorized into two distinct groups
 in what concerns extension: the strict and the free.
 The former does not allow field overriding when extending a record (i.e. one can only extend a 
 record with a field that is not present in it); while the latter does account for field overriding.
@@ -221,12 +213,12 @@ with records that hopefully will enlighten the reader on this matter.
 
 \paragraph{Expressibility}
 \joao{maybe the average function is too long? we can change to a type with only one field}
-In ... (SPJ \& MJ) -- a strict system with extension -- an example of a function that uses 
+In~\cite{jones99lightweight} -- a strict system with extension -- an example of a function that uses 
 record types is the following:
-\begin{align*}
-&\text{average}_1 :: (r \backslash y, r \backslash x) \Rightarrow \{r | x :: \tyint, y :: \tyint\} \rightarrow \tyint \\
-&\text{average}_1 \, r = (r.x + r.y) / 2
-\end{align*}
+%\begin{align*}
+%&\text{average}_1 :: (r \backslash y, r \backslash x) \Rightarrow \{r | x :: \tyint, y :: \tyint\} \rightarrow \tyint \\
+%&\text{average}_1 \, r = (r.x + r.y) / 2
+%\end{align*}
 \begin{lstlisting}[mathescape=true]
 let $\text{average}_1$ (R\y, R\y) => (r : { R | x : Int, y : Int }) : Int = (r.x + r.y) / 2 
 in $\ldots$ 
@@ -237,10 +229,10 @@ as parameter extended with $x$ $y$, returning an integer.
 Note how the bounded polymorphism is essential to ensure that $r$ does not contain $x$ nor $y$.
 On the other hand, in a system with free extension as in~\cite{leijen2005extensible}, 
 the more general program would be accepted:
-\begin{align*}
-&\text{average}_2 :: \forall \; r \;x \; y, \{ x :: \tyint, y :: \tyint | r \} \rightarrow \tyint \\
-&\text{average}_2 \, r = (r.x + r.y) / 2
-\end{align*}
+%\begin{align*}
+%&\text{average}_2 :: \forall \; r \;x \; y, \{ x :: \tyint, y :: \tyint | r \} \rightarrow \tyint \\
+%&\text{average}_2 \, r = (r.x + r.y) / 2
+%\end{align*}
 \begin{lstlisting}[mathescape=true]
 let $\text{average}_2$ R x y (r : { x : Int, y : Int | R }) : Int = (r.x + r.y) / 2 
 in $\ldots$ 
@@ -256,13 +248,13 @@ In \name, this program could be re-written as
 \footnote{We do not support exactly this function definition style; 
 however the type signature and expression (modulo infix operators) are exactly as one would write them
 in \name}:
-\begin{align*}
-&\text{average}_3 :: \fordis r 
-{\recordType x \tyint \inter \recordType y \tyint} 
-{\recordType x \tyint \inter \recordType y \tyint \inter r \rightarrow \tyint} \\
-&\text{average}_3 = 
-{\blamdis t {\recordType x \tyint \inter \recordType y \tyint} {\lam r {(r.x + r.y) / 2}}}
-\end{align*}
+%\begin{align*}
+%&\text{average}_3 :: \fordis r 
+%{\recordType x \tyint \inter \recordType y \tyint} 
+%{\recordType x \tyint \inter \recordType y \tyint \inter r \rightarrow \tyint} \\
+%&\text{average}_3 = 
+%{\blamdis t {\recordType x \tyint \inter \recordType y \tyint} {\lam r {(r.x + r.y) / 2}}}
+%\end{align*}
 \begin{lstlisting}[mathescape=true]
 let $\text{average}_3$ (R * { x : Int } & { y : Int }) (r : { x : Int } & { y : Int } & R) : Int = (r.x + r.y) / 2 
 in $\ldots$ 
@@ -281,12 +273,12 @@ Finally, it is also worth noting that systems using subtyping may suffer from th
 \name does not suffer from this problem. \joao{since we have no refinement types?}
 We may illustrate by defining a suitable update function, in a similar fashion 
 to~\cite{leijen2005extensible}:
-\begin{align*}
-&\text{update} :: \fordis \alpha \top {\fordis r {\recordType l \alpha} 
-{{\recordType l \alpha \inter r \rightarrow \beta \rightarrow \recordType l \beta \inter r}}} \\ 
-&\text{update} \, = \blamdis \alpha \top {\blamdis r {\recordType l \alpha} {\lam x {\lam v {
-\recordCon l v \mergeop (\text{remove } \alpha \; r \; x)}}}} 
-\end{align*}
+%\begin{align*}
+%&\text{update} :: \fordis \alpha \top {\fordis r {\recordType l \alpha} 
+%{{\recordType l \alpha \inter r \rightarrow \beta \rightarrow \recordType l \beta \inter r}}} \\ 
+%&\text{update} \, = \blamdis \alpha \top {\blamdis r {\recordType l \alpha} {\lam x {\lam v {
+%\recordCon l v \mergeop (\text{remove } \alpha \; r \; x)}}}} 
+%\end{align*}
 \begin{lstlisting}[mathescape=true]
 let $\text{update}$ A B (R * { l : A }) (r : { l : A } & R) (v : B) : { l : B } & R = { l = v } ,, (remove a r x) 
 in $\ldots$ 
