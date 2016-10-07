@@ -92,13 +92,9 @@ We will use $\subst {A} \alpha {\Gamma}$
 to denote the capture-avoiding substitution of $A$ for $\alpha$ in the co-domain of
 $\Gamma$ where the domain is a type variable (i.e. substitution in all disjointness constraints).
 Throughout this paper, we will assume that all contexts are
-well-formed\bruno{when you say well-formed here, do you mean the
-  definition in Fig 3?}\joao{no, I mean what's written next}, meaning that:
-\begin{itemize}
-\item All variables must occur at most once in their domain.
-\item Type variables must not appear free within its own disjointness constraint. 
-\end{itemize}
-All substitutions performed in environments must also lead to well-formed environments.
+well-formed. Importantly, besides usual well-formedness conditions, in
+well-formed contexts type variables must not appear free within its own disjointness constraint.
+%All substitutions performed in environments must also lead to well-formed environments.
 
 %In order to focus on the key features that make this language interesting, we do
 %not include other forms such as type constants and fixpoints here. 
@@ -190,8 +186,7 @@ All substitutions performed in environments must also lead to well-formed enviro
 % the fields.
 
 The subtyping rules of the form $A \subtype B$ are shown in 
-Figure~\ref{fig:fi-subtype}. \bruno{in the figure, the rules seem to
-  be in a strange order. } \joao{I did that to save space. should I revert that?}
+Figure~\ref{fig:fi-subtype}. 
 At the moment, the reader is advised to ignore the
 gray-shaded part in the rules, which will be explained later. 
 The following rules are ported from \oldname: \reflabel{\labelsubtop}, 
@@ -222,7 +217,7 @@ produce unique coercions~\cite{icfppaper}, the $ordinary$ relation needed to be 
 As shown at the top of Figure~\ref{fig:fi-subtype}, the new types that compose this unary 
 relation are type variables, universal quantifiers and record types.
 
-The subtyping relation can be shown to be reflexive and transitive.
+\paragraph{Properties of Subtyping} The subtyping relation is reflexive and transitive.
 
 \begin{restatable}[Subtyping reflexivity]{lemma}{subrefl}
   \label{lemma:subrefl}
@@ -230,7 +225,7 @@ The subtyping relation can be shown to be reflexive and transitive.
 \end{restatable}
 \begin{proof}
 By induction on $A$.
-\end{proof}
+\end{proof}\bruno{too much white space between Lemma and proof}
 
 \begin{restatable}[Subtyping transitivity]{lemma}{subtrans}
   \label{lemma:subtrans}
@@ -278,7 +273,7 @@ By double induction on both derivations.
 %  \end{mathpar}
 
 \paragraph{Well-formedness}
-The well-formedness rules are shown in the top part of Figure~\ref{fig:wf}. 
+The well-formedness rules are shown in the top part of Figure~\ref{fig:fi-type}. 
 The new rules over \oldname are \reflabel{\labelwfvar} and \reflabel{\labelwfforall}. 
 Their definition is quite straightforward, but note how we ensure the well-formedness 
 of the constraint in the latter.
@@ -311,7 +306,7 @@ has experience doing this.}
 Our typing rules are formulated as a bi-directional type-system. 
 Just as in \oldname, this ensures the type-system is not only syntax-directed, but
 also that there is no type ambiguity: that is inferred types are unique.
-The typing rules are shown in the bottom part of Figure~\ref{fig:wf}. 
+The typing rules are shown in the bottom part of Figure~\ref{fig:fi-type}. 
 Again, the reader is advised to ignore the
 gray-shaded part here, as these parts will be explained later. 
 The typing judgements are of the form: $\jcheck \Gamma e A$ and  
@@ -332,7 +327,7 @@ application \reflabel{\labelttapp}, and for type abstraction
 \reflabel{\labeltblam}.  Type abstraction is introduced by the big
 lambda $\blamdis \alpha A e$, eliminated by the usual type application
 $\tapp e A$ (\reflabel{\labelttapp}).  The disjointness constraint is
-added to the context with the rule.  During a type application, the
+added to the context in \reflabel{\labeltblam}. During a type application, the
 type system makes sure that the type argument satisfies the
 disjointness constraint.  Type application performs an extra check
 ensuring that the type to be instantiated is compatible
