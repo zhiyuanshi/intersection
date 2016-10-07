@@ -219,7 +219,7 @@ Type variables can be assumed as disjoint to any other type, as a starting point
 Now consider the attempt to write the following polymorphic function in such system (we will use
 uppercase Latin letters to denote type variables): 
 \begin{lstlisting}
-let fst A B (x: A & B) : A = (x : Int (*$ \to $*) Int) in (*$ \ldots $*)
+let fst A B (x: A & B) : A = (x : A) in (*$ \ldots $*)
 \end{lstlisting}
 The \code{fst} function is supposed to extract a value of type
 \lstinline{A} from the merge value $x$ (of type \lstinline{A&B}). 
@@ -308,7 +308,7 @@ allows a type variable to be constrained so that it is disjoint with a given typ
 With disjoint quantification a variant of the program $fst$, which
 is accepted by \name, would be written as:
 \begin{lstlisting}
-let fst A ((*$ \highlight {B *~A} $*)) (x: A & B) = (x : Int (*$ \to $*) Int)
+let fst A ((*$ \highlight {B *~A} $*)) (x: A & B) = (x : A)
 in (*$ \ldots $*)
 \end{lstlisting}
 The small change is in the declaration of the type parameter $B$. The notation
