@@ -1,42 +1,42 @@
-\section{Semantics and Coherence}
+\section{Semantics, Coherence and Type-Safety}
 \label{sec:disjoint}
-This section discusses the elaboration semantics of \name and show how coherence is retained.
-It will first explain the semantics by means of the elaboration to System $F$.
-Then, it will discuss the necessary extensions to retain coherence, namely in the coercions of 
-top-like types; coercive subtyping, and bidirectional type-system's elaboration. 
+This section discusses the elaboration semantics of \name and proves
+type-safety and coherence.
+%The semantics is by an elaboration to System $F$.
+%Then, it will discuss the necessary extensions to retain coherence, namely in the coercions of 
+%top-like types; coercive subtyping, and bidirectional type-system's
+%elaboration. 
 
 \subsection{Semantics}
-The dynamic semantics of the call-by-value \name are defined by means of
-a type-directed translation to an extension of System $F$ with pairs~\footnote{
-  For simplicity, we will just refer to this system as ``System $F$''
-  from now on.}.
+The dynamic semantics of the call-by-value \name is defined by means of
+a type-directed translation to an extension of System $F$ with
+pairs.
 %The type-directed translation is also shown in
 %Figure~\ref{}, where the resulting System F terms are highlighted in
 %gray.
 
-
 \paragraph{Target language.}
-The syntax and typing of our target language is unsurprising. The syntax of the
-target language is shown in Figure~\ref{fig:f-syntax}. The highlighted part
-shows its difference with the standard System $F$. 
-The typing rules can be found in appendix.
-\joao{actually they can't, but should we include them?}
+The syntax and typing of our target language is unsurprising: 
 
-\begin{figure}[!t]
   \[
     \begin{array}{llrl}
-      \text{Types}    & T & \Coloneqq & \alpha \mid \tyint \mid {T_1} \to {T_2} \mid \for \alpha T\\
-                      &   & \mid      & \highlight {$()$} \mid \highlight {$\pair {T_1} {T_2}$} \\
+      \text{Types}    & T & \Coloneqq & \alpha \mid \tyint \mid {T_1}
+      \to {T_2} \mid \for \alpha T \mid \highlight {$()$} \mid
+      \highlight {$\pair {T_1} {T_2}$} \\
       \text{Terms}    & E & \Coloneqq & x \mid i \mid \lamty x T E \mid \app {E_1} {E_2} \mid 
-                                        \blam \alpha E \mid \tapp E T \\
-                      &   & \mid      & \highlight {$()$} \mid \highlight {$ \pair {E_1} {E_2} $} 
-                                        \mid \highlight {$ \proj k E $} \quad k \in \{ 1, 2 \} \\
+                                        \blam \alpha E \mid \tapp E T
+                                        \mid \highlight {$()$} \mid \highlight {$ \pair {E_1} {E_2} $} 
+                                        \mid \highlight {$ \proj 1 E
+                                          $} \mid \highlight {$ \proj 2 E
+                                          $} \\
       \text{Contexts} & G & \Coloneqq & \cdot \mid G, \alpha \mid G, x \oftype T \\
     \end{array}
   \]
-  \caption{Target language syntax.}
-  \label{fig:f-syntax}
-\end{figure}
+
+The highlighted part shows its difference with the standard System $F$. 
+The interested reader can find the formalization of the target language
+syntax and typing rules (which are standard) in our Coq development.
+
 
 \paragraph{Type and context translation.}
 Figure~\ref{fig:type-and-context-translation} defines the type translation
@@ -65,7 +65,10 @@ contexts $\Gamma$ to target language contexts $G$.
 
   \caption{Type and context translation.}
   \label{fig:type-and-context-translation}
-\end{figure}
+\end{figure}\bruno{This figure is too wastefull in terms of
+  syntax. Use a table or tabular to put the two translations
+  side-by-side. The Figure should take half of the space that it
+  currently takes.}
 
 % The rules given in this section are identical with those in
 % Section~\ref{sec:fi}, except for the light blue part. The translation consists
@@ -112,11 +115,14 @@ contexts $\Gamma$ to target language contexts $G$.
   \label{fig:andcoercion}
 \end{figure}
 
-Our definition of top-like types is naturally extended from \oldname. 
+Our definition of top-like types is naturally extended from
+\oldname. \bruno{What are top-like types and why are they important?
+  The reader will not know this, so you need to spend some sentences
+  saying something about it.}
 The rules that compose this unary relation, denoted as $\toplike{ . }$, are presented at the top of 
 Figure~\ref{fig:andcoercion}. 
 The only new rule is \reflabel{\labeltoplforall}, which extends the notion of top-like types for
-the (disjoint) quantifier case.
+the (disjoint) universal quantifier.
 
 It is important pointing out that, despite the small extension in the definition of top-likes types,  
 the notion of disjointness has also changed, leading to a larger set of well-formed top-like types.
@@ -136,15 +142,15 @@ The judgement
 A_1 \subtype A_2 \yields E
 \]
 extends the subtyping judgement in Figure~\ref{fig:fi-subtype} with a coercion
-on the right hand side of $ \yields {} $. A coercion $ E $ is just an term
+on the right hand side of $ \yields {} $. A coercion $ E $ is just a term
 in the target language and is ensured to have type
 $ \im {A_1} \to \im {A_2} $ (by Lemma~\ref{lemma:sub}). For example,
 \[
 \tyint \inter \alpha \subtype \alpha \yields {\lamty x {\im {\tyint \inter \tybool}} {\proj 2 x}}
 \]
-generates a coercion function with type: $\tyint \inter \alpha \to \alpha$.
+generates a target coercion function with type: $(\tyint,\alpha) \to \alpha$.
 
-Rule \reflabel{\labelsubtop} the coercion is the constant function of the unit term.
+In rule \reflabel{\labelsubtop} the coercion is the constant function of the unit term.
 In rules \reflabel{\labelsubvar}, \reflabel{\labelsubint}, coercions are just
 identity functions. 
 In \reflabel{\labelsubfun}, we elaborate the subtyping of
@@ -220,9 +226,8 @@ Finally, all rules produce type-correct coercions:
 %are disjoint it is impossible that both of the preconditions of the left decompositions are satisfied
 %at the same time. 
 
-In order to ensure a coherent type-system, we should prove that our subtyping relation is also 
-coherent.
-More formally, with disjoint polymorphism the following theorem holds:
+In order to ensure a coherent type-system, the subtyping relation also
+needs to be coherent. With disjoint polymorphism the following theorem holds:
 
 \begin{lemma}[Unique subtype contributor]
   \label{lemma:unique-subtype-contributor}
@@ -247,7 +252,7 @@ The variable cases \reflabel{\labeldisvar} and \reflabel{\labeldissym} needed to
 and disjoint types $A$ and $B$, and $B$ is not toplike, then $A$ cannot be a subtype of $B$.
 \end{proof}
 
-Finally, we can show that the coercion of a subtyping relation $A \subtype B$ 
+Using the unique subtype contributor, we can show that the coercion of a subtyping relation $A \subtype B$ 
 is uniquely determined.
 This fact is captured by the following lemma:
 
@@ -418,7 +423,7 @@ This result is captured more formally by the following lemma:
 
 \subsection{Elaboration of type-system and coherence} 
 In order to prove the coherence result, we refer to the previously introduced bidirectional 
-type-system.
+type-system\bruno{Just use a reference to the appropriate (sub)section here: \emph{never} use vague references}.
 The bidirectional type-system is elaborating, producing a term in the target language while
 performing the typing derivation.
 
@@ -429,12 +434,14 @@ It also translates the form of disjoint quantification and disjoint type applica
 quantification and type application. 
 For example, \[ \blamdis \alpha \tyint {\lam x {(x \mergeop 1)}} \] in \name will be translated into System $F$'s: 
 \[ \blam \alpha {\lam x {\pair x 1}}\]
+\begin{comment}
 This is achieved by means of the type-directed translation.
 Note that, when performing type application, the type-system will ensure that the type being applied is compatible
 with the disjoint constraint, otherwise the program is rejected.
 For example, applying the term above to $\tychar$ would be accepted, and the generated term would translate this
 into System $F$'s type application.
 On the other hand, applying the term to $\tyint$ would be rejected, and hence the target term produced is meaningless.
+\end{comment}
 
 \begin{comment}
 For example, \[ 1 \mergeop \code{"one"} \] becomes \pair 1
@@ -449,19 +456,23 @@ the function expects a $\tystring$ but the translated argument is of type $\pair
 \end{comment}
 
 \paragraph{The translation judgement.} 
-The translation judgement $\jtype \Gamma e A \yields E$ extends the typing judgement with an 
-elaborated term on the right hand side of $\yields {}$. 
-The translation ensures that $E$ has type $\im A$. 
-We will look into the coercions of the new rules in greater detail.
-Rule \reflabel{\labeltblam} introduces a type variable $a$ into context, and naturally does not 
-make use of the disjointness constraint.
-In \name, one may pass more information to a function than what is required; but not in System $F$. 
-To account for this difference, in \reflabel{\labeltapp}, the
-coercion $E$ from the subtyping relation is applied to the argument.
-Rules \reflabel{\labeltrec} and \reflabel{\labeltprojr} are quite straightforward, since there
-are not records in the target language.
-It is also noteworthy pointing out that, as usual, the rule \reflabel{\labeltmerge} translates merges 
-into pairs.
+The translation judgement $\jtype \Gamma e A \yields E$ extends the
+typing judgement with an elaborated term on the right hand side of
+$\yields {}$.  The translation ensures that $E$ has type $\im A$.  We
+discuss the most relevant rules/coercions in greater detail next.  The
+two new rules for type abstraction (\reflabel{\labeltblam}) and type
+application (\reflabel{\labelttapp}) generate the expected
+corresponding coercions in System F.  In \name, subtyping means, for
+example, that one may pass more information to a function than what is
+required. This is not the case in System $F$.  The rule
+\reflabel{\labeltsub} is used to account for such differences: the
+coercion $E_{sub}$, derived from the subtyping relation, is applied to
+coerce the System F term into the right type.  The coercions generated
+for \reflabel{\labeltrec} and \reflabel{\labeltprojr} simply erase the
+labels (since there are no labels in the target language) and
+translate the corresponding underlying term. It is also noteworthy
+pointing out that, as usual, the rule \reflabel{\labeltmerge}
+translates merges into pairs.
 
 
 %As an example, we show the coercion generated by the identity function:
@@ -719,11 +730,10 @@ Combining the previous results, we are finally able to show the central theorem:
 
 \end{restatable}
 
-\bruno{Yes, and you want to mention somewhere where the stability of substitution lemma 
-plays a role. I presume it plays a role in the coherence theorems.}
-\joao{from what I could gather we use it to ensure well-formed typing, which is used here (as mentioned below)}
 \begin{proof}
-  By induction on the first derivation.
+  By induction on the first derivation. The most important case is the
+  subsumption rule:
+\begin{comment}
   Note that three cases need special attention: \reflabel{\labelttapp}, \reflabel{\labeltsub} and \reflabel{\labeltapp}.
   In the \reflabel{\labeltblam}:
   \begin{mathpar}
@@ -739,12 +749,16 @@ For \reflabel{\labeltapp}:
 Theorem~\ref{theorem:unique-inference}, in order to apply the
 induction hypothesis.
   Also, in the \reflabel{\labeltsub} rule:
+\end{comment}
 \begin{mathpar}
 \bruletsub
 \end{mathpar}
-\noindent we need to show that $E_{sub}$ is unique (by
-  Lemma~\ref{lemma:unique-coercion}), and thus to show that $A$ is well-typed 
-  (by Lemma~\ref{lemma:wellformed-typing}). 
+\noindent We need to show that $E_{sub}$ is unique (by
+  Lemma~\ref{lemma:unique-coercion}), and thus to show that $A$ is well-formed 
+  (by Lemma~\ref{lemma:wellformed-typing}). Note that this is the
+  place where stability of substitutions (used by
+  Lemma~\ref{lemma:wellformed-typing}) plays a crutial role in
+  guaranteeing coherence.
   We also need to show that $A$ is unique (by
 Theorem~\ref{theorem:unique-inference}). 
 Uniqueness of $A$ is needed to apply the induction hypothesis.
