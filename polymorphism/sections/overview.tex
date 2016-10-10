@@ -4,25 +4,15 @@
 This section introduces \name and its support for intersection types,
 parametric polymorphism and the merge operator. 
 It then discusses the issue of coherence and shows how the notion of disjoint
-intersection types and disjoint quantification achieve a coherent semantics.
+intersection types and disjoint quantification achieves a coherent semantics.
 
 Note that this section uses some syntactic sugar, as well as standard
 programming language features, to illustrate the various concepts in \name. 
 Although the minimal core language that we formalize in
-Section~\ref{sec:fi} does not present all such features, our implementation
-supports them.
+Section~\ref{sec:fi} does not present all such features, such
+syntactic sugar is trivial to add.
 
 \subsection{Intersection Types and the Merge Operator}
-%%\subsection{Intersection Types, Merge and Polymorphism in \namedis}
-%\bruno{We should't simply copy and paste the text from the previous
-%  paper. We should try to at least rephrase some things.}
-
-Intersection types date back as early as Coppo et al.'s work~\cite{coppo1981functional}. 
-Since then various researchers have studied intersection types, and some languages have 
-adopted them in one form or another.
-%However, as we shall see in
-%Section~\ref{subsec:incoherence}, it also introduces difficulties. In what follows
-%intersection types and the merge operator are informally introduced.
 
 \paragraph{Intersection types.}
 The intersection of type $A$ and $B$ (denoted as \lstinline{A & B} in
@@ -36,11 +26,6 @@ let succ (y : Int) : Int = y+1 in
 let not (y : Bool) : Bool = if y then False else True in
 (succ x, not x)
 \end{lstlisting}
-\bruno{I had comment about not having the same text. I should have
-  perhaps have been a bit more clear and say that having the same code
-is ok, it is just the text that needs a little rewriting. In fact now
-the code examples are worst: identity functions are pretty boring and
-they don't really illustrate the point.}
 
 \noindent If a value \lstinline{x} has type \lstinline{Int & Bool} then
 \lstinline{x} can be used anywhere where either a value of type \lstinline{Int} or  
@@ -53,8 +38,9 @@ on integers and characters, respectively -- both accept \lstinline{x} as an argu
 The previous program deliberately ommitted the introduction of values of an
 intersection type. 
 There are many variants of intersection types in the literature. 
-Our work follows a particular formulation, where
-intersection types are introduced by a \emph{merge operator}. \joao{add citations?}
+Our work follows a particular
+formulation, where
+intersection types are introduced by a \emph{merge operator}~\cite{reynolds1997design,reynolds1991coherence,Castagna92calculus,dunfield2014elaborating,oliveira16disjoint}. 
 As Dunfield~\cite{dunfield2014elaborating} has argued a merge operator adds considerable
 expressiveness to a calculus. 
 The merge operator allows two values to be merged in a single intersection type. 
@@ -110,31 +96,33 @@ For example, the result of the program (\lstinline$(1,,2) : Int$)
 can be either \lstinline$1$ or \lstinline$2$, depending on the implementation 
 of the language.
 
+\paragraph{Disjoint intersection types}
 One option to restore coherence is to reject programs which may have
-multiple meanings.
-The \oldname \joao{add reference} system -- a calculus with
-a simply-typed calculus with intersection types and 
-a merge operator, in the same flavour of Dunfield's -- solves this problem
-by using the concept of disjoint intersections. 
-
-\paragraph{Disjoint intersections}
-%Of course, when rejecting programs it is important
-%not to be too conservative, and reject too many programs which are
-%actually coherent.
+multiple meanings.  The \oldname~\cite{oliveira16disjoint} calculus --
+a simply-typed calculus with intersection types and a merge operator
+-- solves this problem by using the concept of disjoint intersections.
 The incoherence problem with the expression $1 \mergeop 2$
 happens because there are two overlapping integers in the merge. 
 Generally speaking, if both terms can be assigned some type $C$
 then both of them can be chosen as the meaning of the merge,
 which in its turn leads to multiple meanings of a term.
 Thus a natural option is to forbid such overlapping
-values of the same type in a merge.
+values of the same type in a merge. In \oldname 
+intersections such as \lstinline{Int&Int} are forbidden, since 
+the types in the intersection overlap. However an intersection 
+such as \lstinline{Char&Int} is ok because the set of characters 
+and integers do not overlap with each other. 
 
+\begin{comment}
 This is precisely the approach taken in \oldname: a merge can only be composed of
 two values as long as their types are \emph{disjoint}.  
 Disjointness is a binary relation between two types, defined for any types which
-do not contain any overlapping types.
-It can be specified as: given any two types, they are disjoint if there does not 
-exist any common super-type.
+do not contain any overlapping types. For example \lstinline{Int&Char}
+is disjoint to \lstinline{Bool} because  but \lstinline{
+\end{comment}
+
+%It can be specified as: given any two types, they are disjoint if there does not 
+%exist any common super-type.
 
 \begin{comment}
 More formally, the notion of disjointness can be specified as follows:
@@ -148,7 +136,6 @@ More formally, the notion of disjointness can be specified as follows:
   subtypes of $C$:
   \[A \disjoint B \equiv \not\exists C.~A \subtype C \wedge B \subtype C\]
 \end{definition}
-\end{comment}
 
 With this concept of disjointness in mind, it is easy to verify that the previous example 
 will no longer be accepted since \lstinline$((1,,2) : Int)$ is no longer well-typed!
@@ -161,6 +148,7 @@ namely \lstinline$Int$ itself.
 This result can be generalized and \oldname has shown that it can lead to a coherent calculus. 
 Although this is a promising result, the question remains: is it possible to incorporate 
 parametric polymorphism in such calculus, while retaining coherence?
+\end{comment}
 
 %\oldname not only provided a specification for disjointness but also an algorithmic version
 %of it, and proved that both versions are equivalent.
@@ -197,10 +185,40 @@ top-like types (i.e. $\top \inter \top$), and pre-top-types, which are functions
 $\top$ as their co-domain (i.e. $\tyint \to \tychar \to \top$).
 \end{comment}
 
-\subsection{Parametric Polymorphism}
-Unfortunately, adding parametric polymorphism is non-trivial.
-A naive attempt to add polymorphism would consist in introducing a forall type, type variables, and a 
-big lambda at term level.
+\subsection{Parametric Polymorphism and Disjointness}
+Unfortunately, combining parametric polymorphism with disjoint
+intersection types is non-trivial. Consider the following programs
+(we will use uppercase Latin letters to denote type variables):
+
+\begin{lstlisting}
+let merge3 A (x : A) : A & Int = x,,3 in
+let fst A B (x: A & B) : A = x in (*$ \ldots $*)
+\end{lstlisting}
+
+\noindent The first program, \lstinline{merge3}, takes an argument
+\lstinline{x} of some type (\lstinline{A}) and merges \lstinline{x}
+with \lstinline{3}. Thus the return type of the program is
+\lstinline{A & Int}. \lstinline{merge3} is unproblematic for many
+possible instantiations of \lstinline{A}.  However, if
+\lstinline{merge3} instantiates \lstinline{A} with a type that
+overlaps with \lstinline{Int}, then incoherence may happen.
+
+\begin{lstlisting}
+merge3 Int 2
+\begin{lstlisting}
+
+\noindent can result in both 2 or 3. 
+
+Unfortunately, combining parametric polymorphism with disjoint
+intersection types is non-trivial. For example, consider the following program:
+
+\begin{lstlisting}
+
+\end{lstlisting}
+
+A naive attempt to add polymorphism consist in forbidding type
+variables to appear in an intersection. 
+
 Type variables can be assumed as disjoint to any other type, as a starting point.
 Now consider the attempt to write the following polymorphic function in such system (we will use
 uppercase Latin letters to denote type variables): 
