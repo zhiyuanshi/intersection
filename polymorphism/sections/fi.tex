@@ -101,6 +101,14 @@ well-formed contexts type variables must not appear free within its own disjoint
 %However they can be included in the formalization in
 %standard ways and we are using them in discussions and examples. %TODO are we?
 
+\paragraph{Syntactic sugar}\bruno{Moned some text here: talk about
+  syntactic sugar here.}
+\joao{should we say anything here about this going against our
+  previous top-disjointness formulation?}
+\bruno{yes, but not here. We can discuss this in later sections when
+  discussing the technical details.}
+For instance, the type of the identity function in System $F$ that reads $\forall A. A \to A$ is 
+equivalent to the \name's type $\forall (A * \top). A \to A$.
 
 % \paragraph{Discussion.} A natural question the reader might ask is that why we
 % have excluded union types from the language. The answer is we found that

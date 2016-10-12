@@ -77,7 +77,7 @@ the method call.
 
 The \emph{extend} function is essentially an encoding of the
 \emph{merge operator}. The merge operator is used on some
-calculi~\cite{reynolds,castagna,dunfield2014elaborating,oliveira} as
+calculi~\cite{reynolds1997design,reynolds1991coherence,Castagna92calculus,dunfield2014elaborating,oliveira16disjoint} as
 an introduction form for intersection types. Similar encodings to
 those in TypeScript have been proposed for Scala to enable
 applications where the merge operator also plays a fundamental
@@ -92,8 +92,9 @@ taken, certain programs using the merge operator do not have a unique
 semantics, which significantly complicates reasoning about programs.
 
 Solutions to the problem of coherence in the presence 
-of a merge operator exist for simply typed calculi~\cite{}, but no prior
-work addresses polymorphism. Most recently Oliveira
+of a merge operator exist for simply typed
+calculi~\cite{reynolds1997design,reynolds1991coherence,Castagna92calculus,oliveira16disjoint}, 
+but no prior work addresses polymorphism. Most recently Oliveira
 et al.~\cite{oliveira16disjoint} proposed using \emph{disjoint intersection types} to 
 guarantee coherence in a calculus with intersection types and a merge 
 operator. The key idea is to allow only disjoint types in
