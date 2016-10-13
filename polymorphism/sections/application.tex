@@ -6,12 +6,10 @@ first application shows how to mimic TypeScript's documentation example of
 dynamic mixins in \name. The second application shows how \name
 enables a powerful form of polymorphic extensible records.
 
-\subsection{Dynamic mixins}
+\subsection{Dynamic Mixins}
 %\subsection{Intersections in nominal type-systems}
 %Recently several languages have embraced intersection types, such as Scala, Ceylon or TypeScript.
-%\joao{references here?}
 %In Scala, it is possible to define a merge-like function:
-%\joao{example from Bruno's ecoop 2013 paper}
 TypeScript is a language that adds static type checking to JavaScript.
 Its type-system is structural, even though at a first glance it might resemble 
 nominal languages such as Java or C\#.
@@ -92,10 +90,14 @@ However, the intersection \lstinline$Person & Dog$ would be ill-typed, since the
 same field \lstinline$name$. 
 We will next explore the enconding of polymorphic records in greater depth. 
 
-\subsection{Extensible records}
+\subsection{Extensible Records}
 Our system can be used to polymorphic extensible records. Describing and
 implementing records within programming languages is certainly not
-novel and has been extensively studied in the past\bruno{references
+novel and has been extensively studied in the past, including
+systems with row types \cite{wand1987complete,wand1989type}; 
+predicates \cite{harper1990extensible,harper1991record}; 
+flags \cite{remy1993type}; conditional constraints; and others.
+\bruno{references
   here; and give names to a few approaches (row types for example)}. 
 Most of the systems are entirely focused on concrete aspects of records
 (i.e. expressiveness, compilation, etc), while ours specializes
@@ -130,9 +132,10 @@ let select A (r : {l : A}) : A = r.l in $\ldots$
 \end{lstlisting}
 
 Note how, through the use of subtyping, this function will accept any intersection type that 
-contains the single recorld $\recordType l \alpha$.
-This resembles other systems with subtyping ..., although it is slightly more general, as any it is not 
-restricted only to record types. \joao{references}
+contains the single record $\recordType l A$.
+This may resemble other systems with subtyping \cite{cardelli1990operations,pierce1994simple}, 
+although it is slightly more general -- the type $A$ is not restricted only  
+restricted to record types. 
 
 \paragraph{Restriction}
 
@@ -273,7 +276,7 @@ Finally, it is also worth noting that systems using subtyping may suffer from th
 \emph{update} problem.
 \joao{show example (for both update problems?)}
 \name does not suffer from this problem. \joao{since we have no refinement types?}
-We may illustrate by defining a suitable update function, in a similar fashion 
+We may illustrate this by defining a suitable update function, in a similar fashion 
 to~\cite{leijen2005extensible}:
 %\begin{align*}
 %&\text{update} :: \fordis \alpha \top {\fordis r {\recordType l \alpha} 
