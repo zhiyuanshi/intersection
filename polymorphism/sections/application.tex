@@ -6,7 +6,7 @@ first application shows how to mimic TypeScript's documentation example of
 dynamic mixins in \name. The second application shows how \name
 enables a powerful form of polymorphic extensible records.
 
-\subsection{Dynamic Mixins}
+\subsection{Dynamic Mixins}\label{subsec:mixins}
 %\subsection{Intersections in nominal type-systems}
 %Recently several languages have embraced intersection types, such as Scala, Ceylon or TypeScript.
 %In Scala, it is possible to define a merge-like function:
@@ -90,10 +90,9 @@ same field \lstinline$name$. \bruno{please write down the full code in
 implementing records within programming languages is certainly not
 novel and has been extensively studied in the past, including
 systems with row types \cite{wand1987complete,wand1989type}; 
-predicates \cite{harper1990extensible,harper1991record}; 
-flags \cite{remy1993type}; conditional constraints; and others.
-\bruno{references
-  here; and give names to a few approaches (row types for example)}. 
+predicates \cite{harper1990extensible,harper1991record,gaster1996polymorphic}; 
+flags \cite{remy1993type}; conditional constraints \cite{pottier2003constraint};
+cases \cite{blume2006extensible}; amongst others.
 Most of the systems are entirely focused on concrete aspects of records
 (i.e. expressiveness, compilation, etc), while ours specializes
 the more general notion of intersection types.  In this section we aim
@@ -149,7 +148,7 @@ let remove A (B * {l : A}) (x : { l : A } & r) : r = x in $\ldots$
 \paragraph{Extension/Concatenation}
 The most usual operators for combining records are extension and concatenation.
 Even though that in some systems, the latter is defined in terms of the former, languages that
-opt to include concatenation usually rely on specific semantics for it. \joao{add references}
+opt to include concatenation usually rely on specific semantics for it. 
 Our system is suitable for encoding both of these operations, but we argue that concatenation is
 the natural primitive operator, due to the resemblance with our merge operator.
 Indeed, \cite{harper1991record} also define a \emph{merge} operator, which is quite similar to
@@ -196,7 +195,7 @@ Had one meant to forbid records with \emph{any} $l$ fields, then one could write
 let $\text{addL}_3$ (A * { l : $\bot$ }) (x : A) : A & { l : $\bot$ } = $\ldots$ in $\ldots$ 
 \end{lstlisting}
 Unfortunately, our system does not support the $\bot$ type, so this program would not be accepted.
-We will get into the reasons for this in further detail, in Section~\ref{sec:alg-dis}.
+We will get into the reasons for this in further detail, in Section~\ref{sec:conclusion}.
 
 Other systems with record concatenation usually define predicates, in terms of field absence or 
 presence (with a type $\alpha$). 
@@ -211,20 +210,19 @@ with records that hopefully will enlighten the reader on this matter.
 
 \paragraph{Expressibility}
 \joao{maybe the average function is too long? we can change to a type with only one field}
-In~\cite{jones99lightweight} -- a strict system with extension -- an example of a function that uses 
+In~\cite{jones99lightweight} -- a system with strict extension -- an example of a function that uses 
 record types is the following:
 %\begin{align*}
 %&\text{average}_1 :: (r \backslash y, r \backslash x) \Rightarrow \{r | x :: \tyint, y :: \tyint\} \rightarrow \tyint \\
 %&\text{average}_1 \, r = (r.x + r.y) / 2
 %\end{align*}
 \begin{lstlisting}[mathescape=true]
-let $\text{average}_1$ (R\y, R\y) => (r : { R | x : Int, y : Int }) : Int = (r.x + r.y) / 2 
-in $\ldots$ 
+let $\text{average}_1$ (R\y, R\y) => (r : { R | x : Int, y : Int }) : Int = (r.x + r.y) / 2 in $\ldots$ 
 \end{lstlisting}
-
 The type signature says that for any record with type $r$, that lacks both $x$ $y$, can be accepted
 as parameter extended with $x$ $y$, returning an integer.
 Note how the bounded polymorphism is essential to ensure that $r$ does not contain $x$ nor $y$.
+
 On the other hand, in a system with free extension as in~\cite{leijen2005extensible}, 
 the more general program would be accepted:
 %\begin{align*}
@@ -235,13 +233,10 @@ the more general program would be accepted:
 let $\text{average}_2$ R x y (r : { x : Int, y : Int | R }) : Int = (r.x + r.y) / 2 
 in $\ldots$ 
 \end{lstlisting}
-
 In this case, if $r$ contains either field $x$ or field $y$, they would be shadowed by the labels 
 present in the type signature.
 In other words, if a record with multiple $x$ fields, the most recent (i.e. left-most) would be used 
 in any function which accesses $x$.
-\joao{add example of a system using subtyping?}
-
 In \name, this program could be re-written as
 \footnote{We do not support exactly this function definition style; 
 however the type signature and expression (modulo infix operators) are exactly as one would write them
@@ -254,10 +249,8 @@ in \name}:
 %{\blamdis t {\recordType x \tyint \inter \recordType y \tyint} {\lam r {(r.x + r.y) / 2}}}
 %\end{align*}
 \begin{lstlisting}[mathescape=true]
-let $\text{average}_3$ (R * { x : Int } & { y : Int }) (r : { x : Int } & { y : Int } & R) : Int = (r.x + r.y) / 2 
-in $\ldots$ 
+let $\text{average}_3$ (R * { x : Int } & { y : Int }) (r : { x : Int } & { y : Int } & R) : Int = (r.x + r.y) / 2 in $\ldots$ 
 \end{lstlisting}
-
 Thus more types are accepted this function than in the first system, but less than the second. 
 Another major difference between \name and the two other mentioned systems, is the ability to 
 combine records with arbitrary types.
@@ -266,9 +259,8 @@ Our system does not account for well-formedness of record types as the other two
 general notion of disjoint intersection types. 
 
 Finally, it is also worth noting that systems using subtyping may suffer from the so-called 
-\emph{update} problem.
-\joao{show example (for both update problems?)}
-\name does not suffer from this problem. \joao{since we have no refinement types?}
+\emph{update} problem~\cite{cardelli1990operations}.
+\name does not suffer from this problem as it does not support refinement types. 
 We may illustrate this by defining a suitable update function, in a similar fashion 
 to~\cite{leijen2005extensible}:
 %\begin{align*}
@@ -278,11 +270,8 @@ to~\cite{leijen2005extensible}:
 %\recordCon l v \mergeop (\text{remove } \alpha \; r \; x)}}}} 
 %\end{align*}
 \begin{lstlisting}[mathescape=true]
-let $\text{update}$ A B (R * { l : A }) (r : { l : A } & R) (v : B) : { l : B } & R = { l = v } ,, (remove a r x) 
-in $\ldots$ 
+let $\text{update}$ A B (R * { l : A }) (r : { l : A } & R) (v : B) : { l : B } & R = { l = v } ,, (remove a r x) in $\ldots$ 
 \end{lstlisting}
-
-
 
 \begin{comment}
 \section{Application: Extensibility}
@@ -590,7 +579,7 @@ allows multiple algebras to be combined into one. A version of this
 combinator has been encoded in Scala before using intersection types
 (which Scala supports) and an encoding of the merge
 operator~\cite{oliveira2013feature,rendel14attributes}.
-Unfortunatelly, the Scala encoding of the merge operator is quite complex as
+Unfortunately, the Scala encoding of the merge operator is quite complex as
 it relies on low-level type-unsafe programming features such as
 dynamic proxies, reflection or other meta-programming techniques.
 In \namedis there is no need for such hacky encoding, as the
