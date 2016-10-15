@@ -101,14 +101,12 @@ well-formed contexts type variables must not appear free within its own disjoint
 %However they can be included in the formalization in
 %standard ways and we are using them in discussions and examples. %TODO are we?
 
-\paragraph{Syntactic sugar}\bruno{Moned some text here: talk about
-  syntactic sugar here.}
-\joao{should we say anything here about this going against our
-  previous top-disjointness formulation?}
-\bruno{yes, but not here. We can discuss this in later sections when
-  discussing the technical details.}
-For instance, the type of the identity function in System $F$ that reads $\forall A. A \to A$ is 
-equivalent to the \name's type $\forall (A * \top). A \to A$.
+\paragraph{Syntactic sugar}
+In \name we may quantify a type variables and ommit its constraint. 
+This means that its constraint is actually $\top$. 
+For example, the identity function type $\forall \alpha. \alpha \to \alpha$ is syntactic sugar
+for  $\fordis \alpha \top {\alpha \to \alpha}$.
+We will discuss this in more detail in Section~\ref{sec:disjoint}. 
 
 % \paragraph{Discussion.} A natural question the reader might ask is that why we
 % have excluded union types from the language. The answer is we found that
@@ -221,7 +219,7 @@ In \reflabel{\labelsubforall} a universal quantifier ($\forall$)
 is covariant in its body, and contravariant in its disjointness constraints.
 The \reflabel{\labelsubrec} rule says that records are covariant within their fields' types.
 Also, since the $ordinary$ conditions on two of the intersection rules are necessary to 
-produce unique coercions~\cite{icfppaper}, the $ordinary$ relation needed to be extended.
+produce unique coercions~\cite{oliveira16disjoint}, the $ordinary$ relation needed to be extended.
 As shown at the top of Figure~\ref{fig:fi-subtype}, the new types that compose this unary 
 relation are type variables, universal quantifiers and record types.
 

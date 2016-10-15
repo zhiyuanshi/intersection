@@ -138,7 +138,6 @@ records that are standard in type-systems with record types:
 \emph{selection}, \emph{restriction}, and \emph{extension}. 
 Most calculi are based on these three primitive operators (especially extension), such as
 \cite{remy1993type,gaster1996polymorphic,jones99lightweight,leijen2004first,leijen2005extensible,blume2006extensible}.
-
 %Following Cardelli and Mitchell's approach, which is based on extension and row types, 
 %More recently, Leijen formalized two neat systems~\cite{leijen2004first,leijen2005extensible}.
 %Just like our calculus, his systems allow records that contain duplicate labels, without the need to 
@@ -146,12 +145,12 @@ Most calculi are based on these three primitive operators (especially extension)
 %However, Leijen's system is more sophisticated, since it relies on shadowing of labels. 
 %Also, it supports passing record labels as arguments to functions. 
 %He also showed an encoding of intersection types using first-class labels.
-
 The merge operator in \name plays the same role as the concatenation operator, as its components 
 may contain any (well-formed and disjoint) types.
 One problem with concatenation is that typically systems are hard to use in practise, due to the
 complicated set of constraints/filters which might arise from combining several, possibly 
 polymorphic, records~\cite{leijen2005extensible}.
+
 All of the aforementioned record calculi are entirely concerned with the conceptual and implementation 
 issues of type-systems with records, using techniques as row types, predicates, flags, qualified types,
 cases, amongst others.
@@ -191,8 +190,10 @@ compiling disjoint intersection types as opposed to compiling records directly.
 % R{\'e}my~\cite{remy1989type}
 
 \paragraph{Traits and mixins.}
-Traits and mixins have become very popular in object-oriented languages. \joao{references}
-They allow for some type of object composition which is not allowed in
+Traits \cite{ducasse2006traits,fisher04atyped,odersky2005scalable} and mixins 
+\cite{bracha1990mixin,ancona96algebraic,flatt1998classes,findler1998modular,ancona2003jam,bettini2004corecalculus} 
+have become very popular in object-oriented languages. 
+They allow a kind of object composition which is not allowed in
 object-oriented type-systems with support for single inheritance.
 One of the main differences between traits and mixins are the way in
 which ambiguity of names is dealt.
@@ -205,7 +206,7 @@ operator.
 However there is a subtle difference between traits and \name: equal 
 names/labels are always rejected in the former, whereas in the latter only
 if their types are disjoint.
-\joao{do you want to reference CZ, where they have a similar spec to our notion of disjointess?}
+\joao{should we reference CZ, where they have a similar spec to our notion of disjointess?}
 
 \begin{comment}
 

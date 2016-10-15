@@ -33,7 +33,7 @@ function extend<T, U>(first: T, second: U): T & U {
 class Person { constructor(public name : string, public male : boolean) { } }
 interface Loggable { log() : void; }
 class ConsoleLogger implements Loggable { log() {...} }
-var jim = extend(new Person("Jim"), new ConsoleLogger());
+var jim = extend(new Person("Jim",true), new ConsoleLogger());
 var n = jim.name;
 jim.log();
 \end{lstlisting}
@@ -200,7 +200,7 @@ We will get into the reasons for this in further detail, in Section~\ref{sec:con
 Other systems with record concatenation usually define predicates, in terms of field absence or 
 presence (with a type $\alpha$). 
 This raises the question: how would one classify our system in terms of extension? 
-As noted in~\cite{leijen2004extensible}, systems typically can be categorized into two distinct groups
+As noted in~\cite{leijen2005extensible}, systems typically can be categorized into two distinct groups
 in what concerns extension: the strict and the free.
 The former does not allow field overriding when extending a record (i.e. one can only extend a 
 record with a field that is not present in it); while the latter does account for field overriding.
