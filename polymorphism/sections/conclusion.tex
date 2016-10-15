@@ -2,7 +2,7 @@
 \label{sec:conclusion}
 
 
-This paper described \namedis: a System $F$-based language that combines
+This paper described \name: a System $F$-based language that combines
 intersection types, parametric polymorphism and a merge operator.
 The language is proved to be type-safe and coherent.
 To ensure coherence the type system accepts only
@@ -12,48 +12,35 @@ disjointness constraints. We believe that disjoint intersection types
 and disjoint quantification are intuitive, and at the same time
 expressive.
 
-We implemented the core functionalities of the \namedis as part of a JVM-based
-compiler. Based on the type system of \namedis, we have built an ML-like
-source language compiler that offers interoperability with Java (such as object
-creation and method calls). The source language is loosely based on the more
-general System $F_{\omega}$ and supports a
-number of other features, including records, mutually recursive
-\code{let} bindings, type aliases, algebraic data types, pattern matching, and
-first-class modules that are encoded using \code{letrec} and records.
+%We implemented the core functionalities of the \namedis as part of a JVM-based
+%compiler. Based on the type system of \namedis, we have built an ML-like
+%source language compiler that offers interoperability with Java (such as object
+%creation and method calls). The source language is loosely based on the more
+%general System $F_{\omega}$ and supports a
+%number of other features, including records, mutually recursive
+%\code{let} bindings, type aliases, algebraic data types, pattern matching, and
+%first-class modules that are encoded using \code{letrec} and records.
 
 For the future, we intend to improve our source language
 and show the power of disjoint intersection types and disjoint
 quantification in large case studies.
-We are also interested in extending our work
-to systems with a $\top$ type. This will also require an adjustment
-to the notion of disjoint types. A suitable notion of
-disjointness between two types $A$ and $B$ in the presence of $\top$
-would be to require that the only common supertype of $A$ and $B$ is $\top$.
-Finally we would like to study the
-addition of union types. This will also require changes in our
-notion of disjointness, since with union types there always exists
-a type $A \union B$, which is the common supertype of two
-types $A$ and $B$.
-
-\paragraph{Bottom}\bruno{I think the discussion
-  about bottom can be done later, perhaps in future work.}
-  \joao{rephrase this}
-Inversely, the most restrictive type is $\bot$, as it is not disjoint to any type, except top-like 
-types. \joao{is this true? I'm not sure about what (bot \& top) means.}
-However, introducing $\bot$ is not compatible with our disjointness rule
+We are also interested in extending our work to systems with union types and/or 
+a $\bot$ type. 
+\joao{simplify this paragraph?}
+However, introducing the latter is not compatible with our disjointness rule
 \reflabel{\labeldisvar} and well-formedness of contexts.
-Let us take a closer look, by supposing that we wish to derive $\jdis \Gamma x x$, for some variable 
-$x$, under some well-formed context $\Gamma$.
-In \name, we can only use \reflabel{\labeldisvar} with the type $A$ as a sub-type of $x$, 
-i.e. an (n-ary) intersection containing $x$.
-Well-formedness of environments guarantees that this will never happen, since $x$ is not in
+Had we introduced it in \name, we could derive non-sensical statements as in 
+$\jdis \Gamma \alpha \alpha$, for some variable $\alpha$, under some well-formed context $\Gamma$.
+In \name, such statement is not derivable since we would have to use \reflabel{\labeldisvar} with the 
+type $A$ as a sub-type of $\alpha$, i.e. an (n-ary) intersection containing $\alpha$.
+Well-formedness of environments guarantees that this will never happen, since $\alpha$ is not in
 scope of itself. 
-Thus, without a $\bot$ type, a derivation for that statement does not exist. 
 However, by introducing $\bot$ we may now construct such derivation, as $A$ can now be $\bot$: a valid
-sub-type of $x$ which does not contain $x$.
-In fact, had \name included a $\bot$ type, then introducing any \emph{bottom-like} type 
-(i.e. $\bot \inter A$, for any type $A$) can lead to this undesired behaviour.
-Since defining the lower bound is not strictly necessary to the formalization; introduces 
+sub-type of $\alpha$ which does not contain $\alpha$.
+This suggests that adding $\bot$ is not as straightforward as initially perceived.
+%In fact, had \name included a $\bot$ type, then introducing any \emph{bottom-like} type 
+%(i.e. $\bot \inter A$, for any type $A$) can lead to this undesired behaviour.
+Since introducing it is not strictly necessary to the system's formalization; adds 
 substantial complexity in our system; and its practical application is not clear, we left this
 as an open problem for future work. 
 
