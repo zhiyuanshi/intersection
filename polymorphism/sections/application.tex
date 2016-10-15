@@ -13,12 +13,10 @@ enables a powerful form of polymorphic extensible records.
 %In Scala, it is possible to define a merge-like function:
 %\joao{example from Bruno's ecoop 2013 paper}
 TypeScript is a language that adds static type checking to JavaScript.
-Its type-system is structural, even though at a first glance it might resemble 
-nominal languages such as Java or C\#.
-Amongst numerous static typing constructs, TypeScript supports a form of intersection types, 
-with no merge operator. 
-However, it is possible to define a function 
-that mimics the merge operator, as some form of mixin composition:
+Amongst numerous static typing constructs, \emph{TypeScript supports a form of intersection types, 
+without a merge operator}. 
+However, it is possible to define a function \lstinline{extend}
+that mimics the merge operator:
 
 \begin{lstlisting}
 function extend<T, U>(first: T, second: U): T & U {
@@ -36,26 +34,22 @@ function extend<T, U>(first: T, second: U): T & U {
 
 class Person { constructor(public name : string, public male : boolean) { } }
 interface Loggable { log() : void; }
-class ConsoleLogger implements Loggable {
-    log() {
-      // ...
-    }
-}
+class ConsoleLogger implements Loggable { log() {...} }
 var jim = extend(new Person("Jim"), new ConsoleLogger());
 var n = jim.name;
 jim.log();
 \end{lstlisting}
 
 In this example, taken from TypeScript's documentation, an \lstinline$extend$ function is defined 
-for mixin composition, and two classes \lstinline$Person$ and \lstinline$ConsoleLogger$. 
-Two instaces of those classes are then composed in a variable \lstinline$jim$ with the type of 
+for mixin composition. Two classes \lstinline$Person$ and
+\lstinline$ConsoleLogger$ are also defined.
+Two instances of those classes are then composed in a variable \lstinline$jim$ with the type of 
 the intersection of both, where it is type-safe to access both the \lstinline$name$ property
 from \lstinline$Persion$ and \lstinline$ConsoleLogger$.
 
-This definition relies essentially on biased choice.
-Let us take a closer look at the definition of \lstinline$extend$.
+The implementation of \lstinline{extend} relies on a biased choice.
 Given two arguments \lstinline$first$ of type \lstinline$T$, and \lstinline$second$ of type 
-\lstinline $U$, it returns an intersection of both types represented as \lstinline$T \inter U$.
+\lstinline $U$, \lstinline{extend} returns an intersection of both types represented as \lstinline$T \& U$.
 The function starts by creating a variable \lstinline$result$ with the type of the intersection, 
 It then iterates through the \lstinline$first$'s properties and copies them to the 
 \lstinline$result$.
@@ -79,21 +73,22 @@ the types in an intersection, or even intersections including repeated types.
 This motivates the need to define a clear meaning to the practical application of 
 intersection types.
 
+\paragraph{Dynamic mixins in \name}
 In \name, the merge combinator is directly embedded in the semantics of the language, 
-and thus there is no need to define such combinators.
+and thus there is no need to define \lstinline{extend}.
 In fact, the introduction of disjoint intersection types can be seen as a type-safe 
-solution for all of the mentioned problems involving intersection types. 
+and coherent solution for all of the mentioned problems involving intersection types. 
 \joao{mention the diamond problem? and that two fields with same name can be composed as long as
 their types are disjoint}
 For the previous TypeScript examples, assuming a straightforward translation from objects
 to (polymorphic) records, then the intersection \lstinline$Person & ConsoleLogger$ would be 
 well-typed in \name.
-However, the intersection \lstinline$Person & Dog$ would be ill-typed, since the types share the
-same field \lstinline$name$. 
-We will next explore the enconding of polymorphic records in greater depth. 
+Moreover, the intersection \lstinline$Person & Dog$ would be ill-typed, since the types share the
+same field \lstinline$name$. \bruno{please write down the full code in
+\name to illustrate how to do the example.}
 
 \subsection{Extensible records}
-Our system can be used to polymorphic extensible records. Describing and
+\name can encode polymorphic extensible records. Describing and
 implementing records within programming languages is certainly not
 novel and has been extensively studied in the past\bruno{references
   here; and give names to a few approaches (row types for example)}. 
