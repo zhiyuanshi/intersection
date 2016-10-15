@@ -225,9 +225,9 @@ Another option to mitigate the issues of incoherence, without using
 disjoint intersection types is to allow for a biased choice: that is
 multiple values of the same type may exist in an intersection, but an
 implementation gives preference to one of them. The encodings of merge 
-operators in TypeScript and Scala~\cite{} use such an approach.
+operators in TypeScript and Scala~\cite{oliveira2013feature} use such an approach.
 A first problem with this approach, which has already been pointed out by
-Dunfield~\cite{}, is that the choice of the corresponding value is
+Dunfield~\cite{dunfield2014elaborating}, is that the choice of the corresponding value is
 tied up to a particular choice in the implementation. In other words
 incoherence still exists at the semantic level, but the implementation makes it predictable 
 which overlapping value will be chosen. From the

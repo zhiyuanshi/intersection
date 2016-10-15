@@ -6,12 +6,10 @@ first application shows how to mimic TypeScript's documentation example of
 dynamic mixins in \name. The second application shows how \name
 enables a powerful form of polymorphic extensible records.
 
-\subsection{Dynamic mixins}
+\subsection{Dynamic Mixins}
 %\subsection{Intersections in nominal type-systems}
 %Recently several languages have embraced intersection types, such as Scala, Ceylon or TypeScript.
-%\joao{references here?}
 %In Scala, it is possible to define a merge-like function:
-%\joao{example from Bruno's ecoop 2013 paper}
 TypeScript is a language that adds static type checking to JavaScript.
 Amongst numerous static typing constructs, \emph{TypeScript supports a form of intersection types, 
 without a merge operator}. 
@@ -90,7 +88,11 @@ same field \lstinline$name$. \bruno{please write down the full code in
 \subsection{Extensible records}
 \name can encode polymorphic extensible records. Describing and
 implementing records within programming languages is certainly not
-novel and has been extensively studied in the past\bruno{references
+novel and has been extensively studied in the past, including
+systems with row types \cite{wand1987complete,wand1989type}; 
+predicates \cite{harper1990extensible,harper1991record}; 
+flags \cite{remy1993type}; conditional constraints; and others.
+\bruno{references
   here; and give names to a few approaches (row types for example)}. 
 Most of the systems are entirely focused on concrete aspects of records
 (i.e. expressiveness, compilation, etc), while ours specializes
@@ -125,9 +127,10 @@ let select A (r : {l : A}) : A = r.l in $\ldots$
 \end{lstlisting}
 
 Note how, through the use of subtyping, this function will accept any intersection type that 
-contains the single recorld $\recordType l \alpha$.
-This resembles other systems with subtyping ..., although it is slightly more general, as any it is not 
-restricted only to record types. \joao{references}
+contains the single record $\recordType l A$.
+This may resemble other systems with subtyping \cite{cardelli1990operations,pierce1994simple}, 
+although it is slightly more general -- the type $A$ is not restricted only  
+restricted to record types. 
 
 \paragraph{Restriction}
 
@@ -144,17 +147,16 @@ let remove A (B * {l : A}) (x : { l : A } & r) : r = x in $\ldots$
 \end{lstlisting}
 
 \paragraph{Extension/Concatenation}
-
 The most usual operators for combining records are extension and concatenation.
 Even though that in some systems, the latter is defined in terms of the former, languages that
 opt to include concatenation usually rely on specific semantics for it. \joao{add references}
 Our system is suitable for encoding both of these operations, but we argue that concatenation is
 the natural primitive operator, due to the resemblance with our merge operator.
-Indeed, (Harper \& Pierce) also define a \emph{merge} operator, which is quite similar to
+Indeed, \cite{harper1991record} also define a \emph{merge} operator, which is quite similar to
 our \emph{merge} for intersection types, except it envoles only record types.
-For instance, in their system, a function which concatenates a single record with field $l$ of type $\tyint$
-with another record that lacks this field, is the following (slightly modified in terms of 
-notation):
+For instance, in their system, the following function concatenates a single record with field $l$ 
+of type $\tyint$ with another record that lacks this field \footnote{The syntax is slightly modified
+with respect to the original notation}:
 %\begin{align*}
 %&\text{addL}_1 :: \forall \alpha\#l. \alpha \rightarrow (\alpha || \recordType l \tyint) \\ 
 %&\text{addL}_1 \, = ...
@@ -173,9 +175,8 @@ The reader might notice the resemblance with our system:
 let $\text{addL}_2$ (A * { l : Int }) (x : A) : (A & { l : Int }) = $\ldots$ in $\ldots$ 
 \end{lstlisting}
 
-
 This shows that one can use disjoint quantification to express negative field information, which
-is very close to what (Harper \& Pierce) describe in their system.  
+is very close to the system described in \cite{harper1991record}.  
 Note how one has to explicitly state the type of the constraint in $\text{addL}_2$, whereas 
 $\text{addL}_1$ does not require this.
 The same generality of disjoint intersection types that allows one to encode record types is the
@@ -268,7 +269,7 @@ Finally, it is also worth noting that systems using subtyping may suffer from th
 \emph{update} problem.
 \joao{show example (for both update problems?)}
 \name does not suffer from this problem. \joao{since we have no refinement types?}
-We may illustrate by defining a suitable update function, in a similar fashion 
+We may illustrate this by defining a suitable update function, in a similar fashion 
 to~\cite{leijen2005extensible}:
 %\begin{align*}
 %&\text{update} :: \fordis \alpha \top {\fordis r {\recordType l \alpha} 

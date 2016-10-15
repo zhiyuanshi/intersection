@@ -1,14 +1,14 @@
 \section{Introduction}
 \label{sec:intro}
 
-Intersection types~\cite{coppo1981functional,Pottinger80type} are an incresingly popular language feature for
-modern programming languages, such as Microsoft's TypeScript~\cite{}, 
-Redhat's Ceylon~\cite{}, Facebook's Flow~\cite{} and
-Scala~\cite{}.
+Intersection types~\cite{coppo1981functional,Pottinger80type} are an increasingly popular language feature for
+modern programming languages, such as Microsoft's TypeScript~\cite{typescript}, 
+Redhat's Ceylon~\cite{ceylon}, Facebook's Flow~\cite{flow} and \joao{cited websites}
+Scala~\cite{scala-overview}.
 %\footnote{Limited forms of intersection types also exist in
 %recent versions of Java~\cite{}.} 
 In those languages a typical use of intersection
-types, which has been known for a long time~\cite{}, 
+types, which has been known for a long time~\cite{} \joao{I could not find the first use}, 
 is to model the subtyping aspects of OO-style multiple inheritance. 
 For example, the following Scala declaration:
 
@@ -47,9 +47,9 @@ concepts that don’t fit in the classic object-oriented mold. (There are a lot 
 \noindent Two points are worth emphasizing. Firstly, 
 intersection types are being used to model concepts that are not
 like the classical (class-based) object-oriented programming. Indeed, 
-being a prototype-based language, Javascript has a much more dynamic 
+being a prototype-based language, JavaScript has a much more dynamic 
 notion of object composition compared to class-based languages:
-objects are composed at run-time, and their types are not necessarally
+objects are composed at run-time, and their types are not necessarilly
 statically known. Secondly, the use of intersection types in
 TypeScript is inspired by common programming patterns in the
 (dynamically typed) JavaScript. This hints that intersection types are 
@@ -81,13 +81,15 @@ calculi~\cite{reynolds1997design,reynolds1991coherence,Castagna92calculus,dunfie
 an introduction form for intersection types. Similar encodings to
 those in TypeScript have been proposed for Scala to enable
 applications where the merge operator also plays a fundamental
-role~\cite{}. Unfortunatelly, the merge operator is not directly
+role~\cite{oliveira2013feature}. \joao{any other uses?} 
+Unfortunately, the merge operator is not directly
 supported by TypeScript, Scala, Ceylon or Flow. There are two possible
 reasons for such lack of support. One reason is simply that merge operator is
 not well-known: many calculi with intersection types in the literature
 do not have explicit introduction forms for intersection types. The
 other reason is that, while powerful, the merge operator is well-known
-to introduce \emph{(in)coherence} problems~\cite{}.  If care is not
+to introduce \emph{(in)coherence} problems~\cite{reynolds1991coherence,dunfield2014elaborating}.  
+If care is not
 taken, certain programs using the merge operator do not have a unique
 semantics, which significantly complicates reasoning about programs.
 
@@ -143,18 +145,19 @@ and guarantees coherence by using the built-in merge operator (\lstinline{,,}).
 
 The applicability of \name is illustrated with examples using \lstinline{extend} 
 ported from TypeScript, and various operations on polymorphic
-extensible records~\cite{}. The operations on polymorphic extensible records
+extensible records~\cite{leijen2005extensible,harper1991record,jones99lightweight}. 
+The operations on polymorphic extensible records
 show that \name can encode various operations/application of row
-types~\cite{}. However, in contrast to various existing proposals for 
+types~\cite{wand1987complete}. However, in contrast to various existing proposals for 
 row types and extensible records, \name supports general intersections 
 and not just record operations.
 
 \name and the proofs of coherence and type-safety are formalized in
-the Coq theorem prover~\cite{}. The proofs are complete except for a minor
+the Coq theorem prover~\cite{coq}. The proofs are complete except for a minor
 (and trivially true) variable renaming lemma used to prove the
 soundness between two subtyping relations used in the
 formalization. The problem arizes from the combination of the locally
-nameless representation of binding~\cite{} and existential
+nameless representation of binding~\cite{aydemir-popl-08} and existential
 quantification, which prevents a Coq proof for that lemma.
 
 In summary, the contributions of this paper are:
