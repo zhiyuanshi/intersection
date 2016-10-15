@@ -25,6 +25,17 @@ He introduced a primitive $\code{glue}$ function as
 a language extension which corresponds to our merge operator. 
 However, users can ``glue'' two arbitrary values, which may lead to incoherence.
 
+Castagna et al.~\cite{Castagna92calculus} proposed $\lamint$ to study
+the overloading problem for functions. 
+They have a special merge for functions and also a special function application
+for these merges.
+Their calculus is coherent and they also employ well-formedness conditions on their 
+(functional) merges. 
+These conditions are incompatible with systems like ours -- which allow arbitrary
+intersections -- and thus are hard to compare in terms of expressiveness.
+This means that $\lamint$ accepts different functional merges than \name and 
+vice-versa.
+
 More recently, Dunfield~\cite{dunfield2014elaborating} formalised a system with
 intersection types and a merge operator with a type-directed translation to the
 simply-typed lambda calculus with pairs.
@@ -34,36 +45,73 @@ hand his system includes union types, but on the other it lacks coherence.
 Our work is an extension to the recent \oldname~\cite{oliveira16disjoint}.
 \name solves the coherence problem present in Dunfield's calculus, by requiring that
 intersection types can only be composed of \emph{disjoint} types.
-\oldname uses a specification for disjointness, that reads as:
-
-\joao{put definition here}
-
+\oldname uses a specification for disjointness, which says that two types are 
+disjoint as long as they do not share a common supertype.
 \name does not use such definition as its adaptation to polymorphic types would require
 using some form of unification.
 Since the purpose of such specification is its simplicity and readability (compared to the
 algorithmic counterpart), we argue that unification would go against this principle, and
 opted to drop the specification.
 In fact, \name's notion of disjointness is based on \oldname's definition of the more
-general notion of disjointess concerning $\top$ types, called $\top$-disjointness: 
-
-\joao{put definition here}
-
-A major difference between the two calculus, is that $\top$-disjointness does not allow
+general notion of disjointess concerning $\top$ types, called $\top$-disjointness. 
+The definition says that, two types $A$ and $B$ are disjoint if two conditions are satisfied:
+%\begin{definition}[$\top$-disjointness]
+%  Two types $A$ and $B$ are disjoint
+%  (written $A \disjoint B$) if the following two conditions are satisfied:
+\begin{enumerate}
+  \item $(\text{not}~\toplike{A})~\text{and}~(\text{not}~\toplike{B}) $
+  \item $\forall C.~\text{if}~ A \subtype C~\text{and}~B \subtype C~\text{then}~\toplike{C}$
+\end{enumerate}
+%\end{definition}
+\noindent A major difference between the two calculus, is that $\top$-disjointness does not allow
 $\top$ in intersections, while our calculus allows it.
 As a consequence, the set of well-formed \emph{top-like} types is a superset of \name's.
-The reason for this is covered in greater detail in Section~\ref{} \joao{put ref to section}.
-
-\joao{reference other calculus} 
+The reason for this is covered in greater detail in Section~\ref{} \joao{fix ref}.
 
 \paragraph{Intersection types and polymorphism, without the merge operator.}
+Recently, Castagna~\textit{et al.}~\cite{Castagna:2014} studied a very interesting
+and coherent calculus that has polymorphism and set-theoretic type connectives (such as
+intersections, unions, and negations). 
+However, their calculus is based on a semantic subtyping relation due to their 
+interpretation of intersection types.
+The difference to our calculus, is that their intersections are mostly used at function
+level, allowing overloading (i.e. branching) of types.
+For example, they can express a function that works on any type, but executes different
+code depending on the type of its input:
 
+\[
+\lambda^{(\tyint \to \tybool) \wedge (\alpha \backslash \tyint \to \alpha \backslash \tyint)} 
+x. (x \in \tyint) ? (x \text{ mod } 2) = 0 : x
+\]
 
-\paragraph{Extensible records.}
+\noindent In our system we cannot express such intersections.
+However, \name does accept other kind of intersections which are not possible to express
+in their calculus, as in merges of type $(\tyint \to \tybool) \inter (\tyint \to \tyint)$.
+Just as in~\cite{Castagna92calculus}, their system is focused on the combination of 
+intersections with functions, whereas \name is concerned with merges between
+arbitrary types.
 
-\george{Record field deletion is also possible.}
+\joao{elaborate more on this paragraph?}
+Going in the direction of higher
+kinds, Compagnoni and Pierce~\cite{compagnoni1996higher} added
+intersection types to System $ F_{\omega} $ and used a new calculus,
+$ F^{\omega}_{\wedge} $, to model multiple inheritance. 
+In their system, types include the construct of intersection of types of the
+same kind $ K $. 
+Davies and Pfenning~\cite{davies2000intersection} studied the interactions between
+intersection types and effects in call-by-value languages. 
+They proposed a ``value restriction'' for intersection types, similar to
+value restriction on parametric polymorphism.
 
+Intersection types have also been adopted in object-oriented languages such as Scala,
+Ceylon, Grace, Flow or TypeScript.
+Generally speaking, the main difference between these languages and \name is the lack
+of explicit instantiation through the merge operator.
+This leads to several ad-hoc solutions at defining such operator in those languages,
+as it has been discussed in Sections~\ref{} and Section~\ref{}. \joao{fix refs} 
+
+\paragraph{Extensible records.}%
 %http://elm-lang.org/learn/Records.elm
-
 Encoding records using intersection types appeared in
 Reynolds~\cite{reynolds1997design} and Castagna et al.~\cite{castagna1995calculus}. 
 Although Dunfield also discussed this idea in his paper \cite{dunfield2014elaborating}, 
@@ -80,29 +128,31 @@ dispatch as self-application.
 But in his paper, intersection types are not used to encode multi-field records.
 
 Wand~\cite{wand1987complete} started the work on extensible records and proposed
-row types~\cite{wand1989type} for records. 
+row types~\cite{wand1989type} for records, together with a \emph{concatenation}
+operator, which is standard in many calculi with extensible records
+\cite{harper1991record,remy1992typing,wand1989type,sulzmann97designing,makholm05type,pottier2003constraint}.
 Cardelli and Mitchell~\cite{cardelli1990operations} defined three primitive operations on
-records that became standard in type-systems with record types: 
+records that are standard in type-systems with record types: 
 \emph{selection}, \emph{restriction}, and \emph{extension}. 
-Examples of calculus that use such primitives are ...
-Following Cardelli and Mitchell's approach, which is based on extension and row types, 
-both Leijen's systems~\cite{leijen2004first,leijen2005extensible} and ours allow records that contain
-duplicate labels. 
-Leijen's system is more sophisticated, since it relies on shadowing of labels. 
-Also, it supports passing record labels as arguments to functions. 
-He also showed an encoding of intersection types using first-class labels.
+Most calculi are based on these three primitive operators (especially extension). \joao{add references}
 
+%Following Cardelli and Mitchell's approach, which is based on extension and row types, 
+%More recently, Leijen formalized two neat systems~\cite{leijen2004first,leijen2005extensible}.
+%Just like our calculus, his systems allow records that contain duplicate labels, without the need to 
+%override 
+%However, Leijen's system is more sophisticated, since it relies on shadowing of labels. 
+%Also, it supports passing record labels as arguments to functions. 
+%He also showed an encoding of intersection types using first-class labels.
 
-Later ... defined a fourth operation on records called \emph{concatenation}.
-The operation eventually became standard of many systems, even though its semantics can be usually
-defined in terms of extension.
-One problem with concatenation is that tipically systems are hard to use in practise, due to the
+The merge operator in \name plays the same role as the concatenation operator, as its components 
+may contain any (well-formed and disjoint) types.
+One problem with concatenation is that typically systems are hard to use in practise, due to the
 complicated set of constraints/filters which might arise from combining several, possibly 
 polymorphic, records~\cite{leijen2005extensible}.
-The merge operator in \name plays the same role as concatenation, as its components may contain
-any (well-formed and disjoint) types.
-However.. \joao{type signatures are simpler and piggybacking on more general notion(s) of DIT}
-
+However, in \name, the polymorphic extensible records implementation piggybacks on the disjointness
+and intersection types features of the type-system.
+Thus, the constraints on labels are encoded using disjoint quantification, and the coherent
+type-system will statically ensure that records and their operations are safe.
 
 % Chlipala's
 % \texttt{Ur}~\cite{chlipala2010ur} explains record as type level
@@ -133,7 +183,21 @@ However.. \joao{type signatures are simpler and piggybacking on more general not
 % R{\'e}my~\cite{remy1989type}
 
 \paragraph{Traits and Mixins}
-
+Traits and mixins have become very popular in object-oriented languages. \joao{references}
+They allow for some type of object composition which is not allowed in
+object-oriented type-systems with support for single inheritance.
+One of the main differences between traits and mixins are the way in
+which ambiguity of names is dealt.
+The former usually rejects programs which compose classes with 
+conflicting methods, whereas the latter assumes a resolution strategy,
+usually language dependent. \joao{is this true?}
+Our example demonstrated in Section~\ref{subsec:records} suggests that
+\name can be used in place of traits, due to the semantics of the merge
+operator.
+However there is a subtle difference between traits and \name: equal 
+names/labels are always rejected in the former, whereas in the latter only
+if their types are disjoint.
+\joao{do you want to reference CZ, where they have a similar spec to our notion of disjointess?}
 
 \begin{comment}
 
