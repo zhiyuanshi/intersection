@@ -87,17 +87,15 @@ Finally, the accessor for a label $l$ in term $e$ is denoted as $\recordProj e l
 $\alpha$ with disjointness constraints $A$; and variables $x$ with their type $A$. 
 We will use $\subst {A} \alpha {\Gamma}$
 to denote the capture-avoiding substitution of $A$ for $\alpha$ in the co-domain of
-$\Gamma$ where the domain is a type variable (i.e. substitution in all disjointness constraints).
+$\Gamma$ where the domain is a type variable (i.e all disjointness constraints).
 Throughout this paper, we will assume that all contexts are
 well-formed. Importantly, besides usual well-formedness conditions, in
 well-formed contexts type variables must not appear free within its own disjointness constraint.
 %All substitutions performed in environments must also lead to well-formed environments.
-
 %In order to focus on the key features that make this language interesting, we do
 %not include other forms such as type constants and fixpoints here. 
 %However they can be included in the formalization in
 %standard ways and we are using them in discussions and examples. %TODO are we?
-
 \paragraph{Syntactic sugar}
 In \name we may quantify a type variables and ommit its constraint. 
 This means that its constraint is $\top$. 
@@ -109,31 +107,7 @@ This is discussed in more detail in Section~\ref{sec:disjoint}.
 % have excluded union types from the language. The answer is we found that
 % intersection types alone are enough support extensible designs.
 
-\begin{figure}[!t]
-\begin{spacing}{0.5}
-  \begin{mathpar}
-    \framebox{$\jatomic A$} \\
-    \inferrule*{}{\jatomic \tyint} \and 
-    \inferrule*{}{\jatomic {A \to B}} \and
-    \inferrule*{}{\jatomic \alpha} \and
-    \inferrule*{}{\jatomic {\fordis \alpha B A}} \and
-    \inferrule*{}{\jatomic {\recordType l A}}
-  \end{mathpar}
-  \begin{mathpar}
-    \formsub \\ 
-    \rulesubtop \and \rulesubinter \and 
-    \rulesubint \and \rulesubinterlcoerce \and 
-    \rulesubrec \and \rulesubinterrcoerce \and
-    \rulesubvar  \and \rulesubfun \and 
-    \rulesubforallext 
-  \end{mathpar}
-\end{spacing}
-  \caption{Subtyping rules of \name.}
-  \label{fig:fi-subtype}
-\end{figure}
-
 \subsection{Subtyping}
-
 % In some calculi, the subtyping relation is external to the language: those
 % calculi are indifferent to how the subtyping relation is defined. In \name, we
 % take a syntactic approach, that is, subtyping is due to the syntax of types.
@@ -193,6 +167,31 @@ Some rules are ported from \oldname: \reflabel{\labelsubtop},
 \reflabel{\labelsubfun}, \reflabel{\labelsubinter}, \reflabel{\labelsubinterl} and
 \reflabel{\labelsubinterr}.
 
+\begin{figure}[t]
+\begin{spacing}{0.5}
+  \begin{mathpar}
+    \framebox{$\jatomic A$} \\
+    \inferrule*{}{\jatomic \tyint} \and 
+    \inferrule*{}{\jatomic {A \to B}} \and
+    \inferrule*{}{\jatomic \alpha} \and
+    \inferrule*{}{\jatomic {\fordis \alpha B A}} \and
+    \inferrule*{}{\jatomic {\recordType l A}}
+  \end{mathpar}
+  \begin{mathpar}
+    \formsub \\ 
+    \rulesubtop \and \rulesubinter \and 
+    \rulesubint \and \rulesubinterlcoerce \and 
+    \rulesubrec \and \rulesubinterrcoerce \and
+    \rulesubvar  \and \rulesubfun \and 
+    \rulesubforallext 
+  \end{mathpar}
+\end{spacing}
+  \caption{Subtyping rules of \name.}
+  \label{fig:fi-subtype}
+\end{figure}
+
+
+
 %There are three rules which rather straightforward: \reflabel{\labelsubtop}
 %says that every type is a subtype of $\top$; \reflabel{\labelsubint} and 
 %\reflabel{\labelsubvar} define subtyping as a reflexive relation on integers and
@@ -213,8 +212,8 @@ is covariant in its body, and contravariant in its disjointness constraints.
 The \reflabel{\labelsubrec} rule says that records are covariant within their fields' types.
 Also, since the $ordinary$ conditions on two of the intersection rules are necessary to 
 produce unique coercions~\cite{oliveira16disjoint}, the $ordinary$ relation needed to be extended.
-As shown at the top of Figure~\ref{fig:fi-subtype}, the new types that compose this unary 
-relation are type variables, universal quantifiers and record types.
+As shown at the top of Figure~\ref{fig:fi-subtype}, the new types it contains are 
+type variables, universal quantifiers and record types.
 
 \paragraph{Properties of Subtyping.} The subtyping relation is reflexive and transitive.
 
