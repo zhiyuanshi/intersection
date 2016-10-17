@@ -27,9 +27,11 @@ $ \jcheck \Gamma e A \yields E\\e$ checks against given type $A$
 }
 
 \newcommand{\bruletlam} {
+%  \mprset {sep=1em}
 \inferrule* [right=\labeltlam]
   {\jwf \Gamma A \\ \jcheck {\Gamma, x \oftype A} e B \yields E}
   {\jcheck \Gamma {\lam x e} {A \to B} \yields {\lam x E}}
+%  \mprset {sep=2em}
 }
 
 \newcommand{\bruletapp}{
@@ -104,9 +106,11 @@ $ \jcheck \Gamma e A \yields E\\e$ checks against given type $A$
 }
 
 \newcommand{\bruletsub}{
+%  \mprset {sep=1em}
 \inferrule* [right=\labeltsub]
   {\jinfer \Gamma {e} A \yields {E} \\ {A} \subtype {B} \yields {E_{sub}}}
   {\jcheck \Gamma {e} {B} \yields {\tapp {E_{sub}} E}}
+%  \mprset {sep=2em}
 }
 
 \newcommand{\bruletmergedis}{

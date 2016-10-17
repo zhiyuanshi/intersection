@@ -1,16 +1,10 @@
 \section{Related Work}
 \label{sec:related-work}
-
-\bruno{This section needs some major rewriting. Remeber that the goal
-  of writting the related work section is to identify how previous
-  work is different from ours. The text written here is also slightly
-  outdated compared to what we wrote on ICFP. In particular we discuss
-the work by Castagna on merges at ICFP.}
-
 \paragraph{Intersection types, polymorphism and the merge operator.}
 To our knowlegde no previous work has been done in a caluclus which
 includes parametric polymorphism, intersection types and a \emph{merge} operator.
 
+\joao{maybe these 3 paragraphs can go, as they aren't refering polymorphic systems?}
 Concerning simply-typed systems, the oldest work dates back to the 1980s,
 when Reynolds invented Forsythe~\cite{reynolds1997design}, with his
 merge-like operator being noted as $p_1, p_2$.
@@ -45,16 +39,15 @@ hand his system includes union types, but on the other it lacks coherence.
 Our work is an extension of the recent \oldname calculus~\cite{oliveira16disjoint}.
 \oldname solves the coherence problem present in Dunfield's calculus, by requiring that
 intersection types can only be composed of \emph{disjoint} types.
-\oldname uses a specification for disjointness, which says that two types are 
+For simplicity purposes, \oldname uses a specification for disjointness, which says that two types are 
 disjoint as long as they do not share a common supertype.
 \name does not use such definition as its adaptation to polymorphic types would require
 using some form of unification.
-Since the purpose of such specification is its simplicity and readability (compared to the
-algorithmic counterpart), we argue that unification would go against this principle, and
-opted to drop the specification.
+We opted to ommit the specification from \name, on grounds that unification would defeat
+the purpose of having such specification.
 In fact, \name's notion of disjointness is based on \oldname's definition of the more
-general notion of disjointess concerning $\top$ types, called $\top$-disjointness. 
-The definition states that, two types $A$ and $B$ are disjoint if two conditions are satisfied:
+general notion of disjointess concerning $\top$ types, called $\top$-disjointness, which 
+states that two types $A$ and $B$ are disjoint if two conditions are satisfied:
 %\begin{definition}[$\top$-disjointness]
 %  Two types $A$ and $B$ are disjoint
 %  (written $A \disjoint B$) if the following two conditions are satisfied:
@@ -67,7 +60,7 @@ The definition states that, two types $A$ and $B$ are disjoint if two conditions
 $\top$ in intersections, while our calculus allows it.
 In other words, condition (1) is not imposed by \name.
 As a consequence, the set of well-formed \emph{top-like} types is a superset of \oldname's.
-The reason for this is covered in greater detail in Section~\ref{sec:disjoint}.
+This is covered in greater detail in Section~\ref{sec:disjoint}.
 
 \paragraph{Intersection types and polymorphism, without the merge operator.}
 Recently, Castagna~\textit{et al.}~\cite{Castagna:2014} studied a very interesting
@@ -77,8 +70,8 @@ However, their calculus is based on a semantic subtyping relation due to their
 interpretation of intersection types.
 The difference to our calculus, is that their intersections are used between function
 types, allowing overloading (i.e. branching) of types.
-For example, they can express a function that works on any type, but executes different
-code depending on the type of its input:
+For example, they can express a function whose domain is defined on any type, but executes different
+code depending on that type:
 
 \[
 \lambda^{(\tyint \to \tybool) \wedge (\alpha \backslash \tyint \to \alpha \backslash \tyint)} 
@@ -87,9 +80,9 @@ x. (x \in \tyint) ? (x \text{ mod } 2) = 0 : x
 
 \noindent In our system we cannot express some of these intersections, namely the ones that
 do not have disjoint co-domains.
-However, \name does accept other kind of intersections which are not possible to express
+However, \name accepts other kind of intersections which are not possible to express
 in their calculus, as in merges of type $(\tyint \to \tybool) \inter (\tyint \to \tyint)$.
-Just as in~\cite{Castagna92calculus}, their system is focused on the combination of 
+Just as~\cite{Castagna92calculus}, their work is focused on combining 
 intersections with functions, whereas \name is concerned with merges between
 arbitrary types.
 
@@ -114,15 +107,15 @@ as it has been discussed in Section~\ref{sec:intro} and Section~\ref{subsec:mixi
 
 \paragraph{Extensible records.}%
 %http://elm-lang.org/learn/Records.elm
-Encoding records using intersection types appeared in
+Encoding records using intersection types appeared in 
 Reynolds~\cite{reynolds1997design} and Castagna et al.~\cite{castagna1995calculus}. 
 Although Dunfield also discussed this idea in his paper \cite{dunfield2014elaborating}, 
 he only provided an implementation but not a formalization. 
 Very similar to our treatment of elaborating records is
 Cardelli's work~\cite{cardelli1992extensible} on translating a calculus, named
-$ F_{\subtype \rho}$, with extensible records to a simpler calculus that without
-records primitives (in which case is $ F_{\subtype} $). 
-But he did not consider encoding multi-field records as intersections; hence his translation is more
+$ F_{\subtype \rho}$, with extensible records to a simpler calculus without
+records primitives ($ F_{\subtype} $). 
+However, he does not encode multi-field records as intersections; hence his translation is more
 heavyweight. 
 Crary~\cite{crary1998simple} used intersection types and
 existential types to address the problem that arises when interpreting method
@@ -154,12 +147,12 @@ polymorphic, records~\cite{leijen2005extensible}.
 All of the aforementioned record calculi are entirely concerned with the conceptual and implementation 
 issues of type-systems with records, using techniques as row types, predicates, flags, qualified types,
 cases, amongst others.
-However, in \name, the polymorphic extensible records implementation instead piggybacks on the disjointness
+However, in \name, the implementation of records instead piggybacks on the disjointness
 and intersection types features of the type-system.
 The constraints on labels are encoded using disjoint quantification, and the coherent
 type-system will statically ensure that records and their operations are safe.
-This means that concerns with type inference, efficiency, expressibility, etc.; are to be dealt with 
-compiling disjoint intersection types as opposed to compiling records directly.
+This means that technical concerns, i.e type inference, efficiency, etc.; are to be dealt with the 
+compilation of disjoint intersection types as opposed to compiling extensible records directly.
 
 % Chlipala's
 % \texttt{Ur}~\cite{chlipala2010ur} explains record as type level
@@ -199,13 +192,13 @@ One of the main differences between traits and mixins are the way in
 which ambiguity of names is dealt.
 The former usually rejects programs which compose classes with 
 conflicting methods, whereas the latter assumes a resolution strategy,
-usually language dependent. \joao{is this true?}
+usually language dependent. 
 Our example demonstrated in Section~\ref{subsec:records} suggests that
 \name can be used in place of traits, due to the semantics of the merge
 operator.
 However there is a subtle difference between traits and \name: equal 
-names/labels are always rejected in the former, whereas in the latter only
-if their types are disjoint.
+names/labels are always rejected in the former, whereas in the latter only rejects
+when their types are disjoint.
 \joao{should we reference CZ, where they have a similar spec to our notion of disjointess?}
 
 \begin{comment}

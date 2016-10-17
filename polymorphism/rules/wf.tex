@@ -31,9 +31,11 @@
 
 \newcommand{\labelwffun}{\makelabelwf \rightarrow}
 \newcommand{\rulewffun}{
+  \mprset {sep=1em}
   \inferrule* [right=\labelwffun]
     {\jwf \Gamma A \\ \jwf \Gamma B}
     {\jwf \Gamma {A \to B}}
+  \mprset {sep=2em}
 }
 
 \newcommand{\labelwfforall}{\makelabelwf \forall}
@@ -44,9 +46,11 @@
 }
 
 \newcommand{\rulewfforalldis}{
+  \mprset {sep=1em}
   \inferrule* [right=\labelwfforall]
     {\jwf \Gamma A \\ \jwf {\Gamma, \alpha \disjoint A} B}
     {\jwf \Gamma {\fordis \alpha A B}}
+  \mprset {sep=2em}
 }
 
 \newcommand{\labelwfinter}{\makelabelwf \inter}
@@ -57,14 +61,16 @@
 }
 
 \newcommand{\rulewfinterdis}{
+  \mprset {sep=1em}
   \inferrule* [right=\labelwfinter]
     {\jwf \Gamma A \\
      \jwf \Gamma B \\ 
      \jdis \Gamma A B}
     {\jwf \Gamma {A \inter B}}
+  \mprset {sep=2em}
 }
 
-\newcommand{\labelwfrec}{\makelabelwf Rec}
+\newcommand{\labelwfrec}{\makelabelwf R}
 \newcommand{\rulewfrec}{
   \inferrule* [right=\labelwfrec]
     {\jwf \Gamma A}
