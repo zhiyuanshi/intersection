@@ -309,10 +309,10 @@ In this case, if $r$ contains either field $x$ or field $y$, they would be shado
 present in the type signature.
 In other words, if a record with multiple $x$ fields, the most recent (i.e. left-most) would be used 
 in any function which accesses $x$.
-In \name the following program can written instead
-\footnote{We do not support exactly this function definition style; 
-however the type signature and expression (modulo infix operators) are exactly as one would write them
-in \name}:
+In \name the following program can written instead:
+%\footnote{We do not support exactly this function definition style; 
+%however the type signature and expression (modulo infix operators) are exactly as one would write them
+%in \name}:
 %\begin{align*}
 %&\text{avg}_3 :: \fordis r 
 %{\recordType x \tyint \inter \recordType y \tyint} 
