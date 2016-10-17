@@ -38,7 +38,9 @@ var n = jim.name;
 jim.log();
 \end{lstlisting}
 
-In this example, taken from TypeScript's documentation, an \lstinline$extend$ function is defined 
+In this example, taken from TypeScript's documentation\footnote{We have added the field \lstinline$male$ to the class
+\lstinline$Person$.}, 
+an \lstinline$extend$ function is defined 
 for mixin composition. Two classes \lstinline$Person$ and
 \lstinline$ConsoleLogger$ are also defined.
 Two instances of those classes are then composed in a variable \lstinline$jim$ with the type of 
@@ -47,12 +49,12 @@ from \lstinline$Persion$ and \lstinline$ConsoleLogger$.
 
 The implementation of \lstinline{extend} relies on a biased choice.
 Given two arguments \lstinline$first$ of type \lstinline$T$, and \lstinline$second$ of type 
-\lstinline $U$, \lstinline{extend} returns an intersection of both types represented as \lstinline$T \& U$.
+\lstinline $U$, \lstinline{extend} returns an intersection of both types represented as \lstinline$T & U$.
 The function starts by creating a variable \lstinline$result$ with the type of the intersection, 
 It then iterates through the \lstinline$first$'s properties and copies them to the 
 \lstinline$result$.
 Next, it iterates through the \lstinline$second$'s properties but it only copies the properties
-that \lstinline$result$ does not possess (i.e. the ones present in \lstinline$first$).
+that \lstinline$result$ does not possess yet (i.e. the ones present in \lstinline$first$).
 This means that the implementation is left-biased, as the properties of left type of the intersection
 are chosen in favor of the ones present in the right.
 However, in TypeScript this may be a cause of severe problems since that, at the time of writing,
@@ -64,7 +66,8 @@ class Dog { constructor(public name : string, public male : string) { } }
 var fool : Dog & Person = extend(new Dog("Pluto","non-sense"),new Person("Arnold",true))
 boolean b = fool.male
 \end{lstlisting}
-Note how \lstinline$fool.male$, at run-time, will contain a value of type \lstinline$String$! 
+Note how \lstinline$fool.male$ is statically bound to a variable of type \lstinline$boolean$ but, at run-time, 
+it will contain a value of type \lstinline$String$! 
 
 Other problematic issues regarding the semantics of intersection types can include the order of 
 the types in an intersection, or even intersections including repeated types.
@@ -82,8 +85,20 @@ For the previous TypeScript examples, assuming a straightforward translation fro
 to (polymorphic) records, then the intersection \lstinline$Person & ConsoleLogger$ would be 
 well-typed in \name.
 Moreover, the intersection \lstinline$Person & Dog$ would be ill-typed, since the types share the
-same field \lstinline$name$. \bruno{please write down the full code in
-\name to illustrate how to do the example.}
+same field \lstinline$name$. 
+This example could be encoded in \name as follows: 
+
+\begin{lstlisting}[mathescape=true]
+type Person = {name : String} & {male : Bool};
+type Loggable = {log : $\top \to \top$};
+
+let person (n : String) (s : Bool) : Person = {name = n} ,, {male = s} in
+let consoleLogger : Loggable = {log = ...} in
+let jim = (person "Jim" true) ,, consoleLogger in
+let n = jim.name in
+jim.log()
+\end{lstlisting}
+
 
 \subsection{Extensible records}
 \name can encode polymorphic extensible records. Describing and
@@ -178,8 +193,8 @@ This shows that one can use disjoint quantification to express negative field in
 is very close to the system described in \cite{harper1991record}.  
 Note how one has to explicitly state the type of the constraint in $\text{addL}_2$, whereas 
 $\text{addL}_1$ does not require this.
-The same generality of disjoint intersection types that allows one to encode record types is the
-one that forces us to add this extra type in the constraint.
+The generality of disjoint intersection types, that allows one to encode record types, is exactly 
+what forces us to add this extra type in the constraint.
 However, there is a slight gain with this approach: $\text{addL}_2$ accepts more types than
 $\text{addL}_1$.
 Namely, all (intersection) types that contain label $l$, with a field type \emph{disjoint} to
