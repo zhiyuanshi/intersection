@@ -275,15 +275,22 @@ We will get into the reasons for this in further detail, in Section~\ref{sec:con
 
 
 \paragraph{Expressibility}
-\joao{maybe the average function is too long? we can change to a type with only one field}
+As noted by Leijen~\cite{leijen2005extensible}, systems typically can be
+categorized into two distinct groups in what concerns extension: the
+strict and the free.  The former does not allow field overriding when
+extending a record (i.e. one can only extend a record with a field
+that is not present in it); while the latter does account for field
+overriding.  Our system can be seen as hybrid of these two kinds of
+systems.  
+
 In~\cite{jones99lightweight} -- a system with strict extension -- an example of a function that uses 
 record types is the following:
 %\begin{align*}
-%&\text{average}_1 :: (r \backslash y, r \backslash x) \Rightarrow \{r | x :: \tyint, y :: \tyint\} \rightarrow \tyint \\
-%&\text{average}_1 \, r = (r.x + r.y) / 2
+%&\text{avg}_1 :: (r \backslash y, r \backslash x) \Rightarrow \{r | x :: \tyint, y :: \tyint\} \rightarrow \tyint \\
+%&\text{avg}_1 \, r = (r.x + r.y) / 2
 %\end{align*}
 \begin{lstlisting}[mathescape=true]
-let $\text{average}_1$ (R\y, R\y) => (r : { R | x : Int, y : Int }) : Int = (r.x + r.y) / 2 in $\ldots$ 
+let $\text{avg}_1$ (R\y, R\y) => (r : {R | x:Int, y:Int}) = (r.x+r.y)/2
 \end{lstlisting}
 The type signature says that for any record with type $r$, that lacks both $x$ $y$, can be accepted
 as parameter extended with $x$ $y$, returning an integer.
@@ -292,30 +299,29 @@ Note how the bounded polymorphism is essential to ensure that $r$ does not conta
 On the other hand, in a system with free extension as in~\cite{leijen2005extensible}, 
 the more general program would be accepted:
 %\begin{align*}
-%&\text{average}_2 :: \forall \; r \;x \; y, \{ x :: \tyint, y :: \tyint | r \} \rightarrow \tyint \\
-%&\text{average}_2 \, r = (r.x + r.y) / 2
+%&\text{avg}_2 :: \forall \; r \;x \; y, \{ x :: \tyint, y :: \tyint | r \} \rightarrow \tyint \\
+%&\text{avg}_2 \, r = (r.x + r.y) / 2
 %\end{align*}
 \begin{lstlisting}[mathescape=true]
-let $\text{average}_2$ R x y (r : { x : Int, y : Int | R }) : Int = (r.x + r.y) / 2 
-in $\ldots$ 
+let $\text{avg}_2$ R x y (r : {x:Int, y:Int | R}) = (r.x+r.y)/2 
 \end{lstlisting}
 In this case, if $r$ contains either field $x$ or field $y$, they would be shadowed by the labels 
 present in the type signature.
 In other words, if a record with multiple $x$ fields, the most recent (i.e. left-most) would be used 
 in any function which accesses $x$.
-In \name, this program could be re-written as
+In \name the following program can written instead
 \footnote{We do not support exactly this function definition style; 
 however the type signature and expression (modulo infix operators) are exactly as one would write them
 in \name}:
 %\begin{align*}
-%&\text{average}_3 :: \fordis r 
+%&\text{avg}_3 :: \fordis r 
 %{\recordType x \tyint \inter \recordType y \tyint} 
 %{\recordType x \tyint \inter \recordType y \tyint \inter r \rightarrow \tyint} \\
-%&\text{average}_3 = 
+%&\text{avg}_3 = 
 %{\blamdis t {\recordType x \tyint \inter \recordType y \tyint} {\lam r {(r.x + r.y) / 2}}}
 %\end{align*}
 \begin{lstlisting}[mathescape=true]
-let $\text{average}_3$ (R * { x : Int } & { y : Int }) (r : { x : Int } & { y : Int } & R) : Int = (r.x + r.y) / 2 in $\ldots$ 
+let $\text{avg}_3$ (R*{x:Int}&{y:Int}) (r : {x:Int}&{y:Int}&R) = (r.x+r.y)/2 
 \end{lstlisting}
 Thus more types are accepted this function than in the first system, but less than the second. 
 Another major difference between \name and the two other mentioned systems, is the ability to 
