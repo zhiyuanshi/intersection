@@ -1,8 +1,8 @@
 \section{Applications}
 \label{subsec:records}
 
-To illustrate the applicability of \name we show two applications. The
-first application shows how to mimic TypeScript's documentation example of 
+\name is illustrated with two applications. The
+first application shows how to mimic some of TypeScript's examples of 
 dynamic mixins in \name. The second application shows how \name
 enables a powerful form of polymorphic extensible records.
 
@@ -44,12 +44,10 @@ an \lstinline$extend$ function is defined
 for mixin composition. Two classes \lstinline$Person$ and
 \lstinline$ConsoleLogger$ are also defined.
 Two instances of those classes are then composed in a variable \lstinline$jim$ with the type of 
-the intersection of both, where it is type-safe to access both the \lstinline$name$ property
-from \lstinline$Persion$ and \lstinline$ConsoleLogger$.
+the intersection of both. It is type-safe to access both the properties
+from \lstinline$Person$ and \lstinline$ConsoleLogger$ in the object \lstinline$jim$.
 
 The implementation of \lstinline{extend} relies on a biased choice.
-Given two arguments \lstinline$first$ of type \lstinline$T$, and \lstinline$second$ of type 
-\lstinline $U$, \lstinline{extend} returns an intersection of both types represented as \lstinline$T & U$.
 The function starts by creating a variable \lstinline$result$ with the type of the intersection, 
 It then iterates through the \lstinline$first$'s properties and copies them to the 
 \lstinline$result$.
@@ -63,7 +61,7 @@ For example, the following code is well-typed:
 
 \begin{lstlisting}
 class Dog { constructor(public name : string, public male : string) { } }
-var fool : Dog & Person = extend(new Dog("Pluto","non-sense"),new Person("Arnold",true))
+var fool : Dog & Person = extend(new Dog("Pluto","yes"),new Person("Arnold",true))
 boolean b = fool.male
 \end{lstlisting}
 Note how \lstinline$fool.male$ is statically bound to a variable of type \lstinline$boolean$ but, at run-time, 
@@ -75,18 +73,26 @@ This motivates the need to define a clear meaning to the practical application o
 intersection types.
 
 \paragraph{Dynamic mixins in \name}
-In \name, the merge combinator is directly embedded in the semantics of the language, 
-and thus there is no need to define \lstinline{extend}.
-In fact, the introduction of disjoint intersection types can be seen as a type-safe 
-and coherent solution for all of the mentioned problems involving intersection types. 
-\joao{mention the diamond problem? and that two fields with same name can be composed as long as
-their types are disjoint}
-For the previous TypeScript examples, assuming a straightforward translation from objects
-to (polymorphic) records, then the intersection \lstinline$Person & ConsoleLogger$ would be 
-well-typed in \name.
-Moreover, the intersection \lstinline$Person & Dog$ would be ill-typed, since the types share the
-same field \lstinline$name$. 
-This example could be encoded in \name as follows: 
+In \name, the merge combinator is directly embedded in the semantics
+of the language, and thus \lstinline{extend} is simply defined as
+follows:
+
+\begin{lstlisting}
+let extend T (U * T) (first : T, second : U) : T & U = first ,, second 
+\end{lstlisting}
+
+\noindent The disjointness constraint on \lstinline{U} ensures that 
+no conflicts exists when merging two objects. In practice this approach
+is quite similar to trait-based OO
+approaches~\cite{}. If conflicts exist, then fields have to be explicitly
+dropped from records. Moreover if no existing implementation can be
+directly reused, a new one must be provided via record extension,
+analogously to standard method overriding in OO languages. 
+
+For the previous TypeScript examples, assuming a straightforward
+translation from objects to (polymorphic) records, then the
+composition of \lstinline{person} and \lstinline{consoleLogger} is
+well-typed in \name:
 
 \begin{lstlisting}[mathescape=true]
 type Person = {name : String} & {male : Bool};
@@ -94,11 +100,18 @@ type Loggable = {log : $\top \to \top$};
 
 let person (n : String) (s : Bool) : Person = {name = n} ,, {male = s} in
 let consoleLogger : Loggable = {log = ...} in
-let jim = (person "Jim" true) ,, consoleLogger in
+let jim = extend Person Loggable (person "Jim" true)  consoleLogger in
 let n = jim.name in
-jim.log()
+jim.log $\top$
 \end{lstlisting}
 
+Moreover, the intersection \lstinline$Person & Dog$ is accepted but
+two different fields \lstinline$name$ are kept in the object. In \name
+it is ok to have duplicated fields as long as their types are
+disjoint.\bruno{Two things: 1) the example would be accepted and not
+  rejected (as you mentioned earlier); 2) I think we need to say more
+  are allowing duplicated fields somewhere, and perhaps have a
+  reference here pointing to that additional discussion.} 
 
 \subsection{Extensible records}
 \name can encode polymorphic extensible records. Describing and
@@ -107,18 +120,33 @@ novel and has been extensively studied in the past, including
 systems with row types \cite{wand1987complete,wand1989type}; 
 predicates \cite{harper1990extensible,harper1991record,gaster1996polymorphic}; 
 flags \cite{remy1993type}; conditional constraints \cite{pottier2003constraint};
-cases \cite{blume2006extensible}; amongst others.
-Most of the systems are entirely focused on concrete aspects of records
-(i.e. expressiveness, compilation, etc), while ours specializes
-the more general notion of intersection types.  In this section we aim
-at comparing our approach with such systems.
+cases \cite{blume2006extensible}; amongst others. However, while 
+most systems have non-trivial built-in constructs to model various aspects of
+records, \name specializes the more general notion of intersection
+types to encode complex records.
 
+\paragraph{Records and record operations in \name}
 Systems with records usually rely on 3 basic operations: selection,
-restriction and extension/concatenation.  We will first introduce the
-basic syntax and typing of records, then the basic operations of
-records in the context of \name and finally we will discuss their
-expressivity in comparison to other record systems.
+restriction and extension/concatenation.  Selection and concatenation
+(via the merge operator) are built-in in the semantics of
+\name. Merges in \name can be viewed as a generalization of record
+concatenation.  In \name, following well-known encodings of records in
+systems with intersection types and a merge operator~\cite{}, there are only three rather simple constructs
+for records: 1) single field record types; 2) single field records; 3)
+field accessors. Multi-field records in \name are encoded with
+intersections and merges of single field records. An example is
+already illustrated in Section~\ref{subsec:mixins}.  The record type
+\lstinline$Person$ is the intersection of two single field record
+types. The record \lstinline$person "Jim" true$ is built with a merge
+of two single field records. Finally, \lstinline{jim.name} and
+\lstinline{jim.log} illustrates the use of field accessors.  Note how,
+through the use of subtyping, accessors will accept any intersection
+type that contains the single record with the corresponding field.
+This resembles systems with record subtyping
+\cite{cardelli1990operations,pierce1994simple}.
 
+
+\begin{comment}
 \paragraph{Record terms and types}
 Our system directly encodes a term for the single record construct $\recordCon l e$, where $l$ is some
 label and $e$ is some other term.
@@ -145,11 +173,12 @@ contains the single record $\recordType l A$.
 This may resemble other systems with subtyping \cite{cardelli1990operations,pierce1994simple}, 
 although it is slightly more general -- the type $A$ is not restricted only  
 restricted to record types. 
+\end{comment}
 
-\paragraph{Restriction}
-
-In constrast with most systems, restriction is not directly embedded on our language.
-Instead, we can make use of subtyping to define such operator: 
+\paragraph{Restriction via subtyping}
+In contrast with most record systems, restriction is not directly
+embedded in \name.
+Instead, \name uses subtyping for restriction: 
 %\begin{align*}
 %&\text{remove} :: \fordis \alpha \top {\fordis r {\recordType l \alpha} 
 %{({\recordType l \alpha \inter r) \rightarrow r}}} \\ 
@@ -157,17 +186,48 @@ Instead, we can make use of subtyping to define such operator:
 %\end{align*}
 %
 \begin{lstlisting}[mathescape=true]
-let remove A (B * {l : A}) (x : { l : A } & r) : r = x in $\ldots$ 
+let remove (x : { age : Int } & {name : String}) : {name : String} = x in $\ldots$ 
 \end{lstlisting}
 
+\noindent The function \lstinline{remove} drops the field
+\lstinline{age} from the record \lstinline{x}. 
+
+\paragraph{Polymorphic extensible records} Records in \name can have
+polymorphic fields, and disjointness enables encoding various
+operations expressible in systems with polymorphic records. For example, 
+the following variant of \lstinline{remove}
+
+\begin{lstlisting}[mathescape=true]
+let remove A (B * {l : A}) (x : { l : A } & B) : B = x in $\ldots$ 
+\end{lstlisting}
+
+\noindent takes a value \lstinline{x} which contains a record of type
+\lstinline{l : A}, as well as some extra information of type
+\lstinline{B}. The disjointness constraint on \lstinline{B} ensures
+that values of type \lstinline{B} do not contain a record with type
+\lstinline{l : A}.  This example shows that one
+can use disjoint quantification to express negative field information,
+which is very close to the system described by Harper and
+Pierce~\cite{harper1991record}.  Note, however, that \name requires
+explicitly stating the type of field in the constraint, whereas
+systems with a \emph{lacks} (field) predicate only require the name of the field.
+The generality of disjoint intersection types, which allows one to
+encode record types, is exactly what forces us to add this extra type
+in the constraint.  However, there is a slight gain with \name's
+approach: $remove$ accepts types that contain field $l$, as long as
+the field type \emph{disjoint} to $\tyint$. Such fine-grained
+constraint is not possible to express only with a lacks predicate.
+
+\begin{comment}
 \paragraph{Extension/Concatenation}
 The most usual operators for combining records are extension and concatenation.
 Even though that in some systems, the latter is defined in terms of the former, languages that
 opt to include concatenation usually rely on specific semantics for it. 
 Our system is suitable for encoding both of these operations, but we argue that concatenation is
-the natural primitive operator, due to the resemblance with our merge operator.
+the natural primitive operator, due to the resemblance with our merge
+operator.
 Indeed, \cite{harper1991record} also define a \emph{merge} operator, which is quite similar to
-our \emph{merge} for intersection types, except it envoles only record types.
+our \emph{merge} for intersection types, except it involves only record types.
 For instance, in their system, the following function concatenates a single record with field $l$ 
 of type $\tyint$ with another record that lacks this field \footnote{The syntax is slightly modified
 with respect to the original notation}:
@@ -211,17 +271,8 @@ let $\text{addL}_3$ (A * { l : $\bot$ }) (x : A) : A & { l : $\bot$ } = $\ldots$
 \end{lstlisting}
 Unfortunately, our system does not support the $\bot$ type, so this program would not be accepted.
 We will get into the reasons for this in further detail, in Section~\ref{sec:conclusion}.
+\end{comment}
 
-Other systems with record concatenation usually define predicates, in terms of field absence or 
-presence (with a type $\alpha$). 
-This raises the question: how would one classify our system in terms of extension? 
-As noted in~\cite{leijen2005extensible}, systems typically can be categorized into two distinct groups
-in what concerns extension: the strict and the free.
-The former does not allow field overriding when extending a record (i.e. one can only extend a 
-record with a field that is not present in it); while the latter does account for field overriding.
-Our system can be seen as hybrid of these two kinds of systems.
-Next we will show a comparison in terms of expressability between \name and other systems 
-with records that hopefully will enlighten the reader on this matter.
 
 \paragraph{Expressibility}
 \joao{maybe the average function is too long? we can change to a type with only one field}
@@ -273,6 +324,7 @@ Our system does not account for well-formedness of record types as the other two
 (i.e. using a special \emph{row} kind), since our encoding of records piggybacks on the more
 general notion of disjoint intersection types. 
 
+\begin{comment}
 Finally, it is also worth noting that systems using subtyping may suffer from the so-called 
 \emph{update} problem~\cite{cardelli1990operations}.
 \name does not suffer from this problem as it does not support refinement types. 
@@ -287,6 +339,7 @@ to~\cite{leijen2005extensible}:
 \begin{lstlisting}[mathescape=true]
 let $\text{update}$ A B (R * { l : A }) (r : { l : A } & R) (v : B) : { l : B } & R = { l = v } ,, (remove a r x) in $\ldots$ 
 \end{lstlisting}
+\edn{comment}
 
 \begin{comment}
 \section{Application: Extensibility}
