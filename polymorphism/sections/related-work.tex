@@ -143,16 +143,17 @@ may contain any (well-formed and disjoint) types.
 One problem with concatenation is that typically systems are hard to use in practise, due to the
 complicated set of constraints/filters which might arise from combining several, possibly 
 polymorphic, records~\cite{leijen2005extensible}.
-
-All of the aforementioned record calculi are entirely concerned with the conceptual and implementation 
-issues of type-systems with records, using techniques as row types, predicates, flags, qualified types,
-cases, amongst others.
+%All of the aforementioned record calculi are entirely concerned with the conceptual and implementation 
+%issues of type-systems with records, using techniques as row types, predicates, flags, qualified types,
+%cases, amongst others.
 However, in \name, the implementation of records instead piggybacks on the disjointness
 and intersection types features of the type-system.
 The constraints on labels are encoded using disjoint quantification, and the coherent
 type-system will statically ensure that records and their operations are safe.
 This means that technical concerns, i.e type inference, efficiency, etc.; are to be dealt with the 
 compilation of disjoint intersection types as opposed to compiling extensible records directly.
+Thus, what is expressed in other systems by means of row types, predicates, flags, qualified types, etc; 
+in \name it is expressed by the use of disjoint intersection types.
 
 % Chlipala's
 % \texttt{Ur}~\cite{chlipala2010ur} explains record as type level

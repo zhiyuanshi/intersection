@@ -26,23 +26,32 @@ and show the power of disjoint intersection types and disjoint
 quantification in large case studies.
 We are also interested in extending our work to systems with union types and/or 
 a $\bot$ type. 
-\joao{simplify this paragraph?}
-However, introducing the latter is not compatible with our disjointness rule
-\reflabel{\labeldisvar} and well-formedness of contexts.
-Had we introduced it in \name, we could derive non-sensical statements as in 
-$\jdis \Gamma \alpha \alpha$, for some variable $\alpha$, under some well-formed context $\Gamma$.
-In \name, such statement is not derivable since we would have to use \reflabel{\labeldisvar} with the 
-type $A$ as a sub-type of $\alpha$, i.e. an (n-ary) intersection containing $\alpha$.
-Well-formedness of environments guarantees that this will never happen, since $\alpha$ is not in
-scope of itself. 
-However, by introducing $\bot$ we may now construct such derivation, as $A$ can now be $\bot$: a valid
-sub-type of $\alpha$ which does not contain $\alpha$.
-This suggests that adding $\bot$ is not as straightforward as initially perceived.
+While introducing the former should not be a major problem, introducing the latter imposes a serious 
+issue in our system.
+Had \name include the $\bot$ type, non-sensical constructs such as $\jdis \Gamma \alpha \alpha$ could
+be derived.
+It turns out the well-formedness conditions imposed on environments are not strong enough for 
+this purpose.
+However, since introducing $\bot$ was not strictly necessary to the system's formalization; adds 
+substantial complexity in our system; and its practical application is not clear; we leave it 
+as an open problem. 
+
+
+%However, introducing the latter is not compatible with our disjointness rule
+%\reflabel{\labeldisvar} and well-formedness of contexts.
+%Had we introduced it in \name, we could derive non-sensical statements as in 
+%$\jdis \Gamma \alpha \alpha$, for some variable $\alpha$, under some well-formed context $\Gamma$.
+%In \name, such statement is not derivable since we would have to use \reflabel{\labeldisvar} with the 
+%type $A$ as a sub-type of $\alpha$, i.e. an (n-ary) intersection containing $\alpha$.
+%Well-formedness of environments guarantees that this will never happen, since $\alpha$ is not in
+%scope of itself. 
+
+
+%However, by introducing $\bot$ we may now construct such derivation, as $A$ can now be $\bot$: a valid
+%sub-type of $\alpha$ which does not contain $\alpha$.
+%This suggests that adding $\bot$ is not as straightforward as initially perceived.
 %In fact, had \name included a $\bot$ type, then introducing any \emph{bottom-like} type 
 %(i.e. $\bot \inter A$, for any type $A$) can lead to this undesired behaviour.
-Since introducing it is not strictly necessary to the system's formalization; adds 
-substantial complexity in our system; and its practical application is not clear, we left this
-as an open problem for future work. 
 
 \begin{comment}
 Some immediate topics for

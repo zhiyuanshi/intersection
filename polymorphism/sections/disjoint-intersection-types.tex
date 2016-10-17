@@ -2,10 +2,10 @@
 \label{sec:disjoint}
 This section discusses the elaboration semantics of \name and proves
 type-safety and coherence.
-%The semantics is by an elaboration to System $F$.
-%Then, it will discuss the necessary extensions to retain coherence, namely in the coercions of 
-%top-like types; coercive subtyping, and bidirectional type-system's
-%elaboration. 
+It will first show how the semantics is described by an elaboration to System $F$.
+Then, it will discuss the necessary extensions to retain coherence, namely in the coercions of 
+top-like types; coercive subtyping, and bidirectional type-system's
+elaboration. 
 
 \subsection{Semantics}
 The dynamic semantics of the call-by-value \name is defined by means of
@@ -119,10 +119,10 @@ contexts $\Gamma$ to target language contexts $G$.
 \end{figure}
 \paragraph{Top-like types.}
 An important set of types are the so-called top-like types.
-These are types that somehow resemble $\top$ and the importance in classifying
-them is crucial when it comes down to proving coherence.
-This is due to top-like types only having one inhabitant each and therefore 
-their (unique) coercions can be directly generated from their structure. 
+This classification is crucial in order to prove coherence.
+Top-like types are types that relate to $\top$, in the sense that they
+only having one inhabitant each.
+Therefore, their (unique) coercions can be generated structurally from their types. 
 For example, the term $\lam x \unit$ represents the only inhabitant of the type 
 $\tyint \to \top$.
 
@@ -133,26 +133,26 @@ $\top \inter \top$.
 This type is a super-type of every other type, including $\top$ itself.
 Also, there might be a coherence problem with this type, since both components of the
 intersection overlap.
-However, taking a closer look at this type ensures that there is no problem with
+However, taking a closer look at this type clarifies that there is no issues with
 such types.
 To see this, let us first consider the ill-type $\tyint \inter \tyint$.
 This type is a potential source for incoherence, as both components of the merge
 overlap.
 %The $\tyint \inter \tyint \subtype \tyint$ judgement has to produce a coercion which
 %is biased, and therefore might lead to different results.
-For example, the term $(3 \mergeop 4) : \tyint$ leads to incoherency, since 
-both terms $3$ and $4$ have type $\tyint$. 
-There is one case though, where coherence would not be compromised:
-whenever the inhabitants of both types are the same, as in $2 \mergeop 2$.
+For example, the term $(3 \mergeop 4) : \tyint$ is incoherent, since 
+the terms $3$ and $4$ can both be typed $\tyint$. 
+There is one case though, where coherence is not compromised:
+if the inhabitants of both types are the same, as in $2 \mergeop 2$.
 In this case, both values can be chosen interchangibily, without affecting the coherence
 of the program.
 It is important realizing that this is always the case with top-like intersections.
 %In fact, this explains why $\top$ is actually disjoint with every other type.
 Moreover, top-like types can also be safely intersected with other types, as their inhabitants
 do not overlap.
-More generally, top-like types should never be a source of incoherence. 
-Thus, in contrast with \cite{oliveira16disjoint}, they can be safely intersected with any other type.
-This also explains why $\top$ is disjoint to every other type, as mentioned in Section~\ref{sec:alg-dis}.
+Generally speaking, top-like types should never be a source of incoherence. 
+%Thus, in contrast with \cite{oliveira16disjoint}, they can be safely intersected with any other type.
+This explains why $\top$ is disjoint to every other type, as mentioned in Section~\ref{sec:alg-dis}.
 
 \paragraph{Rules.}
 Our definition of top-like types is naturally extended from \oldname. 
@@ -161,14 +161,13 @@ Figure~\ref{fig:andcoercion}.
 The only new rule is \reflabel{\labeltoplforall}, which extends the notion of top-like types for
 the (disjoint) universal quantifier.
 
-It is important pointing out that, despite the small extension in the definition of top-likes types,  
-the notion of disjointness has also changed, leading to a larger set of well-formed top-like types.
-Thus, to retain coherece, we adjusted the meta-function $\andcoerce{A}$, as shown in the bottom of 
+Furthermore, the notion of disjointness has changed, leading to a larger set of well-formed top-like types.
+In order to retain coherece, we adjusted the meta-function $\andcoerce{A}$, as shown in the bottom of 
 Figure~\ref{fig:andcoercion}.
-Note how not only the $\forall$ case is now defined, but also the intersection case (covering types such
+Note how not only the $\forall$ case is now defined, but also the $\inter$ case (covering types such
 as $\top \inter \top$).
-These changes are very important since they play a fundamental role in ensuring the coherence of subtyping for top-like
-types.
+%These changes are very important since they play a fundamental role in ensuring the coherence of subtyping for top-like
+%types.
 
 \subsection{Coercive Subtyping and Coherence}
 
@@ -187,18 +186,22 @@ $ \im {A_1} \to \im {A_2} $ (by Lemma~\ref{lemma:sub}). For example,
 \]
 generates a target coercion function with type: $(\tyint,\alpha) \to \alpha$.
 
-In rule \reflabel{\labelsubtop} the coercion is the constant function of the unit term.
-In rules \reflabel{\labelsubvar}, \reflabel{\labelsubint}, coercions are just
-identity functions. 
-In \reflabel{\labelsubfun}, we elaborate the subtyping of
-parameter and return types by $\eta$-expanding $f$ to $\lamty x {\im {A_3}}
-{\app f x}$, applying $E_1$ to the argument and $E_2$ to the result. 
-Rules \reflabel{\labelsubinterl}, \reflabel{\labelsubinterr}, and
-\reflabel{\labelsubinter} elaborate intersection types.
-\reflabel{\labelsubinter} uses both coercions to form a pair. 
-Rules \reflabel{\labelsubinterl} and \reflabel{\labelsubinterr} reuse the coercion
-from the premises and create new ones that cater to the changes of the argument
-type in the conclusions. 
+Rules \reflabel{\labelsubtop}, \reflabel{\labelsubvar}, \reflabel{\labelsubint},
+\reflabel{\labelsubfun}, \reflabel{\labelsubinterl}, \reflabel{\labelsubinterr}, and
+\reflabel{\labelsubinter} are taken directly from \oldname.
+%In rule \reflabel{\labelsubtop} the coercion is the constant function of the unit term.
+%In rules \reflabel{\labelsubvar}, \reflabel{\labelsubint}, coercions are just
+%identity functions. 
+%In \reflabel{\labelsubfun}, we elaborate the subtyping of
+%parameter and return types by $\eta$-expanding $f$ to $\lamty x {\im {A_3}}
+%{\app f x}$, applying $E_1$ to the argument and $E_2$ to the result. 
+%Rules \reflabel{\labelsubinterl}, \reflabel{\labelsubinterr}, and
+%\reflabel{\labelsubinter} elaborate intersection types.
+%\reflabel{\labelsubinter} uses both coercions to form a pair. 
+%Rules \reflabel{\labelsubinterl} and \reflabel{\labelsubinterr} reuse the coercion
+%from the premises and create new ones that cater to the changes of the argument
+%type in the conclusions. 
+In rule \reflabel{\labelsubvar}, the coercion is simply the identity function.
 Rule \reflabel{\labelsubforall} elaborates disjoint quantification, reusing only the coercion of 
 subtyping between the bodies of both types. 
 Rule \reflabel{\labelsubrec} elaborates records by simply reusing the coercion generated between
@@ -495,19 +498,20 @@ the function expects a $\tystring$ but the translated argument is of type $\pair
 \paragraph{The translation judgement.} 
 The translation judgement $\jtype \Gamma e A \yields E$ extends the
 typing judgement with an elaborated term on the right hand side of
-$\yields {}$.  The translation ensures that $E$ has type $\im A$.  We
-discuss the most relevant rules/coercions in greater detail next.  The
-two new rules for type abstraction (\reflabel{\labeltblam}) and type
+$\yields {}$.  The translation ensures that $E$ has type $\im A$.  
+The two rules for type abstraction (\reflabel{\labeltblam}) and type
 application (\reflabel{\labelttapp}) generate the expected
-corresponding coercions in System F.  In \name, subtyping means, for
-example, that one may pass more information to a function than what is
-required. This is not the case in System $F$.  The rule
-\reflabel{\labeltsub} is used to account for such differences: the
-coercion $E_{sub}$, derived from the subtyping relation, is applied to
-coerce the System F term into the right type.  The coercions generated
-for \reflabel{\labeltrec} and \reflabel{\labeltprojr} simply erase the
-labels (since there are no labels in the target language) and
-translate the corresponding underlying term. It is also noteworthy
+corresponding coercions in System F.  
+%In \name, subtyping means, for
+%example, that one may pass more information to a function than what is
+%required. This is not the case in System $F$.  The rule
+%\reflabel{\labeltsub} is used to account for such differences: the
+%coercion $E_{sub}$, derived from the subtyping relation, is applied to
+%coerce the System F term into the right type.  
+The coercions generated for \reflabel{\labeltrec} and \reflabel{\labeltprojr} 
+simply erase the labels and translate the corresponding underlying term. 
+All the remaining rules are ported from \oldname. 
+However, it may be noteworthy
 pointing out that, as usual, the rule \reflabel{\labeltmerge}
 translates merges into pairs.
 
