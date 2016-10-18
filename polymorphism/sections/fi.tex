@@ -1,12 +1,12 @@
 \section{The \name Calculus}\label{sec:fi}
 This section presents the syntax, subtyping, and typing of \name: 
 a calculus with intersection types, parametric polymorphism, records and a merge operator. 
-This calculus is an extension of \oldname and Dunfield's
-calculus~\cite{dunfield2014elaborating}, which are simply typed
+This calculus is an extension of \oldname~\cite{oliveira16disjoint} and Dunfield's~\cite{dunfield2014elaborating}
+calculus, which are simply typed
 calculus with intersection types and a merge operator.
-The novelty of \name is the addition of \emph{disjoint polymorphism}:
-a form of parametric polymorphism with disjointness contraints, which
-allows flexibility while at the same time retaining coherence. 
+%The novelty of \name is the addition of \emph{disjoint polymorphism}:
+%a form of parametric polymorphism with disjointness contraints, which
+%allows flexibility while at the same time retaining coherence. 
 %As discussed in Section~\ref{overview} retaining
 %coherence, while having an expressive form of polymorphism is non-trvial.
 %Section~\ref{sec:disjoint} introduces \namedis, which shows the necessary changes
@@ -16,7 +16,7 @@ Section~\ref{sec:alg-dis} introduces the necessary changes to the
 definition of disjointness presented by Oliveira et al.~\cite{oliveira16disjoint} in
 order to add disjoint polymorphism.
 
-All the meta-theory of \name has been mechanized in Coq, which is available in
+All the meta-theory of \name has been mechanized in Coq, and is available in
 the supplementary materials submitted with the paper.
 
 \subsection{Syntax}
@@ -31,16 +31,15 @@ The syntax of \name (with the differences to \oldname highlighted in gray) is:
     \begin{array}{l}
       \begin{array}{llrll}
         \text{Types}
-        & A, B & \Coloneqq & \top \mid \tyint \mid A \to B \mid A
+        & A, B & \!\!\Coloneqq & \!\top \mid \tyint \mid A \to B \mid A
                              \inter B \mid \highlight{$\alpha$} \mid \highlight{$\fordis \alpha A B$} \mid \highlight{$\recordType l A$} & \\ 
 
         \text{Terms}
-        & e & \Coloneqq & \top \mid i \mid x \mid \lamty x A e \mid \app {e_1} {e_2} 
-              \mid e_1 \mergeop e_2 \mid \highlight{$\blamdis \alpha A e$} \mid \highlight{$\tapp e A$} \mid 
-              \highlight{$\recordCon l e$} \\ 
-        &   &           &\mid \highlight{$\recordProj e l$} & \\
+        & e & \!\!\Coloneqq & \!\top \mid i \mid x \mid \lamty x A e \mid \app {e_1} {e_2} 
+              \mid e_1 \mergeop e_2 \mid \!\highlight{$\blamdis \alpha A e$} \!\mid \!\highlight{$\tapp e A$} \!\mid 
+              \!\highlight{$\recordCon l e$} \!\mid \!\highlight{$\recordProj e l$} & \\
         \text{Contexts}
-        & \Gamma & \Coloneqq & \cdot
+        & \Gamma & \!\!\Coloneqq & \!\cdot
                    \mid \Gamma, \highlight{$\alpha \disjoint A$}
                    \mid \Gamma, x \oftype A  & \\
       \end{array}
@@ -60,7 +59,7 @@ The main novelty are two standard constructs of System $F$ used to support
 polymorphism: 
 type variables $\alpha$ and disjoint (universal) quantification $\fordis \alpha A B$. 
 Unlike traditional universal quantification, the disjoint
-quantification includes a disjointness constraint associatted to a type variable $\alpha$.
+quantification includes a disjointness constraint associated to a type variable $\alpha$.
 Finally, \name also includes singleton record types, which consist of a label $l$ and
 an associated type $A$.
 We will use $\subst {A} \alpha {B}$
