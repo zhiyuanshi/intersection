@@ -111,8 +111,8 @@ type it is not statically known whether the instantiated type will
 be disjoint to other components of the intersection.
 A naive way  to add polymorphism is to forbid 
 type variables in intersections, since they may be instantiated with 
-a type which is not disjoint to other types in an intersction.
-Unfortunatelly this is too conservative and prevents many useful 
+a type which is not disjoint to other types in an intersection.
+Unfortunately this is too conservative and prevents many useful 
 programs, including the \lstinline{extend} function, which uses an
 intersection of two type variables \lstinline{T} and \lstinline{U}. 
 

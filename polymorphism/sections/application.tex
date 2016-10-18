@@ -60,8 +60,8 @@ intersections at type-level are actually right-biased!
 For example, the following code is well-typed:
 
 \begin{lstlisting}
-class Dog { constructor(public male : string) { } }
-var fool : Dog & Person = extend(new Dog("no"),new Person("Dave",true))
+class Dog { constructor(public name : string, public male : string) { } }
+var fool : Dog & Person = extend(new Dog("Pluto","yes"),new Person("Arnold",true))
 boolean b = fool.male
 \end{lstlisting}
 Note how \lstinline$fool.male$ is statically bound to a variable of type \lstinline$boolean$ but, at run-time, 
@@ -106,10 +106,12 @@ let n = jim.name in
 jim.log $\top$
 \end{lstlisting}
 
-Moreover, the intersection \lstinline$Person & Dog$ is accepted but
-two different fields \lstinline$male$ are kept in the object. In \name
-it is ok to have duplicated fields as long as their types are
-disjoint. 
+However, the intersection \lstinline$Person & Dog$ is not accepted.
+This is due to both types sharing a field with the same name (\lstinline$name$) 
+and the same type ($String$). 
+Note that the name clash between \lstinline$male$ fields does not impose any 
+problem in this example.
+This will be further illustrated in the next section.
 
 \subsection{Extensible Records}
 \name can encode polymorphic extensible records. Describing and
