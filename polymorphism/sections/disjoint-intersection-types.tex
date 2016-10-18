@@ -80,13 +80,10 @@ contexts $\Gamma$ to target language contexts $G$.
 
     \ruletopltop \and \ruletoplinter \and \ruletoplfun \and \ruletoplforall
   \end{mathpar}
-
-
 \begin{minipage}[t]{.5\textwidth}
   %\begin{center}
     \framebox{$\andcoerce{A}_{C} = T$}
   %\end{center}
-
   \begin{center} 
   \[
   \andcoerce{A}_{C} = 
@@ -118,7 +115,7 @@ contexts $\Gamma$ to target language contexts $G$.
   \label{fig:andcoercion}
 \end{figure}
 \paragraph{Top-like types.}
-An important set of types are the so-called top-like types.
+Some \name types can be classified as top-like types.
 This classification is crucial in order to prove coherence.
 Top-like types are types that relate to $\top$, in the sense that they
 only having one inhabitant each.
@@ -126,25 +123,23 @@ Therefore, their (unique) coercions can be generated structurally from their typ
 For example, the term $\lam x \unit$ represents the only inhabitant of the type 
 $\tyint \to \top$.
 
-However, according to~\cite{oliveira16disjoint}, some top-like types might be
-problematic.
+According to~\cite{oliveira16disjoint}, some top-like types are problematic.
 For instance, a top-like type can be an intersection composed of $\top$ types, as in
 $\top \inter \top$.
-This type is a super-type of every other type, including $\top$ itself.
+This type is a super-type of every other type, including $\top$.
 Also, there might be a coherence problem with this type, since both components of the
 intersection overlap.
-However, taking a closer look at this type clarifies that there is no issues with
-such types.
+However, taking a closer look at this type clarifies that there are no such issues. 
 To see this, let us first consider the ill-type $\tyint \inter \tyint$.
-This type is a potential source for incoherence, as both components of the merge
+This type is a potential source for incoherence, as both components of the intersection 
 overlap.
 %The $\tyint \inter \tyint \subtype \tyint$ judgement has to produce a coercion which
 %is biased, and therefore might lead to different results.
 For example, the term $(3 \mergeop 4) : \tyint$ is incoherent, since 
 the terms $3$ and $4$ can both be typed $\tyint$. 
 There is one case though, where coherence is not compromised:
-if the inhabitants of both types are the same, as in $2 \mergeop 2$.
-In this case, both values can be chosen interchangibily, without affecting the coherence
+when both terms composing the merge are equivalent (i.e. $\beta$-equivalent), as in $2 \mergeop 2$.
+In this case, both terms can be chosen interchangibily, without affecting the coherence
 of the program.
 It is important realizing that this is always the case with top-like intersections.
 %In fact, this explains why $\top$ is actually disjoint with every other type.
@@ -155,11 +150,11 @@ Generally speaking, top-like types should never be a source of incoherence.
 This explains why $\top$ is disjoint to every other type, as mentioned in Section~\ref{sec:alg-dis}.
 
 \paragraph{Rules.}
-Our definition of top-like types is naturally extended from \oldname. 
+Our definition of top-like types is an extension from \oldname. 
 The rules that compose this unary relation, denoted as $\toplike{ . }$, are presented at the top of 
 Figure~\ref{fig:andcoercion}. 
-The only new rule is \reflabel{\labeltoplforall}, which extends the notion of top-like types for
-the (disjoint) universal quantifier.
+The only new rule is \reflabel{\labeltoplforall}, which states that a (disjoint) universal quantifier 
+is top-like whenever its body is also top-like.
 
 Furthermore, the notion of disjointness has changed, leading to a larger set of well-formed top-like types.
 In order to retain coherece, we adjusted the meta-function $\andcoerce{A}$, as shown in the bottom of 

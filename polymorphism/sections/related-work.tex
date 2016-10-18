@@ -4,7 +4,14 @@
 To our knowlegde no previous work has been done in a caluclus which
 includes parametric polymorphism, intersection types and a \emph{merge} operator.
 
-\joao{maybe these 3 paragraphs can go, as they aren't refering polymorphic systems?}
+Simply-typed systems with intersection types and a merge operator have been studied
+in the past, including Reynold's Forsythe~\cite{reynolds1997design}; 
+Pierce's $F_\wedge$~\cite{pierce1991programming2}; and
+$\lamint$ by Castagna et al.~\cite{Castagna92calculus}.
+These calculi are more restrictive; incoherent; or not comparable in terms of expressiveness
+with \name, respectively.
+%\joao{maybe these 3 paragraphs can go, as they aren't refering polymorphic systems?}
+\begin{comment}
 Concerning simply-typed systems, the oldest work dates back to the 1980s,
 when Reynolds invented Forsythe~\cite{reynolds1997design}, with his
 merge-like operator being noted as $p_1, p_2$.
@@ -29,7 +36,7 @@ These conditions are incompatible with systems like ours -- which allow arbitrar
 intersections -- and thus are hard to compare in terms of expressiveness.
 This means that $\lamint$ accepts different functional merges than \name and 
 vice-versa.
-
+\end{comment}
 More recently, Dunfield~\cite{dunfield2014elaborating} formalised a system with
 intersection types and a merge operator with a type-directed translation to the
 simply-typed lambda calculus with pairs.
@@ -40,13 +47,13 @@ Our work is an extension of the recent \oldname calculus~\cite{oliveira16disjoin
 \oldname solves the coherence problem present in Dunfield's calculus, by requiring that
 intersection types can only be composed of \emph{disjoint} types.
 For simplicity purposes, \oldname uses a specification for disjointness, which says that two types are 
-disjoint as long as they do not share a common supertype.
-\name does not use such definition as its adaptation to polymorphic types would require
-using some form of unification.
+disjoint if they do not share a common supertype.
+\name does not use such specification as its adaptation to polymorphic types would require
+using unification.
 We opted to ommit the specification from \name, on grounds that unification would defeat
 the purpose of having such specification.
-In fact, \name's notion of disjointness is based on \oldname's definition of the more
-general notion of disjointess concerning $\top$ types, called $\top$-disjointness, which 
+In fact, \name's disjointness is based on \oldname's more
+general notion of disjointness concerning $\top$ types, called $\top$-disjointness, which 
 states that two types $A$ and $B$ are disjoint if two conditions are satisfied:
 %\begin{definition}[$\top$-disjointness]
 %  Two types $A$ and $B$ are disjoint
@@ -107,20 +114,20 @@ as it has been discussed in Section~\ref{sec:intro} and Section~\ref{subsec:mixi
 
 \paragraph{Extensible records.}%
 %http://elm-lang.org/learn/Records.elm
-Encoding records using intersection types appeared in 
+Encoding records using intersection types first appeared in 
 Reynolds~\cite{reynolds1997design} and Castagna et al.~\cite{castagna1995calculus}. 
 Although Dunfield also discussed this idea in his paper \cite{dunfield2014elaborating}, 
 he only provided an implementation but not a formalization. 
-Very similar to our treatment of elaborating records is
-Cardelli's work~\cite{cardelli1992extensible} on translating a calculus, named
-$ F_{\subtype \rho}$, with extensible records to a simpler calculus without
+A similar to our treatment of elaborating records is
+Cardelli's work~\cite{cardelli1992extensible} on translating a calculus
+with extensible records ($ F_{\subtype \rho}$) to a simpler calculus without
 records primitives ($ F_{\subtype} $). 
 However, he does not encode multi-field records as intersections; hence his translation is more
 heavyweight. 
 Crary~\cite{crary1998simple} used intersection types and
 existential types to address the problem that arises when interpreting method
 dispatch as self-application. 
-But in his paper, intersection types are not used to encode multi-field records.
+But also in his paper, intersection types are not used to encode multi-field records.
 
 Wand~\cite{wand1987complete} started the work on extensible records and proposed
 row types~\cite{wand1989type} for records, together with a \emph{concatenation}
