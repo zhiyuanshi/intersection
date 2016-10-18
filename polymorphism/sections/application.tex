@@ -60,8 +60,8 @@ intersections at type-level are actually right-biased!
 For example, the following code is well-typed:
 
 \begin{lstlisting}
-class Dog { constructor(public name : string, public male : string) { } }
-var fool : Dog & Person = extend(new Dog("Pluto","yes"),new Person("Arnold",true))
+class Dog { constructor(public male : string) { } }
+var fool : Dog & Person = extend(new Dog("no"),new Person("Dave",true))
 boolean b = fool.male
 \end{lstlisting}
 Note how \lstinline$fool.male$ is statically bound to a variable of type \lstinline$boolean$ but, at run-time, 
@@ -107,12 +107,9 @@ jim.log $\top$
 \end{lstlisting}
 
 Moreover, the intersection \lstinline$Person & Dog$ is accepted but
-two different fields \lstinline$name$ are kept in the object. In \name
+two different fields \lstinline$male$ are kept in the object. In \name
 it is ok to have duplicated fields as long as their types are
-disjoint.\bruno{Two things: 1) the example would be accepted and not
-  rejected (as you mentioned earlier); 2) I think we need to say more
-  are allowing duplicated fields somewhere, and perhaps have a
-  reference here pointing to that additional discussion.} 
+disjoint. 
 
 \subsection{Extensible Records}
 \name can encode polymorphic extensible records. Describing and
@@ -306,7 +303,7 @@ the more general program would be accepted:
 %&\text{avg}_2 \, r = (r.x + r.y) / 2
 %\end{align*}
 \begin{lstlisting}[mathescape=true]
-let $\text{avg}_2$ R x y (r : {x:Int, y:Int | R}) = (r.x+r.y)/2 
+let $\text{avg}_2$ R (r : {x:Int, y:Int | R}) = (r.x+r.y)/2 
 \end{lstlisting}\bruno{any reason why the position of R in the record
   type for the 3 examples is not consistent? If not, please make sure
   they are all consistent.}
