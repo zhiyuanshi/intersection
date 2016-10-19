@@ -1,5 +1,215 @@
 \section{Related Work}
 \label{sec:related-work}
+\paragraph{Intersection types, polymorphism and the merge operator.}
+To our knowlegde no previous work has been done in a caluclus which
+includes parametric polymorphism, intersection types and a \emph{merge} operator.
+
+Simply-typed systems with intersection types and a merge operator have been studied
+in the past, including Reynold's Forsythe~\cite{reynolds1997design}; 
+Pierce's $F_\wedge$~\cite{pierce1991programming2}; and
+$\lamint$ by Castagna et al.~\cite{Castagna92calculus}.
+These calculi are more restrictive; incoherent; or not comparable in terms of expressiveness
+with \name, respectively.
+%\joao{maybe these 3 paragraphs can go, as they aren't refering polymorphic systems?}
+\begin{comment}
+Concerning simply-typed systems, the oldest work dates back to the 1980s,
+when Reynolds invented Forsythe~\cite{reynolds1997design}, with his
+merge-like operator being noted as $p_1, p_2$.
+Even though his calculus was proven to be coherent~\cite{reynolds1991coherence},
+it uses a form of biased choice by having precedence in typing rules for intersections.
+His system is also arguably more restrictive than ours since it forbids, for instance,
+the merge of two functions.
+
+Pierce~\cite{pierce1991programming2} made a comprehensive review
+of coherence, but he was unable to prove it for his $F_\wedge$ calculus. 
+He introduced a primitive $\code{glue}$ function as
+a language extension which corresponds to our merge operator. 
+However, users can ``glue'' two arbitrary values, which may lead to incoherence.
+
+Castagna et al.~\cite{Castagna92calculus} proposed $\lamint$ to study
+the overloading problem for functions. 
+They have a special merge for functions and also a special function application
+for these merges.
+Their calculus is coherent and they also employ well-formedness conditions on their 
+(functional) merges. 
+These conditions are incompatible with systems like ours -- which allow arbitrary
+intersections -- and thus are hard to compare in terms of expressiveness.
+This means that $\lamint$ accepts different functional merges than \name and 
+vice-versa.
+\end{comment}
+More recently, Dunfield~\cite{dunfield2014elaborating} formalised a system with
+intersection types and a merge operator with a type-directed translation to the
+simply-typed lambda calculus with pairs.
+The major differences to our calculus (besides being simply-typed), is that on one
+hand his system includes union types, but on the other it lacks coherence.
+
+Our work is an extension of the recent \oldname calculus~\cite{oliveira16disjoint}.
+\oldname solves the coherence problem present in Dunfield's calculus, by requiring that
+intersection types can only be composed of \emph{disjoint} types.
+For simplicity purposes, \oldname uses a specification for disjointness, which says that two types are 
+disjoint if they do not share a common supertype.
+\name does not use such specification as its adaptation to polymorphic types would require
+using unification.
+We opted to ommit the specification from \name, on grounds that unification would defeat
+the purpose of having such specification.
+In fact, \name's disjointness is based on \oldname's more
+general notion of disjointness concerning $\top$ types, called $\top$-disjointness, which 
+states that two types $A$ and $B$ are disjoint if two conditions are satisfied:
+%\begin{definition}[$\top$-disjointness]
+%  Two types $A$ and $B$ are disjoint
+%  (written $A \disjoint B$) if the following two conditions are satisfied:
+\begin{enumerate}
+  \item $(\text{not}~\toplike{A})~\text{and}~(\text{not}~\toplike{B}) $
+  \item $\forall C.~\text{if}~ A \subtype C~\text{and}~B \subtype C~\text{then}~\toplike{C}$
+\end{enumerate}
+%\end{definition}
+\noindent A major difference between the two calculus, is that $\top$-disjointness does not allow
+$\top$ in intersections, while our calculus allows it.
+In other words, condition (1) is not imposed by \name.
+As a consequence, the set of well-formed \emph{top-like} types is a superset of \oldname's.
+This is covered in greater detail in Section~\ref{sec:disjoint}.
+
+\paragraph{Intersection types and polymorphism, without the merge operator.}
+Recently, Castagna~\textit{et al.}~\cite{Castagna:2014} studied a very interesting
+and coherent calculus that has polymorphism and set-theoretic type connectives (such as
+intersections, unions, and negations). 
+However, their calculus is based on a semantic subtyping relation due to their 
+interpretation of intersection types.
+The difference to our calculus, is that their intersections are used between function
+types, allowing overloading (i.e. branching) of types.
+For example, they can express a function whose domain is defined on any type, but executes different
+code depending on that type:
+
+\[
+\lambda^{(\tyint \to \tybool) \wedge (\alpha \backslash \tyint \to \alpha \backslash \tyint)} 
+x. (x \in \tyint) ? (x \text{ mod } 2) = 0 : x
+\]
+
+\noindent In our system we cannot express some of these intersections, namely the ones that
+do not have disjoint co-domains.
+However, \name accepts other kind of intersections which are not possible to express
+in their calculus, as in merges of type $(\tyint \to \tybool) \inter (\tyint \to \tyint)$.
+Just as~\cite{Castagna92calculus}, their work is focused on combining 
+intersections with functions, whereas \name is concerned with merges between
+arbitrary types.
+
+\joao{elaborate more on this paragraph?}
+Going in the direction of higher
+kinds, Compagnoni and Pierce~\cite{compagnoni1996higher} added
+intersection types to System $ F_{\omega} $ and used a new calculus,
+$ F^{\omega}_{\wedge} $, to model multiple inheritance. 
+In their system, types include the construct of intersection of types of the
+same kind $ K $. 
+Davies and Pfenning~\cite{davies2000intersection} studied the interactions between
+intersection types and effects in call-by-value languages. 
+They proposed a ``value restriction'' for intersection types, similar to
+value restriction on parametric polymorphism.
+
+Intersection types have also been adopted in object-oriented languages such as Scala,
+Ceylon, Grace, Flow or TypeScript.
+Generally speaking, the main difference between these languages and \name is the lack
+of explicit instantiation through the merge operator.
+This leads to several ad-hoc solutions at defining such operator in those languages,
+as it has been discussed in Section~\ref{sec:intro} and Section~\ref{subsec:mixins}. 
+
+\paragraph{Extensible records.}%
+%http://elm-lang.org/learn/Records.elm
+Encoding records using intersection types first appeared in 
+Reynolds~\cite{reynolds1997design} and Castagna et al.~\cite{castagna1995calculus}. 
+Although Dunfield also discussed this idea in his paper \cite{dunfield2014elaborating}, 
+he only provided an implementation but not a formalization. 
+A similar to our treatment of elaborating records is
+Cardelli's work~\cite{cardelli1992extensible} on translating a calculus
+with extensible records ($ F_{\subtype \rho}$) to a simpler calculus without
+records primitives ($ F_{\subtype} $). 
+However, he does not encode multi-field records as intersections; hence his translation is more
+heavyweight. 
+Crary~\cite{crary1998simple} used intersection types and
+existential types to address the problem that arises when interpreting method
+dispatch as self-application. 
+But also in his paper, intersection types are not used to encode multi-field records.
+
+Wand~\cite{wand1987complete} started the work on extensible records and proposed
+row types~\cite{wand1989type} for records, together with a \emph{concatenation}
+operator, which is standard in many calculi with extensible records
+\cite{harper1991record,remy1992typing,wand1989type,sulzmann97designing,makholm05type,pottier2003constraint}.
+Cardelli and Mitchell~\cite{cardelli1990operations} defined three primitive operations on
+records that are standard in type-systems with record types: 
+\emph{selection}, \emph{restriction}, and \emph{extension}. 
+Most calculi are based on these three primitive operators (especially extension), such as
+\cite{remy1993type,gaster1996polymorphic,jones99lightweight,leijen2004first,leijen2005extensible,blume2006extensible}.
+%Following Cardelli and Mitchell's approach, which is based on extension and row types, 
+%More recently, Leijen formalized two neat systems~\cite{leijen2004first,leijen2005extensible}.
+%Just like our calculus, his systems allow records that contain duplicate labels, without the need to 
+%override 
+%However, Leijen's system is more sophisticated, since it relies on shadowing of labels. 
+%Also, it supports passing record labels as arguments to functions. 
+%He also showed an encoding of intersection types using first-class labels.
+The merge operator in \name plays the same role as the concatenation operator, as its components 
+may contain any (well-formed and disjoint) types.
+One problem with concatenation is that typically systems are hard to use in practise, due to the
+complicated set of constraints/filters which might arise from combining several, possibly 
+polymorphic, records~\cite{leijen2005extensible}.
+%All of the aforementioned record calculi are entirely concerned with the conceptual and implementation 
+%issues of type-systems with records, using techniques as row types, predicates, flags, qualified types,
+%cases, amongst others.
+However, in \name, the implementation of records instead piggybacks on the disjointness
+and intersection types features of the type-system.
+The constraints on labels are encoded using disjoint quantification, and the coherent
+type-system will statically ensure that records and their operations are safe.
+This means that technical concerns, i.e type inference, efficiency, etc.; are to be dealt with the 
+compilation of disjoint intersection types as opposed to compiling extensible records directly.
+Thus, what is expressed in other systems by means of row types, predicates, flags, qualified types, etc; 
+in \name it is expressed by the use of disjoint intersection types.
+
+% Chlipala's
+% \texttt{Ur}~\cite{chlipala2010ur} explains record as type level
+% constructs.\bruno{What is the point of citing Chlipala's paper?}
+
+% Our system can be adapted to simulate systems that support extensible
+% records but not intersection of ordinary types like \texttt{Int} and
+% \texttt{Float} by allowing only intersection of record types.
+%
+% $ \turnsrec A $ states that $ A $ is a record type, or the intersection of
+% record types, and so forth.
+%
+% \inferrule [RecBase] {} {\turnsrec \recordType l A}
+%
+% \inferrule [RecStep]
+% {\turnsrec A_1 \andalso \turnsrec A_2}
+% {\turnsrec A_1 \inter A_2}
+%
+% \inferrule [Merge']
+% {\Gamma \turns e_1 : A_1 \yields {E_1} \andalso \turnsrec A_1 \\
+%  \Gamma \turns e_2 : A_2 \yields {E_2} \andalso \turnsrec A_2}
+% {\Gamma \turns e_1 \mergeop e_2 : A_1 \inter A_2 \yields {\pair {E_1} {E_2}}}
+%
+% Of course our approach has its limitation as duplicated labels in a record are
+% allowed. This has been discussed in a larger issue by
+% Dunfield~\cite{dunfield2014elaborating}.
+%
+% R{\'e}my~\cite{remy1989type}
+
+\paragraph{Traits and mixins.}
+Traits \cite{ducasse2006traits,fisher04atyped,odersky2005scalable} and mixins 
+\cite{bracha1990mixin,ancona96algebraic,flatt1998classes,findler1998modular,ancona2003jam,bettini2004corecalculus} 
+have become very popular in object-oriented languages. 
+They allow a kind of object composition which is not allowed in
+object-oriented type-systems with support for single inheritance.
+One of the main differences between traits and mixins are the way in
+which ambiguity of names is dealt.
+The former usually rejects programs which compose classes with 
+conflicting methods, whereas the latter assumes a resolution strategy,
+usually language dependent. 
+Our example demonstrated in Section~\ref{subsec:records} suggests that
+\name can be used in place of traits, due to the semantics of the merge
+operator.
+However there is a subtle difference between traits and \name: equal 
+names/labels are always rejected in the former, whereas in the latter only rejects
+when their types are disjoint.
+\joao{should we reference CZ, where they have a similar spec to our notion of disjointess?}
+
+\begin{comment}
 
 \paragraph{Coherence}
 Reynolds invented Forsythe~\cite{reynolds1997design} in the 1980s. Our
@@ -14,7 +224,7 @@ of the first and second components are. In some cases the meaning of
 the second component takes precedence (that is, is biased) over the
 first component. The set of rules is restrictive and it forbids, for
 instance, the merge of two functions (even when they a provably
-disjoint). In contrast, disjointness in \namedis has a well-defined
+disjoint). In contrast, disjointness in \name has a well-defined
 specification and it is quite flexible. Secondly, Reynolds calculus
 does not support universal quantification. It is unclear to us whether
 his set of rules would still ensure disjointness in the presence of
@@ -61,7 +271,7 @@ quantification to guarantee coherence in our calculus.
 Our type system combines intersection types and parametric polymorphism. Closest
 to us is Pierce's work~\cite{pierce1991programming1} on a prototype
 compiler for a language with both intersection types, union types, and
-parametric polymorphism. Similarly to \namedis in his system universal
+parametric polymorphism. Similarly to \name in his system universal
 quantifiers do not support bounded quantification. However Pierce did not try to prove any
 meta-theoretical results and his calculus does not have a merge
 operator.  Pierce also studied a system where both intersection
@@ -105,12 +315,12 @@ calculus with intersection types and parametric polymorphism is not
 yet proven. Recently, some form of intersection
 types has been adopted in object-oriented languages such as Scala,
 Ceylon, and Grace. Generally speaking,
-the most significant difference to \namedis is that in all previous systems
+the most significant difference to \name is that in all previous systems
 there is no explicit introduction construct like our merge operator. As shown in
 Section~\ref{subsec:OAs}, this feature is pivotal in supporting modularity
 and extensibility because it allows dynamic composition of values.
 
-\begin{comment}
+%\begin{comment}
 only allow intersections of concrete types (classes),
 whereas our language allows intersections of type variables, such as
 \texttt{A \& B}. Without that vehicle, we would not be able to define
@@ -124,7 +334,7 @@ let merge [A, B] (f: ExpAlg A) (g: ExpAlg B) = {
     f.add x y ,, g.add x y
 }
 \end{lstlisting}
-\end{comment}
+%\end{comment}
 
 
 \paragraph{Other type systems with intersection types.}
@@ -161,6 +371,7 @@ subtyping seems to have important advantages over syntactic subtyping. One
 worthy avenue for future work is to study languages with intersection types
 and merge operator in a semantic subtyping setting.
 
+%\begin{comment}
 \paragraph{Extensibility.} One of our motivations to study systems
 with intersections types is to better understand the
 type system requirements needed to address extensibility problems.
@@ -190,9 +401,9 @@ type-theoretic point of view. As shown in Section~\ref{subsec:OAs}, a system
 with intersection types, parametric polymorphism, the merge operator
 and disjoint quantification can be used to explain type-theoretic
 encodings with subtyping and extensibility.
+%\end{comment}
 
-
-\begin{comment}
+%\begin{comment}
 To improve support for extensibility various researchers have proposed
 new OOP languages or programming mechanisms. It is interesting to
 note that design patterns such as object algebras or modular visitors
@@ -229,70 +440,10 @@ have drawbacks of some kind. The first approach often involves heavyweight
 designs, while the second approach still sacrifices the readability for
 extensibility.
 \bruno{fill me in with more details and more references!}
-\end{comment}
+%\end{comment}
 % Intersection types have been shown to be useful in designing languages that
 % support modularity.~\cite{nystrom2006j}
 
-\paragraph{Extensible records.}
-
-\george{Record field deletion is also possible.}
-
-%http://elm-lang.org/learn/Records.elm
-
-Encoding records using intersection types appeared in
-Reynolds~\cite{reynolds1997design} and Castagna et al.~\cite{castagna1995calculus}. 
-Although Dunfield also discussed this idea in his paper \cite{dunfield2014elaborating}, 
-he only provided an implementation but not a formalization. 
-Very similar to our treatment of elaborating records is
-Cardelli's work~\cite{cardelli1992extensible} on translating a calculus, named
-$ F_{\subtype \rho}$, with extensible records to a simpler calculus that without
-records primitives (in which case is $ F_{\subtype} $). 
-But he did not consider encoding multi-field records as intersections; hence his translation is more
-heavyweight. 
-Crary~\cite{crary1998simple} used intersection types and
-existential types to address the problem that arises when interpreting method
-dispatch as self-application. 
-But in his paper, intersection types are not used to encode multi-field records.
-
-Wand~\cite{wand1987complete} started the work on extensible records and proposed
-row types~\cite{wand1989type} for records. 
-Cardelli and Mitchell~\cite{cardelli1990operations} defined three primitive operations on
-records that are similar to ours: \emph{selection}, \emph{restriction}, and
-\emph{extension}. 
-The merge operator in \name plays the same role as extension.
-Following Cardelli and Mitchell's approach, of restriction and extension. 
-Both Leijen's systems~\cite{leijen2004first,leijen2005extensible} and ours allow records that contain
-duplicate labels. 
-Leijen's system is more sophisticated. 
-For example, it supports passing record labels as arguments to functions. 
-He also showed an encoding of intersection types using first-class labels.
-
-% Chlipala's
-% \texttt{Ur}~\cite{chlipala2010ur} explains record as type level
-% constructs.\bruno{What is the point of citing Chlipala's paper?}
-
-% Our system can be adapted to simulate systems that support extensible
-% records but not intersection of ordinary types like \texttt{Int} and
-% \texttt{Float} by allowing only intersection of record types.
-%
-% $ \turnsrec A $ states that $ A $ is a record type, or the intersection of
-% record types, and so forth.
-%
-% \inferrule [RecBase] {} {\turnsrec \recordType l A}
-%
-% \inferrule [RecStep]
-% {\turnsrec A_1 \andalso \turnsrec A_2}
-% {\turnsrec A_1 \inter A_2}
-%
-% \inferrule [Merge']
-% {\Gamma \turns e_1 : A_1 \yields {E_1} \andalso \turnsrec A_1 \\
-%  \Gamma \turns e_2 : A_2 \yields {E_2} \andalso \turnsrec A_2}
-% {\Gamma \turns e_1 \mergeop e_2 : A_1 \inter A_2 \yields {\pair {E_1} {E_2}}}
-%
-% Of course our approach has its limitation as duplicated labels in a record are
-% allowed. This has been discussed in a larger issue by
-% Dunfield~\cite{dunfield2014elaborating}.
-%
-% R{\'e}my~\cite{remy1989type}
+\end{comment}
 
 

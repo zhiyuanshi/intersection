@@ -60,7 +60,7 @@
 %\newcommand{\lamty}[3]{\lam {(#1 \oftype #2)} #3} no longer using types in lambdas
 \newcommand{\lamty}[3]{\lam #1 #3}
 \newcommand{\blam}[2]{\Lambda #1.\binderspace #2}
-\newcommand{\blamdis}[3]{\blam {(#1 \disjoint #2)} #3}
+\newcommand{\blamdis}[3]{\blam {(#1\disjoint#2)} #3}
 \newcommand{\mergeop}{,,}
 \newcommand{\app}[2]{#1 \; #2}
 \newcommand{\tapp}[2]{#1 \appspace #2}
@@ -69,7 +69,7 @@
 \newcommand{\fst}[1]{\app {\code{fst}} {#1}}
 \newcommand{\snd}[1]{\app {\code{snd}} {#1}}
 \newcommand{\recordType}[2]{\{ #1 : #2 \}}
-\newcommand{\recordCon}[2]{\{ #1 = #2 \}}
+\newcommand{\recordCon}[2]{\{ #1=#2 \}}
 \newcommand{\recordProj}[2]{#1 . #2}
 
 \newcommand{\true}{\code{True}}

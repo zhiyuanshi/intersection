@@ -477,6 +477,7 @@ Proof.
     unfold OrthoAx; auto.
 Qed.
 
+
 Lemma Ortho_usub_trans :
   forall Gamma u ty d,
     PType ty ->
@@ -486,17 +487,12 @@ Lemma Ortho_usub_trans :
 Proof.
   intros Gamma u ty d HWFty HOrtho HSub.
   generalize dependent ty.
-  induction HOrtho; intros; eauto.
-  - induction ty; try now (inversion HSub; subst; auto);
-    inversion HWFty; inversion HSub; subst; auto.
-  - induction ty; try now (inversion HSub; subst; auto);
-    inversion HWFty; inversion HSub; subst; auto.
-  - induction ty; try now (inversion HSub; subst; auto);
-    inversion HWFty; inversion HSub; subst; auto.
+  induction HOrtho; intros; eauto;
+  try now (dependent induction HSub; eauto; inversion HWFty; subst; auto).
+  - dependent induction HSub; eauto.
+    inversion HWFty; subst; auto.
+    inversion HWFty; subst; auto.
     inversion H1; subst.
-    clear IHty1 IHty2.
-    inversion HWFty; subst.
-    inversion HSub; subst.
     apply_fresh OForAll as x.
     apply ortho_weaken_sub_extend with (d1 := And d1 d2).
     not_in_L x.
@@ -504,7 +500,7 @@ Proof.
     not_in_L x.
     apply H7.
     not_in_L x.
-    apply H9.
+    apply H3.
     not_in_L x.
     apply USAnd1.
     apply USAnd2; auto.
@@ -513,17 +509,6 @@ Proof.
     auto.
   - pose (usub_trans _ _ _ HWFty H0 HSub).
     apply OVar with (A := A) ; auto.
-  - induction ty0; try (now inversion HSub).
-    inversion HSub; subst; inversion HWFty; auto.
-    inversion HSub; subst; eauto.
-  - dependent induction HSub.
-    inversion HWFty.
-    apply OAnd2; auto.
-    auto.
-  - induction ty; try now (inversion HSub; subst; auto);
-    inversion HWFty; inversion HSub; subst; auto.
-  - induction ty; try now (inversion HSub; subst; auto);
-    inversion HWFty; inversion HSub; subst; auto.
   - destruct t1; destruct t2;
     try (destruct H0 as [_ [_ H0]]; exfalso; now apply H0);
     try (now orthoax_inv_r H0); try (now orthoax_inv_l H0);

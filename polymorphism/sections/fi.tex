@@ -1,63 +1,54 @@
-\section{The \name Calculus}
-\label{sec:fi}
-
+\section{The \name Calculus}\label{sec:fi}
 This section presents the syntax, subtyping, and typing of \name: 
 a calculus with intersection types, parametric polymorphism, records and a merge operator. 
-This calculus is an extension of \oldname and Dunfield's
-calculus~\cite{dunfield2014elaborating}, which are simply typed
+This calculus is an extension of \oldname~\cite{oliveira16disjoint} and Dunfield's~\cite{dunfield2014elaborating}
+calculus, which are simply typed
 calculus with intersection types and a merge operator.
-The novelty of \name is the addition of \emph{disjoint polymorphism}:
-a form of parametric polymorphism with disjointness contraints, which
-allows flexibility while at the same time retaining coherence. 
+%The novelty of \name is the addition of \emph{disjoint polymorphism}:
+%a form of parametric polymorphism with disjointness contraints, which
+%allows flexibility while at the same time retaining coherence. 
 %As discussed in Section~\ref{overview} retaining
 %coherence, while having an expressive form of polymorphism is non-trvial.
 %Section~\ref{sec:disjoint} introduces \namedis, which shows the necessary changes
 %for supporting disjoint intersection types and disjoint
 %quantification and ensuring coherence.
-Section~\ref{sec:disjoint} introduces the necessary changes to the
-definition of disjointness presented by Oliveira et al.~\cite{} in
+Section~\ref{sec:alg-dis} introduces the necessary changes to the
+definition of disjointness presented by Oliveira et al.~\cite{oliveira16disjoint} in
 order to add disjoint polymorphism.
 
-All the meta-theory has been mechanized in Coq, which is available in
+All the meta-theory of \name has been mechanized in Coq, and is available in
 the supplementary materials submitted with the paper.
 
 \subsection{Syntax}
-
-Figure~\ref{fig:fi-syntax} shows the syntax of \name. 
-The differences to \oldname are highlighted in gray.
+The syntax of \name (with the differences to \oldname highlighted in gray) is: 
 %are intersection types $A \inter B$ at the
 %type-level and the ``merges'' $e_1 \mergeop e_2$ at the term level.
 
 %TODO merge this figure with figure 5 (text too)
-\begin{figure}[!t]
+%\begin{figure}[!t]
+\vspace{-15pt}
   \[
     \begin{array}{l}
       \begin{array}{llrll}
         \text{Types}
-        & A, B & \Coloneqq & \top \mid \tyint \mid A \to B \mid A \inter B & \\ 
-        &      & \mid &
-                 \highlight{$\alpha$} \mid \highlight{$\fordis \alpha A B$} 
-                 \mid \highlight{$\recordType l A$} & \\
+        & A, B & \!\!\Coloneqq & \!\top \mid \tyint \mid A \to B \mid A
+                             \inter B \mid \highlight{$\alpha$} \mid \highlight{$\fordis \alpha A B$} \mid \highlight{$\recordType l A$} & \\ 
 
-        \\
         \text{Terms}
-        & e & \Coloneqq & \top \mid i \mid x \mid \lamty x A e \mid \app {e_1} {e_2} 
-              \mid e_1 \mergeop e_2 & \\
-        &   & \mid & \highlight{$\blamdis \alpha A e$} \mid \highlight{$\tapp e A$} \mid 
-              \highlight{$\recordCon l e$} \mid \highlight{$\recordProj e l$}     & \\
-
-        \\
+        & e & \!\!\Coloneqq & \!\top \mid i \mid x \mid \lamty x A e \mid \app {e_1} {e_2} 
+              \mid e_1 \mergeop e_2 \mid \!\highlight{$\blamdis \alpha A e$} \!\mid \!\highlight{$\tapp e A$} \!\mid 
+              \!\highlight{$\recordCon l e$} \!\mid \!\highlight{$\recordProj e l$} & \\
         \text{Contexts}
-        & \Gamma & \Coloneqq & \cdot
+        & \Gamma & \!\!\Coloneqq & \!\cdot
                    \mid \Gamma, \highlight{$\alpha \disjoint A$}
                    \mid \Gamma, x \oftype A  & \\
       \end{array}
     \end{array}
   \]
 
-  \caption{\name syntax.}
-  \label{fig:fi-syntax}
-\end{figure}
+%  \caption{\name syntax.}
+%  \label{fig:fi-syntax}
+% \end{figure}
 
 \paragraph{Types.} 
 Metavariables $A$, $B$ range over types. 
@@ -68,7 +59,7 @@ The main novelty are two standard constructs of System $F$ used to support
 polymorphism: 
 type variables $\alpha$ and disjoint (universal) quantification $\fordis \alpha A B$. 
 Unlike traditional universal quantification, the disjoint
-quantification includes a disjointness constraint associatted to a type variable $\alpha$.
+quantification includes a disjointness constraint associated to a type variable $\alpha$.
 Finally, \name also includes singleton record types, which consist of a label $l$ and
 an associated type $A$.
 We will use $\subst {A} \alpha {B}$
@@ -83,7 +74,7 @@ variables $x$, lambda abstractions ($\lamty x A e$); applications
 $e1 \mergeop e2$.
 Terms are extended with two standard constructs in System $F$:
 abstraction of type variables over terms $\blamdis \alpha A e$; and
-and application of terms to types $\tapp e A$. 
+application of terms to types $\tapp e A$. 
 The former also includes an extra disjointness constraint tied to the type 
 variable $\alpha$, due to disjoint quantification.
 %If one regards $e_1$ and $e_2$ as objects, their merge will respond to
@@ -95,55 +86,27 @@ Finally, the accessor for a label $l$ in term $e$ is denoted as $\recordProj e l
 $\alpha$ with disjointness constraints $A$; and variables $x$ with their type $A$. 
 We will use $\subst {A} \alpha {\Gamma}$
 to denote the capture-avoiding substitution of $A$ for $\alpha$ in the co-domain of
-$\Gamma$ where the domain is a type variable (i.e. substitution in all disjointness constraints).
+$\Gamma$ where the domain is a type variable (i.e all disjointness constraints).
 Throughout this paper, we will assume that all contexts are
-well-formed\bruno{when you say well-formed here, do you mean the
-  definition in Fig 3?}\joao{no, I mean what's written next}, meaning that:
-\begin{itemize}
-\item All variables must occur at most once in their domain.
-\item Type variables must not appear free within its own disjointness constraint. 
-\end{itemize}
-All substitutions performed in environments must also lead to well-formed environments.
-
+well-formed. Importantly, besides usual well-formedness conditions, in
+well-formed contexts type variables must not appear free within its own disjointness constraint.
+%All substitutions performed in environments must also lead to well-formed environments.
 %In order to focus on the key features that make this language interesting, we do
 %not include other forms such as type constants and fixpoints here. 
 %However they can be included in the formalization in
 %standard ways and we are using them in discussions and examples. %TODO are we?
-
+\paragraph{Syntactic sugar}
+In \name we may quantify a type variables and ommit its constraint. 
+This means that its constraint is $\top$. 
+For example, the function type $\forall \alpha. \alpha \to \alpha$ is syntactic sugar
+for  $\fordis \alpha \top {\alpha \to \alpha}$.
+This is discussed in more detail in Section~\ref{sec:disjoint}. 
 
 % \paragraph{Discussion.} A natural question the reader might ask is that why we
 % have excluded union types from the language. The answer is we found that
 % intersection types alone are enough support extensible designs.
 
-\begin{figure}[!t]
-  \begin{mathpar}
-    \framebox{$\jatomic A$} \\
-    \inferrule*{}{\jatomic \tyint}
-
-    \inferrule*{}{\jatomic {A \to B}}
-
-    \inferrule*{}{\jatomic \alpha}
-
-    \inferrule*{}{\jatomic {\fordis \alpha B A}}
-
-    \inferrule*{}{\jatomic {\recordType l A}}
-  \end{mathpar}
-
-  \begin{mathpar}
-    \formsub \\ 
-    \rulesubtop \and \rulesubinter \and 
-    \rulesubint \and \rulesubinterlcoerce \and 
-    \rulesubvar \and \rulesubinterrcoerce \and
-    \rulesubrec  \and \rulesubfun \and 
-    \rulesubforallext 
-  \end{mathpar}
-
-  \caption{Subtyping rules of \name.}
-  \label{fig:fi-subtype}
-\end{figure}
-
 \subsection{Subtyping}
-
 % In some calculi, the subtyping relation is external to the language: those
 % calculi are indifferent to how the subtyping relation is defined. In \name, we
 % take a syntactic approach, that is, subtyping is due to the syntax of types.
@@ -195,14 +158,38 @@ All substitutions performed in environments must also lead to well-formed enviro
 % the fields.
 
 The subtyping rules of the form $A \subtype B$ are shown in 
-Figure~\ref{fig:fi-subtype}. \bruno{in the figure, the rules seem to
-  be in a strange order. } \joao{I did that to save space. should I revert that?}
+Figure~\ref{fig:fi-subtype}. 
 At the moment, the reader is advised to ignore the
-gray-shaded part in the rules, which will be explained later. 
-The following rules are ported from \oldname: \reflabel{\labelsubtop}, 
+gray-shaded parts, which will be explained later. 
+Some rules are ported from \oldname: \reflabel{\labelsubtop}, 
 \reflabel{\labelsubint},
 \reflabel{\labelsubfun}, \reflabel{\labelsubinter}, \reflabel{\labelsubinterl} and
 \reflabel{\labelsubinterr}.
+
+\begin{figure}[t]
+\begin{spacing}{0.5}
+  \begin{mathpar}
+    \framebox{$\jatomic A$} \\
+    \inferrule*{}{\jatomic \tyint} \and 
+    \inferrule*{}{\jatomic {A \to B}} \and
+    \inferrule*{}{\jatomic \alpha} \and
+    \inferrule*{}{\jatomic {\fordis \alpha B A}} \and
+    \inferrule*{}{\jatomic {\recordType l A}}
+  \end{mathpar}
+  \begin{mathpar}
+    \formsub \\ 
+    \rulesubtop \and \rulesubinter \and 
+    \rulesubint \and \rulesubinterlcoerce \and 
+    \rulesubrec \and \rulesubinterrcoerce \and
+    \rulesubvar  \and \rulesubfun \and 
+    \rulesubforallext 
+  \end{mathpar}
+\end{spacing}
+  \caption{Subtyping rules of \name.}
+  \label{fig:fi-subtype}
+\end{figure}
+
+
 
 %There are three rules which rather straightforward: \reflabel{\labelsubtop}
 %says that every type is a subtype of $\top$; \reflabel{\labelsubint} and 
@@ -216,40 +203,39 @@ The following rules are ported from \oldname: \reflabel{\labelsubtop},
 %says that if $A_1$ is both the subset of $A_2$ and the subset of $A_3$, then
 %$A_1$ is also the subset of the intersection of $A_2$ and $A_3$.
 
-\paragraph{Polymorphism and Records}
+\paragraph{Polymorphism and Records.}
 The subtyping rules introduced by \name refer to polymorphic constructs and records. 
 \reflabel{\labelsubvar} defines subtyping as a reflexive relation on type variables.
 In \reflabel{\labelsubforall} a universal quantifier ($\forall$) 
 is covariant in its body, and contravariant in its disjointness constraints.
 The \reflabel{\labelsubrec} rule says that records are covariant within their fields' types.
 Also, since the $ordinary$ conditions on two of the intersection rules are necessary to 
-produce unique coercions~\cite{icfppaper}, the $ordinary$ relation needed to be extended.
-As shown at the top of Figure~\ref{fig:fi-subtype}, the new types that compose this unary 
-relation are type variables, universal quantifiers and record types.
+produce unique coercions~\cite{oliveira16disjoint}, the $ordinary$ relation needed to be extended.
+As shown at the top of Figure~\ref{fig:fi-subtype}, the new types it contains are 
+type variables, universal quantifiers and record types.
 
-The subtyping relation can be shown to be reflexive and transitive.
+\paragraph{Properties of Subtyping.} The subtyping relation is reflexive and transitive.
 
 \begin{restatable}[Subtyping reflexivity]{lemma}{subrefl}
   \label{lemma:subrefl}
   For any type $A$, $A \subtype A$.
-\end{restatable}
-
-\begin{proof}
-By induction on $A$.
-\end{proof}
-
+\end{restatable}%
+\noindent \emph{Proof.} By induction on $A$.
+%\begin{prf}
+%By induction on $A$.
+%\end{prf}%
 \begin{restatable}[Subtyping transitivity]{lemma}{subtrans}
   \label{lemma:subtrans}
   If $A \subtype B$ and $B \subtype C$, then $A \subtype C$.
-\end{restatable}
-
-\begin{proof}
-By double induction on both derivations. 
-\end{proof}
-
+\end{restatable}%
+\noindent \emph{Proof.} By double induction on both derivations.
+%\begin{prf}
+%By double induction on both derivations. 
+%\end{prf}
+%\bruno{Too much space waisted between Lemma and proof. reduce the
+%  white space.}
 %TODO example showing contravariance in disjointness constraints goes here or in the overview 
 %section?
-
 %\paragraph{Metatheory.} As other standard subtyping relations, we can show that
 %subtyping defined by $\subtype$ is also reflexive and transitive.
 %
@@ -261,9 +247,9 @@ By double induction on both derivations.
 %  If $ A_1 \subtype A_2 $ and $ A_2 \subtype A_3 $,
 %  then $ A_1 \subtype A_3 $.
 %\end{lemma}
-
 \subsection{Typing}
 
+\begin{comment}
 \begin{figure}[!t]
   \begin{mathpar}
     \formwf \\ \rulewfint \and \rulewfvardis \and \rulewffun \and \rulewfrec \and 
@@ -273,6 +259,7 @@ By double induction on both derivations.
   \caption{Well-formedness rules for types of \name.}
   \label{fig:wf}
 \end{figure}
+\end{comment}
 
 
 %  \begin{mathpar}
@@ -280,54 +267,57 @@ By double induction on both derivations.
 %    \ruletblam \and \rulettapp \and \ruletmergedis 
 %  \end{mathpar}
 
-\paragraph{Well-formedness}
-The well-formedness rules are shown in the top part of Figure~\ref{fig:wf}. 
-The new rules are \reflabel{\labelwfvar} and \reflabel{\labelwfforall}. 
-Their definition is quite straightforward, but note how we ensure the well-formedness 
-of the constraint in the latter.
+\paragraph{Well-formedness.}
+The well-formedness rules are shown in the top part of Figure~\ref{fig:fi-type}. 
+The new rules over \oldname are \reflabel{\labelwfvar} and \reflabel{\labelwfforall}. 
+Their definition is quite straightforward, but note that the constraint in the latter
+must be well-formed.
 
-\begin{figure}[!t]
+\begin{figure}
+  \begin{spacing}{1}
+  \begin{mathpar}
+    \formwf \\ \rulewfint \and \rulewfvardis \and \rulewfrec \and 
+    \rulewffun \and \rulewftop \and \rulewfforalldis \and \rulewfinterdis 
+  \end{mathpar}
   \begin{mathpar}
     \formbi \\ \brulettop \and \bruletint \and \bruletvar \and \bruletann \and 
     \bruletapp \and \brulettappdis \and \bruletmergedis \and \bruletrec \and 
     \bruletprojr \and \bruletblamdis 
   \end{mathpar}
-
   \begin{mathpar}
     \formbc \\ \bruletlam \and \bruletsub
   \end{mathpar}
-
-  \caption{Type system of \name.}
+  \end{spacing}
+  \caption{Wellformedness and type system of \name.}
   \label{fig:fi-type}
 \end{figure}
 
-
-\paragraph{Typing rules}
+\paragraph{Typing rules.}
 Our typing rules are formulated as a bi-directional type-system. 
 Just as in \oldname, this ensures the type-system is not only syntax-directed, but
-also that there is no type ambiguity.
-The typing rules are shown in the bottom part of Figure~\ref{fig:wf}. 
+also that there is no type ambiguity: that is, inferred types are unique.
+The typing rules are shown in the bottom part of Figure~\ref{fig:fi-type}. 
 Again, the reader is advised to ignore the
-gray-shaded part here, as these parts will be explained later. 
+gray-shaded parts, as these will be explained later. 
 The typing judgements are of the form: $\jcheck \Gamma e A$ and  
 $\jinfer \Gamma e A$.
 They read: ``in the typing context $\Gamma$, the term $e$ can be
 checked or inferred to
 type $A$'', respectively. 
-The rules that are ported from \oldname are the
+The rules ported from \oldname are the
 check rules for $\top$ (\reflabel{\labelttop}), integers (\reflabel{\labeltint}), 
 variables (\reflabel{\labeltvar}),  application (\reflabel{\labeltapp}), merge operator  
 (\reflabel{\labeltmerge}), annotations (\reflabel{\labeltann}); and infer rules
 for lambda abstractions (\reflabel{\labeltlam}), and the subsumption rule 
 (\reflabel{\labeltsub}).
 
-\paragraph{Disjoint quantification}
+\paragraph{Disjoint quantification.}
 The new rules, inspired by System $F$, are the infer rules for type
 application \reflabel{\labelttapp}, and for type abstraction
 \reflabel{\labeltblam}.  Type abstraction is introduced by the big
 lambda $\blamdis \alpha A e$, eliminated by the usual type application
 $\tapp e A$ (\reflabel{\labelttapp}).  The disjointness constraint is
-added to the context with the rule.  During a type application, the
+added to the context in \reflabel{\labeltblam}. During a type application, the
 type system makes sure that the type argument satisfies the
 disjointness constraint.  Type application performs an extra check
 ensuring that the type to be instantiated is compatible
@@ -338,7 +328,7 @@ of our type-system.  For ease of discussion, also in
 quantifier to be fresh.  For programs with type variable shadowing,
 this requirement can be met straighforwardly by variable renaming.
 
-\paragraph{Records}
+\paragraph{Records.}
 Finally, $\reflabel{\labeltrec}$ and $\reflabel{\labeltprojr}$ deal with record types.
 The former infers a type for a record with label $l$ if it can infer a type for the
 inner expression; the latter says if one can infer a record type $\recordType l A$ 

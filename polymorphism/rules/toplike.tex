@@ -1,15 +1,15 @@
 \newcommand{\formtoplike}{\framebox{$ \toplike{A} $}}
 
-\newcommand{\makelabeltopl}[1]{Toplike-#1}
+\newcommand{\makelabeltopl}[1]{$TL#1$}
 
-\newcommand{\labeltopltop}{\makelabeltopl Top}
+\newcommand{\labeltopltop}{\makelabeltopl \top}
 \newcommand{\ruletopltop}{
   \inferrule* [right=\labeltopltop]
     { }
     { \toplike{\top} }
 }
 
-\newcommand{\labeltoplfun}{\makelabeltopl Fun}
+\newcommand{\labeltoplfun}{\makelabeltopl \rightarrow}
 \newcommand{\ruletoplfun}{
   \inferrule* [right=\labeltoplfun]
     { \toplike{B} }
@@ -30,14 +30,14 @@
     { \toplike{A \inter B} }
 }
 
-\newcommand{\labeltoplinter}{\makelabeltopl Inter}
+\newcommand{\labeltoplinter}{\makelabeltopl \&}
 \newcommand{\ruletoplinter}{
   \inferrule* [right=\labeltoplinter]
     { \toplike{A} \\ \toplike{B}}
     { \toplike{A \inter B} }
 }
 
-\newcommand{\labeltoplforall}{\makelabeltopl Forall}
+\newcommand{\labeltoplforall}{\makelabeltopl \forall}
 \newcommand{\ruletoplforall}{
   \inferrule* [right=\labeltoplforall]
     { \toplike{A} }

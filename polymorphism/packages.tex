@@ -23,6 +23,7 @@
 \usepackage{stmaryrd}
 \usepackage{mathtools}  % For "::=" ( \Coloneqq )
 
+%\usepackage{ntheorem}
 % http://tex.stackexchange.com/questions/114151/how-do-i-reference-in-appendix-a-theorem-given-in-the-body
 \usepackage{thmtools, thm-restate}
 
@@ -37,6 +38,18 @@
 
 \usepackage{cleveref}  % Never do "Theorem~\ref{thm1}" agin!
 \crefname{lemma}{Lemma}{Lemmas}
+
+% http://tex.stackexchange.com/questions/28165/amsthm-how-to-reduce-the-vertical-spacing-between-theorem-and-proof
+%\declaretheorem{theorem} 
+%\declaretheoremstyle[%
+%  spaceabove=-2pt,%
+%  spacebelow=2pt,%
+%  headfont=\normalfont\itshape,%
+%  postheadspace=1em,%
+%  qed=\qedsymbol%
+%]{mystyle} 
+%\declaretheorem[name={Proof},style=mystyle,unnumbered,
+%]{prf}
 
 % Font
 % \usepackage{tgpagella}
@@ -85,3 +98,5 @@
 % Copied from the FCore paper:
 \usepackage[colorlinks=true,allcolors=black,breaklinks,draft=false]{hyperref}   % hyperlinks, including DOIs and URLs in bibliography
 % known bug: http://tex.stackexchange.com/questions/1522/pdfendlink-ended-up-in-different-nesting-level-than-pdfstartlink
+
+\usepackage{setspace}

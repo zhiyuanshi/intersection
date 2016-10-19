@@ -1,8 +1,7 @@
 \section{Disjointness} \label{sec:alg-dis}
-
 Section~\ref{sec:fi} presented a type system with disjoint
 intersection types and disjoint quantification. In order to prove 
-both type-safe and coherence (in Section~\ref{}), it is necessary to first introduce a
+both type-safe and coherence (in Section~\ref{sec:disjoint}), it is necessary to first introduce a
 notion of disjointness, considering polymorphism and disjointness quantification.
 %In constrast with \oldname, we no longer use a specification for disjointness, as
 %that would require variable unification.
@@ -10,7 +9,7 @@ This section presents an algorithmic set of rules for determining whether two ty
 After, it will show a few important properties regarding substitution, which will turn out
 to be crucial to ensure type-safety.
 Finally, it will discuss the bounds of disjoint quantification and what implications
-they have on \name, with a special focus on the $\top$ type and an hypothetical $\bot$ type.
+they have on \name, with a special focus on the $\top$ type. 
 
 \begin{comment}
 \subsection{Derivation of the Algorithmic Rules}
@@ -103,6 +102,7 @@ $\commonsuper$:
 \subsection{Algorithmic Rules for Disjointness}
 
 \begin{figure}[!t]
+  \begin{spacing}{0.5}
   \begin{mathpar}
     \formdis \\
     \ruledistop \and \ruledistopsym \and 
@@ -110,13 +110,13 @@ $\commonsuper$:
     \ruledisfun \and \ruledisinterl \and \ruledisinterr \and 
     \ruledisatomic
   \end{mathpar}
-
   \begin{mathpar}
     \formax \\
     \ruleaxintfun \and \ruleaxintforalldis \and \ruleaxfunforalldis \and \ruleaxsym
   \end{mathpar}
+  \end{spacing}
 
-  \caption{Algorithmic Disjointness.}
+  \caption{Algorithmic disjointness.}
   \label{fig:disjointness}
 \end{figure}
 
@@ -127,9 +127,16 @@ Figure~\ref{fig:disjointness}, which consists of two judgements.
 two types $A$ and $B$ are disjoint in a context $\Gamma$.
 The top five rules are novel in relation to the algorithm described in \oldname.
 \reflabel{\labeldistop} and \reflabel{\labeldistopsym} say that any type is disjoint to 
-$\top$. Type variables are dealt with two rules:
+$\top$.
+This is a major difference with \oldname, where the notion of disjointness explicitly forbids
+the presence of $\top$ types in intersections.
+It turns out that even though $\top$ overlaps with every other type,
+it does not affect coherence in any way.
+We will come back to this in Section~\ref{sec:disjoint}.
+ 
+Type variables are dealt with two rules:
 \reflabel{\labeldisvar} is the base rule; and \reflabel{\labeldissym}
-is its twin symetrical rule. 
+is its twin symmetrical rule. 
 Both rules state that a type variable is disjoint to some type $A$, if $\Gamma$ contains any
 subtype of the corresponding disjointness constraint. 
 This rule is a specialization of the more general lemma:
@@ -139,6 +146,11 @@ This rule is a specialization of the more general lemma:
 
   If $\jwf \Gamma {A \disjoint B}$ and $B \subtype C$, then $\jwf \Gamma {A \disjoint C}$.
 \end{restatable}
+\begin{proof}
+By double induction, first on the disjointness derivation and then on the subtyping derivation.
+The first induction case for~\reflabel{\labeldisvar} does not need the second induction as it is 
+a straightforward application of subtyping transitivity. 
+\end{proof}
 
 The lemma states that if a type $A$ is disjoint to $B$ under $\Gamma$, then it is also disjoint
 to any supertype of $B$. 
@@ -152,34 +164,32 @@ disjointness in the bodies under that environment.
 To illustrate this rule, consider the following two types:
 \[ (\forall (\alpha * \tyint).~\tyint \& \alpha) \qquad 
 (\forall (\alpha * \tychar). ~\tychar \& \alpha) \]
-The question is under which conditions are those two types disjoint.
+When are these two types disjoint?
 In the first type $\alpha$ cannot be instantiated with $\tyint$ and in
 the second case $\alpha$ cannot be instantiated with $\tychar$.
 Therefore for both bodies to be disjoint, $\alpha$ cannot be instantiated with either $\tyint$ 
 or $\tychar$. 
-The rule for disjoint quantification captures this fact by requiring the bodies of disjoint 
-quantification to be checked for disjointness under both constraints.
+%The rule for disjoint quantification captures this fact by requiring the bodies of disjoint 
+%quantification to be checked for disjointness under both constraints.
 The reader might notice how this intersection does not necessarily need to be well-formed,
 in the sense that the types that compose it might not be disjoint.
-The explanation for this underlies in the fact that disjointness is only necessary to guarantee
-the coherence of elaboration.
-Introducing arbitrary intersection types in the environment is not problematic, as the disjointness
-relation does not rely on the target term produced by the subtyping relation.
-The remaining rules are identical to the original rules, and we will only briefly explain them.
-The rule for functions \reflabel{\labeldisfun} says that two function
-types are disjoint if and only if their return types are disjoint. 
-The rules dealing with intersection types (\reflabel{\labeldisinterl}
-and \reflabel{\labeldisinterr}) say that an intersection is disjoint to some type $B$, whenever
-both of their components are also disjoint to $B$.
-Finally, the rule \reflabel{\labeldisax} says two types are considered disjoint if they are
-judged to be disjoint by the axiom rules, which are explained below.
+This is not problematic because the intersections present as constraints in the environment
+do not contribute directly to the (coherent) coercions generated by the type-system.
+The remaining rules are identical to the original rules. 
+%The rule for functions \reflabel{\labeldisfun} says that two function
+%types are disjoint if and only if their return types are disjoint. 
+%The rules dealing with intersection types (\reflabel{\labeldisinterl}
+%and \reflabel{\labeldisinterr}) say that an intersection is disjoint to some type $B$, whenever
+%both of their components are also disjoint to $B$.
+%We emphasize that the rule \reflabel{\labeldisax} says two different type constructs are disjoint 
+%if the axiom rules (explained below) apply. 
 
 \paragraph{Axioms.} Axiom rules take care of two types with different language constructs.
 These rules capture the set of rules is that $A \disjointax B$ holds for all 
 two types of different constructs unless any of them is an intersection type, a type variable,
 or $\top$.
 Note that disjointness with type variables is already captured by \reflabel{\labeldisvar} and 
-\reflabel{\labeldissym}, and disjointness with the $\top$ type is already captured by 
+\reflabel{\labeldissym}, and disjointness with the $\top$ type is captured by 
 {\reflabel{\labeldistop}} and {\reflabel{\labeldistopsym}}.
 
 \subsection{Stability under Substitution}
@@ -200,7 +210,7 @@ well-typed.  However, during type instantiation (i.e. when type
 substitution should be stable), both types $A$ and $B$ can change.  It
 should follow naturally that this instantiation will not produce an
 ill-formed type $A \inter B$, or, more generally, disjointness should
-be stable under substitution.  Let us illustrate with an example,
+be stable under substitution.  Let us illustrate this with an example,
 showing why disjointness judgements are not invariant with respect to
 free variable substitution.  In other words, why a careless
 substitution can violate the disjoint constraint in the context.
@@ -215,7 +225,7 @@ is compatible with the disjointness constraint associated with the variable.
 
 \paragraph{Disjoint substitutions.}
 While disjointness cannot be preserved for general substitutions,
-if appropriate disjointness pre-conditions are met then disjoiness can
+if appropriate disjointness pre-conditions are met then disjointess can
 be preserved. More formally, the following lemma holds: 
 
 \begin{lemma}[Disjointness is stable under substitution]
@@ -234,7 +244,7 @@ be preserved. More formally, the following lemma holds:
 \end{proof}
 
 \paragraph{Well-formedness substitution stability.}
-Typically polymorphic systems with explicit instantiation are required to be shown that their
+Typically polymorphic systems with explicit instantiation are required to show that their
 types are stable under substitution, in order to avoid ill-formed types.
 In the presence of disjoint quantification, we cannot prove such property.
 However, a weaker version of that property -- but strong enough for our type-system's metatheory 
@@ -243,10 +253,9 @@ However, a weaker version of that property -- but strong enough for our type-sys
 \begin{lemma}[Types are stable under substitution]
   \label{lemma:wfsubst}
 
-  If $\jwf \Gamma A$ and $\jwf \Gamma B$ and $(x \disjoint C) \in \Gamma$ 
-  and $\jdis \Gamma B C$, then $\jwf {\subst B x \Gamma} {\subst B x A}$.
+  If $\jwf \Gamma A$ and $\jwf \Gamma B$ and $(\alpha \disjoint C) \in \Gamma$ 
+  and $\jdis \Gamma B C$, then $\jwf {\subst B \alpha \Gamma} {\subst B \alpha A}$.
 \end{lemma}
-
 %\begin{restatable}[Instantiation]{lemma}{instantiation}
 %  \label{lemma:instantiation}
 %
@@ -257,7 +266,7 @@ However, a weaker version of that property -- but strong enough for our type-sys
 \begin{proof}
 By induction on the well-formedness derivation of $A$.
 The intersection case requires the use of Lemma~\ref{lemma:orthosubst}.
-Also, the variable case required proving that if $x$ does not occur free in $A$, and it is safe
+Also, the variable case required proving that if $\alpha$ does not occur free in $A$, and it is safe
 to substitute it in the co-domain of $\Gamma$, then it is safe to perform the substitution.
 \end{proof}
 
@@ -277,22 +286,22 @@ More formally, we have that:
   Lemma~\ref{lemma:wfsubst} in the case of \reflabel{\labelttapp}.
 \end{proof}
 
-Even though the meta-theory is consistent with the expected results, there is still a
-question that remains unanswered: what exactly are the bounds of disjoint quantification?
+Even though the meta-theory is consistent with the expected results, we might still ask: 
+what exactly are the bounds of disjoint quantification?
 In other words, which type(s) might be used to allow unrestricted instantiation, and which
 one(s) might be used to completely restrict instantiation?
-As one might expect, the answer is tightely related to subtyping, as we will show next. 
+As the reader might expect, the answer is tightely related to subtyping, as we will show next. 
 
 \subsection{Bounds of Disjoint Quantification}
 Substitution raises the question of what range of types can be instantiated for a given variable, 
 under a given context.
 To get a feeling about this, we ask the reader to recall 
-Lemma~\ref{lemma:disjointness-covariance}, which was used to justify the rule for
+Lemma~\ref{lemma:disjointness-covariance}, used to justify the rule for
 disjointness of variables.
-If one takes $A$ as some variable $x$, then the lemma should read as:   
-\[ \inferrule {\jwf \Gamma {x \disjoint B} \\ B \subtype C }
-              {\jwf \Gamma {x \disjoint C}} \]
-Now we can ask: how many suitable types are there to instantiate $x$ with?
+If one takes $A$ as some variable $\alpha$, then the lemma should read as:   
+\[ \inferrule {\jwf \Gamma {\alpha \disjoint B} \\ B \subtype C }
+              {\jwf \Gamma {\alpha \disjoint C}} \]
+Now we may ask: how many suitable types are there to instantiate $\alpha$ with, depending on $B$?
 Before we answer this, let us ask first how many options are there for $C$, depending on the 
 shape of $B$?
 Given that the cardinality of \name's types is infinite, for the sake of this example we will 
@@ -304,20 +313,30 @@ proportional to the number of intersections present in $B$.
 For example, taking $B$ as $\tyint$ leads $C$ to be either $\top$ or $\tyint$; whereas $B$ as 
 $\tyint \inter \tystring$ leaves $C$ as either $\top$, $\tyint$ or $\tystring$.
 However, as the choices for $C$ grows, the less choices we are left to instantiate 
-the variable $x$, since $x$ must be disjoint to all possible $C$'s. 
-Thus, to answer the first question, the options for instantiating $x$ are inversely proportional 
+the variable $\alpha$, since $\alpha$ must be disjoint to all possible $C$'s. 
+Thus, to answer the first question, the options for instantiating $\alpha$ are inversely proportional 
 to the number of intersections present in $B$.
-As an analogy, one might think of a disjointness constraint as a set of (forbidden) types, where 
+By analogy, one may think of a disjointness constraint as a set of (forbidden) types, where 
 primitive types are the singleton set and each $\inter$ is the set union.
 
 We can now turn our attention to the two extreme cases, namely $\top$ 
 (i.e. the 0-ary intersection) and $\bot$ (i.e. the infinite intersection) 
 \footnote{$\bot$ would not add anything to the hypothetical finite type 
 system, however it can be seen as the infinite intersection in \name.}.
-Following the same logic, we may conclude that $\top$ as the associated constraint leaves $x$ with 
-the most options for instantiation whereas $\bot$ will deliver the least options.
+Following the same logic, we may conclude that having $\top$ as constraint leaves $\alpha$ with 
+the most options for instantiation; whereas $\bot$ will deliver the least options.
+This implies that $\top$ is the empty constraint, meaning that a variable associated to it
+can be instantiated to any well-formed type.
+It is a subtle but very important property, since \name is a generalization of System $F$. 
+Any type variable present in a type signature of System $F$, can be represented in \name
+equivalently by assigning it a $\top$ disjointness constraint
+(as seen in Section~\ref{subsec:disjoint-quantification}).
+
+\begin{comment}
 We will briefly discuss the role of the former in our system. 
-\joao{maybe we can just refer to the overview and delete the next paragraph?}
+\joao{maybe we can just refer to the overview and delete the next
+  paragraph?}
+\bruno{That could be an idea, yes.}
 
 \paragraph{The most liberal bound.}
 It is easy to see that $\top$ is the most liberal type since it is disjoint to everything. 
@@ -329,3 +348,4 @@ the System $F$'s type $\forall \alpha. {T_F}$ (where ${T_F}$ is some other type)
 equivalent to \name's type $\fordis \alpha \top {T_i}$, where ${T_i}$ is also an equivalent 
 translation of $T_{F}$.
 An example of such translation has been given in Section~\ref{sec:overview}.
+\end{comment}

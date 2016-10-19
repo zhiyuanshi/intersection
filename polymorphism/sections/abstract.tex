@@ -8,19 +8,17 @@ intersections types} as a means to ensure coherence in a simply typed
 setting. However, the addition of parametric polymorphism was not
 studied.
 
-This paper presents \name: a core calculus with 
+This paper presents \name: a calculus with 
 \emph{disjoint intersection types}, a variant of \emph{parametric polymorphism} and a
 \emph{merge operator}. \name is both type-safe and
-coherent. The key difficulty in adding polymorphism, while ensuring
-coherence is that, when a type variable occurs in an intersection
+coherent. The key difficulty in adding polymorphism is that, when a type variable occurs in an intersection
 type, it is not statically known whether the instantiated type will be
 disjoint to other components of the intersection. To address this
 problem we propose \emph{disjoint polymorphism}: a constrained form of
-parametric polymorphism, that allows programmers to specify
+parametric polymorphism, which allows programmers to specify
 disjointness constraints for type variables. With disjoint
 polymorphism the calculus remains very flexible in terms of programs
-that can be written with disjoint intersection types, while retaining
-coherence.
+that can be written, while retaining coherence.
 
 \begin{comment}
 Coherence is achieved by ensuring that intersection types
