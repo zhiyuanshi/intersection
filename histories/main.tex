@@ -3,7 +3,7 @@
 
 \usepackage[dvipsnames]{xcolor}
 
-\usepackage{amsfonts}
+\usepackage{amsfonts}  % \mathbb
 \usepackage{mathpartir}
 \usepackage{mathtools}  % \Coloneqq
 
@@ -13,8 +13,8 @@
 \newcommand{\boldcdot}{\bullet}
 
 % Types
-\newcommand{\bool}{\texttt{Bool}}
-\newcommand{\integer}{\mathbb{Z}}
+\newcommand{\bool}{\mathcal{B}}
+\newcommand{\integer}{\mathcal{I}}
 \newcommand{\intersectionop}{\, \textit{\&} \,}
 
 % Terms
@@ -42,7 +42,7 @@
         \begin{array}{rlrl}
             \textrm{Types}     & \typecolor{\tau}      & \Coloneqq & \typecolor{\bool \blackmid \integer \blackmid \tau_1 \to \tau_2 \blackmid \tau_1 \intersectionop \tau_2} \\
             \textrm{Histories} & \derivcolor{\iota}    & \Coloneqq & \derivcolor{\boldcdot \blackmid \labelcolor{l} (\bar{\iota})} \\
-            \textrm{Terms}     & e                     & \Coloneqq & \true, \false \blackmid \ldots, -2, -1, 0, 1, 2, \ldots \blackmid x \blackmid \lam {x : \tau} {e} \blackmid \app {e_1} {e_2} \blackmid e_1 \mergeop e_2 \\
+            \textrm{Terms}     & e                     & \Coloneqq & b \blackmid i \blackmid x \blackmid \lam {x : \tau} {e} \blackmid \app {e_1} {e_2} \blackmid e_1 \mergeop e_2 \\
             \textrm{Contexts}  & \contextcolor{\Gamma} & \Coloneqq & \contextcolor{\boldcdot \blackmid \Gamma, x : \tau} \\
             \textrm{Labels}    & \labelcolor{l}        & \Coloneqq & \labelcolor{bool} \blackmid \labelcolor{int} \blackmid \labelcolor{var} \blackmid \labelcolor{lam} \blackmid \labelcolor{app} \blackmid \labelcolor{merge}
         \end{array}
@@ -54,11 +54,11 @@
     \begin{mathpar}
         \inferrule* [right=$\labelcolor{bool}$]
             { }
-            {\typing {\boldcdot} {\true, \false} {\bool} {bool(\boldcdot)}}
+            {\typing {\boldcdot} b \bool {bool(\boldcdot)}}
 
         \inferrule* [right=$\labelcolor{int}$]
             { }
-            {\typing {\boldcdot} {\ldots, -2, -1, 0, 1, \ldots} {\integer} {int(\boldcdot)}}
+            {\typing {\boldcdot} i \integer {int(\boldcdot)}}
 
         \inferrule* [right=$\labelcolor{var}$]
             {x : \tau \in \Gamma}
@@ -104,7 +104,7 @@
             \and
             {\inferrule* [right=$\labelcolor{inter_L}$]
                 {\inferrule* [right=$\labelcolor{merge}$]
-                    {\typing {\boldcdot} {1} {\integer} {\boldcdot} \and \typing {\boldcdot} {\true} {\bool} {\boldcdot}}
+                    {\typing {\boldcdot} {1} {\integer} {int(\boldcdot)} \and \typing {\boldcdot} {\true} {\bool} {bool(\boldcdot)}}
                     {\typing {\boldcdot} {1 \mergeop \true} {\integer \intersectionop \bool} {merge(\boldcdot, \boldcdot)}}}
                 {\typing {\boldcdot} {1 \mergeop \true} {\integer} {inter_L(merge(\boldcdot, \boldcdot))}}}}
             {\typing
@@ -126,7 +126,7 @@
             \and
             {\inferrule* [right=$\labelcolor{inter_R}$]
                 {\inferrule* [right=$\labelcolor{merge}$]
-                    {\typing {\boldcdot} {1} {\integer} {\boldcdot} \and \typing {\boldcdot} {\true} {\bool} {\boldcdot}}
+                    {\typing {\boldcdot} {1} {\integer} {int(\boldcdot)} \and \typing {\boldcdot} {\true} {\bool} {bool(\boldcdot)}}
                     {\typing {\boldcdot} {1 \mergeop \true} {\integer \intersectionop \bool} {merge(\boldcdot, \boldcdot)}}}
                 {\typing {\boldcdot} {1 \mergeop \true} {\bool} {inter_R(merge(\boldcdot, \boldcdot))}}}}
             {\typing
