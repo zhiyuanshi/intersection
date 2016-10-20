@@ -49,9 +49,9 @@ from \lstinline$Person$ and \lstinline$ConsoleLogger$ in the object \lstinline$j
 
 TypeScript's implementation of \lstinline{extend} relies on a biased choice.
 The function starts by creating a variable \lstinline$result$ with the type of the intersection. 
-It then iterates through the \lstinline$first$'s properties and copies them to the 
+It then iterates through \lstinline$first$'s properties and copies them to 
 \lstinline$result$.
-Next, it iterates through the \lstinline$second$'s properties but it only copies the properties
+Next, it iterates through \lstinline$second$'s properties but it only copies the properties
 that \lstinline$result$ does not possess yet (i.e. the ones present in \lstinline$first$).
 This means that the implementation is left-biased, as the properties of left type of the intersection
 are chosen in favor of the ones in the right.
@@ -83,7 +83,7 @@ let extend T (U * T) (first : T, second : U) : T & U = first ,, second
 
 \noindent The disjointness constraint on \lstinline{U} ensures that no
 conflicts (such as duplicated fields of the same type) exists when merging the two objects. In practice this approach
-is quite similar to trait-based OO approaches~\cite{}. If conflicts
+is quite similar to trait-based OO approaches~\cite{scharli2003traits}. If conflicts
 exist when two objects are composed, then fields have to be explicitly
 dropped from at least one object. Moreover if no existing
 implementation can be directly reused, a new one must be provided via
@@ -109,7 +109,8 @@ jim.log $\top$
 However, the intersection \lstinline$Person & Dog$ is not accepted.
 This is due to both types sharing a field with the same name (\lstinline$name$) 
 and the same type ($String$). 
-Note that the name clash between \lstinline$male$ fields does not impose any 
+Note that the name clash between \lstinline$male$ fields (which have
+different types) does not impose any 
 problem in this example.
 This will be further illustrated in the next section.
 
@@ -131,7 +132,8 @@ restriction and extension/concatenation.  Selection and concatenation
 (via the merge operator) are built-in in the semantics of
 \name. Merges in \name can be viewed as a generalization of record
 concatenation.  In \name, following well-known encodings of records in
-systems with intersection types and a merge operator~\cite{}, there are only three rather simple constructs
+systems with intersection types and a merge
+operator~\cite{}\bruno{reference missing}, there are only three rather simple constructs
 for records: 1) single field record types; 2) single field records; 3)
 field accessors. Multi-field records in \name are encoded with
 intersections and merges of single field records. An example is
@@ -292,7 +294,7 @@ record types is the following:
 \begin{lstlisting}[mathescape=true]
 let $\text{avg}_1$ (R\y, R\y) => (r : {R | x:Int, y:Int}) = (r.x+r.y)/2
 \end{lstlisting}
-The type signature says that for any record $r$, containing fields $x$
+The type signature says that any record $r$, containing fields $x$
 and $y$ and some more information $R$ (which lacks both fields $x$ and
 $y$), can be accepted returning an integer.  Note how the bounded
 polymorphism is essential to ensure that $R$ does not contain $x$ nor
