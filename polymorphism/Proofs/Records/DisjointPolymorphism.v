@@ -36,7 +36,7 @@ Export MExtended.
 
 (* Lemma 2: Subtyping reflexivity *)
 
-Lemma subyping_reflexivity : forall t, PType t -> Sub t t.
+Lemma subyping_reflexivity : forall A, PType A -> Sub A A.
 Proof. intros; apply sound_sub; now apply usub_refl. Qed.
 
 (* Lemma 3: Subtyping transitivity *)
@@ -50,37 +50,37 @@ Qed.
 (* Lemma 4: Covariance of disjointness *)
 
 Lemma covariance_disjointness :
-  forall Gamma u ty d, PType ty -> Ortho Gamma u d -> Sub d ty -> Ortho Gamma u ty.
+  forall Gamma A B C, PType C -> Ortho Gamma A B -> Sub B C -> Ortho Gamma A C.
 Proof.
-  intros Gamma u ty d HT HO HS; apply complete_sub in HS; eapply Ortho_usub_trans; eauto.
+  intros Gamma A B C HT HO HS; apply complete_sub in HS; eapply Ortho_usub_trans; eauto.
 Qed.
 
 (* Lemma 5: Disjointness is stable under substitution *)
 
 Lemma disjointness_stable_substitution :
-  forall z u Gamma d t1 t2,
-    not (In z (fv_ptyp u)) ->
-    WFEnv (subst_env Gamma z u) ->
+  forall a C Gamma D A B,
+    not (In a (fv_ptyp C)) ->
+    WFEnv (subst_env Gamma a C) ->
     WFEnv Gamma ->
-    MapsTo Gamma z d -> 
-    Ortho Gamma u d ->
-    Ortho Gamma t1 t2 ->
-    PType u ->
-    PType t1 ->
-    PType t2 ->
-    Ortho (subst_env Gamma z u) (subst_typ_source z u t1) (subst_typ_source z u t2).
+    MapsTo Gamma a D -> 
+    Ortho Gamma C D ->
+    Ortho Gamma A B ->
+    PType C ->
+    PType A ->
+    PType B ->
+    Ortho (subst_env Gamma a C) (subst_typ_source a C A) (subst_typ_source a C B).
 Proof. apply ortho_subst. Qed.
 
 (* Lemma 6: Types are stable under substitution *)
 
 Lemma types_stable_substitution :
-  forall t z u Gamma d, not (In z (fv_ptyp u)) ->
-               MapsTo Gamma z d ->
-               WFEnv (subst_env Gamma z u) ->
-               Ortho Gamma u d ->
-               WFTyp Gamma u ->
-               WFTyp Gamma t ->
-               WFTyp (subst_env Gamma z u) (subst_typ_source z u t).
+  forall A a B Gamma C, not (In a (fv_ptyp B)) ->
+               MapsTo Gamma a C ->
+               WFEnv (subst_env Gamma a B) ->
+               Ortho Gamma B C ->
+               WFTyp Gamma B ->
+               WFTyp Gamma A ->
+               WFTyp (subst_env Gamma a B) (subst_typ_source a B A).
 Proof. apply subst_source_wf_typ. Qed.
 
 (* Lemma 7: Well-formed typing *)

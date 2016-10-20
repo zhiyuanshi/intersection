@@ -141,23 +141,36 @@ Both rules state that a type variable is disjoint to some type $A$, if $\Gamma$ 
 subtype of the corresponding disjointness constraint. 
 This rule is a specialization of the more general lemma:
 
+\thmprf{-0.1cm}{
 \begin{restatable}[Covariance of disjointness]{lemma}{disjointnesscovariance}
   \label{lemma:disjointness-covariance}
 
   If $\jwf \Gamma {A \disjoint B}$ and $B \subtype C$, then $\jwf \Gamma {A \disjoint C}$.
-\end{restatable}
-\begin{proof}
+\end{restatable}}
+{-0.2cm}
+{\noindent \emph{Proof.}
 By double induction, first on the disjointness derivation and then on the subtyping derivation.
 The first induction case for~\reflabel{\labeldisvar} does not need the second induction as it is 
-a straightforward application of subtyping transitivity. 
-\end{proof}
+a straightforward application of subtyping transitivity.}
+{0.05cm}
 
-\noindent The lemma states that if a type $A$ is disjoint to $B$ under $\Gamma$, then it is also disjoint
+%\begin{restatable}[Covariance of disjointness]{lemma}{disjointnesscovariance}
+%  \label{lemma:disjointness-covariance}
+%
+%  If $\jwf \Gamma {A \disjoint B}$ and $B \subtype C$, then $\jwf \Gamma {A \disjoint C}$.
+%\end{restatable}
+%\begin{proof}
+%By double induction, first on the disjointness derivation and then on the subtyping derivation.
+%The first induction case for~\reflabel{\labeldisvar} does not need the second induction as it is 
+%a straightforward application of subtyping transitivity. 
+%\end{proof}
+
+The lemma states that if a type $A$ is disjoint to $B$ under $\Gamma$, then it is also disjoint
 to any supertype of $B$. 
-Note how these two variable rules would allow one to prove $x \disjoint x$, for any type 
-variable $x$.
+Note how these two variable rules would allow one to prove $\alpha \disjoint \alpha$, for any 
+variable $\alpha$.
 However, under the assumption that contexts are well-formed, such derivation is not possible 
-as $x$ cannot occur free in $A$. 
+as $\alpha$ cannot occur free in $A$. 
 
 The rule for disjoint quantification \reflabel{\labeldisforall} is the last novel rule. 
 To illustrate this rule, consider the following two types:
