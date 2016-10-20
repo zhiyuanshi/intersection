@@ -1,9 +1,14 @@
 \section{Related Work}
 \label{sec:related-work}
 \paragraph{Intersection types, polymorphism and the merge operator.}
-To our knowlegde no previous work has been done in a calculus which
-includes parametric polymorphism, intersection types and a
-\emph{merge} operator. However, various simply typed systems with 
+To our knowlegde no previous work presents a \emph{coherent} calculus
+which includes parametric polymorphism, intersection types and a
+\emph{merge} operator. As far as we are aware only Pierce's
+$F_\wedge$~\cite{pierce1991programming2}\bruno{joao: you need to read
+  Pierce's stuff to double-check that what I say is correct.}
+supports both the merge operator, intersection types and polymorphism.
+However $F_\wedge$ is incoherent.  In $F_\wedge$ the
+merge operator is called $glue$. Various simply typed systems with 
 intersections types and a merge operator have been studied in the past.
 The merge operator was first introduced 
 by Reynold's in the Forsythe~\cite{reynolds1997design}
@@ -14,9 +19,7 @@ Castagna et al.~\cite{Castagna92calculus} studied a coherent calculus with a
 special merge operator on that works on functions only. The goal was to model
 \emph{function overloading}. Unlike Reynold's operator, multiple 
 functions are allowed in merges, but non-functional types are
-forbidden. Pierce's $F_\wedge$~\cite{pierce1991programming2} also 
-studied a $glue$ operator that was esseintially a merge. However
-Pierce's calculus is incoherent.
+forbidden.
 \begin{comment}
 Concerning simply-typed systems, the oldest work dates back to the 1980s,
 when Reynolds invented Forsythe~\cite{reynolds1997design}, with his
@@ -51,13 +54,14 @@ is incoherent, it was the inspiration for the
 
 \oldname solves the coherence problem for a calculus similar to Dunfield's, by requiring that
 intersection types can only be composed of \emph{disjoint} types.
-For simplicity purposes, \oldname uses a specification for disjointness, which says that two types are 
+\oldname uses a specification for disjointness, which says that two types are 
 disjoint if they do not share a common supertype.
 \name does not use such specification as its adaptation to polymorphic types would require
 using unification, making the specification arguably more complex than
 the algorithmic rules (and defeating the purpose of having a
 specification). \name's notion of disjointness is based on \oldname's more
-general notion of disjointness concerning $\top$ types, called $\top$-disjointness, which 
+general notion of disjointness concerning $\top$ types, called
+$\top$-disjointness. $\top$-disjointness 
 states that two types $A$ and $B$ are disjoint if two conditions are satisfied:
 %\begin{definition}[$\top$-disjointness]
 %  Two types $A$ and $B$ are disjoint
@@ -67,8 +71,8 @@ states that two types $A$ and $B$ are disjoint if two conditions are satisfied:
   \item $\forall C.~\text{if}~ A \subtype C~\text{and}~B \subtype C~\text{then}~\toplike{C}$
 \end{enumerate}
 %\end{definition}
-\noindent A major difference between the two calculus, is that $\top$-disjointness does not allow
-$\top$ in intersections, while our calculus allows it.
+\noindent A major difference between the \name and \oldname, is that $\top$-disjointness does not allow
+$\top$ in intersections, while \name allows this.
 In other words, condition (1) is not imposed by \name.
 As a consequence, the set of well-formed \emph{top-like} types is a superset of \oldname's.
 This is covered in greater detail in Section~\ref{sec:disjoint}.
@@ -91,15 +95,16 @@ x. (x \in \tyint) ? (x \text{ mod } 2) = 0 : x
 
 \noindent In our system we cannot express some of these intersections, namely the ones that
 do not have disjoint co-domains.
-However, \name accepts other kind of intersections which are not possible to express
+However, \name accepts other kinds of intersections which are not possible to express
 in their calculus, as in merges of type $(\tyint \to \tybool) \inter (\tyint \to \tyint)$.
 Just as~\cite{Castagna92calculus}, their work is focused on combining 
 intersections with functions, whereas \name is concerned with merges between
-arbitrary types.
+arbitrary types.\bruno{I think you need to comment on the relation
+  between disjointness and negation ($\alpha \backslash \tyint$)}
 
 \joao{elaborate more on this paragraph?}
 Going in the direction of higher
-kinds, Compagnoni and Pierce~\cite{compagnoni1996higher} added
+kinds, Compagnoni and Pierce~\cite{comppier96} added
 intersection types to System $ F_{\omega} $ and used a new calculus,
 $ F^{\omega}_{\wedge} $, to model multiple inheritance. 
 In their system, types include the construct of intersection of types of the
@@ -109,19 +114,21 @@ intersection types and effects in call-by-value languages.
 They proposed a ``value restriction'' for intersection types, similar to
 value restriction on parametric polymorphism.
 
-Intersection types have also been adopted in object-oriented languages such as Scala,
-Ceylon, Grace, Flow or TypeScript.
-Generally speaking, the main difference between these languages and \name is the lack
-of explicit instantiation through the merge operator.
-This leads to several ad-hoc solutions at defining such operator in those languages,
-as it has been discussed in Section~\ref{sec:intro} and Section~\ref{subsec:mixins}. 
+Recently, some form of intersection types has been adopted in
+object-oriented languages such as Scala, TypeScript, Flow, Ceylon, and
+Grace\bruno{references}.  There is also a foundational calculus for Scala
+that incorporates intersection types~\cite{rompf2016soundness}.
+Generally speaking, the most significant difference between \name 
+and those languages/calculus is that
+in they have no explicit introduction construct
+like our merge operator.  This leads to several ad-hoc solutions at
+defining a merge operator in those languages, as it has been discussed in
+Section~\ref{sec:intro} and Section~\ref{subsec:mixins}.
 
 \paragraph{Extensible records.}%
 %http://elm-lang.org/learn/Records.elm
 Encoding records using intersection types first appeared in 
 Reynolds~\cite{reynolds1997design} and Castagna et al.~\cite{castagna1995calculus}. 
-Although Dunfield also discussed this idea in his paper \cite{dunfield2014elaborating}, 
-he only provided an implementation but not a formalization. 
 A similar to our treatment of elaborating records is
 Cardelli's work~\cite{cardelli1992extensible} on translating a calculus
 with extensible records ($ F_{\subtype \rho}$) to a simpler calculus without
