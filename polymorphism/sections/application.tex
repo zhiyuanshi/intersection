@@ -78,7 +78,7 @@ of the language, and thus \lstinline{extend} is simply defined as
 follows:
 
 \begin{lstlisting}
-let extend T (U * T) (first : T, second : U) : T & U = first ,, second 
+let extend T (U * T) (first : T, second : U) : T & U = first ,, second in 
 \end{lstlisting}
 
 \noindent The disjointness constraint on \lstinline{U} ensures that no
@@ -188,7 +188,7 @@ Instead, \name uses subtyping for restriction:
 %\end{align*}
 %
 \begin{lstlisting}[mathescape=true]
-let remove (x : { age : Int } & {name : String}) : {name : String} = x in $\ldots$ 
+let remove (x : {age : Int} & {name : String}) : {name : String} = x in $\ldots$ 
 \end{lstlisting}
 
 \noindent The function \lstinline{remove} drops the field

@@ -123,14 +123,13 @@ Therefore, their (unique) coercions can be generated structurally from their typ
 For example, the term $\lam x \unit$ represents the only inhabitant of the type 
 $\tyint \to \top$.
 
-According to~\cite{oliveira16disjoint}, some top-like types are problematic.
-For instance, a top-like type can be an intersection composed of $\top$ types, as in
-$\top \inter \top$.
-This type is a super-type of every other type, including $\top$.
-Also, there might be a coherence problem with this type, as both components of the
+According to~\cite{oliveira16disjoint}, some top-like types are problematic,
+for instance: $\top \inter \top$.
+Not only this type is a super-type of every other type (including $\top$), but
+also it might impose a coherence problem, as both components of the
 intersection overlap.
-However, taking a closer look at this type clarifies that there are no such issues. 
-To see this, let us first consider the ill-type $\tyint \inter \tyint$.
+However, taking a closer look at it clarifies that such issues are not problematic. 
+To explain why, let us first consider the ill-type $\tyint \inter \tyint$.
 This type is a potential source for incoherence, as both components of the intersection 
 overlap.
 %The $\tyint \inter \tyint \subtype \tyint$ judgement has to produce a coercion which
@@ -146,9 +145,9 @@ It is important realizing that this is always the case with top-like intersectio
 %In fact, this explains why $\top$ is actually disjoint with every other type.
 Moreover, top-like types can also be safely intersected with other types, as their inhabitants
 do not overlap.
-Generally speaking, top-like types should never be a source of incoherence. 
+Generally speaking, top-like types should never be a source of incoherence, implying that 
 %Thus, in contrast with \cite{oliveira16disjoint}, they can be safely intersected with any other type.
-This explains why $\top$ is disjoint to every other type, as mentioned in Section~\ref{sec:alg-dis}.
+$\top$ is disjoint to every other type (as mentioned in Section~\ref{sec:alg-dis}).
 
 \paragraph{Rules.}
 Our definition of top-like types is an extension from \oldname. 
@@ -212,14 +211,12 @@ Finally, all rules produce type-correct coercions:
 % of $A_3$ and the new coercion is a function that takes a value $ x $ of type
 % $A_1\inter A_2$, project $x$ on the first item, and apply $ C $ to it.
 
+\defaultthmprf{
 \begin{restatable}[Subtyping rules produce type-correct coercions]{lemma}{lemmasub}
   \label{lemma:sub}
   If $ A_1 \subtype A_2 \yields E $, then $ \jtype \cdot E {\im {A_1} \to \im {A_2}} $.
-\end{restatable}
-
-\begin{proof}
-  By a straightforward induction on the derivation.
-\end{proof}
+\end{restatable}}
+{\noindent \emph{Proof.} By a straightforward induction on the derivation.}
 
 % \george{Explain \reflabel{\labelsubforall} and distinction of kernel and all version.}
 
@@ -265,6 +262,7 @@ Finally, all rules produce type-correct coercions:
 In order to prove the type-system coherent, the subtyping relation also 
 needs to be shown coherent. With disjoint polymorphism the following lemma holds:
 
+\defaultthmprf{
 \begin{lemma}[Unique subtype contributor]
   \label{lemma:unique-subtype-contributor}
 
@@ -276,31 +274,25 @@ needs to be shown coherent. With disjoint polymorphism the following lemma holds
     \item $A_1 \subtype B$
     \item $A_2 \subtype B$
   \end{enumerate}
-\end{lemma}
-
-%Unfortunately, disjoint intersections alone are insufficient to deal with problem 2).
-%In order to deal with problem 2), we introduce a distinction between types, and atomic types.
-
-\begin{proof}
-By double induction: the first on the disjointness derivation (which follows from $A_1 \inter A_2$ being well-formed);
+\end{lemma}}
+{\noindent \emph{Proof.} By double induction: the first on the disjointness derivation (which follows from $A_1 \inter A_2$ being well-formed);
 the second on type $B$.
 The variable cases \reflabel{\labeldisvar} and \reflabel{\labeldissym} needed to show that, for any two well-formed 
-and disjoint types $A$ and $B$, and $B$ is not toplike, then $A$ cannot be a subtype of $B$.
-\end{proof}
+and disjoint types $A$ and $B$, and $B$ is not toplike, then $A$ cannot be a subtype of $B$.}
 
 Using this lemma, we can show that the coercion of a subtyping relation $A \subtype B$ 
 is uniquely determined.
 This fact is captured by the following lemma:
 
+\defaultthmprf{
 \begin{restatable}[Unique coercion]{lemma}{uniquecoercion}
   \label{lemma:unique-coercion}
 
   If $A \subtype B \yields {E_1}$ and $A \subtype B \yields {E_2}$, where $A$
   and $B$ are well-formed types, then $E_1 \equiv E_2$.
-\end{restatable}
-\begin{proof}
-By induction on the first derivation and case analysis on the shape of the second. 
-\end{proof}
+\end{restatable}}
+{\noindent \emph{Proof.} By induction on the first derivation and case analysis on the second.} 
+
 \begin{comment}
 \paragraph{Expressiveness.}
 Remarkably, our restrictions on subtyping do not sacrifice the expressiveness of
@@ -459,8 +451,8 @@ This translation turns merges into usual pairs, similar to Dunfield's
 elaboration approach~\cite{dunfield2014elaborating}.
 It also translates the form of disjoint quantification and disjoint type application into regular (polymorphic) 
 quantification and type application. 
-For example, \[ \blamdis \alpha \tyint {\lam x {(x \mergeop 1)}} \] in \name will be translated into System $F$'s: 
-\[ \blam \alpha {\lam x {\pair x 1}}\]
+For example, $\blamdis \alpha \tyint {\lam x {(x \mergeop 1)}}$ in \name will be translated into System $F$'s 
+$\blam \alpha {\lam x {\pair x 1}}$.
 \begin{comment}
 This is achieved by means of the type-directed translation.
 Note that, when performing type application, the type-system will ensure that the type being applied is compatible
@@ -518,6 +510,7 @@ All the remaining rules are ported from \oldname.
 The type-directed translation is type-safe. This property is captured
 by the following two theorems.
 
+\thmprf{0cm}{
 \begin{restatable}[Type preservation]{theorem}{typepreservation}
   \label{theorem:type-preservation}
   We have that:
@@ -527,23 +520,16 @@ by the following two theorems.
   \item If $ \jcheck \Gamma e A \yields E $, 
         then $ \jtype {\im \Gamma} E {\im A} $.
   \end{itemize}
-
-\end{restatable}
-
-\begin{proof}
-  By structural induction on the term and the corresponding inference rule.
-\end{proof}
-
+\end{restatable}}{-0.1cm}
+{\noindent \emph{Proof.} By structural induction on the term and the corresponding inference rule.}
+{-0.1cm}
+\defaultthmprf{
 \begin{theorem}[Type safety]
   If $e$ is a well-typed \name term, then $e$ evaluates to some System $F$
   value $v$.
-\end{theorem}
-
-\begin{proof}
-  Since we define the dynamic semantics of \name in terms of the composition of
-  the type-directed translation and the dynamic semantics of System $F$, type safety follows immediately.
-\end{proof}
-
+\end{theorem}}
+{\noindent \emph{Proof.} Since we define the dynamic semantics of \name in terms of the composition of
+  the type-directed translation and the dynamic semantics of System $F$, type safety follows immediately.}
 %From the theoretical point-of-view, the end goal of this section is to show that the resulting system has
 %a coherent (or unique) elaboration semantics:
 %\begin{restatable}[Unique elaboration]{theorem}{uniqueelaboration}
@@ -727,6 +713,7 @@ by the following two theorems.
 An important property of the bidirectional type-checking is that, given an expression $e$, if
 it is possible to infer a type for it, then $e$ has a unique type.
 
+\defaultthmprf{
 \begin{restatable}[Uniqueness of type-inference]{theorem}{uniqueinference}
   \label{theorem:unique-inference}
   We have that:
@@ -734,16 +721,13 @@ it is possible to infer a type for it, then $e$ has a unique type.
     \item If $\jinfer \Gamma e {A_1} \yields {E_1}$ and $\jinfer \Gamma e {A_2} \yields
           {E_2}$, then ${A_1} = {A_2}$. 
   \end{itemize*}
-\end{restatable}
-
-\begin{proof}
-By structural induction on the term and the corresponding inference rule.
-\end{proof}
-
+\end{restatable}}
+{\noindent \emph{Proof.} By structural induction on the term and the corresponding inference rule.}
 
 \paragraph{Coherency of Elaboration}
 Combining the previous results, we are finally able to show the central theorem:
 
+\defaultthmprf{
 \begin{restatable}[Unique elaboration]{theorem}{uniqueelaboration}
   \label{theorem:unique-elaboration}
   We have that:
@@ -754,30 +738,27 @@ Combining the previous results, we are finally able to show the central theorem:
           {E_2}$, then $E_1 \equiv E_2$.
   \end{itemize*}(``$\equiv$'' means syntactical equality, up to
   $\alpha$-equality.)
-  
-
-\end{restatable}
-
-\begin{proof}
+\end{restatable}}
+{\noindent \emph{Proof.}
   By induction on the first derivation. The most important case is the
   subsumption rule:
-\begin{comment}
-  Note that three cases need special attention: \reflabel{\labelttapp}, \reflabel{\labeltsub} and \reflabel{\labeltapp}.
-  In the \reflabel{\labeltblam}:
-  \begin{mathpar}
-    \brulettappdis
-  \end{mathpar}
-\noindent we need to show that the constraint $B$ is unique, using Theorem~\ref{theorem:unique-inference}, 
-in order to apply the induction hypothesis.
-For \reflabel{\labeltapp}: 
-\begin{mathpar}
-\bruletapp
-\end{mathpar}
-\noindent we also need to show the uniqueness of $A_1$ using
-Theorem~\ref{theorem:unique-inference}, in order to apply the
-induction hypothesis.
-  Also, in the \reflabel{\labeltsub} rule:
-\end{comment}
+%\begin{comment}
+%  Note that three cases need special attention: \reflabel{\labelttapp}, \reflabel{\labeltsub} and \reflabel{\labeltapp}.
+%  In the \reflabel{\labeltblam}:
+%  \begin{mathpar}
+%    \brulettappdis
+%  \end{mathpar}
+%\noindent we need to show that the constraint $B$ is unique, using Theorem~\ref{theorem:unique-inference}, 
+%in order to apply the induction hypothesis.
+%For \reflabel{\labeltapp}: 
+%\begin{mathpar}
+%\bruletapp
+%\end{mathpar}
+%\noindent we also need to show the uniqueness of $A_1$ using
+%Theorem~\ref{theorem:unique-inference}, in order to apply the
+%induction hypothesis.
+%  Also, in the \reflabel{\labeltsub} rule:
+%\end{comment}
 \begin{mathpar}
 \bruletsub
 \end{mathpar}
@@ -789,6 +770,4 @@ induction hypothesis.
   guaranteeing coherence.
   We also need to show that $A$ is unique (by
 Theorem~\ref{theorem:unique-inference}). 
-Uniqueness of $A$ is needed to apply the induction hypothesis.
-
-\end{proof}
+Uniqueness of $A$ is needed to apply the induction hypothesis.}

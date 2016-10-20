@@ -377,8 +377,7 @@ Disjoint quantification also allows type variables to be disjoint
 to previously defined type variables. For example, the following
 program is accepted by \name:
 \begin{lstlisting}
-let fst A ((*$ \highlight {B *~A} $*)) (x: A & B) : A = x
-in (*$ \ldots $*)
+let fst A ((*$ \highlight {B *~A} $*)) (x: A & B) : A = x in (*$ \ldots $*)
 \end{lstlisting}
 The program has two type variables \lstinline{A} and \lstinline{B}. 
 \lstinline{A} is unconstrained and can be instantiated with any type. 
