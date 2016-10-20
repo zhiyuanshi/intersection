@@ -739,31 +739,6 @@ Proof.
   apply EqFacts.eqb_neq in H1; exfalso; apply H1; reflexivity.
   auto. auto.
 Qed.  
-    
-Lemma sub_rename :
-  forall L t1 t2 c, forall y,
-    PType (open_typ_source t1 (PFVarT y)) ->
-    PType (open_typ_source t2 (PFVarT y)) ->
-    ~ In y (union L (union (fv c) (union (fv_ptyp t1) (fv_ptyp t2)))) ->
-    sub (open_typ_source t1 (PFVarT y))
-        (open_typ_source t2 (PFVarT y))
-        (open_typ_term c (STFVarT y)) ->
-    (forall x : elt, ~ In x L -> sub (open_typ_source t1 (PFVarT x))
-                               (open_typ_source t2 (PFVarT x))
-                               (open_typ_term c (STFVarT x))).
-Proof.
-  intros.
-  destruct (VarTyp.eq_dec x y).
-  subst; auto.
-  rewrite subst_typ_source_intro with (x := y); auto.
-  rewrite subst_typ_source_intro with (x := y) (t := t2); auto.
-  rewrite subst_typ_term_intro with (x := y).
-  admit. (* TODO we need something like our usub_subst and substitution of types on terms *)
-  not_in_L y.
-  auto.
-  not_in_L y.
-  not_in_L y.
-Admitted.
 
 Lemma sub_ex : forall L t1 t2,
   (forall x, ~ In x L -> PType (open_typ_source t1 (PFVarT x))) ->
@@ -782,9 +757,8 @@ Proof.
   destruct Ha as [c HAC].
   exists c.
   intros.
-  apply sub_rename with (y := x) (L := L); auto.
-  apply H1; not_in_L x.
-  apply H2; not_in_L x.
+  (* this should follow naturally from hypothesis HAC *)
+  (* we could try using a renaming lemma, but then "x" would have to be fresh in "c" *)
   admit.
 Admitted.
 

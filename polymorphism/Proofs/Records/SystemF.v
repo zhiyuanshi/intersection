@@ -1350,8 +1350,13 @@ Qed.
 
 Lemma subst_open_var : forall x y u t, y <> x -> STTerm u ->
   ([x ~> u]t) ^ y = [x ~> u] (t ^ y).
-Proof. (* intros Neq Wu. rewrite subst_open. simpl. case_var*. *) Admitted.
-
+Proof.
+  intros x y u t Neq Wu. rewrite subst_open; auto; simpl.
+  case_eq (VarTyp.eqb y x); intros; auto.
+  exfalso; apply Neq.
+  now apply eqb_eq in H.
+Qed.
+  
 Lemma subst_typ_open_var : forall x y u t, y <> x -> STType u ->
   open_typ (subst_typ x u t) (STFVarT y) = subst_typ x u (open_typ t (STFVarT y)).
 Proof.
@@ -1685,121 +1690,6 @@ Proof.
   (* STTyTApp *)
   - subst; apply STTyTApp; auto.
 Qed. 
-    
-Lemma typing_strengthen : forall z U E F t T,
-  not (In z (union (fv t) (fv_typ T))) ->
-  has_type_st (E ++ ((z,U) :: nil) ++ F) t T ->
-  has_type_st (E ++ F) t T.
-Proof.
-  intros.
-  remember (E ++ ((z,U) :: nil) ++ F).
-  
-  generalize dependent Heql.
-  generalize dependent E.
-  
-  induction H0; intros; auto.
-  - subst; apply STTyVar; auto.
-    apply wf_strengthen with (z := z) (U := U).
-    not_in_L z.
-    auto.
-    now apply ok_remove in H1.
-    apply in_or_app.
-    repeat apply in_app_or in H2.
-    inversion H2.
-    auto.
-    apply in_app_or in H3.
-    inversion H3.
-    inversion H4.
-    inversion H5.
-    subst.
-    exfalso; apply H; simpl.
-    rewrite union_spec.
-    left; apply MSetProperties.Dec.F.singleton_2; reflexivity.
-    inversion H5.
-    auto.
-  - apply STTyUnit.
-    subst.
-    now apply ok_remove in H0.
-  - apply STTyLit.
-    subst.
-    now apply ok_remove in H0.
-  - subst.
-    apply_fresh STTyLam as x.
-    unfold extend in *; simpl in *.
-    rewrite app_comm_cons.
-    apply H1.
-    not_in_L x.
-    not_in_L z.
-    apply fv_distr in H4.
-    rewrite union_spec in H4.
-    inversion H4.
-    contradiction.
-    simpl in H6.
-    exfalso; apply Frx.
-    not_in_L x.
-    exfalso; apply H14.
-    apply MSetProperties.Dec.F.singleton_2.
-    apply MSetProperties.Dec.F.singleton_1 in H6.
-    symmetry; assumption.
-    rewrite app_comm_cons.
-    reflexivity.
-    apply wf_strengthen in H2.
-    auto.
-    simpl in H.
-    not_in_L z.
-  - subst. apply STTyApp with (A := A).
-    apply IHhas_type_st1; simpl in *. admit.
-    reflexivity.
-    subst.
-    apply IHhas_type_st2; simpl in *. admit.
-    reflexivity.
-  - subst.
-    apply STTyPair.
-    apply IHhas_type_st1; simpl in *; not_in_L z; reflexivity.
-    apply IHhas_type_st2; simpl in *; not_in_L z; reflexivity.
-  - subst.
-    eapply STTyProj1.
-    apply IHhas_type_st. simpl.
-    (* Print has_type_st_ind. *)
-    admit.
-    reflexivity.
-  - subst.
-    eapply STTyProj2.
-    apply IHhas_type_st. admit.
-    reflexivity.
-  - subst.
-    apply_fresh STTyTLam as x.
-    intros.
-    unfold extend in *; simpl in *.
-    rewrite app_comm_cons.
-    apply H1.
-    not_in_L x.
-    unfold not; intros HH.
-    rewrite union_spec in HH.
-    destruct HH as [ HH | HH ].
-    apply fv_open_rec_typ_term in HH.
-    not_in_L x.
-    rewrite union_spec in HH; destruct HH as [ HH | HH ].
-    admit.
-    simpl in HH. admit.
-    admit.
-    (*
-    apply H8.
-    apply MSetProperties.Dec.F.singleton_1 in HH.
-    apply MSetProperties.Dec.F.singleton_2.
-    symmetry; auto. *)
-    rewrite app_comm_cons.
-    reflexivity.
-  - subst.
-    eapply STTyTApp.
-    simpl in H.
-    eapply wf_strengthen with (z := z).
-    not_in_L z.
-    apply H0.
-    apply IHhas_type_st.
-    admit.
-    reflexivity.
-Admitted.
     
 (*
 Lemma typing_strengthen : forall z U E F t T,

@@ -28,7 +28,7 @@ Lemma 4
 for example, to look for the proof of lemma 4 in the paper.
 
 All lemmas and theorems are complete: there are no uses of admit or Admitted,
-with the exceptions of "tlam" and "tylam" due to a technical limitation.
+with the exceptions of "sound_sub" due to a technical limitation.
 
 *)
 
@@ -1071,52 +1071,7 @@ induction H; intros.
   not_in_L x.
 Qed.
 
-Lemma coercions_produce_terms :
-  forall E A B, sub A B E -> STTerm E.
-Proof.
-  intros.
-  induction H.
-  (* Case SInt *)
-  - apply_fresh STTerm_Lam as x; cbn; auto.
-  (* Case SFun *)
-  - apply_fresh STTerm_Lam as x; cbn.
-    apply_fresh STTerm_Lam as y; cbn.
-    apply STTerm_App.
-    repeat rewrite <- open_rec_term; assumption.
-    apply STTerm_App.
-    apply STTerm_Var.
-    apply STTerm_App; [ repeat rewrite <- open_rec_term; auto | apply STTerm_Var ].
-  (* Case SAnd1 *)
-  - apply_fresh STTerm_Lam as x; cbn.
-    apply STTerm_Pair.
-    apply STTerm_App; repeat rewrite <- open_rec_term; auto.
-    rewrite <- open_rec_term; auto.
-  (* Case SAnd2 *)
-  - apply and_coercion_proj1_term with (t0 := t0) (c := c); auto.
-    assert (Ha : Sub t1 t0) by (unfold Sub; eauto).
-    now apply sub_lc in Ha as [Ha1 Ha2].
-  (* Case SAnd3 *)
-  - apply and_coercion_proj2_term with (t0 := t0) (c := c); auto.
-    assert (Ha : Sub t2 t0) by (unfold Sub; eauto).
-    now apply sub_lc in Ha as [Ha1 Ha2].
-  (* Case SVar *)
-  - apply_fresh STTerm_Lam as x; cbn; auto.
-  (* Case SForAll *)
-  - apply_fresh STTerm_Lam as x; cbn.
-    apply_fresh STTerm_TLam as y; cbn.
-    apply STTerm_App; auto.
-    assert (Ha : not (In y L)) by (not_in_L y).
-    apply H0 in Ha.
-    rewrite open_comm_open_typ_term.
-    rewrite <- open_rec_term; auto.
-  (* Case STop *)
-  - apply_fresh STTerm_Lam as x; cbn; auto.
-  (* Case SRec *)
-  - auto.
-Qed.
-
 Hint Resolve coercions_produce_terms.
-
 
 (* Subtyping rules produce type-correct coercions: Lemma 1 *)
 Lemma type_correct_coercions :

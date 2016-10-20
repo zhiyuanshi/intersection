@@ -2,7 +2,7 @@ default: coq
 
 all: coq 
 
-coq: systemf language infrastructure subtyping disjointness typing extended 
+coq: systemf language infrastructure subtyping disjointness typing extended dp 
 
 systemf: SystemF.vo 
 language: Language.vo
@@ -11,6 +11,7 @@ subtyping: Subtyping.vo
 disjointness: Disjointness.vo 
 typing: Typing.vo
 extended: Extended.vo
+dp: DisjointPolymorphism.vo
 
 SystemF.vo: SystemF.v
 	coqc SystemF.v
@@ -32,6 +33,9 @@ Typing.vo: Disjointness.vo Typing.v
 
 Extended.vo: Typing.vo Extended.v
 	coqc Extended.v
+
+DisjointPolymorphism.vo: Extended.vo DisjointPolymorphism.v
+	coqc DisjointPolymorphism.v
 
 clean:
 	rm -f *.vo *.vio *.glob
