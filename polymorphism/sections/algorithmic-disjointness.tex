@@ -160,8 +160,6 @@ However, under the assumption that contexts are well-formed, such derivation is 
 as $x$ cannot occur free in $A$. 
 
 The rule for disjoint quantification \reflabel{\labeldisforall} is the last novel rule. 
-It adds a constraint composed of the intersection of both constraints into $\Gamma$ and checks for 
-disjointness in the bodies under that environment.
 To illustrate this rule, consider the following two types:
 \[ (\forall (\alpha * \tyint).~\tyint \& \alpha) \qquad 
 (\forall (\alpha * \tychar). ~\tychar \& \alpha) \]
@@ -170,8 +168,8 @@ In the first type $\alpha$ cannot be instantiated with $\tyint$ and in
 the second case $\alpha$ cannot be instantiated with $\tychar$.
 Therefore for both bodies to be disjoint, $\alpha$ cannot be instantiated with either $\tyint$ 
 or $\tychar$. 
-%The rule for disjoint quantification captures this fact by requiring the bodies of disjoint 
-%quantification to be checked for disjointness under both constraints.
+The rule for disjoint quantification adds a constraint composed of the intersection of both constraints into $\Gamma$ and checks for 
+disjointness in the bodies under that environment.
 The reader might notice how this intersection does not necessarily need to be well-formed,
 in the sense that the types that compose it might not be disjoint.
 This is not problematic because the intersections present as constraints in the environment
@@ -234,7 +232,7 @@ be preserved. More formally, the following lemma holds:
   \label{lemma:orthosubst}
 
   If $(x \disjoint C) \in \Gamma$ and $\jdis \Gamma C D$, 
-  then $\jdis {\subst C x \Gamma} {\subst C x A} {\subst C x B}$,
+  then $\jdis {\subst C x \Gamma} {\subst C x A} {\subst C x B}$.
 \end{lemma}
 
 \begin{proof}
@@ -272,7 +270,7 @@ Also, the variable case required proving that if $\alpha$ does not occur free in
 to substitute it in the co-domain of $\Gamma$, then it is safe to perform the substitution.
 \end{proof}
 
-This lemma enables us to show that all types produced by the type-system are well-typed.
+This lemma enables us to show that all types produced by the type-system are well-formed.
 More formally, we have that:
 
 \begin{restatable}[Well-formed typing]{lemma}{wellformedtyping}

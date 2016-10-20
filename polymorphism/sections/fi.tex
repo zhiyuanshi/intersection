@@ -209,9 +209,12 @@ The subtyping rules introduced by \name refer to polymorphic constructs and reco
 \reflabel{\labelsubvar} defines subtyping as a reflexive relation on type variables.
 In \reflabel{\labelsubforall} a universal quantifier ($\forall$) 
 is covariant in its body, and contravariant in its disjointness constraints.
-The \reflabel{\labelsubrec} rule says that records are covariant within their fields' types.
-Also, since the $ordinary$ conditions on two of the intersection rules are necessary to 
-produce unique coercions~\cite{oliveira16disjoint}, the $ordinary$ relation needed to be extended.
+The \reflabel{\labelsubrec} rule says that records are covariant
+within their fields' types.
+The subtyping relation uses an auxiliary unary $ordinary$ relation,
+which identifies types that are not intersections. The $ordinary$ conditions on two of the intersection rules are necessary to 
+produce unique coercions~\cite{oliveira16disjoint}. The $ordinary$
+relation needed to be extended with respect to \oldname.
 As shown at the top of Figure~\ref{fig:fi-subtype}, the new types it contains are 
 type variables, universal quantifiers and record types.
 
