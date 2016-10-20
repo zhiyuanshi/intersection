@@ -9,7 +9,7 @@ This section presents an algorithmic set of rules for determining whether two ty
 After, it will show a few important properties regarding substitution, which will turn out
 to be crucial to ensure type-safety.
 Finally, it will discuss the bounds of disjoint quantification and what implications
-they have on \name, with a special focus on the $\top$ type. 
+they have on \name. %with a special focus on the $\top$ type. 
 
 \begin{comment}
 \subsection{Derivation of the Algorithmic Rules}
@@ -152,14 +152,15 @@ The first induction case for~\reflabel{\labeldisvar} does not need the second in
 a straightforward application of subtyping transitivity. 
 \end{proof}
 
-The lemma states that if a type $A$ is disjoint to $B$ under $\Gamma$, then it is also disjoint
+\noindent The lemma states that if a type $A$ is disjoint to $B$ under $\Gamma$, then it is also disjoint
 to any supertype of $B$. 
-Note how these two variable rules would allow one to prove $x \disjoint x$, for a given type 
+Note how these two variable rules would allow one to prove $x \disjoint x$, for any type 
 variable $x$.
-However, since we are assuming that all contexts are well-formed, it is not possible to make
-such derivation as $x$ cannot occur free in $A$. 
+However, under the assumption that contexts are well-formed, such derivation is not possible 
+as $x$ cannot occur free in $A$. 
+
 The rule for disjoint quantification \reflabel{\labeldisforall} is the last novel rule. 
-It adds a constraint composed of the intersection both constraints into $\Gamma$ and checks for 
+It adds a constraint composed of the intersection of both constraints into $\Gamma$ and checks for 
 disjointness in the bodies under that environment.
 To illustrate this rule, consider the following two types:
 \[ (\forall (\alpha * \tyint).~\tyint \& \alpha) \qquad 
@@ -210,18 +211,19 @@ well-typed.  However, during type instantiation (i.e. when type
 substitution should be stable), both types $A$ and $B$ can change.  It
 should follow naturally that this instantiation will not produce an
 ill-formed type $A \inter B$, or, more generally, disjointness should
-be stable under substitution.  Let us illustrate this with an example,
-showing why disjointness judgements are not invariant with respect to
-free variable substitution.  In other words, why a careless
-substitution can violate the disjoint constraint in the context.
+be stable under substitution.  
+Let us illustrate this with an example.
+%showing why disjointness judgements are not invariant with respect to
+%free variable substitution.  
 Consider the following judgement, where in the context $\alpha
 \disjoint \tyint$, $\alpha$ and $\tyint$ are disjoint:
 \[ \jdis {\alpha \disjoint \tyint} \alpha \tyint \]
 After the substitution of $\tyint$ for $\alpha$ on the two types, the sentence
 \[ \jdis {\alpha \disjoint \tyint} \tyint \tyint \]
 is no longer true since $\tyint$ is clearly not disjoint with itself.
+Generally speaking, a careless substitution can violate the disjoint constraint in the context.
 This explains the need to ensure that during type-instantiation the target of the substitution  
-is compatible with the disjointness constraint associated with the variable. 
+is compatible with such disjointness constraint. 
 
 \paragraph{Disjoint substitutions.}
 While disjointness cannot be preserved for general substitutions,
@@ -290,48 +292,65 @@ Even though the meta-theory is consistent with the expected results, we might st
 what exactly are the bounds of disjoint quantification?
 In other words, which type(s) might be used to allow unrestricted instantiation, and which
 one(s) might be used to completely restrict instantiation?
-As the reader might expect, the answer is tightely related to subtyping, as we will show next. 
+As the reader might expect, the answer is tightely related to subtyping. 
 
 \subsection{Bounds of Disjoint Quantification}
-Substitution raises the question of what range of types can be instantiated for a given variable, 
-under a given context.
-To get a feeling about this, we ask the reader to recall 
-Lemma~\ref{lemma:disjointness-covariance}, used to justify the rule for
-disjointness of variables.
-If one takes $A$ as some variable $\alpha$, then the lemma should read as:   
-\[ \inferrule {\jwf \Gamma {\alpha \disjoint B} \\ B \subtype C }
-              {\jwf \Gamma {\alpha \disjoint C}} \]
-Now we may ask: how many suitable types are there to instantiate $\alpha$ with, depending on $B$?
-Before we answer this, let us ask first how many options are there for $C$, depending on the 
-shape of $B$?
+Substitution raises the question of what range of types can be instantiated for a given variable
+$\alpha$, under a given context $\Gamma$.
+%To get a feeling about this, we ask the reader to recall 
+%Lemma~\ref{lemma:disjointness-covariance}, used to justify the rule for
+%disjointness of variables.
+%If one takes $A$ as some variable $\alpha$, then the lemma should read as:   
+%\[ \inferrule {\jwf \Gamma {\alpha \disjoint B} \\ B \subtype C }
+%              {\jwf \Gamma {\alpha \disjoint C}} \]
+To answer this question, we ask the reader to recall the rule \reflabel{\labeldisvar}, copied below:
+\[ \ruledisvar \]
 Given that the cardinality of \name's types is infinite, for the sake of this example we will 
 restrict the type universe to a finite number of 
 primitive types (i.e. $\tyint$, $\tystring$, etc), disjoint intersections of these types,
 $\top$ and $\bot$.
-Having this in mind, we can answer the second question: the number of choices for $C$ is directly 
-proportional to the number of intersections present in $B$.
-For example, taking $B$ as $\tyint$ leads $C$ to be either $\top$ or $\tyint$; whereas $B$ as 
-$\tyint \inter \tystring$ leaves $C$ as either $\top$, $\tyint$ or $\tystring$.
-However, as the choices for $C$ grows, the less choices we are left to instantiate 
-the variable $\alpha$, since $\alpha$ must be disjoint to all possible $C$'s. 
-Thus, to answer the first question, the options for instantiating $\alpha$ are inversely proportional 
-to the number of intersections present in $B$.
-By analogy, one may think of a disjointness constraint as a set of (forbidden) types, where 
-primitive types are the singleton set and each $\inter$ is the set union.
+Now we may ask: how many suitable types are there to instantiate $\alpha$ with, depending on $A$?
+The rule above tells us that the more super-types $A$ has, the more types $\alpha$ has to be disjoint
+with.
+In other words, the choices for instantiating $\alpha$ are inversely proportional to the number
+of super-types of $A$.
+It is easy to see that the number of super-types of $A$ is directly proportional to the number of
+intersections in $A$.
+For example, taking $A$ as $\tyint$ leads $B$ to be either $\top$ or $\tyint$; whereas $A$ as 
+$\tyint \inter \tystring$ leaves $B$ as either $\top$, $\tyint$ or $\tystring$.
+Thus, the choices of $\alpha$ are inversely proportional to the number of intersections in $A$.
 
-We can now turn our attention to the two extreme cases, namely $\top$ 
-(i.e. the 0-ary intersection) and $\bot$ (i.e. the infinite intersection) 
-\footnote{$\bot$ would not add anything to the hypothetical finite type 
-system, however it can be seen as the infinite intersection in \name.}.
-Following the same logic, we may conclude that having $\top$ as constraint leaves $\alpha$ with 
-the most options for instantiation; whereas $\bot$ will deliver the least options.
-This implies that $\top$ is the empty constraint, meaning that a variable associated to it
-can be instantiated to any well-formed type.
+%Now we may ask: how many suitable types are there to instantiate $\alpha$ with, depending on $B$?
+%Before we answer this, let us ask first how many options are there for $C$, depending on the 
+%shape of $B$?
+%Given that the cardinality of \name's types is infinite, for the sake of this example we will 
+%restrict the type universe to a finite number of 
+%primitive types (i.e. $\tyint$, $\tystring$, etc), disjoint intersections of these types,
+%$\top$ and $\bot$.
+%Having this in mind, we can answer the second question: the number of choices for $C$ is directly 
+%proportional to the number of intersections present in $B$.
+%For example, taking $B$ as $\tyint$ leads $C$ to be either $\top$ or $\tyint$; whereas $B$ as 
+%$\tyint \inter \tystring$ leaves $C$ as either $\top$, $\tyint$ or $\tystring$.
+%However, as the choices for $C$ grows, the less choices we are left to instantiate 
+%the variable $\alpha$, since $\alpha$ must be disjoint to all possible $C$'s. 
+%Thus, to answer the first question, the options for instantiating $\alpha$ are inversely proportional 
+%to the number of intersections present in $B$.
+%By analogy, one may think of a disjointness constraint as a set of (forbidden) types, where 
+%primitive types are the singleton set and each $\inter$ is the set union.
+
+%We can now turn our attention to the two extreme cases, namely $\top$ 
+%(i.e. the 0-ary intersection) and $\bot$ (i.e. the infinite intersection) 
+%\footnote{$\bot$ would not add anything to the hypothetical finite type 
+%system, however it can be seen as the infinite intersection in \name.}.
+Following the same logic, we may conclude that having $\top$ (i.e. the 0-ary intersection)
+as constraint leaves $\alpha$ with the most options for instantiation; 
+whereas $\bot$ (i.e. the infinite intersection) will deliver the least options.
+Thus $\top$ is the empty constraint: a variable associated to it can be instantiated to any 
+well-formed type.
 It is a subtle but very important property, since \name is a generalization of System $F$. 
-Any type variable present in a type signature of System $F$, can be represented in \name
-equivalently by assigning it a $\top$ disjointness constraint
+Any type variable quantified in System $F$, can be quantified equivalently in \name
+by assigning it a $\top$ disjointness constraint
 (as seen in Section~\ref{subsec:disjoint-quantification}).
-
 \begin{comment}
 We will briefly discuss the role of the former in our system. 
 \joao{maybe we can just refer to the overview and delete the next

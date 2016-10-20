@@ -157,10 +157,10 @@ However, in \name, the implementation of records instead piggybacks on the disjo
 and intersection types features of the type-system.
 The constraints on labels are encoded using disjoint quantification, and the coherent
 type-system will statically ensure that records and their operations are safe.
-This means that technical concerns, i.e type inference, efficiency, etc.; are to be dealt with the 
+This means that technical concerns w.r.t. records, i.e type inference, efficiency, etc.; are to be dealt with the 
 compilation of disjoint intersection types as opposed to compiling extensible records directly.
-Thus, what is expressed in other systems by means of row types, predicates, flags, qualified types, etc; 
-in \name it is expressed by the use of disjoint intersection types.
+%Thus, what is expressed in other systems by means of row types, predicates, flags, qualified types, etc; 
+%in \name it is expressed by the use of disjoint intersection types.
 
 % Chlipala's
 % \texttt{Ur}~\cite{chlipala2010ur} explains record as type level
@@ -207,7 +207,7 @@ operator.
 However there is a subtle difference between traits and \name: equal 
 names/labels are always rejected in the former, whereas in the latter only rejects
 when their types are disjoint.
-\joao{should we reference CZ, where they have a similar spec to our notion of disjointess?}
+\joao{ref CZ? (similar spec to disjointess)}
 
 \begin{comment}
 

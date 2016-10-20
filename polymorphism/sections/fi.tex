@@ -16,8 +16,9 @@ Section~\ref{sec:alg-dis} introduces the necessary changes to the
 definition of disjointness presented by Oliveira et al.~\cite{oliveira16disjoint} in
 order to add disjoint polymorphism.
 
-All the meta-theory of \name has been mechanized in Coq, and is available in
-the supplementary materials submitted with the paper.
+%\joao{we already say this in the introduction}
+%All the meta-theory of \name has been mechanized in Coq, and is available in
+%the supplementary materials submitted with the paper.
 
 \subsection{Syntax}
 The syntax of \name (with the differences to \oldname highlighted in gray) is: 
@@ -215,7 +216,6 @@ As shown at the top of Figure~\ref{fig:fi-subtype}, the new types it contains ar
 type variables, universal quantifiers and record types.
 
 \paragraph{Properties of Subtyping.} The subtyping relation is reflexive and transitive.
-
 \begin{restatable}[Subtyping reflexivity]{lemma}{subrefl}
   \label{lemma:subrefl}
   For any type $A$, $A \subtype A$.
@@ -228,7 +228,7 @@ type variables, universal quantifiers and record types.
   \label{lemma:subtrans}
   If $A \subtype B$ and $B \subtype C$, then $A \subtype C$.
 \end{restatable}%
-\noindent \emph{Proof.} By double induction on both derivations.
+\noindent \emph{Proof.} By double induction on both derivations.%
 %\begin{prf}
 %By double induction on both derivations. 
 %\end{prf}
@@ -288,7 +288,7 @@ must be well-formed.
     \formbc \\ \bruletlam \and \bruletsub
   \end{mathpar}
   \end{spacing}
-  \caption{Wellformedness and type system of \name.}
+  \caption{Well-formedness and type system of \name.}
   \label{fig:fi-type}
 \end{figure}
 

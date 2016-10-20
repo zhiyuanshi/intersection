@@ -1,5 +1,4 @@
-\section{Semantics, Coherence and Type-Safety}
-\label{sec:disjoint}
+\section{Semantics, Coherence and Type-Safety}\label{sec:disjoint}
 This section discusses the elaboration semantics of \name and proves
 type-safety and coherence.
 It will first show how the semantics is described by an elaboration to System $F$.
@@ -17,7 +16,6 @@ pairs.
 
 \paragraph{Target language.}
 The syntax and typing of our target language is unsurprising: 
-
   \[
     \begin{array}{llrl}
       \text{Types}    & T & \Coloneqq & \alpha \mid \tyint \mid {T_1}
@@ -32,11 +30,9 @@ The syntax and typing of our target language is unsurprising:
       \text{Contexts} & G & \Coloneqq & \cdot \mid G, \alpha \mid G, x \oftype T \\
     \end{array}
   \]
-
 The highlighted part shows its difference with the standard System $F$. 
 The interested reader can find the formalization of the target language
 syntax and typing rules (which are standard) in our Coq development.
-
 
 \paragraph{Type and context translation.}
 Figure~\ref{fig:type-and-context-translation} defines the type translation
@@ -131,7 +127,7 @@ According to~\cite{oliveira16disjoint}, some top-like types are problematic.
 For instance, a top-like type can be an intersection composed of $\top$ types, as in
 $\top \inter \top$.
 This type is a super-type of every other type, including $\top$.
-Also, there might be a coherence problem with this type, since both components of the
+Also, there might be a coherence problem with this type, as both components of the
 intersection overlap.
 However, taking a closer look at this type clarifies that there are no such issues. 
 To see this, let us first consider the ill-type $\tyint \inter \tyint$.
@@ -142,7 +138,8 @@ overlap.
 For example, the term $(3 \mergeop 4) : \tyint$ is incoherent, since 
 the terms $3$ and $4$ can both be typed $\tyint$. 
 There is one case though, where coherence is not compromised:
-when both terms composing the merge are equivalent (i.e. $\beta$-equivalent), as in $2 \mergeop 2$.
+when both terms composing the merge are equivalent (i.e. $\beta$-equivalent), as in 
+$(2 \mergeop 2) : \tyint$.
 In this case, both terms can be chosen interchangibily, without affecting the coherence
 of the program.
 It is important realizing that this is always the case with top-like intersections.
@@ -265,8 +262,8 @@ Finally, all rules produce type-correct coercions:
 %are disjoint it is impossible that both of the preconditions of the left decompositions are satisfied
 %at the same time. 
 
-In order to ensure a coherent type-system, the subtyping relation also
-needs to be coherent. With disjoint polymorphism the following theorem holds:
+In order to prove the type-system coherent, the subtyping relation also 
+needs to be shown coherent. With disjoint polymorphism the following lemma holds:
 
 \begin{lemma}[Unique subtype contributor]
   \label{lemma:unique-subtype-contributor}
@@ -291,7 +288,7 @@ The variable cases \reflabel{\labeldisvar} and \reflabel{\labeldissym} needed to
 and disjoint types $A$ and $B$, and $B$ is not toplike, then $A$ cannot be a subtype of $B$.
 \end{proof}
 
-Using the unique subtype contributor, we can show that the coercion of a subtyping relation $A \subtype B$ 
+Using this lemma, we can show that the coercion of a subtyping relation $A \subtype B$ 
 is uniquely determined.
 This fact is captured by the following lemma:
 
@@ -301,11 +298,9 @@ This fact is captured by the following lemma:
   If $A \subtype B \yields {E_1}$ and $A \subtype B \yields {E_2}$, where $A$
   and $B$ are well-formed types, then $E_1 \equiv E_2$.
 \end{restatable}
-
 \begin{proof}
 By induction on the first derivation and case analysis on the shape of the second. 
 \end{proof}
-
 \begin{comment}
 \paragraph{Expressiveness.}
 Remarkably, our restrictions on subtyping do not sacrifice the expressiveness of
@@ -344,17 +339,12 @@ the very requirement that the theorem holds.
 
 This result is captured more formally by the following lemma:
 \end{comment}
-
 % \george{Note that $\bot$ does not participate in subtyping and why (because the
 % empty set intersecting the empty set is still empty).}
-
 % \george{What's the variance of the disjoint constraint? C.f. bounded
 % polymorphism.}
-
 % \george{Two points are being made here: 1) nondisjoint intersections, 2) atomic
 % types. Show an offending example for each?}
-
-
 %\subsection{Disjointness} Throughout the paper we already presented an intuitive
 %definition for disjoiness. Here such definition is made a bit more precise, and
 %well-suited to \namedis.
@@ -458,8 +448,6 @@ This result is captured more formally by the following lemma:
 
 %Indeed, \bruno{unfinidhed sentence}\george{Mabe show a diagram here to contrast
 %with bounded polymorphism.}
-
-
 \subsection{Elaboration of type-system and coherence} 
 In order to prove the coherence result, we refer to the bidirectional type-system introduced in
 Section~\ref{sec:fi}. 
@@ -510,9 +498,9 @@ corresponding coercions in System F.
 The coercions generated for \reflabel{\labeltrec} and \reflabel{\labeltprojr} 
 simply erase the labels and translate the corresponding underlying term. 
 All the remaining rules are ported from \oldname. 
-However, it may be noteworthy
-pointing out that, as usual, the rule \reflabel{\labeltmerge}
-translates merges into pairs.
+%However, it may be noteworthy
+%pointing out that, as usual, the rule \reflabel{\labeltmerge}
+%translates merges into pairs.
 
 
 %As an example, we show the coercion generated by the identity function:

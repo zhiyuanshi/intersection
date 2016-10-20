@@ -54,9 +54,9 @@ It then iterates through the \lstinline$first$'s properties and copies them to t
 Next, it iterates through the \lstinline$second$'s properties but it only copies the properties
 that \lstinline$result$ does not possess yet (i.e. the ones present in \lstinline$first$).
 This means that the implementation is left-biased, as the properties of left type of the intersection
-are chosen in favor of the ones present in the right.
+are chosen in favor of the ones in the right.
 However, in TypeScript this may be a cause of severe problems since that, at the time of writing,
-intersections at type-level are actually right-biased!
+intersections at type-level are right-biased!
 For example, the following code is well-typed:
 
 \begin{lstlisting}
@@ -306,9 +306,7 @@ the more general program would be accepted:
 %\end{align*}
 \begin{lstlisting}[mathescape=true]
 let $\text{avg}_2$ R (r : {x:Int, y:Int | R}) = (r.x+r.y)/2 
-\end{lstlisting}\bruno{any reason why the position of R in the record
-  type for the 3 examples is not consistent? If not, please make sure
-  they are all consistent.}
+\end{lstlisting}
 In this case, if $R$ contains either field $x$ or field $y$, they would be shadowed by the labels 
 present in the type signature.
 In other words, in a record with multiple $x$ fields, the most recent (i.e. left-most) is used 
