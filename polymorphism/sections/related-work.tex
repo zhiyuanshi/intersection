@@ -1,16 +1,22 @@
 \section{Related Work}
 \label{sec:related-work}
 \paragraph{Intersection types, polymorphism and the merge operator.}
-To our knowlegde no previous work has been done in a caluclus which
-includes parametric polymorphism, intersection types and a \emph{merge} operator.
-
-Simply-typed systems with intersection types and a merge operator have been studied
-in the past, including Reynold's Forsythe~\cite{reynolds1997design}; 
-Pierce's $F_\wedge$~\cite{pierce1991programming2}; and
-$\lamint$ by Castagna et al.~\cite{Castagna92calculus}.
-These calculi are more restrictive; incoherent; or not comparable in terms of expressiveness
-with \name, respectively.
-%\joao{maybe these 3 paragraphs can go, as they aren't refering polymorphic systems?}
+To our knowlegde no previous work has been done in a calculus which
+includes parametric polymorphism, intersection types and a
+\emph{merge} operator. However, various simply typed systems with 
+intersections types and a merge operator have been studied in the past.
+The merge operator was first introduced 
+by Reynold's in the Forsythe~\cite{reynolds1997design}
+language. The merge operator in Forsythe is coherent~\cite{reynolds1991coherence}, but it
+has various restrictions to ensure coherence that are lifted in
+\name. For example Forsythe merges cannot contain more than one function.
+Castagna et al.~\cite{Castagna92calculus} studied a coherent calculus with a
+special merge operator on that works on functions only. The goal was to model
+\emph{function overloading}. Unlike Reynold's operator, multiple 
+functions are allowed in merges, but non-functional types are
+forbidden. Pierce's $F_\wedge$~\cite{pierce1991programming2} also 
+studied a $glue$ operator that was esseintially a merge. However
+Pierce's calculus is incoherent.
 \begin{comment}
 Concerning simply-typed systems, the oldest work dates back to the 1980s,
 when Reynolds invented Forsythe~\cite{reynolds1997design}, with his
@@ -39,20 +45,18 @@ vice-versa.
 \end{comment}
 More recently, Dunfield~\cite{dunfield2014elaborating} formalised a system with
 intersection types and a merge operator with a type-directed translation to the
-simply-typed lambda calculus with pairs.
-The major differences to our calculus (besides being simply-typed), is that on one
-hand his system includes union types, but on the other it lacks coherence.
+simply-typed lambda calculus with pairs. Although Dunfield's calculus
+is incoherent, it was the inspiration for the
+\oldname~\cite{oliveira16disjoint}, which \name extends.
 
-Our work is an extension of the recent \oldname calculus~\cite{oliveira16disjoint}.
-\oldname solves the coherence problem present in Dunfield's calculus, by requiring that
+\oldname solves the coherence problem for a calculus similar to Dunfield's, by requiring that
 intersection types can only be composed of \emph{disjoint} types.
 For simplicity purposes, \oldname uses a specification for disjointness, which says that two types are 
 disjoint if they do not share a common supertype.
 \name does not use such specification as its adaptation to polymorphic types would require
-using unification.
-We opted to ommit the specification from \name, on grounds that unification would defeat
-the purpose of having such specification.
-In fact, \name's disjointness is based on \oldname's more
+using unification, making the specification arguably more complex than
+the algorithmic rules (and defeating the purpose of having a
+specification). \name's notion of disjointness is based on \oldname's more
 general notion of disjointness concerning $\top$ types, called $\top$-disjointness, which 
 states that two types $A$ and $B$ are disjoint if two conditions are satisfied:
 %\begin{definition}[$\top$-disjointness]
