@@ -6,17 +6,16 @@ which includes parametric polymorphism, intersection types and a
 \emph{merge} operator. As far as we are aware only Pierce's
 $F_\wedge$~\cite{pierce1991programming2}\bruno{joao: you need to read
   Pierce's stuff to double-check that what I say is correct.}
-supports both the merge operator, intersection types and polymorphism.
-However $F_\wedge$ is incoherent.  In $F_\wedge$ the
-merge operator is called $glue$. Various simply typed systems with 
+supports both the merge operator (called $glue$ in $F_\wedge$), intersection types and polymorphism.
+However $F_\wedge$ is incoherent. Various simply typed systems with 
 intersections types and a merge operator have been studied in the past.
 The merge operator was first introduced 
 by Reynold's in the Forsythe~\cite{reynolds1997design}
 language. The merge operator in Forsythe is coherent~\cite{reynolds1991coherence}, but it
-has various restrictions to ensure coherence that are lifted in
-\name. For example Forsythe merges cannot contain more than one function.
-Castagna et al.~\cite{Castagna92calculus} studied a coherent calculus with a
-special merge operator on that works on functions only. The goal was to model
+has various restrictions to ensure coherence. For example Forsythe merges cannot contain more than one function.
+Many of those restrictions are lifted in \name. 
+Castagna et al.~\cite{castagna1995calculus} studied a coherent calculus with a
+special merge operator that works on functions only. The goal was to model
 \emph{function overloading}. Unlike Reynold's operator, multiple 
 functions are allowed in merges, but non-functional types are
 forbidden.
@@ -71,19 +70,19 @@ states that two types $A$ and $B$ are disjoint if two conditions are satisfied:
   \item $\forall C.~\text{if}~ A \subtype C~\text{and}~B \subtype C~\text{then}~\toplike{C}$
 \end{enumerate}
 %\end{definition}
-\noindent A major difference between the \name and \oldname, is that $\top$-disjointness does not allow
+\noindent A significant difference between the \name and \oldname, is that $\top$-disjointness does not allow
 $\top$ in intersections, while \name allows this.
 In other words, condition (1) is not imposed by \name.
 As a consequence, the set of well-formed \emph{top-like} types is a superset of \oldname's.
 This is covered in greater detail in Section~\ref{sec:disjoint}.
 
 \paragraph{Intersection types and polymorphism, without the merge operator.}
-Recently, Castagna~\textit{et al.}~\cite{Castagna:2014} studied a very interesting
-and coherent calculus that has polymorphism and set-theoretic type connectives (such as
+Recently, Castagna~\textit{et al.}~\cite{Castagna:2014} studied a 
+coherent calculus that has polymorphism and set-theoretic type connectives (such as
 intersections, unions, and negations). 
-However, their calculus is based on a semantic subtyping relation due to their 
+Their calculus is based on a semantic subtyping relation due to their 
 interpretation of intersection types.
-The difference to our calculus, is that their intersections are used between function
+The difference to \name, is that their intersections are used between function
 types, allowing overloading (i.e. branching) of types.
 For example, they can express a function whose domain is defined on any type, but executes different
 code depending on that type:
@@ -93,16 +92,17 @@ code depending on that type:
 x. (x \in \tyint) ? (x \text{ mod } 2) = 0 : x
 \]
 
-\noindent In our system we cannot express some of these intersections, namely the ones that
-do not have disjoint co-domains.
-However, \name accepts other kinds of intersections which are not possible to express
-in their calculus, as in merges of type $(\tyint \to \tybool) \inter (\tyint \to \tyint)$.
-Just as~\cite{Castagna92calculus}, their work is focused on combining 
-intersections with functions, whereas \name is concerned with merges between
-arbitrary types.\bruno{I think you need to comment on the relation
-  between disjointness and negation ($\alpha \backslash \tyint$)}
+\noindent In our system we cannot express some of these intersections,
+namely the ones that do not have disjoint co-domains.  However, \name
+accepts other kinds of intersections which are not possible to express
+in their calculus. For example merges with type $(\tyint \to \tybool)
+\inter (\tyint \to \tyint)$ are accepted in \name.  Similarly to
+Castagna et al. previous work~\cite{castagna1995calculus}, their work is
+focused on combining intersections with functions (but without a merge
+operator), whereas \name is concerned with merges between arbitrary
+types.\bruno{I think you need to comment on the relation between
+  disjointness and negation ($\alpha \backslash \tyint$)}
 
-\joao{elaborate more on this paragraph?}
 Going in the direction of higher
 kinds, Compagnoni and Pierce~\cite{comppier96} added
 intersection types to System $ F_{\omega} $ and used a new calculus,
@@ -112,7 +112,8 @@ same kind $ K $.
 Davies and Pfenning~\cite{davies2000intersection} studied the interactions between
 intersection types and effects in call-by-value languages. 
 They proposed a ``value restriction'' for intersection types, similar to
-value restriction on parametric polymorphism.
+value restriction on parametric polymorphism. None of these calculi
+has a merge operator.
 
 Recently, some form of intersection types has been adopted in
 object-oriented languages such as Scala, TypeScript, Flow, Ceylon, and
@@ -120,20 +121,22 @@ Grace\bruno{references}.  There is also a foundational calculus for Scala
 that incorporates intersection types~\cite{rompf2016soundness}.
 Generally speaking, the most significant difference between \name 
 and those languages/calculus is that
-in they have no explicit introduction construct
-like our merge operator.  This leads to several ad-hoc solutions at
-defining a merge operator in those languages, as it has been discussed in
-Section~\ref{sec:intro} and Section~\ref{subsec:mixins}.
+they have no explicit introduction construct
+like our merge operator.  The lack of a native merge operator
+ leads to several ad-hoc solutions for
+defining a merge operator in those languages, as discussed in
+Sections~\ref{sec:intro} and \ref{subsec:mixins}.
 
 \paragraph{Extensible records.}%
 %http://elm-lang.org/learn/Records.elm
-Encoding records using intersection types first appeared in 
-Reynolds~\cite{reynolds1997design} and Castagna et al.~\cite{castagna1995calculus}. 
-A similar to our treatment of elaborating records is
+The encoding multi-field records using intersection types and the merge operator first appeared in 
+Forsythe~\cite{reynolds1997design}. Castagna et
+al.~\cite{castagna1995calculus} propose an alternative encoding for records. 
+Similarly to \name's treatment of elaborating records is
 Cardelli's work~\cite{cardelli1992extensible} on translating a calculus
 with extensible records ($ F_{\subtype \rho}$) to a simpler calculus without
 records primitives ($ F_{\subtype} $). 
-However, he does not encode multi-field records as intersections; hence his translation is more
+However, he does not encode multi-field records as intersections/merges hence his translation is more
 heavyweight. 
 Crary~\cite{crary1998simple} used intersection types and
 existential types to address the problem that arises when interpreting method
@@ -147,7 +150,7 @@ operator, which is standard in many calculi with extensible records
 Cardelli and Mitchell~\cite{cardelli1990operations} defined three primitive operations on
 records that are standard in type-systems with record types: 
 \emph{selection}, \emph{restriction}, and \emph{extension}. 
-Most calculi are based on these three primitive operators (especially extension), such as
+Most calculi are based on these three primitive operators (especially extension)
 \cite{remy1993type,gaster1996polymorphic,jones99lightweight,leijen2004first,leijen2005extensible,blume2006extensible}.
 %Following Cardelli and Mitchell's approach, which is based on extension and row types, 
 %More recently, Leijen formalized two neat systems~\cite{leijen2004first,leijen2005extensible}.
@@ -169,7 +172,8 @@ and intersection types features of the type-system.
 The constraints on labels are encoded using disjoint quantification, and the coherent
 type-system will statically ensure that records and their operations are safe.
 This means that technical concerns w.r.t. records, i.e type inference, efficiency, etc.; are to be dealt with the 
-compilation of disjoint intersection types as opposed to compiling extensible records directly.
+compilation of disjoint intersection types as opposed to compiling
+extensible records directly.
 %Thus, what is expressed in other systems by means of row types, predicates, flags, qualified types, etc; 
 %in \name it is expressed by the use of disjoint intersection types.
 
@@ -205,20 +209,25 @@ compilation of disjoint intersection types as opposed to compiling extensible re
 Traits \cite{ducasse2006traits,fisher04atyped,odersky2005scalable} and mixins 
 \cite{bracha1990mixin,ancona96algebraic,flatt1998classes,findler1998modular,ancona2003jam,bettini2004corecalculus} 
 have become very popular in object-oriented languages. 
-They allow a kind of object composition which is not allowed in
-object-oriented type-systems with support for single inheritance.
+They enable restricted forms of multiple inheritance.
 One of the main differences between traits and mixins are the way in
-which ambiguity of names is dealt.
-The former usually rejects programs which compose classes with 
-conflicting methods, whereas the latter assumes a resolution strategy,
-usually language dependent. 
+which ambiguity of names is dealt with.
+Traits reject programs which compose classes with 
+conflicting method implementations, whereas mixins assume a resolution strategy,
+which is usually language dependent. 
 Our example demonstrated in Section~\ref{subsec:records} suggests that
-\name can be used in place of traits, due to the semantics of the merge
-operator.
-However there is a subtle difference between traits and \name: equal 
-names/labels are always rejected in the former, whereas in the latter only rejects
-when their types are disjoint.
-\joao{ref CZ? (similar spec to disjointess)}
+disjointness in \name enables a model with a phylosophy similar to
+traits: merging multiple values of overlapping types is forbidden. However while our 
+simple encodings of objects work for very dynamic forms of prototype
+inheritance, the work on type systems for mixins/traits usually builds
+on more conventional class-based OO models.
+
+
+%\joao{ref CZ? (similar spec to disjointess)
+
+%However there is a subtle difference between traits and \name: equal 
+%names/labels are always rejected in the former, whereas in the latter only rejects
+%when their types are disjoint.}
 
 \begin{comment}
 
