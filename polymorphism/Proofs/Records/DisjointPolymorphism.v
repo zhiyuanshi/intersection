@@ -112,7 +112,7 @@ Proof. apply uniquesub. Qed.
 
 (* Lemma 10: Unique coercion *)
 
-Lemma sub_coherent :
+Lemma unique_coercion :
   forall A B E1 E2 Gamma, WFTyp Gamma A ->
                  WFTyp Gamma B ->
                  sub A B E1 ->
