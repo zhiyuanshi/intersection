@@ -166,7 +166,7 @@ Finally, all rules produce type-correct coercions:
 %at the same time. 
 
 In order to prove the type-system coherent, the subtyping relation also 
-needs to be shown coherent. With disjoint polymorphism the following lemma holds:
+needs to be shown coherent. In \name the following lemma holds:
 
 \defaultthmprf{
 \begin{lemma}[Unique subtype contributor]
@@ -350,13 +350,14 @@ This result is captured more formally by the following lemma:
 \begin{spacing}{1}
   \begin{mathpar}
     \formtoplike \\ %\framebox{$\jatomic A$} \\
-
+\vspace{-5pt}
     \ruletopltop \and \ruletoplinter \and \ruletoplfun \and \ruletoplforall
   \end{mathpar}
 \begin{minipage}[t]{.5\textwidth}
   %\begin{center}
     \framebox{$\andcoerce{A}_{C} = T$}
   %\end{center}
+\vspace{-7pt}
   \begin{center} 
   \[
   \andcoerce{A}_{C} = 
@@ -373,7 +374,7 @@ This result is captured more formally by the following lemma:
   %\begin{center}
     \framebox{$\andcoerce{A} = T$}
   %\end{center}
-
+\vspace{-7pt}
   \[
   \andcoerce{A} = 
   \begin{cases} 
@@ -393,12 +394,10 @@ Lemma~\ref{lemma:unique-subtype-contributor}, which is fundamental in
 the proof of coherence of subtyping, holds under the condition
 that $B$ is not a \emph{top-like type}. Top-like types in \name
 include $\top$ as well as other syntactically different types that
-behave as $\top$ (such as $\top \inter \top$), or are applications
-resulting in a top-like type. It is easy to see that the unique
+behave as $\top$ (such as $\top \inter \top$). It is easy to see that the unique
 subtyping contributor lemma is invalidated if no restriction on
-top-like types exists. Since every type is a subtype of $\top$ (or
-another top-like type) then, without the restriction, the lemma would
-never hold.
+top-like types exists. Since every type is a subtype of $\top$ 
+then, without the restriction, the lemma would never hold.
 
 \paragraph{Rules.}
 \name's definition of top-like types extends that from \oldname.  The
