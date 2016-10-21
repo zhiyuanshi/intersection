@@ -423,21 +423,21 @@ $\lambda x . ()$.
 \paragraph{Allowing overlapping top-like types in intersections} 
 In \name $\top \& \top$ is a well-formed disjoint intersection type.
 This may look odd at first, since all other types
-cannot appear more than once in an intersection. Indeed in \oldname 
+cannot appear more than once in an intersection. Indeed, in \oldname, 
 $\top \& \top$ is not well-formed. However, $\top$ types are special 
 in that they have a \emph{unique} canonical top value, which is
 translated to the unit value \lstinline{()} in the target language. In
 other words a merge of two top types will always return the same value 
-regardless of which component of the merge we chose. This is different 
+regardless of which component of the merge is chosen. This is different 
 from merges with other types of values, which do not have this
 property.  
 It turns out that allowing top-types in intersections is fundamental 
 for the $\top$ type to behave correctly as the empty constraint, since
-the empty constraint (i.e. $\top$) should be disjoint to every other
+the empty constraint should be disjoint to every other
 type. This explains the more liberal treatment of top types \name when
 compared to \oldname.
 
-\subsection{Elaboration of type-system and coherence} 
+\subsection{Elaboration of Type-System and Coherence} 
 In order to prove the coherence result, we refer to the bidirectional type-system introduced in
 Section~\ref{sec:fi}. 
 The bidirectional type-system is elaborating, producing a term in the target language while
