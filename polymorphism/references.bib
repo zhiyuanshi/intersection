@@ -173,6 +173,7 @@
  journal = {Inf. Comput.},
  volume = {109},
  number = {1-2},
+ pages = {4--56},
  //month = feb,
  year = {1994}
 }
@@ -499,6 +500,7 @@
   author = {Benedict R. Gaster and Mark P. Jones},
   title = {A Polymorphic Type System for Extensible Records and Variants},
   institution = {University of Nottingham},
+  number = {NOTTCS-TR-96-3},
   year = {1996}
 }
 
@@ -588,12 +590,24 @@ volume=76,
 year=1988,
 pages="138-164"}
 
-@article{dunfield2014elaborating,
+article{dunfield2014elaborating,
   title={Elaborating intersection and union types},
   author={Dunfield, Joshua},
   journal={Journal of Functional Programming},
   year={2014},
 }
+
+@inproceedings{dunfield2014elaborating,
+   author = {Dunfield, Joshua},
+   title = {Elaborating Intersection and Union Types},
+   //booktitle = {Proceedings of the 17th ACM SIGPLAN International Conference on Functional Programming},
+   booktitle = {ICFP'12},
+   year = {2012},
+   //pages = {17--28},
+   //publisher = {ACM},
+   //address = {New York, NY, USA},
+   keywords = {intersection types},
+} 
 
 @article{frisch2008semantic,
   title={Semantic subtyping: Dealing set-theoretically with function, union, intersection, and negation types},
@@ -659,6 +673,7 @@ inproceedings{dunfield2007refined,
   title={Simple, efficient object encoding using intersection types},
   author={Crary, Karl},
   year={1998},
+  number={CMU-CS-99-100},
   institution={Cornell University}
 }
 
@@ -671,8 +686,10 @@ book{reynolds1997design,
 @Inbook{reynolds1997design,
   author="Reynolds, John C.",
   editor="O'Hearn, Peter W. and Tennent, Robert D.",
-  title="Design of the programming language {F}orsythe",
-  bookTitle="Algol-like Languages",
+  //title="Design of the programming language {F}orsythe",
+  chapter="Design of the programming language {F}orsythe",
+  //bookTitle="Algol-like Languages",
+  title="Algol-like languages",
   year="1997",
   publisher="Birkh{\"a}user Boston",
   //address="Boston, MA",
@@ -708,6 +725,9 @@ book{reynolds1997design,
   author={Castagna, Giuseppe and Ghelli, Giorgio and Longo, Giuseppe},
   journal={Information and Computation},
   year={1995},
+  volume={117},
+  number={1},
+  pages={115-135}
 }
 
 @article{barbanera1995intersection,
@@ -795,10 +815,10 @@ RECORDS
   organization={ACM}
 }
 
-@article{leijen2005extensible,
+@inproceedings{leijen2005extensible,
   title={Extensible records with scoped labels.},
   author={Leijen, Daan},
-  journal={Trends in Functional Programming},
+  booktitle={Trends in Functional Programming},
   year={2005}
 }
 
@@ -806,12 +826,24 @@ RECORDS
   title={First-class labels for extensible rows},
   author={Leijen, Daan},
   journal={UU-CS},
-  number={2004-051},
+  number={UU-CS-2004-051},
   institution={Utrecht University},
   year={2004},
 }
 
-@book{remy1993type,
+@incollection{remy1993type,
+   author = {R{\'e}my, Didier},
+   chapter = {Type inference for records in natural extension of {ML}},
+   title = {Theoretical Aspects of Object-oriented Programming},
+   //editor = {Gunter, Carl A. and Mitchell, John C.},
+   year = {1994},
+   //isbn = {0-262-07155-X},
+   //pages = {67--95},
+   publisher = {MIT Press},
+   //address = {Cambridge, MA, USA},
+} 
+
+book{remy1993type,
   title={Type inference for records in a natural extension of ML},
   author={R{\'e}my, Didier},
   year={1993},
@@ -829,17 +861,30 @@ RECORDS
     year      = {1992},
 }
 
-@book{cardelli1992extensible,
+book{cardelli1992extensible,
   title={Extensible records in a pure calculus of subtyping},
   author={Cardelli, Luca},
   year={1992},
   publisher={Digital. Systems Research Center}
 }
 
+@incollection{cardelli1992extensible,
+   author = {Cardelli, Luca},
+   chapter = {Extensible records in a pure calculus of subtyping},
+   title = {Theoretical Aspects of Object-oriented Programming},
+   //editor = {Gunter, Carl A. and Mitchell, John C.},
+   year = {1994},
+   //isbn = {0-262-07155-X},
+   //pages = {373--425},
+   publisher = {MIT Press},
+   //address = {Cambridge, MA, USA},
+} 
+
 @techreport{sulzmann97designing, 
   author = {Martin Sulzmann}, 
   title = {Designing Record Systems}, 
   institution = {Yale University}, 
+  number = {YALEU/DCS/RR-1128},
   year = {1997} 
 } 
 
@@ -878,13 +923,14 @@ RECORDS
 @inproceedings{cardelli1990operations,
   title={Operations on records},
   author={Cardelli, Luca and Mitchell, John C},
-  booktitle={Mathematical foundations of programming semantics},
+  booktitle={Mathematical Foundations of Programming Semantics},
   year={1990},
 }
 
 @techreport{harper1990extensible,
   title={Extensible records without subsumption},
   author={Harper, Robert William and Pierce, Benjamin C},
+  number={CMU-C5-90-102},
   year={1990}
 }
 
@@ -915,10 +961,11 @@ RECORDS
     year      = {1994},
 }
 
-@misc{jones99lightweight,
+@techreport{jones99lightweight,
   author = {M. Jones and S. Jones},
   title = {Lightweight Extensible Records for {H}askell},
-  text = {In Haskell Workshop, Paris, September 1999.},
+  number = {UU-CS-1999-28},
+  institution = {Haskell Workshop},
   year = {1999},
 }
 
@@ -937,7 +984,7 @@ RECORDS
    author = {Black, Andrew P. and Bruce, Kim B. and Homer, Michael and Noble, James},
    title = {Grace: The Absence of (Inessential) Difficulty},
    //booktitle = {Proceedings of the ACM International Symposium on New Ideas, New Paradigms, and Reflections on Programming and Software},
-   series = {Onward! 2012},
+   booktitle = {Onward! 2012},
    year = {2012},
    //isbn = {978-1-4503-1562-3},
    //pages = {85--98},
@@ -999,26 +1046,17 @@ TRAITS
 MIXINS
 ------
 
-@article{bracha1990mixin,
+@inproceedings{bracha1990mixin,
    author = {Bracha, Gilad and Cook, William},
    title = {Mixin-based Inheritance},
-   journal = {SIGPLAN Not.},
-   volume = {25},
-   number = {10},
-   //month = sep,
+   //booktitle = {Proceedings of the European Conference on Object-oriented Programming on Object-oriented Programming Systems, Languages, and Applications},
+   booktitle = {OOPSLA/ECOOP '90},
    year = {1990},
-   //issn = {0362-1340},
-   pages = {303--311},
+   //isbn = {0-89791-411-2},
+   //pages = {303--311},
    //publisher = {ACM},
    //address = {New York, NY, USA},
 } 
-
-inproceedings{bracha1990mixin,
-  title={Mixin-based inheritance},
-  author={Bracha, Gilad and Cook, William},
-  booktitle={OOPSLA’90},
-  year={1990}
-}
 
 @INPROCEEDINGS{ancona96algebraic,
    author = {Davide Ancona and Elena Zucca},
@@ -1072,7 +1110,7 @@ inproceedings{bracha1990mixin,
    //keywords = {Java, language design},
 }
 
-@Inbook{bettini2004corecalculus,
+Inbook{bettini2004corecalculus,
   author={Bettini, Lorenzo
     and Bono, Viviana
     and Likavec, Silvia},
@@ -1088,6 +1126,16 @@ inproceedings{bracha1990mixin,
   //isbn={978-3-540-24849-1},
 }
 
+@inproceedings{bettini2004corecalculus,
+   author = {Bettini, Lorenzo and Bono, Viviana and Likavec, Silvia},
+   title = {A core calculus of higher-order mixins and classes},
+   //booktitle = {Proceedings of the 2004 ACM Symposium on Applied Computing},
+   booktitle = {SAC'04},
+   year = {2004},
+   //pages = {1508--1509},
+   //publisher = {ACM},
+   //address = {New York, NY, USA},
+} 
 
 ----
 URLs
