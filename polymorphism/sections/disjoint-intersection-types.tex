@@ -6,15 +6,13 @@ Then, it will discuss the necessary extensions to retain coherence, namely in th
 top-like types; coercive subtyping, and bidirectional type-system's
 elaboration. 
 
-\subsection{Semantics}
+\subsection{Target Language}
 The dynamic semantics of the call-by-value \name is defined by means of
 a type-directed translation to an extension of System $F$ with
 pairs.
 %The type-directed translation is also shown in
 %Figure~\ref{}, where the resulting System F terms are highlighted in
 %gray.
-
-\paragraph{Target language.}
 The syntax and typing of our target language is unsurprising: 
   \[
     \begin{array}{llrl}
@@ -31,8 +29,8 @@ The syntax and typing of our target language is unsurprising:
     \end{array}
   \]
 The highlighted part shows its difference with the standard System $F$. 
-The interested reader can find the formalization of the target language
-syntax and typing rules (which are standard) in our Coq development.
+The interested reader can find the formalization of the full target language
+syntax and typing rules in our Coq development.
 
 \paragraph{Type and context translation.}
 Figure~\ref{fig:type-and-context-translation} defines the type translation
@@ -71,98 +69,6 @@ contexts $\Gamma$ to target language contexts $G$.
 % Section~\ref{sec:fi}, except for the light blue part. The translation consists
 % of four sets of rules, which are explained below:
 
-\subsection{Top-like types and their coercions}
-\begin{figure}[!t]
-\begin{spacing}{1}
-  \begin{mathpar}
-    \formtoplike \\ %\framebox{$\jatomic A$} \\
-
-    \ruletopltop \and \ruletoplinter \and \ruletoplfun \and \ruletoplforall
-  \end{mathpar}
-\begin{minipage}[t]{.5\textwidth}
-  %\begin{center}
-    \framebox{$\andcoerce{A}_{C} = T$}
-  %\end{center}
-  \begin{center} 
-  \[
-  \andcoerce{A}_{C} = 
-  \begin{cases} 
-        \toplike{A} & \andcoerce{A} \\ 
-        %A = \top & () \\
-        %A = A_1 \to A_2 \; \wedge \; \toplike{A_2} & \lam x \andcoerce{A_2}_{C} \\
-        \text{otherwise} & {C} 
-  \end{cases}
-  \]
-  \end{center}
-\end{minipage}
-\begin{minipage}[t]{.5\textwidth}
-  %\begin{center}
-    \framebox{$\andcoerce{A} = T$}
-  %\end{center}
-
-  \[
-  \andcoerce{A} = 
-  \begin{cases} 
-        A = \top & () \\
-        A = A_1 \to A_2 & \lam x \andcoerce{A_2} \\
-        A = A_1 \inter A_2 & \pair {\andcoerce{A_1}} {\andcoerce{A_2}} \\
-        A = \fordis \alpha B A & \blam \alpha {\andcoerce{A}}
-  \end{cases}
-  \]
-\end{minipage}
-\end{spacing}
-  \caption{Top-like types and their coercions.}
-  \label{fig:andcoercion}
-\end{figure}
-\paragraph{Top-like types.}
-Some \name types can be classified as top-like types.
-This classification is crucial in order to prove coherence.
-Top-like types are types that relate to $\top$, in the sense that they
-only having one inhabitant each.
-Therefore, their (unique) coercions can be generated structurally from their types. 
-For example, the term $\lam x \unit$ represents the only inhabitant of the type 
-$\tyint \to \top$.
-
-According to~\cite{oliveira16disjoint}, some top-like types are problematic,
-for instance: $\top \inter \top$.
-Not only this type is a super-type of every other type (including $\top$), but
-also it might impose a coherence problem, as both components of the
-intersection overlap.
-However, taking a closer look at it clarifies that such issues are not problematic. 
-To explain why, let us first consider the ill-type $\tyint \inter \tyint$.
-This type is a potential source for incoherence, as both components of the intersection 
-overlap.
-%The $\tyint \inter \tyint \subtype \tyint$ judgement has to produce a coercion which
-%is biased, and therefore might lead to different results.
-For example, the term $(3 \mergeop 4) : \tyint$ is incoherent, since 
-the terms $3$ and $4$ can both be typed $\tyint$. 
-There is one case though, where coherence is not compromised:
-when both terms composing the merge are equivalent (i.e. $\beta$-equivalent), as in 
-$(2 \mergeop 2) : \tyint$.
-In this case, both terms can be chosen interchangibily, without affecting the coherence
-of the program.
-It is important realizing that this is always the case with top-like intersections.
-%In fact, this explains why $\top$ is actually disjoint with every other type.
-Moreover, top-like types can also be safely intersected with other types, as their inhabitants
-do not overlap.
-Generally speaking, top-like types should never be a source of incoherence, implying that 
-%Thus, in contrast with \cite{oliveira16disjoint}, they can be safely intersected with any other type.
-$\top$ is disjoint to every other type (as mentioned in Section~\ref{sec:alg-dis}).
-
-\paragraph{Rules.}
-Our definition of top-like types is an extension from \oldname. 
-The rules that compose this unary relation, denoted as $\toplike{ . }$, are presented at the top of 
-Figure~\ref{fig:andcoercion}. 
-The only new rule is \reflabel{\labeltoplforall}, which states that a (disjoint) universal quantifier 
-is top-like whenever its body is also top-like.
-
-Furthermore, the notion of disjointness has changed, leading to a larger set of well-formed top-like types.
-In order to retain coherece, we adjusted the meta-function $\andcoerce{A}$, as shown in the bottom of 
-Figure~\ref{fig:andcoercion}.
-Note how not only the $\forall$ case is now defined, but also the $\inter$ case (covering types such
-as $\top \inter \top$).
-%These changes are very important since they play a fundamental role in ensuring the coherence of subtyping for top-like
-%types.
 
 \subsection{Coercive Subtyping and Coherence}
 
@@ -438,6 +344,99 @@ This result is captured more formally by the following lemma:
 
 %Indeed, \bruno{unfinidhed sentence}\george{Mabe show a diagram here to contrast
 %with bounded polymorphism.}
+
+\subsection{Top-like Types and their Coercions}
+\begin{figure}[!t]
+\begin{spacing}{1}
+  \begin{mathpar}
+    \formtoplike \\ %\framebox{$\jatomic A$} \\
+
+    \ruletopltop \and \ruletoplinter \and \ruletoplfun \and \ruletoplforall
+  \end{mathpar}
+\begin{minipage}[t]{.5\textwidth}
+  %\begin{center}
+    \framebox{$\andcoerce{A}_{C} = T$}
+  %\end{center}
+  \begin{center} 
+  \[
+  \andcoerce{A}_{C} = 
+  \begin{cases} 
+        \toplike{A} & \andcoerce{A} \\ 
+        %A = \top & () \\
+        %A = A_1 \to A_2 \; \wedge \; \toplike{A_2} & \lam x \andcoerce{A_2}_{C} \\
+        \text{otherwise} & {C} 
+  \end{cases}
+  \]
+  \end{center}
+\end{minipage}
+\begin{minipage}[t]{.5\textwidth}
+  %\begin{center}
+    \framebox{$\andcoerce{A} = T$}
+  %\end{center}
+
+  \[
+  \andcoerce{A} = 
+  \begin{cases} 
+        A = \top & () \\
+        A = A_1 \to A_2 & \lam x \andcoerce{A_2} \\
+        A = A_1 \inter A_2 & \pair {\andcoerce{A_1}} {\andcoerce{A_2}} \\
+        A = \fordis \alpha B A & \blam \alpha {\andcoerce{A}}
+  \end{cases}
+  \]
+\end{minipage}
+\end{spacing}
+  \caption{Top-like types and their coercions.}
+  \label{fig:andcoercion}
+\end{figure}
+
+Lemma~\ref{lemma:unique-subtype-contributor}, which is fundamental in
+the proof of coherence of subtyping, holds under the condition
+that $B$ is not a \emph{top-like type}. Top-like types in \name
+include $\top$ as well as other syntactically different types that
+behave as $\top$ (such as $\top \inter \top$), or are applications
+resulting in a top-like type. It is easy to see that the unique
+subtyping contributor lemma is invalidated if no restriction on
+top-like types exists. Since every type is a subtype of $\top$ (or
+another top-like type) then, without the restriction, the lemma would
+never hold.
+
+\paragraph{Rules.}
+\name's definition of top-like types extends that from \oldname.  The
+rules that compose this unary relation, denoted as $\toplike{ . }$,
+are presented at the top of Figure~\ref{fig:andcoercion}.  The only
+new rule is \reflabel{\labeltoplforall}, which states that a
+(disjoint) universal quantifier is top-like whenever its body is also
+top-like.
+
+\paragraph{Coercions for top-like types} Coercions for top-like types 
+require special treatement for retaining coherence. Although Lemma~\ref{lemma:unique-subtype-contributor}
+does not hold for top-like types, we can still ensure that that any 
+coercions for top-like types are unique, \emph{even if multiple
+  derivations exist}. The meta-function
+$\andcoerce{A}$, shown at the bottom of Figure~\ref{fig:andcoercion},
+ defines coercions for top-like types. With respect to \oldname the $\forall$ case is
+now defined, and there is also a change in the $\inter$ case (covering types such as $\top
+\inter \top$). With this definition, although two derivations
+exist for type $Char\&Int <: \top$, they both generate the coercion 
+$\lambda x . ()$.
+ 
+\paragraph{Allowing overlapping top-like types in intersections} 
+In \name $\top \& \top$ is a well-formed disjoint intersection type.
+This may look odd at first, since all other types
+cannot appear more than once in an intersection. Indeed in \oldname 
+$\top \& \top$ is not well-formed. However, $\top$ types are special 
+in that they have a \emph{unique} canonical top value, which is
+translated to the unit value \lstinline{()} in the target language. In
+other words a merge of two top types will always return the same value 
+regardless of which component of the merge we chose. This is different 
+from merges with other types of values, which do not have this
+property.  
+It turns out that allowing top-types in intersections is fundamental 
+for the $\top$ type to behave correctly as the empty constraint, since
+the empty constraint (i.e. $\top$) should be disjoint to every other
+type. This explains the more liberal treatment of top types \name when
+compared to \oldname.
+
 \subsection{Elaboration of type-system and coherence} 
 In order to prove the coherence result, we refer to the bidirectional type-system introduced in
 Section~\ref{sec:fi}. 
