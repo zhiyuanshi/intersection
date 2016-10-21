@@ -213,7 +213,6 @@ design is that type variables can be instantiated to any types,
 including those already in the intersection. Thus forbidding type
 variables in the intersection will prevent invalid intersections
 arizing from instantiations with overlapping types.
-
 Such design does guarantee coherence and would prevent
 \lstinline{merge3} from type-checking. Unfortunatelly the big drawback
 is that the design is too conservative and many other (useful) programs would be 
@@ -225,7 +224,7 @@ Another option to mitigate the issues of incoherence, without using
 disjoint intersection types is to allow for a biased choice: that is
 multiple values of the same type may exist in an intersection, but an
 implementation gives preference to one of them. The encodings of merge 
-operators in TypeScript and Scala~\cite{oliveira2013feature} use such an approach.
+operators in TypeScript and Scala~\cite{oliveira2013feature,Rendel14OA} use such an approach.
 A first problem with this approach, which has already been pointed out by
 Dunfield~\cite{dunfield2014elaborating}, is that the choice of the corresponding value is
 tied up to a particular choice in the implementation. In other words
@@ -358,19 +357,19 @@ merge3 Bool True
 \noindent is accepted. However, instantiating \lstinline{A} with
 \lstinline{Int} fails to type-check. 
 
-\paragraph{Multiple constraints} Disjoint quantification allows for
-multiple constraints. For example, in the following variant of the
-\lstinline{merge3} there is an additional boolean in the merge:
+\paragraph{Multiple constraints} Disjoint quantification allows 
+multiple constraints. For example, the following variant of 
+\lstinline{merge3} has an additional boolean in the merge:
 
 \begin{lstlisting}
 let merge3b ((*$ \highlight {A *~Int \&~Bool} $*)) (x : A) : A & Int & Bool = x,,3,,True in
 \end{lstlisting}
 
-\noindent In this case the type variable \lstinline{A} needs to be
+\noindent Here the type variable \lstinline{A} needs to be
 disjoint to both \lstinline{Int} and \lstinline{Bool}. In \name
 such constraint is specified using an intersection type
 \lstinline{Int & Bool}. In general, multiple constraints are specified 
-by creating an intersection of all required constraints. 
+with an intersection of all required constraints. 
 
 \paragraph{Type variable constraints}
 Disjoint quantification also allows type variables to be disjoint 
