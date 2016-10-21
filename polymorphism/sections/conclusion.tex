@@ -21,17 +21,51 @@ flexible enough to enable practical applications.
 %first-class modules that are encoded using \code{letrec} and records.
 
 For the future, we intend to create a prototype-based statically typed
-source language based on \name.
-We are also interested in extending our work to systems with union types and
-a $\bot$ type. Union types are also widely used in languages such as
-Ceylon or Flow, but preserving coherence in the presence of union
-types is challenging. The naive addition of $\bot$ breaks
-covariance of disjointness. For example, given $\jwf \Gamma {\top \disjoint \bot}$ and 
+source language based on \name.  We are also interested in extending
+our work to systems with union types and a $\bot$ type. Union types
+are also widely used in languages such as Ceylon or Flow, but
+preserving coherence in the presence of union types is
+challenging. The naive addition of $\bot$ seems to be problematic. 
+The proofs for \name rely on the invariant that a type variable $\alpha$ can never be disjoint 
+to another type that contains $\alpha$. The addition of $\bot$ breaks
+this invariant, allowing us to derive, for example, $\jdis \Gamma
+\alpha \alpha$. 
+
+%Further study is needed to determine how to integrate $\bot$ in the system.
+
+
+\begin{comment}
+allows deriving $\jdis
+\Gamma \alpha A$, where \lstinline{A} contains $\alpha
+
+for some type variable $\alpha$, under some
+well-formed context $\Gamma$.  In \name, such statement is not
+derivable, and many of the proofs rely on the
+
+However, by introducing $\bot$ we may now construct such derivation, as $A$ can now be $\bot$: a valid
+sub-type of $\alpha$ which does not contain $\alpha$.
+This suggests that adding $\bot$ is not as straightforward as initially perceived.
+In fact, had \name included a $\bot$ type, then introducing any \emph{bottom-like} type 
+(i.e. $\bot \inter A$, for any type $A$) can lead to this undesired behaviour.
+
+
+In \name, such statement is not
+derivable, since well-formedness of environments guarantees that
+$\alpha$ is not in scope of the constraint. 
+
+ since we would have to use \reflabel{\labeldisvar} with the 
+type $A$ as a sub-type of $\alpha$, i.e. an (n-ary) intersection containing $\alpha$.
+Well-formedness of environments guarantees that this will never happen, since $\alpha$ is not in
+scope of itself. 
+
+
+For example, given $\jwf \Gamma {\top \disjoint \bot}$ and 
 $\bot \subtype Int$ we could conclude  $\jwf \Gamma {\top \disjoint
   Int}$. One possible way out is to have a notion of bottom-like
 types, similar to top-like types to restrict covariance of
 disjointness to non-bottom-like types only. However, we have not yet
 investigated this path. 
+
 
 
 %It turns out the well-formedness conditions imposed on environments are not strong enough for 
@@ -42,21 +76,22 @@ investigated this path.
 %as an open problem. 
 
 
-%However, introducing the latter is not compatible with our disjointness rule
-%\reflabel{\labeldisvar} and well-formedness of contexts.
-%Had we introduced it in \name, we could derive non-sensical statements as in 
-%$\jdis \Gamma \alpha \alpha$, for some variable $\alpha$, under some well-formed context $\Gamma$.
-%In \name, such statement is not derivable since we would have to use \reflabel{\labeldisvar} with the 
-%type $A$ as a sub-type of $\alpha$, i.e. an (n-ary) intersection containing $\alpha$.
-%Well-formedness of environments guarantees that this will never happen, since $\alpha$ is not in
-%scope of itself. 
+However, introducing the latter is not compatible with our disjointness rule
+\reflabel{\labeldisvar} and well-formedness of contexts.
+Had we introduced it in \name, we could derive non-sensical statements as in 
+$\jdis \Gamma \alpha \alpha$, for some variable $\alpha$, under some well-formed context $\Gamma$.
+In \name, such statement is not derivable since we would have to use \reflabel{\labeldisvar} with the 
+type $A$ as a sub-type of $\alpha$, i.e. an (n-ary) intersection containing $\alpha$.
+Well-formedness of environments guarantees that this will never happen, since $\alpha$ is not in
+scope of itself. 
 
 
-%However, by introducing $\bot$ we may now construct such derivation, as $A$ can now be $\bot$: a valid
-%sub-type of $\alpha$ which does not contain $\alpha$.
-%This suggests that adding $\bot$ is not as straightforward as initially perceived.
-%In fact, had \name included a $\bot$ type, then introducing any \emph{bottom-like} type 
-%(i.e. $\bot \inter A$, for any type $A$) can lead to this undesired behaviour.
+However, by introducing $\bot$ we may now construct such derivation, as $A$ can now be $\bot$: a valid
+sub-type of $\alpha$ which does not contain $\alpha$.
+This suggests that adding $\bot$ is not as straightforward as initially perceived.
+In fact, had \name included a $\bot$ type, then introducing any \emph{bottom-like} type 
+(i.e. $\bot \inter A$, for any type $A$) can lead to this undesired behaviour.
+\end{comment}
 
 \begin{comment}
 Some immediate topics for
