@@ -4,10 +4,11 @@
 To our knowlegde no previous work presents a \emph{coherent} calculus
 which includes parametric polymorphism, intersection types and a
 \emph{merge} operator. As far as we are aware only Pierce's
-$F_\wedge$~\cite{pierce1991programming2}\bruno{joao: you need to read
-  Pierce's stuff to double-check that what I say is correct.}
-supports both the merge operator (called $glue$ in $F_\wedge$), intersection types and polymorphism.
-However $F_\wedge$ is incoherent. Various simply typed systems with 
+$F_\wedge$~\cite{pierce1991programming2}
+supports intersection types, polymorphism and, as an extension,
+the merge operator (called $glue$ in $F_\wedge$). 
+However, with such extension, $F_\wedge$ is incoherent. 
+Various simply typed systems with 
 intersections types and a merge operator have been studied in the past.
 The merge operator was first introduced 
 by Reynold's in the Forsythe~\cite{reynolds1997design}
@@ -100,8 +101,13 @@ in their calculus. For example merges with type $(\tyint \to \tybool)
 Castagna et al. previous work~\cite{castagna1995calculus}, their work is
 focused on combining intersections with functions (but without a merge
 operator), whereas \name is concerned with merges between arbitrary
-types.\bruno{I think you need to comment on the relation between
-  disjointness and negation ($\alpha \backslash \tyint$)}
+types.
+Nevertheless, both systems need to express negative information about
+type variables.
+That is, which types a given variable cannot be instantiated to.
+In their calculus, negation takes this role (i.e. $\alpha\backslash\tyint$); 
+whereas in \name, one can express it using disjoint quantification 
+(i.e. $\fordis \alpha \tyint {\ldots}$). 
 
 Going in the direction of higher
 kinds, Compagnoni and Pierce~\cite{comppier96} added
@@ -116,11 +122,13 @@ value restriction on parametric polymorphism. None of these calculi
 has a merge operator.
 
 Recently, some form of intersection types has been adopted in
-object-oriented languages such as Scala, TypeScript, Flow, Ceylon, and
-Grace\bruno{references}.  There is also a foundational calculus for Scala
+object-oriented languages such as Scala~\cite{scala-overview}, 
+TypeScript~\cite{typescript}, Flow~\cite{flow}, Ceylon~\cite{ceylon}, and
+Grace~\cite{black2012grace}.
+There is also a foundational calculus for Scala
 that incorporates intersection types~\cite{rompf2016soundness}.
-Generally speaking, the most significant difference between \name 
-and those languages/calculus is that
+The most significant difference between \name 
+and those languages/calculi is that
 they have no explicit introduction construct
 like our merge operator.  The lack of a native merge operator
  leads to several ad-hoc solutions for
@@ -139,18 +147,18 @@ records primitives ($ F_{\subtype} $).
 However, he does not encode multi-field records as intersections/merges hence his translation is more
 heavyweight. 
 Crary~\cite{crary1998simple} used intersection types and
-existential types to address the problem that arises when interpreting method
-dispatch as self-application. 
-But also in his paper, intersection types are not used to encode multi-field records.
+existential types to address the problem arising from interpreting method
+dispatch as self-application, 
+but he also did not use intersection types to encode multi-field records.
 
 Wand~\cite{wand1987complete} started the work on extensible records and proposed
 row types~\cite{wand1989type} for records, together with a \emph{concatenation}
 operator, which is standard in many calculi with extensible records
 \cite{harper1991record,remy1992typing,wand1989type,sulzmann97designing,makholm05type,pottier2003constraint}.
 Cardelli and Mitchell~\cite{cardelli1990operations} defined three primitive operations on
-records that are standard in type-systems with record types: 
+records that are also standard in type-systems with record types: 
 \emph{selection}, \emph{restriction}, and \emph{extension}. 
-Most calculi are based on these three primitive operators (especially extension)
+Several calculi are based on these three primitive operators (especially extension)
 \cite{remy1993type,gaster1996polymorphic,jones99lightweight,leijen2004first,leijen2005extensible,blume2006extensible}.
 %Following Cardelli and Mitchell's approach, which is based on extension and row types, 
 %More recently, Leijen formalized two neat systems~\cite{leijen2004first,leijen2005extensible}.
