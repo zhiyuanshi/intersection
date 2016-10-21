@@ -91,8 +91,8 @@ let extend T (U * T) (first : T, second : U) : T & U = first ,, second in
 \noindent The disjointness constraint on \lstinline{U} ensures that no
 conflicts (such as duplicated fields of the same type) exists when merging the two objects. In practice this approach
 is quite similar to trait-based OO approaches~\cite{scharli2003traits}. If conflicts
-exist when two objects are composed, then fields have to be explicitly
-dropped from at least one object. Moreover if no existing
+exist when two objects are composed, then they have to be resolved
+manually (by dropping fields from from some object, for example). Moreover if no existing
 implementation can be directly reused, a new one must be provided via
 record extension, analogously to standard method overriding in OO
 languages.
@@ -138,9 +138,10 @@ Systems with records usually rely on 3 basic operations: selection,
 restriction and extension/concatenation.  Selection and concatenation
 (via the merge operator) are built-in in the semantics of
 \name. Merges in \name can be viewed as a generalization of record
-concatenation.  In \name, following well-known encodings of records in
+concatenation.  In \name, following well-known encodings of
+multi-field records in
 systems with intersection types and a merge
-operator~\cite{}\bruno{reference missing}, there are only three rather simple constructs
+operator~\cite{reynolds1997design,reynolds1991coherence}, there are only three rather simple constructs
 for records: 1) single field record types; 2) single field records; 3)
 field accessors. Multi-field records in \name are encoded with
 intersections and merges of single field records. An example is
@@ -185,7 +186,7 @@ restricted to record types.
 \end{comment}
 
 \paragraph{Restriction via subtyping}
-In contrast with most record systems, restriction is not directly
+In contrast to most record systems, restriction is not directly
 embedded in \name.
 Instead, \name uses subtyping for restriction: 
 %\begin{align*}
@@ -284,7 +285,7 @@ We will get into the reasons for this in further detail, in Section~\ref{sec:con
 
 
 \paragraph{Expressibility}
-As noted by Leijen~\cite{leijen2005extensible}, systems typically can be
+As noted by Leijen~\cite{leijen2005extensible}, systems can typically be
 categorized into two distinct groups in what concerns extension:
 strict; and free. The former does not allow field overriding when
 extending a record (i.e. one can only extend a record with a field
@@ -292,7 +293,7 @@ that is not present in it); while the latter does account for field
 overriding.  Our system can be seen as hybrid of these two kinds of
 systems.  
 
-With lightweight extensible records~\cite{jones99lightweight} -- a system with strict extension -- an example of a function that uses 
+With \emph{lightweight extensible records}~\cite{jones99lightweight} -- a system with strict extension -- an example of a function that uses 
 record types is the following:
 %\begin{align*}
 %&\text{avg}_1 :: (r \backslash y, r \backslash x) \Rightarrow \{r | x :: \tyint, y :: \tyint\} \rightarrow \tyint \\
