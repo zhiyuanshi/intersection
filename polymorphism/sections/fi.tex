@@ -1,9 +1,9 @@
 \section{The \name Calculus}\label{sec:fi}
 This section presents the syntax, subtyping, and typing of \name: 
 a calculus with intersection types, parametric polymorphism, records and a merge operator. 
-This calculus is an extension of \oldname~\cite{oliveira16disjoint} and Dunfield's~\cite{dunfield2014elaborating}
-calculus, which are simply typed
-calculus with intersection types and a merge operator.
+This calculus is an extension of the \oldname calculus~\cite{oliveira16disjoint},
+which is itself inspired by Dunfield's
+calculus~\cite{dunfield2014elaborating}. \name extends \oldname with (disjoint) polymorphism.
 %The novelty of \name is the addition of \emph{disjoint polymorphism}:
 %a form of parametric polymorphism with disjointness contraints, which
 %allows flexibility while at the same time retaining coherence. 
@@ -97,7 +97,7 @@ well-formed contexts type variables must not appear free within its own disjoint
 %However they can be included in the formalization in
 %standard ways and we are using them in discussions and examples. %TODO are we?
 \paragraph{Syntactic sugar}
-In \name we may quantify a type variables and ommit its constraint. 
+In \name we may quantify a type variable and ommit its constraint. 
 This means that its constraint is $\top$. 
 For example, the function type $\forall \alpha. \alpha \to \alpha$ is syntactic sugar
 for  $\fordis \alpha \top {\alpha \to \alpha}$.
