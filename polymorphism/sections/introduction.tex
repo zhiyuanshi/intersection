@@ -17,7 +17,7 @@ class A extends B with C
 \end{lstlisting}
 
 \noindent says that the class \lstinline{A} implements \emph{both}
-\lstinline{B} and \lstinline{C}. The fact that \lstinline{A}
+\lstinline{B} \emph{and} \lstinline{C}. The fact that \lstinline{A}
 implements two interfaces/traits is captured by an intersection type
 between \lstinline{B} and \lstinline{C} (denoted in Scala by
 \lstinline{B with C}). Unlike a language like Java, where
@@ -96,9 +96,9 @@ semantics, which significantly complicates reasoning about programs.
 Solutions to the problem of coherence in the presence 
 of a merge operator exist for simply typed
 calculi~\cite{reynolds1997design,reynolds1991coherence,castagna1995calculus,oliveira16disjoint}, 
-but no prior work addresses polymorphism. Most recently Oliveira
-et al.~\cite{oliveira16disjoint} proposed using \emph{disjoint intersection types} to 
-guarantee coherence in a calculus with intersection types and a merge 
+but no prior work addresses polymorphism. Most recently, we
+proposed using \emph{disjoint intersection types}~\cite{oliveira16disjoint} to 
+guarantee coherence in \oldname: a simply typed calculus with intersection types and a merge 
 operator. The key idea is to allow only disjoint types in
 intersections. If two types are disjoint then there is no ambiguity in
 selecting a value of the appropriate type from an intersection, 
@@ -107,7 +107,7 @@ guaranteeing coherence.
 Combining parametric polymorphism with disjoint intersection
 types, while retaining enough flexibility for practical applications,
 is non-trivial. The key issue is that when a type variable occurs in an intersection
-type it is not statically known whether the instantiated type will
+type it is not statically known whether the instantiated types will
 be disjoint to other components of the intersection.
 A naive way  to add polymorphism is to forbid 
 type variables in intersections, since they may be instantiated with 

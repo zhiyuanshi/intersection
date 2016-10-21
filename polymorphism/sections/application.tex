@@ -35,7 +35,7 @@ interface Loggable { log() : void; }
 class ConsoleLogger implements Loggable { log() {...} }
 var jim = extend(new Person("Jim",true), new ConsoleLogger());
 var n = jim.name;
-jim.log();
+jim.log(); 
 \end{lstlisting}
 
 In this example, taken from TypeScript's documentation\footnote{We have added the field \lstinline$male$ to the class
@@ -59,13 +59,21 @@ However, in TypeScript this may be a cause of severe problems since that, at the
 intersections at type-level are right-biased!
 For example, the following code is well-typed:
 
-\begin{lstlisting}
+\begin{lstlisting}[mathescape=true]
 class Dog { constructor(public name : string, public male : string) { } }
-var fool : Dog & Person = extend(new Dog("Pluto","yes"),new Person("Arnold",true))
-boolean b = fool.male
+var fool : Dog & Person = extend(new Dog("Pluto","yes"),new Person("Arnold",true));
+boolean b = fool.male;     /* $\text{{\bf Undetected type-error here!}}$ */
 \end{lstlisting}
-Note how \lstinline$fool.male$ is statically bound to a variable of type \lstinline$boolean$ but, at run-time, 
-it will contain a value of type \lstinline$String$! 
+There are a few problems here. Firstly both \lstinline{Dog} and
+\lstinline{Person} contain a \lstinline{name} field, and the use of
+\lstinline{extend} will favour the \lstinline{name} field in the first object. This
+could be surprising for someone unfamiliar with the semantics of
+\lstinline{extend} and, more importantly, it could easily allow
+unintended name clashes to go undetected. 
+Secondly, note how \lstinline$fool.male$ is statically
+bound to a variable of type \lstinline$boolean$ but, at run-time, it
+will contain a value of type \lstinline$String$! Thus the example
+shows some run-time type errors can still occur when using \lstinline{extend}.
 
 Other problematic issues regarding the semantics of intersection types can include the order of 
 the types in an intersection, or even intersections including repeated types.
@@ -73,8 +81,7 @@ This motivates the need to define a clear meaning for the practical application 
 intersection types.
 
 \paragraph{Dynamic mixins in \name}
-In \name, the merge combinator is directly embedded in the semantics
-of the language, and thus \lstinline{extend} is simply defined as
+In \name, the merge operator is built-in in \name. Thus \lstinline{extend} is simply defined as
 follows:
 
 \begin{lstlisting}
@@ -106,13 +113,13 @@ let n = jim.name in
 jim.log $\top$
 \end{lstlisting}
 
-However, the intersection \lstinline$Person & Dog$ is not accepted.
+However, the intersection \lstinline$Dog & Person$ is not accepted.
 This is due to both types sharing a field with the same name (\lstinline$name$) 
-and the same type ($String$). 
+and the same type ($String$).
 Note that the name clash between \lstinline$male$ fields (which have
 different types) does not impose any 
-problem in this example.
-This will be further illustrated in the next section.
+problem in this example: \name allows and keeps duplicated fields
+whose types are disjoint. This feature of \name is further illustrated next.
 
 \subsection{Extensible Records}
 \name can encode polymorphic extensible records. Describing and
