@@ -1,5 +1,8 @@
 \documentclass[9pt]{llncs}
 
+%\setlength{\parskip}{\baselineskip}%
+%\setlength{\parindent}{0pt}%
+
 \input{packages.tex}
 \input{macros.tex}
 
@@ -10,6 +13,9 @@
 \input{rules/bidityping.tex}
 \input{rules/target.tex}
 \input{rules/toplike.tex}
+
+\let\oldparagraph\paragraph
+\renewcommand{\paragraph}[1]{\vspace{-6pt}\oldparagraph{#1}}
 
 \begin{document}
 
