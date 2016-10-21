@@ -265,7 +265,6 @@ needs to be shown coherent. With disjoint polymorphism the following lemma holds
 \defaultthmprf{
 \begin{lemma}[Unique subtype contributor]
   \label{lemma:unique-subtype-contributor}
-
   If $A_1 \inter A_2 \subtype B$, 
   where $A_1 \inter A_2$ and $B$ are well-formed types, and
   $B$ is not top-like,
@@ -287,7 +286,6 @@ This fact is captured by the following lemma:
 \defaultthmprf{
 \begin{restatable}[Unique coercion]{lemma}{uniquecoercion}
   \label{lemma:unique-coercion}
-
   If $A \subtype B \yields {E_1}$ and $A \subtype B \yields {E_2}$, where $A$
   and $B$ are well-formed types, then $E_1 \equiv E_2$.
 \end{restatable}}
@@ -716,14 +714,9 @@ it is possible to infer a type for it, then $e$ has a unique type.
 \defaultthmprf{
 \begin{restatable}[Uniqueness of type-inference]{theorem}{uniqueinference}
   \label{theorem:unique-inference}
-  We have that:
-  \begin{itemize*}
-    \item If $\jinfer \Gamma e {A_1} \yields {E_1}$ and $\jinfer \Gamma e {A_2} \yields
-          {E_2}$, then ${A_1} = {A_2}$. 
-  \end{itemize*}
+  If $\jinfer \Gamma e {A_1} \yields {E_1}$ and $\jinfer \Gamma e {A_2} \yields {E_2}$, then ${A_1} = {A_2}$. 
 \end{restatable}}
 {\noindent \emph{Proof.} By structural induction on the term and the corresponding inference rule.}
-
 \paragraph{Coherency of Elaboration}
 Combining the previous results, we are finally able to show the central theorem:
 

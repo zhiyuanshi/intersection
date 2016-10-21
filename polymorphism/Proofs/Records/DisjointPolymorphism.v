@@ -86,50 +86,59 @@ Proof. apply subst_source_wf_typ. Qed.
 (* Lemma 7: Well-formed typing *)
 
 Lemma wellformed_typing :
-  forall Gamma t T E dir, has_type_source_alg Gamma t dir T E -> WFTyp Gamma T.
+  forall Gamma e A E dir, has_type_source_alg Gamma e dir A E -> WFTyp Gamma A.
 Proof. apply typing_wf_source_alg. Qed.  
 
 (* Lemma 8: Subtyping rules produce type-correct coercions *)
 
 Lemma subtype_correct_coercions :
-  forall Gamma A B E, sub A B E ->
-             WFEnv Gamma ->
-             WFTyp Gamma A ->
-             WFTyp Gamma B ->
-             has_type_st (∥ Gamma ∥) E (STFun (|A|) (|B|)) .
+  forall Gamma A1 A2 E, sub A1 A2 E ->
+               WFEnv Gamma ->
+               WFTyp Gamma A1 ->
+               WFTyp Gamma A2 ->
+               has_type_st (∥ Gamma ∥) E (STFun (|A1|) (|A2|)) .
 Proof. apply type_correct_coercions. Qed.
 
 (* Lemma 9: Unique subtyping contributor *)
 
 Lemma unique_subtyping_contributor :
-  forall Gamma A B C, WFTyp Gamma A ->
-             WFTyp Gamma B ->
-             ~ TopLike C ->
-             Ortho Gamma A B ->
-             Sub (And A B) C ->
-             not (Sub A C /\ Sub B C).
+  forall Gamma A1 A2 B, WFTyp Gamma A1 ->
+               WFTyp Gamma A2 ->
+               ~ TopLike B ->
+               Ortho Gamma A1 A2 ->
+               Sub (And A1 A2) B ->
+               not (Sub A1 B /\ Sub A2 B).
 Proof. apply uniquesub. Qed.
+
+(* Lemma 10: Unique coercion *)
+
+Lemma sub_coherent :
+  forall A B E1 E2 Gamma, WFTyp Gamma A ->
+                 WFTyp Gamma B ->
+                 sub A B E1 ->
+                 sub A B E2 -> E1 = E2.
+Proof. intros; eapply sub_coherent; [ apply H | apply H0 | | ]; eauto. Qed.
 
 (* Theorem 1: Type preservation *)
 
 Lemma type_preservation :
-  forall x ty dir E (Gamma : context TyEnvSource) (H : has_type_source_alg Gamma x dir ty E),
+  forall e ty dir E (Gamma : context TyEnvSource) (H : has_type_source_alg Gamma e dir ty E),
   has_type_st (∥ Gamma ∥) E (|ty|).
 Proof. apply type_preservation. Qed.
 
 (* Theorem 3: Uniqueness of type-inference *)
 
 Lemma uniqueness_type_inference :
-  forall Gamma e t1 t2 E1 E2, has_type_source_alg Gamma e Inf t1 E1 ->
-                     has_type_source_alg Gamma e Inf t2 E2 ->
-                     t1 = t2.
+  forall Gamma e A1 A2 E1 E2, has_type_source_alg Gamma e Inf A1 E1 ->
+                     has_type_source_alg Gamma e Inf A2 E2 ->
+                     A1 = A2.
 Proof. intros; eapply typ_inf_unique; eauto. Qed.
 
 (* Theorem 4: Unique elaboration *)
 
 Lemma unique_elaboration :
-  forall Gamma e d t E1 E2, has_type_source_alg Gamma e d t E1 ->
-                   has_type_source_alg Gamma e d t E2 ->
+  forall Gamma e d A E1 E2, has_type_source_alg Gamma e d A E1 ->
+                   has_type_source_alg Gamma e d A E2 ->
                    E1 = E2.
 Proof. intros; eapply typ_coherence; eauto. Qed.
 
