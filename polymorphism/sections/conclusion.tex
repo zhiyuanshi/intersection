@@ -1,7 +1,6 @@
 \section{Conclusion and Future Work}
 \label{sec:conclusion}
 
-
 This paper described \name: a System $F$-based language that combines
 intersection types, parametric polymorphism and a merge operator.
 The language is proved to be type-safe and coherent.
@@ -9,8 +8,8 @@ To ensure coherence the type system accepts only
 disjoint intersections. To provide flexibility in the presence of parametric polymorphism,
 universal quantification is extended with
 disjointness constraints. We believe that disjoint intersection types
-and disjoint quantification are intuitive, and at the same time
-expressive.
+and disjoint quantification is intuitive, and at the same time
+flexible enough to enable practical applications.
 
 %We implemented the core functionalities of the \namedis as part of a JVM-based
 %compiler. Based on the type system of \namedis, we have built an ML-like
@@ -21,20 +20,26 @@ expressive.
 %\code{let} bindings, type aliases, algebraic data types, pattern matching, and
 %first-class modules that are encoded using \code{letrec} and records.
 
-For the future, we intend to improve our source language
-and show the power of disjoint intersection types and disjoint
-quantification in large case studies.
-We are also interested in extending our work to systems with union types and/or 
-a $\bot$ type. 
-While introducing the former should not be a major problem, introducing the latter imposes a serious 
-issue in our system.
-Had \name include the $\bot$ type, non-sensical constructs such as $\jdis \Gamma \alpha \alpha$ could
-be derived.
-It turns out the well-formedness conditions imposed on environments are not strong enough for 
-this purpose.
-However, since introducing $\bot$ was not strictly necessary to the system's formalization; adds 
-substantial complexity in our system; and its practical application is not clear; we leave it 
-as an open problem. 
+For the future, we intend to create a prototype-based statically typed
+source language based on \name.
+We are also interested in extending our work to systems with union types and
+a $\bot$ type. Union types are also widely used in languages such as
+Ceylon or Flow, but preserving coherence in the presence of union
+types is challenging. The naive addition of $\bot$ breaks
+covariance of disjointness. For example, given $\jwf \Gamma {\top \disjoint \bot}$ and 
+$\bot \subtype Int$ we could conclude  $\jwf \Gamma {\top \disjoint
+  Int}$. One possible way out is to have a notion of bottom-like
+types, similar to top-like types to restrict covariance of
+disjointness to non-bottom-like types only. However, we have not yet
+investigated this path. 
+
+
+%It turns out the well-formedness conditions imposed on environments are not strong enough for 
+%this purpose. We conjecture that, similarly to top-types, a notion of
+%bottom-like types is needed. 
+%However, since introducing $\bot$ was not strictly necessary to the system's formalization; adds 
+%substantial complexity in our system; and its practical application is not clear; we leave it 
+%as an open problem. 
 
 
 %However, introducing the latter is not compatible with our disjointness rule
