@@ -97,7 +97,7 @@ well-formed contexts type variables must not appear free within its own disjoint
 %However they can be included in the formalization in
 %standard ways and we are using them in discussions and examples. %TODO are we?
 \paragraph{Syntactic sugar}
-In \name we may quantify a type variable and ommit its constraint. 
+In \name we may quantify a type variable and omit its constraint. 
 This means that its constraint is $\top$. 
 For example, the function type $\forall \alpha. \alpha \to \alpha$ is syntactic sugar
 for  $\fordis \alpha \top {\alpha \to \alpha}$.
@@ -340,11 +340,11 @@ variable.  This is important, as it will retain the desired coherence
 of our type-system.  For ease of discussion, also in
 \reflabel{\labeltblam}, we require the type variable introduced by the
 quantifier to be fresh.  For programs with type variable shadowing,
-this requirement can be met straighforwardly by variable renaming.
+this requirement can be met straightforwardly by variable renaming.
 
 \paragraph{Records.}
 Finally, $\reflabel{\labeltrec}$ and $\reflabel{\labeltprojr}$ deal with record types.
 The former infers a type for a record with label $l$ if it can infer a type for the
 inner expression; the latter says if one can infer a record type $\recordType l A$ 
-from an expression $e$, then it is safe to access the field $l$, and infering type $A$.
+from an expression $e$, then it is safe to access the field $l$, and inferring type $A$.
 

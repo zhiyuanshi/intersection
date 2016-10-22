@@ -29,7 +29,7 @@ first we introduce some notation.
   share no common supertype.
 \end{example}
 
-Parellel to the notion of the set of common supertypes is the notion of the set
+Parallel to the notion of the set of common supertypes is the notion of the set
 of common subtypes.
 
 \begin{definition}[Set of common subtypes]
@@ -206,9 +206,9 @@ invalidates various conventional substitution lemmas related to
 well-formedness and typing.  
 For example, as shown in Section~\ref{sec:overview}, in the type 
 $\fordis A \tyint {(\tyint \inter A) \to \tyint}$, the type $A$ cannot be substituted by any type.
-However, under certain conditions, weaker versions of substituion lemmas do hold. 
+However, under certain conditions, weaker versions of substitution lemmas do hold. 
 The conditions are guaranteed by the type-system by only
-allowing instantiations of a type variable with types disjoint to the
+allowing instantiation of a type variable with types disjoint to the
 variable's disjointness constraints.
 
 \paragraph{Problematic substitutions.}
@@ -234,7 +234,7 @@ is compatible with such disjointness constraint.
 
 \paragraph{Disjoint substitutions.}
 While disjointness cannot be preserved for general substitutions,
-if appropriate disjointness pre-conditions are met then disjointess can
+if appropriate disjointness pre-conditions are met then disjointness can
 be preserved. More formally, the following lemma holds: 
 
 \defaultthmprf{
@@ -294,7 +294,7 @@ Even though the meta-theory is consistent, we can still ask:
 what are the bounds of disjoint quantification?
 In other words, which type(s) can be used to allow unrestricted instantiation, and which
 one(s) will completely restrict instantiation?
-As the reader might expect, the answer is tightely related to subtyping. 
+As the reader might expect, the answer is tightly related to subtyping. 
 
 \subsection{Bounds of Disjoint Quantification}
 Substitution raises the question of what range of types can be instantiated for a given variable

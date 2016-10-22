@@ -32,7 +32,7 @@ the functions \lstinline{succ} and \lstinline{not} -- simple functions
 on integers and booleans, respectively -- both accept \lstinline{x} as an argument. 
 
 \paragraph{Merge operator.}
-The previous program deliberately ommitted the introduction of values of an
+The previous program deliberately omitted the introduction of values of an
 intersection type. 
 There are many variants of intersection types in the literature. 
 Our work follows a particular
@@ -51,7 +51,7 @@ merge operator and regular pairs is in the elimination construct.
 With pairs there are explicit eliminators (\lstinline{fst} and
 \lstinline{snd}), and these eliminators must be used to extract the
 components of the right type.
-With intersection types and a merge operator, elminators are implicit in the language,
+With intersection types and a merge operator, eliminators are implicit in the language,
 meaning no uses of projection functions are necessary.
 \end{comment}
 
@@ -104,7 +104,7 @@ Thus a natural option is to forbid such overlapping
 values of the same type in a merge. In \oldname 
 intersections such as \lstinline{Int&Int} are forbidden, since 
 the types in the intersection overlap (i.e. they are not disjoint). However an intersection 
-such as \lstinline{Char&Int} is ok because the set of characters 
+such as \lstinline{Char&Int} is OK because the set of characters 
 and integers are disjoint to each other. 
 
 \begin{comment}
@@ -150,7 +150,7 @@ parametric polymorphism in such calculus, while retaining coherence?
 
 \begin{comment}
 \subsection{Top-like types}\bruno{You are spending too much time to
-  get to the point. When writting a paper you want to get to the point
+  get to the point. When writing a paper you want to get to the point
   (what's the problem) 
 as fast as possible. So you should have enough background to understand
 the paper, but keep that background minimal. Look at the ICFP paper: 
@@ -402,7 +402,7 @@ disjointness constraint on the second type parameter of \lstinline$fst$.
 %Even though disjoint quantification solves the problem of coherence, there is still one detail 
 %that needs further justification.
 The type variable $A$ in the \lstinline$fst$ function has no constraint.
-In \name this actually means that $A$ should be associated with the empty contraint,
+In \name this actually means that $A$ should be associated with the empty constraint,
 which raises the question: which type should be used to represent such empty constraint?
 Or, in other words, which type is disjoint to every other type? 
 It is obvious that this type should be one of the bounds of the subtyping lattice: either $\bot$ or
@@ -490,8 +490,8 @@ Now, the second $\tyint$ application is problematic, since instantiating $B$ wit
 the ill-formed type $(\tyint \inter \tyint) \to \tyint$.
 However, from this example it is easy to see that all types which are not problematic are exactly the
 ones disjoint with $A$.
-This paper shows how a weaker version of the usual type substituition stability still holds, 
-namely by requiring that the type varible's disjointness constraint is compatible
+This paper shows how a weaker version of the usual type substitution stability still holds, 
+namely by requiring that the type variable's disjointness constraint is compatible
 with the type as target of the instantiation. 
 
 \begin{comment}
@@ -596,7 +596,7 @@ of type \lstinline{Int & Char} is found, the compiler uses the
 type system to extract the corresponding value.
 
 \subsection{Incoherence}\label{subsec:incoherence}
-Unfortunatelly the implicit nature of elimination for intersection
+Unfortunately the implicit nature of elimination for intersection
 types built with a merge operator can lead to incoherence.
 The merge operator combines two terms, of type $A$ and $B$
 respectively, to form a term of type $A \inter B$. For example,
@@ -686,7 +686,7 @@ components of the merge are not subtypes of each other, they share
 some types in common.
 
 \paragraph{A proper definition of disjointness.} In order for two types
-to be trully disjoint, they must not have any subcomponents sharing
+to be truly disjoint, they must not have any sub-components sharing
 the same type. In a system with intersection types this can be ensured
 by requiring the two types do not share a common supertype. The
 following definition captures this idea more formally.
@@ -704,7 +704,7 @@ $Int \& Bool$, those two types are not disjoint.
 
 \namedis's type system only accepts programs that use disjoint
 intersection types. As shown in Section~\ref{sec:disjoint} disjoint intersection
-types will play a crutial rule in guaranteeing that the semantics is coherent.
+types will play a crucial rule in guaranteeing that the semantics is coherent.
 
 \subsection{Parametric Polymorphism and Intersection Types}\label{subsec:polymorphism}
 Before we show how \namedis extends the idea of disjointness to parametric
@@ -759,7 +759,7 @@ seems to validate such result:
 (*$ \rightsquigarrow $*) 2                          -- (* \textnormal{By $\beta$-reduction} *)
 \end{lstlisting}
 
-However (assumming a straightforward implementation of right-biased
+However (assuming a straightforward implementation of right-biased
 choice) the result of the program would be 1! The reason for this has
 todo with \emph{when} the type-based lookup on the merge happens. In
 the case of \lstinline{fst}, lookup is triggered by a coercion

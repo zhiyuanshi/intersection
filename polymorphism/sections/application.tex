@@ -433,7 +433,7 @@ multiple operations over datatypes.
 
 \subsection{Church Encoded Arithmetic Expressions}
 In the Expression Problem, the idea is to start with a very simple
-system modeling arithmetic expressions and evaluation.
+system modelling arithmetic expressions and evaluation.
 The standard typed Church encoding ~\cite{BoehmBerarducci} for arithmetic expressions,
 denoted as the type \lstinline{CExp}, is:
 
@@ -466,7 +466,7 @@ The second part, which is the actual type of the Church encoding, is:
 type Exp = { accept: (*$ \forall $*)E. ExpAlg[E] (*$ \to $*) E } in (*$ \ldots $*)
 \end{lstlisting}
 
-\noindent It should be clear that, modulo some refactoring, and the
+\noindent It should be clear that, modulo some re-factoring, and the
 use of records, the type \lstinline{Exp} and \lstinline{CExp}
 are equivalent.
 
