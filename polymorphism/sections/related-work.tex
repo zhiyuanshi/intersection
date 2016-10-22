@@ -50,7 +50,7 @@ More recently, Dunfield~\cite{dunfield2014elaborating} formalised a system with
 intersection types and a merge operator with a type-directed translation to the
 simply-typed lambda calculus with pairs. Although Dunfield's calculus
 is incoherent, it was the inspiration for the
-\oldname~\cite{oliveira16disjoint}, which \name extends.
+\oldname calculus~\cite{oliveira16disjoint}, which \name extends.
 
 \oldname solves the coherence problem for a calculus similar to Dunfield's, by requiring that
 intersection types can only be composed of \emph{disjoint} types.
@@ -153,7 +153,7 @@ but he also did not use intersection types to encode multi-field records.
 
 Wand~\cite{wand1987complete} started the work on extensible records and proposed
 row types~\cite{wand1989type} for records, together with a \emph{concatenation}
-operator, which is standard in many calculi with extensible records
+operator, which is used in many calculi with extensible records
 \cite{harper1991record,remy1992typing,wand1989type,sulzmann97designing,makholm05type,pottier2003constraint}.
 Cardelli and Mitchell~\cite{cardelli1990operations} defined three primitive operations on
 records that are also standard in type-systems with record types: 
@@ -169,19 +169,28 @@ Several calculi are based on these three primitive operators (especially extensi
 %He also showed an encoding of intersection types using first-class labels.
 The merge operator in \name plays the same role as the concatenation operator, as its components 
 may contain any (well-formed and disjoint) types.
-One problem with concatenation is that typically systems are hard to use in practise, due to the
-complicated set of constraints/filters which might arise from combining several, possibly 
+Systems with concatenation typically use a set of constraints/filters
+(such as $lacks$ and $contains$) which are useful to combine several, possibly 
 polymorphic, records~\cite{leijen2005extensible}.
 %All of the aforementioned record calculi are entirely concerned with the conceptual and implementation 
 %issues of type-systems with records, using techniques as row types, predicates, flags, qualified types,
 %cases, amongst others.
-However, in \name, the implementation of records instead piggybacks on the disjointness
-and intersection types features of the type-system.
-The constraints on labels are encoded using disjoint quantification, and the coherent
-type-system will statically ensure that records and their operations are safe.
-This means that technical concerns w.r.t. records, i.e type inference, efficiency, etc.; are to be dealt with the 
-compilation of disjoint intersection types as opposed to compiling
-extensible records directly.
+In \name, the implementation of records piggybacks on the disjointness
+and intersection types features of the type-system. The constraints on
+labels are encoded using disjoint quantification and intersections,
+and the coherent type-system will statically ensure that records and
+their operations are safe. Unlike systems with records, which have
+been extensively studied, there is much less work on intersection
+types and the merge operator. An interesting avenue for future work is 
+to see whether some known compilation and type-inference techniques
+for extensible records can be adpapted to disjoint intersections and
+merges.
+
+%Since intersection types and the merge operator are more general
+%than records, the techniques cannot be directly applied.
+%This means that technical concerns w.r.t. records, i.e type inference, efficiency, etc.; are to be dealt with the 
+%compilation of disjoint intersection types as opposed to compiling
+%extensible records directly.
 %Thus, what is expressed in other systems by means of row types, predicates, flags, qualified types, etc; 
 %in \name it is expressed by the use of disjoint intersection types.
 
