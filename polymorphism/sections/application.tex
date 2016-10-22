@@ -92,7 +92,7 @@ let extend T (U * T) (first : T, second : U) : T & U = first ,, second in
 conflicts (such as duplicated fields of the same type) exists when merging the two objects. In practice this approach
 is quite similar to trait-based OO approaches~\cite{scharli2003traits}. If conflicts
 exist when two objects are composed, then they have to be resolved
-manually (by dropping fields from from some object, for example). Moreover if no existing
+manually (by dropping fields from some object, for example). Moreover if no existing
 implementation can be directly reused, a new one must be provided via
 record extension, analogously to standard method overriding in OO
 languages.
