@@ -7,8 +7,8 @@ intersection types and disjoint quantification achieves a coherent semantics.
 This section uses some syntactic sugar, as well as standard
 programming language features, to illustrate the various concepts in \name. 
 Although the minimal core language that we formalize in
-Section~\ref{sec:fi} does not present all such features, such
-syntactic sugar is trivial to add.
+Section~\ref{sec:fi} does not present all such features and syntactic sugar, 
+these are trivial to add.
 
 \subsection{Intersection Types and the Merge Operator}
 
@@ -182,7 +182,7 @@ $\top$ as their co-domain (i.e. $\tyint \to \tychar \to \top$).
 \subsection{Parametric Polymorphism}
 Unfortunately, combining parametric polymorphism with disjoint
 intersection types is non-trivial. Consider the following program
-(uppercase Latin letters to denote type variables):
+(uppercase Latin letters denote type variables):
 
 \begin{lstlisting}
 let merge3 A (x : A) : A & Int = x,,3 in
@@ -214,14 +214,14 @@ including those already in the intersection. Thus forbidding type
 variables in the intersection will prevent invalid intersections
 arizing from instantiations with overlapping types.
 Such design does guarantee coherence and would prevent
-\lstinline{merge3} from type-checking. Unfortunatelly the big drawback
+\lstinline{merge3} from type-checking. Unfortunately the big drawback
 is that the design is too conservative and many other (useful) programs would be 
 rejected. In particular, the \lstinline{extend} function from Section~\ref{sec:intro}
 would also be rejected. 
 
 \paragraph{Other approaches}
-Another option to mitigate the issues of incoherence, without using
-disjoint intersection types is to allow for a biased choice: that is
+Another option to mitigate the issues of incoherence, without the use of 
+disjoint intersection types, is to allow for a biased choice: 
 multiple values of the same type may exist in an intersection, but an
 implementation gives preference to one of them. The encodings of merge 
 operators in TypeScript and Scala~\cite{oliveira2013feature,Rendel14OA} use such an approach.
