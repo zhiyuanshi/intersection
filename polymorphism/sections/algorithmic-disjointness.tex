@@ -145,8 +145,7 @@ This rule is a specialization of the more general lemma:
   If $\jwf \Gamma {A \disjoint B}$ and $B \subtype C$, then $\jwf \Gamma {A \disjoint C}$.
 \end{restatable}}
 {-0.2cm}
-{\noindent \emph{Proof.}
-By double induction, first on the disjointness derivation and then on the subtyping derivation.
+{By double induction, first on the disjointness derivation and then on the subtyping derivation.
 The first induction case for~\reflabel{\labeldisvar} does not need the second induction as it is 
 a straightforward application of subtyping transitivity.}
 {0cm}
@@ -245,7 +244,7 @@ be preserved. More formally, the following lemma holds:
   context $\subst C \alpha \Gamma$, 
   then $\jdis {\subst C \alpha \Gamma} {\subst C \alpha A} {\subst C \alpha B}$.
 \end{lemma}}
-{\noindent \emph{Proof.} By induction on the disjointness derivation of $C$ and $D$.
+{By induction on the disjointness derivation of $C$ and $D$.
   Special attention is needed for the variable case, where it is necessary to prove stability
   of substitution for the subtyping relation.
   It is also needed to show that, if $C$ and $D$ do not contain any variable $x$, then it is
@@ -271,7 +270,7 @@ However, a weaker version of that property -- but strong enough for our type-sys
 %  If $\jwf {\Gamma, \alpha \disjoint B} C$, $\jwf \Gamma A$, $\jdis \Gamma A B$
 %  then $\jwf \Gamma {\subst A \alpha C}$.
 %\end{restatable}
-{\noindent \emph{Proof.} By induction on the well-formedness derivation of $A$.
+{By induction on the well-formedness derivation of $A$.
 The intersection case requires the use of Lemma~\ref{lemma:orthosubst}.
 Also, the variable case required proving that if $\alpha$ does not occur free in $A$, and it is safe
 to substitute it in the co-domain of $\Gamma$, then it is safe to perform the substitution.}
@@ -288,7 +287,7 @@ More formally, we have that:
   \item If $\jinfer \Gamma e A$, then $\jwf \Gamma A$.
   \end{itemize}
 \end{restatable}}
-{\noindent \emph{Proof.} By induction on the derivation and applying
+{By induction on the derivation and applying
   Lemma~\ref{lemma:wfsubst} in the case of \reflabel{\labelttapp}.}
 
 Even though the meta-theory is consistent, we can still ask: 
