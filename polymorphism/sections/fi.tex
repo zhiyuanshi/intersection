@@ -53,7 +53,7 @@ The syntax of \name (with the differences to \oldname highlighted in gray) is:
 
 \paragraph{Types.} 
 Metavariables $A$, $B$ range over types. 
-Types include all constructs in \oldname (excluding product types): a top type $\top$; 
+Types include all constructs in \oldname: a top type $\top$; 
 the type of integers $\tyint$;
 function types $A \to B$; and intersection types $A \inter B$.
 The main novelty are two standard constructs of System $F$ used to support
@@ -69,7 +69,8 @@ $\ftv \cdot$ for sets of free type variables.
 
 \paragraph{Terms.} 
 Metavariables $e$ range over terms.  
-Terms include all constructs in \oldname: a canonical top value $\top$; integer literals $i$;
+Terms include all constructs in \oldname: 
+a canonical top value $\top$; integer literals $i$;
 variables $x$, lambda abstractions ($\lamty x A e$); applications 
 ($\app {e_1} {e_2}$); and the \emph{merge} of terms $e_1$ and $e_2 $ denoted as 
 $e1 \mergeop e2$.
