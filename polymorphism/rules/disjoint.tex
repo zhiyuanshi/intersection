@@ -80,7 +80,7 @@
 
 \newcommand{\formax}{\framebox{$ A \disjointax B$}}
 
-\newcommand{\makelabelax}[1]{D-Ax$#1$}
+\newcommand{\makelabelax}[1]{$\text{D}_{Ax}#1$}
 
 \newcommand{\labelaxintforall}{\makelabelax {(\mathbb{Z} \forall)}}
 \newcommand{\ruleaxintforall}{
@@ -102,6 +102,13 @@
     {\tyint \disjointax {A_1} \to {A_2}}
 }
 
+\newcommand{\labelaxintrec}{\makelabelax {(\mathbb{Z} Rec)}}
+\newcommand{\ruleaxintrec}{
+  \inferrule* [right=\labelaxintrec]
+    { }
+    {\tyint \disjointax {\recordCon l A}}
+}
+
 \newcommand{\labelaxfunforall}{\makelabelax {(\rightarrow \! \forall)}}
 \newcommand{\ruleaxfunforall}{
   \inferrule* [right=\labelaxfunforall]
@@ -113,6 +120,20 @@
   \inferrule* [right=\labelaxfunforall]
     { }
     {A_1 \to A_2 \disjointax \fordis \alpha {B_1} {B_2}}
+}
+
+\newcommand{\labelaxfunrec}{\makelabelax {(\rightarrow \! Rec)}}
+\newcommand{\ruleaxfunrec}{
+  \inferrule* [right=\labelaxfunrec]
+    { }
+    {A_1 \to A_2 \disjointax {\recordCon l B}}
+}
+
+\newcommand{\labelaxforalldisrec}{\makelabelax {(\forall Rec)}}
+\newcommand{\ruleaxforalldisrec}{
+  \inferrule* [right=\labelaxforalldisrec]
+    { }
+    {\fordis \alpha {A_1} {A_2} \disjointax {\recordCon l B}}
 }
 
 \newcommand{\labelaxsym}{\makelabelax Sym}
