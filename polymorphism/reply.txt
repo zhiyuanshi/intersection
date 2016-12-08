@@ -41,7 +41,7 @@ We used records pervasively in the examples shown in Section 3.
 * Page 16: Dforall rule
 
 Right; in the Dforall rule, the intersection (A_1 & A_2) does not need
-to be well-formed type.  It does sound odd, but we argue that this
+to be a well-formed type.  It does sound odd, but we argue that this
 increases the expressive power of our language, since we allow more
 types than a system with such restriction (and without breaking the
 meta-theory).  We do not know other systems that have similar
@@ -81,7 +81,7 @@ weakening the disjointness relation. For example:
 
 T |- forall a . a -> a * Int -> Int      (valid in F_i with explicit polymorphism)
 
-is a valid deducation in F_i because 2 structurally different types
+is a valid deduction in F_i because 2 structurally different types
 are always disjoint. However, with implicit polymorphism:
 
 T |- forall a . a -> a * Int -> Int      (invalid with implicit polymorphism)
@@ -105,7 +105,7 @@ forall t . P(t) => f(t)
 
 where t ranges over monotypes. This form generalizes HM type
 schemes, with predicates over monotypes (P(t)). In HM there's a 
-crutial distinction between (mono)types and type-schemes. 
+crucial distinction between (mono)types and type-schemes. 
 There is no such distinction in F_i, and F_i types can be higher-ranked 
 (like System F, and unlike HM). Moreover, predicates in qualified
 types can only range over monotypes, but F_i allows disjointness 
@@ -121,7 +121,7 @@ intersection types into an HM type system is challenging (we do not
 know any work that accounts for HM and arbitrary intersections). 
 Put another way, monotypes with intersections still require a
 subtyping relation, but monotypes in HM do not.
-Finally, evidence plays a crutial role in qualified types. I.e. when
+Finally, evidence plays a crucial role in qualified types. I.e. when
 translating from a source language with qualified types into a 
 target language without qualified types, the predicates are translated 
 into a type that has operational significance. For example, the
@@ -138,9 +138,9 @@ f A (x : A) : A = x
 We will add a discussion on qualified types to our related work.
 
 [1] Jerzy Tiuryn and Paweł Urzyczyn. 
-The subtyping problem for second-order types is undecidable. In LICS, 1996.
+The subtyping problem for second-order types is undecidable. In: LICS, 1996.
 
-[2] Complete and easy bidirectional typechecking for higher-rank
-polymorphism, ICFP 2013
+[2] Joshua Dunfield and Neelakantan R. Krishnaswami.
+Complete and easy bidirectional typechecking for higher-rank polymorphism. In: ICFP, 2013.
 
 
