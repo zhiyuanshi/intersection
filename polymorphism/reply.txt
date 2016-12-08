@@ -1,0 +1,143 @@
+#Reviewer 1
+
+- Are the intersection types of this paper associative, i.e., is A&(B&C) = (A&B)&C?
+
+Yes. Those types are isomorphic to each other since A&(B&C) <: (A&B)&C
+and (A&B)&C <: A&(B&C). 
+
+- I do not understand the discussion in section 5.2-5.3.  In fact, I
+  do not see the "problem" with substitution that is pointed out here
+  (and also earlier in section 2.5). Doesn't the T-TApp rule
+  correctly take care of substitution by enforcing the disjointness
+  constraint?
+
+Yes, it does. Although it might be obvious to the naked-eye, we added
+the discussion in those sections in order to:
+
+1. Show that regular substitution does not hold in our system.
+
+2. Justify that such constraint is sufficient to ensure that the
+type-system only produces well-formed types.
+
+- p.17: "well-formed context" is not defined.
+
+It is briefly mentioned on Section 4.1 (second to last paragraph) what
+it is meant by a well-formed context.  We will make this clearer.
+
+- p.20: Please formally define "top-like type".
+
+Top-like types are formalised in Figure 5. 
+We will add a better reference to this figure.
+
+#Reviewer 2
+
+* Page 11: Why add singleton records?
+
+Because it illustrates that, in a system with disjoint intersections,
+singleton records is all that is needed to encode complex records. 
+We used records pervasively in the examples shown in Section 3.
+
+* Page 16: Dforall rule
+
+Right; in the Dforall rule, the intersection (A_1 & A_2) does not need
+to be well-formed type.  It does sound odd, but we argue that this
+increases the expressive power of our language, since we allow more
+types than a system with such restriction (and without breaking the
+meta-theory).  We do not know other systems that have similar
+mechanisms.
+
+#Reviewer 3
+
+- The reviewer asks about changes to support implicit
+  quantification/instantiation.
+
+Various changes would be needed. Besides some obvious changes on
+syntax and typing, there would be several significant changes in the
+subtyping and disjointness rules. The subtyping rules for forall
+would be more powerful, since we would like to allow:
+
+T |- forall a . a -> a <: Int -> Int
+
+which is forbidden in F_i. Allowing such subtypes brings several
+questions, such as decidability of subtyping. It is known that the
+subtyping relation for impredicative System F is undecidable [1]. To
+keep decidability we could start instead from a predicative version of
+System F, and borrow the rules used, for example, by Dunfield and
+Krishnaswami [2]. However, our subtyping relation would also include
+intersections, so careful study would be needed to determine whether
+important results (such as decidability of subtyping) would hold. We
+also expect (if all the metatheory works out) that coming up with an
+algorithmic version to check subtyping to be highly non-trivial. The
+presence of intersections in types will probably require significant
+adaptations to existing algorithms (such as Dunfield and
+Krishnaswami), since existing type-inference algorithms for
+intersection types employ quite different techniques.
+
+As the reviewer mentioned, the disjointness rules would also 
+require changes in the rules involving forall. This is a consequence 
+of a more powerful subtyping relation, which in turn requires
+weakening the disjointness relation. For example:
+
+T |- forall a . a -> a * Int -> Int      (valid in F_i with explicit polymorphism)
+
+is a valid deducation in F_i because 2 structurally different types
+are always disjoint. However, with implicit polymorphism:
+
+T |- forall a . a -> a * Int -> Int      (invalid with implicit polymorphism)
+
+is not a valid deduction because "forall a . a -> a" can be
+instantiated to "Int -> Int".
+
+- We interpret the 2nd question of the reviewer as whether it would 
+be possible to view disjoint quantification as an instance of Mark
+Jones qualified types. 
+
+The answer is no. The short answer is that qualified types work 
+for a very specific class of languages: *HM-style* languages extended 
+with predicatives over *monotypes*. F_i falls outside of this class of 
+languages for multiple reasons. 
+
+The longer answer is that qualified types assume the following
+(slightly simplified) form (see page 4 of Jones thesis, for example):
+
+forall t . P(t) => f(t)
+
+where t ranges over monotypes. This form generalizes HM type
+schemes, with predicates over monotypes (P(t)). In HM there's a 
+crutial distinction between (mono)types and type-schemes. 
+There is no such distinction in F_i, and F_i types can be higher-ranked 
+(like System F, and unlike HM). Moreover, predicates in qualified
+types can only range over monotypes, but F_i allows disjointness 
+constraints with arbitrary types (not just monotypes). For example:
+
+f (A * forall a . a -> a) (x : A) : A = x
+
+Even if we were to restrict F_i to a form closer to let-polymorphism, 
+and allow only monotypes on disjoint quantification, there are still 
+reasons why qualified types would not work. A first reason is that 
+our monotypes would still include intersections, but integrating
+intersection types into an HM type system is challenging (we do not
+know any work that accounts for HM and arbitrary intersections). 
+Finally, evidence plays a crutial role in qualified types. I.e. when
+translating from a source language with qualified types into a 
+target language without qualified types, the predicates are translated 
+into a type that has operational significance. For example, the
+qualified type above, would translate into a target term with type:
+
+forall t. P(t) -> f(t)
+
+In contrast, disjoint quantification has no operational significance, 
+and constraints are simply erased. The example above would translate
+to a target term like:
+
+f A (x : A) : A = x
+
+We will add a discussion on qualified types to our related work.
+
+[1] Jerzy Tiuryn and Paweł Urzyczyn. 
+The subtyping problem for second-order types is undecidable. In LICS, 1996.
+
+[2] Complete and easy bidirectional typechecking for higher-rank
+polymorphism, ICFP 2013
+
+
