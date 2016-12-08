@@ -6,8 +6,8 @@ out misunderstandings.
 
 - Are the intersection types of this paper associative, i.e., is A&(B&C) = (A&B)&C?
 
-Yes. Those types are isomorphic to each other since A&(B&C) <: (A&B)&C
-and (A&B)&C <: A&(B&C). 
+Yes. Those types are isomorphic since A&(B&C) <: (A&B)&C and (A&B)&C
+<: A&(B&C).
 
 - Doesn't the T-TApp rule correctly take care of substitution by
   enforcing the disjointness constraint?
@@ -95,7 +95,7 @@ Jones qualified types.
 
 The answer is no. The short answer is that qualified types work 
 for a very specific class of languages: *HM-style* languages extended 
-with predicatives over *monotypes*. F_i falls outside of this class of 
+with *predicates over monotypes*. F_i falls outside of this class of 
 languages for multiple reasons. 
 
 The longer answer is that qualified types assume the following
