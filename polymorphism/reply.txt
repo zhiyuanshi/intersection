@@ -9,9 +9,8 @@ out misunderstandings.
 Yes. Those types are isomorphic to each other since A&(B&C) <: (A&B)&C
 and (A&B)&C <: A&(B&C). 
 
-- Doesn't the T-TApp rule
-  correctly take care of substitution by enforcing the disjointness
-  constraint?
+- Doesn't the T-TApp rule correctly take care of substitution by
+  enforcing the disjointness constraint?
 
 Yes, it does. Although it might be obvious to the naked-eye, we added
 the discussion in those sections in order to:
