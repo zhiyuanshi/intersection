@@ -1,3 +1,7 @@
+We thank all reviewers for their suggestions and advice, which we will
+use to improve the final version. Next we reply to questions and point
+out misunderstandings.
+
 #Reviewer 1
 
 - Are the intersection types of this paper associative, i.e., is A&(B&C) = (A&B)&C?
@@ -5,9 +9,7 @@
 Yes. Those types are isomorphic to each other since A&(B&C) <: (A&B)&C
 and (A&B)&C <: A&(B&C). 
 
-- I do not understand the discussion in section 5.2-5.3.  In fact, I
-  do not see the "problem" with substitution that is pointed out here
-  (and also earlier in section 2.5). Doesn't the T-TApp rule
+- Doesn't the T-TApp rule
   correctly take care of substitution by enforcing the disjointness
   constraint?
 
