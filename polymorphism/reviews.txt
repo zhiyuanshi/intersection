@@ -1,0 +1,47 @@
+# Reviewer 1
+
+- Are the intersection types of this paper associative, i.e., is A&(B&C) = (A&B)&C?
+
+Yes. Those types are isomorphic to each other since A&(B&C) <: (A&B)&C and (A&B)&C <: A&(B&C).
+
+- The discussion seems overly pedantic at times.  Much of sections 2 and 3 can be cut.  I think that the paper would have a better flow if it moved more quickly to the formalization part.
+
+Noted. We did have space issues, so we will work on reducing those sections.
+
+- I do not understand the discussion in section 5.2-5.3.  In fact, I do not see the "problem" with substitution that is pointed out here (and also earlier in section 2.5).  Doesn't the T-TApp rule correctly take care of substitution by enforcing the disjointness constraint?
+
+Yes, it does. Although it might be obvious to the naked-eye, we added the discussion in those sections in order to:
+1. Show that regular substitution does not hold in our system.
+2. Justify that such constraint is sufficient to ensure that the type-system only produces well-formed types.
+
+- p.17: "well-formed context" is not defined.
+
+It is briefly mentioned on Section 4.1 (second to last paragraph) what it is meant by a well-formed context.
+We will make this clearer.
+
+- p.20: Please formally define "top-like type".
+
+Top-like types are formalised in Figure 5. 
+We will add a better reference to this figure.
+
+# Reviewer 2
+
+* Page 9 and everywhere: Something went wrong with your latex macros: there are calligraphic, roman and tt font mismatches all over the place. Please carefully attend to this. If you use a font for a rule name, then that should appear everywhere, likewise if you use tt font in code snippets...
+
+You are right; we did have some issues typesetting proofs/code snippets. We will work on this.
+
+* Page 11: Why add singleton records?
+
+We added them for the sake of completeness w.r.t. examples shown in Section 3.
+TODO: Should we mention here that the rules for records are missing in Fig 3 & 4? I suppose that’s why he/she is asking.
+
+* Page 16: The rule Dforall troubles me a little because it relies on the fact that you never ask that the Delta is well-formed. If you didn't it wouldn't work properly (as you discuss). This sounds a little odd to me: can you think of another system where that is the case?
+
+Right; in the Dforall rule, the intersection (A_1 & A_2) does not need to be well-formed type. 
+It does sound odd, but we argue that this increases the expressive power of our language, since we allow more types than a system with such restriction.
+Also, it shows how disjointness is only related the coherence problem, and thus unrestricted intersections can be used freely in this setting.
+TODO: Bruno, do you know any system where this is the case? What other systems have anything close to disjoint intersections?
+
+* Page 17: I found myself confused at the example of substitution just because it was obvious to me that you need to respect the constraint on the type variable to do substitution, so I couldn't see what you were saying. It was only when I gave up and carried on reading that I got to lemma 5 and noticed that was your point. I think you could tighten up this discussion a little, maybe even discussing the solution earlier.
+
+Noted. We will re-structure Section 5.2.
