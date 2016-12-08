@@ -61,18 +61,18 @@ T |- forall a . a -> a <: Int -> Int
 
 which is forbidden in F_i. Allowing such subtypes brings several
 questions, such as decidability of subtyping. It is known that the
-subtyping relation for impredicative System F is undecidable [1]. To
-keep decidability we could start instead from a predicative version of
-System F, and borrow the rules used, for example, by Dunfield and
-Krishnaswami [2]. However, our subtyping relation would also include
-intersections, so careful study would be needed to determine whether
-important results (such as decidability of subtyping) would hold. We
-also expect (if all the metatheory works out) that coming up with an
-algorithmic version to check subtyping to be highly non-trivial. The
-presence of intersections in types will probably require significant
-adaptations to existing algorithms (such as Dunfield and
-Krishnaswami), since existing type-inference algorithms for
-intersection types employ quite different techniques.
+subtyping relation for implicit polymorphism in impredicative System F
+is undecidable [1]. To keep decidability we could start instead from a
+predicative version of System F, and borrow the rules used, for
+example, by Dunfield and Krishnaswami [2]. However, our subtyping
+relation would also include intersections, so careful study would be
+needed to determine whether important results (such as decidability of
+subtyping) would hold. We also expect (if all the metatheory works
+out) that coming up with an algorithmic version to check subtyping to
+be highly non-trivial. The presence of intersections in types will
+probably require significant adaptations to existing algorithms (such
+as Dunfield and Krishnaswami), since existing type-inference
+algorithms for intersection types employ quite different techniques.
 
 As the reviewer mentioned, the disjointness rules would also 
 require changes in the rules involving forall. This is a consequence 
