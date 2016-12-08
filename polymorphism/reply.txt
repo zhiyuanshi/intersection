@@ -118,6 +118,8 @@ reasons why qualified types would not work. A first reason is that
 our monotypes would still include intersections, but integrating
 intersection types into an HM type system is challenging (we do not
 know any work that accounts for HM and arbitrary intersections). 
+Put another way, monotypes with intersections still require a
+subtyping relation, but monotypes in HM do not.
 Finally, evidence plays a crutial role in qualified types. I.e. when
 translating from a source language with qualified types into a 
 target language without qualified types, the predicates are translated 
