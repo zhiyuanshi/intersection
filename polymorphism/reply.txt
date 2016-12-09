@@ -111,7 +111,7 @@ There is no such distinction in F_i, and F_i types can be higher-ranked
 types can only range over monotypes, but F_i allows disjointness 
 constraints with arbitrary types (not just monotypes). For example:
 
-f (A * forall a . a -> a) (x : A) : A = x
+f (A * forall B . B -> B) (x : A) : A = x
 
 Even if we were to restrict F_i to a form closer to let-polymorphism, 
 and allow only monotypes on disjoint quantification, there are still 
