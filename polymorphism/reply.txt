@@ -53,26 +53,18 @@ mechanisms.
   quantification/instantiation.
 
 Various changes would be needed. Besides some obvious changes on
-syntax and typing, there would be several significant changes in the
+syntax and typing, there would be several changes in the
 subtyping and disjointness rules. The subtyping rules for forall
 would be more powerful, since we would like to allow:
 
 T |- forall a . a -> a <: Int -> Int
 
-which is forbidden in F_i. Allowing such subtypes brings several
-questions, such as decidability of subtyping. It is known that the
-subtyping relation for implicit polymorphism in impredicative System F
-is undecidable [1]. To keep decidability we could start instead from a
-predicative version of System F, and borrow the rules used, for
-example, by Dunfield and Krishnaswami [2]. However, our subtyping
-relation would also include intersections, so careful study would be
-needed to determine whether important results (such as decidability of
-subtyping) would hold. We also expect (if all the metatheory works
-out) that coming up with an algorithmic version to check subtyping to
-be highly non-trivial. The presence of intersections in types will
-probably require significant adaptations to existing algorithms (such
-as Dunfield and Krishnaswami), since existing type-inference
-algorithms for intersection types employ quite different techniques.
+which is forbidden in F_i. We could borrow the rules used, for
+example, by Dunfield and Krishnaswami [1] to allow for such kinds of
+subtyping. However, our subtyping relation would also include
+intersections, so some study would be needed to determine whether
+important results would hold, and how to adapt existing algorithms
+into our setting.
 
 As the reviewer mentioned, the disjointness rules would also 
 require changes in the rules involving forall. This is a consequence 
@@ -89,8 +81,9 @@ T |- forall a . a -> a * Int -> Int      (invalid with implicit polymorphism)
 is not a valid deduction because "forall a . a -> a" can be
 instantiated to "Int -> Int".
 
+
 - We interpret the 2nd question of the reviewer as whether it would 
-be possible to view disjoint quantification as an instance of Mark
+be possible to view disjointness constraints as an instance of Mark
 Jones qualified types. 
 
 The answer is no. The short answer is that qualified types work 
@@ -137,10 +130,7 @@ f A (x : A) : A = x
 
 We will add a discussion on qualified types to our related work.
 
-[1] Jerzy Tiuryn and Paweł Urzyczyn. 
-The subtyping problem for second-order types is undecidable. In: LICS, 1996.
-
-[2] Joshua Dunfield and Neelakantan R. Krishnaswami.
+[1] Joshua Dunfield and Neelakantan R. Krishnaswami.
 Complete and easy bidirectional typechecking for higher-rank polymorphism. In: ICFP, 2013.
 
 
