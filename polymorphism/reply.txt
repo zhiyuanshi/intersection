@@ -41,7 +41,7 @@ We used records pervasively in the examples shown in Section 3.
 * Page 16: Dforall rule
 
 Right; in the Dforall rule, the intersection (A_1 & A_2) does not need
-to be a well-formed type.  It does sound odd, but we argue that this
+to be a well-formed type. It does sound odd, but we argue that this
 increases the expressive power of our language, since we allow more
 types than a system with such restriction (and without breaking the
 meta-theory).  We do not know other systems that have similar
