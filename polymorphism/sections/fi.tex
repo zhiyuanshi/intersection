@@ -338,7 +338,8 @@ disjointness constraint.  Type application performs an extra check
 ensuring that the type to be instantiated is compatible
 (i.e. disjoint) with the constraint associated with the abstracted
 variable.  This is important, as it will retain the desired coherence
-of our type-system.  For ease of discussion, also in
+of our type-system; and it will be further explained in Section~\ref{sec:alg-dis}.  
+For ease of discussion, also in
 \reflabel{\labeltblam}, we require the type variable introduced by the
 quantifier to be fresh.  For programs with type variable shadowing,
 this requirement can be met straightforwardly by variable renaming.

@@ -81,8 +81,8 @@ This motivates the need to define a clear meaning for the practical application 
 intersection types.
 
 \paragraph{Dynamic mixins in \name}
-In \name, the merge operator is built-in in \name. Thus \lstinline{extend} is simply defined as
-follows:
+In \name, the merge operator is built-in. 
+Thus \lstinline{extend} is simply defined as follows:
 
 \begin{lstlisting}
 let extend T (U * T) (first : T, second : U) : T & U = first ,, second in 
@@ -225,7 +225,7 @@ The generality of disjoint intersection types, which allows one to
 encode record types, is exactly what forces us to add this extra type
 in the constraint.  However, there is a slight gain with \name's
 approach: $remove$ allows \lstinline{B} to contain fields with label $l$, as long as
-the field types are \emph{disjoint} to $\tyint$. Such fine-grained
+the field types are \emph{disjoint} to $A$. Such fine-grained
 constraint is not possible to express only with a lacks predicate.
 
 \begin{comment}
@@ -287,7 +287,7 @@ We will get into the reasons for this in further detail, in Section~\ref{sec:con
 \paragraph{Expressibility}
 As noted by Leijen~\cite{leijen2005extensible}, systems can typically be
 categorized into two distinct groups in what concerns extension:
-strict; and free. The former does not allow field overriding when
+strict and free. The former does not allow field overriding when
 extending a record (i.e. one can only extend a record with a field
 that is not present in it); while the latter does account for field
 overriding.  Our system can be seen as hybrid of these two kinds of
@@ -300,7 +300,7 @@ record types is the following:
 %&\text{avg}_1 \, r = (r.x + r.y) / 2
 %\end{align*}
 \begin{lstlisting}[mathescape=true]
-let $\text{avg}_1$ (R\y, R\y) => (r : {R | x:Int, y:Int}) = (r.x+r.y)/2
+let $\text{avg}_1$ (R\x, R\y) => (r : {R | x:Int, y:Int}) = (r.x+r.y)/2
 \end{lstlisting}
 The type signature says that any record $r$, containing fields $x$
 and $y$ and some more information $R$ (which lacks both fields $x$ and

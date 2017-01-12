@@ -33,7 +33,7 @@ def narrow(x : B with C) : B = x
 \noindent taking an argument with an intersection
 type \lstinline{B with C}. 
 
-The existence of first-class intersections has lead to the
+The existence of first-class intersections has led to the
 discovery of other interesting applications of intersection types. 
 For example, TypeScript's documentation motivates intersection
 types\footnote{\url{https://www.typescriptlang.org/docs/handbook/advanced-types.html}}
@@ -139,7 +139,7 @@ let extend T (U * T) (first : T, second : U) : T & U = first ,, second
 \lstinline{extend} in TypeScript and \name is that the type variable
 \lstinline{U} now has a \emph{disjointness constraint}. The notation
 \lstinline{U * T} means that the type variable U can be instantiated
-to any types which are disjoint to the type \lstinline{T}. Unlike
+to any types that is disjoint to the type \lstinline{T}. Unlike
 TypeScript, the definition of \lstinline{extend} is trivial, type-safe
 and guarantees coherence by using the built-in merge operator (\lstinline{,,}). 
 

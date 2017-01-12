@@ -45,3 +45,21 @@ TODO: Bruno, do you know any system where this is the case? What other systems h
 * Page 17: I found myself confused at the example of substitution just because it was obvious to me that you need to respect the constraint on the type variable to do substitution, so I couldn't see what you were saying. It was only when I gave up and carried on reading that I got to lemma 5 and noticed that was your point. I think you could tighten up this discussion a little, maybe even discussing the solution earlier.
 
 Noted. We will re-structure Section 5.2.
+
+
+
+
+
+
+
+Right; in the Dforall rule, the intersection (A_1 & A_2) does not need
+to be a well-formed type. 
+It does sound odd, but one way to think of
+it is that in F_i, intersections play two different roles.
+The first is as types, where the restricted version of
+intersections (i.e. disjoint intersections) is required for coherence.
+The second is as disjointness constraints for polymorphic instantiation, 
+where the unrestricted version of intersections can be used safely.
+Naturally, these two could be formalised using different constructs, 
+but in our view this would make the system substantially more complicated 
+and therefore less appealing.

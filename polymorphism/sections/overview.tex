@@ -13,7 +13,7 @@ these are trivial to add.
 \subsection{Intersection Types and the Merge Operator}
 
 \paragraph{Intersection types.}
-The intersection of type $A$ and $B$ (denoted as \lstinline{A & B} in
+The intersection of type $A$ and $B$ (denoted by \lstinline{A & B} in
 \name) contains exactly those values
 which can be used as both values of type $A$ and of type $B$. 
 For instance, consider the following program in \name:
@@ -42,7 +42,7 @@ As Dunfield~\cite{dunfield2014elaborating} has argued a merge operator adds cons
 expressiveness to a calculus. 
 The merge operator allows two values to be merged in a single intersection type. 
 For example, an implementation of \lstinline{x} in \name is \lstinline{1,,True}.
-Following Dunfield's notation the merge of $v_1$ and $v_2$ is denoted as $v_1 ,, v_2$.
+Following Dunfield's notation the merge of $v_1$ and $v_2$ is denoted by $v_1 ,, v_2$.
 
 \begin{comment}
 \paragraph{Merge vs Pairs}
@@ -212,7 +212,7 @@ some type variable) would be rejected. The reasoning behind this
 design is that type variables can be instantiated to any types,
 including those already in the intersection. Thus forbidding type
 variables in the intersection will prevent invalid intersections
-arizing from instantiations with overlapping types.
+arising from instantiations with overlapping types.
 Such design does guarantee coherence and would prevent
 \lstinline{merge3} from type-checking. Unfortunately the big drawback
 is that the design is too conservative and many other (useful) programs would be 
@@ -410,8 +410,8 @@ $\top$.
 The essential intuition here is that the more specific a type in the subtyping relation is, the less types
 exist that are disjoint to it.
 For example, $\tyint$ is disjoint to all types except the intersections that contain $\tyint$, $\tyint$
-itself, and $\bot$; while $\tyint \inter \tychar$ is disjoint to all types that $\tyint$ is, plus the
-types disjoint to $\tychar$.
+itself, and $\bot$; while $\tyint \inter \tychar$ is disjoint to all types that do not contain $\tyint$ or
+$\tychar$, and $\bot$.
 Thus, the more specific a type variable constraint is, the less options we have to instantiate it with.
 This reasoning implies that $\top$ should be treated as the empty constraint.
 Indeed, in \name, a single type variable $A$ is only syntactic sugar

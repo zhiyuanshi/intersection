@@ -1,0 +1,74 @@
+*** Major points ***
+
+* Implicit polymorphishm
+TODO
+
+* Bounded polymorphism + Qualified types
+TODO
+
+* Disjoint types vs Coherent types
+TODO
+
+* Dforall rule
+Done
+
+* Stability of substitutions
+TODO
+
+*** Minor points ***
+
+# Reviewer 1
+
+* p.5: "arizing"
+Done
+* p.7: "Int&Char is disjoint to ..." The way it is written sounds incorrect. As I understand, Int&Char should be disjoint to all types that contains Int or Char.
+Done
+* The discussion seems overly pedantic at times. Much of sections 2 and 3 can be cut. I think that the paper would have a better flow if it moved more quickly to the formalization part.
+TODO cut if we need space?
+* p.10: "disjoint to Int" should be "disjoint to A".
+Done
+* p.10: "(R/y, R/y)" should be "(R/x, R/y)".
+Done
+* p.17: "well-formed context" is not defined.
+TODO better reference?
+* I do not understand the discussion in section 5.2-5.3. In fact, I do not see the "problem" with substitution that is pointed out here (and also earlier in section 2.5). Doesn't the T-TApp rule correctly take care of substitution by enforcing the disjointness constraint?
+TODO
+* p.20: Please formally define "top-like type".
+TODO better reference?
+
+# Reviewer 2
+
+* Page 3. "can be instantiated to any types which are disjoint" -> " can be instantiated to any type that is disjoint"
+Done
+* Page 9: The sentence "In F_i the merge operator is built in in F_i" - you can remove the last two words.
+Done
+* Page 9 and everywhere: Something went wrong with your latex macros: there are calligraphic, roman and tt font mismatches all over the place. Please carefully attend to this. If you use a font for a rule name, then that should appear everywhere, likewise if you use tt font in code snippets...
+TODO
+* Page 10: "strict;" -> "strict"
+Done
+* Page 11: Why add singleton records?
+TODO -- is this really necessary?
+* Page 13. You need to add a forward reference to the rules for Gamma |- A*B...
+Done: added a sentence pointing to section 5.
+* Page 15: Please rewrite the sentence "The top five rules are novel in relation to the algorithm..."
+Done.
+* Page 16: The rule Dforall troubles me a little because it relies on the fact that you never ask that the Delta is well-formed. If you didn't it wouldn't work properly (as you discuss). This sounds a little odd to me: can you think of another system where that is the case?
+Done: used the reply.
+* Page 17: I found myself confused at the example of substitution just because it was obvious to me that you need to respect the constraint on the type variable to do substitution, so I couldn't see what you were saying. It was only when I gave up and carried on reading that I got to lemma 5 and noticed that was your point. I think you could tighten up this discussion a little, maybe even discussing the solution earlier.
+TODO
+
+# Reviewer 3
+
+* "has lead" should be "has led" (p. 1)
+* "denoted as" should be "denoted by" (p. 4)
+* "arizing"
+Done
+
+* p. 24, discussion of Castagna et al.'s set-based work: "In their calculus, negation..." should be "In their calculus, difference...": that paper indeed uses negation, making A\B syntactic sugar for A & ~B, but one needs to read that paper to realize this.
+Done
+
+* p. 24, "The encoding **of** multi-field records"
+Done
+
+* Reference [29]: "Jones, S." should be "Peyton Jones, S."
+Done
