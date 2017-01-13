@@ -108,7 +108,8 @@ $ \jcheck \Gamma e A \yields E\\e$ checks against given type $A$
 \newcommand{\bruletsub}{
 %  \mprset {sep=1em}
 \inferrule* [right=\labeltsub]
-  {\jinfer \Gamma {e} A \yields {E} \\ {A} \subtype {B} \yields {E_{sub}}}
+  {\jinfer \Gamma {e} A \yields {E} \\ {A} \subtype {B} \yields {E_{sub}} \\
+   \jwf \Gamma B}
   {\jcheck \Gamma {e} {B} \yields {\tapp {E_{sub}} E}}
 %  \mprset {sep=2em}
 }

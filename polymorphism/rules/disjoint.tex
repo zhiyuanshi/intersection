@@ -70,6 +70,20 @@
     {\jdis \Gamma {\fordis \alpha {A_1} {B}} {\fordis \alpha {A_2} {C}}}
 }
 
+\newcommand{\labeldisreceq}{\makelabeldis {Rec_=}}
+\newcommand{\ruledisreceq}{
+  \inferrule* [right=\labeldisreceq]
+    {\jdis \Gamma A B}
+    {\jdis \Gamma {\recordCon l A} {\recordCon l B}}
+}
+
+\newcommand{\labeldisrecneq}{\makelabeldis {Rec_{\neq}}}
+\newcommand{\ruledisrecneq}{
+  \inferrule* [right=\labeldisrecneq]
+    {l_1 \neq l_2}
+    {\jdis \Gamma {\recordCon {l_1} A} {\recordCon {l_2} B}}
+}
+
 \newcommand{\labeldisax}{\makelabeldis Ax}
 \newcommand{\ruledisatomic}{
   \inferrule* [right=\labeldisax]

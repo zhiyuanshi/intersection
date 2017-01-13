@@ -94,6 +94,7 @@
 \newcommand{\labeltsub}{\makelabelt Sub}
 \newcommand{\ruletsub}{
 \inferrule* [right=\labeltsub]
-  {\jtype \Gamma {e} A \yields {E} \\ {A} \subtype {B} \yields {E_{sub}}}
+  {\jtype \Gamma {e} A \yields {E} \\ {A} \subtype {B} \yields {E_{sub}} \\ 
+   \jwf \Gamma B}
   {\jtype \Gamma {e} {B} \yields {\tapp {E_{sub}} E}}
 }

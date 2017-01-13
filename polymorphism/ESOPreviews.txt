@@ -1,10 +1,11 @@
 *** Major points ***
 
 * Implicit polymorphishm
-TODO
+Done: Added some sentences at the end of conclusion. 
 
 * Bounded polymorphism + Qualified types
-TODO
+Done: Appended a paragraph in the RW. 
+TODO: references
 
 * Disjoint types vs Coherent types
 TODO
@@ -13,7 +14,11 @@ TODO
 Done
 
 * Stability of substitutions
-TODO
+Done: Re-phrased and shortened this subsection.
+
+* Other changes
+1. Added disjointness rules for records.
+2. Added the premise "Gamma |- B" to T-Sub.
 
 *** Minor points ***
 
@@ -32,7 +37,7 @@ Done
 * p.17: "well-formed context" is not defined.
 TODO better reference?
 * I do not understand the discussion in section 5.2-5.3. In fact, I do not see the "problem" with substitution that is pointed out here (and also earlier in section 2.5). Doesn't the T-TApp rule correctly take care of substitution by enforcing the disjointness constraint?
-TODO
+Done. See Major points.
 * p.20: Please formally define "top-like type".
 TODO better reference?
 
@@ -55,7 +60,7 @@ Done.
 * Page 16: The rule Dforall troubles me a little because it relies on the fact that you never ask that the Delta is well-formed. If you didn't it wouldn't work properly (as you discuss). This sounds a little odd to me: can you think of another system where that is the case?
 Done: used the reply.
 * Page 17: I found myself confused at the example of substitution just because it was obvious to me that you need to respect the constraint on the type variable to do substitution, so I couldn't see what you were saying. It was only when I gave up and carried on reading that I got to lemma 5 and noticed that was your point. I think you could tighten up this discussion a little, maybe even discussing the solution earlier.
-TODO
+Done. See Major points.
 
 # Reviewer 3
 

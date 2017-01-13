@@ -30,6 +30,13 @@ The proofs for \name rely on the invariant that a type variable $\alpha$ can nev
 to another type that contains $\alpha$. The addition of $\bot$ breaks
 this invariant, allowing us to derive, for example, $\jdis \Gamma
 \alpha \alpha$.
+Finally, another line for future work is to study a similar system with 
+implicit polymorphism.
+This would require some changes in the subtyping and disjointness relations,
+as well as the study of existing work on type reconstruction for systems with 
+intersection types, which typically lack an explicit introduction form 
+(i.e. merge operator).
+
 
 %Further study is needed to determine how to integrate $\bot$ in the system.
 
