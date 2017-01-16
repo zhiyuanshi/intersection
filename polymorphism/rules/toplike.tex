@@ -43,3 +43,10 @@
     { \toplike{A} }
     { \toplike{\fordis \alpha B A} }
 }
+
+\newcommand{\labeltoplrec}{\makelabeltopl Rec}
+\newcommand{\ruletoplrec}{
+  \inferrule* [right=\labeltoplrec]
+    { \toplike{A} }
+    { \toplike{\recordType l A} }
+}

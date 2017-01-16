@@ -39,10 +39,9 @@ The notation $\im \cdot$ is also overloaded for context translation from \name
 contexts $\Gamma$ to target language contexts $G$.
 
 \begin{figure}[!t]
-\begin{spacing}{0.5}
+\begin{spacing}{0.3}
 \begin{minipage}[t]{.5\textwidth}
   \framebox{$\im A = T$}
-
   \begin{align*}
     \im \alpha                &= \alpha \\
     \im \top                  &= () \\
@@ -54,7 +53,6 @@ contexts $\Gamma$ to target language contexts $G$.
 \end{minipage}
 \begin{minipage}[t]{.5\textwidth}
   \framebox{$\im \Gamma = G$}
-
   \begin{align*}
     \im \cdot                        &= \cdot \\
     \im {\Gamma, \alpha \disjoint A} &= \im \Gamma, \alpha \\
@@ -74,18 +72,12 @@ contexts $\Gamma$ to target language contexts $G$.
 \subsection{Coercive Subtyping and Coherence}
 
 \paragraph{Coercive subtyping.}
-
-The judgement
-\[
-A_1 \subtype A_2 \yields E
-\]
-extends the subtyping judgement in Figure~\ref{fig:fi-subtype} with a coercion
-on the right hand side of $ \yields {} $. A coercion $ E $ is just a term
+The judgement $A_1 \subtype A_2 \yields E$
+present in Figure~\ref{fig:fi-subtype}, extends the subtyping relation 
+with a coercion on the right hand side of $ \yields {} $. A coercion $ E $ is just a term
 in the target language and is ensured to have type
 $ \im {A_1} \to \im {A_2} $ (by Lemma~\ref{lemma:sub}). For example,
-\[
-\tyint \inter \alpha \subtype \alpha \yields {\lamty x {\im {\tyint \inter \tybool}} {\proj 2 x}}
-\]
+$\tyint \inter \alpha \subtype \alpha \yields {\lamty x {\im {\tyint \inter \tybool}} {\proj 2 x}}$,
 generates a target coercion function with type: $(\tyint,\alpha) \to \alpha$.
 
 Rules \reflabel{\labelsubtop}, \reflabel{\labelsubvar}, \reflabel{\labelsubint},
@@ -176,6 +168,7 @@ needs to be shown coherent. In \name the following lemma holds:
   where $A_1 \inter A_2$ and $B$ are well-formed types, and
   $B$ is not top-like,
   then it is not possible that the following holds at the same time:
+  \vspace{-0.2cm}
   \begin{enumerate}
     \item $A_1 \subtype B$
     \item $A_2 \subtype B$
@@ -348,11 +341,12 @@ This result is captured more formally by the following lemma:
 
 \subsection{Top-like Types and their Coercions}\label{subsec:top-types}
 \begin{figure}[!t]
-\begin{spacing}{1}
+\begin{spacing}{0.9}
   \begin{mathpar}
     \formtoplike \\ %\framebox{$\jatomic A$} \\
-\vspace{-5pt}
-    \ruletopltop \and \ruletoplinter \and \ruletoplfun \and \ruletoplforall
+\vspace{-0.1cm}
+    \ruletopltop \and \ruletoplinter \and \ruletoplfun 
+    \and \ruletoplrec \and \ruletoplforall 
   \end{mathpar}
 \begin{minipage}[t]{.5\textwidth}
   %\begin{center}
@@ -382,7 +376,8 @@ This result is captured more formally by the following lemma:
         A = \top & () \\
         A = A_1 \to A_2 & \lam x \andcoerce{A_2} \\
         A = A_1 \inter A_2 & \pair {\andcoerce{A_1}} {\andcoerce{A_2}} \\
-        A = \fordis \alpha B A & \blam \alpha {\andcoerce{A}}
+        A = \recordType l A & {\andcoerce{A}} \\
+        A = \fordis \alpha B A & \blam \alpha {\andcoerce{A}} 
   \end{cases}
   \]
 \end{minipage}
@@ -403,10 +398,14 @@ then, without the restriction, the lemma would never hold.
 \paragraph{Rules.}
 \name's definition of top-like types extends that from \oldname.  The
 rules that compose this unary relation, denoted as $\toplike{ . }$,
-are presented at the top of Figure~\ref{fig:andcoercion}.  The only
-new rule is \reflabel{\labeltoplforall}, which states that a
-(disjoint) universal quantifier is top-like whenever its body is also
-top-like.
+are presented at the top of Figure~\ref{fig:andcoercion}.  
+The new rules are \reflabel{\labeltoplrec} and
+\reflabel{\labeltoplforall}. 
+Both rules say that their constructs are top-like whenever their enclosing
+expressions are also top-like.
+%The former says that a record is top-like whenever its field type is also
+%top-like. Similarly, the latter states that an universal quantifier is 
+%top-like whenever its body is also top-like.
 
 \paragraph{Coercions for top-like types} Coercions for top-like types 
 require special treatment for retaining coherence. Although Lemma~\ref{lemma:unique-subtype-contributor}
@@ -414,8 +413,8 @@ does not hold for top-like types, we can still ensure that that any
 coercions for top-like types are unique, \emph{even if multiple
   derivations exist}. The meta-function
 $\andcoerce{A}$, shown at the bottom of Figure~\ref{fig:andcoercion},
- defines coercions for top-like types. With respect to \oldname the $\forall$ case is
-now defined, and there is also a change in the $\inter$ case (covering types such as $\top
+ defines coercions for top-like types. With respect to \oldname the record and $\forall$ cases
+are now defined, and there is also a change in the $\inter$ case (covering types such as $\top
 \inter \top$). With this definition, although two derivations
 exist for type $Char\&Int <: \top$, they both generate the coercion 
 $\lambda x . ()$.
@@ -424,17 +423,22 @@ $\lambda x . ()$.
 In \name $\top \& \top$ is a well-formed disjoint intersection type.
 This may look odd at first, since all other types
 cannot appear more than once in an intersection. Indeed, in \oldname, 
-$\top \& \top$ is not well-formed. However, $\top$ types are special 
+$\top \& \top$ is not well-formed. However, $\top$-types are special 
 in that they have a \emph{unique} canonical top value, which is
 translated to the unit value \lstinline{()} in the target language. In
-other words a merge of two top types will always return the same value 
-regardless of which component of the merge is chosen. This is different 
-from merges with other types of values, which do not have this
+other words a merge of two $\top$-types will always return the same value 
+regardless of which component of the merge is chosen. 
+This is different 
+from merges of non $\top$-types, which do not have this
 property.  
-It turns out that allowing top-types in intersections is fundamental 
-for the $\top$ type to behave correctly as the empty constraint, since
-the empty constraint should be disjoint to every other
-type. This explains the more liberal treatment of top types \name when
+Thus, one may say that $\top$-types are \emph{coherent} with every other type.
+This property makes $\top$-types as perfect candidates for the empty constraint,
+but such can only be achieved by allowing $\top$ in intersections.
+%It turns out that allowing top-types in intersections is fundamental 
+%for the $\top$ type to behave correctly as the empty constraint, since
+%the empty constraint should be coherent with every other
+%type. 
+This explains the more liberal treatment of top types \name when
 compared to \oldname.
 
 \subsection{Elaboration of the Type-System and Coherence} 
@@ -506,20 +510,20 @@ All the remaining rules are ported from \oldname.
 \paragraph{Type-safety}
 The type-directed translation is type-safe. This property is captured
 by the following two theorems.
-
-\thmprf{0cm}{
+\defaultthmprf{
 \begin{restatable}[Type preservation]{theorem}{typepreservation}
   \label{theorem:type-preservation}
   We have that:
+  \vspace{-0.1cm}
   \begin{itemize}
   \item If $ \jinfer \Gamma e A \yields E $, 
         then $ \jtype {\im \Gamma} E {\im A} \,$.
   \item If $ \jcheck \Gamma e A \yields E $, 
         then $ \jtype {\im \Gamma} E {\im A} $.
   \end{itemize}
-\end{restatable}}{-0.1cm}
+\end{restatable}}
 {By structural induction on the term and the respective inference rule.}
-{-0.1cm}
+\vspace{-0.2cm}
 \defaultthmprf{
 \begin{theorem}[Type safety]
   If $e$ is a well-typed \name term, then $e$ evaluates to some System $F$
@@ -723,6 +727,7 @@ Combining the previous results, we are finally able to show the central theorem:
 \begin{restatable}[Unique elaboration]{theorem}{uniqueelaboration}
   \label{theorem:unique-elaboration}
   We have that:
+  \vspace{-0.1cm}
   \begin{itemize*}
     \item If $\jinfer \Gamma e A \yields {E_1}$ and $\jinfer \Gamma e A \yields
           {E_2}$, then $E_1 \equiv E_2$. 
