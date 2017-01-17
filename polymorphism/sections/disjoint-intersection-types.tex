@@ -370,16 +370,24 @@ This result is captured more formally by the following lemma:
     \framebox{$\andcoerce{A} = T$}
   %\end{center}
 \vspace{-7pt}
-  \[
-  \andcoerce{A} = 
-  \begin{cases} 
-        A = \top & () \\
-        A = A_1 \to A_2 & \lam x \andcoerce{A_2} \\
-        A = A_1 \inter A_2 & \pair {\andcoerce{A_1}} {\andcoerce{A_2}} \\
-        A = \recordType l A & {\andcoerce{A}} \\
-        A = \fordis \alpha B A & \blam \alpha {\andcoerce{A}} 
-  \end{cases}
-  \]
+  \begin{align*} 
+        \andcoerce{\top} &= () \\
+        \andcoerce{A_1 \to A_2} &= \lam x \andcoerce{A_2} \\
+        \andcoerce{A_1 \inter A_2} &= \pair {\andcoerce{A_1}} {\andcoerce{A_2}} \\
+        \andcoerce{\recordType l A} &= {\andcoerce{A}} \\
+        \andcoerce{\fordis \alpha B A} &= \blam \alpha {\andcoerce{A}} 
+  \end{align*}
+%  \andcoerce{A} = 
+%  \[
+%  \andcoerce{A} = 
+%  \begin{cases} 
+%        A = \top & () \\
+%        A = A_1 \to A_2 & \lam x \andcoerce{A_2} \\
+%        A = A_1 \inter A_2 & \pair {\andcoerce{A_1}} {\andcoerce{A_2}} \\
+%        A = \recordType l A & {\andcoerce{A}} \\
+%        A = \fordis \alpha B A & \blam \alpha {\andcoerce{A}} 
+%  \end{cases}
+%  \]
 \end{minipage}
 \end{spacing}
   \caption{Top-like types and their coercions.}

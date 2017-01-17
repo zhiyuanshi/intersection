@@ -74,14 +74,14 @@
 \newcommand{\ruledisreceq}{
   \inferrule* [right=\labeldisreceq]
     {\jdis \Gamma A B}
-    {\jdis \Gamma {\recordCon l A} {\recordCon l B}}
+    {\jdis \Gamma {\recordType l A} {\recordType l B}}
 }
 
 \newcommand{\labeldisrecneq}{\makelabeldis {Rec_{\neq}}}
 \newcommand{\ruledisrecneq}{
   \inferrule* [right=\labeldisrecneq]
     {l_1 \neq l_2}
-    {\jdis \Gamma {\recordCon {l_1} A} {\recordCon {l_2} B}}
+    {\jdis \Gamma {\recordType {l_1} A} {\recordType {l_2} B}}
 }
 
 \newcommand{\labeldisax}{\makelabeldis Ax}
@@ -120,7 +120,7 @@
 \newcommand{\ruleaxintrec}{
   \inferrule* [right=\labelaxintrec]
     { }
-    {\tyint \disjointax {\recordCon l A}}
+    {\tyint \disjointax {\recordType l A}}
 }
 
 \newcommand{\labelaxfunforall}{\makelabelax {(\rightarrow \! \forall)}}
@@ -140,14 +140,14 @@
 \newcommand{\ruleaxfunrec}{
   \inferrule* [right=\labelaxfunrec]
     { }
-    {A_1 \to A_2 \disjointax {\recordCon l B}}
+    {A_1 \to A_2 \disjointax {\recordType l B}}
 }
 
 \newcommand{\labelaxforalldisrec}{\makelabelax {(\forall Rec)}}
 \newcommand{\ruleaxforalldisrec}{
   \inferrule* [right=\labelaxforalldisrec]
     { }
-    {\fordis \alpha {A_1} {A_2} \disjointax {\recordCon l B}}
+    {\fordis \alpha {A_1} {A_2} \disjointax {\recordType l B}}
 }
 
 \newcommand{\labelaxsym}{\makelabelax Sym}
