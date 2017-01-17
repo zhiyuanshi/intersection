@@ -238,12 +238,13 @@ inheritance, the work on type systems for mixins/traits usually builds
 on more conventional class-based OO models.
 
 \paragraph{Constrained types.}
-The notion of disjoint quantification is inspired on \emph{bounded polymorphism} \joao{refs}.
+The notion of disjoint quantification is inspired on \emph{bounded polymorphism} 
+\cite{cardelli1985understanding,Canning89f-bounded}.
 Such form of polymorphism typically uses types as subtyping bounds, whereas disjoint
 quantification uses types as \emph{disjoint} (i.e. coherent) bounds.
-Another line of work are \emph{qualified types} \joao{refs}, which uses predicates on types to
-express constraints.
-However, qualified types are only applicable to the class of Hindley-Milner \joao{ref} 
+Another line of work are \emph{qualified types} \cite{jones94}, 
+which uses predicates on types to express constraints.
+However, qualified types are only applicable to the class of Hindley-Milner 
 languages and such predicates are only defined over monotypes.
 \name falls outside this class of languages, plus its constraints can
 be expressed using any arbitrary type (and not just monotypes).

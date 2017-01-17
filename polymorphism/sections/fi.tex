@@ -220,14 +220,18 @@ As shown at the top of Figure~\ref{fig:fi-subtype}, the new types it contains ar
 type variables, universal quantifiers and record types.
 
 \paragraph{Properties of Subtyping.} The subtyping relation is reflexive and transitive.
-\thmprf{0cm}{
+\defaultthmprf{
 \begin{restatable}[Subtyping reflexivity]{lemma}{subrefl}
   \label{lemma:subrefl}
   For any type $A$, $A \subtype A$.
 \end{restatable}}
-{-0.1cm}
-{By induction on $A$.}
-{0cm}
+{By structural induction on $A$.}
+\defaultthmprf{
+\begin{restatable}[Subtyping transitivity]{lemma}{subtrans}
+  \label{lemma:subtrans}
+  If $A \subtype B$ and $B \subtype C$, then $A \subtype C$.
+\end{restatable}}
+{By double induction on both derivations.}
 %\noindent \emph{Proof.} By induction on $A$.
 %\restatableproof{lemma}{Subtyping reflexivity}{subrefl}{lemma:subrefl}
 %{For any type $A$, $A \subtype A$.}
@@ -240,9 +244,6 @@ type variables, universal quantifiers and record types.
 %  If $A \subtype B$ and $B \subtype C$, then $A \subtype C$.
 %\end{restatable}%
 %\noindent \emph{Proof.} By double induction on both derivations.%
-\restatableproof{lemma}{Subtyping transitivity}{subtrans}{lemma:subtrans}
-{If $A \subtype B$ and $B \subtype C$, then $A \subtype C$.}
-{By double induction on both derivations.}{-0.1cm}
 
 %\begin{prf}
 %By double induction on both derivations. 

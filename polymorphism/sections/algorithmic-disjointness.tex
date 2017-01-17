@@ -141,16 +141,14 @@ is its twin symmetrical rule.
 Both rules state that a type variable is disjoint to some type $B$, if $\Gamma$ contains any
 subtype of the corresponding disjointness constraint. 
 This rule is a specialization of the more general lemma:
-\thmprf{0cm}{
+\defaultthmprf{
 \begin{restatable}[Covariance of disjointness]{lemma}{disjointnesscovariance}
   \label{lemma:disjointness-covariance}
   If $\jwf \Gamma {A \disjoint B}$ and $B \subtype C$, then $\jwf \Gamma {A \disjoint C}$.
 \end{restatable}}
-{-0.2cm}
 {By double induction, first on the disjointness derivation and then on the subtyping derivation.
 The first induction case for~\reflabel{\labeldisvar} does not need the second induction as it is 
 a straightforward application of subtyping transitivity.}
-{0cm}
 %\begin{restatable}[Covariance of disjointness]{lemma}{disjointnesscovariance}
 %  \label{lemma:disjointness-covariance}
 %

@@ -105,36 +105,14 @@
 \newcommand\joao[1]{\authornote{joao}{Blue}{#1}}
 
 % Proofs
-\newcommand{\restatableproof}[7]{
-  \begin{restatable}[#2]{#1}{#3}
-    \label{#4}
-    #5
-  \end{restatable}%
-  \vspace{#7}
-  \noindent \emph{Proof.} #6 \hfill\(\Box\)
-  %\vspace{-0.51cm}%
-  %\begin{proof}
-  %  #6
-  %\end{proof}
-  %\vspace{-0.51cm}
-}
-
 \newcommand{\thmprf}[5]{
   \vspace{#1}
   #2
   \vspace{#3}
-  \noindent \emph{Proof.} #4 \hfill\(\Box\)
+  \noindent \emph{Proof.} #4 \hfill$\square$
   \vspace{#5}
 }
 
 \newcommand{\defaultthmprf}[2]{
   \thmprf{0cm}{#1}{-0.2cm}{#2}{0cm}
 }
-
-%\newcommand{\lemmaproof}[5]{
-%  \restatableproof{lemma,#1,#2,#3,#4,#5}
-%}
-
-%\newcommand{\theoremproof}[5]{
-%  \restatableproof{theorem,#1,#2,#3,#4,#5}
-%}
