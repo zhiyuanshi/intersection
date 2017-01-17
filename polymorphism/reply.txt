@@ -41,17 +41,16 @@ We used records pervasively in the examples shown in Section 3.
 * Page 16: Dforall rule
 
 Right; in the Dforall rule, the intersection (A_1 & A_2) does not need
-to be a well-formed type. 
-It does sound odd, but one way to think of
-it is that in F_i, intersections play two different roles.
-The first is as types, where the restricted version of
-intersections (i.e. disjoint intersections) is required for coherence.
-The second is as disjointness constraints for polymorphic instantiation, 
-where the unrestricted version of intersections can be used safely.
-Naturally, these two could be formalised using different constructs, 
-but in our view it would make the system substantially more complicated 
-and therefore less appealing.
-We do not know other systems that have similar mechanisms.
+to be a well-formed type.  It does sound odd, but one way to think of
+it is that in F_i, intersections play two different roles.  The first
+is as types, where the restricted version of intersections
+(i.e. disjoint intersections) is required for coherence.  The second
+is as disjointness constraints for polymorphic instantiation, where
+the unrestricted version of intersections can be used safely.
+Naturally, these two could be formalised using different constructs,
+but in our view it would make the system substantially more
+complicated and therefore less appealing.  We do not know other
+systems that have similar mechanisms.
 
 #Reviewer 3
 

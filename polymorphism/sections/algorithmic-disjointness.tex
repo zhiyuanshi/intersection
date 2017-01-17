@@ -169,7 +169,7 @@ variable $\alpha$.
 However, under the assumption that contexts are well-formed, such derivation is not possible 
 as $\alpha$ cannot occur free in $A$. 
 
-The rule for disjoint quantification \reflabel{\labeldisforall} is the last novel rule. 
+The rule for disjoint quantification \reflabel{\labeldisforall} is the most interesting. 
 To illustrate this rule, consider the following two types:
 
 \[ (\forall (\alpha * \tyint).~\tyint \& \alpha) \qquad 
@@ -245,8 +245,8 @@ Note that disjointness with type variables is already captured by \reflabel{\lab
 
 \subsection{Well-formed Types}
 In \name it is important to show that the type-system only produces well-formed types.
-These will turn out to be crucial to ensure coherence, as it will be shown in Section~\ref{sec:disjoint}.
-However, in the presence of both polymorphism and disjoint intersection types, an extra
+This is crucial to ensure coherence, as shown in Section~\ref{sec:disjoint}.
+However, in the presence of both polymorphism and disjoint intersection types, extra
 effort is needed to show that all types in \name are well-formed.
 To achieve this, not only we need to show that a weaker version of the general substitution lemma holds, 
 but also that disjointness between two types is preserved after substitution.
