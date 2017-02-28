@@ -1,0 +1,155 @@
+% Article template
+\documentclass[oneside,a4paper]{article}
+
+% Set margins
+\usepackage[top=1in,bottom=1in,left=1.25in,right=1.25in]{geometry}
+
+% Font settings
+\usepackage{times}
+\renewcommand{\ttdefault}{cmtt}
+\usepackage{url}
+\urlstyle{rm}
+
+% AMS support
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsthm}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{lemma}[theorem]{Lemma}
+
+% Language support
+\usepackage{csquotes}
+\usepackage[english]{babel}
+\MakeOuterQuote{"}
+\usepackage{indentfirst}
+\usepackage{verbatim}
+
+% Reference settings
+\usepackage{hyperref}
+\hypersetup{
+   colorlinks,
+   citecolor=black,
+   filecolor=black,
+   linkcolor=black,
+   urlcolor=black
+}
+
+% Caption format
+\usepackage{titlesec}
+\titleformat{\section}{\normalfont\large\bfseries}{\arabic{section}.}{0.5em}{}
+\titleformat{\subsection}{\normalfont\normalsize\bfseries}{\thesubsection}{0.5em}{}
+\usepackage[font=small,labelfont=bf]{caption}
+\DeclareCaptionLabelSeparator{colon}{.~}
+\numberwithin{equation}{section}
+
+% Line spacing
+\usepackage{setspace}
+
+% List support
+\usepackage{paralist}
+
+% Graphics support
+\usepackage{graphicx}
+\usepackage{float}
+
+% Ott
+\usepackage{mathpartir}
+\usepackage{comment}
+\input{red.ott.tex}
+\input{otthelper.tex}
+
+% Title
+\title{\bf Semantics}
+\author{}
+\date{}
+
+% Text
+\begin{document}
+\maketitle
+
+\section{Syntax}
+\begin{small}
+\begin{spacing}{0.4}
+\gram{
+  \otte\ottinterrule
+  \otta\ottinterrule
+  \ottv\ottinterrule
+%  \ottA
+}
+\end{spacing}
+\end{small}
+
+\section{Semantics}
+\begin{spacing}{0.4}
+\begin{small}
+\noindent
+\ottdefnreduction{}\ottinterrule
+\ottdefnareduction{}\ottinterrule
+%\ottdefnsubtyping{}\ottinterrule
+%\ottdefnwellformed{}\ottinterrule
+\end{small}
+\end{spacing}
+
+%\subsection{Traditional System}
+%\begin{spacing}{0.5}
+%\begin{small}
+%\noindent
+%\ottdefnwellformed{}\ottinterrule
+%\ottdefntyping{}\ottinterrule
+%\ottdefnsubtyping{}
+%\end{small}
+%\end{spacing}
+
+%\section{Metatheory}
+%
+%\begin{lemma}[Reflexivity]\verb|[sub_refl]|
+%  If $[[G |- e1 <: e2 : A]]$, then $[[G |- e1 <: e1 : A]]$ and
+%  $[[G |- e2 <: e2 : A]]$.
+%\end{lemma}
+%
+%\begin{lemma}[Weakening]\verb|[sub_weaken]|
+%  If $[[G |- e1 <: e2 : A]]$, $[[G {= G']]$ and $[[|- G']]$, then
+%  $[[G' |- e1 <: e2 : A ]]$.
+%\end{lemma}
+%
+%\begin{lemma}[Narrowing]\verb|[sub_narrowing]|
+%  If $[[G1,x:B,G2 |- e1 <: e2 : C]]$, $[[G1 |- A <: B : *]]$ and
+%  $[[|- G1, x:A, G2]]$, then $[[G1,x:A,G2 |- e1 <: e2 : C]]$.
+%\end{lemma}
+%
+%\begin{lemma}[Type Passing]\verb|[sub_type_keep]|
+%  If $[[G |- e1 <: e1 : A]]$ and $[[G |- e1 <: e2 : B]]$, then
+%  $[[G |- e1 <: e2 : A]]$.
+%\end{lemma}
+%
+%\begin{lemma}[Transitivity]\verb|[sub_trans]|
+%  If $[[G |- e1 <: e2 : A]]$ and $[[G |- e2 <: e3 : A]]$, then
+%  $[[G |- e1 <: e3 : A]]$.
+%\end{lemma}
+%
+%\begin{lemma}[Substitution]\verb|[sub_substitution]|
+%  If $[[G1,x:B,G2 |- e1 <: e2 : A]]$ and $[[G1 |- e3 <: e3 : B]]$,
+%  then $[[G1, G2[x:=e3] |- e1[x:=e3] <: e2[x:=e3] : A[x:=e3] ]]$.
+%\end{lemma}
+%
+%\begin{lemma}[Well-typedness]\verb|[sub_wf_from_sub]|
+%  If $[[G |- A <: B : C]]$, then $[[G |- C <: C : *]]$.
+%\end{lemma}
+%
+%\begin{theorem}[Soundness and Completeness]\quad
+%  \begin{enumerate}
+%  \item \verb|[sub_from]| If $[[G |= e1 : A]]$ and
+%    $[[G |= e1 <| e2]]$, then $[[G |- e1 <: e2 : A]]$.
+%  \item \verb|[sub_to]| If $[[G |- e1 <: e2 : A]]$, then
+%    $[[G |= e1 : A]]$, $[[G |= e2 : A]]$ and $[[G |= e1 <| e2]]$.
+%  \end{enumerate}
+%\end{theorem}
+
+\end{document}
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: t
+%%% End:
+

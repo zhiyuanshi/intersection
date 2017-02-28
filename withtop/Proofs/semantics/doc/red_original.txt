@@ -1,0 +1,117 @@
+A, B ::= Int | A -> B
+
+e ::= n | e1 + e2 | x | \x . e | e1 e2 | (e : A) | e1,,e2
+
+a ::= n | \x . e | a1,,a2
+
+v ::= a : A
+
+-------
+e1 ~> e2
+-------
+
+n ~> n : Int
+
+e1 ~> e1'
+----------------
+e1 + e2 ~> e1' + e2
+
+e ~> e'
+------------
+v + e ~> v + e'
+
+---------------------------
+(n : Int) + (m : Int) ~> (n + m) : Int 
+
+e1 ~> e1'
+-------------
+e1 e2 ~> e1' e2
+
+(e2 : A) ~> e2'
+----------------------------------
+(\x . e1 : A -> B) e2 ~> (\x . e1 : A -> B) e2'
+
+---------------------------
+(\x . e : A -> B) v ~> [x |-> v] e : B
+
+e1 ~> e1'
+---------------
+e1 ,, e2 ~> e1' ,, e2
+
+e ~> e'
+-----------
+v ,, e ~> v ,, e'
+
+---------------------- (maybe this is wrong?)
+a : A ,, b : B ~> a ,, b : A & B
+
+{- rules -}
+e ~> e'
+----------- (overlaps with other rules, if e can be a value, but it is harmless because, on atomic values is just the identity?)
+e : A ~> e' : A
+
+B <: A      a : A ~> v
+---------------- (no need for the subtype check if it is already type-checked!)
+(a : B) : A ~> v
+
+a : A ~> a1 : A       a : B ~> a2 : B 
+--------------------------
+a : A & B ~> a1 ,, a2 : A & B
+
+a1 : A ~> a1' : A              ordinary A
+----------------------------
+a1 ,, a2 : A ~> a1' : A
+
+a2 : A ~> a2' : A              ordinary A
+----------------------------
+a1 ,, a2 : A ~> a2' : A
+
+n : Int ~> n : Int
+
+\x . e : A -> B ~> \x . e : A -> B
+
+
+
+{- We should not include the 2 above? At the moment they are necessary -}
+
+
+3 ,, 'c' : Char ~> 'c' : Char        3,,'c' : Int ~> 3 : Int
+---------------------------------------
+3 ,, 'c' : Char & Int ~> 'c' ,, 3
+
+3 : Int ~> 3 : Int 
+---------------
+3,,'c' : Int ~> 3 : Int
+
+{- alternative -}
+e : A ~> e1 : A       e : B ~> e2 : B 
+-------------------------- (evaluates multiple times, which seems wrong!)
+e : A & B ~> e1 ,, e2 : A & B
+
+
+Int <: Int     3 : Int ~> 3 : Int
+-----------------
+((3 : Int) : Int) ~> (3 : Int) 
+
+
+
+
+
+(3,,'c' : Int & Char) : Int
+------------------
+3,,'c' : Int
+
+--------------------
+ (\x . x : Int -> Int) 1 ~> ([x |-> (1 : Int)] x) : Int
+
+
+-----------------
+(2 : Int) + (3 : Int) : Int
+
+-----------------------------------------------------
+((\y . (2 : Int) + y) : Int -> Int) 3 ~> ([y |-> (3 : Int)] (2 : Int) + y) : Int ~> (2 : Int) + (3 : Int) : Int
+
+
+\x . \y . x + y : Int -> Int -> Int) 2 ~> ([x |-> (2 : Int)] (\y . x + y)) : Int -> Int 
+-------------------------------------------------------------
+((\x . \y . x + y : Int -> Int -> Int) 2) 3 ~> ((\y . (2 : Int) + y) : Int -> Int) 3

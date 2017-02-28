@@ -1,0 +1,60 @@
+Problem with original system (red_original.txt): 
+
+Some expressions can step, introducing non-termination. 
+For instance, the following value can step:
+
+(3 ,, ‘c’) : Int & Char ~>
+(3 : Int ,, ‘c’) : Int & Char ~>
+(3 : Int ,, ‘c’ : Char) : Int & Char ~>
+((3 ,, ‘c’) : Int & Char) : Int & Char ~>
+(3 ,, ‘c’) : Int & Char
+
+Also, some rules are assuming that values can step. For instance:
+
+a1 : A ~> a1' : A              ordinary A
+----------------------------
+a1 ,, a2 : A ~> a1' : A
+
+
+Proposal (red.pdf): distinguish between types constructed at run-time (=>) and compile-time annotated types (<=) (or “:” in our original work).
+In this way, expressions inside run-time annotations (e => A) are guaranteed to be *values* (i.e. they cannot be reduced any further).
+
+For instance (supposing we support Char):
+
+(3 ,, ‘c’) <= Int & Char ~>                       (R_Ann, R_Merge1, R_Int)
+(3 => Int ,, ‘c’) <= Int & Char ~>                (R_Ann, R_Merge2, R_Char)
+(3 => Int ,, ‘c’ => Char) <= Int & Char ~>        (R_Ann, R_Merge3)
+((3 ,, ‘c’) => Int & Char) <= Int & Char ~>       (R_Ann, A_Merge3)
+((3 => Int) <= Int) ,, ((‘c’ => Char) <= Char) ~> (R_Merge1, A_Int)
+(3 => Int ,, (‘c’ => Char) <= Char) ~>            (R_Merge2, A_Char)
+(3 => Int ,, ‘c’ => Char) ~>                      (R_Merge3)
+(3 ,, ‘c’) => Int & Char
+
+A more interesting example, that handles sub-typing, would be:
+
+((\x . x + 1 <= Int -> Int) <= Int&Char -> Int) (‘a’ ,, 1)                                                       ~>  (R_App1, R_Abs)
+((\x . x + 1 => Int -> Int) <= Int&Char -> Int) (‘a’ ,, 1)                                                       ~>  (R_App1, A_Abs)
+((\y. ((\x . x + 1 => Int -> Int) (y <= Int)) <= Int) => Int&Char -> Int) (‘a’ ,, 1)                             ~>  (R_App2, R_Merge1, R_Char)
+((\y. ((\x . x + 1 => Int -> Int) (y <= Int)) <= Int) => Int&Char -> Int) (‘a’ => Char ,, 1)                     ~>  (R_App2, R_Merge2, R_Int)
+((\y. ((\x . x + 1 => Int -> Int) (y <= Int)) <= Int) => Int&Char -> Int) (‘a’ => Char ,, 1 => Int)              ~>  (R_App2, R_Merge3)
+((\y. ((\x . x + 1 => Int -> Int) (y <= Int)) <= Int) => Int&Char -> Int) ((‘a’ ,, 1) => Char&Int)               ~>  (R_App3)
+((\y. ((\x . x + 1 => Int -> Int) (y <= Int)) <= Int) => Int&Char -> Int) (((‘a’ ,, 1) => Char&Int) <= Int&Char) ~>* (R_App2, (*))
+((\y. ((\x . x + 1 => Int -> Int) (y <= Int)) <= Int) => Int&Char -> Int) ((1 ,, ‘a’) => Int&Char)               ~>  (R_App4)
+((\x . x + 1 => Int -> Int) ((1 ,, ‘a’ => Int&Char) <= Int)) <= Int                                              ~>  (R_Ann, R_App2, A_Merge1)
+((\x . x + 1 => Int -> Int) ((1 => Int) <= Int)) <= Int                                                          ~>  (R_Ann, R_App2, A_Int)
+((\x . x + 1 => Int -> Int) (1 => Int)) <= Int                                                                   ~>  (R_Ann, R_App4)
+((1 => Int) + 1 <= Int) <= Int                                                                                   ~>  (R_Ann, R_Ann, R_Add2)
+((1 => Int) + (1 => Int) <= Int) <= Int                                                                          ~>  (R_Ann, R_Ann, R_Add3)
+((2 => Int) <= Int) <= Int                                                                                       ~>  (R_Ann, A_Int)
+(2 => Int) <= Int                                                                                                ~>  (A_Int)
+2 => Int
+
+with (*):
+((‘a’ ,, 1) => Char&Int) <= Int&Char                                    ~> (A_Merge3)
+(((‘a’ ,, 1) => Char&Int) <= Int) ,, (((‘a’ ,, 1) => Char&Int) <= Char) ~> (R_Merge1, A_Merge2)
+((1 => Int) <= Int) ,, (((‘a’ ,, 1) => Char&Int) <= Char)               ~> (R_Merge1, A_Int)
+(1 => Int) ,, (((‘a’ ,, 1) => Char&Int) <= Char)                        ~> (R_Merge2, A_Merge1)
+(1 => Int) ,, ((‘a’ => Char) <= Char)                                   ~> (R_Merge2, A_Char)
+(1 => Int) ,, (‘a’ => Char)                                             ~> (R_Merge3)
+(1 ,, ‘a’) => Int&Char                                                  
+
