@@ -1502,8 +1502,8 @@ Inductive has_type_source_alg : context PTyp -> PExp -> Dir -> PTyp -> (SExp var
                 has_type_source_alg Gamma t2 Inf B E2 ->
                 OrthoS A B ->
                 has_type_source_alg Gamma (PMerge t1 t2) Inf (And A B) (STPair _ E1 E2)
-  | ATyAnn : forall Gamma t1 A E, has_type_source_alg Gamma t1 Chk A E ->
-                         has_type_source_alg Gamma (PAnn CT t1 A) Inf A E
+  | ATyAnn : forall Gamma t1 A E m, has_type_source_alg Gamma t1 Chk A E ->
+                           has_type_source_alg Gamma (PAnn m t1 A) Inf A E
   (* Checking rules *)
   | ATyLam : forall L Gamma t A B E, (forall x, not (In x L) -> 
                                  has_type_source_alg (extend x A Gamma) (open_source t (PFVar x)) Chk B (open E (STFVar _ x))) -> WFTyp A ->
@@ -1978,8 +1978,7 @@ induction H; intros.
   apply IHhas_type_source_alg2 in H9.
   rewrite H8. rewrite H9. auto.
 (* Case Ann *)
-- inversion H0.
-  apply IHhas_type_source_alg in H3. auto.
+- inversion H0; subst; now apply IHhas_type_source_alg in H7.
 (* Case Lam *)
 - inversion H2; subst.
   apply f_equal.

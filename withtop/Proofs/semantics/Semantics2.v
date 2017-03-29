@@ -5,6 +5,7 @@ Require Import Coq.MSets.MSetInterface.
 Require Import Arith.
 Require Import Setoid.
 Require Import Coq.Program.Equality.
+Require Import Coq.Program.Tactics.
 
 Module Semantics
        (Import VarTyp : BooleanDecidableType')
@@ -162,13 +163,74 @@ Inductive red : PExp -> PExp -> Prop :=
 
 Hint Constructors typing bidityping AExp Value In WFTyp red.
 
-Theorem sub_trans : forall A B, Sub A B -> forall C, Sub B C -> Sub A C. Admitted.
-Theorem bityping_ok : forall Gamma t A m, bidityping Gamma t m A -> ST.ok Gamma. Admitted.
-Theorem bityping_wf : forall Gamma t A m, bidityping Gamma t m A -> WFTyp A. Admitted.
+(** Soundness and Completeness wrt to the elaborating biditypecheker **)
 
-Hint Resolve bityping_ok bityping_wf reflex sub_trans.
+Theorem has_type_source_alg_rename :
+  forall L Gamma A B t1 c m y,
+    has_type_source_alg (ST.extend y A Gamma) (open_source t1 (PFVar y)) B m 
+                        (ST.open c (ST.STFVar _ y)) ->
+    (forall x, ~ ST.M.In x L ->
+          has_type_source_alg (ST.extend x A Gamma) (open_source t1 (PFVar x)) B m
+                              (ST.open c (ST.STFVar _ x))).
+Proof.
+  intros.
+  (* subst_typ_source_intro *)
+Admitted.
+  
+Theorem soundness : forall Gamma e A m, bidityping Gamma e A m -> has_ty Gamma e A m.
+Proof.
+  intros Gamma e A m H; unfold has_ty.
+  induction H; destruct_conjs; eauto.
+  - ST.pick_fresh x.
+    destruct (H0 _ Fr) as [c H2].
+    exists (ST.STLam' _ c).
+    apply_fresh ATyLam as z; auto.
+    apply has_type_source_alg_rename with (L := L) (y := x).
+    admit. (* missing the good old renaming lemma... *)
+    ST.not_in_L z.
+Admitted.
+    
+Theorem completeness :
+  forall Gamma A m d e, has_type_source_alg Gamma e A m d -> bidityping Gamma e A m.
+Proof. intros Gamma A m d e H; induction H; eauto; destruct m; auto. Qed.
+
+Hint Resolve soundness completeness.
+
+(** Some necessary properties about bidityping, which are lifted from 
+    the elaborated version **)
+
+Theorem bityping_ok : forall Gamma t A m, bidityping Gamma t m A -> ST.ok Gamma.
+Proof.
+  intros; apply soundness in H as [c H]; eapply typing_alg_ok_env; eauto.
+Qed.
+  
+Theorem bityping_wf : forall Gamma t A m, bidityping Gamma t m A -> WFTyp A.
+Proof.
+  intros; apply soundness in H as [c H]; eapply typing_wf_source_alg; eauto.
+Qed.
+
+Theorem bityping_term : forall Gamma e A m, bidityping Gamma e m A -> PTerm e.
+Proof.
+  intros; apply soundness in H as [c H]; eapply type_correct_alg_terms; eauto.
+Qed.
+
+Theorem bityping_weaken:
+  forall G E F t T dir, bidityping (E ++ G) t dir T ->
+                   ST.ok (E ++ F ++ G) ->
+                   bidityping (E ++ F ++ G) t dir T.
+Proof.
+  intros; apply soundness in H as [c H].
+  assert (Ha := typing_weaken_alg _ _ _ _ _ _ _ H H0); eauto.
+Qed.
+
+(* We didn't prove this before?! *)
+Theorem sub_trans : forall A B, Sub A B -> forall C, Sub B C -> Sub A C. Admitted.
+
+Hint Resolve bityping_ok bityping_wf bityping_term bityping_weaken
+     reflex sub_trans.
 Hint Unfold Sub.
 
+(*
 Theorem bityping_ann_sub :
   forall Gamma t A B m1 m2, bidityping Gamma (PAnn m1 t A) m2 B -> Sub A B.
 Proof. intros Gamma t A B m1 m2 Htyping; dependent induction Htyping; eauto. Qed.
@@ -176,30 +238,14 @@ Proof. intros Gamma t A B m1 m2 Htyping; dependent induction Htyping; eauto. Qed
 Theorem bityping_ann :
   forall Gamma t A B m1 m2, bidityping Gamma (PAnn m1 t A) B m2 -> bidityping Gamma t Chk A.
 Proof. intros Gamma t A B m1 m2 Htyping; dependent induction Htyping; eauto. Qed.
+*)
 
-Theorem typeable_terms_reduce :
-  forall e1 A m, bidityping nil e1 m A -> exists e2, red e1 e2.
-Proof.
-  intros e1 A m H.
-  dependent induction H; eauto.
-  - inversion H0.
-  - assert (Ha1 : exists e2 : PExp, red t1 e2) by eauto.
-    destruct Ha1; eauto.
-  - assert (Ha1 : exists e2 : PExp, red t1 e2) by eauto.
-    assert (Ha2 : exists e2 : PExp, red t2 e2) by eauto. 
-    destruct Ha1, Ha2; eauto.
-  - assert (Ha1 : exists e2  : PExp, red t1 e2) by eauto.
-    destruct Ha1; eauto.
-  - assert (Ha1 : exists e2  : PExp, red t1 e2) by eauto.
-    destruct Ha1.
-    admit. (* missing assumption that terms do not contain RT anns? *)
-  - admit. (* abs case *)
-Admitted.
+(** Properties mixing "Sub", "In" and the type-system. **)
 
 Theorem In_Ann_inv : forall a A B, AExp a -> In (PAnn RT a A) B -> A = B.
 Proof. intros v A B H1 H2; dependent induction H2; auto. Qed.
 
-Hint Resolve bityping_ann_sub bityping_ann.
+(*Hint Resolve bityping_ann_sub bityping_ann.*)
 Hint Resolve In_Ann_inv.
 Hint Unfold erase.
 
@@ -208,8 +254,9 @@ Theorem In_bityping_sub :
 Proof.
   intros A v HIn.
   induction HIn; eauto 3.
-  - intros.
-    dependent induction H0.
+  - intros; inversion H; subst; eauto.
+  - intros; inversion H; subst; eauto.
+  - intros; dependent induction H0.
     clear IHbidityping1 IHbidityping2.
     apply IHHIn1 in H0_.
     apply IHHIn2 in H0_0.
@@ -264,6 +311,31 @@ Qed.
 
 Hint Resolve bityping_inf_chk.
 
+(** Defining body. (getting ready for subject reduction) **)
+
+Definition body_bityping Gamma t A B :=
+  exists L, forall x, not (ST.M.In x L) ->
+            bidityping (ST.extend x A Gamma) (open_source t (PFVar x)) Chk B.
+
+Hint Unfold body_bityping.
+
+Lemma abs_to_body_bityping : forall A B e Gamma, 
+  bidityping Gamma (PLam e) Chk (Fun A B) -> body_bityping Gamma e A B.
+Proof. intros; inversion H; subst; eauto; inversion H0. Qed.
+
+Lemma open_body_bityping :
+  forall e A B u Gamma, body_bityping Gamma e A B -> WFTyp A ->
+               bidityping Gamma (open_source e u) Chk B.
+Proof.
+  intros e A B u Gamma H1 H2; destruct H1. pick_fresh y.
+  assert (Ha : not (ST.M.In y x)) by ST.not_in_L y; apply H in Ha.
+  admit. (* needs subst, weakening, etc... *)
+Admitted.
+
+Hint Resolve open_body_bityping.
+
+(** Theorem 1. Subject reduction **)
+
 Theorem subject_reduction :
   forall Gamma e1 A m, bidityping Gamma e1 m A ->
               forall e2, red e1 e2 ->
@@ -294,7 +366,9 @@ Proof.
     clear IHHtyping1 IHHtyping2.
     inversion Htyping1; subst.
     apply ATyAnnCT'; clear Htyping1.
-    admit. (* some property about the body *)
+    apply open_body_bityping with (A := A0); eauto.
+    inversion H5; subst; eauto.
+    inversion H1.
   - (* A_Abs *)
     dependent induction Htyping; subst; eauto; clear IHHtyping.
     inversion Htyping; subst.
@@ -312,10 +386,13 @@ Proof.
     eapply ATySub' with (A := B); eauto 2.
     eapply ATyApp' with (A := A).
     + apply ATyAnnRT'.
-      apply_fresh ATyLam' as x; auto.
-      (* looks like we should ensure the variable introduced is never bound
-         in the body of the abstraction *)
-      admit.
+      change (PLam (open_rec_source 1 (PFVar x) e)) with
+             ((open_rec_source 0 (PFVar x) (PLam e))).
+      rewrite <- open_rec_source_term; eauto 3.
+      rewrite <- app_nil_l with (l := (ST.extend x C Gamma)).
+      apply bityping_weaken; simpl; auto.
+      apply ST.Ok_push; eauto.
+      ST.not_in_L x.
     + assert (Ha1 : Sub A A) by apply reflex; destruct Ha1.
       eapply ATySub' with (A := A); eauto 2.
       apply ATyAnnCT'.
@@ -331,20 +408,44 @@ Proof.
     apply ATyAnnCT'.
     assert (Ha : bidityping Gamma v1 Inf A) by eauto.
     destruct H; eauto.
-  - dependent induction Htyping; subst; eauto; clear IHHtyping.
+  - (* A_Merge2 *)
+    dependent induction Htyping; subst; eauto; clear IHHtyping.
     inversion Htyping; subst.
     inversion H4; subst.
     apply ATyAnnCT'.
     assert (Ha : bidityping Gamma v2 Inf B0) by eauto.
     destruct H; eauto.
-  - dependent induction Htyping; subst; eauto; clear IHHtyping.
+  - (* A_Merge3 *)
+    dependent induction Htyping; subst; eauto; clear IHHtyping.
     inversion Htyping; subst.
     inversion H2; subst.
     assert (HSub : Sub A0 (And A B)) by eauto.
     apply invAndS1 in HSub; destruct HSub; destruct H3; destruct H4.
     apply ATyMerge'; eauto.
+Qed.
+
+(** Theorem 2. All typeable terms can reduce **)
+
+Theorem typeable_terms_reduce :
+  forall e1 A, bidityping nil e1 Inf A -> exists e2, red e1 e2.
+Proof.  
+  intros e1 A m H.
+  dependent induction H; eauto.
+  - inversion H0.
+  - assert (Ha1 : exists e2 : PExp, red t1 e2) by eauto.
+    destruct Ha1; eauto.
+  - assert (Ha1 : exists e2 : PExp, red t1 e2) by eauto.
+    assert (Ha2 : exists e2 : PExp, red t2 e2) by eauto. 
+    destruct Ha1, Ha2; eauto.
+  - assert (Ha1 : exists e2  : PExp, red t1 e2) by eauto.
+    destruct Ha1; eauto.
+  - assert (Ha1 : exists e2  : PExp, red t1 e2) by eauto.
+    destruct Ha1.
+    admit. (* missing assumption that terms do not contain RT anns? *)
+  - admit. (* abs case *)
 Admitted.
 
+End Semantics.
 
 
 
