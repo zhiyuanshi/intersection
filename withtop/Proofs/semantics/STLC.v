@@ -10,7 +10,7 @@ Require Import MSetProperties.
 Require Import Coq.Init.Specif.
 
 Module TLC
-       (Import VarTyp : BooleanDecidableType')
+       (Import VarTyp : UsualDecidableTypeFull)
        (Import set : MSetInterface.S).
 
 Module EqFacts := BoolEqualityFacts(VarTyp).
@@ -159,8 +159,8 @@ Ltac not_in_L x :=
     | H:_ |- context [M.In x (dom ((?v, ?t) :: ?l))] => simpl; rewrite MSetProperties.Dec.F.add_iff
     | H: _ |- context [M.In ?v (dom ((x, ?t) :: ?l))] => simpl; rewrite MSetProperties.Dec.F.add_iff
     | H1: ~ ?l, H2: ?l |- _ => contradiction
-    | H: ~ M.In ?y (M.singleton x) |- not (VarTyp.eq x ?y) => rewrite MSetProperties.Dec.F.singleton_iff in H; assumption 
-    | H: ~ M.In x (M.singleton ?y) |- not (VarTyp.eq x ?y) => rewrite MSetProperties.Dec.F.singleton_iff in H; unfold not; intros; apply H; symmetry; assumption
+    | H: ~ M.In ?y (M.singleton x) |- not (x = ?y) => rewrite MSetProperties.Dec.F.singleton_iff in H; assumption 
+    | H: ~ M.In x (M.singleton ?y) |- not (x = ?y) => rewrite MSetProperties.Dec.F.singleton_iff in H; unfold not; intros; apply H; symmetry; assumption
     | H: ~ M.In x (M.add ?v M.empty) |- _ => rewrite <- MSetProperties.singleton_equal_add in H 
     | H: not (M.In x (dom ?l)) |- _ => rewrite dom_union in H; simpl in H
     | H: not (M.In x (M.union ?l1 ?l2)) |- _ =>
@@ -174,10 +174,10 @@ Ltac not_in_L x :=
       let r := fresh in
       apply not_or_and in H; destruct H as [l r]
     | H: not (M.In x ?l1) |- not (M.In x ?l1) => assumption
-    | H:_ |- ~ (x == ?v \/ M.In ?v ?l) => unfold not; intro HInv; inversion HInv as [HH | HH]
+    | H:_ |- ~ (x ?= ?v \/ M.In ?v ?l) => unfold not; intro HInv; inversion HInv as [HH | HH]
     | H:_ |- not (?A \/ ?B) => apply and_not_or; split
-    | H1: ~ M.In x (M.singleton ?v), H2: ?v == x |- _ => exfalso; apply H1; apply MSetProperties.Dec.F.singleton_2; assumption
-    | H1: ~ M.In x (M.singleton ?v), H2: x == ?v |- _ => exfalso; apply H1; apply MSetProperties.Dec.F.singleton_2; symmetry; assumption
+    | H1: ~ M.In x (M.singleton ?v), H2: ?v ?= x |- _ => exfalso; apply H1; apply MSetProperties.Dec.F.singleton_2; assumption
+    | H1: ~ M.In x (M.singleton ?v), H2: x ?= ?v |- _ => exfalso; apply H1; apply MSetProperties.Dec.F.singleton_2; symmetry; assumption
     | H: not (M.In x ?l1) |- not (M.In x ?l2) =>
       unfold not; intros; apply H; repeat rewrite M.union_spec; auto 10 
   end.
@@ -294,8 +294,7 @@ Proof.
   inversion HOk; subst.
   simpl in *.
   apply H6.
-  apply MSetProperties.Dec.F.add_1.
-  assumption.
+  now apply MSetProperties.Dec.F.add_1.
   inversion HOk; subst.
   rewrite dom_union in H6; rewrite union_spec in H6.
   apply not_or_and in H6.

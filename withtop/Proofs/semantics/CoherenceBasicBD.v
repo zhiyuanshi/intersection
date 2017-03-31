@@ -6,7 +6,7 @@ Require Import Arith.
 Require Import Setoid.
 
 Module CoherenceBasicBiDi
-       (Import VarTyp : BooleanDecidableType')
+       (Import VarTyp : UsualDecidableTypeFull)
        (Import set : MSetInterface.S).
 
   
@@ -690,7 +690,7 @@ Proof.
   induction t; intros; auto.
   (* Case PFVar *)
   simpl.
-  remember (v =? x) as H1.
+  remember (eqb v x) as H1.
   destruct H1.
   exfalso.
   apply H.
@@ -739,7 +739,7 @@ Defined.
 
 (** Substitution and open_var for distinct names commute. *)
 
-Lemma subst_source_open_var : forall (x y : var) u t, not (x == y) -> PTerm u ->
+Lemma subst_source_open_var : forall (x y : var) u t, not (x = y) -> PTerm u ->
   open_source (subst_source x u t) (PFVar y) = subst_source x u (open_source t (PFVar y)).
 Proof.
   intros. rewrite subst_source_open. simpl.
@@ -776,7 +776,7 @@ Proof.
   intros x z t H1.
   rewrite subst_source_open.
   simpl.
-  case_eq (x =? x); intros HEq.
+  case_eq (eqb x x); intros HEq.
   rewrite subst_source_fresh.
   reflexivity.
   auto.
@@ -1041,7 +1041,7 @@ Proof.
   generalize dependent E.
   generalize dependent F.
   induction H0; intros; simpl in *; subst; eauto.
-  - case_eq (x0 =? x); intro HEq.
+  - case_eq (eqb x0 x); intro HEq.
     apply TyVar.
     rewrite <- app_nil_l; apply ok_middle_comm; rewrite app_nil_l.
     apply Ok_push.
@@ -1056,12 +1056,12 @@ Proof.
     apply in_app_or in H0.
     inversion H0.
     exfalso; apply H7; rewrite dom_union; rewrite union_spec; left.
-    apply list_impl_m in H3; now rewrite HEq in H3.
+    now apply list_impl_m in H3.
     unfold extend in H3; apply in_app_or in H3. 
     inversion H3.
     inversion H4; now inversion H6.
     exfalso; apply H7; rewrite dom_union; rewrite union_spec; right.
-    apply list_impl_m in H4; now rewrite HEq in H4.
+    now apply list_impl_m in H4.
     rewrite Ha.
     apply in_or_app.
     right; apply in_or_app; left.
@@ -1103,20 +1103,11 @@ Proof.
     rewrite app_assoc.
     apply H0.
     not_in_L z.
-    unfold not; intros.
     simpl.
-    rewrite dom_union in H3; apply MSetProperties.Dec.F.union_1 in H3.
-    inversion H3.
-    rewrite dom_union in H4; apply MSetProperties.Dec.F.union_1 in H4.
-    inversion H4.
-    simpl in H5.
-    apply MSetProperties.Dec.F.add_iff in H5.
-    inversion H5.
-    apply Frz.
     not_in_L z.
-    inversion H6.
-    apply H2; not_in_L y.
-    apply H2; not_in_L y.
+    unfold not; intros HH; apply MSetProperties.Dec.F.add_iff in HH.
+    destruct HH; subst; auto.
+    rewrite MSetProperties.Dec.F.singleton_iff in H11; exfalso; now apply H11.
     rewrite app_assoc; reflexivity.
     not_in_L z.
     not_in_L x.
@@ -1164,11 +1155,11 @@ Proof.
     apply H1 in Ha.
     apply MSetProperties.Dec.F.add_iff in Ha.
     inversion Ha.
-    assert (HNot : not (VarTyp.eq z x)) by not_in_L z.
+    assert (HNot : not (z = x)) by not_in_L z.
     contradiction.
     assumption.
     apply fv_source_in_open.
-    assert (HNot : not (VarTyp.eq z x)) by not_in_L z.
+    assert (HNot : not (z = x)) by not_in_L z.
     unfold not; intros; apply HNot; now symmetry.
     assumption.
   - simpl in H0; rewrite union_spec in H0.
@@ -1202,7 +1193,7 @@ Proof.
   - simpl in *.
     pick_fresh z.
     assert (not (In z L)) by not_in_L z.
-    assert (not (VarTyp.eq z x)) by not_in_L z.
+    assert (not (z = x)) by not_in_L z.
     apply H in H2.
     assert (not (In z L)) by not_in_L z.
     apply H0 in H4.
@@ -1248,7 +1239,7 @@ Proof.
   - simpl in *.
     pick_fresh z.
     assert (not (In z L)) by not_in_L z.
-    assert (not (VarTyp.eq z x)) by not_in_L z.
+    assert (not (z = x)) by not_in_L z.
     apply H in H2.
     assert (not (In z L)) by not_in_L z.
     apply H0 in H4.

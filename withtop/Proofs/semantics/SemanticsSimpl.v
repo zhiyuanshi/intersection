@@ -8,7 +8,7 @@ Require Import Coq.Program.Equality.
 Require Import Coq.Program.Tactics.
 
 Module Semantics
-       (Import VarTyp : BooleanDecidableType')
+       (Import VarTyp : UsualDecidableTypeFull)
        (Import set : MSetInterface.S).
 
 Module CBD := CoherenceBasicBiDi(VarTyp)(set).
@@ -222,7 +222,17 @@ Proof.
   assert (Ha := typing_weaken_alg _ _ _ _ _ _ _ H H0); eauto.
 Qed.
 
-(* We didn't prove this before?! *)
+Theorem bityping_strengthen:
+  forall z U E F e dir A,
+    not (ST.M.In z (fv_source e)) ->
+    bidityping (E ++ ((z,U) :: nil) ++ F) e dir A ->
+    bidityping (E ++ F) e dir A.
+Proof.
+  intros z U E F e dir A H1 H2; apply soundness in H2 as [c H2].
+  assert (Ha := typing_strengthen_alg _ _ _ _ _ _ _ _ H1 H2); eauto.
+Qed.
+
+(* We didn't prove this before?! See: Pfenning *)
 Theorem sub_trans : forall A B, Sub A B -> forall C, Sub B C -> Sub A C. Admitted.
 
 Hint Resolve bityping_ok bityping_wf bityping_term bityping_weaken
@@ -301,26 +311,61 @@ Hint Resolve bityping_inf_chk.
 
 (** Defining body. (getting ready for subject reduction) **)
 
-Definition body_bityping Gamma t A B :=
+Definition body_bityping Gamma t A B m :=
   exists L, forall x, not (ST.M.In x L) ->
-            bidityping (ST.extend x A Gamma) (open_source t (PFVar x)) Chk B.
+            bidityping (ST.extend x A Gamma) (open_source t (PFVar x)) m B.
 
 Hint Unfold body_bityping.
 
-Lemma abs_to_body_bityping : forall A B e Gamma, 
-  bidityping Gamma (PLam e) Chk (Fun A B) -> body_bityping Gamma e A B.
+Lemma abs_to_body_bityping : forall A B e Gamma m, 
+  bidityping Gamma (PLam e) m (Fun A B) -> body_bityping Gamma e A B m.
 Proof. intros; inversion H; subst; eauto; inversion H0. Qed.
 
-Lemma open_body_bityping :
-  forall e A B u Gamma, body_bityping Gamma e A B -> WFTyp A ->
-               bidityping Gamma (open_source e u) Chk B.
+Lemma bityping_subst : forall Gamma A B e u m x,
+                         List.In (x,B) Gamma ->
+                         bidityping Gamma e m A ->
+                         bidityping Gamma u Inf B ->
+                         bidityping Gamma (subst_source x u e) m A.
 Proof.
-  intros e A B u Gamma H1 H2; destruct H1. pick_fresh y.
-  assert (Ha : not (ST.M.In y x)) by ST.not_in_L y; apply H in Ha.
-  admit. (* needs subst, weakening, etc... *)
-Admitted.
+  intros Gamma A B e u m x HIn H1 H2.
+  induction H1; simpl; eauto.
+  - remember (eqb x0 x) as Heq; destruct Heq; auto.
+    symmetry in HeqHeq; apply eqb_eq in HeqHeq; subst.
+    assert (Ha : B = ty) by (eapply ok_unique_type; eauto); now subst.
+  - apply_fresh ATyLam' as x; auto.
+    rewrite subst_source_open_var; eauto.
+    apply H0.
+    ST.not_in_L y.
+    right; simpl; assumption.
+    rewrite <- app_nil_l with (l := (ST.extend y A Gamma)).
+    apply bityping_weaken; simpl; auto.
+    apply ST.Ok_push; eauto.
+    ST.not_in_L y.
+    ST.not_in_L y.
+    ST.not_in_L x.
+Qed.
 
-Hint Resolve open_body_bityping.
+Lemma open_body_bityping :
+  forall e A B u Gamma m, body_bityping Gamma e A B m -> bidityping Gamma u Inf A ->
+                 bidityping Gamma (open_source e u) m B.
+Proof.
+  intros e A B u Gamma m H1 H2; destruct H1. pick_fresh y.
+  assert (Ha : not (ST.M.In y x)) by ST.not_in_L y; apply H in Ha.
+  rewrite <- app_nil_l with (l := Gamma).
+  eapply bityping_strengthen with (z := y) (U := A).
+  ST.not_in_L y; apply fv_source_distr in H3; apply MSetProperties.Dec.F.union_1 in H3.
+  inversion H3; contradiction.
+  rewrite subst_source_intro with (x := y).
+  apply bityping_subst with (B := A).
+  simpl; left; auto.
+  rewrite app_nil_l; auto.
+  apply bityping_weaken; simpl; auto.
+  apply ST.Ok_push; eauto.
+  ST.not_in_L y.
+  ST.not_in_L y.
+  eauto.
+Qed.
+
 
 (** Theorem 1. Subject reduction **)
 
@@ -344,6 +389,8 @@ Proof.
     apply open_body_bityping with (A := A0); eauto.
     inversion H5; subst; eauto.
     inversion H1.
+    dependent induction Htyping2; subst; eauto.
+    inversion H2.
   - (* R_Ann2 *)
     dependent induction Htyping; eauto; subst; clear IHHtyping.
     inversion Htyping; subst.
