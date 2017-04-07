@@ -89,8 +89,11 @@ Inductive red : PExp -> PExp -> Prop :=
                  In v1 (Fun A B) ->
                  In v2 C ->
                  A <> C ->
-                 red (PApp v1 v2) (PApp v1 (PAnn v2 C))
-  | Red_App4 : forall A B e v,
+                 red (PApp v1 v2) (PApp v1 (PAnn v2 A))
+  | Red_App4 : forall A B v e,
+                 In v (Fun A B) ->
+                 red (PApp v (PLam e)) (PApp v (PAnn (PLam e) A))
+  | Red_App5 : forall A B e v,
                  In v A -> 
                  red (PApp (PAnn (PLam e) (Fun A B)) v)
                      (PAnn (open_source e v) B)
@@ -126,8 +129,8 @@ Inductive red : PExp -> PExp -> Prop :=
                  In (PMerge v1 v2) (And B C) ->
                  red (PAnn (PMerge v1 v2) A)
                      (PAnn v2 A)
-  | Red_Ann6 : forall v A B C D,
-                 In v (And C D) ->
+  | Red_Ann6 : forall v A B C,
+                 In v C ->
                  red (PAnn v (And A B))
                      (PMerge (PAnn v A) (PAnn v B)).
 
@@ -347,11 +350,10 @@ Proof.
     dependent induction Htyping; subst; eauto; clear IHHtyping1 IHHtyping2.
     inversion H; subst; inversion Htyping1; subst.
     apply ATyApp' with (A := A0); auto.
-    inversion Htyping2; subst.
-    inversion H0.
-    assert (Ha : C = A) by eauto; subst.
-    eapply ATySub' with (A := A); eauto.
   - (* R_App4 *)
+    dependent induction Htyping; eauto; clear IHHtyping1 IHHtyping2.
+    inverts* H; inverts* Htyping1.
+  - (* R_App5 *)
     dependent induction Htyping; subst; eauto.
     clear IHHtyping1 IHHtyping2.
     inversion Htyping1; subst.
@@ -479,12 +481,17 @@ Proof.
       eapply IHHred in H6; subst; eauto.
     + dependent induction H1; eauto.
     + dependent induction H1; eauto.
-  - inversion H2; subst; auto.
-    + assert (Ha : C = C0) by (eapply In_unique; eauto); subst; auto.
+    + dependent induction H1; eauto.
+  - inverts* H2.
+    + assert (Ha : Fun A B = Fun A1 B0) by (eapply In_unique; eauto); subst; auto.
+      inverts* Ha.
     + assert (Ha : Fun A1 B0 = Fun A B) by (eapply In_unique; eauto).
       inversion Ha; subst.
       assert (Ha1 : A = C) by (eapply In_unique; eauto); subst.
       exfalso; apply H1; auto.
+  - dependent induction H0; eauto.
+    assert (Ha : Fun A B = Fun A0 B0) by (eapply In_unique; eauto).
+    inverts* Ha.
   - inversion H0; subst; auto.
     + inversion H5; subst; auto. 
     + inversion H4; subst.
@@ -527,11 +534,7 @@ Proof.
     assert (Ha1 : ~ (Sub C0 A /\ Sub B0 A)) by eauto.
     exfalso; apply Ha1; split; assumption.
     inversion H0.
-  - inversion H0; subst.
-    inversion H0; subst; auto.
-    inversion H5.
-    inversion H5.
-    reflexivity.
+  - inverts* H0; inverts* H5.
 Qed.
 
 (** Call-by-value lambda calculus **)
@@ -684,38 +687,79 @@ Qed.
 
 (** Theorem 3. Progress: all typeable terms can reduce. **)
 
-Theorem typeable_terms_reduce_chk :
-  forall t A, bidityping empty t Chk A ->
-         (exists B, In (PAnn t B) B) \/ (exists t', red (PAnn t A) t').
+Lemma In_dec : forall t, (exists B, In t B) \/ (~ exists B, In t B).
+Proof.
+  intro t; induction t;
+  try now (right; unfold not; intros [H1 H2]; inversion H2).
+  - destruct IHt1 as [[B H1] | H1]; destruct IHt2 as [[C H2] | H2]; autos*;
+    right; unfold not; intros [H3 H4]; inverts* H4.
+  - destruct IHt as [[B H] | H].
+    right; unfold not; intros [H3 H4]; inverts* H4.
+    inverts H.
+    destruct t; try (now right; unfold not; intros [H3 H4]; inverts* H4).
+    destruct (decidability_types p PInt); subst*.
+    right; unfold not; intros [H3 H4]; inverts* H4.
+    destruct p; autos*.
+    right*; unfold not; intros [H3 H4]; inverts* H4.
+    right*; unfold not; intros [H3 H4]; inverts* H4.
+Qed.    
+
+Lemma value_ann_red : forall A B t, Sub A B ->
+                     In t A ->
+                     exists t', red (PAnn t B) t'.
+Proof.
+  introv HSub HIn.
+  gen B.
+  induction HIn; intros.
+  - destruct HSub; inverts* H.
+  - destruct HSub; inverts* H.
+  - destruct HSub; inverts H.
+    autos*.
+    eexists; eapply Red_Ann4 with (B := A); eauto.
+    eexists; eapply Red_Ann5 with (C := B); eauto.
+Qed.
+
+Hint Resolve value_ann_red.
+
+Theorem typeable_terms_reduce :
+  forall t A m, bidityping empty t m A ->
+           ((m = Inf -> In t A \/ (exists t', red t t')) /\
+            (m = Chk -> In (PAnn t A) A \/ (exists t', red (PAnn t A) t'))).
 Proof.
   introv Typ.
-  dependent induction Typ.
-  - left*.
-  - destruct (decidability_types A B).
-    subst.
-    admit.
-    admit.
-Admitted.
-
-Theorem typeable_terms_reduce_inf :
-  forall t A m, bidityping empty t m A -> (exists B, In t B) \/ (exists t', red t t').
-Proof.  
-  introv Typ. gen_eq E: (empty:env PTyp). lets Typ': Typ.
-  induction Typ; intros; substs*.
+  gen_eq E: (empty:env PTyp). lets Typ': Typ.
+  induction Typ; intros; substs; split; introv HH; try now inversion HH.
   - false* binds_empty_inv.
-  - right. destruct~ IHTyp1 as [[C v1] | [t1' Red1]];
-    destruct~ IHTyp2 as [[D v2] | [t2' Red2]]; autos*.
-    admit.
-    admit.
-  - destruct~ IHTyp1 as [[C v1] | [t1' Red1]];
-    destruct~ IHTyp2 as [[D v2] | [t2' Red2]]; autos*.
-  - destruct~ IHTyp as [[C v] | [t' Red]].
-    assert (Ha : Sub C A) by eauto.
-    admit. (* maybe a separate lemma for this? *)
-    admit. (* split proof whether (PAnn t1 A) is a value or not? *)
-  - admit. (* stuck... *)
-Admitted.
-
+  - autos*.
+  - right.
+    forwards* [H1 _] : IHTyp1 Typ1.
+    forwards* [_ H2] : IHTyp2 Typ2.
+    assert (Ha : Chk = Chk) by auto.
+    destruct (H1 HH) as [ HIn1 | [t1' Hred1]];
+      destruct (H2 Ha) as [ HIn2 | [t2' Hred2]]; autos*.
+    inverts* HIn1.
+    inverts* HIn2.
+    inverts* HIn1.
+    destruct (In_dec t2).
+    destruct H as [C H]; destruct (decidability_types C A); substs*.
+    clear IHTyp1 IHTyp2.
+    inverts* Hred2; tryfalse*.
+  - forwards* [H1 _] : IHTyp1 Typ1.
+    forwards* [H2 _] : IHTyp2 Typ2.
+    destruct (H1 HH) as [ HIn1 | [t1' Hred1]];
+    destruct (H2 HH) as [ HIn2 | [t2' Hred2]]; autos*.
+  - forwards* [_ H1] : IHTyp Typ.
+  - inverts* Typ'.
+  - forwards* [H1 _] : IHTyp Typ.
+    assert (Ha : Inf = Inf) by auto.
+    destruct (H1 Ha) as [ HIn | [t' Hred] ].
+    right; clear IHTyp Ha HH H1.
+    autos*.
+    destruct (In_dec (PAnn t B)).    
+    destruct H2; inverts* H2.
+    right; eexists; eauto.
+Qed.
+    
 (** Theorem 4. Direct semantics are equivalent to elaboration semantics. **)
 
 Definition relation := SExp -> SExp -> Prop.

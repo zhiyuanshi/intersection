@@ -102,8 +102,39 @@
 %\end{small}
 %\end{spacing}
 
-%\section{Metatheory}
-%
+\newpage
+\section{Metatheory}
+
+\begin{lemma}[Subject reduction (inf)]\verb|[safety_inf]|
+  If $[[G |- e1 => A]]$ 
+  and $[[e1 ~> e2]]$, then 
+  $[[G |- e2 => A]]$.
+\end{lemma}
+
+\begin{lemma}[Subject reduction (chk)]\verb|[safety_chk]|
+  If $[[G |- e1 <= A]]$ 
+  and $[[e1 ~> e2]]$, then 
+  $[[G |- e2 <= A]]$.
+\end{lemma}
+
+\begin{lemma}[Progress (inf)]\verb|[progress_inf]|
+    If $[[nil |- e => A]]$, then 
+  $e=v \, \wedge \, [[v \in A]]$ or $\exists \, e_1 . \, [[e ~> e1]]$ .
+\end{lemma}
+
+\begin{lemma}[Progress (chk)]\verb|[progress_chk]|
+  If $[[nil |- e <= A]]$, then 
+  $(e:A)=v \, \wedge \, [[v \in A]]$ or $\exists \, e_1 . \, [[(e : A) ~> e1]]$ .
+\end{lemma}
+
+\begin{lemma}[Reduction is determistic]\verb|[red_unique]|
+  If ($[[G |- e1 <= A]]$ or $[[G |- e1 => A]]$),
+  and $[[e1 ~> e2]]$,
+  and $[[e1 ~> e3]]$, then 
+  $e_2 = e_3$.
+\end{lemma}
+
+
 %\begin{lemma}[Reflexivity]\verb|[sub_refl]|
 %  If $[[G |- e1 <: e2 : A]]$, then $[[G |- e1 <: e1 : A]]$ and
 %  $[[G |- e2 <: e2 : A]]$.
