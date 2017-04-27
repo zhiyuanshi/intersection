@@ -1,5 +1,6 @@
 Set Implicit Arguments.
 Require Import LibLN STLCNew.
+Require Import Coq.Program.Tactics.
 
 
 (* Notes:
@@ -43,16 +44,16 @@ Inductive Atomic : PTyp -> Prop :=
   | AFun : forall t1 t2, Atomic (Fun t1 t2).
 
 Inductive sub : PTyp -> PTyp -> SExp -> Prop :=
-  | SInt : sub PInt PInt (STLam' (STBVar 0))
+  | SInt : sub PInt PInt (STLam (STBVar 0))
   | SFun : forall o1 o2 o3 o4 c1 c2, sub o3 o1 c1 -> sub o2 o4 c2 -> 
-     sub (Fun o1 o2) (Fun o3 o4) (STLam' (STLam' (STApp c2 (STApp (STBVar 1) (STApp c1 (STBVar 0))))))
+     sub (Fun o1 o2) (Fun o3 o4) (STLam (STLam (STApp c2 (STApp (STBVar 1) (STApp c1 (STBVar 0))))))
   | SAnd1 : forall t t1 t2 c1 c2, sub t t1 c1 -> sub t t2 c2 -> 
-     sub t (And  t1 t2) (STLam'
+     sub t (And  t1 t2) (STLam
        (STPair (STApp c1 (STBVar 0)) (STApp c2 (STBVar 0))))
   | SAnd2 : forall t t1 t2 c, sub t1 t c -> Atomic t ->
-     sub (And  t1 t2) t (STLam' ((STApp c (STProj1 (STBVar 0)))))
+     sub (And  t1 t2) t (STLam ((STApp c (STProj1 (STBVar 0)))))
   | SAnd3 : forall t t1 t2 c, sub t2 t c -> Atomic t ->
-     sub (And  t1 t2) t (STLam' ((STApp c (STProj2 (STBVar 0))))).
+     sub (And  t1 t2) t (STLam ((STApp c (STProj2 (STBVar 0))))).
 
 Hint Constructors sub Atomic.
 
@@ -702,20 +703,6 @@ intros.  unfold has_type. exists (PFVar x). auto. Defined.
 Definition tlit : forall Gamma x, ok Gamma -> has_type Gamma (PLit x) PInt.
 intros. unfold has_type. exists (PLit x); auto. Defined.
 
-Fixpoint subst (z : var) (u : SExp) (t : SExp) {struct t} : SExp :=
-  match t with
-    | STBVar i     => STBVar i
-    | STFVar x     => If x = z then u else (STFVar x)
-    | STLit i      => STLit i
-    | STLam A t1   => STLam A (subst z u t1)
-    | STLam' t1    => STLam' (subst z u t1)
-    | STApp t1 t2  => STApp (subst z u t1) (subst z u t2)
-    | STPair t1 t2 => STPair (subst z u t1) (subst z u t2)
-    | STProj1 t    => STProj1 (subst z u t)
-    | STProj2 t    => STProj2 (subst z u t)
-    | STUnit       => STUnit
-  end.
-
 
 Lemma fv_source_distr_open_l :
   forall t1 t2 x n, x \in (fv_source t1) ->
@@ -731,14 +718,6 @@ not (In y (dom Gamma)) =>
 (x,A)::Gamma :- t1 ^ x : B (-> t2 ^ x) => 
 (y,A)::Gamma :- [x -> y] (t1 ^ x) : B (-> [x -> y] (t2 ^ x))
  *)
-
-Lemma ok_middle_rename : forall (a : Type) (E : env a) x y A F,
-                           y \notin (dom E \u dom F) ->
-                           ok (E & x ~ A & F) -> ok (E & y ~ A & F).
-Proof.
-  introv H1 H2.
-  apply ok_remove in H2. SearchAbout ok.
-Admitted.
   
 Lemma tsubst :
   forall E F t1 t2 x y A B,
@@ -1046,7 +1025,7 @@ Inductive has_type_source_alg : env PTyp -> PExp -> Dir -> PTyp -> SExp -> Prop 
   (* Checking rules *)
   | ATyLam : forall L Gamma t A B E, (forall x, x \notin L -> 
                                  has_type_source_alg (Gamma & x ~ A) (open_source t (PFVar x)) Chk B (open E (STFVar x))) -> WFTyp A ->
-                           has_type_source_alg Gamma (PLam t) Chk (Fun A B) (STLam' E)
+                           has_type_source_alg Gamma (PLam t) Chk (Fun A B) (STLam E)
   | ATySub : forall Gamma t A B C E,
                has_type_source_alg Gamma t Inf A E ->
                sub A B C ->
@@ -1110,6 +1089,20 @@ Proof.
   apply* ATyVar. apply* binds_weaken.
   apply_fresh* ATyLam as y. apply_ih_bind* H0.
 Qed.  
+
+Lemma typing_strengthen_alg : forall z U E F t T d c,
+  z \notin (fv_source t) ->
+  has_type_source_alg (E & z ~ U & F) t T d c ->
+  has_type_source_alg (E & F) t T d c.
+Proof.
+  intros.
+  remember (E & z ~ U & F).
+  gen Heqe. gen F. 
+  induction H0; intros; substs*; simpls*.
+  - apply* ATyVar; simpls*; apply* binds_remove.
+  - apply_fresh* ATyLam as x.
+    apply_ih_bind* H1; apply* fv_source_distr2; simpls*.
+Qed.
 
 Lemma type_correct_alg_terms : forall Gamma E ty e dir, has_type_source_alg Gamma E dir ty e -> PTerm E.
 Proof.
@@ -1352,10 +1345,10 @@ Proof.
   intros.
   induction H; simpls*.
   (* Case SInt *)
-  - apply_fresh STTerm_Lam' as x. cbv. case_nat*. 
+  - apply_fresh STTerm_Lam as x. cbv. case_nat*. 
   (* Case SFun *)
-  - apply_fresh STTerm_Lam' as x; cbn.
-    apply_fresh STTerm_Lam' as y; cbn.
+  - apply_fresh STTerm_Lam as x; cbn.
+    apply_fresh STTerm_Lam as y; cbn.
     apply STTerm_App.
     repeat rewrite <- open_rec_term; assumption.
     apply STTerm_App.
@@ -1366,19 +1359,19 @@ Proof.
     cbv.
     case_nat*.
   (* Case SAnd1 *)
-  - apply_fresh STTerm_Lam' as x; cbn.
+  - apply_fresh STTerm_Lam as x; cbn.
     apply STTerm_Pair.
     apply STTerm_App; repeat rewrite <- open_rec_term; auto.
     case_nat*.
     case_nat*.
     rewrite <- open_rec_term; auto.
   (* Case SAnd2 *)
-  - apply_fresh STTerm_Lam' as x; cbn.
+  - apply_fresh STTerm_Lam as x; cbn.
     apply STTerm_App; auto.
     rewrite <- open_rec_term; auto.
     case_nat*.
   (* Case SAnd3 *)
-  - apply_fresh STTerm_Lam' as x; cbn.
+  - apply_fresh STTerm_Lam as x; cbn.
     apply STTerm_App; auto.
     rewrite <- open_rec_term; auto.
     case_nat*.
@@ -1395,10 +1388,10 @@ Proof.
   intros.
   induction H; substs*.
   (* Case SInt *)
-  - apply_fresh STTyLam' as x; cbn; case_nat*.
+  - apply_fresh STTyLam as x; cbn; case_nat*.
   (* Case SFun *)
-  - apply_fresh STTyLam' as x; cbn.
-    apply_fresh STTyLam' as y; cbn.
+  - apply_fresh STTyLam as x; cbn.
+    apply_fresh STTyLam as y; cbn.
     apply STTyApp with (A := (| o2 |)).
     rewrite <- open_rec_term.
     rewrite <- open_rec_term.
@@ -1414,7 +1407,7 @@ Proof.
     simpls*.
     case_nat*.
   (* Case SAnd1 *)
-  - apply_fresh STTyLam' as x; cbn.
+  - apply_fresh STTyLam as x; cbn.
     apply STTyPair.
     eapply STTyApp.
     rewrite <- open_rec_term.
@@ -1432,7 +1425,7 @@ Proof.
     autos*.
     autos*.
   (* Case SAnd2 *)
-  - apply_fresh STTyLam' as x; cbn.
+  - apply_fresh STTyLam as x; cbn.
     eapply STTyApp.
     rewrite <- open_rec_term.
     apply typing_weaken_extend.
@@ -1441,7 +1434,7 @@ Proof.
     autos*.
     case_nat*.
   (* SAnd3 *)
-  - apply_fresh STTyLam' as x; cbn.
+  - apply_fresh STTyLam as x; cbn.
     eapply STTyApp.
     rewrite <- open_rec_term.
     apply typing_weaken_extend.
@@ -1465,7 +1458,7 @@ Proof.
   (* TyLit *)
   - apply STTyLit; apply* ok_map.
   (* TyLam *)
-  - apply_fresh STTyLam' as x.
+  - apply_fresh STTyLam as x.
     unfold open; simpl.
     assert (Ha : x \notin L) by autos*.
     apply H0 in Ha. 
@@ -1579,3 +1572,162 @@ Proof.
   (* Sub *)
   - eapply tsub; eauto.
 Qed.
+
+(**** Bi-directional type-system (non-elaborating) ****)
+
+Inductive bidityping : env PTyp -> PExp -> Dir -> PTyp -> Prop :=
+  | ATyVar' : forall Gamma x ty,
+                ok Gamma ->
+                binds x ty Gamma ->
+                WFTyp ty ->
+                bidityping Gamma (PFVar x) Inf ty
+  | ATyLit' : forall Gamma (x : nat),
+                ok Gamma ->
+                bidityping Gamma (PLit x) Inf PInt
+  | ATyApp' : forall Gamma (A B : PTyp) (t1 t2 : PExp),
+                bidityping Gamma t1 Inf (Fun A B) ->
+                bidityping Gamma t2 Chk A ->
+                bidityping Gamma (PApp t1 t2) Inf B
+  | ATyMerge' : forall Gamma (A B : PTyp) (t1 t2 : PExp),
+                  bidityping Gamma t1 Inf A ->
+                  bidityping Gamma t2 Inf B ->
+                  OrthoS A B ->
+                  bidityping Gamma (PMerge t1 t2) Inf (And A B)
+  | ATyAnnCT' : forall Gamma (t1 : PExp) (A : PTyp),
+                  bidityping Gamma t1 Chk A ->
+                  bidityping Gamma (PAnn t1 A) Inf A
+  | ATyLam' : forall L Gamma 
+                (t : PExp) (A B : PTyp),
+                (forall x, x \notin L ->
+                      bidityping (Gamma & x ~ A) (open_source t (PFVar x)) Chk B) ->
+                WFTyp A ->
+                bidityping Gamma (PLam t) Chk (Fun A B)
+  | ATySub' : forall Gamma (t : PExp) 
+                (A B : PTyp) C,
+                bidityping Gamma t Inf A ->
+                sub A B C ->
+                WFTyp B ->
+                bidityping Gamma t Chk B.
+
+Hint Constructors bidityping.
+
+(** Soundness and Completeness wrt to the elaborating biditypecheker **)
+
+Theorem has_type_source_alg_rename :
+  forall L Gamma A B t1 c m y,
+    has_type_source_alg (Gamma & y ~ A) (open_source t1 (PFVar y)) B m 
+                        (open c (STFVar y)) ->
+    (forall x, x \notin L ->
+          has_type_source_alg (Gamma & x ~ A) (open_source t1 (PFVar x)) B m
+                              (open c (STFVar x))).
+Proof.
+  intros.
+  (* subst_typ_source_intro *)
+Admitted.
+
+Theorem soundness : forall Gamma e A m, bidityping Gamma e A m -> has_ty Gamma e A m.
+Proof.
+  intros Gamma e A m H; unfold has_ty.
+  induction H; destruct_conjs; eauto.
+  - pick_fresh x.
+    assert (Ha : x \notin L) by autos*.
+    destruct (H0 _ Ha) as [c H2].
+    exists (STLam c).
+    apply_fresh ATyLam as z; auto.
+    apply has_type_source_alg_rename with (L := L) (y := x).
+    admit. (* missing the good old renaming lemma... *)
+    autos*.
+Admitted.
+    
+Theorem completeness :
+  forall Gamma A m d e, has_type_source_alg Gamma e A m d -> bidityping Gamma e A m.
+Proof. intros Gamma A m d e H; induction H; eauto. Qed.
+
+Hint Resolve soundness completeness.
+
+(** Some necessary properties about bidityping, which are lifted from 
+    the elaborated version **)
+
+Theorem bityping_ok : forall Gamma t A m, bidityping Gamma t m A -> ok Gamma.
+Proof.
+  intros; apply soundness in H as [c H]; eapply typing_alg_ok_env; eauto.
+Qed.
+  
+Theorem bityping_wf : forall Gamma t A m, bidityping Gamma t m A -> WFTyp A.
+Proof.
+  intros; apply soundness in H as [c H]; eapply typing_wf_source_alg; eauto.
+Qed.
+
+Theorem bityping_term : forall Gamma e A m, bidityping Gamma e m A -> PTerm e.
+Proof.
+  intros; apply soundness in H as [c H]; eapply type_correct_alg_terms; eauto.
+Qed.
+
+Theorem bityping_weaken:
+  forall G E F t T dir, bidityping (E & G) t dir T ->
+                   ok (E & F & G) ->
+                   bidityping (E & F & G) t dir T.
+Proof.
+  intros; apply soundness in H as [c H].
+  lets* Ha : typing_weaken_alg H.
+Qed.
+
+Theorem bityping_strengthen:
+  forall z U E F e dir A,
+    z \notin (fv_source e) ->
+    bidityping (E & z ~ U & F) e dir A ->
+    bidityping (E & F) e dir A.
+Proof.
+  intros z U E F e dir A H1 H2; apply soundness in H2 as [c H2].
+  lets* Ha : typing_strengthen_alg H1 H2.
+Qed.
+
+Hint Resolve bityping_ok bityping_wf bityping_term bityping_weaken.
+
+(** defining body on bityping. (i.e. used for subject reduction) **)
+
+Definition body_bityping Gamma t A B m :=
+  exists L, forall x, x \notin L ->
+            bidityping (Gamma & x ~ A) (open_source t (PFVar x)) m B.
+
+Hint Unfold body_bityping.
+
+Lemma abs_to_body_bityping : forall A B e Gamma m, 
+  bidityping Gamma (PLam e) m (Fun A B) -> body_bityping Gamma e A B m.
+Proof. intros; inversion H; subst; eauto; inversion H0. Qed.
+
+Lemma bityping_subst : forall Gamma A B e u m x,
+                         binds x B Gamma ->
+                         bidityping Gamma e m A ->
+                         bidityping Gamma u Inf B ->
+                         bidityping Gamma (subst_source x u e) m A.
+Proof.
+  intros Gamma A B e u m x HIn H1 H2.
+  induction H1; simpl; eauto.
+  - case_var*.
+    assert (Ha : B = ty) by (eapply binds_func; eauto). now subst.
+  - apply_fresh ATyLam' as x; auto.
+    rewrite subst_source_open_var; eauto.
+    apply H0; autos*.
+    rewrite <- concat_empty_r with (E := (Gamma & y ~ A)).
+    apply bityping_weaken; rewrite concat_empty_r; autos*.
+Qed.
+
+Lemma open_body_bityping :
+  forall e A B u Gamma m, body_bityping Gamma e A B m -> bidityping Gamma u Inf A ->
+                 bidityping Gamma (open_source e u) m B.
+Proof.
+  intros e A B u Gamma m H1 H2; destruct H1. pick_fresh y.
+  assert (Ha : y \notin x) by autos*; apply H in Ha.
+  rewrite <- concat_empty_r with (E := Gamma).
+  eapply bityping_strengthen with (z := y) (U := A).
+  apply fv_source_distr2; autos*.
+  rewrite concat_empty_r.
+  rewrite subst_source_intro with (x := y); autos*.
+  apply bityping_subst with (B := A); autos*.
+  rewrite <- concat_empty_r with (E := (Gamma & y ~ A)).
+  apply bityping_weaken; rewrite concat_empty_r; autos*.
+Qed.
+
+
+

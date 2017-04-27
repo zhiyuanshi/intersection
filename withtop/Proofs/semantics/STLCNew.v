@@ -15,8 +15,7 @@ Inductive SExp :=
   | STBVar  : nat -> SExp
   | STUnit  : SExp
   | STLit   : nat -> SExp
-  | STLam   : STyp -> SExp -> SExp
-  | STLam'  : SExp -> SExp
+  | STLam  : SExp -> SExp
   | STApp   : SExp -> SExp -> SExp
   | STPair  : SExp -> SExp -> SExp
   | STProj1 : SExp -> SExp
@@ -29,8 +28,7 @@ Fixpoint fv (sExp : SExp) : vars :=
     | STBVar _ => \{}
     | STUnit => \{}
     | STLit _ => \{}
-    | STLam _ t => fv t
-    | STLam' t => fv t
+    | STLam t => fv t
     | STApp t1 t2 => (fv t1) \u (fv t2)
     | STPair t1 t2 => (fv t1) \u (fv t2)
     | STProj1 t => fv t
@@ -43,8 +41,7 @@ Fixpoint open_rec (k : nat) (u : SExp) (t : SExp) {struct t} : SExp :=
   | STFVar x => STFVar x
   | STUnit => STUnit
   | STLit x => STLit x
-  | STLam ty t1 => STLam ty (open_rec (S k) u t1)
-  | STLam' t1 => STLam' (open_rec (S k) u t1)    
+  | STLam t1 => STLam (open_rec (S k) u t1)    
   | STApp t1 t2 => STApp (open_rec k u t1) (open_rec k u t2)
   | STPair t1 t2 => STPair (open_rec k u t1) (open_rec k u t2)
   | STProj1 t => STProj1 (open_rec k u t)
@@ -80,12 +77,9 @@ Inductive STTerm : SExp -> Prop :=
   | STTerm_Unit : STTerm STUnit
   | STTerm_Lit : forall n,
       STTerm (STLit n)
-  | STTerm_Lam : forall L t1 ty,
+  | STTerm_Lam : forall L t1,
       (forall x, x \notin L -> STTerm (open t1 (STFVar x))) ->
-      STTerm (STLam ty t1)
-  | STTerm_Lam' : forall L t1,
-      (forall x, x \notin L -> STTerm (open t1 (STFVar x))) ->
-      STTerm (STLam' t1)
+      STTerm (STLam t1)
   | STTerm_App : forall t1 t2,
       STTerm t1 -> 
       STTerm t2 -> 
@@ -192,11 +186,7 @@ Inductive has_type_st : ctx -> SExp -> STyp -> Prop :=
   | STTyLam : forall L Gamma t A B,
                 (forall x, x \notin L -> 
                       has_type_st (Gamma & x ~ A) (open t (STFVar x)) B) ->
-                has_type_st Gamma (STLam A t) (STFun A B)
-  | STTyLam' : forall L Gamma t A B,
-                 (forall x, x \notin L -> 
-                       has_type_st (Gamma & x ~ A) (open t (STFVar x)) B) ->
-                 has_type_st Gamma (STLam' t) (STFun A B)
+                has_type_st Gamma (STLam t) (STFun A B)
   | STTyApp : forall Gamma A B t1 t2, has_type_st Gamma t1 (STFun A B) ->
                              has_type_st Gamma t2 A -> has_type_st Gamma (STApp t1 t2) B
   | STTyPair : forall Gamma A B t1 t2, has_type_st Gamma t1 A ->
@@ -231,7 +221,6 @@ Proof.
   induction Typ; intros G EQ Ok; substs*.
   apply* STTyVar. apply* binds_weaken.
   apply_fresh* STTyLam as y. apply_ih_bind* H0.
-  apply_fresh* STTyLam' as y. apply_ih_bind* H0.
 Qed.
 
 Lemma typing_strengthen : forall z U E F t T,
@@ -246,8 +235,6 @@ Proof.
   - apply* STTyVar; simpls*; apply* binds_remove.
   - apply_fresh* STTyLam as x.
     apply_ih_bind* H1; apply* fv_distr2; simpls*.
-  - apply_fresh* STTyLam' as x.
-    apply_ih_bind* H1; apply* fv_distr2; simpls*.
 Qed.
 
 Lemma typing_weaken_extend : forall x E t T A,
@@ -261,4 +248,67 @@ Proof.
   apply typing_weaken.
   rewrite* concat_empty_r.
   rewrite* concat_empty_r.
+Qed.
+
+
+(***** Substitution *****)
+
+Fixpoint subst (z : var) (u : SExp) (t : SExp) {struct t} : SExp :=
+  match t with
+    | STBVar i     => STBVar i
+    | STFVar x     => If x = z then u else (STFVar x)
+    | STLit i      => STLit i
+    | STLam t1     => STLam (subst z u t1)
+    | STApp t1 t2  => STApp (subst z u t1) (subst z u t2)
+    | STPair t1 t2 => STPair (subst z u t1) (subst z u t2)
+    | STProj1 t    => STProj1 (subst z u t)
+    | STProj2 t    => STProj2 (subst z u t)
+    | STUnit       => STUnit
+  end.
+
+(** Substitution for a fresh name is identity. *)
+
+Lemma subst_fresh : forall x t u, 
+  x \notin fv t ->  subst x u t = t.
+Proof. intros. induction t; simpls; fequals*. case_var*. Qed.
+
+(** Substitution distributes on the open operation. *)
+
+Lemma subst_open : forall x u t1 t2, STTerm u -> 
+  subst x u (t1 ^^ t2) = (subst x u t1) ^^ (subst x u t2).
+Proof.
+  intros. unfold open. generalize 0.
+  induction t1; intros; simpl; fequals*.
+  case_var*. case_nat*.
+Qed.
+
+(** Substitution and open_var for distinct names commute. *)
+
+Lemma subst_open_var : forall x y u t, y <> x -> STTerm u ->
+  (subst x u t) ^^ (STFVar y) = subst x u (t ^^ (STFVar y)).
+Proof. introv Neq Wu. rewrite* subst_open. simpl. case_var*. Qed.
+
+(** Opening up an abstraction of body [t] with a term [u] is the same as opening
+  up the abstraction with a fresh name [x] and then substituting [u] for [x]. *)
+
+Lemma subst_intro : forall x t u, 
+  x \notin (fv t) -> STTerm u ->
+  t ^^ u = subst x u (t ^^ (STFVar x)).
+Proof.
+  introv Fr Wu. rewrite* subst_open.
+  rewrite* subst_fresh. simpl. case_var*.
+Qed.
+
+Lemma typing_subst : forall F E t T z u U,
+  has_type_st (E & z ~ U & F) t T ->
+  has_type_st E u U ->
+  has_type_st (E & F) (subst z u t) T.
+Proof.
+  introv Typt Typu. gen_eq G: (E & z ~ U & F). gen F.
+  induction Typt; intros G Equ; subst; simpls*.
+  - case_var.
+    binds_get H0. apply_empty* typing_weaken.
+    binds_cases H0; apply* STTyVar.
+  - apply_fresh STTyLam as y.
+    rewrite* subst_open_var. apply_ih_bind* H0.
 Qed.
