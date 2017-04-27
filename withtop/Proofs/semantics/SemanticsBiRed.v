@@ -35,12 +35,17 @@ Inductive typing : env PTyp -> PExp -> PTyp -> Prop :=
                WFTyp B ->
                typing Gamma t B.
 
-Inductive In : PExp -> PTyp -> Prop :=
-  | InInt : forall n, In (PAnn (PLit n) PInt) PInt
-  | InFun : forall e A B, In (PAnn (PLam e) (Fun A B)) (Fun A B)
-  | InAnd : forall v1 v2 A B, In v1 A ->
-                         In v2 B ->
-                         In (PMerge v1 v2) (And A B).
+Inductive VChk : PExp -> PTyp -> Prop :=
+  | VLam : forall A B t, VChk (PLam t) (Fun A B).
+
+Inductive VInf : PExp -> PTyp -> Prop :=
+  | VInt : forall n, VInf (PLit n) PInt
+  | VMerge : forall v1 v2 A B, VInf v1 A ->
+                          VInf v2 B ->
+                          VInf (PMerge v1 v2) (And A B)
+  | VAnn : forall v A, VChk v A -> VInf (PAnn v A) A. 
+
+Hint Constructors VChk VInf.
 
 Inductive bidityping : env PTyp -> PExp -> Dir -> PTyp -> Prop :=
   | ATyVar' : forall Gamma x ty,
@@ -76,65 +81,67 @@ Inductive bidityping : env PTyp -> PExp -> Dir -> PTyp -> Prop :=
                 WFTyp B ->
                 bidityping Gamma t Chk B.
 
-Inductive red : PExp -> PExp -> Prop :=
-  | Red_Int : forall n, red (PLit n) (PAnn (PLit n) PInt)
-  | Red_App1 : forall e1 e2 e3,
-                 red e1 e3 ->
-                 red (PApp e1 e2) (PApp e3 e2)
-  | Red_App2 : forall e1 e2 v A B,
-                 In v (Fun A B) ->
-                 red e1 e2 ->
-                 red (PApp v e1) (PApp v e2)
-  | Red_App3 : forall A B C v1 v2,
-                 In v1 (Fun A B) ->
-                 In v2 C ->
-                 A <> C ->
-                 red (PApp v1 v2) (PApp v1 (PAnn v2 A))
-  | Red_App4 : forall A B v e,
-                 In v (Fun A B) ->
-                 red (PApp v (PLam e)) (PApp v (PAnn (PLam e) A))
-  | Red_App5 : forall A B e v,
-                 In v A -> 
-                 red (PApp (PAnn (PLam e) (Fun A B)) v)
-                     (PAnn (open_source e v) B)
-  | Red_Merge1 : forall e1 e2 e3,
-                   red e1 e3 ->
-                   red (PMerge e1 e2) (PMerge e3 e2)
-  | Red_Merge2 : forall e1 e2 v A,
-                   In v A ->
-                   red e1 e2 ->
-                   red (PMerge v e1) (PMerge v e2)
-  | Red_Ann1 : forall e1 e2 A,
-                 ~ (In (PAnn e1 A) A) ->
-                 red e1 e2 ->
-                 red (PAnn e1 A) (PAnn e2 A)
-  | Red_Ann2 : forall v,
-                 In v PInt ->
-                 red (PAnn v PInt) v
-  | Red_Ann3 :
-      forall e A B C D,
-        red (PAnn (PAnn (PLam e) (Fun A B)) (Fun C D))
-            (PAnn (PLam (PAnn (PApp (PAnn (PLam e) (Fun A B))
-                                          (PAnn (PBVar 0) A)) D))
-                  (Fun C D))
-  | Red_Ann4 : forall v1 v2 A B C,
-                    Sub B A ->
-                    Atomic A ->
-                    In (PMerge v1 v2) (And B C) ->
-                    red (PAnn (PMerge v1 v2) A)
-                        (PAnn v1 A)
-  | Red_Ann5 : forall v1 v2 A B C,
-                 Sub C A ->
-                 Atomic A ->
-                 In (PMerge v1 v2) (And B C) ->
-                 red (PAnn (PMerge v1 v2) A)
-                     (PAnn v2 A)
-  | Red_Ann6 : forall v A B C,
-                 In v C ->
-                 red (PAnn v (And A B))
-                     (PMerge (PAnn v A) (PAnn v B)).
+Definition value (v : PExp) := exists A, VInf v A.
 
-Hint Constructors typing bidityping In WFTyp red.
+Inductive subred : PExp -> PExp -> PTyp -> Prop :=
+  | SRed_Fun :
+      forall v A B C D,
+        VInf v (Fun A B) ->
+        subred v (PAnn (PLam (PAnn (PApp v (PBVar 0)) D)) (Fun C D)) (Fun C D)
+  | SRed_AndR : forall v A B, value v ->
+                         subred v (PMerge (PAnn v A) (PAnn v B)) (And A B)
+  | SRed_AndL1 : forall v1 v2 A B, VInf v1 B ->
+                              value v2 ->
+                              Atomic A ->
+                              Sub B A ->
+                              subred (PMerge v1 v2) v1 A
+  | SRed_AndL2 : forall v1 v2 A C, value v1 ->
+                              VInf v2 C ->
+                              Atomic A ->
+                              Sub C A ->
+                              subred (PMerge v1 v2) v2 A.
+
+Inductive bired : PExp -> PExp -> Prop :=
+  | Red_App1 : forall e1 e2 e3,
+                 bired e1 e3 ->
+                 bired (PApp e1 e2) (PApp e3 e2)
+  | Red_App2 : forall e1 e2 v,
+                 value v ->
+                 bired e1 e2 ->
+                 bired (PApp v e1) (PApp v e2)
+  | Red_App3 : forall A B C v1 v2 e,
+                 VInf v1 (Fun A B) ->
+                 VInf v2 C ->
+                 A <> C ->
+                 subred v2 e A ->
+                 bired (PApp v1 v2) (PApp v1 e)
+  | Red_App4 : forall A B v1 v2,
+                 VInf v1 (Fun A B) ->
+                 VChk v2 A ->
+                 bired (PApp v1 v2) (PApp v1 (PAnn v2 A))
+  | Red_App5 : forall A B e v,
+                 VInf v A -> 
+                 bired (PApp (PAnn (PLam e) (Fun A B)) v)
+                       (PAnn (open_source e v) B)
+  | Red_Merge1 : forall e1 e2 e3,
+                   bired e1 e3 ->
+                   bired (PMerge e1 e2) (PMerge e3 e2)
+  | Red_Merge2 : forall e1 e2 v,
+                   value v ->
+                   bired e1 e2 ->
+                   bired (PMerge v e1) (PMerge v e2)
+  | Red_Ann1 : forall e1 e2 A,
+                 bired e1 e2 ->
+                 bired (PAnn e1 A) (PAnn e2 A)
+  | Red_Ann2 : forall v e A B,
+                 VInf v B ->
+                 A <> B ->
+                 subred v e A ->
+                 bired (PAnn v A) (PAnn e A)
+  | Red_Ann3 : forall v A, VInf v A ->
+                      bired (PAnn v A) v.
+
+Hint Constructors typing bidityping WFTyp subred bired.
 
 (** Soundness and Completeness wrt to the elaborating biditypecheker **)
 
@@ -241,43 +248,37 @@ Proof. intros Gamma t A B m1 m2 Htyping; dependent induction Htyping; eauto. Qed
 
 (** Properties mixing "Sub", "In" and the type-system. **)
 
-Theorem In_Ann_inv : forall v A B, In (PAnn v A) B -> A = B.
-Proof. intros v A B H1. inverts* H1. Qed.
-
 (*Hint Resolve bityping_ann_sub bityping_ann.*)
-Hint Resolve In_Ann_inv.
 Hint Unfold erase.
 
-Theorem In_bityping_eq :
-  forall A v, In v A -> forall B Gamma, bidityping Gamma v Inf B -> A = B.
+Theorem VInf_bityping_eq :
+  forall A v, VInf v A -> forall B Gamma, bidityping Gamma v Inf B -> A = B.
 Proof.
   intros A v HIn.
   induction HIn; eauto 3.
   - intros; inversion H; subst; eauto.
-  - intros; inversion H; subst; eauto.
-  - intros.
-    inverts* H.
-    apply IHHIn1 in H2.
-    apply IHHIn2 in H4.
-    now subst.
+  - intros; inversion H; subst.
+    erewrite IHHIn1; erewrite IHHIn2; eauto.
+  - intros; now inversion H0; subst.
 Qed.
 
-Hint Resolve In_bityping_eq.
+Hint Resolve VInf_bityping_eq.
 
-Theorem In_bityping_sub :
-  forall A v, In v A -> forall B Gamma m, bidityping Gamma v m B -> Sub A B.
+Theorem VInf_bityping_sub :
+  forall A v, VInf v A -> forall B Gamma m, bidityping Gamma v m B -> Sub A B.
 Proof.
   intros A v HIn.
   induction HIn. 
   - intros; inversion H; subst; auto.
     inversion H0; subst; eauto.
-  - intros; inversion H; subst; auto.
-    inversion H0; subst; eauto.
   - intros; dependent induction H; [ clear IHbidityping1 IHbidityping2 | eauto 5 ].
     apply sand1; [ apply sand2 | apply sand3 ]; eauto.
+  - intros; inversion H; subst; auto.
+    inversion H0; subst; eauto.
+    inversion H1; subst; eauto.
 Qed.
 
-Hint Resolve In_bityping_sub.
+Hint Resolve VInf_bityping_sub.
 
 Theorem bityping_inf_chk :
   forall Gamma e A,
@@ -338,9 +339,56 @@ Qed.
 
 (** Theorem 1. Subject reduction **)
 
+Theorem subject_reduction_sub :
+  forall Gamma v A, bidityping Gamma v Inf A ->
+           forall e B, subred v e B ->
+                  Sub A B ->
+                  WFTyp B ->
+                  bidityping Gamma e Chk B.
+Proof.
+  intros Gamma v A Htyping e B Hred HTyp.
+  generalize dependent Gamma.
+  induction Hred; intros. 
+  - inverts H. dependent induction Htyping; subst; eauto; clear IHHtyping.
+    inverts H0.
+    assert (Ha1 : Sub (Fun C D) (Fun C D)). eauto. destruct Ha1.
+    apply ATySub' with (A := Fun C D) (C := x); eauto.
+    apply ATyAnnCT'.
+    assert (Ha : WFTyp (Fun A0 B)) by
+        (now assert (Ha := bityping_wf _ _ _ _ Htyping); inversion Ha).
+    inverts Ha.
+    apply_fresh ATyLam' as x; auto.
+    unfold open_source; simpl.
+    case_nat*.
+    assert (Ha2 : Sub D D) by eauto; destruct Ha2.
+    eapply ATySub' with (A := D); eauto 2.
+    apply ATyAnnCT'.
+    inverts HTyp; inverts H2.
+    eapply ATySub' with (A := B); eauto 2.
+    eapply ATyApp' with (A := A0).
+    + apply ATyAnnCT'.
+      rewrite <- open_rec_source_term; eauto 3.
+      rewrite <- concat_empty_r with (E := Gamma & y ~ C).
+      apply bityping_weaken; rewrite concat_empty_r; autos*.
+    + assert (Ha1 : Sub C C) by apply reflex; destruct Ha1.
+      eapply ATySub' with (A := C); eauto 2.
+      apply* ATyVar'.
+  - inverts H.
+    inverts HTyp. inverts H; try now inversion H3.
+    inverts H0.
+    assert (Ha : Sub (And A0 B) (And A0 B)) by eauto.
+    destruct Ha.
+    apply* ATySub'.
+    apply* ATyMerge'.
+  - dependent induction Htyping; subst; eauto. clear IHHtyping1 IHHtyping2.
+    assert (B = A) by eauto; subst. destruct H2; apply* ATySub'.
+  - dependent induction Htyping; subst; eauto. clear IHHtyping1 IHHtyping2.
+    assert (C = B) by eauto; subst. destruct H2; apply* ATySub'.
+Qed.  
+      
 Theorem subject_reduction :
   forall Gamma e1 A m, bidityping Gamma e1 m A ->
-              forall e2, red e1 e2 ->
+              forall e2, bired e1 e2 ->
                     bidityping Gamma e2 m A.
 Proof.
   intros Gamma e1 A m Htyping e2 Hred;
@@ -350,6 +398,9 @@ Proof.
     dependent induction Htyping; subst; eauto; clear IHHtyping1 IHHtyping2.
     inversion H; subst; inversion Htyping1; subst.
     apply ATyApp' with (A := A0); auto.
+    inverts Htyping2. inverts H0.
+    assert (Ha : C = A) by eauto; subst.
+    apply* subject_reduction_sub.
   - (* R_App4 *)
     dependent induction Htyping; eauto; clear IHHtyping1 IHHtyping2.
     inverts* H; inverts* Htyping1.
@@ -366,87 +417,51 @@ Proof.
     assert (B = A) by eauto; now subst.
   - (* R_Ann2 *)
     dependent induction Htyping; eauto; subst; clear IHHtyping.
-    dependent induction Htyping; eauto.
-    inversion H1; subst; eauto.
-  - (* R_AnnAbs *)
-    dependent induction Htyping; subst; eauto; clear IHHtyping.
-    inversion Htyping; subst.
-    inversion H; subst.
-    inversion H1; subst.
-    apply ATyAnnCT'.     
-    apply_fresh ATyLam' as x; auto.
-    unfold open_source; simpl.
-    assert (Ha : Sub D D) by apply reflex; destruct Ha.
-    assert (Ha : WFTyp A) by
-        (now assert (Ha := bityping_wf _ _ _ _ H); inversion Ha).
-    eapply ATySub' with (A := D); eauto 2.
-    apply ATyAnnCT'.
-    inversion H0; subst; clear H0.
-    eapply ATySub' with (A := B); eauto 2.
-    eapply ATyApp' with (A := A).
-    + apply ATyAnnCT'.
-      change (PLam (open_rec_source 1 (PFVar x) e)) with
-             ((open_rec_source 0 (PFVar x) (PLam e))).
-      rewrite <- open_rec_source_term; eauto 3.
-      rewrite <- concat_empty_r with (E := Gamma & x ~ C).
-      apply bityping_weaken; rewrite concat_empty_r; autos*.
-    + assert (Ha1 : Sub A A) by apply reflex; destruct Ha1.
-      eapply ATySub' with (A := A); eauto 2.
-      apply ATyAnnCT'.
-      eapply ATySub' with (A := C); eauto 2.
-      case_nat*.
-  - (* R_Ann4 *)
-    dependent induction Htyping; subst; eauto; clear IHHtyping.
-    destruct H.
-    inversion Htyping; subst.
-    inversion H2; inversion H1; subst.
-    assert (B = A1) by eauto; subst; eauto.    
-  - (* R_Ann5 *)
-    dependent induction Htyping; subst; eauto; clear IHHtyping.
-    destruct H.
-    inversion Htyping; subst.
-    inversion H2; inversion H1; subst.
-    assert (C = B0) by eauto; subst; eauto.
-  - (* R_Ann6 *)
-    dependent induction Htyping; subst; eauto; clear IHHtyping.
-    inversion Htyping; subst.
-    inversion H1; subst; try now inversion H4.
-    assert (Ha : WFTyp (And A B)) by eauto; inversion Ha; subst.
-    assert (Ha2 : Sub A0 A) by eauto.
-    assert (Ha3 : Sub A0 B) by eauto.
-    destruct Ha2, Ha3.
-    apply ATyMerge'; eauto.
+    inverts Htyping. inverts H.
+    apply ATyAnnCT'; apply* subject_reduction_sub.
+  - (* R_Ann3 *)
+    dependent induction Htyping; eauto; clear IHHtyping.
+    inverts Htyping. inverts H.
+    assert (A = A0) by eauto; now subst.
 Qed.
 
 (** Theorem 2. Reduction is deterministic **)
 
 Hint Extern 1 =>
   match goal with
-    | [ H : red (PLam ?e2) ?e1 |- _ ] => inversion H
-    | [ H : In (PLam ?e) ?A |- _ ] => inversion H
-    | [ H : In (PInt ?e) ?A |- _ ] => inversion H
+    | [ H : bired (PLam ?e2) ?e1 |- _ ] => inversion H
+    | [ H : VInf (PLam ?e) ?A |- _ ] => inversion H
+    | [ H : VInf (PInt ?e) ?A |- _ ] => inversion H
   end. 
 
-Lemma value_not_red : forall e1 e2 A, In e1 A -> red e1 e2 -> False.
+Lemma value_inf_chk_false : forall v A B, VChk v A -> VInf v B -> False.
+Proof.
+  introv H1 H2; inverts H1; inverts H2.
+Qed.
+
+Hint Resolve value_inf_chk_false.
+
+Lemma value_not_red : forall e1 e2 A, VInf e1 A -> bired e1 e2 -> False.
 Proof.
   intros e1 e2 A Hin Hred. generalize dependent A.
-  induction Hred; intros; inversion Hin; subst; eauto; inversion H.
+  induction Hred; intros; try now inversion Hin; subst; eauto.
+  inverts Hin. inverts H2. inverts Hred.
 Qed.
 
 Hint Extern 1 =>
   match goal with
-    | [ H1 : In ?e1 ?A,
-        H2 : red ?e1 ?e2 |- _ ] => exfalso; apply (value_not_red _ _ _ H1 H2)
+    | [ H1 : VInf ?e1 ?A,
+        H2 : bired ?e1 ?e2 |- _ ] => exfalso; apply (value_not_red _ _ _ H1 H2)
   end. 
 
-Lemma In_unique : forall v A B, In v A -> In v B -> A = B.
+Lemma VInf_unique : forall v A B, VInf v A -> VInf v B -> A = B.
 Proof.
   intros v A B HIn1 HIn2. generalize dependent B.
   induction HIn1; intros; inversion HIn2; subst; auto.
   apply IHHIn1_1 in H1; apply IHHIn1_2 in H3; now subst.
 Qed.
 
-Hint Rewrite In_unique.
+Hint Rewrite VInf_unique.
 
 (*
 Lemma value_ann_red_id :
@@ -465,8 +480,11 @@ Qed.
 Hint Rewrite value_ann_red_id.
 *)
 
-Theorem red_unique :
-  forall e1 e2, red e1 e2 -> forall e3, red e1 e3 -> forall Gamma A m, bidityping Gamma e1 m A -> e2 = e3.
+(***** REVISED UP UNTIL HERE ******)
+
+Theorem bired_unique :
+  forall e1 e2, bired e1 e2 -> forall e3, bired e1 e3 -> forall Gamma A m,
+                                               bidityping Gamma e1 m A -> e2 = e3.
 Proof.
   intros e1 e2 Hred.
   induction Hred; intros.

@@ -1,0 +1,326 @@
+% Meta-variable
+
+metavar x, y, z ::= {{ com Variables }}
+metavar m, n, r ::= {{ com Integer Variables }}
+indexvar i, j   ::= {{ com Indexes }}
+
+% Syntax
+
+grammar
+
+%% Expression
+
+e :: 'e_' ::= {{ com Expression }}
+ | n                 ::   :: Lit     {{ com Integer Literal }}
+ | e1 + e2           ::   :: Add     {{ com Add }}
+ | x                 ::   :: Var     {{ com Variable }}
+ | \ x . e           ::   :: Abs     {{ com Abstraction }}
+ | e1 e2             ::   :: App     {{ com Application }}
+ | e1 ,, e2          ::   :: Merge   {{ com Merge }}
+ | ( e : A )         ::   :: Ann     {{ com Annotation }} 
+ | ( e )             :: M :: Parens
+ | e1 [ x := e2 ]    :: M :: Subst
+ | v                 :: M :: EValue 
+ | ?                 :: M :: Undefined
+
+v :: 'v_' ::= {{ com Value }}
+ | n                    ::   :: ValInt
+ | \ x . e              ::   :: ValAbs
+ | v1 ,, v2             ::   :: ValMerge
+ | ( v : A )            ::   :: ValAnn
+
+A, B, C, D :: 't_' ::= {{ com Type }}
+ | Int               ::   :: Integer {{ com Integer }}
+ | A -> B            ::   :: Arrow   {{ com Function }}
+ | A & B             ::   :: Inter   {{ com Intersection }}
+ | top               :: M :: Top     {{ com Top }}
+ | alpha             :: M :: TypeVar {{ com Type Variable }}
+ | ( A )             :: M :: TParens
+
+
+%% Context
+
+G {{ tex \Gamma }} :: 'ctx_' ::= {{ com Context }}
+ | nil             ::   :: Nil     {{ com Empty }}
+ | G , x : B       ::   :: Binding {{ com Binding }}
+ | G1 , x : A , G2 :: M :: Middle
+ | G [ x := e ]    :: M :: Subst
+ | G1 , G2         :: M :: Concat
+
+
+%% Terminals
+terminals :: 'terminals_' ::=
+ | \      ::   :: lambda    {{ tex \lambda }}
+ | .      ::   :: dot       {{ tex .~ }}
+ | +      ::   :: plus      {{ tex + }}
+ | *      ::   :: dis       {{ tex * }}
+ | nil    ::   :: nil       {{ tex \varnothing }}
+ | ->     ::   :: to        {{ tex \rightarrow }}
+ | :=     ::   :: subst     {{ tex \mapsto }}
+ | |-     ::   :: turnstile {{ tex \vdash }}
+ | |=     ::   :: vdashd    {{ tex \vDash }}
+ | Int    ::   :: int       {{ tex \text{Int} }}
+ | ord    ::   :: ord       {{ tex \text{ord} }}
+ | ,,     ::   :: merge     {{ tex \mathbin{,,} }}
+ | &      ::   :: intersect {{ tex \mathbin{\&} }}
+ | <:     ::   :: sub       {{ tex \leq }}
+ | <|     ::   :: tsub      {{ tex \triangleleft }}
+ | Leaf   ::   :: leaf      {{ tex \mathsf{Leaf} }}
+ | #      ::   :: fresh     {{ tex \mathbin{\#} }}
+ | in     ::   :: in        {{ tex \in }}
+ | {=     ::   :: subset    {{ tex \subseteq }}
+ | <>     ::   :: neq       {{ tex \neq }}
+ | ?      ::   :: undefined {{ tex {\,?} }}
+ | top    ::   :: top       {{ tex \top }}
+ | =      ::   :: eq        {{ tex = }}
+ | alpha  ::   :: alpha     {{ tex \alpha }}
+ | ~>     ::   :: leadsto   {{ tex \leadsto }}
+ | <=     ::   :: chk       {{ tex \Leftarrow }}
+ | =>     ::   :: inf       {{ tex \Rightarrow }}
+ | /=>    ::   :: notinf    {{ tex {\,\not\Rightarrow\,} }}
+ | /<=    ::   :: notchk    {{ tex {\,\not\Leftarrow\,} }}
+ | \in    ::   :: inclusion {{ tex \in }}
+ | \notin ::   :: negincl   {{ tex {\,\not\in\,} }}
+
+%% Formula
+formula :: 'formula_' ::=
+ | judgement    ::   :: judgement
+ | ( formula )  ::   :: parens
+ | x # G        ::   :: fresh
+ | x * A : B in G   ::   :: binds
+ | G {= G'      ::   :: subset
+ | A <> B       ::   :: neq_types 
+ | e1 <> e2     ::   :: neq 
+ | A = B        ::   :: eq 
+ | ord A        ::   :: ord
+ | r = m + n    ::   :: plus 
+ | e \notin A   ::   :: notin 
+ | A * B        ::   :: disjoint 
+ | G |- e => A  ::   :: inference 
+ | G |- e <= A  ::   :: check 
+ | e /=> A      ::   :: notvalueinf 
+ | e /<= A      ::   :: notvaluechk 
+
+% Typing Rules
+
+defns Rules :: '' ::=
+
+%% Typed Values (Inf) 
+
+defn v => A :: :: typedvalinf :: 'VI_' {{ com Typed Values (Inf) }} 
+by
+
+-------- :: Int
+n => Int
+
+
+v1 => A
+v2 => B
+----------------- :: Merge
+v1 ,, v2 => A & B
+
+
+v <= A
+------------ :: Ann 
+(v : A) => A 
+
+
+%% Typed Values (Chk) 
+
+defn v <= A :: :: typedvalchk :: 'VC_' {{ com Typed Values (Chk) }} 
+by
+
+
+---------------- :: Abs
+\x . e <= A -> B
+
+
+%% Typed Reduction 
+
+defn e1 ~> e2 :: :: reductioninf :: 'R_' {{ com Reduction }} 
+by
+
+e1 ~> e3
+------------------------- :: Add1 
+e1 + e2 ~> e3 + e2 
+
+e1 ~> e2 
+----------------------- :: Add2
+n + e1 ~> n + e2 
+
+r = n + m
+----------------- :: Add3
+n + m ~> r
+
+e1 ~> e3
+------------------- :: App1
+e1 e2 ~> e3 e2 
+
+e1 ~> e2 
+------------------------- :: App2
+v e1 ~> v e2 
+
+v => B
+A <> B
+v ~> e <= A
+------------------------- :: AppSub
+(\x . e : A -> C) v ~> (\x . e : A -> C) e 
+
+v <= A
+---------------------------------------------- :: App4
+(\x . e : A -> B) v ~> (\x . e : A -> B) (v : A)
+
+v => A
+---------------------------------------- :: App5
+(\x . e : A -> B) v ~> e [ x := v ] 
+
+e1 ~> e3 
+----------------------------- :: Merge1
+e1 ,, e2 ~> e3 ,, e2 
+
+e1 ~> e2 
+--------------------------- :: Merge2
+v ,, e1 ~> v ,, e2 
+
+e1 ~> e2 
+------------------------- :: Ann1 
+(e1 : A) ~> (e2 : A) 
+
+v => B
+A <> B
+v ~> e <= A
+------------------------- :: AnnSub
+(v : A) ~> (e : A) 
+
+v => A
+----------------- :: Ann3
+(v : A) ~> v 
+
+
+defn v ~> e <= A :: :: reductionchk :: 'RSub_' {{ com Reduction (Sub) }} 
+by
+
+
+v => A -> B
+------------------------------------------------ :: Fun
+v ~> (\y . (v y : D) : C -> D) <= C -> D
+
+------------------------------------ :: AndR 
+v ~> ( v : A ) ,, ( v : B ) <= A & B 
+
+ord A
+v1 => B
+B <: A
+------------------------- :: AndL1 
+v1 ,, v2 ~> v1 <= A  
+
+ord A
+v2 => C 
+C <: A
+------------------------- :: AndL2 
+v1 ,, v2 ~> v2 <= A 
+
+
+%% Subtyping/Annotation reduction 
+
+defn e1 ~> e2 ::   :: areduction :: 'A_' 
+{{ com Sub/Ann Reduction ($(v \Leftarrow A) \leadsto e$)}}
+by
+
+
+--------------------------------------------------------------------------- :: Abs
+((\x . e => A -> B) <= C -> D) ~> (\y . (((\x . e => A -> B) (y <= A)) <= D) => C -> D)
+
+A <: C
+ord C
+------------------------------------ :: Merge1
+((a1 ,, a2 => A & B) <= C) ~> ((a1 => A) <= C)
+
+B <: C
+ord C
+------------------------------------ :: Merge2
+((a1 ,, a2 => A & B) <= C) ~> ((a2 => B) <= C)
+
+ 
+
+-------------------------------------------------- :: Merge3
+((a => A & B) <= C & D) ~> ((a => A & B) <= C) ,, ((a => A & B) <= D)
+
+
+%% Subtyping 
+
+defn A <: B ::   :: subtyping :: 'S_' {{ com Subtyping }}
+by
+
+---------- :: Int 
+Int <: Int 
+
+-------------- :: Var
+alpha <: alpha 
+
+-------- :: Top 
+A <: top
+
+A1 <: A2 
+A1 <: A3
+------------- :: And1 
+A1 <: A2 & A3
+
+A1 <: A3
+------------- :: And2 
+A1 & A2 <: A3
+
+A2 <: A3
+------------- :: And3 
+A1 & A2 <: A3
+
+A1 <: B1 -> B3
+A2 <: B2 -> B4
+--------------------------------- :: And4
+A1 & A2 <: (B1 & B2) -> (B3 & B4)
+
+
+%% Disjointness 
+
+defn G |- A * B ::   :: disjointness :: 'D_' {{ com Disjointness }}
+by
+
+G |- A * C 
+G |- B * C 
+------------------- :: And1 
+G |- A & B * C 
+
+G |- A * B 
+G |- A * C 
+------------------- :: And2 
+G |- A * B & C 
+
+x * A : C in G
+G |- A <: B 
+----------------------- :: Var
+G |- x * B 
+
+x * A : C in G
+G |- A <: B : C
+----------------------- :: VarSym
+G |- B * x : C
+
+----------------------- :: Top
+G |- top * A 
+
+----------------------- :: TopSym
+G |- A * top 
+
+
+%% Well-formedness
+
+defn |= G ::   :: wellformed :: 'W_' {{ com Well-formedness }}
+by
+
+------ :: Empty
+|= nil
+
+x # G
+----------- :: Cons
+|= G, x : A
+
