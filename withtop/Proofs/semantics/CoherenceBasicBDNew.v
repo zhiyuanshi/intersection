@@ -1729,5 +1729,13 @@ Proof.
   apply bityping_weaken; rewrite concat_empty_r; autos*.
 Qed.
 
+Lemma elaboration_regular :
+  forall Gamma e A m E, has_type_source_alg Gamma e m A E -> STTerm E.
+Proof.
+  introv Typ. apply type_preservation in Typ. apply* typing_gives_terms.
+Qed.
+
+Hint Resolve elaboration_regular.
+
 
 

@@ -6,6 +6,70 @@ Require Import STLCNew.
 Require Import CoherenceBasicBDNew.
 Require Import STLCred.
 
+(** Full reduction **)
+Inductive fulletared : relation :=
+  | fulletared_beta : forall t1 t2,
+      body t1 ->
+      STTerm t2 ->           
+      fulletared (STApp (STLam t1) t2) (t1 ^^ t2)
+  | fulletared_eta : forall t,
+      STTerm t ->         
+      fulletared (STLam (STApp t (STBVar 0))) t
+  | fulletared_abs : forall L t1 t1', 
+      (forall x, x \notin L -> fulletared (open t1 (STFVar x)) (open t1' (STFVar x))) ->
+      fulletared (STLam t1) (STLam t1')
+  | fulletared_app_1 : forall t1 t1' t2,
+      STTerm t2 ->
+      fulletared t1 t1' ->
+      fulletared (STApp t1 t2) (STApp t1' t2)
+  | fulletared_app_2 : forall t1 t2 t2',
+      STTerm t1 ->
+      fulletared t2 t2' ->
+      fulletared (STApp t1 t2) (STApp t1 t2')
+  | fulletared_pair_1 : forall t1 t1' t2,
+      STTerm t2 ->
+      fulletared t1 t1' ->
+      fulletared (STPair t1 t2) (STPair t1' t2)
+  | fulletared_pair_2 : forall t1 t2 t2',
+      STTerm t1 ->
+      fulletared t2 t2' ->
+      fulletared (STPair t1 t2) (STPair t1 t2')
+  | fulletared_proj1_1 : forall t1 t1',
+      fulletared t1 t1' ->
+      fulletared (STProj1 t1) (STProj1 t1')
+  | fulletared_proj1_2 : forall t1 t2,
+      STTerm (STPair t1 t2) ->
+      fulletared (STProj1 (STPair t1 t2)) t1
+  | fulletared_proj2_1 : forall t1 t1',
+      fulletared t1 t1' ->
+      fulletared (STProj2 t1) (STProj2 t1')
+  | fulletared_proj2_2 : forall t1 t2,
+      STTerm (STPair t1 t2) ->
+      fulletared (STProj2 (STPair t1 t2)) t2.
+
+Hint Constructors fulletared.
+
+(* ********************************************************************** *)
+(** * Infrastructure *)
+
+Lemma fulletared_regular : forall e e',
+  fulletared e e' -> STTerm e /\ STTerm e'.
+Proof.
+  induction 1; destruct_conjs; split; eauto; try now inverts* H.
+  apply_fresh STTerm_Lam as x.
+  unfold open; simpls; case_nat*; apply* STTerm_App; now rewrite <- open_rec_term.
+  apply_fresh STTerm_Lam as x; forwards* H2 : H0 x.
+  apply_fresh STTerm_Lam as x; forwards* H2 : H0 x.
+Qed.
+
+Hint Extern 1 (STTerm ?t) =>
+  match goal with
+  | H: fulletared t _ |- _ => apply (proj1 (fulletared_regular H))
+  | H: fulletared _ t |- _ => apply (proj2 (fulletared_regular H))
+  end.
+
+Hint Constructors has_type_st STred STValue.
+
 Inductive VChk : PExp -> PTyp -> Prop :=
   | VLam : forall A B t, VChk (PLam t) (Fun A B).
 
@@ -24,7 +88,7 @@ Inductive subred : PExp -> PExp -> PTyp -> Prop :=
   | SRed_Fun :
       forall v A B C D,
         VInf v (Fun A B) ->
-        subred v (PAnn (PLam (PAnn (PApp v (PBVar 0)) D)) (Fun C D)) (Fun C D)
+        subred v (PLam (PAnn (PApp v (PBVar 0)) D)) (Fun C D)
   | SRed_AndR : forall v A B, value v ->
                          subred v (PMerge (PAnn v A) (PAnn v B)) (And A B)
   | SRed_AndL1 : forall v1 v2 A B, VInf v1 B ->
@@ -143,26 +207,10 @@ Proof.
   - inverts H. dependent induction Htyping; subst; eauto; clear IHHtyping.
     inverts H0.
     assert (Ha1 : Sub (Fun C D) (Fun C D)). eauto. destruct Ha1.
-    apply ATyAnnCT'.
     assert (Ha : WFTyp (Fun A0 B)) by
         (now assert (Ha := bityping_wf Htyping); inversion Ha).
     inverts Ha.
-    apply_fresh ATyLam' as x; auto.
-    unfold open_source; simpl.
-    case_nat*.
-    assert (Ha2 : Sub D D) by eauto; destruct Ha2.
-    eapply ATySub' with (A := D); eauto 2.
-    apply ATyAnnCT'.
-    inverts HTyp; inverts H2.
-    eapply ATySub' with (A := B); eauto 2.
-    eapply ATyApp' with (A := A0).
-    + apply ATyAnnCT'.
-      rewrite <- open_rec_source_term; eauto 3.
-      rewrite <- concat_empty_r with (E := Gamma & y ~ C).
-      apply bityping_weaken; rewrite concat_empty_r; autos*.
-    + assert (Ha1 : Sub C C) by apply reflex; destruct Ha1.
-      eapply ATySub' with (A := C); eauto 2.
-      apply* ATyVar'.
+    admit.
   - inverts H.
     inverts HTyp. inverts H; try now inversion H3.
     inverts H0.
@@ -188,8 +236,6 @@ Proof.
   - inverts H. dependent induction Htyping; subst; eauto; clear IHHtyping.
     inverts H0.
     assert (Ha1 : Sub (Fun C D) (Fun C D)). eauto. destruct Ha1.
-    apply ATySub' with (A := Fun C D) (C := x); eauto.
-    apply ATyAnnCT'.
     assert (Ha : WFTyp (Fun A0 B)) by
         (now assert (Ha := bityping_wf Htyping); inversion Ha).
     inverts Ha.
@@ -385,7 +431,35 @@ Proof.
     assert (A = B) by apply* VInf_unique. substs*.
 Qed.
 
-(** Theorem 3. Reduction is complete **)
+(** Theorem 3. Progress **)
+
+Theorem bired_progress :
+  forall e1 A m, bidityping empty e1 m A ->
+              (value e1) \/ (exists e2, bired e1 e2).
+Proof.
+  introv Typ. unfold value.
+  gen_eq E: (empty:env PTyp). lets Typ': Typ.
+  induction Typ; intros; substs*.
+  - admit.
+  - right.
+Admitted.
+
+(* First define star_; then prove property on star_ and show that star_ -> equiv_? *)
+Theorem equiv_safety :
+  forall Gamma A e1 e2, equiv_ fulletared e1 e2 ->
+               (has_type_st Gamma e1 A -> has_type_st Gamma e2 A) /\ 
+               (has_type_st Gamma e2 A -> has_type_st Gamma e1 A).
+Proof.
+  introv Red.
+  induction* Red; intros.
+Admitted.
+
+Theorem st_fulletared_value :
+  forall e A, has_type_st empty e A -> exists v, equiv_ fulletared e v /\ STValue v.
+Proof.
+Admitted.
+ 
+(** Theorem 4. Reduction is complete **)
 
 (*
 Lemma value_ann_red_id :
@@ -405,77 +479,85 @@ Hint Rewrite value_ann_red_id.
  *)
 
 Hint Constructors equiv_.
-Hint Resolve fullred_regular.
+Hint Resolve fulletared_regular.
 
-Lemma fullred_equiv_regular :
-  forall e1 e2, equiv_ fullred e1 e2 -> STTerm e1 /\ STTerm e2.
+Lemma fulletared_equiv_regular :
+  forall e1 e2, equiv_ fulletared e1 e2 -> STTerm e1 /\ STTerm e2.
 Proof. introv H; induction* H. Qed.
 
-Lemma fullred_equiv_regular_l :
-  forall e1 e2, equiv_ fullred e1 e2 -> STTerm e1.
-Proof. introv H; forwards* Ha : fullred_equiv_regular e1 e2. Qed.
+Lemma fulletared_equiv_regular_l :
+  forall e1 e2, equiv_ fulletared e1 e2 -> STTerm e1.
+Proof. introv H; forwards* Ha : fulletared_equiv_regular e1 e2. Qed.
 
-Lemma fullred_equiv_regular_r :
-  forall e1 e2, equiv_ fullred e1 e2 -> STTerm e2.
-Proof. introv H; forwards* Ha : fullred_equiv_regular e1 e2. Qed.
+Lemma fulletared_equiv_regular_r :
+  forall e1 e2, equiv_ fulletared e1 e2 -> STTerm e2.
+Proof. introv H; forwards* Ha : fulletared_equiv_regular e1 e2. Qed.
 
-Hint Resolve fullred_equiv_regular_l fullred_equiv_regular_r.
+Hint Resolve fulletared_equiv_regular_l fulletared_equiv_regular_r.
 
-Lemma fullred_equiv_app_l :
-  forall e1 e2, equiv_ fullred e1 e2 ->
+Lemma fulletared_equiv_app_l :
+  forall e1 e2, equiv_ fulletared e1 e2 ->
            forall e3, STTerm e3 ->
-                 equiv_ fullred (STApp e1 e3) (STApp e2 e3).
+                 equiv_ fulletared (STApp e1 e3) (STApp e2 e3).
 Proof. introv Equiv; induction* Equiv. Qed.
 
-Lemma fullred_equiv_app_r :
-  forall e2 e3, equiv_ fullred e2 e3 ->
+Lemma fulletared_equiv_app_r :
+  forall e2 e3, equiv_ fulletared e2 e3 ->
            forall e1, STTerm e1 ->
-                 equiv_ fullred (STApp e1 e2) (STApp e1 e3).
+                 equiv_ fulletared (STApp e1 e2) (STApp e1 e3).
 Proof. introv Equiv; induction* Equiv. Qed.
 
-Hint Resolve fullred_equiv_app_l fullred_equiv_app_r.
+Hint Resolve fulletared_equiv_app_l fulletared_equiv_app_r.
 
-Lemma fullred_equiv_pair_l :
-  forall e1 e2, equiv_ fullred e1 e2 ->
+Lemma fulletared_equiv_pair_l :
+  forall e1 e2, equiv_ fulletared e1 e2 ->
            forall e3, STTerm e3 ->
-                 equiv_ fullred (STPair e1 e3) (STPair e2 e3).
+                 equiv_ fulletared (STPair e1 e3) (STPair e2 e3).
 Proof. introv Equiv; induction* Equiv. Qed.
 
-Lemma fullred_equiv_pair_r :
-  forall e2 e3, equiv_ fullred e2 e3 ->
+Lemma fulletared_equiv_pair_r :
+  forall e2 e3, equiv_ fulletared e2 e3 ->
            forall e1, STTerm e1 ->
-                 equiv_ fullred (STPair e1 e2) (STPair e1 e3).
+                 equiv_ fulletared (STPair e1 e2) (STPair e1 e3).
 Proof. introv Equiv; induction* Equiv. Qed.
 
-Lemma fullred_equiv_pair :
-  forall e1 e3, equiv_ fullred e1 e3 ->
-           forall e2 e4, equiv_ fullred e2 e4 ->
-                 equiv_ fullred (STPair e1 e2) (STPair e3 e4).
+Lemma fulletared_equiv_pair :
+  forall e1 e3, equiv_ fulletared e1 e3 ->
+           forall e2 e4, equiv_ fulletared e2 e4 ->
+                 equiv_ fulletared (STPair e1 e2) (STPair e3 e4).
 Proof.
   introv H1 H2.
   apply equiv_trans with (t2 := (STPair e3 e2)). 
-  apply* fullred_equiv_pair_l.
-  apply* fullred_equiv_pair_r.
+  apply* fulletared_equiv_pair_l.
+  apply* fulletared_equiv_pair_r.
 Qed.
 
-Hint Resolve fullred_equiv_pair_l fullred_equiv_pair_r fullred_equiv_pair.
+Hint Resolve fulletared_equiv_pair_l fulletared_equiv_pair_r fulletared_equiv_pair.
+
+Lemma bar : forall v t A,
+              subred v t A ->
+              forall E1 E2, 
+                has_type_source_alg empty v Chk A E1 ->
+                has_type_source_alg empty t Chk A E2 ->
+                equiv_ fulletared E1 E2.
+Proof.
+  introv Subred Typ1 Typ2.
+  inverts Typ1. inverts Subred. inverts H4. inverts Typ2.
+Admitted.  
 
 Lemma foo : forall v t A,
               subred v t A ->
               forall E1 E2, 
                 has_type_source_alg empty v Chk A E1 ->
                 has_type_source_alg empty t Chk A E2 ->
-                equiv_ fullred E1 E2.
+                equiv_ fulletared E1 E2.
 Proof.
   introv Subred.
   induction Subred; introv Typ1 Typ2.
   - inverts H; inverts H0.
-    inverts Typ1; inverts Typ2.
-    inverts H.
-    inverts H2.
-    inverts H3.
-    inverts H0.
-    inverts H6; inverts H7; try now inverts H.
+    inverts Typ1. inverts H.
+    inverts Typ2; try now inverts H2.
+    inverts H4; try now inverts H.
     admit.
   - inverts Typ1. inverts Typ2.
     inverts H3.
@@ -523,32 +605,97 @@ Proof.
     admit. (* seems provable *)
 Admitted.    
 
+Lemma fulletared_equiv_abs :
+  forall L t1 t1',
+    (forall x, x \notin L -> equiv_ fulletared (t1 ^^ STFVar x) (t1' ^^ STFVar x)) ->
+    equiv_ fulletared (STLam t1) (STLam t1').
+Proof.
+  introv H.
+  pick_fresh x.
+  forwards* Ha : H x.
+Admitted.
+
 Definition id := STLam (STBVar 0).
 Definition idType a := STFun a a.
 
 Definition app := STLam (STLam (STApp (STBVar 1) (STBVar 0))).
 Definition appType a b := STFun (STFun a b) (STFun a b).
 
-Lemma app_id :
+Lemma id_type : forall A, has_type_st empty id (idType A).
+Proof.
+  intros; unfold id; apply_fresh STTyLam as x; unfold open; simpls; case_nat*.
+Qed.
+
+Lemma app_type : forall A B, has_type_st empty app (appType A B).
+Proof.
+  intros A B.
+  unfold app, appType. apply_fresh STTyLam as x. unfold open; simpls; repeat case_nat.
+  apply_fresh STTyLam as y. unfold open; simpls; repeat case_nat. apply* STTyApp.
+Qed.
+  
+Lemma fun_app_value :
   forall A B,
     has_type_st empty app (appType A B) ->
     forall f, has_type_st empty f (STFun A B) ->
          STValue f ->
-         equiv_ fullred (STApp app f) f.
+         equiv_ fulletared (STApp app f) f.
 Proof.
   introv Typ1 Typ2 Value.
   inverts Value; inverts Typ2.
   unfold app.
   apply* equiv_trans.
   unfold open; simpls; repeat case_nat.
-  
-Admitted.  
+  apply* equiv_trans.
+Qed.
 
-Lemma consistency_fullred :
+Lemma fun_app :
+  forall A B,
+    has_type_st empty app (appType A B) ->
+    forall f, has_type_st empty f (STFun A B) ->
+         equiv_ fulletared (STApp app f) f.
+Proof.
+  introv Typ1 Typ2.
+  forwards f' : st_fulletared_value Typ2.
+  destruct_conjs.
+  apply equiv_trans with (t2 := STApp app f'). eauto.
+  apply equiv_trans with (t2 := f'); auto.
+  assert (Ha1 : has_type_st empty f' (STFun A B)).
+  lets* Ha : equiv_safety H.
+  forwards* Ha2 : fun_app_value Typ1 Ha1.
+Qed.
+  
+Lemma sub_id : forall A c, sub A A c -> equiv_ fulletared c id. 
+Proof.
+  introv HSub.
+  dependent induction HSub; try now inverts H. eauto.
+  - unfold id.
+    apply_fresh fulletared_equiv_abs as x.
+    unfold open; simpls; repeat case_nat.
+    repeat rewrite <- open_rec_term; eauto 3.
+    apply equiv_trans with (t2 := (STLam (STApp (STFVar x) (STBVar 0)))); [ | apply* equiv_step ].
+    apply_fresh fulletared_equiv_abs as y.
+    unfold open; simpls; repeat case_nat.
+    repeat rewrite <- open_rec_term; eauto 3.
+    apply equiv_trans with (t2 := (STApp id (STApp (STFVar x) (STApp c1 (STFVar y))))).
+    apply* fulletared_equiv_app_l.
+    apply equiv_trans with (t2 := (STApp (STFVar x) (STApp c1 (STFVar y)))).
+    unfold id.
+    apply equiv_trans with (t2 := open (STBVar 0) (STApp (STFVar x) (STApp c1 (STFVar y)))).
+    apply equiv_step; apply* fulletared_beta.
+    unfold open; simpls; repeat case_nat*.
+    apply* fulletared_equiv_app_r.
+    apply equiv_trans with (t2 := (STApp id (STFVar y))).
+    apply* fulletared_equiv_app_l.
+    unfold id. apply equiv_trans with (t2 := open (STBVar 0) (STFVar y)); eauto.
+    unfold open; simpls; case_nat*.
+  - admit.
+Admitted.
+    
+Lemma consistency_fulletared :
   forall e A c1 m, has_type_source_alg empty e m A c1 ->
               forall e', bired e e' ->
                     forall c2, has_type_source_alg empty e' m A c2 ->
-                         equiv_ fullred c1 c2.
+                         equiv_ fulletared c1 c2.
 Proof.
   introv Typ.
   gen_eq E: (empty:env PTyp). lets Typ': Typ.
@@ -581,8 +728,8 @@ Proof.
       clear IHTyp1 IHTyp2.
       assert (E1 = E0) by (eapply typ_coherence; eauto).
       subst.
-      apply* fullred_equiv_app_r.
-
+      apply* fulletared_equiv_app_r.
+      (*
       inverts Typ2. inverts H4. 
       assert (Ha : exists E4, has_type_source_alg empty e Inf A E4). admit.
       destruct Ha.
@@ -591,7 +738,7 @@ Proof.
       forwards* Ha : typ_unique H2 H3. destruct Ha.
       assert (x = E1). apply* typ_coherence. substs.
       assert (C1 = C0). apply @sub_coherent with (A := A) (B := A0); eauto. substs.
-      
+       *)
       admit. (* property about subred ? *)
     + clear IHTyp1 IHTyp2.
       inverts Typ1.
