@@ -1737,5 +1737,65 @@ Qed.
 
 Hint Resolve elaboration_regular.
 
+Definition body_type_source Gamma e1 A B m E1 :=
+  exists L, forall x : var, x \notin L ->
+                  has_type_source_alg (Gamma & x ~ A) (open_source e1 (PFVar x)) m B
+                                      (open E1 (STFVar x)).
+
+Hint Unfold body_type_source.
+
+Lemma abs_to_body_type_source :
+  forall A B e c Gamma m, has_type_source_alg Gamma (PLam e) m (Fun A B) (STLam c) ->
+                 body_type_source Gamma e A B m c.
+Proof. intros; inversion H; subst; eauto. Qed.
+
+Lemma sub_fv_empty : forall A B c, sub A B c -> fv c = \{}.
+Proof.
+  introv Hsub.
+  induction* Hsub; simpls*;
+  try rewrite IHHsub; try rewrite IHHsub1; try rewrite IHHsub2;
+  now repeat rewrite union_empty_l. 
+Qed.
+
+Lemma has_type_source_subst :
+  forall Gamma A B e u x m E1 E2,
+    binds x B Gamma ->
+    has_type_source_alg Gamma e m A E1 ->
+    has_type_source_alg Gamma u Inf B E2 ->
+    has_type_source_alg Gamma (subst_source x u e) m A (subst x E2 E1).
+Proof.
+  introv HIn H1 H2.
+  induction H1; simpl; eauto.
+  - case_var*.
+    assert (Ha : B = ty) by (eapply binds_func; eauto). now subst.
+  - apply_fresh ATyLam as x; auto.
+    rewrite subst_source_open_var; eauto 3.
+    rewrite subst_open_var; eauto 3.
+    apply* H0.
+    rewrite <- concat_empty_r with (E := (Gamma & y ~ A)).
+    apply typing_weaken_alg; rewrite concat_empty_r; autos*.
+  - forwards* Ha : IHhas_type_source_alg HIn H2.
+    apply* ATySub; rewrite* subst_fresh.
+    forwards* Ha1 : sub_fv_empty H; rewrite* Ha1. 
+Qed.
+
+Lemma open_body_type :
+  forall Gamma A B e1 e2 E1 E2 m,
+    body_type_source Gamma e1 A B m E1 -> 
+    has_type_source_alg Gamma e2 Inf A E2 ->
+    has_type_source_alg Gamma (open_source e1 e2) m B (open E1 E2).
+Proof.
+  introv H1 H2; destruct H1. pick_fresh y.
+  assert (Ha : y \notin x) by autos*; apply H in Ha.
+  rewrite <- concat_empty_r with (E := Gamma).
+  eapply typing_strengthen_alg with (z := y) (U := A).
+  apply fv_source_distr2; autos*.
+  rewrite concat_empty_r.
+  rewrite subst_source_intro with (x := y); autos*.
+  rewrite subst_intro with (x := y); autos*.
+  apply has_type_source_subst with (B := A); autos*.
+  rewrite <- concat_empty_r with (E := (Gamma & y ~ A)).
+  apply typing_weaken_alg; rewrite concat_empty_r; autos*.
+Qed.
 
 

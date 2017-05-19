@@ -1,7 +1,7 @@
 Require Import STLCNew LibLN.
 Require Import Coq.Program.Tactics.
 
-(**** ****)
+(**** Values in the cbv STLC ****)
 
 Inductive STValue : SExp -> Prop :=
   | STValue_Lam :
@@ -9,68 +9,6 @@ Inductive STValue : SExp -> Prop :=
   | STValue_Lit : forall n, STValue (STLit n)
   | STValue_Unit : STValue STUnit
   | STValue_Pair : forall v1 v2, STValue v1 -> STValue v2 -> STValue (STPair v1 v2).
-
-Definition body (t : SExp) :=
-  exists L, forall (x : var), x \notin L -> STTerm (open t (STFVar x)).
-
-(* ********************************************************************** *)
-(** ** Terms are stable through substitutions *)
-
-(** Terms are stable by substitution *)
-
-Lemma subst_term : forall t z u,
-  STTerm u -> STTerm t -> STTerm (subst z u t).
-Proof.
-  induction 2; simpls*.
-  case_var*.
-  apply_fresh STTerm_Lam as y. rewrite* subst_open_var.
-Qed.
-
-Hint Resolve subst_term.
-
-(* ********************************************************************** *)
-(** ** Terms are stable through open *)
-
-(** Conversion from locally closed abstractions and bodies *)
-
-Lemma term_abs_to_body : forall t1, 
-  STTerm (STLam t1) -> body t1.
-Proof.
-  intros. unfold body. inversion* H.
-Qed.
-
-Lemma body_to_term_abs : forall t1, 
-  body t1 -> STTerm (STLam t1).
-Proof.
-  intros. inversion* H.
-Qed.
-
-Hint Resolve term_abs_to_body body_to_term_abs.
-
-(** ** Opening a body with a term gives a term *)
-
-Lemma open_term : forall t u,
-  body t -> STTerm u -> STTerm (t ^^ u).
-Proof.
-  intros. destruct H. pick_fresh y. rewrite* (@subst_intro y).
-Qed.
-
-Hint Resolve open_term.
-
-(* ********************************************************************** *)
-(** ** Regularity of relations *)
-
-(** A typing relation holds only if the environment has no
-   duplicated keys and the pre-term is locally-closed. *)
-
-Lemma typing_regular : forall E e T,
-  has_type_st E e T -> ok E /\ STTerm e.
-Proof.
-  introv H.
-  split; induction H; autos*.
-  Unshelve. apply 0.
-  (* pick_fresh y. forward~ (H0 y) as K. inversions* K. *)
-Qed.
 
 (** The value predicate only holds on locally-closed terms. *)
 
@@ -271,6 +209,8 @@ Notation "R 'star'" := (star_ R) (at level 69).
 (* ********************************************************************** *)
 (** Definition of confluence and of the Church-Rosser property
  (Our goal is to prove the Church-Rosser Property for beta relation) *)
+
+(** TODO: prove this following Chargueraud's system **)
 
 Definition confluence (R : relation) := 
   forall M S T, R M S -> R M T -> 

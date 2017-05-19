@@ -99,6 +99,10 @@ R\_AppSub and R\_AnnSub's condition $A \neq B$ prevents looping
 
 \noindent\textbf{Remark 2}:
 If there are no assumptions over $v$, then assume $\exists A.\, v \Rightarrow A$. 
+
+\noindent\textbf{Remark 3}:
+For a closer version of 1-step reduction of sub-rule, check the system below. 
+
 %\subsection{Traditional System}
 %\begin{spacing}{0.5}
 %\begin{small}
@@ -129,6 +133,22 @@ If there are no assumptions over $v$, then assume $\exists A.\, v \Rightarrow A$
   and $[[e1 ~> e2]]$, then 
   $[[G |- e2 <= A]]$.
 \end{lemma}
+
+\section{Alternative Sub reduction rules}
+
+\begin{spacing}{0.4}
+\begin{small}
+\noindent
+\ottdefnreductionchkalt{}\ottinterrule
+%\ottdefnareduction{}\ottinterrule
+%\ottdefnsubtyping{}\ottinterrule
+%\ottdefnwellformed{}\ottinterrule
+\end{small}
+\end{spacing}
+
+\noindent\textbf{Remark 1}:
+How to get a better RSubAlt\_Fun? (i.e. without using annotations)
+
 
 %\begin{lemma}[Progress (inf)]\verb|[progress_inf]|
 %    If $[[nil |- e => A]]$, then 

@@ -1,7 +1,7 @@
 {\rtf1\ansi\ansicpg1252\cocoartf1348\cocoasubrtf170
 {\fonttbl\f0\froman\fcharset0 Times-Roman;}
 {\colortbl;\red255\green255\blue255;}
-\paperw11900\paperh16840\margl1440\margr1440\vieww10800\viewh8400\viewkind0
+\paperw11900\paperh16840\margl1440\margr1440\vieww12600\viewh14580\viewkind0
 \deftab720
 \pard\pardeftab720\sl340
 
@@ -42,12 +42,16 @@ A <: C ~> c1\uc0\u8232 B <: C ~> c2\u8232 A & B <: C ~> c3\u8232 ---------------
 
 \b (**** Example derivations ****) 
 \b0 \
-(**) :: (a -> c) -> (b -> d) -> (a,b) -> (c,d)\
+\pard\pardeftab720\sl340\sa240
+\cf0 \expnd0\expndtw0\kerning0
+(**) :: ((a,b) -> c) -> ((a,b) -> d) -> (a,b) -> (c,d)\expnd0\expndtw0\kerning0
+\
 Int & Char <: Char ~> id . snd\uc0\u8232 Int & Char <: Int ~> id . fst\u8232 ---------------------------\u8232 Int & Char <: Char | Int ~>\'a0Both . ((id . fst) ** (id . snd))\u8232 \
 Int & Bool & Char <: Bool ~> c2\uc0\u8232 -------------------------------\u8232 Int & Bool & Char <: Int ~> c1\u8232 Int & Bool & Char <: String | Bool\'a0~> Right . c2\u8232 --------------------------------------------------------------------------\u8232 Int & Bool & Char <: Int | String | Bool ~> Both . (c1 ** (Right . c2))\u8232 \
 Int <: Bool | String | Int ~>\'a0Right . Right . id \'a0 (c1)\uc0\u8232 String <: Bool | String | Int ~>\'a0Right . Left . id \'a0 (c2)\u8232 Int & String <: Bool | String | Int ~>\'a0Right . Both . ((id . snd) ** (id . fst)) \'a0 (c3)\u8232 ---------------------------------------\u8232 Int | String <: Bool | String | Int ~>\u8232 \'a0 case x of\u8232 \'a0\'a0\'a0 Left x -> c1 x\u8232 \'a0\'a0\'a0 Right x -> c2 x\u8232 \'a0\'a0\'a0 Both x -> c3 x \
+\pard\pardeftab720\sl340\sa240
 
-\b (*** Syntax/Typing of tcase ***) 
+\b \cf0 (*** Syntax/Typing of tcase ***) 
 \b0 \
 Syntax (match the type of expression e and let x be bound to that exp):\uc0\u8232 tcase e as x of\u8232 \'a0 A -> e1\u8232 \'a0 B -> e2\u8232 \'a0 A & B -> e3 \
 G |- e : A | B ~> c\uc0\u8232 G[x : A] |- e1 : C ~> c1\u8232 G[x : B] |- e2 : C ~> c2\u8232 G[x : A & B] |- e3 : C ~> c3\u8232 -----------------------------------------------------------\u8232 \'a0 \'a0 \'a0 \'a0tcase e as x of                      \expnd0\expndtw0\kerning0
