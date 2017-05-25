@@ -1,0 +1,8 @@
+-R tlc/src TLC
+
+STLCNew.v
+CoherenceBasicBDNew.v
+STLCred.v
+SemanticsFullRed.v
+SemanticsBiRed.v
+SemanticsBiRedEta.v

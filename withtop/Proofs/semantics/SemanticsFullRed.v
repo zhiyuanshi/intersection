@@ -894,6 +894,7 @@ Admitted.
 
 (**** END OF FULLRED ****)
 
+(*** Remainings of the previous attempt at proving consistency ***)
 Lemma star_trans' : forall t1 t2, star_ STred t1 t2 ->
                      forall t3, star_ STred t2 t3 -> star_ STred t1 t3.
 Proof. introv H; induction H; intros; autos*. Qed.
