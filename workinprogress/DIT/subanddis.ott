@@ -1,0 +1,391 @@
+% Meta-variable
+
+metavar x, y, z ::= {{ com Variables }}
+indexvar i, j   ::= {{ com Indexes }}
+
+% Syntax
+
+grammar
+
+%% Expression
+
+e, A, B, C, D, E, F :: 'e_' ::= {{ com Expression }}
+ | x                 ::   :: Var     {{ com Variable }}
+ | *                 ::   :: Star    {{ com Type of Types }}
+ | \ x ** D : A . e  ::   :: AbsDis  {{ com Disjoint Abstraction }}
+ | e1 e2             ::   :: App     {{ com Application }}
+ | Pi x ** D : A . B ::   :: ProdDis {{ com Product }}
+ | e1 ,, e2          ::   :: Merge   {{ com Merge }}
+ | A & B             ::   :: Inter   {{ com Intersection }}
+ | top               ::   :: Top     {{ com Top }}
+ | ( e )             :: M :: Parens
+ | e1 [ x := e2 ]    :: M :: Subst
+ | A -> B            :: M :: Arrow
+ | L                 :: M :: Literal
+ | Pi ( x : A ) . B  :: M :: ProdParen
+ | ?                 :: M :: Undefined
+
+%% Literal
+
+L :: 'lit_' ::=
+ | Int  :: M :: Integer
+ | 3    :: M :: Three
+ | Bool :: M :: Boolean
+ | True :: M :: True
+
+%% Context
+
+G {{ tex \Gamma }} :: 'ctx_' ::= {{ com Context }}
+ | nil             ::   :: Nil     {{ com Empty }}
+ | G , x ** A : B  ::   :: Binding {{ com Binding }}
+ | G1 , x : A , G2 :: M :: Middle
+ | G [ x := e ]    :: M :: Subst
+ | G1 , G2         :: M :: Concat
+
+
+%% Terminals
+terminals :: 'terminals_' ::=
+ | \      ::   :: lambda    {{ tex \lambda }}
+ | Pi     ::   :: pi        {{ tex \Pi }}
+ | .      ::   :: dot       {{ tex .~ }}
+ | *      ::   :: star      {{ tex \star }}
+ | **     ::   :: dis       {{ tex * }}
+ | **ns   ::   :: nsdis     {{ tex *_{NS} }}
+ | nil    ::   :: nil       {{ tex \varnothing }}
+ | ->     ::   :: to        {{ tex \rightarrow }}
+ | :=     ::   :: subst     {{ tex \mapsto }}
+ | |-     ::   :: turnstile {{ tex \vdash }}
+ | |=     ::   :: vdashd    {{ tex \vDash }}
+ | Int    ::   :: int       {{ tex \mathit{Int} }}
+ | ,,     ::   :: merge     {{ tex \mathbin{,,} }}
+ | &      ::   :: intersect {{ tex \mathbin{\&} }}
+ | <:     ::   :: sub       {{ tex \leq }}
+ | <|     ::   :: tsub      {{ tex \triangleleft }}
+ | Leaf   ::   :: leaf      {{ tex \mathsf{Leaf} }}
+ | #      ::   :: fresh     {{ tex \mathbin{\#} }}
+ | in     ::   :: in        {{ tex \in }}
+ | {=     ::   :: subset    {{ tex \subseteq }}
+ | <>     ::   :: neq       {{ tex \neq }}
+ | ?      ::   :: undefined {{ tex {\,?} }}
+ | top    ::   :: top       {{ tex \top }}
+ | unit   ::   :: unit      {{ tex {()} }}
+ | =      ::   :: equiv     {{ tex \equiv }}
+
+%% Formula
+formula :: 'formula_' ::=
+ | judgement    ::   :: judgement
+ | ( formula )  ::   :: parens
+ | x # G        ::   :: fresh
+ | x ** A : B in G   ::   :: binds
+ | G {= G'      ::   :: subset
+ | A <> B       ::   :: neq 
+ | A = B        ::   :: eq 
+
+% Typing Rules
+
+defns Rules :: '' ::=
+
+%% Leaf
+
+defn Leaf e ::   :: leaf :: 'L_' {{ com Leaf Term }}
+by
+
+------ :: Var
+Leaf x
+
+------ :: Star
+Leaf *
+
+%% Typed Subtyping
+
+defn G |- e1 <: e2 : A ::   :: tsubtyping :: 'TS_' {{ com Typed Subtyping }}
+by
+
+----------------- :: Star
+nil |- * <: * : *
+
+G |- A <: A : *
+G |- D <: D : A
+x # G
+---------------------- :: Var
+G, x ** D : A |- x <: x : A
+
+G |- e <: e : B
+G |- A <: A : *
+G |- D <: D : A
+Leaf e
+x # G
+---------------------- :: Weak
+G, x ** D : A |- e <: e : B
+
+G |- A <: A : *
+G, x ** D : A |- B <: B : *
+G, x ** D : A |- e1 <: e2 : B
+---------------------------------------------- :: Lam
+G |- \x ** D : A . e1 <: \x ** D : A . e2 : Pi x ** D : A . B
+
+G |- A <: A : B
+G |- e1 <: e2 : Pi x ** D : B . C
+G |- A ** D : B
+------------------------------ :: App
+G |- e1 A <: e2 A : C [x := A]
+
+G |- C <: A : *
+G |- F <: E : A
+G, x ** E : A |- B <: B : *
+G, x ** F : C |- B <: D : *
+----------------------------------------------- :: Pi
+G |- Pi x ** E : A . B <: Pi x ** F : C . D : *
+
+G |- A <: C : D
+G |- B <: B : D
+------------------- :: And1
+G |- A & B <: C : D
+
+G |- B <: C : D
+G |- A <: A : D
+------------------- :: And2
+G |- A & B <: C : D
+
+G |- A <: B : D
+G |- A <: C : D
+------------------- :: And3
+G |- A <: B & C : D
+
+G |- e1 <: e3 : A
+G |- e2 <: e4 : B
+G |- A ** B : *
+--------------------------------- :: Merge
+G |- e1 ,, e2 <: e3 ,, e4 : A & B
+
+G |- e1 <: e2 : A
+G |- A <: B : *
+----------------- :: Sub
+G |- e1 <: e2 : B
+
+G |- e <: e : A
+----------------- :: Top
+G |- e <: top : A
+
+%% Typed Disjointness 
+
+defn G |- e1 ** e2 : A ::   :: tdisjointness :: 'TD_' {{ com Typed Disjointness }}
+by
+
+G |- A ** C : D
+G |- B ** C : D 
+------------------- :: And1 
+G |- A & B ** C : D
+
+G |- A ** B : D
+G |- A ** C : D 
+------------------- :: And2 
+G |- A ** B & C : D
+
+
+G, x ** D : A |- e1 ** e2 : B
+----------------------------------------------------------------- :: Lam1
+G |- (\x ** D : A . e1) ** (\x ** D : A . e2) : Pi x ** D : A . B
+
+
+G, x ** E & F : C |- A ** B : *
+--------------------------------------------------- :: Pi
+G |- (Pi x ** E : C . A) ** (Pi x ** F : D . B) : *
+
+
+G |- e1 ** e2 : Pi x ** D : E . C
+G |- A ** D : E
+G |- B ** D : E
+(C [x := A]) = (C [x := B])
+------------------------------ :: App
+G |- e1 A ** e2 B : C [x := A]
+
+
+x ** A : C in G
+G |- A <: B : C
+----------------------- :: Var
+G |- x ** B : C
+
+x ** A : C in G
+G |- A <: B : C
+----------------------- :: VarSym
+G |- B ** x : C
+
+G |- e1 ** e3 : A 
+-------------------------------- :: Merge1
+G |- e1 ,, e2 ** e3 ,, e4 : A & B
+
+G |- e2 ** e4 : B
+-------------------------------- :: Merge2
+G |- e1 ,, e2 ** e3 ,, e4 : A & B
+
+G |- A <: A : B
+----------------------- :: Top
+G |- top ** A : B
+
+G |- A <: A : B
+----------------------- :: TopSym
+G |- A ** top : B
+
+G |- A **ns B : C
+----------------------- :: NS 
+G |- A ** B : C
+
+G |- e1 ** e2 : Pi x ** D : B . C
+G |- A ** D : B
+------------------------------ :: AppAlternative
+G |- e1 A ** e2 A : C [x := A]
+
+%% Typed Disjointness 
+
+defn G |- e1 **ns e2 : A ::   :: tnsdisjointness :: 'TDNS_' {{ com Typed Disjointness (non-structural) }}
+by
+
+----------------------------------- :: StarPi
+G |- * **ns (Pi x ** D : A . B) : *
+
+G |- e1 e2 <: e1 e2 : *
+----------------------- :: StarApp 
+G |- * **ns (e1 e2) : *
+
+G |- e1 e2 <: e1 e2 : Pi x ** D : B . C
+G |- \x ** D : B . e3 <: \x ** D : B . e3 : Pi x ** D : B . C
+-------------------------------------------------------- :: AppLam 
+G |- (e1 e2) **ns (\x ** D : B . e3) : Pi x ** D : B . C 
+
+G |- e1 e2 <: e1 e2 : *
+G |- Pi x ** D : A . B <: Pi x ** D : A . B : *
+----------------------------------------- :: AppPi 
+G |- (e1 e2) **ns (Pi x ** D : A . B) : * 
+
+
+G |- e1 e2 <: e1 e2 : A & B 
+G |- e3 ,, e4 <: e3 ,, e4 : A & B
+--------------------------------- :: AppMerge
+G |- (e1 e2) **ns (e3 ,, e4) : A & B
+
+G |- B **ns A : C 
+----------------- :: Sym
+G |- A **ns B : C 
+
+%% Well-formedness via Typed Subtyping
+
+defn |- G ::   :: twellformed :: 'TW_' {{ com Well-formedness via Typed Subtyping }}
+by
+
+------ :: Empty
+|- nil
+
+G |- A <: A : *
+G |- D <: D : *
+x # G
+--------------- :: Cons
+|- G, x ** D : A
+
+%% Well-formedness
+
+defn |= G ::   :: wellformed :: 'W_' {{ com Well-formedness }}
+by
+
+------ :: Empty
+|= nil
+
+G |= A : *
+x # G
+----------- :: Cons
+|= G, x : A
+
+%% Typing
+
+defn G |= e : A ::   :: typing :: 'T_' {{ com Typing }}
+by
+
+|= G
+---------- :: Star
+G |= * : *
+
+|= G
+x : A in G
+---------- :: Var
+G |= x : A
+
+G |= A : *
+G, x : A |= B : *
+G, x : A |= e : B
+------------------------------ :: Lam
+G |= \x : A . e : Pi x : A . B
+
+G |= A : B
+G |= e : Pi x : B . C
+--------------------- :: App
+G |= e A : C [x := A]
+
+G |= A : *
+G, x : A |= B : *
+--------------------- :: Pi
+G |= Pi x : A . B : *
+
+G |= A : C
+G |= B : C
+-------------- :: And
+G |= A & B : C
+
+G |= e1 : A
+G |= e2 : B
+--------------------- :: Merge
+G |= e1 ,, e2 : A & B
+
+G |= e : A
+G |= A <| B
+----------- :: Sub
+G |= e : B
+
+%% Subtyping
+
+defn G |= A <| B ::   :: subtyping :: 'S_' {{ com Subtyping }}
+by
+
+|= G
+----------- :: Star
+G |= * <| *
+
+|= G
+x : A in G
+----------- :: Var
+G |= x <| x
+
+G |= A : *
+G, x : A |= e1 <| e2
+------------------------------- :: Lam
+G |= \x : A . e1 <| \x : A . e2
+
+G |= e1 <| e2
+----------------- :: App
+G |= e1 A <| e2 A
+
+G |= C : *
+G |= C <| A
+G, x : C |= B <| D
+--------------------------------- :: Pi
+G |= Pi x : A . B <| Pi x : C . D
+
+G |= A <| C
+G |= B <| B
+--------------- :: And1
+G |= A & B <| C
+
+G |= B <| C
+G |= A <| A
+--------------- :: And2
+G |= A & B <| C
+
+G |= A <| B
+G |= A <| C
+--------------- :: And3
+G |= A <| B & C
+
+G |= e1 <| e3
+G |= e2 <| e4
+------------------------- :: Merge
+G |= e1 ,, e2 <| e3 ,, e4
+

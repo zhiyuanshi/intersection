@@ -1,0 +1,13 @@
+% Hack to use mathpartir for ott
+\newcommand{\ottlinebreak}{}
+\renewcommand{\ottdrulename}[1]{\textsc{\small #1}}
+\renewcommand{\ottusedrule}[1]{{\displaystyle #1} \and}
+\renewenvironment{ottdefnblock}[3][]{\raggedright \framebox{\mbox{#2}} \quad #3
+  \\[0pt] \begin{mathpar}}{\end{mathpar}}
+\renewcommand{\ottdrule}[4][]{{\inferrule*[right=\textsc{\small #4}]{#2 }{#3}}}
+\renewcommand{\ottrulehead}[3]{ $#1$  & $#2$ &  & \multicolumn{2}{l}{#3}}
+\renewcommand{\ottprodline}[6]{& $#1$ & $#2$ & $#5$ & $#6$}
+\renewcommand{\ottgrammartabular}[1]{\begin{tabular}{lclllll}#1\end{tabular}}
+\renewcommand{\ottinterrule}{\\[2.0mm]}
+\newcommand{\gram}[1]{\ottgrammartabular{#1\ottafterlastrule}}
+\newcommand{\ruleref}[1]{\ottdrulename{#1}}
